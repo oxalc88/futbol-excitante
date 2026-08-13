@@ -101,6 +101,8 @@ Any such treatment requires an independent football-readability experiment and c
 - Visual body proportions MUST be sourced from explicit presentation/profile data or a documented fictional archetype assignment. Nominal tactical position MUST NOT silently determine body mass, collider size, acceleration, contact strength, or any other simulation property.
 - Visual scale, root offsets, and limb proportions MUST NOT alter canonical player position, contact time, ball impulse, reach, or collision geometry.
 - If physical dimensions later affect simulation, they MUST enter through a versioned simulation capability/dimension contract and not be inferred from rendered mesh bounds.
+- Every character rig, visual body profile, and applicable LOD MUST have an accepted `EmbodimentMapping` to each supported simulation body/reach profile. The mapping names semantic contact anchors, compatible canonical dimensions, scale policy, action pose envelopes, and maximum translation/angle correction.
+- Import validation MUST exercise head, foot, leg, and hand contact samples used by the active milestone at pose-envelope extremes. An asset/profile pairing that cannot reach those samples within its declared correction limits is rejected; neither simulation reach nor mesh scale is silently changed.
 
 `EXPERIMENT`:
 
@@ -148,7 +150,16 @@ TeamVisualProfile
 
 OfficialVisualProfile (when officials are rendered)
   kit choices and palette/value metadata
+
+PresentationMatchConfig
+  bindings from stable simulation team/player IDs to visual-profile IDs
+  selected outfield/GK/official kit and asset-manifest IDs
+  embodiment mapping per player
+  accessibility mode and local-control-slot indicator profiles
+  VisualConfig ID/version
 ```
+
+The browser composition layer owns `PresentationMatchConfig` and passes it to the renderer alongside immutable `PresentationSnapshot`s. It validates all shared IDs before the match/capture and records the config and resolved asset hashes as presentation provenance. The configuration is never inserted into canonical gameplay state, and the renderer MUST NOT fetch provider data or infer a visual profile from mutable globals. [TECHNICAL_SPEC §13.1.1](./TECHNICAL_SPEC.md#1311-presentation-match-configuration)
 
 Color metadata MUST be represented in a defined color space in the implementation contract. The exact storage color space and numeric contrast formula are `TBD` and must be selected before automated clash scoring becomes a gate.
 
@@ -411,6 +422,8 @@ Compatibility
   renderer/material profile version
   rig/skeleton profile where applicable
   supported quality tiers / candidate LODs
+  accepted EmbodimentMapping IDs and simulation body-profile versions
+  semantic contact anchors, scale policy, pose envelopes, and per-LOD correction limits
 
 Presentation metadata
   bounding information for culling only
@@ -431,7 +444,7 @@ Validation artifacts
 - Character visual variation SHOULD share reusable animation/rig contracts where feasible, but a particular skeleton, bone count, or GPU-skinning implementation is not yet normative.
 - Team-color replacement MUST use explicit masks/material metadata and MUST not rely on ad hoc texture editing per matchup.
 - Automated LOD, atlas, compression, or baking tools MUST be deterministic enough to reproduce an export from pinned sources/tool versions, or their generated outputs MUST be versioned as source artifacts.
-- Asset import validation MUST reject missing IDs, incompatible profiles, invalid numeric data, missing required kit masks/slots, and references to unavailable materials/textures.
+- Asset import validation MUST reject missing IDs, incompatible profiles, invalid numeric data, missing required kit masks/slots, references to unavailable materials/textures, absent semantic anchors, and any body/reach/action contact fixture that exceeds the declared pose envelope or visual-correction bound.
 
 ### 17.2 Pipeline experiment
 

@@ -61,6 +61,8 @@ Every unmeasured gameplay coefficient, curve, threshold, cadence, or assistance 
 ```text
 External team data ──> Data adapter ──> Neutral team/capability data
                                                 │
+External visual data ─> Presentation data adapter ─> PresentationMatchConfig
+                                                        │
 Physical devices ──> Input adapters ──> tick-indexed InputFrame
 Replay/scenario/network ───────────────> tick-indexed InputFrame
                                                 │
@@ -77,6 +79,7 @@ Replay/scenario/network ───────────────> tick-inde
                      v                     v                      v
              PresentationSnapshot   Telemetry/events       Replay/hash data
                      |                     |                      |
+                     +<-- PresentationMatchConfig
                      v                     v                      v
              Three.js renderer      Evaluation/diagnostics   Replay storage
                      |
@@ -151,6 +154,18 @@ This avoids the unsupported assumption of a universal 105 × 68 m field noted in
 - The ball always has a full 3D position, linear velocity, and angular velocity.
 
 Headers, jumps, goalkeeper reaches, and exceptional falls may add simulation-owned vertical reach/action state later without converting ordinary players into fully dynamic humanoids. [R3 §Player locomotion and physical contact](../research/03-simulation-techniques.md#player-locomotion-and-physical-contact) [R3 §Ball physics and player-ball interaction](../research/03-simulation-techniques.md#ball-physics-and-player-ball-interaction)
+
+Simulation body/reach data and visual embodiment meet through a versioned compatibility contract. A `SimulationBodyProfile` defines canonical body dimensions, gameplay contact/reach volumes, and semantic surfaces such as `HEAD`, `TORSO`, `LEFT_FOOT`, `RIGHT_FOOT`, `LEFT_LEG`, `RIGHT_LEG`, `LEFT_HAND`, and `RIGHT_HAND`. It contains no rig, mesh, or animation reference.
+
+An `EmbodimentMapping` binds one simulation body-profile version to one rig/asset-profile version and declares, per semantic surface and supported action:
+
+- required rig anchor/socket IDs and handedness/mirroring rules;
+- the compatible canonical dimension/reach range and authored visual scale policy;
+- pose-envelope coverage at preparation, contact, and recovery extremes;
+- maximum translational and angular visual correction, including per-LOD limits;
+- validation fixture IDs and mapping version/hash.
+
+Asset import validates every supported body-profile/rig/LOD pairing against the canonical contact samples and pose envelopes for the active milestone. Missing anchors, unreachable contacts, excessive correction, or incompatible scale rejects the pairing. Runtime MUST NOT silently resize simulation reach, mesh scale, or correction limits to force compatibility.
 
 ### 4.4 Identity and versions
 
@@ -484,6 +499,8 @@ The simulation schedules and resolves the canonical contact tick, contact actor/
 
 If authored animation data informs a contact window, that data must be imported as explicit versioned simulation data and remain headlessly testable. Presentation may add bounded visual offsets to align a foot with the already-resolved contact, but those offsets do not feed back. [R3 §Animation and simulation-state separation](../research/03-simulation-techniques.md#animation-and-simulation-state-separation) [AUDIT F-19](../research/RESEARCH_AUDIT.md#f-19--animationcontact-authority-is-not-consistently-resolved)
 
+Canonical contacts identify the simulation body-profile version, semantic surface, world-space point/normal, and action/contact tick. The presentation adapter resolves that semantic surface only through the selected `EmbodimentMapping`; mesh proximity is not evidence of feasibility. Visual correction is clamped by the mapping's declared translation/angle limits and recorded. If the mapped pose cannot present the contact within those limits, the renderer emits an embodiment incompatibility artifact and the applicable browser test fails; it never alters contact time, reach, ball state, or simulation geometry.
+
 ### 12.3 First touch and dribbling
 
 First touch is contextual contact selection, not a possession toggle. Its inputs may include incoming ball velocity/height/spin, player movement and body heading, desired exit, dominant-foot capability, pressure, and technical capability. Candidate families may include cushioning, trapping, redirecting, pushing into space, leaving, and aerial control. Exact availability, error, assistance, and output mappings are TBD.
@@ -541,6 +558,32 @@ stable control-slot assignments and controlled player/team IDs
 It does not expose mutable world storage or solver internals. The snapshot schema is versioned independently from the complete replay/checkpoint schema.
 
 The snapshot exposes match-level stable slot assignments, but does not decide which slots are local or how their indicators look. Browser composition joins those assignments to local session ownership and the presentation match configuration; remote/replay provenance cannot become a gameplay-visible distinction inside simulation.
+
+### 13.1.1 Presentation match configuration
+
+Browser composition owns an immutable, versioned `PresentationMatchConfig`, separate from `SimulationMatchConfig` and canonical state:
+
+```ts
+interface PresentationMatchConfig {
+  configId: string;
+  configVersion: string;
+  simulationMatchConfigHash: string;
+  teamVisualProfilesByTeamId: Record<string, string>;
+  playerVisualProfilesByPlayerId: Record<string, string>;
+  embodimentMappingByPlayerId: Record<string, string>;
+  selectedOutfieldKitByTeamId: Record<string, string>;
+  selectedGoalkeeperKitByTeamId: Record<string, string>;
+  officialVisualProfileId: string | null;
+  assetManifestIds: string[];
+  accessibilityModeId: string;
+  indicatorProfileByLocalControlSlot: Record<string, string>;
+  visualConfigId: string;
+}
+```
+
+The presentation data adapter converts provider/art schemas into neutral versioned visual profiles; the renderer MUST NOT fetch or interpret provider data. Composition validates that every team/player/control-slot key resolves against the immutable simulation match config and presentation snapshot, that each asset/profile exists, and that every embodiment pairing passes §4.3 compatibility. A missing, extra, or mismatched shared ID rejects composition rather than creating mutable global fallback state.
+
+The presentation config ID/version/hash and resolved asset hashes are capture and optional replay-presentation provenance. They are excluded from canonical gameplay state and its hash; changing kits, accessibility mode, indicators, or assets cannot change simulation results.
 
 ### 13.2 Interpolation and discrete events
 
@@ -868,7 +911,8 @@ src/
   adapters/
     input-browser/        keyboard/Gamepad -> InputFrame
     renderer-three/       PresentationSnapshot -> Three.js
-    data/                 external data -> neutral profiles
+    data-simulation/      external roster data -> neutral gameplay profiles
+    data-presentation/    external visual/art data -> neutral visual profiles/config
     replay/               replay encoding/decoding and playback glue
   apps/
     browser/              real-time composition root
@@ -897,7 +941,8 @@ Exact filenames, workspace tooling, and whether `contracts` is a distinct npm pa
 | `simulation` | Authoritative state and all gameplay transitions | DOM, renderer, devices, network, filesystem, provider schemas |
 | `input-browser` | Keyboard/Gamepad discovery and normalization | Gameplay decisions or direct player mutation |
 | `renderer-three` | Scene, animation, camera, visuals | Canonical contacts, rules, physics, AI |
-| `data` | Provider-specific parsing/normalization | Provider types leaking into core |
+| `data-simulation` | Provider-specific roster parsing into neutral gameplay profiles | Provider types leaking into core |
+| `data-presentation` | Provider/art parsing into neutral visual profiles and `PresentationMatchConfig` inputs | Gameplay values, renderer fetches, mutable global selection |
 | `replay` | Encoding, decoding, validation, playback composition | Alternative gameplay logic |
 | `browser app` | Real-time scheduling and adapter composition | Duplicate simulation rules |
 | `headless app` | Explicit tick batches and artifact sinks | Timed real-time simulation authority |

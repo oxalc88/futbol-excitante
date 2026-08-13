@@ -107,6 +107,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### I-04 — Simulation reach geometry and visual embodiment have no compatibility contract
 
+**Resolution:** `RESOLVED` — Technical §§4.3 and 12.2 plus Visual §§5.2 and 17.1 now define versioned semantic-surface embodiment mappings, pose/scale/correction bounds, import fixtures, rejection behavior, and fail-closed runtime contact presentation.
+
 **Conflict:** Technical §§4.3 and 12.2 allow simulation-owned vertical reach/contact data, while the Visual Spec makes rig sockets and anchors presentation-only and forbids mesh bounds from changing gameplay. Header, tackle, kick, and goalkeeper tests nevertheless require the rendered head/foot/leg/hand to agree with a canonical contact and allow only bounded visual correction. Neither spec defines how a canonical surface/contact point maps to a rig, archetype, limb length, or pose envelope, nor what happens when the mesh cannot reach it.
 
 **Impact:** A valid headless contact may be visually impossible, and the only available fixes are unbounded IK, visual interpenetration, or illicitly changing gameplay geometry to match the asset.
@@ -114,6 +116,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 **Recommended correction:** Define a versioned embodiment mapping contract: semantic contact surfaces, canonical body/reach dimensions, rig anchor IDs, pose-envelope compatibility, scale policy, and maximum visual correction. Validate assets against every supported simulation body/reach profile at import. Reject incompatible pairings; never silently resize simulation or visual reach.
 
 ### I-05 — Visual match data has no explicit route through the architecture
+
+**Resolution:** `RESOLVED` — Technical §13.1.1 and Visual §7.1 now route a browser-owned `PresentationMatchConfig` from neutral presentation adapters to the renderer, validate shared IDs/assets, record capture provenance, and exclude it from gameplay state/hash.
 
 **Conflict:** Visual §7 requires `TeamVisualProfile`, goalkeeper/official kits, accessibility variants, and matchup selection. Technical §3 shows only external team data becoming neutral team/capability data, and §20's data adapter describes provider data to neutral profiles. The renderer consumes `PresentationSnapshot`, which does not contain visual profiles, kit selection, asset IDs, accessibility settings, or the controlled-player presentation mapping.
 
