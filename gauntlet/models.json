@@ -1,0 +1,80 @@
+{
+  "version": "gauntlet-models-v1",
+  "notes": "OpenCode agent frontmatter and opencode.json must stay in sync with this file. See gauntlet/README.md.",
+  "roles": {
+    "orchestrator": {
+      "agent": "orchestrator",
+      "mode": "primary",
+      "provider": "xai",
+      "model": "xai/grok-4.6",
+      "fallback": ["xai/grok-4.6-fast"]
+    },
+    "builder_qwen": {
+      "agent": "builder-qwen",
+      "mode": "subagent",
+      "provider": "nan",
+      "model": "nan/qwen3.6",
+      "fallback": ["nan/mimo-v2.5"]
+    },
+    "builder_mimo": {
+      "agent": "builder-mimo",
+      "mode": "subagent",
+      "provider": "nan",
+      "model": "nan/mimo-v2.5",
+      "fallback": ["nan/qwen3.6"]
+    },
+    "critic": {
+      "agent": "critic",
+      "mode": "subagent",
+      "provider": "nan",
+      "model": "nan/deepseek-v4-flash-0731",
+      "fallback": ["critic-qwen", "critic-mimo"],
+      "constraint": "Never use the same model that implemented the candidate under review."
+    },
+    "critic_qwen": {
+      "agent": "critic-qwen",
+      "mode": "subagent",
+      "hidden": true,
+      "provider": "nan",
+      "model": "nan/qwen3.6"
+    },
+    "critic_mimo": {
+      "agent": "critic-mimo",
+      "mode": "subagent",
+      "hidden": true,
+      "provider": "nan",
+      "model": "nan/mimo-v2.5"
+    },
+    "integration_reviewer": {
+      "agent": "integration-reviewer",
+      "mode": "subagent",
+      "provider": "nan",
+      "model": "nan/deepseek-v4-flash-0731",
+      "fallback": ["nan/qwen3.6", "nan/mimo-v2.5"],
+      "constraint": "Prefer DeepSeek. If unavailable, use a NaN model different from the builder under review."
+    },
+    "aux": {
+      "agent": "aux",
+      "mode": "subagent",
+      "provider": "nan",
+      "model": "nan/gemma4",
+      "fallback": ["nan/qwen3.6"]
+    }
+  },
+  "cheap_auxiliary": ["nan/gemma4", "nan/qwen3.6"],
+  "high_volume": ["nan/qwen3.6", "nan/mimo-v2.5", "nan/deepseek-v4-flash-0731", "nan/gemma4"],
+  "grok_uses": [
+    "orchestration",
+    "prioritization",
+    "delegation",
+    "integration decisions",
+    "next-objective selection"
+  ],
+  "grok_never": [
+    "implementation",
+    "test fixing",
+    "parameter experimentation",
+    "routine criticism",
+    "narrow unblocker after NaN failures"
+  ]
+}
