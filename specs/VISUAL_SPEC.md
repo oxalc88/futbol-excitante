@@ -448,7 +448,7 @@ Validation artifacts
 
 ### 17.2 Pipeline experiment
 
-Before production art begins, build one representative original rigged character with one kit system, the actions needed by the current milestone, the ball, and candidate material/LOD variants. Use it in the 22-player benchmark to derive actual budgets and authoring rules.
+Use the staged experiment sequence in §21.1. The first fixture is deliberately provisional and selects only working camera/material/target-matrix baselines. The later production-candidate rigged character, kit system, milestone actions, ball, and LOD variants are used in the 22-player benchmark to derive candidate budgets and authoring rules; camera/readability and performance are then rerun before those budgets freeze.
 
 ### 17.3 Deferred pipeline choices
 
@@ -561,6 +561,20 @@ These help explain failures. They do not replace the task-based dimensions above
 
 ## 21. Experiment register and decision gates
 
+### 21.1 Staged dependency and revalidation policy
+
+Visual experiments run in three passes:
+
+1. `PROVISIONAL_BASELINE`: version one deliberately provisional fixture containing a representative player silhouette/rig, kit pair, ball, pitch, milestone action subset, and draft target browser/device matrix. Use it to select one provisional fixed camera and material/lighting baseline. Results may guide the next pass but are not production-asset or budget evidence.
+2. `PRODUCTION_CANDIDATE`: using those provisional baselines, build the production-candidate asset/rig/kit pipeline and candidate LODs. Run `VIS-PERF-001`, memory/load measurements, embodiment validation, and authoring/export reproducibility on the target matrix to propose budgets and fallbacks.
+3. `FREEZE_REVALIDATION`: rerun camera, silhouette, ball, kit, action/contact, LOD-transition, and performance scenes using production-candidate assets and the proposed budgets. Only results that still satisfy their predeclared rules may freeze the camera/material/LOD profiles and production budgets.
+
+An experiment decision record MUST contain `pass`, input/dependency IDs and versions, `provisional_dependencies`, accepted outputs, and predeclared material-change triggers. At minimum, a change to camera projection/preset, representative silhouette or embodiment profile, shader/material/light profile, LOD representation/thresholds, animation load, target matrix, or quality fallback invalidates every downstream decision that names it as provisional. Invalidated decisions return to `EXPERIMENT` and rerun their required scenes; evidence from a placeholder can never be silently promoted to production evidence.
+
+The experiment registry MUST encode this dependency graph and reject cycles. A temporary fixture or baseline may unblock a later pass only when clearly labeled provisional with explicit revalidation edges.
+
+### 21.2 Experiment definitions
+
 | Experiment ID | Open decision | Required comparison | Evidence required to resolve |
 |---|---|---|---|
 | `VEXP-SHADER-001` | Minimal stylized PBR vs cel bands vs hybrid NPR | `VIS-SHADE-001`, representative asset, identical lighting/replay | Task results, temporal review, authoring impact, and target-device p95 cost |
@@ -576,7 +590,7 @@ These help explain failures. They do not replace the task-based dimensions above
 | `VEXP-ASSET-001` | Production geometry/texture/rig/material budgets | `VIS-PERF-001` on target matrix | Measured budgets and quality fallbacks meeting versioned performance/readability policy |
 | `VEXP-ANIM-001` | Degree of animation exaggeration/correction | Matched canonical actions with candidate presentation profiles | Better action/contact comprehension without timing/outcome misreading |
 
-An experiment is resolved only when its artifact manifest, raw measurements, analysis, and decision are versioned. The resulting rule must update this specification or a versioned visual profile; a default hidden in code is not a decision record.
+An experiment is resolved only when its artifact manifest, raw measurements, analysis, decision, dependency versions, and revalidation status are versioned. The resulting rule must update this specification or a versioned visual profile; a default hidden in code is not a decision record.
 
 All experiment captures inherit the §19 presentation-session contract. Paired candidates MUST begin from independent resets with the same presentation seed and capture coordinates; reuse of animation, camera, LOD, effect, or temporal-post state across candidates invalidates the pair.
 

@@ -189,6 +189,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### I-12 — The visual experiment register contains circular prerequisites
 
+**Resolution:** `RESOLVED` — Visual §§17.2 and 21.1 now define provisional-baseline, production-candidate, and freeze-revalidation passes, with an acyclic dependency registry and explicit material-change invalidation triggers.
+
 **Conflict:** Visual shader decisions require a representative asset and target-device cost; production asset budgets require a provisional camera and accepted material/LOD profiles; LOD decisions require representative asset memory/performance; camera selection relies on readable representative actors and ball behavior. The document lists all experiments but no staged dependency or provisional-fixture policy.
 
 **Impact:** Teams can either freeze an input prematurely or wait indefinitely for another experiment to finish. Results from an early placeholder may later be treated as production evidence without revalidation.
