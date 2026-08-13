@@ -8,7 +8,9 @@
     "gauntlet/README.md"
   ],
   "permission": {
-    "doom_loop": "ask"
+    "doom_loop": "allow",
+    "external_directory": "allow",
+    "question": "deny"
   },
   "provider": {
     "nan": {
