@@ -1,0 +1,93 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "xai/grok-4.6",
+  "small_model": "nan/gemma4",
+  "default_agent": "orchestrator",
+  "subagent_depth": 1,
+  "instructions": [
+    "gauntlet/README.md"
+  ],
+  "permission": {
+    "doom_loop": "ask"
+  },
+  "provider": {
+    "nan": {
+      "name": "NaN",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "https://api.nan.builders/v1"
+      },
+      "models": {
+        "qwen3.6": {
+          "name": "Qwen 3.6",
+          "contextWindow": 262144,
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "gemma4": {
+          "name": "Gemma 4",
+          "contextWindow": 262144,
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "deepseek-v4-flash-0731": {
+          "name": "DeepSeek V4-Flash 0731",
+          "contextWindow": 500000,
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "mimo-v2.5": {
+          "name": "Xiaomi MiMo V2.5",
+          "contextWindow": 500000,
+          "modalities": {
+            "input": ["text", "image", "audio"],
+            "output": ["text"]
+          }
+        }
+      }
+    }
+  },
+  "agent": {
+    "orchestrator": {
+      "mode": "primary",
+      "model": "xai/grok-4.6",
+      "color": "accent"
+    },
+    "builder-qwen": {
+      "mode": "subagent",
+      "model": "nan/qwen3.6"
+    },
+    "builder-mimo": {
+      "mode": "subagent",
+      "model": "nan/mimo-v2.5"
+    },
+    "critic": {
+      "mode": "subagent",
+      "model": "nan/deepseek-v4-flash-0731"
+    },
+    "critic-qwen": {
+      "mode": "subagent",
+      "model": "nan/qwen3.6",
+      "hidden": true
+    },
+    "critic-mimo": {
+      "mode": "subagent",
+      "model": "nan/mimo-v2.5",
+      "hidden": true
+    },
+    "integration-reviewer": {
+      "mode": "subagent",
+      "model": "nan/deepseek-v4-flash-0731"
+    },
+    "aux": {
+      "mode": "subagent",
+      "model": "nan/gemma4"
+    }
+  }
+}
