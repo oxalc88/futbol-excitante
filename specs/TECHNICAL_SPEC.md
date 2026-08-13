@@ -535,9 +535,12 @@ desired contact geometry for visual alignment
 ball transform, velocity, spin, and ground/air state
 ordered presentation events
 score, clock, and rule facts needed by UI
+stable control-slot assignments and controlled player/team IDs
 ```
 
 It does not expose mutable world storage or solver internals. The snapshot schema is versioned independently from the complete replay/checkpoint schema.
+
+The snapshot exposes match-level stable slot assignments, but does not decide which slots are local or how their indicators look. Browser composition joins those assignments to local session ownership and the presentation match configuration; remote/replay provenance cannot become a gameplay-visible distinction inside simulation.
 
 ### 13.2 Interpolation and discrete events
 
@@ -627,7 +630,7 @@ All command sources produce the same engine-neutral representation. Physical, re
 ```ts
 interface InputFrame {
   tick: number;
-  sourceId: string;
+  sourceId: string; // provenance only
   controlSlot: string;
 
   moveX: number; // normalized -1..1
@@ -642,11 +645,39 @@ interface InputFrame {
 
 The exact action set is versioned and expands without changing device adapters into gameplay systems. Keyboard, Gamepad API, AI, replay, scenario/test, and future network sources all enter through this contract. [R4 §Keyboard and gamepad input](../research/04-autonomous-evaluation.md#keyboard-and-gamepad-input) [AUDIT F-27](../research/RESEARCH_AUDIT.md#f-27--input-abstraction-is-supported-but-sampling-semantics-and-device-policy-are-tbd)
 
+`sourceId` identifies the producing device/adapter only for provenance and diagnostics. It MUST NOT participate in gameplay decisions, assignment arbitration, canonical world state, or the canonical state hash. Adapters map unstable device identities to stable match-scoped `controlSlot` IDs before submission.
+
+Canonical control ownership is a match-level `ControlAssignmentState`, not a player field or adapter table:
+
+```ts
+interface ControlAssignmentState {
+  bySlot: Record<string, {
+    teamId: string;
+    controlledPlayerId: string | null;
+    mode: "HUMAN" | "AI_FALLBACK";
+  }>;
+}
+
+interface ControlAssignmentCommand {
+  tick: number;
+  controlSlot: string;
+  commandSequence: number;
+  kind: "CLAIM_TEAM" | "REQUEST_PLAYER_SWITCH" | "SET_AI_FALLBACK";
+  teamId?: string;
+  requestedPlayerId?: string;
+  switchDirection?: "NEXT" | "PREVIOUS" | "AUTO_POLICY";
+}
+```
+
+Only these tick-indexed commands and stable slots cross into simulation. Commands are ordered by `(tick, controlSlot, commandSequence)`; a slot sequence must be contiguous. A slot can own at most one active player, and an active player can be owned by at most one human slot. For a same-tick conflict, lexically lower `controlSlot` wins and every loser retains its previous valid assignment or enters declared AI fallback if it had none. Automatic switch selection uses a versioned simulation policy over committed start-of-tick state; adapters never choose the player.
+
+The normalized-frame policy is deterministic: at most one frame exists for `(tick, controlSlot)`. A duplicate is rejected as an invalid input event and the slot uses the configured missing-frame policy for that tick; arrival order is never a tie-breaker. The initial missing-frame policy is `REPEAT_HELD_WITH_ZERO_EDGES`, bounded by a configured maximum consecutive count, after which the slot receives neutral input without changing ownership. The policy/version and every rejection/fallback event are replay provenance.
+
 ### 16.2 Adapter responsibilities
 
 Device adapters own:
 
-- physical device discovery, hot-plug, disconnect, and ownership;
+- physical device discovery, hot-plug, disconnect, and session-to-stable-slot ownership;
 - brand/browser mappings and `standard` mapping fallbacks;
 - keyboard digital-to-analog policy;
 - dead zones and response curves;
@@ -654,6 +685,8 @@ Device adapters own:
 - sample buffering and assignment to a simulation tick.
 
 These policies are versioned and included in replay/run provenance. Their exact values and sample-to-tick rule are TBD before gamepad fidelity testing.
+
+A device disconnect does not directly mutate canonical control ownership. The browser composition layer emits a tick-indexed `SET_AI_FALLBACK` command at its declared effective tick; reconnect requires a new claim command. Local two-player setup maps two devices to distinct stable slots, normally assigned to opposing teams. Same-team cooperative control is outside the initial contract and requires a profile/version that defines its arbitration.
 
 Replay/test injection is the authoritative deterministic path. Browser automation need not emulate an OS gamepad; it tests physical adapters separately and drives gameplay through normalized frames. [R4 §Keyboard and gamepad input](../research/04-autonomous-evaluation.md#keyboard-and-gamepad-input)
 

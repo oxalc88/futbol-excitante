@@ -97,6 +97,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### I-03 — Human control ownership is split ambiguously between core and adapters
 
+**Resolution:** `RESOLVED` — Technical §§13.1 and 16 now separate unstable device/session ownership from canonical stable-slot assignments, define switch/claim/disconnect and duplicate/missing-frame arbitration, make `sourceId` provenance-only, and expose assignments for local presentation indicators.
+
 **Conflict:** Technical §9.1 makes `controlAssignment` canonical player state, §16 places device ownership in adapters, and `InputFrame` contains both `sourceId` and `controlSlot`. The spec does not say whether device identity can affect gameplay, how two local controllers claim teams/players, how control switching is ordered, or what happens on disconnect. The Visual Spec requires controlled-player indicators, but the presentation snapshot example does not expose control slots or locally relevant controlled actors.
 
 **Impact:** Local two-player support from Vision §3.2/§12, deterministic replay, player switching, AI takeover, and controlled-player rendering can acquire hidden adapter-to-simulation coupling.
