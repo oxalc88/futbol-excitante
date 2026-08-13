@@ -603,6 +603,37 @@ Camera is a presentation subsystem and is calibrated separately from locomotion 
 
 Ball trails, glow, and airborne emphasis are not baseline architecture. The baseline uses high contrast and a grounded shadow; optional cues must derive solely from simulation state and be testable on/off because they can distort perceived ball physics. [R6 §Ball readability](../research/06-visual-direction.md#ball-readability-and-vfx) [AUDIT F-39](../research/RESEARCH_AUDIT.md#f-39--ball-visibility-effects-may-distort-the-behavior-being-evaluated)
 
+### 13.5 Deterministic presentation session
+
+Browser evaluation owns a non-authoritative but deterministic `PresentationSession`. Its conceptual contract is:
+
+```ts
+interface PresentationSession {
+  reset(request: {
+    sessionConfigId: string;
+    presentationMatchConfig: PresentationMatchConfig;
+    assetManifestHashes: string[];
+    presentationSeed: string;
+    initialSnapshot: PresentationSnapshot;
+  }): Promise<RendererReadyReceipt>;
+  advance(step: {
+    previous: PresentationSnapshot;
+    current: PresentationSnapshot;
+    interpolation: { numerator: number; denominator: number };
+  }): void;
+  stateSnapshot(): SerializablePresentationState;
+  restore(state: SerializablePresentationState): void;
+  stateHash(): string;
+  capture(): Promise<PresentationCapture>;
+}
+```
+
+`reset` clears and seeds every stateful presentation system: animation mixer time and blend history, camera lag/velocity, LOD hysteresis/cross-fades, particle/effect generators, temporal post-processing/history buffers, exposure adaptation, and queued presentation events. The renderer-ready receipt is issued only after pinned assets are decoded/uploaded, required shaders/pipelines are ready, fonts/atlases used by the capture are stable, and resolved hashes match the request. Capture before that barrier is `INVALID_RUN`.
+
+`advance` derives time only from snapshot simulation ticks and the declared rational interpolation phase; in test mode animation, camera, LOD, effects, and temporal processing MUST NOT read wall-clock time, `requestAnimationFrame` deltas, asset-completion order, or previous tests. A capture coordinate is `(previous_tick, current_tick, interpolation_numerator, interpolation_denominator)`, not merely “tick t.”
+
+Seeking is valid only by restoring a compatible presentation-state checkpoint or by reset plus deterministic advancement through every intervening presentation step/event. Each capture records the session/config version, asset-ready receipt hash, presentation seed, capture coordinate, and before/after presentation-state hashes. These hashes are presentation provenance and remain explicitly outside the canonical gameplay state/hash.
+
 ## 14. Renderer integration
 
 ### 14.1 Selected renderer boundary
@@ -662,7 +693,7 @@ Node worker threads are not required for correctness and MAY be used only for in
 
 ### 15.3 Browser verification
 
-Playwright is the selected browser integration and capture tool. A test-only bridge MAY reset a scenario, inject normalized inputs, step exact ticks, read snapshots/events/metrics, select a camera preset, and render a requested tick. The bridge is excluded from production authority and must use the same core. Browser screenshots, frame strips, video, and traces validate presentation/integration; they do not replace state-space physics evidence. [R4 §Browser execution and artifacts](../research/04-autonomous-evaluation.md#browser-execution-should-reuse-the-same-simulation)
+Playwright is the selected browser integration and capture tool. A test-only bridge MAY reset a scenario and `PresentationSession`, inject normalized inputs, step exact ticks, read snapshots/events/metrics, await the renderer-ready barrier, select a camera preset, advance the controlled presentation clock, and capture a declared interpolation phase. The bridge is excluded from production authority and must use the same core. Browser screenshots, frame strips, video, and traces validate presentation/integration; they do not replace state-space physics evidence. [R4 §Browser execution and artifacts](../research/04-autonomous-evaluation.md#browser-execution-should-reuse-the-same-simulation)
 
 ## 16. Input abstraction
 

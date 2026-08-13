@@ -459,6 +459,8 @@ Class-C catalog tests are currently `UNKNOWN`. They may run as engine sensitivit
 
 `PERCEPTUAL_TARGET` criteria require deterministic browser replays, event-centered frame strips, relevant telemetry beside each frame, randomized/counterbalanced comparisons, a versioned rubric, critic identity/version, confidence, evidence-frame indices, and human escalation for unresolved high-severity disagreement. Raw PES-versus-engine pixel difference is invalid unless geometry, camera, and timing are actually aligned.
 
+Every browser artifact also requires a reset deterministic `PresentationSession`, renderer-ready receipt, controlled presentation seed/clock, declared rational interpolation phase, and presentation-state/config hashes as specified by Technical §13.5. Missing or mismatched session provenance is `INVALID_RUN`.
+
 ### 5.5 Regression policy
 
 Regression comparison is candidate versus immutable best under identical `comparison_condition_hash` values and the allowed-difference policy in §4. Build/artifact identity is expected to differ and is never included in that condition hash. External-reference comparison answers fidelity; regression comparison answers what changed. The evaluator MUST preserve both results. Materiality thresholds remain TBD until repeated baselines and the evaluator mutant suite establish run variance and sensitivity.

@@ -57,6 +57,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### B-04 — Exact-tick browser evaluation lacks deterministic presentation-session state
 
+**Resolution:** `RESOLVED` — Technical §§13.5 and 15.3 plus Visual §§19 and 21 now define reset/seed/readiness, controlled presentation-time advancement, checkpoint/reconstruction, interpolation-phase capture, and non-gameplay presentation hashes.
+
 **Conflict:** Technical §15.3 and Visual §§19–21 require resettable exact-tick captures over identical replays. Technical §13 makes animation, camera, LOD, and visual correction renderer-owned but specifies only immutable simulation snapshots and render interpolation. No contract owns or resets animation mixer time, blend history, camera lag, LOD hysteresis, particle/effect seeds, temporal post-processing, or asset-load readiness. A screenshot at simulation tick `t` can therefore depend on wall-clock history and prior test execution.
 
 **Impact:** Frame strips, camera metrics, action/contact alignment, LOD transition tests, and visual regression artifacts are not reproducible. `COMMON-DETERMINISTIC` covers canonical state hashes only and cannot detect presentation drift.

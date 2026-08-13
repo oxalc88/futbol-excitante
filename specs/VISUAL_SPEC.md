@@ -486,7 +486,9 @@ Experimental parameters MUST support controlled on/off or A/B configurations ove
 
 ## 19. Visual test scenes
 
-Visual tests use versioned declarative scenarios shared with the browser test bridge. They MUST be repeatable at exact simulation ticks and MUST capture renderer, browser, viewport, device scale, camera, visual-config, asset, kit, lighting, and quality-tier provenance. Playwright is the selected capture path. [TECHNICAL_SPEC §15.3 and §19](./TECHNICAL_SPEC.md#153-browser-verification)
+Visual tests use versioned declarative scenarios shared with the browser test bridge. They MUST run through the deterministic `PresentationSession`: reset all temporal state, await the renderer-ready barrier, advance from controlled simulation snapshots, and capture a declared rational interpolation phase. A direct render at simulation tick `t` without session reset/readiness/advancement is invalid for repeatable evidence.
+
+Every artifact records renderer/session versions, before/after presentation-state hashes, presentation seed, asset-ready receipt, capture coordinate, browser, viewport, device scale, camera, visual-config, presentation-match-config, asset, kit, lighting, and quality-tier provenance. Exact capture replay uses a compatible presentation checkpoint or reset plus deterministic reconstruction; animation, camera, LOD, particles, and temporal post-processing never use wall-clock history in test mode. Playwright is the selected capture path. [TECHNICAL_SPEC §§13.5, 15.3, and 19](./TECHNICAL_SPEC.md#135-deterministic-presentation-session)
 
 | Scene ID | Required contents and variants | Primary questions | Artifacts |
 |---|---|---|---|
@@ -575,6 +577,8 @@ These help explain failures. They do not replace the task-based dimensions above
 | `VEXP-ANIM-001` | Degree of animation exaggeration/correction | Matched canonical actions with candidate presentation profiles | Better action/contact comprehension without timing/outcome misreading |
 
 An experiment is resolved only when its artifact manifest, raw measurements, analysis, and decision are versioned. The resulting rule must update this specification or a versioned visual profile; a default hidden in code is not a decision record.
+
+All experiment captures inherit the §19 presentation-session contract. Paired candidates MUST begin from independent resets with the same presentation seed and capture coordinates; reuse of animation, camera, LOD, effect, or temporal-post state across candidates invalidates the pair.
 
 ## 22. Required visual constraints summary
 
