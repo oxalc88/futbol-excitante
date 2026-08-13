@@ -149,6 +149,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### I-08 — Detailed tick phase ordering is premature and underspecifies simultaneity
 
+**Resolution:** `RESOLVED` — Technical §6.2 now makes the eleven-stage sequence a replaceable prototype scheduler, freezes only coherent-read/staged-write/order/commit invariants, defines versioned held cadences, and requires explicit same-tick arbitration before affected promotion.
+
 **Conflict:** Technical §6.2 freezes an eleven-stage order in which tactics and individual AI are computed each tick, player/player contacts precede player/ball action contacts, and rules precede derived control/possession. Yet §11.3 leaves AI decision cadence TBD, and §12.7 defers complex rule/event ordering. Research supports stable documented ordering, not this particular untested football ordering.
 
 **Impact:** Simultaneous tackle/shot, ball/post/player, foul/advantage, boundary/contact, and possession-transition cases may become accidentally dependent on an early pipeline choice. Computing all tactical decisions every physics tick may also silently settle a deferred cadence decision.

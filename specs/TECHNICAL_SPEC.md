@@ -217,23 +217,22 @@ S(t) + InputFrame(t) + scheduled events(t) + RNG(t)
 
 The exact tick frequency and ball/contact substep policy are **TBD**. The 60 Hz values shown elsewhere in the corpus are examples or prototype candidates, not selected gameplay constants. A higher whole-world rate, targeted ball substeps, and swept/continuous collision tests remain alternatives behind the same tick contract. [R3 §Fixed-step simulation](../research/03-simulation-techniques.md#fixed-step-simulation) [AUDIT F-12](../research/RESEARCH_AUDIT.md#f-12--the-exact-simulation-rate-and-substep-policy-remain-tbd)
 
-### 6.2 Normative tick phases
+### 6.2 Versioned provisional scheduler
 
-Each tick executes a versioned, deterministic phase order:
+The scheduler is a versioned profile, not a frozen claim about correct football simultaneity. The normative architectural invariants are:
 
-1. Apply scheduled scenario/rule events due at the tick.
-2. Accept and validate the tick's normalized input frames.
-3. Compute team tactical phase, formation deformation, and role assignments from the committed start-of-tick state.
-4. Compute individual AI decisions as normalized control commands, then merge external and AI commands into player intents.
-5. Arbitrate action requests and update action preparation/active/recovery state.
-6. Compute desired velocities/headings, then integrate bounded player locomotion into tentative state.
-7. Generate player/player and environment contact candidates; sort them canonically; resolve positional, velocity, and balance effects.
-8. Resolve scheduled player/ball action contacts and advance ball physics, including any configured deterministic ball substeps or swept tests.
-9. Apply match-rule decisions to ordered simulation events.
-10. Derive control eligibility, possession/statistical facts, team phase inputs, and presentation facts.
-11. Validate invariants, emit telemetry/events, compute the canonical state hash, and commit `S(t+1)`.
+1. A stage reads a declared coherent committed snapshot or declared prior staged buffer; it never observes incidental partial updates from collection iteration.
+2. Every write is staged under one documented owner and becomes visible only at an explicit commit boundary.
+3. Inputs, candidates, contacts, and events use documented total-order keys; container, broad-phase, promise, or arrival order is never a tie-breaker.
+4. Every stage declares its read/write sets, cadence, phase offset, held-output behavior when not due, and event/candidate schemas.
+5. Same inputs and scheduler/arbitration profile produce the same ordered commits and hashes.
+6. Same-tick conflicts are resolved by a versioned subsystem arbitration policy before affected test families become milestone-required.
 
-Subsystems MUST NOT observe partially updated entities in collection iteration order unless that ordering is explicitly part of the versioned algorithm. Intent and AI phases read a coherent committed snapshot or staged buffers. Candidate contacts are resolved by a documented total order, never by incidental container or broad-phase order. This is required by the stable-ordering rationale in [R3 §Reproducibility discipline](../research/03-simulation-techniques.md#reproducibility-discipline) and [R4 §Headless simulation](../research/04-autonomous-evaluation.md#headless-simulation-should-be-the-center-of-the-system).
+The initial `scheduler-prototype-v1` candidate runs these logical stages in order: scheduled events; input validation; due team-tactics decisions; due individual-AI decisions and intent merge; action requests/state; locomotion integration; contact-candidate generation; player/environment and action/ball resolution; rules; derived control/possession/presentation facts; invariant/telemetry/hash commit. This list is a replaceable experiment profile. In particular, it does not establish that player/player contacts always precede player/ball contacts, that rules always observe one preselected intermediate state, or that tactics/AI execute every physics tick.
+
+Tactics and AI may use independent integer-tick cadences and phase offsets. On a tick when a decision stage is not due, its last committed decision remains held and inspectable; it is not silently recomputed. Cadence/profile IDs and held decisions are canonical replay state.
+
+The contact and rules specifications MUST define same-tick arbitration matrices for at least tackle-versus-shot, multiple player/ball contacts, ball/post/player, boundary-versus-contact, foul/advantage, possession transition, and goal/out-of-play ordering before those families can be required by a milestone. Until then, a scheduler profile may run diagnostic fixtures but cannot turn its incidental order into an acceptance truth. This preserves the stable-ordering rationale in [R3 §Reproducibility discipline](../research/03-simulation-techniques.md#reproducibility-discipline) and [R4 §Headless simulation](../research/04-autonomous-evaluation.md#headless-simulation-should-be-the-center-of-the-system).
 
 ### 6.3 Real-time browser loop
 
