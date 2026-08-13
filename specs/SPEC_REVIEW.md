@@ -117,6 +117,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### I-06 — Candidate identity is incorrectly mixed with comparison conditions
 
+**Resolution:** `RESOLVED` — Gameplay Evaluation §§4, 5.5, and 12 now separate artifact provenance from a shared comparison-condition hash and define the exact allowed differences for candidate-versus-baseline pairs.
+
 **Conflict:** Gameplay §4 requires `candidate_commit`, `parent_best_commit`, and `dirty_tree_status` in every run contract, while §5.5 requires candidate and best to run “under the same run contract.” Different commits necessarily make those contracts—and presumably `run_contract_hash`—different. The same ambiguity affects comparisons across simulation versions.
 
 **Impact:** A strict comparator will reject every candidate-versus-best pair as non-equivalent; a loose comparator may ignore genuine condition changes.

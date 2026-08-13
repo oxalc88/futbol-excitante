@@ -358,28 +358,38 @@ The evaluator package MUST publish a registry-set ID and content hash covering e
 
 ## 4. Common execution contract
 
-Every test inherits the following run requirements:
+Every test inherits the following run requirements. Artifact identity and experimental conditions are deliberately separate:
 
 ```yaml
-common_run_contract:
+run_manifest:
+  artifact_provenance:
+    required: [comparison_role, commit, dirty_tree_status, build_id,
+      build_artifact_hash, simulation_version, toolchain_identity]
+  comparison_conditions:
+    required: [scenario_id, scenario_version, initial_state_hash,
+      input_trace_hash, seed, runtime_class, runtime_version, fixed_dt_config,
+      gameplay_config_hash, roster_capability_hash, tactics_hash,
+      assistance_policy_hash, metric_registry_set_id, metric_registry_hash,
+      contract_version, applicable_reference_version]
+    browser_required_when_run: [browser_version, viewport, device_scale_factor,
+      camera_preset, presentation_config_hash, presentation_session_version,
+      capture_interpolation_phase, render_settings]
+  hashes:
+    required: [artifact_provenance_hash, comparison_condition_hash, run_manifest_hash]
   scenario:
     required: [id, version, family, duration_ticks, seed_policy, initial_state,
       config_hash, input_trace_or_generator, observation_windows, requested_metrics]
-  provenance:
-    required: [candidate_commit, parent_best_commit, dirty_tree_status,
-      simulation_version, runtime_version, fixed_dt_config, scenario_version,
-      roster_capability_hash, tactics_hash, assistance_policy_hash, seed,
-      input_trace_hash, metric_version, contract_version, reference_version]
   per_tick_state:
     required: [tick, simulation_time, input_frames, prng_state_hash,
       state_hash, player_states, ball_state, team_states]
   events:
     required: [action_events, contact_events, control_events, possession_events,
       tactical_phase_events, rule_events]
-  browser_only:
-    required_when_run: [browser_version, viewport, device_scale_factor,
-      camera_preset, camera_transform, camera_target, fov_or_zoom, render_settings]
 ```
+
+`comparison_role` is `CANDIDATE` or `BASELINE`. Each run names only its own commit/build; the comparison record links the two immutable manifests. `comparison_condition_hash` covers only controlled conditions and MUST be identical for paired regression runs. `artifact_provenance_hash` and `run_manifest_hash` are expected to differ when builds differ.
+
+A versioned allowed-difference policy permits differences only in `comparison_role`, artifact provenance, produced state/events/metrics, timings explicitly classified as measured outputs, and artifact paths. Any scenario, input, seed, runtime, gameplay/capability/tactic/assistance, evaluator-contract, or applicable presentation-condition difference makes the pair non-equivalent and returns `INVALID_RUN`. A cross-simulation-version migration study may use a separate comparison policy, but it cannot masquerade as the ordinary candidate-versus-best regression pair.
 
 The headless runner MUST advance an explicit fixed number of ticks without wall-clock pacing. Browser tests MUST step the same simulation through normalized `InputFrame`s and the test bridge; browser input timing is not a substitute for tick-indexed input.
 
@@ -451,7 +461,7 @@ Class-C catalog tests are currently `UNKNOWN`. They may run as engine sensitivit
 
 ### 5.5 Regression policy
 
-Regression comparison is candidate versus immutable best under the same run contract. External-reference comparison answers fidelity; regression comparison answers what changed. The evaluator MUST preserve both results. Materiality thresholds remain TBD until repeated baselines and the evaluator mutant suite establish run variance and sensitivity.
+Regression comparison is candidate versus immutable best under identical `comparison_condition_hash` values and the allowed-difference policy in §4. Build/artifact identity is expected to differ and is never included in that condition hash. External-reference comparison answers fidelity; regression comparison answers what changed. The evaluator MUST preserve both results. Materiality thresholds remain TBD until repeated baselines and the evaluator mutant suite establish run variance and sensitivity.
 
 ### 5.6 Engine design-target policy
 
@@ -1897,7 +1907,9 @@ Every test run produces a manifest, criterion results, metrics, events, hashes, 
 {
   "test_id": "LOC-T90-001",
   "scenario_id": "locomotion.turn-90.v1",
-  "run_contract_hash": "...",
+  "candidate_run_manifest_hash": "...",
+  "baseline_run_manifest_hash": "...",
+  "comparison_condition_hash": "...",
   "criteria": [
     {
       "criterion_id": "LOC-T90-001-REF",
