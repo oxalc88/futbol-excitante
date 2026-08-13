@@ -34,6 +34,7 @@ Every acceptance criterion has exactly one `class`:
 | Class | Meaning | Current gate behavior |
 |---|---|---|
 | `HARD_INVARIANT` | An architectural or logical truth independent of PES measurement. | Exact pass/fail; any failure rejects the run. |
+| `ENGINE_DESIGN_TARGET` | A versioned internal product contract for fictional engine capabilities; it makes no PES or provider-rating claim. | Exact pass/fail under the selected internal design-target policy. |
 | `MEASURED_TARGET` | A comparison against an accepted PES reference distribution or envelope. | Gate only when a populated, eligible A/B target exists. |
 | `PERCEPTUAL_TARGET` | A structured judgment about visible or perceived behavior. | Requires a versioned rubric and browser artifacts; no invented scalar proxy. |
 | `REGRESSION` | Candidate-versus-best preservation criterion. | Report delta now; gate only under a versioned regression policy or an independently classified hard failure. |
@@ -72,6 +73,75 @@ INVALID_RUN > FAIL > NEEDS_PERCEPTUAL_REVIEW
 
 An unavailable `REGRESSION` policy yields `NOT_EVALUATED`; it never hides a `FAIL` from an independently evaluated hard invariant.
 
+### 2.3 Milestone applicability and promotion
+
+Every promotion run MUST select exactly one versioned `MilestoneProfile` and one `CapabilityManifest`. Applicability is a registry decision, never an implementation's interpretation of “where implemented.” A profile classifies capabilities as:
+
+- `REQUIRED`: implementation, bindings, prerequisite suites, and declared execution paths must exist and pass;
+- `OPTIONAL_DIAGNOSTIC`: execute and report when present, but exclude its outcome from the milestone verdict;
+- `DEFERRED`: intentionally outside this milestone and excluded from execution and verdict reduction;
+- `PROHIBITED`: must not be used to satisfy another required capability or acceptance criterion.
+
+The evaluator reduces the milestone verdict only over required tests and required criterion classes. Every required criterion MUST resolve to `PASS`; a missing required implementation, binding, observation, policy, execution path, or prerequisite is `INVALID_RUN`. Optional-diagnostic, deferred, `UNKNOWN`, unavailable external-reference, and unvalidated perceptual results are reported in separate sections and cannot improve or worsen the milestone verdict. A profile MAY require a populated reference, regression, or perceptual policy explicitly; if it does, its non-pass outcome participates normally. Implementing an optional capability never silently makes it required: that requires a profile-version change.
+
+The normative initial profiles are:
+
+```yaml
+milestone_profiles:
+  - milestone_id: FOUNDATION_LAB
+    profile_version: milestone-foundation-v1
+    required_capabilities: [DETERMINISTIC_CORE, LOCOMOTION, INDEPENDENT_BALL,
+      HEADLESS_SCENARIOS, BROWSER_CORE_SMOKE]
+    optional_diagnostic_capabilities: [FIRST_TOUCH, BASIC_ACTIONS, PRESENTATION_BASELINE]
+    deferred_capabilities: [PLAYER_DUELS, GOALKEEPERS, TEAM_TACTICS,
+      REGULATION_MATCH_RULES, MATCH_ECOLOGY, PERCEPTUAL_GATES]
+    prohibited_capabilities: [EXTERNAL_RATING_AS_GAMEPLAY_VALUE]
+    required_suite_ids: [fast, locomotion, ball]
+    required_execution_paths: [HEADLESS, BROWSER]
+    required_browser_case_ids: [BROWSER-CORE-RESET-001, BROWSER-CORE-STEP-001]
+    required_criterion_classes: [HARD_INVARIANT]
+    accepted_required_outcomes: [PASS]
+    entry_prerequisites: [PINNED_RUNTIME]
+    exit_prerequisites: [COMMON_DETERMINISTIC_PASS, MUTANT_CORE_PASS]
+
+  - milestone_id: PLAYABLE_1V1
+    profile_version: milestone-1v1-v1
+    required_capabilities: [DETERMINISTIC_CORE, LOCOMOTION, INDEPENDENT_BALL,
+      FIRST_TOUCH, BASIC_ACTIONS, PLAYER_DUELS, LOCAL_CONTROL_SLOTS,
+      PRESENTATION_BASELINE, FICTIONAL_ARCHETYPES]
+    optional_diagnostic_capabilities: [GOALKEEPERS, TEAM_TACTICS, PERCEPTUAL_PES_REFERENCE]
+    deferred_capabilities: [REGULATION_MATCH_RULES, MATCH_ECOLOGY]
+    prohibited_capabilities: [EXTERNAL_RATING_AS_GAMEPLAY_VALUE]
+    required_suite_ids: [fast, locomotion, ball, touch_and_actions, duels]
+    required_execution_paths: [HEADLESS, BROWSER]
+    required_browser_case_ids: [BROWSER-CORE-RESET-001, BROWSER-CORE-STEP-001,
+      BROWSER-1V1-CONTROL-001, ARCH-DIFF-001]
+    required_criterion_classes: [HARD_INVARIANT, ENGINE_DESIGN_TARGET]
+    accepted_required_outcomes: [PASS]
+    entry_prerequisites: [FOUNDATION_LAB_PASS, CAPABILITY_DESIGN_PROFILE]
+    exit_prerequisites: [MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON_PASS]
+
+  - milestone_id: SMALL_SIDED_SHAPE
+    profile_version: milestone-small-sided-v1
+    required_capabilities: [DETERMINISTIC_CORE, LOCOMOTION, INDEPENDENT_BALL,
+      FIRST_TOUCH, BASIC_ACTIONS, PLAYER_DUELS, TEAM_TACTICS,
+      TRANSITION_PHASES, SMALL_SIDED_CARDINALITY, PRESENTATION_BASELINE]
+    optional_diagnostic_capabilities: [GOALKEEPERS, REGULATION_MATCH_RULES,
+      MATCH_ECOLOGY, PERCEPTUAL_PES_REFERENCE]
+    deferred_capabilities: [COMPLETE_REGULATION_MATCH]
+    prohibited_capabilities: [EXTERNAL_RATING_AS_GAMEPLAY_VALUE]
+    required_suite_ids: [fast, locomotion, ball, touch_and_actions, duels, team]
+    required_execution_paths: [HEADLESS, BROWSER]
+    required_browser_case_ids: [BROWSER-CORE-RESET-001, BROWSER-CORE-STEP-001,
+      BROWSER-SMALL-SIDED-001]
+    required_criterion_classes: [HARD_INVARIANT, ENGINE_DESIGN_TARGET]
+    accepted_required_outcomes: [PASS]
+    entry_prerequisites: [PLAYABLE_1V1_PASS, TEAM_DECISION_PROFILE]
+    exit_prerequisites: [MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS]
+```
+
+A later regulation/full-match milestone MUST NOT be published until dedicated goalkeeper and deterministic rules specifications exist and their executable suites cover goal validity, boundaries, restart placement, offside snapshots, foul/advantage ordering, match phase/clock and ball-in-play accounting, and same-tick event arbitration.
+
 ## 3. Machine contract
 
 The catalog in §7 is normative structured YAML. Each family block is a standalone document fragment with a `tests` array; a materializer concatenates those arrays in document order and rejects duplicate IDs. A future implementation MAY extract the fragments from this document, but SHOULD materialize the same records as versioned data under `eval/contracts/`. The `suites` block in §8 is a separate registry document. Field names and enum values MUST remain stable within a catalog version.
@@ -79,6 +149,7 @@ The catalog in §7 is normative structured YAML. Each family block is a standalo
 ```ts
 type CriterionClass =
   | "HARD_INVARIANT"
+  | "ENGINE_DESIGN_TARGET"
   | "MEASURED_TARGET"
   | "PERCEPTUAL_TARGET"
   | "REGRESSION"
@@ -117,6 +188,31 @@ interface EvaluationCriterion {
   criterion_id: string;
   class: CriterionClass;
   rule: string;
+}
+
+type CapabilityDisposition = "REQUIRED" | "OPTIONAL_DIAGNOSTIC" | "DEFERRED" | "PROHIBITED";
+
+interface CapabilityManifest {
+  manifest_id: string;
+  manifest_version: string;
+  implementation_versions: Record<string, string>;
+  dispositions: Record<string, CapabilityDisposition>;
+}
+
+interface MilestoneProfile {
+  milestone_id: "FOUNDATION_LAB" | "PLAYABLE_1V1" | "SMALL_SIDED_SHAPE";
+  profile_version: string;
+  required_capabilities: string[];
+  optional_diagnostic_capabilities: string[];
+  deferred_capabilities: string[];
+  prohibited_capabilities: string[];
+  required_suite_ids: string[];
+  required_execution_paths: ExecutionPath[];
+  required_browser_case_ids: string[];
+  required_criterion_classes: CriterionClass[];
+  accepted_required_outcomes: ["PASS"];
+  entry_prerequisites: string[];
+  exit_prerequisites: string[];
 }
 
 interface TestImplementationBinding {
@@ -248,6 +344,22 @@ Class-C catalog tests are currently `UNKNOWN`. They may run as engine sensitivit
 
 Regression comparison is candidate versus immutable best under the same run contract. External-reference comparison answers fidelity; regression comparison answers what changed. The evaluator MUST preserve both results. Materiality thresholds remain TBD until repeated baselines and the evaluator mutant suite establish run variance and sensitivity.
 
+### 5.6 Engine design-target policy
+
+`ENGINE_DESIGN_TARGET` is independent of the PES reference registry. A versioned `CapabilityDesignProfile` MUST define, for each fictional capability axis: the controlled scenario/metric IDs, low and high profile values, expected monotonic direction, minimum material effect, protected outputs, maximum permitted cross-coupling, seed/config matrix, estimator, and policy version. These internal thresholds are deliberate product values and MUST NOT be described as PES magnitudes or provider-rating mappings.
+
+The initial semantic requirements are:
+
+| Capability axis | Required intended effect | Protected from unintended change |
+|---|---|---|
+| transient acceleration | Earlier speed/distance gain under matched sustainable speed | sustainable-speed plateau |
+| physical contact | Greater resistance/impulse outcome under matched contact | raw locomotion speed, AI aggression, automatic possession, foul policy |
+| body control | Less disturbance and/or faster recovery after matched perturbation | contact strength |
+| shooting power | Greater legal strike output under matched action | unrelated accuracy and preparation timing unless separately targeted |
+| swerve | Greater controllable spin/curvature response under matched strike | base ball law and straight-shot symmetry |
+
+Whole-archetype validation uses `ARCH-DIFF-001`: identical visual models, hidden labels, identical replay/task conditions, randomized/counterbalanced order, and a versioned rubric. Participants classify the intended archetype or compare the declared semantic dimensions; objective capability labels and telemetry remain blinded until responses are locked. The profile must predeclare chance model, minimum differentiation, confidence method, and material-confusion limits. Passing establishes only that the fictional engine profiles are deliberately and perceptibly different.
+
 ## 6. Recording and metric rules
 
 - Time derives from simulation ticks for engine runs and decoded PTS for reference footage.
@@ -293,8 +405,9 @@ tests:
     state_to_record: ["capability profiles", "position, velocity, acceleration", "RNG and action state"]
     metrics: ["early acceleration curve", "t25/t50/t90", "early distance", "observed plateau speed"]
     reference_evidence: {behavioral: "R1 LOC-ACC-002; separate Speed and Explosive Power dimensions", measurement_class: C, evidence_limit: "Public players differ in many attributes; causal isolation absent", target_status: ABSENT}
-    target_types: [UNKNOWN, REGRESSION]
+    target_types: [ENGINE_DESIGN_TARGET, UNKNOWN, REGRESSION]
     acceptance_logic:
+      - {criterion_id: LOC-ACC-002-DESIGN, class: ENGINE_DESIGN_TARGET, rule: "Under the selected CapabilityDesignProfile, increased transient acceleration produces the required earlier speed/distance effect without materially changing sustainable-speed plateau"}
       - {criterion_id: LOC-ACC-002-CAUSAL, class: UNKNOWN, rule: "Diagnostic sensitivity only until controlled matched PES capture exists"}
       - {criterion_id: LOC-ACC-002-REG, class: REGRESSION, rule: "Capability separation must not collapse relative to the declared engine baseline"}
     known_uncertainty: ["PES rating-to-capability mapping unknown", "Attribute interactions unknown"]
@@ -445,8 +558,9 @@ tests:
     state_to_record: ["capability profiles", "contact events", "displacement/velocity", "balance and recovery states"]
     metrics: ["displacement", "speed retention", "stumble duration", "recovery time"]
     reference_evidence: {behavioral: "R1 PHY-STR-001; roster supports strength/agility distinction", measurement_class: C, evidence_limit: "No isolated matched PES pair", target_status: ABSENT}
-    target_types: [UNKNOWN, REGRESSION]
+    target_types: [ENGINE_DESIGN_TARGET, UNKNOWN, REGRESSION]
     acceptance_logic:
+      - {criterion_id: PHY-STR-001-DESIGN, class: ENGINE_DESIGN_TARGET, rule: "The selected CapabilityDesignProfile must preserve independently controllable physical-contact and body-control effects and their protected outputs"}
       - {criterion_id: PHY-STR-001-CAUSAL, class: UNKNOWN, rule: "Engine sensitivity diagnostic only until controlled attribute isolation exists"}
       - {criterion_id: PHY-STR-001-REG, class: REGRESSION, rule: "Distinct capability dimensions must not collapse versus best"}
     known_uncertainty: ["Attribute mappings/interactions unknown"]
@@ -461,8 +575,9 @@ tests:
     state_to_record: ["heading disturbance", "velocity", "balance/stumble/recovery states", "contact event"]
     metrics: ["peak heading disturbance", "stumble duration", "velocity recovery", "path deviation"]
     reference_evidence: {behavioral: "R1 PHY-BC-001; some players maintain/recover posture better", measurement_class: C, evidence_limit: "Attribute-specific causal trial absent", target_status: ABSENT}
-    target_types: [UNKNOWN, REGRESSION]
+    target_types: [ENGINE_DESIGN_TARGET, UNKNOWN, REGRESSION]
     acceptance_logic:
+      - {criterion_id: PHY-BC-001-DESIGN, class: ENGINE_DESIGN_TARGET, rule: "Increasing body control must meet the versioned disturbance/recovery direction and materiality target without increasing contact strength"}
       - {criterion_id: PHY-BC-001-CAUSAL, class: UNKNOWN, rule: "No PES acceptance until controlled perturbation capture exists"}
       - {criterion_id: PHY-BC-001-REG, class: REGRESSION, rule: "Report sensitivity and coupling changes versus best"}
     known_uncertainty: ["Exact Body Control mapping unknown", "Perturbation/contact geometry TBD"]
@@ -477,8 +592,9 @@ tests:
     state_to_record: ["capability profiles", "contacts, fouls, displacement", "actions and possession"]
     metrics: ["contacts per scenario", "displacement distribution", "speed loss", "foul/event rate", "control outcomes"]
     reference_evidence: {behavioral: "R1 PHY-PC-001; low-confidence community roster intervention", measurement_class: C, evidence_limit: "Community mod uncontrolled and indirect effects possible", target_status: ABSENT}
-    target_types: [UNKNOWN, REGRESSION]
+    target_types: [ENGINE_DESIGN_TARGET, UNKNOWN, REGRESSION]
     acceptance_logic:
+      - {criterion_id: PHY-PC-001-DESIGN, class: ENGINE_DESIGN_TARGET, rule: "Increasing physical-contact capability must meet the versioned resistance/outcome target without changing protected locomotion, AI, possession, or rule outputs"}
       - {criterion_id: PHY-PC-001-CAUSAL, class: UNKNOWN, rule: "Never use community claim as numeric or causal acceptance target"}
       - {criterion_id: PHY-PC-001-REG, class: REGRESSION, rule: "Sensitivity must not create unrelated speed, AI, or foul regressions"}
     known_uncertainty: ["Evidence confidence low", "Rules/foul thresholds under-researched"]
@@ -798,8 +914,9 @@ tests:
     state_to_record: ["capability profile", "action/contact state", "outgoing ball state"]
     metrics: ["initial-speed distribution", "preparation duration", "trajectory and error deltas"]
     reference_evidence: {behavioral: "R1 SHOT-IND-001; players with differing Kicking Power are observable", measurement_class: C, evidence_limit: "Public player comparison is confounded", target_status: ABSENT}
-    target_types: [UNKNOWN, REGRESSION]
+    target_types: [ENGINE_DESIGN_TARGET, UNKNOWN, REGRESSION]
     acceptance_logic:
+      - {criterion_id: SHOT-IND-001-DESIGN, class: ENGINE_DESIGN_TARGET, rule: "Increasing fictional shooting-power capability must meet the versioned legal strike-output target without changing protected accuracy or preparation outputs"}
       - {criterion_id: SHOT-IND-001-CAUSAL, class: UNKNOWN, rule: "No PES capability curve until controlled matched capture"}
       - {criterion_id: SHOT-IND-001-REG, class: REGRESSION, rule: "Report isolation/coupling changes versus best"}
     known_uncertainty: ["External rating mapping unknown", "Other PES skills/animations confound"]
@@ -814,8 +931,9 @@ tests:
     state_to_record: ["capabilities", "contact linear/angular output", "3D ball path"]
     metrics: ["spin proxy/angular velocity", "lateral deviation", "curvature by segment", "paired capability delta"]
     reference_evidence: {behavioral: "R1 SHOT-SWV-001; Swerve is a separate roster dimension", measurement_class: C, evidence_limit: "Controlled comparable strikes absent", target_status: ABSENT}
-    target_types: [UNKNOWN, REGRESSION]
+    target_types: [ENGINE_DESIGN_TARGET, UNKNOWN, REGRESSION]
     acceptance_logic:
+      - {criterion_id: SHOT-SWV-001-DESIGN, class: ENGINE_DESIGN_TARGET, rule: "Increasing fictional swerve capability must meet the versioned spin/curvature target while preserving the base ball law and straight-shot symmetry"}
       - {criterion_id: SHOT-SWV-001-CAUSAL, class: UNKNOWN, rule: "Engine sensitivity only; no PES mapping claim"}
       - {criterion_id: SHOT-SWV-001-REG, class: REGRESSION, rule: "Preserve base ball-spin symmetry and shot-power behavior"}
     known_uncertainty: ["PES input/spin unobserved", "Attribute mapping unknown"]
@@ -1449,6 +1567,8 @@ tests:
 ## 8. Suite topology
 
 The evaluator SHOULD expose these suites. Dependency closure is computed from each record's `regression_dependencies` plus common criteria.
+
+Goalkeeper tests (`GK-*`) have prerequisite capabilities `GOALKEEPER_SPEC_V1`, `GOALKEEPER_RULES_V1`, and `GOALKEEPER_SUITE_PASS`. `TEMPO-001` and `TEMPO-002` additionally require `RULES_SPEC_V1`, `REGULATION_RULES_SUITE_PASS`, `BALL_IN_PLAY_CLOCK_V1`, and `SAME_TICK_RULE_ARBITRATION_V1`. The evaluator MUST refuse metric computation and return `INVALID_RUN` when one of these tests is selected as required without every prerequisite. Merely emitting plausible goalkeeper outcomes, event rates, or phase durations does not satisfy a prerequisite. While those specifications and suites are absent, the tests may be listed only as deferred or optional diagnostic work, never as promotion evidence.
 
 ```yaml
 suites:

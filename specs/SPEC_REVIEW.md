@@ -35,6 +35,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### B-02 — Promotion has no milestone-scoped applicability model and can deadlock
 
+**Resolution:** `RESOLVED` — Gameplay Evaluation §2.3 now defines versioned milestone/capability profiles, required-only verdict reduction, exact missing-capability behavior, and concrete foundation, 1v1, and small-sided profiles.
+
 **Conflict:** Research Audit F-05 resolves the project into a locomotion/ball laboratory, playable 1v1 slice, and small-sided/team-shape prototype, but none of the three specs defines those milestone profiles. Gameplay Evaluation §2 makes missing references, unavailable regression policy, and perceptual review stronger than `PASS`; §8 then describes `PROMOTION` as full headless regression plus browser, visual, and match-ecology work “where implemented.” There is no normative definition of “where implemented,” “critical,” required versus optional tests, or which non-pass outcomes are permissible for a given milestone.
 
 **Impact:** A locomotion change can never receive an overall `PASS` if the evaluator includes absent PES targets, unvalidated visual rubrics, deferred goalkeeper/rules tests, or unavailable regression tolerances. Conversely, an implementation could omit an inconvenient family and call it unimplemented. Promotion is neither achievable nor safe.
@@ -58,6 +60,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 **Recommended correction:** Add a non-authoritative but deterministic `PresentationSession` contract with `reset(config, assets, seed)`, explicit simulation-time/tick advancement, renderer-ready barriers, camera/animation/LOD state snapshot or deterministic reconstruction, and capture at a declared interpolation phase. For test mode, all temporal presentation systems must derive from the controlled presentation clock, never wall clock. Record a presentation-state/config hash beside each capture; keep it explicitly outside the canonical gameplay hash.
 
 ### B-05 — The vision's prototype success criterion cannot produce an acceptance result
+
+**Resolution:** `RESOLVED` — Gameplay Evaluation §§2.1 and 5.6 add an engine-only design-target class, capability monotonicity/orthogonality contracts, and blinded same-model archetype acceptance without making PES claims.
 
 **Conflict:** Vision §28 says gameplay works when deliberately different player profiles feel clearly different with the same visual model. Technical §9.3 correctly separates internal capabilities from unsupported PES/provider ratings, but Gameplay tests such as `LOC-ACC-002`, `PHY-STR-001`, `PHY-BC-001`, `PHY-PC-001`, `SHOT-IND-001`, and `SHOT-SWV-001` classify capability effects only as `UNKNOWN` plus threshold-free regression. That is correct for PES causal fidelity, but it leaves no engine-internal conformance or perceptual criterion for the declared fictional archetypes.
 
@@ -132,6 +136,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 **Recommended correction:** Make the current sequence a provisional scheduler profile, not a frozen gameplay truth. Specify only immediate architectural invariants now: coherent read snapshots, staged writes, total event/contact ordering, and explicit commit. Let AI/tactics stages run on versioned cadences while holding prior decisions. Require the rules/contact specs to define same-tick arbitration before their families become milestone requirements.
 
 ### I-09 — Full-match tempo tests depend on rules the architecture explicitly cannot yet supply
+
+**Resolution:** `RESOLVED` — Gameplay Evaluation §§2.3 and 8 now defer full-match promotion, enumerate required goalkeeper/rules specifications and suites, and make keeper/tempo evaluation fail closed when prerequisites are absent.
 
 **Conflict:** Technical §12.7 defers goals, boundaries, offside, fouls/advantage, restarts, timing edge cases, and deep goalkeeper logic to future specs. Gameplay still includes goalkeeper hard invariants and `TEMPO-001/002` full-match ecology, but it has no rules test family for goal validity, out-of-play, restart placement, offside snapshots, foul/advantage order, or clock/ball-in-play accounting.
 
