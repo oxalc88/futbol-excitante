@@ -27,6 +27,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### B-01 — The Gameplay Evaluation Spec is a catalog, not yet an executable contract
 
+**Resolution:** `RESOLVED` — Gameplay Evaluation §§1, 3, and 6 now classify the document honestly and define versioned executable scenario, observation, metric, invariant, binding, schema, suite, and tier registries with fail-closed resolution.
+
 **Conflict:** Gameplay Evaluation §1 says scenarios and metric extraction are executable now, and §3 calls the catalog normative structured YAML. In reality, `initial_scenario`, `controlled_inputs`, `state_to_record`, `metrics`, and each criterion `rule` are natural-language strings. The proposed `TestImplementationBinding` has no instances, and the specs contain no executable scenario registry, metric formulas, estimator definitions, units per metric, observation-window algorithms, or invariant implementations. The spec itself says a missing binding returns `NOT_EVALUATED`.
 
 **Impact:** Two conforming implementations can calculate materially different `t90`, turn radius, reach margin, compactness, contact time, or action latency. The Gauntlet cannot reproducibly run or compare the catalog, and the claim that metric extraction is executable is false.
@@ -44,6 +46,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 **Recommended correction:** Add a versioned `MilestoneProfile`/`CapabilityManifest` that lists required, optional-diagnostic, deferred, and prohibited test families; required execution paths; accepted outcome set; browser smoke set; and entry/exit prerequisites. Reduce outcomes only over criteria required by that profile, while reporting all other outcomes separately. Missing implementation of a required capability must be `INVALID_RUN` or `FAIL`; an explicitly deferred capability must not participate in the milestone verdict.
 
 ### B-03 — Gauntlet observations and hard-invariant oracles have no enforceable trust boundary
+
+**Resolution:** `RESOLVED` — Gameplay Evaluation §3 and Technical §17.2 now bind versioned diagnostic channels, separate raw/candidate/evaluator evidence, and require protected evaluator-owned oracles to recompute hard facts from raw state and immutable policy data.
 
 **Conflict:** Gameplay tests require data absent from Technical §17.2's guaranteed telemetry, including contact candidates and corrections, solver/substep state, contact volumes and surface geometry, AI perception, utility scores, reach graphs, AI memory, support-foot/pose markers, screen projections, and visible-response timestamps. `TestImplementationBinding` maps scenarios, metrics, and invariants but not observation channels. More seriously, hard criteria such as “feasible contact,” “valid possession evidence,” and “continuous rebound” can pass by trusting the same candidate-authored semantic event whose correctness is being tested. Technical §20 protects dependency direction but does not define which raw evidence is captured outside candidate-controlled reporting or which invariant logic is evaluator-owned.
 
@@ -121,6 +125,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### I-07 — Reference target status has two sources of truth
 
+**Resolution:** `RESOLVED` — Gameplay Evaluation §§3, 5, and 7 remove catalog target-presence flags and make the versioned registry the sole authority, with a fail-closed `(test_id, criterion_id)` join and class check.
+
 **Conflict:** Every catalog record embeds `reference_evidence.target_status: ABSENT`, while a separate `ReferenceTarget` registry is intended to become populated. Publishing a target would require either modifying the supposedly stable catalog record or allowing it to contradict the registry. The same record duplicates the reference class that the Technical Spec says must be inherited from the canonical registry.
 
 **Impact:** A valid target can be ignored, or an outdated catalog flag/class can incorrectly activate or block a gate.
@@ -147,6 +153,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### I-10 — Regression “dependencies” are cyclic and their semantics are undefined
 
+**Resolution:** `RESOLVED` — Catalog links and suite policy now use `regression_impact_ids`; §8 defines deterministic visited-set fixed-point reachability, canonical output, and expansion-manifest validation rather than prerequisite ordering.
+
 **Conflict:** Gameplay §8 says dependency closure is computed, but the graph is highly cyclic: examples include `LOC-ACC-001 <-> LOC-DEC-001`, `BALL-GND-001 <-> BALL-GND-002`, `CAM-FLW-001 <-> CAM-PER-001`, and multi-node cycles across pass, interception, touch, keeper, and team tests. The term “dependency” suggests a prerequisite order, while the data behaves like symmetric regression-impact associations. No closure or cycle behavior is specified.
 
 **Impact:** A topological executor will fail; a recursive executor without a visited set can loop; and a small targeted change can unexpectedly expand to most of the catalog.
@@ -154,6 +162,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 **Recommended correction:** Rename these links to `regression_impact_ids` unless true prerequisite semantics are intended. Define closure as set reachability with a visited set, publish the expected expanded suite for validation, and add separate acyclic `prerequisite_capabilities` for actual execution order/availability.
 
 ### I-11 — Suite and tier schemas are not machine-defined
+
+**Resolution:** `RESOLVED` — Gameplay Evaluation §§3 and 8 now define uniform machine-readable suite/tier schemas and concrete registries for test selection, closure, prerequisites, matrices, held-out work, browser cases, resources, and outcome reduction.
 
 **Conflict:** Gameplay §3 says §8 is a separate registry document, but supplies no `SuiteDefinition` type. `fast` is an object with `includes`, while every other suite is a bare array. The four evaluation tiers are prose and are not linked to suite IDs, required outcomes, seeds, held-out policy, or browser tests.
 

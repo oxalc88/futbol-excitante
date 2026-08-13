@@ -691,6 +691,27 @@ Telemetry must make these domains inspectable:
 
 Metric definitions SHOULD be reusable between engine traces and the PES reference dataset wherever the measured quantity is equivalent. Raw observations, derived metrics, uncertainty, validity, and provenance remain separate. [R2 §Preserve raw, corrected and derived layers](../research/02-reference-measurement.md#preserve-raw-corrected-and-derived-layers) [R4 §Measurement and reference comparison](../research/04-autonomous-evaluation.md#measurement-reference-comparison-and-critics)
 
+Diagnostic observations are versioned subsystem schemas, not an open-ended log. The minimum schema families are:
+
+| Schema family | Required evidence |
+|---|---|
+| canonical world/config | before/after tick state, immutable geometry/policy/config IDs, stable entity references, PRNG and scheduler state |
+| locomotion/contact | desired and actual kinematics, contact candidates, canonical sort keys, correction/impulse components, balance state, solver/substep identifiers |
+| action/ball/reach | action phase, candidate and selected semantic surface, contact/reach volumes, incoming/outgoing ball state, reach graph/margins, assistance-policy decisions |
+| AI/tactics | perception snapshot, utility inputs/scores, hysteresis/memory, selected intention, team assignment maps and decision cadence |
+| control/possession/rules | control-slot commands and arbitration, eligibility windows, last-touch evidence, derived possession inputs, ordered rule inputs/outputs |
+| presentation | support-foot/pose/semantic anchors, projected contact points, camera/animation/LOD state, simulation-event and visible-response ticks |
+
+Every schema has an ID/version, required fields, cadence, producer boundary, and missing-data behavior. Evaluation bindings name exact observation IDs and schema versions; a missing channel or required field invalidates a required run.
+
+Observations have three trust classes:
+
+1. `RAW_CANONICAL`: the runner captures canonical before/after state and immutable configuration directly through the serializer/observer boundary, rather than accepting a candidate-authored report file.
+2. `CANDIDATE_SEMANTIC`: action, contact, possession, reach, phase, and rule labels emitted by the candidate. These are diagnostic claims and are never sufficient evidence for the corresponding hard invariant.
+3. `EVALUATOR_DERIVED`: facts recomputed by protected evaluator code from raw state, ordered inputs, and immutable geometry/policy data.
+
+Protected invariant oracles MUST recompute continuity and teleport detection, total ordering, contact/reach feasibility, rebound continuity, and possession/control preconditions. They compare candidate semantic events with independently derived facts and fail on missing, impossible, or contradictory evidence. Oracle source, schemas, fixtures, held-out material, and versions are read-only to ordinary gameplay candidates and are validated by the mutant suite. The trust boundary does not imply that canonical state is truthful by assertion; it makes that state the raw evidence against which evaluator-owned algorithms test the candidate's semantic claims.
+
 ### 17.3 Invariants
 
 At minimum, evaluation can assert:
@@ -834,7 +855,7 @@ Exact filenames, workspace tooling, and whether `contracts` is a distinct npm pa
 | `replay` | Encoding, decoding, validation, playback composition | Alternative gameplay logic |
 | `browser app` | Real-time scheduling and adapter composition | Duplicate simulation rules |
 | `headless app` | Explicit tick batches and artifact sinks | Timed real-time simulation authority |
-| `eval` | Scenarios, metrics, invariants, comparison | Production core dependency on evaluator policy |
+| `eval` | Scenario/observation/metric/invariant registries, protected oracles, suites, comparison | Production core dependency on evaluator policy or candidate mutation of protected material |
 
 ### 20.3 Dependency rules
 
