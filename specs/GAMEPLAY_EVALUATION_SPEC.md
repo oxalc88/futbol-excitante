@@ -379,12 +379,15 @@ run_manifest:
   scenario:
     required: [id, version, family, duration_ticks, seed_policy, initial_state,
       config_hash, input_trace_or_generator, observation_windows, requested_metrics]
-  per_tick_state:
-    required: [tick, simulation_time, input_frames, prng_state_hash,
-      state_hash, player_states, ball_state, team_states]
-  events:
-    required: [action_events, contact_events, control_events, possession_events,
-      tactical_phase_events, rule_events]
+  observation:
+    required: [observation_profile_id, observation_profile_version,
+      observation_schema_versions, overhead_measurement_id]
+    FULL_FORENSIC: [declared per-tick canonical/diagnostic state,
+      declared semantic events, periodic/event checkpoints, requested captures]
+    METRIC_ONLINE: [per-tick input and state hash, declared online accumulators,
+      semantic events, preallocated event-triggered ring buffers]
+    PERFORMANCE_MINIMAL: [start/end hashes, preallocated counters,
+      timed-window boundaries, evaluator-overhead result, separate forensic replay reference]
 ```
 
 `comparison_role` is `CANDIDATE` or `BASELINE`. Each run names only its own commit/build; the comparison record links the two immutable manifests. `comparison_condition_hash` covers only controlled conditions and MUST be identical for paired regression runs. `artifact_provenance_hash` and `run_manifest_hash` are expected to differ when builds differ.
@@ -392,6 +395,8 @@ run_manifest:
 A versioned allowed-difference policy permits differences only in `comparison_role`, artifact provenance, produced state/events/metrics, timings explicitly classified as measured outputs, and artifact paths. Any scenario, input, seed, runtime, gameplay/capability/tactic/assistance, evaluator-contract, or applicable presentation-condition difference makes the pair non-equivalent and returns `INVALID_RUN`. A cross-simulation-version migration study may use a separate comparison policy, but it cannot masquerade as the ordinary candidate-versus-best regression pair.
 
 The headless runner MUST advance an explicit fixed number of ticks without wall-clock pacing. Browser tests MUST step the same simulation through normalized `InputFrame`s and the test bridge; browser input timing is not a substitute for tick-indexed input.
+
+`FULL_FORENSIC` is the default scientific/debug profile and `METRIC_ONLINE` is permitted when all bound metrics/invariants can be evaluated from its declared channels. Timing, frame-cost, memory, and load claims require `PERFORMANCE_MINIMAL`. Screenshots, full-state serialization, unbounded logs, and artifact writes are prohibited inside its timed window. Performance manifests state which times exclude evaluator/capture work and link a separate forensic reproduction when diagnosis is needed. [TECHNICAL_SPEC §17.1](./TECHNICAL_SPEC.md#171-observer-boundary)
 
 ### 4.1 Common criteria
 

@@ -783,14 +783,17 @@ This preserves the research distinction between low intent latency and non-insta
 
 The core emits structured observations to injected sinks; it does not write console logs, files, sockets, or UI directly. Instrumentation MUST be read-only with respect to authoritative state and MUST NOT alter iteration or RNG consumption.
 
-The default observation model is:
+Every run selects one immutable, versioned observation profile:
 
-- input frame: every tick;
-- state hash: every tick in determinism suites, configurable persistence otherwise;
-- semantic event log: on event;
-- online metric accumulation: where cheap and side-effect free;
-- full checkpoint: periodic or event-triggered, configurable;
-- presentation/camera telemetry: browser path only.
+| Profile | Timed-window behavior | Diagnostic evidence |
+|---|---|---|
+| `FULL_FORENSIC` | Not valid for performance claims. | Required observations each declared tick/event, full state/checkpoints, solver/AI/presentation diagnostics, screenshots when requested. |
+| `METRIC_ONLINE` | Normal functional/evaluation profile. | Per-tick input/hash plus declared low-overhead observations and online accumulators; event-triggered slices from preallocated ring buffers. |
+| `PERFORMANCE_MINIMAL` | Required for reported CPU/GPU/frame/load timing. No screenshots, full serialization, dynamic trace growth, synchronous artifact I/O, or forensic callbacks inside the timed window. | Start/end hashes, preallocated counters, sampled platform metrics, and an event-trigger flag; forensic reproduction runs separately. |
+
+The profile declares observation/schema IDs, sampling cadence, ring-buffer capacity, allocation/I/O rules, warm-up and timed windows, and whether each reported duration includes or excludes evaluator/capture work. Performance acceptance values MUST exclude evaluator serialization/capture time and report simulation, render, and load phases separately.
+
+Observer overhead is measured independently for each target/runtime by paired repeated control runs using the same scenario/build: observer-disabled baseline versus the selected profile, with order counterbalanced. The manifest records absolute/relative overhead and uncertainty. `PERFORMANCE_MINIMAL` is invalid if its overhead exceeds the active performance policy or if counters allocate/grow during the timed window. A triggered failure is reproduced in a separate `FULL_FORENSIC` run; that reproduction diagnoses the failure but does not replace the minimal-profile timing sample.
 
 [R4 §State recording and telemetry](../research/04-autonomous-evaluation.md#state-recording-and-telemetry) supports this forensic split.
 

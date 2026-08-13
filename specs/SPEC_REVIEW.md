@@ -199,6 +199,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### I-13 — Instrumentation can invalidate the performance measurements it records
 
+**Resolution:** `RESOLVED` — Technical §17.1, Gameplay Evaluation §4, and Visual §19 now define forensic, online-metric, and minimal-performance observation profiles, paired overhead measurement, timed-window prohibitions, and separate forensic reproduction.
+
 **Conflict:** Gameplay §4 requires full player, ball, and team state every tick for every test, while Technical §17 allows full checkpoints to be periodic and Visual `VIS-PERF-001` measures p95 frame cost, memory, and load behavior. No spec separates scientific full-trace runs from low-overhead performance runs or budgets observer overhead.
 
 **Impact:** Serialization, allocation, screenshots, and trace collection can dominate the runtime being measured. Conversely, disabling instrumentation can remove evidence needed to reproduce a failure.

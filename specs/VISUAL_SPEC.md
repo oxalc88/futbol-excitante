@@ -505,9 +505,11 @@ Every artifact records renderer/session versions, before/after presentation-stat
 | `VIS-CAMERA-001` | Identical replay under fixed camera candidates varying FOV/zoom, height, pitch, target lead, lag, and smoothing | Which provisional preset best balances spatial awareness, perceived speed, ball/action readability, and comfort? | synchronized videos and task/preference data |
 | `VIS-LOD-001` | Camera traversal and forced LOD locks across representative actors/actions/kit pairs | Are transitions stable, and which cues survive each representation? | traversal video, LOD-locked stills, cost/memory data |
 | `VIS-ENV-001` | Minimal stadium and environment/crowd candidates over the same full-match replay | Does atmosphere add distraction, false ball targets, or team-color confusion? | salience/task captures and cost data |
-| `VIS-PERF-001` | One representative rigged character family instantiated as 22 players, ball, pitch, camera, accepted candidate lighting/shadows/materials; controlled animation load | What budgets and quality fallbacks work on the target matrix? | p50/p95 frame cost, dropped frames, memory, load size/time, visual captures |
+| `VIS-PERF-001` | One representative rigged character family instantiated as 22 players, ball, pitch, camera, accepted candidate lighting/shadows/materials; controlled animation load | What budgets and quality fallbacks work on the target matrix? | `PERFORMANCE_MINIMAL` p50/p95 frame cost, dropped frames, memory, load size/time; separate untimed captures/forensic replay |
 
 `VIS-PERF-001` targets exactly 22 active footballers plus one ball. Officials, substitutes, and crowd entities are separately counted and reported; they MUST NOT be hidden inside an accidental 44-player assumption.
+
+`VIS-PERF-001` timed windows inherit Technical §17.1: no screenshots, full serialization, trace growth, or artifact I/O occurs inside them; observer/counter overhead is measured separately and all reported timings state whether evaluator/capture work is excluded. Visual captures and `FULL_FORENSIC` diagnosis use separate matched runs and cannot contribute timing samples.
 
 ## 20. Perceptual evaluation dimensions and targets
 
