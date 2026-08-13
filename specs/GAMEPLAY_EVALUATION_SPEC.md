@@ -1698,7 +1698,7 @@ The evaluator MUST expose uniform `SuiteDefinition` and `TierDefinition` registr
 
 Every materialized suite publishes a canonical expansion manifest containing the direct set, expanded set, catalog/registry versions, closure policy, and content hash. Validation compares it with `expected_expansion_manifest_id`; an unexpected expansion is an evaluator-maintenance change, not an implicit larger run. Actual availability/order constraints use the separate `prerequisite_capabilities` graph, which MUST be acyclic and validated independently.
 
-Goalkeeper tests (`GK-*`) have prerequisite capabilities `GOALKEEPER_SPEC_V1`, `GOALKEEPER_RULES_V1`, and `GOALKEEPER_SUITE_PASS`. `TEMPO-001` and `TEMPO-002` additionally require `RULES_SPEC_V1`, `REGULATION_RULES_SUITE_PASS`, `BALL_IN_PLAY_CLOCK_V1`, and `SAME_TICK_RULE_ARBITRATION_V1`. The evaluator MUST refuse metric computation and return `INVALID_RUN` when one of these tests is selected as required without every prerequisite. Merely emitting plausible goalkeeper outcomes, event rates, or phase durations does not satisfy a prerequisite. While those specifications and suites are absent, the tests may be listed only as deferred or optional diagnostic work, never as promotion evidence.
+Goalkeeper tests (`GK-*`) have prerequisite capabilities `GOALKEEPER_SPEC_V1` and `GOALKEEPER_RULES_V1`. Passing their suite produces the downstream capability `GOALKEEPER_SUITE_PASS`; it is not a prerequisite of itself. `TEMPO-001` and `TEMPO-002` additionally require `GOALKEEPER_SUITE_PASS`, `RULES_SPEC_V1`, `REGULATION_RULES_SUITE_PASS`, `BALL_IN_PLAY_CLOCK_V1`, and `SAME_TICK_RULE_ARBITRATION_V1`. The evaluator MUST refuse metric computation and return `INVALID_RUN` when one of these tests is selected as required without every prerequisite. Merely emitting plausible goalkeeper outcomes, event rates, or phase durations does not satisfy a prerequisite. While those specifications and suites are absent, the tests may be listed only as deferred or optional diagnostic work, never as promotion evidence.
 
 ```yaml
 suites:
@@ -1779,7 +1779,7 @@ suites:
     direct_test_ids: [GK-REA-001, GK-WF-001, GK-LEG-001, GK-PARRY-001, GK-REC-001, GK-HIGH-001]
     common_criterion_ids: [COMMON-FINITE, COMMON-DETERMINISTIC, COMMON-REFERENCES, COMMON-BOUNDS]
     impact_closure: NONE
-    prerequisite_capabilities: [GOALKEEPER_SPEC_V1, GOALKEEPER_RULES_V1, GOALKEEPER_SUITE_PASS]
+    prerequisite_capabilities: [GOALKEEPER_SPEC_V1, GOALKEEPER_RULES_V1]
     seed_matrix_id: seeds-family-v1
     config_matrix_id: config-goalkeepers-v1
     held_out_policy_id: null
