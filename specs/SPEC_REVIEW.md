@@ -2,6 +2,8 @@
 
 **Review date:** 2026-08-12
 
+**Last remediation update:** 2026-08-13
+
 **Reviewed sources:** `VISION.md`, `research/RESEARCH_AUDIT.md`, `specs/TECHNICAL_SPEC.md`, `specs/GAMEPLAY_EVALUATION_SPEC.md`, and `specs/VISUAL_SPEC.md`
 
 **Review posture:** Independent architecture and specification review. This document does not amend any reviewed specification.
@@ -10,16 +12,16 @@
 
 The three specifications preserve the most important project boundary: the football simulation is authoritative, renderer-independent, fixed-step, headless-capable, seeded, and observable through adapters. They also correctly avoid presenting absent PES measurements as calibrated constants. The Technical and Visual Specs resolve most conflicts already identified by the research audit without prematurely selecting workers, ECS, Rapier, WebGPU, production art budgets, or multiplayer topology.
 
-The specification set is not yet an executable promotion contract, despite the Gameplay Evaluation Spec's status and opening claim. Its catalog is a strong test inventory, but most scenarios, metrics, invariant algorithms, observation bindings, applicability rules, and thresholds do not yet exist. In addition, the browser path has no deterministic owner for stateful presentation behavior, and the Gauntlet has no defined independent trust boundary for claims such as feasible contact, no teleport, or valid possession evidence.
+At review time, the specification set was not yet an executable promotion contract, despite the Gameplay Evaluation Spec's former status and opening claim. Its catalog was a strong test inventory, but most scenarios, metrics, invariant algorithms, observation bindings, applicability rules, and thresholds did not yet exist. In addition, the browser path had no deterministic owner for stateful presentation behavior, and the Gauntlet had no defined independent trust boundary for claims such as feasible contact, no teleport, or valid possession evidence.
 
-The most urgent corrections are therefore contractual rather than gameplay tuning: define milestone-scoped promotion profiles, materialize executable evaluator registries, bind every required observation, introduce deterministic presentation-session control, and separate independent evaluator evidence from candidate-authored semantic claims.
+The original review identified contractual corrections rather than gameplay tuning: define milestone-scoped promotion profiles, materialize executable evaluator registries, bind every required observation, introduce deterministic presentation-session control, and separate independent evaluator evidence from candidate-authored semantic claims. All `BLOCKER` and `IMPORTANT` findings have since been resolved in the affected specifications. The four `MINOR` findings remain open and were intentionally left outside the remediation scope.
 
-| Severity | Count |
-|---|---:|
-| `BLOCKER` | 5 |
-| `IMPORTANT` | 13 |
-| `MINOR` | 4 |
-| **Total** | **22** |
+| Severity | Total findings | Resolved | Open |
+|---|---:|---:|---:|
+| `BLOCKER` | 5 | 5 | 0 |
+| `IMPORTANT` | 13 | 13 | 0 |
+| `MINOR` | 4 | 0 | 4 |
+| **Total** | **22** | **18** | **4** |
 
 `BLOCKER` means the affected implementation, milestone acceptance, or Gauntlet promotion cannot be validly completed. It does not necessarily block the deterministic locomotion/ball foundation. `IMPORTANT` means the correction should be made before the affected subsystem or test family is implemented. `MINOR` means the ambiguity is containable but should be removed before automated tooling depends on it.
 
@@ -211,11 +213,15 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### M-01 — `target_types` duplicates criterion classes
 
+**Status:** `OPEN`
+
 **Issue:** Every gameplay test declares `target_types` and repeats the same information in `acceptance_logic[].class`. They are currently consistent but can drift.
 
 **Recommended correction:** Derive target types from acceptance criteria during materialization, or require the validator to reject any mismatch. Prefer removing the redundant field in the next catalog version.
 
 ### M-02 — Scenario interventions need explicit exclusion semantics
+
+**Status:** `OPEN`
 
 **Issue:** Technical §19.1 permits tick-indexed direct state setup/teleport as a declared scenario event. It says this cannot masquerade as gameplay, but does not require observation windows, continuity invariants, or metrics to exclude setup/discontinuity ticks.
 
@@ -223,11 +229,15 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### M-03 — Configurable visual ball scale lacks a truthfulness bound
 
+**Status:** `OPEN`
+
 **Issue:** Visual §18 includes a configurable ball visual-scale policy while §§3 and 11 require truthful size/contact presentation and prohibit effects that make the ball materially larger. No admissible relationship to canonical radius or camera scale is defined.
 
 **Recommended correction:** Default rendered geometry to canonical diameter and record any accessibility enlargement as an explicit experimental effect. Define a validated maximum screen-space/physical scale deviation and require contact diagnostics to render the canonical collision silhouette alongside the visual ball.
 
 ### M-04 — Kit support is universal in wording but unbounded in scope
+
+**Status:** `OPEN`
 
 **Issue:** Visual §§7 and 11 require testing every supported kit matchup, pitch, lighting preset, and quality tier, while the project intends replaceable external team data. “Supported” is not defined, and arbitrary imported palettes create an unbounded combination space before the clash algorithm and fallback are validated.
 
