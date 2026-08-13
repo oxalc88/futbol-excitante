@@ -1,0 +1,12 @@
+node_modules/
+dist/
+artifacts/*
+!artifacts/.gitkeep
+.vite/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+*.log
+*.tsbuildinfo
+.DS_Store
