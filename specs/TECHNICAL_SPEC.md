@@ -6,7 +6,7 @@
 
 **Scope:** Browser-playable and headless football simulation engine
 
-**Target scale:** 22 active footballers and one physically independent ball
+**Target scale:** profile-dependent active set, up to the regulation target of 22 footballers, plus one physically independent ball
 
 ## 1. Purpose and authority
 
@@ -303,12 +303,22 @@ WorldState
   PRNG state
   scheduled events
   teams[2]
-  players[22]
+  playersById (active set in stable playerId order)
   ball
   ordered action/contact/rule state
 ```
 
-Exactly 22 active footballers plus one ball is the regulation capacity target. Officials or stress-test entities require separate explicit state and budgets; the “22×2” phrase in the browser research is rejected as an error. [VISION §3.1](../VISION.md#31-gameplay) [AUDIT F-17](../research/RESEARCH_AUDIT.md#f-17--player-count-assumptions-contain-an-error)
+The active player set is variable and bounded by the selected scenario/match profile. Stable player IDs determine serialization and iteration order; array position never defines identity. Roster members not activated by initial state are immutable match configuration, do not appear in `playersById`, and are excluded from gameplay systems, team geometry, metrics, and the canonical world hash until a future rules specification defines a deterministic activation/substitution event.
+
+Cardinality validation is profile-specific:
+
+| Profile | Active-player invariant |
+|---|---|
+| `LABORATORY` | Exact declared set of 1–22 players; asymmetric teams and isolated actors are allowed when declared. |
+| `SMALL_SIDED` | Exact declared set of 2–20 players, at least one per team; any asymmetric experimental roster must be explicit. |
+| `REGULATION` | Exactly 22 active players, exactly 11 assigned to each of two teams. |
+
+One physically independent ball is required in every gameplay profile unless a scenario schema explicitly declares a no-ball subsystem fixture. Officials or stress-test entities require separate explicit state and budgets; the “22×2” phrase in the browser research is rejected as an error. [VISION §3.1](../VISION.md#31-gameplay) [AUDIT F-17](../research/RESEARCH_AUDIT.md#f-17--player-count-assumptions-contain-an-error)
 
 ### 8.2 Explicit state, not a generic ECS
 
@@ -322,7 +332,7 @@ Each player has stable identity and authoritative state in these categories:
 
 ```text
 Identity
-  playerId, teamId, roleId, controlAssignment
+  playerId, teamId
 
 Kinematics
   groundPosition
@@ -340,11 +350,8 @@ Action and contact
   disruption/recovery state
   stamina state
 
-Tactical
-  formation anchor
-  current role assignment
-  tactical target
-  team phase
+Individual decision
+  current intention and steering target
   current utility decision and hysteresis state
 
 Interaction facts
@@ -354,6 +361,10 @@ Interaction facts
 ```
 
 Fields that are derivable for display need not be duplicated in authoritative state. Fields that affect future decisions MUST be serialized even if visually hidden.
+
+Team tactical state is normalized under the team record. Each team solely owns its current phase, base/deformed formation state, and assignment maps keyed by stable `playerId` for tactical role, formation anchor/region, tactical target/responsibility, marking, pressing, and cover. Player state owns only the selected individual intention/steering target and utility/hysteresis memory that affect that player's future decisions.
+
+Player-facing role, anchor, target, or phase values are derived views. They MUST NOT be serialized as independently writable copies. If profiling later justifies a cache, the cache is rebuilt from team state before use, is excluded from authoritative serialization, and has a mandatory equality invariant against the owning assignment map. The versioned team-tactics phase is the only writer of team phase and assignment maps; individual AI reads one committed assignment snapshot and stages player-local decisions for the later commit phase.
 
 ### 9.2 Locomotion model
 
@@ -428,6 +439,8 @@ The architectural rule is: **tactics decides where and why; steering requests lo
 ### 11.2 Team tactics
 
 Team tactics contain a base formation plus versioned parameters for shape and preferences, including defensive line, compactness, support distance, width, build-up tendency, pressing, mentality, and advanced instructions where supported. These are neutral engine concepts, not claimed PES slider formulas.
+
+The team record is authoritative for tactical phase and all team-to-player assignment maps. Every active team member has exactly one applicable role/anchor responsibility record, and every map key resolves to an active player on that team. Removing or activating a player and recomputing assignments is one staged canonical transition; partial maps or player-local tactical copies are invariant failures.
 
 Formation anchors are normalized pitch-relative preferred regions, not rigid positions. They deform by ball zone, team side, possession/control facts, match phase, role corridor, and tactical instruction. Two teams with the same nominal formation may differ through tactics and individual decision preferences.
 

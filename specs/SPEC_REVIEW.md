@@ -77,6 +77,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 
 ### I-01 — Canonical player cardinality conflicts with laboratory scenarios
 
+**Resolution:** `RESOLVED` — Technical §8.1 now defines a stable-ID variable active set and explicit laboratory, small-sided, and regulation cardinality invariants, including inactive-roster exclusion.
+
 **Conflict:** Technical §8.1 depicts `players[22]` and says exactly 22 active footballers is the regulation target, while Vision §27 and many Gameplay scenarios require one or two players. It is unclear whether the array is fixed capacity, exact active cardinality, or shorthand.
 
 **Impact:** Scenario initialization, invariants, iteration order, team geometry, serialization, and performance baselines can make incompatible assumptions.
@@ -84,6 +86,8 @@ The most urgent corrections are therefore contractual rather than gameplay tunin
 **Recommended correction:** Specify either a variable active set bounded by 22 for regulation profiles, or 22 stable slots with explicit inactive state excluded from gameplay systems and metrics. Define separate cardinality invariants for laboratory, small-sided, and regulation match profiles.
 
 ### I-02 — Team tactical state is duplicated without a single owner
+
+**Resolution:** `RESOLVED` — Technical §§9.1 and 11.2 now make team records the sole owners of phase and assignment maps while limiting player state to individual intention and decision memory.
 
 **Conflict:** Technical §9.1 places team phase, formation anchor, role assignment, tactical target, and utility/hysteresis state inside each player, while §11 describes team phase, shape deformation, roles, pressing assignments, and tactics as team-level decisions. World state lists both teams and players, but no normalization or consistency invariant identifies the authoritative owner.
 
