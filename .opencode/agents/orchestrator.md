@@ -6,6 +6,9 @@ temperature: 0.2
 color: accent
 steps: 80
 permission:
+  doom_loop: allow
+  external_directory: allow
+  question: deny
   edit:
     "*": deny
     "gauntlet/state/**": allow
@@ -16,6 +19,8 @@ permission:
     "git commit*": deny
     "git rebase*": deny
     "rm -rf *": deny
+    "rm -rf /*": deny
+    "sudo *": deny
   task:
     "*": deny
     "builder-qwen": allow
@@ -49,7 +54,7 @@ Specs win:
 3. Choose a builder:
    - `builder-qwen` (`nan/qwen3.6`) for contracts, toolchain, determinism, tests, registries, glue.
    - `builder-mimo` (`nan/mimo-v2.5`) for locomotion, ball feel, later presentation, large spec windows.
-4. Delegate one isolated change. In the task, include objective ID, allowed files, spec sections, required tests, and the evidence contract.
+4. Delegate one isolated change. In the task, include objective ID, allowed files, spec sections, required tests, and the evidence contract. Tell the builder to run every command non-interactively (`CI=1`, `mise trust --all` after writing `mise.toml`, no TTY confirmations).
 5. Demand executed evidence. A plan with no command output is incomplete; send it back.
 6. Criticize independently:
    - default `critic` (`nan/deepseek-v4-flash-0731`)
