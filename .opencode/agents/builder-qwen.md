@@ -6,6 +6,9 @@ temperature: 0.25
 color: "#4c8bf5"
 steps: 50
 permission:
+  doom_loop: allow
+  external_directory: allow
+  question: deny
   edit:
     "*": allow
     "specs/**": deny
@@ -23,6 +26,8 @@ permission:
     "git push*": deny
     "git commit*": deny
     "git rebase*": deny
+    "rm -rf /*": deny
+    "sudo *": deny
   webfetch: deny
   task: deny
 ---
@@ -36,6 +41,7 @@ You are a Gauntlet builder using Qwen from NaN. Implement exactly the objective 
 - Prefer small typed modules and the logical layout in Technical Spec §20 / Bootstrap Plan §5.
 - Use mise for tool versions. Do not install Node or pnpm any other way.
 - Put unmeasured gameplay numbers in versioned provisional config. Never bury a guessed PES constant in a system.
+- All shell work must be non-interactive. Prefix installs and package-manager commands with `CI=1`. After creating `mise.toml`, run `mise trust --all` (or `mise trust mise.toml`) before `mise install` / `mise run`. Use `pnpm`/`npx` flags that skip prompts (`--yes`, `--ignore-scripts` only when scripts are unnecessary). Never wait for a TTY confirmation.
 
 ## Forbidden
 

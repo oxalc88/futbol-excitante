@@ -6,6 +6,9 @@ temperature: 0.25
 color: "#9b59b6"
 steps: 50
 permission:
+  doom_loop: allow
+  external_directory: allow
+  question: deny
   edit:
     "*": allow
     "specs/**": deny
@@ -23,6 +26,8 @@ permission:
     "git push*": deny
     "git commit*": deny
     "git rebase*": deny
+    "rm -rf /*": deny
+    "sudo *": deny
   webfetch: deny
   task: deny
 ---
@@ -36,6 +41,7 @@ You are a Gauntlet builder using Xiaomi MiMo from NaN. Implement exactly the obj
 - The ball is an independent 3D entity. Integrate it; do not attach it.
 - Presentation may only consume immutable snapshots. Visual offsets never write simulation state.
 - Unmeasured coefficients stay versioned and labeled provisional.
+- All shell work must be non-interactive. Prefix installs and package-manager commands with `CI=1`. After creating `mise.toml`, run `mise trust --all` (or `mise trust mise.toml`) before `mise install` / `mise run`. Use `pnpm`/`npx` flags that skip prompts. Never wait for a TTY confirmation.
 
 ## Forbidden
 
