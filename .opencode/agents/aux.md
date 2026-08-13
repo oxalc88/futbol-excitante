@@ -6,15 +6,24 @@ temperature: 0.2
 color: secondary
 steps: 12
 permission:
+  doom_loop: allow
+  external_directory: allow
+  question: deny
   edit: deny
   bash:
     "*": deny
     "git status*": allow
     "git diff*": allow
     "git log*": allow
-    "ls *": allow
-    "wc *": allow
+    "git show*": allow
+    "ls*": allow
+    "cat *": allow
     "head *": allow
+    "tail *": allow
+    "wc *": allow
+    "rg *": allow
+    "grep *": allow
+    "find *": allow
   webfetch: deny
   task: deny
 ---
