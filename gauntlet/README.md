@@ -19,10 +19,10 @@ An empty implementation is a valid start. `BOOTSTRAP-01` is the initial objectiv
 From the repository root:
 
 ```bash
-opencode
+opencode --auto
 ```
 
-This project sets `default_agent` to `orchestrator`. Then run:
+`--auto` auto-approves any remaining non-denied permission requests. This project also sets `doom_loop` and `external_directory` to `allow`, and `default_agent` to `orchestrator`. Then run:
 
 ```text
 /gauntlet
@@ -193,7 +193,10 @@ Do not put builder work on Grok by editing only the builder frontmatter. If a Na
 
 ## Permissions
 
+Unattended Gauntlet is the intended mode. Project `opencode.json` sets `doom_loop: allow`, `external_directory: allow`, and `question: deny`. Launch with `opencode --auto`.
+
 - Orchestrator cannot edit `src/`, `eval/`, or specs. It writes Gauntlet state only.
 - Builders can create and edit implementation files. They cannot edit specs, research, or `.opencode/agents/`.
-- Critics and the integration reviewer cannot edit files.
-- Nobody in this loop should `git push`. Commits are optional and outside the default loop; accepted work stays in the working tree.
+- Critics and the integration reviewer cannot edit files. They may run read-only validation (`git`, `mise`, `pnpm`, `npx`, `node`, `vitest`, and inspect commands).
+- Nobody in this loop should `git push`, `git commit`, `git rebase`, `sudo`, or `rm -rf /`. Commits are optional and outside the default loop; accepted work stays in the working tree.
+- Builders must run installs non-interactively (`CI=1`, `mise trust --all` after writing `mise.toml`).
