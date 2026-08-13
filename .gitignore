@@ -1,7 +1,11 @@
 node_modules/
+.opencode/node_modules/
+.opencode/package.json
+.opencode/package-lock.json
 dist/
 artifacts/*
 !artifacts/.gitkeep
+gauntlet/artifacts/
 .vite/
 coverage/
 test-results/
@@ -10,3 +14,4 @@ blob-report/
 *.log
 *.tsbuildinfo
 .DS_Store
+.worktrees/
