@@ -69,4 +69,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - commit: 7853fc26bf258432c71e49007608078f2f6bea65
 - notes: Synchronous Simulation API (tick, applyInputs, step, snapshot, presentation, restore, stateHash). System-free locomotion/ball stages. createWorld uniqueness fail-closed. 194 node tests. Non-blocking: cross-call applyInputs duplicates and scheduledEvents wiring for BOOTSTRAP-06.
 
+## Iteration 6 — 2026-08-13
+
+- objective_id: BOOTSTRAP-06
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 2)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: 1b80cc23528a525e06ae13863c5f3bf236d15979
+- notes: Normalized InputFrame, one stable slot, REPEAT_HELD_WITH_ZERO_EDGES, sourceId provenance-only. First two critic RETRYs: dead slot wiring, then double tick resolution and false unassigned. 233 node tests. No locomotion yet.
+
+
 
