@@ -3,17 +3,17 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: BOOTSTRAP
-next_objective_id: BOOTSTRAP-10
+next_objective_id: BOOTSTRAP-11
 best_known:
-  commit: c96de25
-  note: "BOOTSTRAP-09 accepted. Replay codec, recorder, and verifyReplay are the new best-known engine baseline."
+  commit: 9aa5f77
+  note: "BOOTSTRAP-10 accepted. Headless runner, telemetry, and DELTA_ONLY compare are the new best-known engine baseline."
 active_candidate:
-  objective_id: BOOTSTRAP-10
-  builder: builder-qwen
+  objective_id: BOOTSTRAP-11
+  builder: builder-mimo
   critic: critic
-  started_from_commit: c96de25
+  started_from_commit: 9aa5f77
   last_verdict: null
-builder_in_use: builder-qwen
+builder_in_use: builder-mimo
 critic_in_use: critic
 retry_count: 0
 max_retries_per_objective: 3
@@ -28,19 +28,21 @@ accepted:
   - BOOTSTRAP-07
   - BOOTSTRAP-08
   - BOOTSTRAP-09
+  - BOOTSTRAP-10
 blocked: []
-selection_note: "Highest-value remaining gap is telemetry, bootstrap invariants, metrics, and the headless runner. Runs can be replayed; they are not yet a machine-readable laboratory loop."
+selection_note: "Highest-value remaining gap is primitive browser composition and Three.js renderer. Headless laboratory exists; the same core is not yet visually inspectable. Presentation must not own football outcomes."
 ```
 
 ## Last accepted objective
 
-BOOTSTRAP-09 — checkpoints, input recording, replay verification.
+BOOTSTRAP-10 — telemetry, bootstrap invariants, metrics, headless runner.
 
-- commit: `c96de25d8a4f44136b1efae8b7aa16d98239b93c`
+- commit: `9aa5f77d72f76795fccfdcedae6e63491b021e66`
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 1
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 3
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
+- advisory: headless replay initialStateHash currently uses first committed step hash (tick 1), not tick-0 world hash
 
 ## Next action
 
-Delegate BOOTSTRAP-10 to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate BOOTSTRAP-11 to builder-mimo (presentation). After ACCEPT + integration, atomic-commit and push.

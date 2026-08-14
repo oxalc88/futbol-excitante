@@ -113,6 +113,18 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - commit: c96de25d8a4f44136b1efae8b7aa16d98239b93c
 - notes: ReplayV1 codec, recorder, reusable verifyReplay with earliest divergence + state slice, restore-capable checkpoints. First critic RETRY for missing verifier/full checkpoints. 318 node tests. No alternative physics.
 
+## Iteration 10 — 2026-08-14
+
+- objective_id: BOOTSTRAP-10
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 3)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: 9aa5f77d72f76795fccfdcedae6e63491b021e66
+- notes: Headless runner, telemetry sink, eval metrics/invariants, compare=DELTA_ONLY. Three critic RETRYs for theatrical canaries and CLI replay verify. 370 node tests. Advisory: headless replay initialStateHash uses tick-1 not tick-0. No FOUNDATION_LAB_PASS or PES claim.
+
+
 
 
 
