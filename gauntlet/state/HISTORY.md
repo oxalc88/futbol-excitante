@@ -124,6 +124,18 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - commit: 9aa5f77d72f76795fccfdcedae6e63491b021e66
 - notes: Headless runner, telemetry sink, eval metrics/invariants, compare=DELTA_ONLY. Three critic RETRYs for theatrical canaries and CLI replay verify. 370 node tests. Advisory: headless replay initialStateHash uses tick-1 not tick-0. No FOUNDATION_LAB_PASS or PES claim.
 
+## Iteration 11 — 2026-08-14
+
+- objective_id: BOOTSTRAP-11
+- builder: builder-mimo / mimo-v2.5
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 2)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: 09cd9fff62cb08a3d97a78c7b1b0622e57154941
+- notes: Keyboard adapter, Three.js primitive renderer, test-bridge, browser hashes match headless. Two critic RETRYs for theatrical screenshot smoke. 409 node + 16 browser tests. No PES visual claim.
+
+
 
 
 
