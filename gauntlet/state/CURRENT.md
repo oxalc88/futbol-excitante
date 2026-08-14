@@ -3,17 +3,17 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-next_objective_id: PLAYABLE-PLAYER-DUEL
+next_objective_id: PLAYABLE-ENGINE-DESIGN-RUNNER
 best_known:
-  commit: 639d0f8
-  note: "PLAYABLE-CLOSE-CONTROL accepted. Held first-touch dribble-touches. Restore rebuilds cooldown. Independent ball. Not PES."
+  commit: 73dd78c
+  note: "PLAYABLE-PLAYER-DUEL accepted. Symmetric planar player contact. Independent ball. Not PES."
 active_candidate:
-  objective_id: PLAYABLE-PLAYER-DUEL
-  builder: builder-mimo
+  objective_id: PLAYABLE-ENGINE-DESIGN-RUNNER
+  builder: builder-qwen
   critic: critic
-  started_from_commit: 639d0f8
+  started_from_commit: 73dd78c
   last_verdict: null
-builder_in_use: builder-mimo
+builder_in_use: builder-qwen
 critic_in_use: critic
 retry_count: 0
 max_retries_per_objective: 3
@@ -44,19 +44,20 @@ accepted:
   - PLAYABLE-BASIC-SHOT
   - PLAYABLE-SECOND-SLOT
   - PLAYABLE-CLOSE-CONTROL
+  - PLAYABLE-PLAYER-DUEL
 blocked: []
-selection_note: "Two humans can move, first-touch, pass, shoot, and dribble. They cannot contest each other. Next PLAYABLE-1V1 gap is versioned player-player contact without parenting the ball. Do not invent PES envelopes. Do not start 11v11."
+selection_note: "Duels are planar and symmetric. PLAYABLE-1V1 still needs ENGINE_DESIGN_TARGET evaluation. Next gap is a runner for the existing transient-acceleration axis. Do not invent PES envelopes. Do not start 11v11."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-CLOSE-CONTROL — held first-touch dribble-touches.
+PLAYABLE-PLAYER-DUEL — symmetric planar player-player contact.
 
-- commits: `f6563b2` (config), `9809c45` (impulse), `48ca933` (restore), `639d0f8` (tests)
+- commits: `dc6533e` (event kind), `3e394aa` (config), `b87b056` (resolver), `fb5cd75` (loop), `73dd78c` (tests)
 - builder: builder-mimo / mimo-v2.5 (retry 1)
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT (after RETRY)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate PLAYABLE-PLAYER-DUEL to builder-mimo. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-ENGINE-DESIGN-RUNNER to builder-qwen. After ACCEPT + integration, atomic-commit and push.

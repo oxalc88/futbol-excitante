@@ -905,4 +905,62 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 26 — 2026-08-14
+
+- objective_id: PLAYABLE-PLAYER-DUEL
+- builder: builder-mimo / mimo-v2.5
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: dc6533e event kind; 3e394aa config; b87b056 resolver; fb5cd75 loop; 73dd78c tests
+- notes: Symmetric planar disc contact after locomotion. First critic RETRY: pair order followed array index. Retry sorts by stable player IDs and tests 3-player shuffle. 769 node + 16 browser. No PES claim.
+
+### Critic verdict (retry 0 — RETRY)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-PLAYER-DUEL
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-mimo
+- builder_model: mimo-v2.5
+- independence_ok: true
+- verdict: RETRY
+- required_fixes:
+  - Sort pair candidates by stable player IDs before applying corrections.
+  - Strengthen the ordering test to 3+ overlapping players in shuffled array order.
+```
+
+### Critic verdict (retry 1 — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-PLAYER-DUEL
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-mimo
+- builder_model: mimo-v2.5
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-PLAYER-DUEL
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 769/769; test-browser 16/16
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
