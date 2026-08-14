@@ -279,6 +279,30 @@ export interface CriterionEvaluationResult {
   evidence: string[];
 }
 
+// ---------------------------------------------------------------------------
+// Browser case result
+// ---------------------------------------------------------------------------
+
+/**
+ * Result recorded when a browser case is executed.
+ * Browser case results populate `RegistrySet.browser_cases`.
+ */
+export interface BrowserCaseResult {
+  /** Case identifier — must match a definition in the browser-case registry. */
+  case_id: string;
+  /** Whether the case passed. */
+  passed: boolean;
+  /** Optional error message if the case failed or could not run. */
+  error?: string;
+  /** Evidence proving a real browser run occurred. */
+  evidence: {
+    /** Initial state hash from the bridge after reset (stateHash()). */
+    initialHash: string;
+    /** Per-tick state hashes from bridge.step() if inputs were injected. */
+    perTickHashes?: string[];
+  };
+}
+
 /** Overall test outcome. */
 export interface TestEvaluationResult {
   test_id: string;

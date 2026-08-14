@@ -26,6 +26,7 @@ import type {
   ReferenceTarget,
   ScenarioDefinition,
   ExpansionManifest,
+  BrowserCaseResult,
 } from "./types.js";
 
 // ---------------------------------------------------------------------------
@@ -47,6 +48,7 @@ import { RESOURCE_POLICIES } from "./policies.js";
 import { OUTCOME_REDUCTION_POLICIES } from "./policies.js";
 import { EXPANSION_MANIFESTS } from "./policies.js";
 import { TEST_BINDINGS } from "./bindings.js";
+import { BROWSER_CASES } from "./browser-cases.js";
 
 // ---------------------------------------------------------------------------
 // Typed registry set
@@ -72,6 +74,8 @@ export interface RegistrySet {
   resource_policies: Record<string, any>;
   outcome_reduction_policies: Record<string, any>;
   expansion_manifests: Record<string, ExpansionManifest>;
+  /** Browser case results from a browser evaluation run. */
+  browser_cases: BrowserCaseResult[];
 }
 
 // ---------------------------------------------------------------------------
@@ -447,6 +451,7 @@ export function loadRegistrySet(): RegistrySet {
     resource_policies: RESOURCE_POLICIES,
     outcome_reduction_policies: OUTCOME_REDUCTION_POLICIES,
     expansion_manifests: EXPANSION_MANIFESTS,
+    browser_cases: [],
   };
 
   // Validate
@@ -476,6 +481,7 @@ export function loadRegistrySet(): RegistrySet {
     resourcePolicies: RESOURCE_POLICIES,
     outcomeReductionPolicies: OUTCOME_REDUCTION_POLICIES,
     expansionManifests: EXPANSION_MANIFESTS,
+    browserCases: BROWSER_CASES,
   };
 
   // Assign schema version to the top-level hashable
