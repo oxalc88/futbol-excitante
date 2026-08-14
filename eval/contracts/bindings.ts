@@ -112,13 +112,44 @@ function makeTestBinding(
 
 // --- fast suite tests ---
 
-export const BINDING_BALL_IND_001: TestImplementationBinding = makeTestBinding(
+// Helper to build criterion_bindings that includes common criteria + test-level criteria.
+function makeTestBindingWith(
+  testId: string,
+  scenarioIds: string[],
+  metricIds: string[],
+  invariantIds: string[],
+  observationIds: string[],
+  commonCriterionIds: string[],
+  extraCriterionBindings: Record<string, string[]> = {},
+): TestImplementationBinding {
+  return {
+    test_id: testId,
+    scenario_ids: scenarioIds,
+    metric_ids: metricIds,
+    invariant_ids: invariantIds,
+    observation_ids: observationIds,
+    criterion_bindings: {
+      ...makeCriterionBindings(commonCriterionIds, invariantIds),
+      ...extraCriterionBindings,
+    },
+    required_schema_versions: {},
+    implementation_version: "binding-v1",
+  };
+}
+
+export const BINDING_BALL_IND_001: TestImplementationBinding = makeTestBindingWith(
   "BALL-IND-001",
   ["scn-ball-ind-001-v1"],
   ["ball-speed", "ball-distance", "ball-contact"],
   ["ball-continuity", "finite-number", "event-references"],
   ["obs-per-tick-v1", "obs-ball-motion-v1"],
   ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES"],
+  {
+    "BALL-IND-001-CONT": ["ball-continuity"],
+    "BALL-IND-001-POSS": ["possession-evidence"],
+    // MEASURED_TARGET — no reference target at bootstrap → BLOCKED_MISSING_REFERENCE.
+    "BALL-SPD-001-REF": ["ball-speed"],
+  },
 );
 
 export const BINDING_LOC_ACC_001: TestImplementationBinding = makeTestBinding(
@@ -130,13 +161,16 @@ export const BINDING_LOC_ACC_001: TestImplementationBinding = makeTestBinding(
   ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES"],
 );
 
-export const BINDING_BALL_GND_001: TestImplementationBinding = makeTestBinding(
+export const BINDING_BALL_GND_001: TestImplementationBinding = makeTestBindingWith(
   "BALL-GND-001",
   ["scn-ball-gnd-001-v1"],
   ["ball-speed", "ball-distance"],
   ["finite-number", "event-references"],
   ["obs-per-tick-v1", "obs-ball-motion-v1"],
   ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES"],
+  {
+    "BALL-GND-001-CONTACT": ["ball-continuity"],
+  },
 );
 
 // --- locomotion suite tests ---
@@ -204,13 +238,16 @@ export const BINDING_LOC_ORI_001: TestImplementationBinding = makeTestBinding(
   ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
 );
 
-export const BINDING_LOC_BALL_001: TestImplementationBinding = makeTestBinding(
+export const BINDING_LOC_BALL_001: TestImplementationBinding = makeTestBindingWith(
   "LOC-BALL-001",
   ["scn-loc-ball-001-v1"],
   ["player-speed", "ball-speed"],
   ["ball-continuity", "finite-number", "event-references"],
   ["obs-per-tick-v1", "obs-ball-motion-v1"],
   ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "LOC-BALL-001-FREE": ["ball-continuity"],
+  },
 );
 
 export const BINDING_CTRL_LAT_001: TestImplementationBinding = makeTestBinding(

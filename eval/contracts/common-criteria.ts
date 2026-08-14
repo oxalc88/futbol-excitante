@@ -62,6 +62,56 @@ export const COMMON_REGRESSION: EvaluationCriterion = {
   rule: "Compare all declared dependency metrics and pathologies with the immutable best run; gate only with a versioned materiality policy.",
 };
 
+/**
+ * BALL-IND-001-CONT — ball position must not teleport between ticks.
+ * Class: HARD_INVARIANT.
+ */
+export const BALL_IND_001_CONT: EvaluationCriterion = {
+  criterion_id: "BALL-IND-001-CONT",
+  class: "HARD_INVARIANT",
+  rule: "Ball displacement between consecutive ticks must not exceed the configured continuity bound.",
+};
+
+/**
+ * BALL-IND-001-POSS — ball possession changes must be backed by touch evidence.
+ * Class: HARD_INVARIANT.
+ */
+export const BALL_IND_001_POSS: EvaluationCriterion = {
+  criterion_id: "BALL-IND-001-POSS",
+  class: "HARD_INVARIANT",
+  rule: "Ball lastTouchRef changes must correspond to a touch event in the current tick.",
+};
+
+/**
+ * BALL-GND-001-CONTACT — ball ground contact events must be continuous.
+ * Class: HARD_INVARIANT.
+ */
+export const BALL_GND_001_CONTACT: EvaluationCriterion = {
+  criterion_id: "BALL-GND-001-CONTACT",
+  class: "HARD_INVARIANT",
+  rule: "Ball ground-contact state must not exhibit discontinuous transitions.",
+};
+
+/**
+ * BALL-SPD-001-REF — ball speed envelope comparison against measured reference.
+ * Class: MEASURED_TARGET.  (No reference target exists yet at bootstrap.)
+ */
+export const BALL_SPD_001_REF: EvaluationCriterion = {
+  criterion_id: "BALL-SPD-001-REF",
+  class: "MEASURED_TARGET",
+  rule: "Ball speed trajectory must fall within the versioned reference envelope.",
+};
+
+/**
+ * LOC-BALL-001-FREE — player must not make unexpected contact with the ball.
+ * Class: HARD_INVARIANT.
+ */
+export const LOC_BALL_001_FREE: EvaluationCriterion = {
+  criterion_id: "LOC-BALL-001-FREE",
+  class: "HARD_INVARIANT",
+  rule: "Ball position relative to player must not exhibit unexpected contact transitions.",
+};
+
 /** All common criteria keyed by criterion_id. */
 export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [COMMON_FINITE.criterion_id]: COMMON_FINITE,
@@ -69,6 +119,11 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [COMMON_REFERENCES.criterion_id]: COMMON_REFERENCES,
   [COMMON_BOUNDS.criterion_id]: COMMON_BOUNDS,
   [COMMON_REGRESSION.criterion_id]: COMMON_REGRESSION,
+  [BALL_IND_001_CONT.criterion_id]: BALL_IND_001_CONT,
+  [BALL_IND_001_POSS.criterion_id]: BALL_IND_001_POSS,
+  [BALL_GND_001_CONTACT.criterion_id]: BALL_GND_001_CONTACT,
+  [BALL_SPD_001_REF.criterion_id]: BALL_SPD_001_REF,
+  [LOC_BALL_001_FREE.criterion_id]: LOC_BALL_001_FREE,
 };
 
 /**
