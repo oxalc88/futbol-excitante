@@ -59,7 +59,7 @@ import {
 import { stepLocomotion } from "../locomotion/locomotion-system.js";
 import { stepBall } from "../ball/ball-system.js";
 import { stepContacts } from "../contacts/contact-system.js";
-import { FOUNDATION_LOCOMOTION_V1, FOUNDATION_BALL_V1 } from "../config/foundation.js";
+import { FOUNDATION_LOCOMOTION_V1, FOUNDATION_BALL_V1, FOUNDATION_CLOSE_CONTROL_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -184,6 +184,10 @@ export function createSimulation(
 
   // Event counter — persists across steps for total ordering.
   let eventCounter: number = 0;
+
+  // Per-player dribble-touch cooldown — maps playerId → last tick a dribble-touch occurred.
+  // Lives in the simulation closure; does not affect world state or hashing.
+  const dribbleCooldowns: Map<string, number> = new Map();
 
   // ------------------------------------------------------------------
   // Internal: drain all buffers into a single flat array (ordered by tick, then insertion).
@@ -376,6 +380,10 @@ export function createSimulation(
       undefined,
       counter,
       state.tick,
+      undefined,
+      undefined,
+      FOUNDATION_CLOSE_CONTROL_V1,
+      dribbleCooldowns,
     );
     eventCounter = counter.value;
     return events;
@@ -772,6 +780,21 @@ export function createSimulation(
       // Reset buffers since we're restoring a previous point.
       for (const key of Object.keys(inputBuffers)) {
         delete inputBuffers[key];
+      }
+      // Reconstruct dribble-touch cooldowns from event history.
+      // Clear then rebuild from all player-ball-contact events with
+      // contactType "dribble-touch", keeping the latest tick per player.
+      dribbleCooldowns.clear();
+      for (const ev of state.events) {
+        if (ev.kind === "player-ball-contact") {
+          const payload = ev.payload as { contactType?: string; playerId?: string } | undefined;
+          if (payload?.contactType === "dribble-touch" && payload.playerId) {
+            const prev = dribbleCooldowns.get(payload.playerId);
+            if (prev === undefined || ev.tick > prev) {
+              dribbleCooldowns.set(payload.playerId, ev.tick);
+            }
+          }
+        }
       }
       // Re-derive eventCounter from state.events max sequence.
       let maxSeq = 0;
