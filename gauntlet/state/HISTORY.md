@@ -365,6 +365,51 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - required_fixes: none
 ```
 
+## Iteration 14 — 2026-08-14
+
+- objective_id: FOUNDATION-ORACLES
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after RETRY, RETRY, REJECT, post-reject ACCEPT)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: d51b9d6 telemetry; 5122f7e sim observationCoreHash; a8a63bc oracles; 81eab71 oracle tests; 3074d89 PRNG mutant
+- notes: Protected oracle registry + implementable mutants (finite, snap, decay, teleport, possession, camera-hash, genuine PRNG via snapshot/restore). Deferred contact/team/transition = not_evaluated. First RETRY: theatrical camera-hash, decay missed constant speed, deferred no-ops. Second RETRY: camera-hash always-fail, deferred named fail, hash-injection as nondeterminism. Retry 3 REJECT: ungated mutatePrng + theatrical PRNG test (passed with identity mutator). Post-reject removed hook, rewrite via restore. 487 node tests. No FOUNDATION_LAB_PASS or PES claim.
+
+### Critic verdict (final — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: FOUNDATION-ORACLES
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- evidence_reviewed: mutatePrng absent; snapshot/restore XOR prng.state; identity restore zero divergence; camera-hash clean pass; deferred not_evaluated; typecheck 0; 487/487
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferred); RETRY (always-fail camera-hash / deferred as fail / hash-injection as RNG); REJECT (mutatePrng public hook + PRNG test independent of mutation).
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: FOUNDATION-ORACLES
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 487/487; typecheck PASS; sim-smoke PASS; mutatePrng absent
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 
