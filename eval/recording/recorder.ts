@@ -220,6 +220,7 @@ export function createRecorder(
     build(): ReplayV1 {
       return {
         header: {
+          replayVersion: "replay-v1",
           ...internal.header,
           schemaVersion: internal.schemaVersion,
         },

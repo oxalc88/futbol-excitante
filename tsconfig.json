@@ -18,7 +18,8 @@
       "@pes/contracts": ["./src/contracts/index.ts"],
       "@pes/simulation": ["./src/simulation/index.ts"],
       "@pes/adapters/*": ["./src/adapters/*"],
-      "@pes/apps/*": ["./src/apps/*"]
+      "@pes/apps/*": ["./src/apps/*"],
+      "@pes/eval/*": ["./eval/*"]
     }
   },
   "exclude": ["node_modules", "dist", "artifacts", "eval", "tests"]

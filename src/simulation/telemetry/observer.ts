@@ -1,11 +1,10 @@
 /**
  * @module @pes/simulation/telemetry/observer
  *
- * No-op observer interface for the simulation core.
+ * Observer interface for the simulation core.
  *
  * The core writes observations through this interface at well-defined
- * points in the stepping pipeline (before-step, after-step,
- * invariant-failure, presentation). The observer must not mutate
+ * points in the stepping pipeline. The observer must not mutate
  * authoritative state, consume the PRNG, or affect event ordering.
  *
  * A no-op implementation (all methods are empty) is always available
@@ -23,6 +22,9 @@ import type { TelemetryObservation } from "../../contracts/telemetry.js";
  *
  * All methods accept a `reason` string so callers can distinguish
  * why the hook was called (e.g., "invariant-failure" vs normal step).
+ *
+ * All observer methods are optional — the no-op implementation
+ * provides empty stubs for every hook.
  */
 export interface SimulationObserver {
   /** Called before the stepping stages run (before tick increment). */
@@ -30,6 +32,13 @@ export interface SimulationObserver {
 
   /** Called after all stepping stages have committed. */
   onAfterStep?(reason: string): void;
+
+  /**
+   * Called with the full per-tick telemetry observation (after hash computed).
+   * This is the primary hook for telemetry collection.
+   * @param observation - Full per-tick telemetry data.
+   */
+  onObservation?(observation: TelemetryObservation): void;
 
   /**
    * Called when an invariant validation succeeds.
@@ -61,6 +70,7 @@ export interface SimulationObserver {
 export const NO_OP_OBSERVER: SimulationObserver = Object.freeze({
   onBeforeStep() { /* no-op */ },
   onAfterStep() { /* no-op */ },
+  onObservation() { /* no-op */ },
   onInvariantPass() { /* no-op */ },
   onInvariantFail() { /* no-op */ },
   onPresent() { /* no-op */ },

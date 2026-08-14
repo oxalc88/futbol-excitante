@@ -7,14 +7,14 @@
   "include": [
     "src/contracts/**/*.ts",
     "src/simulation/**/*.ts",
-    "src/apps/headless/**/*.ts"
+    "src/apps/**/*.ts",
+    "eval/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "src/adapters/renderer-three/**/*",
     "src/adapters/input-browser/**/*",
-    "tests/**/*",
-    "eval/**/*"
+    "tests/**/*"
   ]
 }

@@ -451,11 +451,20 @@ export function createSimulation(
     events: SimulationEvent[],
     inputs: InputFrame[],
   ): TelemetryObservation {
+    // Compute PRNG state hash from the serializable snapshot.
+    const prngSnapshot = {
+      algorithmId: state.prng.algorithmId,
+      seed: state.prng.seed,
+      state: state.prng.state,
+    };
+    const prngStateHash = hashFnv1a64(JSON.stringify(prngSnapshot));
+
     return {
       tick,
       simulationTime: tick * (state.fixedDt.numerator / state.fixedDt.denominator),
       prngAlgorithmId: state.prng.algorithmId,
       stateHash: "", // placeholder — computed after commit
+      prngStateHash,
       committedTick: tick,
       inputs: inputs.map((f) => ({ ...f })),
       players: state.players.map((p) => ({
@@ -625,10 +634,17 @@ export function createSimulation(
       const invariantsOk = validateInvariants();
       const allStepEvents = [...oldTickEvents, ...schedEvents, ...ballEvents];
       const obsData = buildObservation(newTick, allStepEvents, currentFrames);
+
+      // Compute hash once (freezeWorldState copies, does not mutate).
+      const computedHash = hashFnv1a64(
+        encodeCanonical(freezeWorldState(state) as unknown as Record<string, unknown>),
+      );
+      obsData.stateHash = computedHash;
+
+      // Call onObservation with the populated observation.
+      obs.onObservation?.(obsData);
+
       if (invariantsOk) {
-        obsData.stateHash = hashFnv1a64(
-          encodeCanonical(freezeWorldState(state) as unknown as Record<string, unknown>),
-        );
         obs.onInvariantPass?.(obsData);
       } else {
         obs.onInvariantFail?.(obsData, "finite-number-invariant-failed");
@@ -638,18 +654,14 @@ export function createSimulation(
       const presentation = derivePresentation();
       obs.onPresent?.("step");
 
-      // 8. Commit — compute hash
-      const stateHash = hashFnv1a64(
-        encodeCanonical(freezeWorldState(state) as unknown as Record<string, unknown>),
-      );
-
+      // 8. Commit — use the already-computed hash
       obs.onAfterStep?.("step");
 
       // Return defensive copies of events so callers cannot mutate internal state.
       return {
         tick: newTick,
         events: allStepEvents.map((e) => deepClone(e) as SimulationEvent),
-        stateHash,
+        stateHash: computedHash,
       };
     },
 

@@ -225,6 +225,7 @@ export function makeTelemetryObservation(): TelemetryObservation {
     simulationTime: 0,
     prngAlgorithmId: FOUNDATION_CONFIG.prngAlgorithmId,
     stateHash: "abc123",
+    prngStateHash: "def456",
     committedTick: 0,
     inputs: [makeInputFrame(0, "slot-1")],
     players: [
