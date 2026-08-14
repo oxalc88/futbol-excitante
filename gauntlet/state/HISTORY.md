@@ -453,6 +453,48 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 16 — 2026-08-14
+
+- objective_id: FOUNDATION-BROWSER
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 3)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: e588033 registry; 3adc812 evaluator gate; 963ebdd tests
+- notes: Required RESET/STEP cases gate evaluateFoundation. First RETRY: {passed:true} stubs. Second RETRY: dummy hashes still PASS. Third RETRY: unused __BROWSER_CASE_EVIDENCE__ export. Evidence hashes now cross-checked against headless reference. Dummy INVALID_RUN. passed:false FAIL. 533 node + 16 browser. No FOUNDATION_LAB_PASS.
+
+### Critic verdict (retry 3 — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: FOUNDATION-BROWSER (retry 3, last)
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: FOUNDATION-BROWSER
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 533/533; test-browser 16/16
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 

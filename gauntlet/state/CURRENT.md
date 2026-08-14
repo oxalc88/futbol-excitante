@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: FOUNDATION
-next_objective_id: FOUNDATION-BROWSER
+next_objective_id: FOUNDATION-DETERMINISTIC
 best_known:
-  commit: f19c6df
-  note: "FOUNDATION-HARD accepted. Catalog HARD_INVARIANTs execute through protected oracles. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. No FOUNDATION_LAB_PASS."
+  commit: 963ebdd
+  note: "FOUNDATION-BROWSER accepted. Required RESET/STEP cases gate evaluateFoundation. Dummy hashes INVALID_RUN. No FOUNDATION_LAB_PASS."
 active_candidate:
-  objective_id: FOUNDATION-BROWSER
+  objective_id: FOUNDATION-DETERMINISTIC
   builder: builder-qwen
   critic: critic
-  started_from_commit: f19c6df
+  started_from_commit: 963ebdd
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -34,19 +34,20 @@ accepted:
   - FOUNDATION-REGISTRIES
   - FOUNDATION-ORACLES
   - FOUNDATION-HARD
+  - FOUNDATION-BROWSER
 blocked: []
-selection_note: "HARD_INVARIANTs execute headlessly. Highest-value remaining foundation gap is FOUNDATION-BROWSER: bind required BROWSER-CORE-RESET-001 and BROWSER-CORE-STEP-001 into the milestone required execution path. Do not claim FOUNDATION_LAB_PASS."
+selection_note: "Catalog foundation IDs REGISTRIES/ORACLES/HARD/BROWSER are accepted. Highest-value remaining spec gap is COMMON-DETERMINISTIC as a real two-run path (FOUNDATION_LAB exit prerequisite COMMON_DETERMINISTIC_PASS). MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. Do not claim FOUNDATION_LAB_PASS."
 ```
 
 ## Last accepted objective
 
-FOUNDATION-HARD — required HARD_INVARIANT criteria execute for fast/locomotion/ball.
+FOUNDATION-BROWSER — required BROWSER-CORE-RESET-001 and BROWSER-CORE-STEP-001 gate the foundation evaluator.
 
-- commits: `16718e9` (criteria/bindings), `f265a84` (possession pass), `0dd1085` (evaluator), `f19c6df` (tests)
+- commits: `e588033` (registry), `3adc812` (evaluator gate), `963ebdd` (tests)
 - builder: builder-qwen / qwen3.6
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT after RETRY×3
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate FOUNDATION-BROWSER to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate FOUNDATION-DETERMINISTIC (two-run COMMON-DETERMINISTIC) to builder-qwen. After ACCEPT + integration, atomic-commit and push.
