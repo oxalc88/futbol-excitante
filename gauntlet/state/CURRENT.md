@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-next_objective_id: PLAYABLE-CLOSE-CONTROL
+next_objective_id: PLAYABLE-PLAYER-DUEL
 best_known:
-  commit: 0578f03
-  note: "PLAYABLE-SECOND-SLOT accepted. Two HUMAN slots, slot-2 keyboard, ?scenario=two-player. Independent ball. Not PES."
+  commit: 639d0f8
+  note: "PLAYABLE-CLOSE-CONTROL accepted. Held first-touch dribble-touches. Restore rebuilds cooldown. Independent ball. Not PES."
 active_candidate:
-  objective_id: PLAYABLE-CLOSE-CONTROL
+  objective_id: PLAYABLE-PLAYER-DUEL
   builder: builder-mimo
   critic: critic
-  started_from_commit: 0578f03
+  started_from_commit: 639d0f8
   last_verdict: null
 builder_in_use: builder-mimo
 critic_in_use: critic
@@ -43,19 +43,20 @@ accepted:
   - PLAYABLE-BASIC-PASS
   - PLAYABLE-BASIC-SHOT
   - PLAYABLE-SECOND-SLOT
+  - PLAYABLE-CLOSE-CONTROL
 blocked: []
-selection_note: "Two humans can occupy opposite slots. Ball still only reacts to discrete first-touch/pass/shot edges. Next PLAYABLE-1V1 gap is versioned close-control / dribble touches while moving, without parenting the ball. Do not invent PES envelopes. Do not start 11v11."
+selection_note: "Two humans can move, first-touch, pass, shoot, and dribble. They cannot contest each other. Next PLAYABLE-1V1 gap is versioned player-player contact without parenting the ball. Do not invent PES envelopes. Do not start 11v11."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-SECOND-SLOT — second local HUMAN control slot.
+PLAYABLE-CLOSE-CONTROL — held first-touch dribble-touches.
 
-- commits: `69a98b5` (scenario), `09f37c9` (slot-2 keys), `132dff0` (fixture export), `48f6f32` (selector + adapter), `0578f03` (tests)
-- builder: builder-qwen / qwen3.6 (retry 1)
+- commits: `f6563b2` (config), `9809c45` (impulse), `48ca933` (restore), `639d0f8` (tests)
+- builder: builder-mimo / mimo-v2.5 (retry 1)
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT (after RETRY)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate PLAYABLE-CLOSE-CONTROL to builder-mimo. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-PLAYER-DUEL to builder-mimo. After ACCEPT + integration, atomic-commit and push.

@@ -847,4 +847,62 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 25 — 2026-08-14
+
+- objective_id: PLAYABLE-CLOSE-CONTROL
+- builder: builder-mimo / mimo-v2.5
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: f6563b2 config; 9809c45 dribble-touch; 48ca933 restore cooldown; 639d0f8 tests
+- notes: Held FIRST_TOUCH applies repeated velocity-only micro-contacts with versioned cooldown. First critic RETRY: restore() cleared cooldown so mid-dribble checkpoints diverged. Retry rebuilds the map from committed dribble-touch events. 744 node + 16 browser. No PES claim.
+
+### Critic verdict (retry 0 — RETRY)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-CLOSE-CONTROL
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-mimo
+- builder_model: mimo-v2.5
+- independence_ok: true
+- verdict: RETRY
+- required_fixes:
+  - restore() must not discard dribble-touch cooldown state. Reconstruct from state.events or serialize the map so checkpoint/restore continuation matches the uninterrupted run.
+  - Add a test asserting checkpoint/restore hash-equality while dribbling.
+```
+
+### Critic verdict (retry 1 — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-CLOSE-CONTROL
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-mimo
+- builder_model: mimo-v2.5
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-CLOSE-CONTROL
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 744/744; test-browser 16/16
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
