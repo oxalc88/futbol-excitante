@@ -135,6 +135,67 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - commit: 09cd9fff62cb08a3d97a78c7b1b0622e57154941
 - notes: Keyboard adapter, Three.js primitive renderer, test-bridge, browser hashes match headless. Two critic RETRYs for theatrical screenshot smoke. 409 node + 16 browser tests. No PES visual claim.
 
+### Critic verdict (retry 2 follow-up — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: BOOTSTRAP-11
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-mimo
+- builder_model: mimo-v2.5
+- independence_ok: true
+- evidence_reviewed:
+  - tests/browser/core-smoke.browser.test.ts (SCREENSHOT-SMOKE-001)
+  - src/adapters/renderer-three/renderer.ts
+  - src/apps/browser/test-bridge.ts
+  - src/simulation/loop/simulation.ts (isControlled from controlAssignments)
+  - Re-ran: typecheck exit 0; node 409/409; CI=1 browser 16/16
+- criteria:
+  - id: SCREENSHOT-SMOKE-001-named-objects
+    class: bootstrap-executable
+    outcome: PASS
+  - id: SCREENSHOT-SMOKE-001-non-blank
+    class: bootstrap-executable
+    outcome: PASS
+    note: luminance variance > 50 and distinct colors >= 20 fail a black/blank frame
+  - id: BROWSER-CORE-RESET/STEP/RENDER
+    class: bootstrap-executable
+    outcome: PASS
+  - id: prior-retry-fixes
+    class: bootstrap
+    outcome: PASS
+  - id: toolchain-and-arch
+    class: bootstrap
+    outcome: PASS
+- architecture_violations: none
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-resolve timeout regression, incomplete reset, tests did not drive test-bridge); RETRY (screenshot still theatrical; black frame would pass).
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: BOOTSTRAP-11
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS
+  - typecheck exit 0 (core, node, browser)
+  - node 409/409 (BOOTSTRAP-01–10 suites + keyboard 39)
+  - browser 16/16 (RESET-001, STEP-001 hashes match headless, RENDER-001 hash unchanged, SCREENSHOT-SMOKE-001)
+  - locomotion, ball independence, InputFrame contract, replay hashes intact
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 
