@@ -537,6 +537,48 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 18 — 2026-08-14
+
+- objective_id: FOUNDATION-MUTANT-REDUCTION
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: 50a7453 clean-pass; 8d2f49a prng-order+registry; b3e5428 reducer; 8084f79 tests
+- notes: evaluateMutantCore PASS only when all 7 implementable mutants clean-PASS and poison-FAIL. First RETRY: skip test theatrical; INVALID_RUN dead. Retry added skipMutationIds and INVALID_RUN precedence. Deferred NOT_EVALUATED. 570 node tests. No FOUNDATION_LAB_PASS.
+
+### Critic verdict (retry 1 — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: FOUNDATION-MUTANT-REDUCTION (retry 1)
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: FOUNDATION-MUTANT-REDUCTION
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 570/570
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 
