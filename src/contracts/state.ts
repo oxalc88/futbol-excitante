@@ -119,8 +119,8 @@ export interface SchedulerMemory {
   maxConsecutiveMissing: number;
   /** Current tick-indexed missing-input counters keyed by controlSlot. */
   missingInputCounters: Record<string, number>;
-  /** Last held InputFrame per controlSlot for repeat-held policy. */
-  lastHeldFrames: Record<string, InputFrame | null>;
+  /** Last held frame per controlSlot for repeat-held policy (no sourceId). */
+  lastHeldFrames: Record<string, { moveX: number; moveY: number; sprint: number; heldButtons: number; pressedButtons: number; releasedButtons: number } | null>;
 }
 
 /**
@@ -151,6 +151,8 @@ export interface WorldState {
   events: readonly SimulationEvent[];
   /** Scheduler / input-policy continuation state. */
   schedulerMemory: SchedulerMemory;
+  /** Control assignments keyed by slot — maps slot → player for input resolution. */
+  controlAssignments: Record<string, { teamId: string; controlledPlayerId: string; mode: string }>;
   /** Arbitrary read-only metadata keyed by string. */
   meta?: Record<string, unknown>;
 }

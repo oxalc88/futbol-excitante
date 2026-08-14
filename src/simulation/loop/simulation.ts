@@ -11,6 +11,8 @@
  * - `step()` commits exactly one tick per call. It returns the
  *   committed tick, ordered events for the committed tick, and a
  *   deterministic state hash.
+ * - Events in the returned StepResult are defensive copies — mutating
+ *   them does not affect internal state or subsequent hashes.
  *
  * Bootstrap scheduler stages (system-free — locomotion and ball are
  * no-ops). Read/write ownership and event sort keys are documented.
@@ -18,7 +20,7 @@
  * | Stage               | Read set            | Write set                    | Event sort key              |
  * |---------------------|---------------------|------------------------------|-----------------------------|
  * | Scheduled events    | committed state     | appends to `events` buffer   | `(tick, ++eventCounter)`    |
- * | Input resolution    | buffered inputs     | mutates player state         | N/A (no events emitted)     |
+ * | Input resolution    | buffered inputs     | mutates schedulerMemory    | `(tick, ++eventCounter)` for rejections/fallbacks |
  * | Locomotion          | committed state     | none (no-op in bootstrap)    | N/A                         |
  * | Ball integration    | committed state     | none (no-op in bootstrap)    | N/A                         |
  * | Invariant validation| committed state     | none (diagnostic only)       | N/A                         |
@@ -47,6 +49,13 @@ import { encodeCanonical } from "../determinism/canonical.js";
 import { hashFnv1a64 } from "../determinism/hash.js";
 import { checkFinite } from "../determinism/finite.js";
 import { NO_OP_OBSERVER } from "../telemetry/observer.js";
+import {
+  validateInputFrame,
+  filterDuplicateFrames,
+  resolveInputForPlayer,
+  createRejectionEvent,
+  NEUTRAL_INPUT,
+} from "../input/input-system.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -165,33 +174,122 @@ export function createSimulation(
   // Deep-clone so we own a mutable copy (the original is immutable).
   let state = deepClone(world) as WorldState;
 
-  // Input frame buffer — keyed by tick string.
-  const inputBuffers: Record<number, InputFrame[]> = {};
+  // Input frame buffer — keyed by tick string (string to avoid collision with numeric keys).
+  const inputBuffers: Record<string, InputFrame[]> = {};
 
   // Event counter — persists across steps for total ordering.
   let eventCounter: number = 0;
 
   // ------------------------------------------------------------------
-  // Internal: apply input frames to player state (system-free).
+  // Internal: drain all buffers into a single flat array (ordered by tick, then insertion).
+  // ------------------------------------------------------------------
+
+  /** Flatten all input buffers into a single ordered array. */
+  function flattenInputBuffers(): InputFrame[] {
+    const all: InputFrame[] = [];
+    for (const key of Object.keys(inputBuffers).sort((a, b) => Number(a) - Number(b))) {
+      for (const f of inputBuffers[key]) {
+        all.push(f);
+      }
+    }
+    return all;
+  }
+
+  // ------------------------------------------------------------------
+  // Internal: resolve input frames for the target tick.
   // ------------------------------------------------------------------
 
   /**
-   * Stubbed input resolution for the bootstrap system-free step.
+   * Input resolution stage.
    *
-   * Missing-input policy: "no stored frames → no kinematic change".
+   * Processes buffered frames for `targetTick`, detects duplicates across
+   * all buffers (not just the current tick), applies the missing-input
+   * policy from schedulerMemory, and produces resolved intents.
    *
-   * For each player, if a frame for the target tick and the player's
-   * control slot exists, it would update desired velocity and heading.
-   * During bootstrap (no locomotion system), this stage is a no-op:
-   * it only validates that the expected inputs are present.
+   * Emits diagnostic events for rejections and fallbacks.
    */
   function resolveInputs(
-    tick: number,
-    frames: InputFrame[],
+    targetTick: number,
+    framesForTick: InputFrame[],
   ): SimulationEvent[] {
-    // Bootstrap: no-kinematic-change stub.
-    // A full implementation would map frames → player kinematic updates.
-    return [];
+    const events: SimulationEvent[] = [];
+
+    // --- Cross-call duplicate detection --------------------------------
+    const allBuffered = flattenInputBuffers();
+    // Remove frames belonging to targetTick from allBuffered (they are in framesForTick).
+    const priorBuffered = allBuffered.filter(
+      (f) => f.tick !== targetTick,
+    );
+
+    // Filter duplicates: new frames that conflict with prior buffers.
+    const { rejectFrames, okFrames } = filterDuplicateFrames(
+      framesForTick,
+      priorBuffered,
+    );
+
+    // Emit diagnostic events for rejected duplicates (in arrival order of framesForTick).
+    for (const rej of rejectFrames) {
+      const ev = createRejectionEvent(targetTick, rej, ++eventCounter);
+      events.push(ev);
+      state.events = [...state.events, ev];
+    }
+
+    // Process valid frames: resolve intent per player.
+    // Determine which controlSlot each valid frame belongs to.
+    const frameBySlot = new Map<string, InputFrame>();
+    for (const f of okFrames) {
+      frameBySlot.set(f.controlSlot, f);
+    }
+
+    // For each player, check if there is a frame for its control slot.
+    // In the bootstrap we use the first control slot from the scenario.
+    for (const player of state.players) {
+      // Find the slot that controls this player from controlAssignments.
+      const slot = findControlSlotForPlayer(player.playerId);
+      if (!slot) continue;
+
+      const frameForSlot = frameBySlot.get(slot);
+
+      // Clone schedulerMemory for mutation safety.
+      const sm = deepClone(state.schedulerMemory) as SchedulerMemory;
+
+      const { resolved: _intent, events: playerEvents } = resolveInputForPlayer(
+        player,
+        frameForSlot,
+        sm,
+        slot,
+      );
+
+      // Update schedulerMemory in-place (canonical continuation state).
+      state.schedulerMemory = sm;
+
+      // Emit fallback events with correct tick and sequence.
+      for (const pe of playerEvents) {
+        const cloned = deepClone(pe) as SimulationEvent;
+        cloned.tick = targetTick;
+        cloned.sequence = ++eventCounter;
+        events.push(cloned);
+        state.events = [...state.events, cloned];
+      }
+    }
+
+    return events;
+  }
+
+  /**
+   * Find the controlSlot that controls the given playerId.
+   *
+   * Uses the authoritative controlAssignments stored on WorldState.
+   */
+  function findControlSlotForPlayer(playerId: string): string | null {
+    const assignments = state.controlAssignments;
+    if (!assignments) return null;
+    for (const slot of Object.keys(assignments)) {
+      if ((assignments[slot] as { controlledPlayerId?: string })?.controlledPlayerId === playerId) {
+        return slot;
+      }
+    }
+    return null;
   }
 
   // ------------------------------------------------------------------
@@ -379,55 +477,115 @@ export function createSimulation(
     },
 
     /**
-     * Buffer input frames. Duplicates per tick are detected eagerly.
+     * Buffer input frames. Duplicates across all buffered ticks are detected eagerly.
+     *
+     * Duplicates for the same (tick, controlSlot) are rejected with a thrown
+     * error listing all conflicting frames. The error is not resolved by
+     * arrival order — both frames are reported so the caller can decide.
+     *
+     * @param frames - Input frames; validation is strict.
+     * @throws {Error} on invalid frame or duplicate (tick, controlSlot).
      */
     applyInputs(frames: readonly InputFrame[]): void {
-      // Eager duplicate detection per tick.
-      const seen = new Set<string>();
+      // Validate each frame.
       for (const frame of frames) {
-        const key = `${frame.tick}:${frame.controlSlot}`;
-        if (seen.has(key)) {
+        if (!validateInputFrame(frame)) {
           throw new Error(
-            `Duplicate input frame for (tick=${frame.tick}, controlSlot="${frame.controlSlot}")`,
+            `Invalid input frame at tick ${frame.tick}, controlSlot "${frame.controlSlot}": range or type error`,
           );
         }
-        seen.add(key);
       }
+
+      // Eager duplicate detection per batch.
+      const intraSeen = new Set<string>();
+      for (const frame of frames) {
+        const key = `${frame.tick}:${frame.controlSlot}`;
+        if (intraSeen.has(key)) {
+          throw new Error(
+            `Duplicate input frame for (tick=${frame.tick}, controlSlot="${frame.controlSlot}") within batch`,
+          );
+        }
+        intraSeen.add(key);
+      }
+
+      // Cross-call duplicate detection against all buffered frames.
+      const allBuffered = flattenInputBuffers();
+      const { rejectFrames } = filterDuplicateFrames(frames, allBuffered);
+      if (rejectFrames.length > 0) {
+        const details = rejectFrames.map(
+          (r) => `(tick=${r.tick}, controlSlot="${r.controlSlot}")`,
+        );
+        throw new Error(
+          `Duplicate input frame across calls: ${details.join(", ")}`,
+        );
+      }
+
       // Buffer by tick.
       for (const frame of frames) {
-        if (!(frame.tick in inputBuffers)) {
-          inputBuffers[frame.tick] = [];
+        const key = String(frame.tick);
+        if (!(key in inputBuffers)) {
+          inputBuffers[key] = [];
         }
-        inputBuffers[frame.tick] = inputBuffers[frame.tick] ?? [];
-        inputBuffers[frame.tick].push({ ...frame });
+        inputBuffers[key] = inputBuffers[key] ?? [];
+        inputBuffers[key].push({ ...frame });
       }
     },
 
     /**
      * Advance by one tick.
+     *
+     * Events in the returned StepResult are defensive copies.
+     * Mutating them does not affect internal state or subsequent hashes.
      */
     step(): StepResult {
-      const newTick = state.tick + 1;
+      // Collect the current tick's frames before any mutations.
+      const currentTickKey = String(state.tick);
+      const currentFrames = inputBuffers[currentTickKey] ?? [];
+      delete inputBuffers[currentTickKey];
 
-      // 1. Increment tick
+      // Advance to the new tick (committed tick).
+      const newTick = state.tick + 1;
       state.tick = newTick;
+
+      // Resolve the old tick's input using the new (committed) tick for
+      // event attribution. Each tick is resolved exactly once.
+      const oldTickEvents = resolveInputs(newTick, currentFrames);
 
       obs.onBeforeStep?.("step");
 
-      // 2. Scheduled events
+      // Scheduled events for the new tick.
       const schedEvents = scheduledEvents(newTick);
       for (const ev of schedEvents) {
-        ev.sequence = ++eventCounter;
-        state.events = [...state.events, ev];
+        const clonedEv = deepClone(ev) as SimulationEvent;
+        clonedEv.sequence = ++eventCounter;
+        state.events = [...state.events, clonedEv];
       }
 
-      // 3. Input resolution
-      const buffered = inputBuffers[newTick] ?? [];
-      delete inputBuffers[newTick];
-      const inputEvents = resolveInputs(newTick, buffered);
-      for (const ev of inputEvents) {
-        ev.sequence = ++eventCounter;
-        state.events = [...state.events, ev];
+      // Diagnostic: detect frames whose controlSlot isn't assigned to any player.
+      // Check against controlAssignments (source of truth), not lastHeldFrames.
+      {
+        const assignedSlots = new Set(Object.keys(state.controlAssignments));
+        const unassigned = currentFrames.filter(
+          (f) => !assignedSlots.has(f.controlSlot),
+        );
+        if (unassigned.length > 0) {
+          const ev: SimulationEvent = {
+            id: `input-unassigned-${newTick}`,
+            tick: newTick,
+            sequence: ++eventCounter,
+            kind: "scheduler" as const,
+            label: `Input frame(s) for tick ${newTick} have unassigned controlSlot`,
+            payload: {
+              tick: newTick,
+              frameCount: unassigned.length,
+              unassignedSlots: unassigned.map((f) => f.controlSlot),
+            },
+          };
+          const clonedEv = deepClone(ev) as SimulationEvent;
+          clonedEv.sequence = ++eventCounter;
+          state.events = [...state.events, clonedEv];
+          oldTickEvents.push(clonedEv);
+        }
       }
 
       // 4. Locomotion (no-op)
@@ -438,7 +596,8 @@ export function createSimulation(
 
       // 6. Invariant validation
       const invariantsOk = validateInvariants();
-      const obsData = buildObservation(newTick, [...schedEvents, ...inputEvents], buffered);
+      const allStepEvents = [...oldTickEvents, ...schedEvents];
+      const obsData = buildObservation(newTick, allStepEvents, currentFrames);
       if (invariantsOk) {
         obsData.stateHash = hashFnv1a64(
           encodeCanonical(freezeWorldState(state) as unknown as Record<string, unknown>),
@@ -452,21 +611,17 @@ export function createSimulation(
       const presentation = derivePresentation();
       obs.onPresent?.("step");
 
-      // 8. Commit — append events, compute hash
-      const commitEvents: SimulationEvent[] = [
-        ...schedEvents,
-        ...inputEvents,
-      ];
-
+      // 8. Commit — compute hash
       const stateHash = hashFnv1a64(
         encodeCanonical(freezeWorldState(state) as unknown as Record<string, unknown>),
       );
 
       obs.onAfterStep?.("step");
 
+      // Return defensive copies of events so callers cannot mutate internal state.
       return {
         tick: newTick,
-        events: commitEvents,
+        events: allStepEvents.map((e) => deepClone(e) as SimulationEvent),
         stateHash,
       };
     },
@@ -487,15 +642,26 @@ export function createSimulation(
 
     /**
      * Restore from a checkpoint (deep-cloned world state).
+     *
+     * Re-derives eventCounter from the maximum sequence in state.events
+     * so that later events stay deterministically ordered after restore.
      */
     restore(snapshot: Checkpoint): void {
       // Deep clone again to ensure the caller's reference doesn't
       // affect internal state.
       state = deepClone(snapshot) as WorldState;
       // Reset buffers since we're restoring a previous point.
-      Object.keys(inputBuffers).forEach((k) => delete inputBuffers[Number(k)]);
-      // Reset event counter to maintain determinism.
-      eventCounter = 0;
+      for (const key of Object.keys(inputBuffers)) {
+        delete inputBuffers[key];
+      }
+      // Re-derive eventCounter from state.events max sequence.
+      let maxSeq = 0;
+      for (const ev of state.events) {
+        if (Number.isInteger(ev.sequence) && ev.sequence > maxSeq) {
+          maxSeq = ev.sequence;
+        }
+      }
+      eventCounter = maxSeq;
     },
 
     /**

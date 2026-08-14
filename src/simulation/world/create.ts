@@ -163,6 +163,7 @@ export function createWorld(opts: CreateOptions): WorldState {
       missingInputCounters: {},
       lastHeldFrames: {},
     },
+    controlAssignments: scenario.controlAssignments,
     meta: {
       scenarioId: scenario.id,
       scenarioVersion: scenario.version,
