@@ -89,5 +89,14 @@ export function checkVelocitySnap(
     }
   }
 
+  // No violations found — oracle ran successfully on clean data.
+  if (results.length === 0) {
+    results.push({
+      id: "velocity-snap-clean",
+      status: "pass",
+      description: "No instantaneous velocity or heading snap detected",
+    });
+  }
+
   return results;
 }

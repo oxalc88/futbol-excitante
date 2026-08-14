@@ -79,5 +79,14 @@ export function checkBallDecay(
     }
   }
 
+  // No violations found — oracle ran successfully on clean data.
+  if (results.length === 0) {
+    results.push({
+      id: "ball-decay-clean",
+      status: "pass",
+      description: "Ball ground-roll speed decays as expected",
+    });
+  }
+
   return results;
 }

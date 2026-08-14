@@ -90,5 +90,14 @@ export function checkBallTeleport(
     }
   }
 
+  // No violations found — oracle ran successfully on clean data.
+  if (results.length === 0) {
+    results.push({
+      id: "ball-teleport-clean",
+      status: "pass",
+      description: "No ball teleportation or parenting detected",
+    });
+  }
+
   return results;
 }

@@ -101,6 +101,15 @@ export function checkCameraHashConsistency(
     }
   }
 
+  // No violations found — oracle ran successfully on clean data.
+  if (results.length === 0) {
+    results.push({
+      id: "camera-hash-clean",
+      status: "pass",
+      description: "No camera-hash inconsistency detected",
+    });
+  }
+
   return results;
 }
 
