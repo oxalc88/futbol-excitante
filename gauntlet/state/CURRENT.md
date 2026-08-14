@@ -3,17 +3,17 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: BOOTSTRAP
-next_objective_id: BOOTSTRAP-08
+next_objective_id: BOOTSTRAP-09
 best_known:
-  commit: 9fb016f
-  note: "BOOTSTRAP-07 accepted. One-player kinematic locomotion is the new best-known engine baseline."
+  commit: bb1556d
+  note: "BOOTSTRAP-08 accepted. Independent 3D ball is the new best-known engine baseline."
 active_candidate:
-  objective_id: BOOTSTRAP-08
-  builder: builder-mimo
+  objective_id: BOOTSTRAP-09
+  builder: builder-qwen
   critic: critic
-  started_from_commit: 9fb016f
+  started_from_commit: bb1556d
   last_verdict: null
-builder_in_use: builder-mimo
+builder_in_use: builder-qwen
 critic_in_use: critic
 retry_count: 0
 max_retries_per_objective: 3
@@ -26,19 +26,20 @@ accepted:
   - BOOTSTRAP-05
   - BOOTSTRAP-06
   - BOOTSTRAP-07
+  - BOOTSTRAP-08
 blocked: []
-selection_note: "Highest-value remaining gap is the independent 3D ball. The player can move; the ball is still a static no-op. No invented PES envelopes."
+selection_note: "Highest-value remaining gap is checkpoints, input recording, and replay verification. Player and ball now move; runs are not yet reconstructible from a ReplayV1 record."
 ```
 
 ## Last accepted objective
 
-BOOTSTRAP-07 — one-player kinematic locomotion.
+BOOTSTRAP-08 — primitive independent 3D ball.
 
-- commit: `9fb016fbffe8f6a9b97f56e44ba317b35ddfb60e`
+- commit: `bb1556d82395252daf2f2df4cd90f0b7a06419e4`
 - builder: builder-mimo / mimo-v2.5
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate BOOTSTRAP-08 to builder-mimo.
+Delegate BOOTSTRAP-09 to builder-qwen. After critic + integration ACCEPT, atomic-commit and push.

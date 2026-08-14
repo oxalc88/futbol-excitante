@@ -91,6 +91,18 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - commit: 9fb016fbffe8f6a9b97f56e44ba317b35ddfb60e
 - notes: One-player kinematic locomotion. Desired velocity/heading immediate; actual converges under provisional accel/brake/turn/maxSpeed. Position from velocity. Sprint multiplier unused (known gap). 247 node tests. No PES/LOC claim.
 
+## Iteration 8 — 2026-08-13
+
+- objective_id: BOOTSTRAP-08
+- builder: builder-mimo / mimo-v2.5
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: bb1556d82395252daf2f2df4cd90f0b7a06419e4
+- notes: Independent 3D ball with gravity, swept pitch impact, bounce, non-reversing ground resistance, spin decay. Pitch-contact events with incoming/outgoing snapshots. 264 node tests. No PES ball claim.
+
+
 
 
 
