@@ -470,12 +470,48 @@ export function createSimulation(
     };
     const prngStateHash = hashFnv1a64(JSON.stringify(prngSnapshot));
 
+    // Build the exact core-fields snapshot that the camera-hash oracle
+    // recomputes from.  This must match the structure in eval/oracles/
+    // camera-hash.ts computeObservationHash field-for-field.
+    const coreFieldsSnapshot = {
+      schemaVersion: "observation-core-v1",
+      tick,
+      prngAlgorithmId: state.prng.algorithmId,
+      prngStateHash,
+      committedTick: tick,
+      players: state.players.map((p) => ({
+        playerId: p.playerId,
+        teamId: p.teamId,
+        groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
+        linearVelocity: { x: p.linearVelocity.x, y: p.linearVelocity.y },
+        bodyHeading: p.bodyHeading,
+        desiredHeading: p.desiredHeading,
+      })),
+      ball: {
+        position: {
+          x: state.ball.position.x,
+          y: state.ball.position.y,
+          z: state.ball.position.z,
+        },
+        linearVelocity: {
+          x: state.ball.linearVelocity.x,
+          y: state.ball.linearVelocity.y,
+          z: state.ball.linearVelocity.z,
+        },
+        regime: state.ball.regime,
+        lastTouchRef: state.ball.lastTouchRef,
+      },
+      events: events.map((e) => ({ id: e.id, tick: e.tick, sequence: e.sequence, kind: e.kind })),
+    };
+    const observationCoreHash = hashFnv1a64(encodeCanonical(coreFieldsSnapshot));
+
     return {
       tick,
       simulationTime: tick * (state.fixedDt.numerator / state.fixedDt.denominator),
       prngAlgorithmId: state.prng.algorithmId,
       stateHash: "", // placeholder — computed after commit
       prngStateHash,
+      observationCoreHash,
       committedTick: tick,
       inputs: inputs.map((f) => ({ ...f })),
       players: state.players.map((p) => ({
@@ -651,6 +687,7 @@ export function createSimulation(
         encodeCanonical(freezeWorldState(state) as unknown as Record<string, unknown>),
       );
       obsData.stateHash = computedHash;
+      // observationCoreHash is already set from buildObservation (same value).
 
       // Call onObservation with the populated observation.
       obs.onObservation?.(obsData);
