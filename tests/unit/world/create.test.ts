@@ -349,3 +349,82 @@ describe("BOOTSTRAP-04-VALIDATION-ORDER-001: validation order", () => {
     expect(() => createWorld({ scenario })).not.toThrow();
   });
 });
+
+// ---------------------------------------------------------------------------
+// 8. Duplicate input frame rejection (BOOTSTRAP-05 integration)
+// ---------------------------------------------------------------------------
+
+describe("BOOTSTRAP-05-UNIQUENESS-001: createWorld rejects duplicate input frames", () => {
+  it("rejects scenario with duplicate (tick, controlSlot) frames", () => {
+    const scenario = loadFixture("foundation-move-and-roll.v1.json");
+    // Add a duplicate frame: same tick 0, same controlSlot slot-1
+    scenario.inputProgram[0]!.push({
+      tick: 0,
+      sourceId: "test-dup",
+      controlSlot: "slot-1",
+      moveX: 0,
+      moveY: 0,
+      sprint: 0,
+      heldButtons: 0,
+      pressedButtons: 0,
+      releasedButtons: 0,
+    });
+
+    expect(() => createWorld({ scenario })).toThrow("Input uniqueness validation failed");
+  });
+
+  it("rejects duplicates across different sourceIds", () => {
+    const scenario = loadFixture("foundation-move-and-roll.v1.json");
+    // Same tick/slot but different sourceId — still a duplicate
+    const dupFrame = {
+      tick: 0,
+      sourceId: "another-source",
+      controlSlot: "slot-1",
+      moveX: 0,
+      moveY: 0,
+      sprint: 0,
+      heldButtons: 0,
+      pressedButtons: 0,
+      releasedButtons: 0,
+    };
+    scenario.inputProgram[0]!.push(dupFrame);
+
+    expect(() => createWorld({ scenario })).toThrow("Input uniqueness validation failed");
+  });
+
+  it("accepts frames with same tick but different controlSlots", () => {
+    const scenario = loadFixture("foundation-move-and-roll.v1.json");
+    scenario.inputProgram[0]!.push({
+      tick: 0,
+      sourceId: "test-slot2",
+      controlSlot: "slot-2",
+      moveX: 0,
+      moveY: 0,
+      sprint: 0,
+      heldButtons: 0,
+      pressedButtons: 0,
+      releasedButtons: 0,
+    });
+
+    // Should succeed — different controlSlot is allowed.
+    expect(() => createWorld({ scenario })).not.toThrow();
+  });
+
+  it("accepts frames with same controlSlot but different ticks", () => {
+    const scenario = loadFixture("foundation-move-and-roll.v1.json");
+    scenario.inputProgram[1]!.push({
+      tick: 5, // different tick
+      sourceId: "test",
+      controlSlot: "slot-1",
+      moveX: 0,
+      moveY: 0,
+      sprint: 0,
+      heldButtons: 0,
+      pressedButtons: 0,
+      releasedButtons: 0,
+    });
+
+    // Should succeed — different tick is allowed.
+    expect(() => createWorld({ scenario })).not.toThrow();
+  });
+});

@@ -106,7 +106,7 @@ export function createWorld(opts: CreateOptions): WorldState {
     );
   }
 
-  // 3. Validate input frame uniqueness
+  // 3. Validate input frame uniqueness — fail closed
   const allFrames: InputFrame[] = [];
   for (const tickStr of Object.keys(scenario.inputProgram)) {
     const tick = Number(tickStr);
@@ -119,7 +119,12 @@ export function createWorld(opts: CreateOptions): WorldState {
       }
     }
   }
-  validateInputUniqueness(allFrames, () => {});
+  const uniqErrors = validateInputUniqueness(allFrames);
+  if (uniqErrors.length > 0) {
+    throw new Error(
+      `Input uniqueness validation failed:\n${uniqErrors.join("\n")}`,
+    );
+  }
 
   // 4. Build initial state — deep-cloned from scenario data
   const sortedPlayers = [...scenario.players]
