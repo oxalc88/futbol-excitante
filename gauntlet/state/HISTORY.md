@@ -410,6 +410,49 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 15 — 2026-08-14
+
+- objective_id: FOUNDATION-HARD
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 3)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: 16718e9 criteria/bindings; f265a84 possession pass; 0dd1085 evaluator; f19c6df tests
+- notes: Catalog HARD_INVARIANTs (CONT/POSS/CONTACT/FREE) execute through protected oracles. First RETRY: only COMMON-* ran. Second RETRY: POSS empty→NOT_EVALUATED, invented TELEPORT test_id. Third RETRY: LOC-BALL-001-FREE not bound. 508 node tests. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. No FOUNDATION_LAB_PASS.
+
+### Critic verdict (retry 3 — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: FOUNDATION-HARD (retry 3, last)
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- evidence_reviewed: bindings, evaluator, oracles, 508/508 tests, empirical evaluateFoundation
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: FOUNDATION-HARD
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 508/508
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 

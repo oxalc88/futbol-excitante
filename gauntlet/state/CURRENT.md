@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: FOUNDATION
-next_objective_id: FOUNDATION-HARD
+next_objective_id: FOUNDATION-BROWSER
 best_known:
-  commit: 3074d89
-  note: "FOUNDATION-ORACLES accepted. Protected oracle registry and implementable mutant canaries exist. Deferred contact/team/transition mutants are not_evaluated. No FOUNDATION_LAB_PASS."
+  commit: f19c6df
+  note: "FOUNDATION-HARD accepted. Catalog HARD_INVARIANTs execute through protected oracles. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. No FOUNDATION_LAB_PASS."
 active_candidate:
-  objective_id: FOUNDATION-HARD
+  objective_id: FOUNDATION-BROWSER
   builder: builder-qwen
   critic: critic
-  started_from_commit: 3074d89
+  started_from_commit: f19c6df
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -33,19 +33,20 @@ accepted:
   - BOOTSTRAP-12
   - FOUNDATION-REGISTRIES
   - FOUNDATION-ORACLES
+  - FOUNDATION-HARD
 blocked: []
-selection_note: "Oracles exist. Highest-value next gap is FOUNDATION-HARD: run required HARD_INVARIANT criteria for fast/locomotion/ball through the protected oracles. Browser RESET/STEP cases already exist from BOOTSTRAP-11. Do not claim FOUNDATION_LAB_PASS. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE."
+selection_note: "HARD_INVARIANTs execute headlessly. Highest-value remaining foundation gap is FOUNDATION-BROWSER: bind required BROWSER-CORE-RESET-001 and BROWSER-CORE-STEP-001 into the milestone required execution path. Do not claim FOUNDATION_LAB_PASS."
 ```
 
 ## Last accepted objective
 
-FOUNDATION-ORACLES — protected evaluator oracles and core mutant/canary suite.
+FOUNDATION-HARD — required HARD_INVARIANT criteria execute for fast/locomotion/ball.
 
-- commits: `d51b9d6` (telemetry), `5122f7e` (sim hash), `a8a63bc` (oracles), `81eab71` (oracle tests), `3074d89` (PRNG mutant)
+- commits: `16718e9` (criteria/bindings), `f265a84` (possession pass), `0dd1085` (evaluator), `f19c6df` (tests)
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT after RETRY×2, REJECT (mutatePrng + theatrical PRNG test), then post-reject ACCEPT
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT after RETRY×3
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate FOUNDATION-HARD to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate FOUNDATION-BROWSER to builder-qwen. After ACCEPT + integration, atomic-commit and push.
