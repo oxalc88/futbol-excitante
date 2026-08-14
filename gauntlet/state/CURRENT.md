@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: BOOTSTRAP
-next_objective_id: BOOTSTRAP-07
+next_objective_id: BOOTSTRAP-08
 best_known:
-  commit: 1b80cc2
-  note: "BOOTSTRAP-06 accepted. Normalized input is the new best-known engine baseline."
+  commit: 9fb016f
+  note: "BOOTSTRAP-07 accepted. One-player kinematic locomotion is the new best-known engine baseline."
 active_candidate:
-  objective_id: BOOTSTRAP-07
+  objective_id: BOOTSTRAP-08
   builder: builder-mimo
   critic: critic
-  started_from_commit: 1b80cc2
+  started_from_commit: 9fb016f
   last_verdict: null
 builder_in_use: builder-mimo
 critic_in_use: critic
@@ -25,19 +25,20 @@ accepted:
   - BOOTSTRAP-04
   - BOOTSTRAP-05
   - BOOTSTRAP-06
+  - BOOTSTRAP-07
 blocked: []
-selection_note: "Highest-value remaining gap is one-player kinematic locomotion. Input is now real; the player still does not move. BOOTSTRAP-08 (ball) is isolatable later but shares foundation.ts so it waits until 07 lands."
+selection_note: "Highest-value remaining gap is the independent 3D ball. The player can move; the ball is still a static no-op. No invented PES envelopes."
 ```
 
 ## Last accepted objective
 
-BOOTSTRAP-06 — normalized input and one stable control slot.
+BOOTSTRAP-07 — one-player kinematic locomotion.
 
-- commit: `1b80cc23528a525e06ae13863c5f3bf236d15979`
-- builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 2
+- commit: `9fb016fbffe8f6a9b97f56e44ba317b35ddfb60e`
+- builder: builder-mimo / mimo-v2.5
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate BOOTSTRAP-07 to builder-mimo.
+Delegate BOOTSTRAP-08 to builder-mimo.

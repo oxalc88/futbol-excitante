@@ -80,5 +80,17 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - commit: 1b80cc23528a525e06ae13863c5f3bf236d15979
 - notes: Normalized InputFrame, one stable slot, REPEAT_HELD_WITH_ZERO_EDGES, sourceId provenance-only. First two critic RETRYs: dead slot wiring, then double tick resolution and false unassigned. 233 node tests. No locomotion yet.
 
+## Iteration 7 — 2026-08-13
+
+- objective_id: BOOTSTRAP-07
+- builder: builder-mimo / mimo-v2.5
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: 9fb016fbffe8f6a9b97f56e44ba317b35ddfb60e
+- notes: One-player kinematic locomotion. Desired velocity/heading immediate; actual converges under provisional accel/brake/turn/maxSpeed. Position from velocity. Sprint multiplier unused (known gap). 247 node tests. No PES/LOC claim.
+
+
 
 
