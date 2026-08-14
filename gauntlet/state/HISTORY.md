@@ -196,7 +196,116 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - required_fixes: none
 ```
 
+## Iteration 12 — 2026-08-14
 
+- objective_id: BOOTSTRAP-12
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: edcaf04 feat(headless) CLIs; 6899492 chore mise/test-all gate; ab568a6 docs README
+- notes: mise tasks, README iteration loop, test-all frozen-lockfile+typecheck+node+browser+sim-smoke+build. First critic RETRY for argv offset (parseArgs started at 3; documented `mise run <task> -- <args>` skipped the path) and eval-compare baseline/candidate swap. Retry fixed argv[2] and removed embedded flags. 409 node + 16 browser. No FOUNDATION_LAB_PASS or PES claim.
+
+### Critic verdict (retry 1 — RETRY)
+
+```markdown
+## Critic verdict
+- objective_id: BOOTSTRAP-12
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- evidence_reviewed:
+  - Read BOOTSTRAP_PLAN.md §6 Step 12, mise.toml, package.json, README.md,
+    replay-verify-cli.ts, eval-compare-cli.ts, verifier.ts, compare.ts.
+  - Re-ran test-all (0), test (409), test-browser (16), replay-verify and
+    eval-compare (identical / mismatch / crafted metric-delta).
+- criteria:
+  - BOOTSTRAP-12-mise-tasks: PASS
+  - BOOTSTRAP-12-replay-verify: FAIL (documented single `--` form skips the path)
+  - BOOTSTRAP-12-eval-compare: FAIL (same argv bug plus swapped baseline/candidate)
+  - BOOTSTRAP-12-test-all: PASS
+  - BOOTSTRAP-12-readme-loop: PASS
+  - BOOTSTRAP-12-no-forbidden-names: PASS
+  - BOOTSTRAP-12-fresh-install: PASS (global mise lock noise is pre-existing)
+  - BOOTSTRAP-12-no-neighboring-regression: PASS
+- architecture_violations: none
+- verdict: RETRY
+- required_fixes:
+  - Fix parseArgs so user args start at argv[2] under pnpm/tsx
+  - Remove value-less `--baseline --candidate` from the eval-compare script
+  - Re-prove the documented single-`--` forms, including metric-delta order
+```
+
+### Critic verdict (retry 1 follow-up — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: BOOTSTRAP-12 (retry 1)
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- evidence_reviewed: git diff (mise.toml, package.json), src/apps/headless/replay-verify-cli.ts, src/apps/headless/eval-compare-cli.ts, eval/recording/verifier.ts, src/contracts/telemetry.ts (status enum), README.md, BOOTSTRAP_PLAN.md §6 Step 12; re-ran all documented single-`--` forms plus test/test-all.
+- criteria:
+  - id: MISE_TASKS
+    class: executable
+    outcome: PASS
+  - id: REPLAY_VERIFY_SINGLE_DASH
+    class: executable
+    outcome: PASS
+    note: `CI=1 mise run replay-verify -- artifacts/sim-smoke/replay.json` exits 0; parseArgs starts at argv[2]; verifyReplay imported from eval/recording/verifier.ts.
+  - id: EVAL_COMPARE_IDENTICAL
+    class: executable
+    outcome: PASS
+    note: exit 0, delta_only, never a PASS name.
+  - id: EVAL_COMPARE_MISMATCH
+    class: executable
+    outcome: PASS
+    note: exit 1, condition hash mismatch.
+  - id: EVAL_COMPARE_ORDER
+    class: executable
+    outcome: PASS
+    note: expected=baseline 0.176..., actual=candidate 0.999; order proven.
+  - id: NODE_TESTS
+    class: executable
+    outcome: PASS
+    note: 409/409
+  - id: TEST_ALL_GATE
+    class: executable
+    outcome: PASS
+    note: frozen-lockfile, typecheck, 409 node, 16 browser, sim-smoke, vite build.
+  - id: README_LOOP
+    class: documentation
+    outcome: PASS
+    note: Optional nit: troubleshooting mentions `mise run typecheck`, which is not a mise task.
+  - id: NO_FORBIDDEN_PASS_NAMES
+    class: executable
+    outcome: PASS
+- architecture_violations: None
+- verdict: ACCEPT
+- required_fixes: None
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: BOOTSTRAP-12
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6 (builder-qwen)
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: None. Re-ran `mise run test` (409, exit 0), `mise run test-browser` (16, exit 0), `mise run test-all` (exit 0). Exercised sim-smoke, replay-verify single-`--`, eval-compare identical (delta_only) and mismatch (exit 1). No changes to src/simulation, src/contracts, adapters, or eval/. Pre-existing advisory: replay-verify prints initial hash match false (tick-1 vs tick-0); not a candidate regression.
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
 
 
 

@@ -2,16 +2,16 @@
 
 ```yaml
 gauntlet_version: gauntlet-loop-v1
-phase: BOOTSTRAP
-next_objective_id: BOOTSTRAP-12
+phase: FOUNDATION
+next_objective_id: FOUNDATION-REGISTRIES
 best_known:
-  commit: 09cd9ff
-  note: "BOOTSTRAP-11 accepted. Primitive browser Three.js view is the new best-known engine baseline."
+  commit: ab568a6
+  note: "BOOTSTRAP-12 accepted. mise tasks, README, test-all gate, and replay-verify/eval-compare CLIs are the new best-known baseline."
 active_candidate:
-  objective_id: BOOTSTRAP-12
+  objective_id: FOUNDATION-REGISTRIES
   builder: builder-qwen
   critic: critic
-  started_from_commit: 09cd9ff
+  started_from_commit: ab568a6
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -30,19 +30,20 @@ accepted:
   - BOOTSTRAP-09
   - BOOTSTRAP-10
   - BOOTSTRAP-11
+  - BOOTSTRAP-12
 blocked: []
-selection_note: "Highest-value remaining gap is the automated mise gate and README (BOOTSTRAP-12). After that, reassess for FOUNDATION registries or remaining spec gaps."
+selection_note: "Bootstrap exit criteria are met. Highest-value spec-backed gap is FOUNDATION-REGISTRIES: eval/contracts only has a bootstrap fixture ID list, not executable catalog bindings or suite/metric/invariant/schema/policy registries for fast, locomotion, and ball. Do not claim FOUNDATION_LAB_PASS."
 ```
 
 ## Last accepted objective
 
-BOOTSTRAP-11 — primitive browser composition and renderer.
+BOOTSTRAP-12 — automated mise gate, README, and iteration workflow.
 
-- commit: `09cd9fff62cb08a3d97a78c7b1b0622e57154941`
-- builder: builder-mimo / mimo-v2.5
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 2
+- commits: `edcaf04` (CLIs), `6899492` (mise/package gate), `ab568a6` (README)
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 1
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate BOOTSTRAP-12 to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate FOUNDATION-REGISTRIES to builder-qwen. After ACCEPT + integration, atomic-commit and push.
