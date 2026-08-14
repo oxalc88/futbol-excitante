@@ -11,8 +11,20 @@ export type ActionBits = number;
  * on the current tick. Pressed while within contact radius of the ball.
  * The contact system resolves the actual touch; pressing this bit does
  * not guarantee a touch occurs (range, timing, and priority govern).
+ *
+ * Bit 1: PASS — the player intends to pass the ball along body heading
+ * on the current tick. Pressed while within contact radius of the ball.
+ * The contact system resolves the actual pass; pressing this bit does
+ * not guarantee a pass occurs (range, timing, and priority govern).
  */
 export const FIRST_TOUCH_BIT = 1 << 0;
+
+/**
+ * PASS_BIT: directed pass action. The controlled player applies an
+ * impulse along body heading to the ball, emitting an ordered pass
+ * event. The ball remains an independent 3D entity.
+ */
+export const PASS_BIT = 1 << 1;
 
 /**
  * A tick-indexed input frame from any source (keyboard, gamepad, replay, AI, test).

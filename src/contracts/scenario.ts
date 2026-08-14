@@ -28,6 +28,7 @@ export interface SimulationEvent {
     | "scenario-stop"
     | "pitch-contact"
     | "player-ball-contact"
+    | "pass"
     | "rule"
     | "input-rejection"
     | "invariant"
