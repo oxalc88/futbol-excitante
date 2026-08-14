@@ -20,7 +20,7 @@ import type { BallState, PlayerState } from "../../contracts/state.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { SimulationEvent } from "../../contracts/scenario.js";
 import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT } from "../../contracts/input.js";
-import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1, FOUNDATION_SHOT_V1 } from "../config/foundation.js";
+import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1, FOUNDATION_SHOT_V1, FOUNDATION_CLOSE_CONTROL_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -53,6 +53,16 @@ interface ShotConfig {
   shotRadius: { value: number };
   exitSpeed: { value: number };
   verticalComponent: { value: number };
+}
+
+/**
+ * Close-control config shape (matches FOUNDATION_CLOSE_CONTROL_V1).
+ */
+interface CloseControlConfig {
+  dribbleRadius: { value: number };
+  pushAheadFraction: { value: number };
+  cooldownTicks: { value: number };
+  minPlayerSpeed: { value: number };
 }
 
 /**
@@ -178,6 +188,48 @@ function computeShotVelocity(
   };
 }
 
+/**
+ * Compute outgoing velocity for a dribble-touch close-control contact.
+ *
+ * The dribble touch nudges the ball forward in the player's movement
+ * direction (desiredVelocity) when moving at sufficient speed, or
+ * falls back to body heading when nearly stationary.  Ball position
+ * is never modified — only velocity.
+ */
+function computeCloseControlVelocity(
+  player: PlayerState,
+  config: CloseControlConfig,
+): { vx: number; vy: number; vz: number } {
+  // Determine movement direction from desiredVelocity if moving fast enough.
+  const playerSpeed = Math.sqrt(
+    player.desiredVelocity.x * player.desiredVelocity.x +
+      player.desiredVelocity.y * player.desiredVelocity.y,
+  );
+
+  let dirX: number;
+  let dirY: number;
+
+  if (playerSpeed >= config.minPlayerSpeed.value) {
+    // Use desired velocity direction.
+    dirX = player.desiredVelocity.x / playerSpeed;
+    dirY = player.desiredVelocity.y / playerSpeed;
+  } else {
+    // Nearly stationary — use body heading.
+    dirX = Math.cos(player.bodyHeading);
+    dirY = Math.sin(player.bodyHeading);
+  }
+
+  // Outgoing speed: fraction of player speed, clamped to a small range
+  // that stays below pass/shot exit speeds.
+  const outgoingHSpeed = playerSpeed * config.pushAheadFraction.value;
+
+  return {
+    vx: dirX * outgoingHSpeed,
+    vy: dirY * outgoingHSpeed,
+    vz: 0,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -224,6 +276,8 @@ export interface ContactStepResult {
  * @param tick - Current simulation tick.
  * @param passConfig - Pass coefficient set (default: FOUNDATION_PASS_V1).
  * @param shotConfig - Shot coefficient set (default: FOUNDATION_SHOT_V1).
+ * @param closeControlConfig - Close-control coefficient set (default: FOUNDATION_CLOSE_CONTROL_V1).
+ * @param dribbleCooldowns - Mutable per-player cooldown map (keyed by playerId, value is last dribble-touch tick).
  * @returns Contact events and whether a touch occurred.
  */
 export function stepContacts(
@@ -236,6 +290,8 @@ export function stepContacts(
   tick: number,
   passConfig: PassConfig = FOUNDATION_PASS_V1,
   shotConfig: ShotConfig = FOUNDATION_SHOT_V1,
+  closeControlConfig: CloseControlConfig = FOUNDATION_CLOSE_CONTROL_V1,
+  dribbleCooldowns: Map<string, number> = new Map(),
 ): ContactStepResult {
   const events: SimulationEvent[] = [];
   const radius = config.contactRadius.value;
@@ -260,8 +316,10 @@ export function stepContacts(
   }
 
   // Find eligible players — within radius + SHOT_BIT, PASS_BIT, or FIRST_TOUCH_BIT set.
-  // Priority: shot > pass > first-touch.
-  const candidates: Array<{ player: PlayerState; action: "shot" | "pass" | "first-touch" }> = [];
+  // Priority: shot > pass > first-touch (on pressedButtons) > dribble-touch (on heldButtons).
+  // Dribble-touch fires on heldButtons & FIRST_TOUCH_BIT but NOT pressedButtons & FIRST_TOUCH_BIT
+  // to avoid double-firing with the one-shot first-touch edge on the same tick.
+  const candidates: Array<{ player: PlayerState; action: "shot" | "pass" | "first-touch" | "dribble-touch" }> = [];
 
   for (const player of players) {
     const frame = frameByPlayerId.get(player.playerId);
@@ -271,10 +329,13 @@ export function stepContacts(
     const hasShotBit = (frame.pressedButtons & SHOT_BIT) !== 0;
     // Check PASS_BIT next.
     const hasPassBit = (frame.pressedButtons & PASS_BIT) !== 0;
-    // Check FIRST_TOUCH_BIT last.
+    // Check FIRST_TOUCH_BIT for one-shot edge.
     const hasFirstTouchBit = (frame.pressedButtons & FIRST_TOUCH_BIT) !== 0;
+    // Check FIRST_TOUCH_BIT held (for dribble-touch) — only if not also pressed this tick.
+    const hasFirstTouchHeld = (frame.heldButtons & FIRST_TOUCH_BIT) !== 0 &&
+      (frame.pressedButtons & FIRST_TOUCH_BIT) === 0;
 
-    if (!hasShotBit && !hasPassBit && !hasFirstTouchBit) continue;
+    if (!hasShotBit && !hasPassBit && !hasFirstTouchBit && !hasFirstTouchHeld) continue;
 
     const dist = planarDistance(
       player.groundPosition.x,
@@ -283,18 +344,23 @@ export function stepContacts(
       ball.position.y,
     );
 
-    // Use shotRadius for shot, passRadius for pass, contactRadius for first-touch.
+    // Use shotRadius for shot, passRadius for pass, contactRadius for first-touch,
+    // dribbleRadius for dribble-touch.
     let effectiveRadius: number;
-    let action: "shot" | "pass" | "first-touch";
+    let action: "shot" | "pass" | "first-touch" | "dribble-touch";
     if (hasShotBit) {
       effectiveRadius = shotConfig.shotRadius.value;
       action = "shot";
     } else if (hasPassBit) {
       effectiveRadius = passConfig.passRadius.value;
       action = "pass";
-    } else {
+    } else if (hasFirstTouchBit) {
       effectiveRadius = radius;
       action = "first-touch";
+    } else {
+      // hasFirstTouchHeld — dribble-touch (held, not pressed this tick).
+      effectiveRadius = closeControlConfig.dribbleRadius.value;
+      action = "dribble-touch";
     }
 
     if (dist <= effectiveRadius) {
@@ -304,6 +370,14 @@ export function stepContacts(
           ball.linearVelocity.y * ball.linearVelocity.y,
       );
       if (hSpeed > maxApproach) continue;
+
+      // Cooldown check for dribble-touch: skip if too soon since last touch.
+      if (action === "dribble-touch") {
+        const lastTick = dribbleCooldowns.get(player.playerId);
+        if (lastTick !== undefined && tick - lastTick < closeControlConfig.cooldownTicks.value) {
+          continue;
+        }
+      }
 
       candidates.push({ player, action });
     }
@@ -371,6 +445,11 @@ export function stepContacts(
     eventKind = "pass";
     contactType = "pass";
     eventLabel = `Player ${contactPlayer.playerId} directed pass`;
+  } else if (action === "dribble-touch") {
+    out = computeCloseControlVelocity(contactPlayer, closeControlConfig);
+    eventKind = "player-ball-contact";
+    contactType = "dribble-touch";
+    eventLabel = `Player ${contactPlayer.playerId} dribble-touch close-control`;
   } else {
     out = computeOutgoingVelocity(contactPlayer, ball, config);
     eventKind = "player-ball-contact";
@@ -441,6 +520,11 @@ export function stepContacts(
 
   // Update lastTouchRef — this is the authoritative touch reference.
   ball.lastTouchRef = eventId;
+
+  // Record dribble-touch cooldown for this player.
+  if (action === "dribble-touch") {
+    dribbleCooldowns.set(contactPlayer.playerId, tick);
+  }
 
   return { events, touched: true };
 }

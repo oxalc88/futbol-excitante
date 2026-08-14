@@ -36,6 +36,7 @@ export function checkPossessionEvidence(
       const eventIds = new Set(curr.events.map((e) => e.id));
 
       // Check for touch events in this tick.
+      // Includes dribble-touch (emits player-ball-contact with contactType "dribble-touch").
       const hasTouchEvent = curr.events.some(
         (e) => e.kind === "touch" || e.kind === "ball-touch" || e.kind === "player-ball-contact" || e.kind === "pass" || e.kind === "shot",
       );
