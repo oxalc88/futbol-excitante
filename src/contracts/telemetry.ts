@@ -33,7 +33,7 @@ export interface TelemetryObservation {
   simulationTime: number;
   /** PRNG algorithm ID and state hash (not the raw state). */
   prngAlgorithmId: string;
-  /** Committed state hash for this tick. */
+  /** Committed state hash for this tick (full world state). */
   stateHash: string;
   /**
    * Hash of the serializable PRNG snapshot (prngAlgorithmId + seed +
@@ -41,6 +41,10 @@ export interface TelemetryObservation {
    * to verify that the PRNG state is stable across identical runs.
    */
   prngStateHash: string;
+  /** Hash of the observation-core fields (tick, prng, players, ball, events).
+   * Computed by the simulation at commit time; the camera-hash oracle
+   * independently recomputes over the same core fields and compares. */
+  observationCoreHash: string;
   /** Committed tick (matches observation tick for committed observations). */
   committedTick: number;
   /** Ordered input frames received for this tick. */
@@ -148,8 +152,8 @@ export interface EvaluationMetrics {
 export interface InvariantResult {
   /** Unique invariant identifier. */
   id: string;
-  /** Pass or fail. */
-  status: "pass" | "fail";
+  /** Pass, fail, or not_evaluated (for deferred mutants whose spec does not yet exist). */
+  status: "pass" | "fail" | "not_evaluated";
   /** Human-readable description of the check. */
   description: string;
   /** Optional details. */
