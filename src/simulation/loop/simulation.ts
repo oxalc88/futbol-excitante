@@ -362,8 +362,9 @@ export function createSimulation(
    *
    * Runs AFTER locomotion (players at tick-advanced positions) and
    * BEFORE ball integration (ball still has pre-step velocity).
-   * Detects proximity + FIRST_TOUCH input, applies impulse to ball,
-   * emits ordered player-ball-contact events, and updates lastTouchRef.
+   * Detects proximity + FIRST_TOUCH/PASS/SHOT input, applies impulse
+   * to ball, emits ordered player-ball-contact/pass/shot events,
+   * and updates lastTouchRef.
    */
   function contactDetectionStage(framesForTick: InputFrame[]): SimulationEvent[] {
     const counter = { value: eventCounter };

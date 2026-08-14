@@ -19,8 +19,8 @@
 import type { BallState, PlayerState } from "../../contracts/state.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { SimulationEvent } from "../../contracts/scenario.js";
-import { FIRST_TOUCH_BIT, PASS_BIT } from "../../contracts/input.js";
-import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1 } from "../config/foundation.js";
+import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT } from "../../contracts/input.js";
+import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1, FOUNDATION_SHOT_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -42,6 +42,15 @@ interface ContactConfig {
  */
 interface PassConfig {
   passRadius: { value: number };
+  exitSpeed: { value: number };
+  verticalComponent: { value: number };
+}
+
+/**
+ * Shot config shape (matches FOUNDATION_SHOT_V1).
+ */
+interface ShotConfig {
+  shotRadius: { value: number };
   exitSpeed: { value: number };
   verticalComponent: { value: number };
 }
@@ -147,6 +156,28 @@ function computePassVelocity(
   };
 }
 
+/**
+ * Compute outgoing velocity for a directed shot along body heading.
+ *
+ * The shot applies a stronger exit speed in the player's body
+ * heading direction with a larger vertical component for loft.
+ * Ball position is never modified — only velocity.
+ */
+function computeShotVelocity(
+  player: PlayerState,
+  config: ShotConfig,
+): { vx: number; vy: number; vz: number } {
+  const dirX = Math.cos(player.bodyHeading);
+  const dirY = Math.sin(player.bodyHeading);
+  const speed = config.exitSpeed.value;
+
+  return {
+    vx: dirX * speed,
+    vy: dirY * speed,
+    vz: speed * config.verticalComponent.value,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -178,6 +209,8 @@ export interface ContactStepResult {
  * executed along body heading. Otherwise, FIRST_TOUCH_BIT triggers the
  * existing first-touch impulse model.
  *
+ * Priority if multiple bits: shot > pass > first-touch.
+ *
  * At most one player can touch the ball per tick. If multiple players
  * are eligible, the one closest to the ball wins (stable by playerId
  * for deterministic ordering).
@@ -189,6 +222,8 @@ export interface ContactStepResult {
  * @param config - Contact coefficient set (default: FOUNDATION_CONTACT_V1).
  * @param eventCounter - Global event counter (mutated in place).
  * @param tick - Current simulation tick.
+ * @param passConfig - Pass coefficient set (default: FOUNDATION_PASS_V1).
+ * @param shotConfig - Shot coefficient set (default: FOUNDATION_SHOT_V1).
  * @returns Contact events and whether a touch occurred.
  */
 export function stepContacts(
@@ -200,6 +235,7 @@ export function stepContacts(
   eventCounter: { value: number },
   tick: number,
   passConfig: PassConfig = FOUNDATION_PASS_V1,
+  shotConfig: ShotConfig = FOUNDATION_SHOT_V1,
 ): ContactStepResult {
   const events: SimulationEvent[] = [];
   const radius = config.contactRadius.value;
@@ -223,19 +259,22 @@ export function stepContacts(
     }
   }
 
-  // Find eligible players — within radius + PASS_BIT or FIRST_TOUCH_BIT set.
-  const candidates: Array<{ player: PlayerState; action: "pass" | "first-touch" }> = [];
+  // Find eligible players — within radius + SHOT_BIT, PASS_BIT, or FIRST_TOUCH_BIT set.
+  // Priority: shot > pass > first-touch.
+  const candidates: Array<{ player: PlayerState; action: "shot" | "pass" | "first-touch" }> = [];
 
   for (const player of players) {
     const frame = frameByPlayerId.get(player.playerId);
     if (!frame) continue;
 
-    // Check PASS_BIT first (directed pass takes priority).
+    // Check SHOT_BIT first (highest priority).
+    const hasShotBit = (frame.pressedButtons & SHOT_BIT) !== 0;
+    // Check PASS_BIT next.
     const hasPassBit = (frame.pressedButtons & PASS_BIT) !== 0;
-    // Check FIRST_TOUCH_BIT.
+    // Check FIRST_TOUCH_BIT last.
     const hasFirstTouchBit = (frame.pressedButtons & FIRST_TOUCH_BIT) !== 0;
 
-    if (!hasPassBit && !hasFirstTouchBit) continue;
+    if (!hasShotBit && !hasPassBit && !hasFirstTouchBit) continue;
 
     const dist = planarDistance(
       player.groundPosition.x,
@@ -244,10 +283,19 @@ export function stepContacts(
       ball.position.y,
     );
 
-    // Use passRadius for pass, contactRadius for first-touch.
-    const effectiveRadius = hasPassBit
-      ? passConfig.passRadius.value
-      : radius;
+    // Use shotRadius for shot, passRadius for pass, contactRadius for first-touch.
+    let effectiveRadius: number;
+    let action: "shot" | "pass" | "first-touch";
+    if (hasShotBit) {
+      effectiveRadius = shotConfig.shotRadius.value;
+      action = "shot";
+    } else if (hasPassBit) {
+      effectiveRadius = passConfig.passRadius.value;
+      action = "pass";
+    } else {
+      effectiveRadius = radius;
+      action = "first-touch";
+    }
 
     if (dist <= effectiveRadius) {
       // Check approach speed.
@@ -257,10 +305,7 @@ export function stepContacts(
       );
       if (hSpeed > maxApproach) continue;
 
-      candidates.push({
-        player,
-        action: hasPassBit ? "pass" : "first-touch",
-      });
+      candidates.push({ player, action });
     }
   }
 
@@ -312,11 +357,16 @@ export function stepContacts(
 
   // Compute and apply outgoing velocity based on action type.
   let out: { vx: number; vy: number; vz: number };
-  let eventKind: "pass" | "player-ball-contact";
+  let eventKind: "shot" | "pass" | "player-ball-contact";
   let contactType: string;
   let eventLabel: string;
 
-  if (action === "pass") {
+  if (action === "shot") {
+    out = computeShotVelocity(contactPlayer, shotConfig);
+    eventKind = "shot";
+    contactType = "shot";
+    eventLabel = `Player ${contactPlayer.playerId} directed shot`;
+  } else if (action === "pass") {
     out = computePassVelocity(contactPlayer, passConfig);
     eventKind = "pass";
     contactType = "pass";
@@ -364,7 +414,7 @@ export function stepContacts(
 
   // Emit ordered event.
   eventCounter.value++;
-  const eventId = `${eventKind === "pass" ? "pass" : "player-ball-contact"}-${tick}-${eventCounter.value}`;
+  const eventId = `${eventKind === "pass" ? "pass" : eventKind === "shot" ? "shot" : "player-ball-contact"}-${tick}-${eventCounter.value}`;
 
   const event: SimulationEvent = {
     id: eventId,

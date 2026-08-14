@@ -124,6 +124,29 @@ export const FOUNDATION_PASS_V1 = {
   verticalComponent: { value: 0.05, note: "provisional upward velocity fraction" },
 } as const;
 
+// -- Shot coefficients (provisional) -----------------------------------------
+
+/**
+ * Provisional shot coefficients.
+ *
+ * Every value is provisional — hand-tuned for laboratory testing only.
+ * No PES 2017 calibration claim is made.
+ *
+ * A shot applies a stronger lofted impulse along the player's body
+ * heading. The ball remains an independent 3D entity; position is
+ * never teleported.
+ */
+export const FOUNDATION_SHOT_V1 = {
+  id: "foundation-shot-v1",
+  label: "provisional",
+  /** Proximity radius (metres) at which a shot is geometrically possible. */
+  shotRadius: { value: 1.2, unit: "m", note: "provisional shot proximity radius" },
+  /** Exit speed (m/s) applied to the ball along body heading. */
+  exitSpeed: { value: 12.0, unit: "m/s", note: "provisional shot exit speed" },
+  /** Vertical launch component: fraction of exitSpeed projected upward for loft. */
+  verticalComponent: { value: 0.15, note: "provisional upward velocity fraction for loft" },
+} as const;
+
 // -- Foundation config object -------------------------------------------------
 
 /**
@@ -142,6 +165,7 @@ export const FOUNDATION_CONFIG = {
   ball: FOUNDATION_BALL_V1,
   contact: FOUNDATION_CONTACT_V1,
   pass: FOUNDATION_PASS_V1,
+  shot: FOUNDATION_SHOT_V1,
 } as const;
 
 /** Runtime type guard: this module exports the versioned config. */
