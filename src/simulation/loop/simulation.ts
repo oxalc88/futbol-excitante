@@ -58,6 +58,7 @@ import {
 } from "../input/input-system.js";
 import { stepLocomotion } from "../locomotion/locomotion-system.js";
 import { stepBall } from "../ball/ball-system.js";
+import { stepContacts } from "../contacts/contact-system.js";
 import { FOUNDATION_LOCOMOTION_V1, FOUNDATION_BALL_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
@@ -116,7 +117,8 @@ export interface Simulation {
    *  2. Scheduled scenario events (read committed state, append events)
    *  3. Input resolution (consume buffered inputs for new tick)
    *  4. Locomotion (converge velocity/heading, integrate position)
-   *  5. Ball integration (no-op in bootstrap)
+   *  4.5. Contact detection (player-ball proximity + first-touch input)
+   *  5. Ball integration (gravity, drag, bounce, ground resistance)
    *  6. Invariant validation (finite checks)
    *  7. Presentation derivation (derive read-only snapshot)
    *  8. Commit (append events, compute hash)
@@ -351,6 +353,29 @@ export function createSimulation(
     const dt = state.fixedDt.numerator / state.fixedDt.denominator;
     const counter = { value: eventCounter };
     const events = stepBall(state.ball, dt, FOUNDATION_BALL_V1, counter, state.tick);
+    eventCounter = counter.value;
+    return events;
+  }
+
+  /**
+   * Stage: player-ball contact detection and resolution.
+   *
+   * Runs AFTER locomotion (players at tick-advanced positions) and
+   * BEFORE ball integration (ball still has pre-step velocity).
+   * Detects proximity + FIRST_TOUCH input, applies impulse to ball,
+   * emits ordered player-ball-contact events, and updates lastTouchRef.
+   */
+  function contactDetectionStage(framesForTick: InputFrame[]): SimulationEvent[] {
+    const counter = { value: eventCounter };
+    const { events } = stepContacts(
+      state.players,
+      state.ball,
+      framesForTick,
+      state.controlAssignments,
+      undefined,
+      counter,
+      state.tick,
+    );
     eventCounter = counter.value;
     return events;
   }
@@ -671,6 +696,12 @@ export function createSimulation(
       // 4. Locomotion
       locomotionStep();
 
+      // 4.5. Player-ball contact detection (after locomotion, before ball integration)
+      const contactEvents = contactDetectionStage(currentFrames);
+      for (const ev of contactEvents) {
+        state.events = [...state.events, ev];
+      }
+
       // 5. Ball integration
       const ballEvents = ballIntegrationStage();
       for (const ev of ballEvents) {
@@ -679,7 +710,7 @@ export function createSimulation(
 
       // 6. Invariant validation
       const invariantsOk = validateInvariants();
-      const allStepEvents = [...oldTickEvents, ...schedEvents, ...ballEvents];
+      const allStepEvents = [...oldTickEvents, ...schedEvents, ...contactEvents, ...ballEvents];
       const obsData = buildObservation(newTick, allStepEvents, currentFrames);
 
       // Compute hash once (freezeWorldState copies, does not mutate).
