@@ -86,6 +86,31 @@ export const DEFAULT_KEYBOARD_CONFIG: KeyboardAdapterConfig = {
   ],
 };
 
+/**
+ * Default keyboard configuration for slot-2 (second local player).
+ *
+ * Uses Arrow keys for movement and numpad/period/semicolon for actions.
+ * Mapping:
+ *  - Movement: ArrowLeft/ArrowRight/ArrowUp/ArrowDown
+ *  - Sprint: ShiftRight
+ *  - Action bit 0 (first-touch): Numpad0 or period (.)
+ *  - Action bit 1 (pass): Numpad1 or semicolon (;)
+ *  - Action bit 2 (shot): Numpad2 or slash (/)
+ *  - Action bit 3 (switch): comma (,)
+ */
+export const DEFAULT_SLOT2_KEYBOARD_CONFIG: KeyboardAdapterConfig = {
+  controlSlot: "slot-2",
+  horizontalAxis: { negative: "ArrowLeft", positive: "ArrowRight" },
+  verticalAxis: { negative: "ArrowDown", positive: "ArrowUp" },
+  sprintButton: { key: "ShiftRight", actionBit: -1 },
+  buttons: [
+    { key: "Numpad0", actionBit: 0 },
+    { key: "Semicolon", actionBit: 1 },
+    { key: "Slash", actionBit: 2 },
+    { key: "Comma", actionBit: 3 },
+  ],
+};
+
 // ---------------------------------------------------------------------------
 // Keyboard state tracking
 // ---------------------------------------------------------------------------
