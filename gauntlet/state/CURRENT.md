@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: BOOTSTRAP
-next_objective_id: BOOTSTRAP-03
+next_objective_id: BOOTSTRAP-04
 best_known:
-  commit: 6d40bc2
-  note: "BOOTSTRAP-02 accepted. Portable contracts, versioned foundation config, and validation are the best-known engine baseline."
+  commit: 2b402c3
+  note: "BOOTSTRAP-03 accepted. Determinism substrate is the new best-known engine baseline."
 active_candidate:
-  objective_id: BOOTSTRAP-03
+  objective_id: BOOTSTRAP-04
   builder: builder-qwen
   critic: critic
-  started_from_commit: 6d40bc2
+  started_from_commit: 2b402c3
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -21,19 +21,20 @@ nan_builder_failures: 0
 accepted:
   - BOOTSTRAP-01
   - BOOTSTRAP-02
+  - BOOTSTRAP-03
 blocked: []
-selection_note: "Highest-value remaining gap is deterministic primitives (PRNG, canonical encoding, hash, finite checks). Contracts exist; world startup and the simulation loop cannot be reproducible without this substrate."
+selection_note: "Highest-value remaining gap is deterministic world/scenario startup. Contracts and determinism exist; the simulation loop cannot start without a reproducible initial world."
 ```
 
 ## Last accepted objective
 
-BOOTSTRAP-02 — portable contracts and versioned foundation config.
+BOOTSTRAP-03 — deterministic primitives.
 
-- commit: `6d40bc2caaa8172215fdec25cf73f04827b45dd5`
+- commit: `2b402c361be74b5360b403220a0bbe1d53bd32b3`
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 1
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate BOOTSTRAP-03 to builder-qwen. After critic + integration ACCEPT, atomic-commit and reassess.
+Delegate BOOTSTRAP-04 to builder-qwen. After critic + integration ACCEPT, atomic-commit and reassess.

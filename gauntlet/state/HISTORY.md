@@ -35,3 +35,14 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - result: accepted
 - commit: 6d40bc2caaa8172215fdec25cf73f04827b45dd5
 - notes: Portable contracts (Vec2/Vec3, InputFrame, control assignment, PlayerState, independent BallState, WorldState, ScenarioDefinition, SimulationEvent, PresentationSnapshot, telemetry, ReplayV1), immutable versioned FOUNDATION_CONFIG with provisional locomotion/ball coefficients, and table-driven validation. 90 node tests. No PES fidelity or FOUNDATION_LAB_PASS claimed.
+
+## Iteration 3 — 2026-08-13
+
+- objective_id: BOOTSTRAP-03
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: 2b402c361be74b5360b403220a0bbe1d53bd32b3
+- notes: Determinism substrate — mulberry32-v1, canonical-json-v1, fnv1a64-v1, UTF-8 encoder, finite checks, core-boundary scan. First critic RETRY for non-canonical Mulberry32, FNV offset rounding, and UTF-8 surrogate bug. Retry aligned algorithms to cited references. 143 node tests. No PES fidelity claimed.
