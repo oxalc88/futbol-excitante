@@ -4,6 +4,17 @@
 export type ActionBits = number;
 
 /**
+ * Action-bit constants. Each constant represents a single bit position
+ * in the heldButtons / pressedButtons / releasedButtons masks.
+ *
+ * Bit 0: FIRST_TOUCH — the player intends to receive/control the ball
+ * on the current tick. Pressed while within contact radius of the ball.
+ * The contact system resolves the actual touch; pressing this bit does
+ * not guarantee a touch occurs (range, timing, and priority govern).
+ */
+export const FIRST_TOUCH_BIT = 1 << 0;
+
+/**
  * A tick-indexed input frame from any source (keyboard, gamepad, replay, AI, test).
  *
  * sourceId is provenance only — it must never affect gameplay outcomes,
