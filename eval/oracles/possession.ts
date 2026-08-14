@@ -37,7 +37,7 @@ export function checkPossessionEvidence(
 
       // Check for touch events in this tick.
       const hasTouchEvent = curr.events.some(
-        (e) => e.kind === "touch" || e.kind === "ball-touch" || e.kind === "player-ball-contact" || e.kind === "pass",
+        (e) => e.kind === "touch" || e.kind === "ball-touch" || e.kind === "player-ball-contact" || e.kind === "pass" || e.kind === "shot",
       );
 
       if (!hasTouchEvent && curr.ball.lastTouchRef !== null) {
