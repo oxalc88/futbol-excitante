@@ -19,6 +19,7 @@ import { checkBallTeleport } from "./ball-teleport.js";
 import { checkPossessionEvidence } from "./possession.js";
 import { checkCameraHashConsistency } from "./camera-hash.js";
 import { checkDeferredMutants } from "./deferred-mutants.js";
+import { checkPrngOrderOracle } from "./prng-order.js";
 import type { OracleEntry } from "./oracle-registry.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 
@@ -86,6 +87,11 @@ const entries: OracleEntry[] = [
     oracle_id: "deferred-mutants",
     oracle_version: "oracle-deferred-mutants-v1",
     fn: () => [checkDeferredMutants()],
+  },
+  {
+    oracle_id: "prng-order",
+    oracle_version: "oracle-prng-order-v1",
+    fn: checkPrngOrderOracle,
   },
 ];
 
