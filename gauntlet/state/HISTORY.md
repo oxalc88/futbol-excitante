@@ -747,6 +747,48 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 23 — 2026-08-14
+
+- objective_id: PLAYABLE-BASIC-SHOT
+- builder: builder-mimo / mimo-v2.5
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: b5079e4 SHOT_BIT; c91ce18 impulse; 6da76d5 KeyL; 9961259 oracle; 3228f48 tests
+- notes: Lofted shot along heading. Priority shot > pass > first-touch. 689 node + 16 browser. No PES claim.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-BASIC-SHOT
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-mimo
+- builder_model: mimo-v2.5
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-BASIC-SHOT
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 689/689; test-browser 16/16
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 

@@ -3,17 +3,17 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-next_objective_id: PLAYABLE-BASIC-SHOT
+next_objective_id: PLAYABLE-SECOND-SLOT
 best_known:
-  commit: 0cb5527
-  note: "PLAYABLE-BASIC-PASS accepted. PASS_BIT, KeyJ pass, KeyK first-touch. Independent ball. Not PES."
+  commit: 3228f48
+  note: "PLAYABLE-BASIC-SHOT accepted. SHOT_BIT KeyL lofted shot. Independent ball. Not PES."
 active_candidate:
-  objective_id: PLAYABLE-BASIC-SHOT
-  builder: builder-mimo
+  objective_id: PLAYABLE-SECOND-SLOT
+  builder: builder-qwen
   critic: critic
-  started_from_commit: 0cb5527
+  started_from_commit: 3228f48
   last_verdict: null
-builder_in_use: builder-mimo
+builder_in_use: builder-qwen
 critic_in_use: critic
 retry_count: 0
 max_retries_per_objective: 3
@@ -41,19 +41,20 @@ accepted:
   - CAPABILITY-DESIGN-PROFILE
   - PLAYABLE-FIRST-TOUCH
   - PLAYABLE-BASIC-PASS
+  - PLAYABLE-BASIC-SHOT
 blocked: []
-selection_note: "Pass exists. Next BASIC_ACTIONS gap is a directed shot: new SHOT_BIT, independent ball, explicit shot event, provisional config. Do not invent PES envelopes. Do not start 11v11."
+selection_note: "Basic actions exist. Next PLAYABLE-1V1 gap is a second local control slot so two players can compete. Do not invent PES envelopes. Do not start 11v11."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-BASIC-PASS — directed pass.
+PLAYABLE-BASIC-SHOT — lofted directed shot.
 
-- commits: `4d88fff` (contracts), `f64e999` (impulse), `4ded7ca` (keys), `8992fa6` (oracle), `0cb5527` (tests)
+- commits: `b5079e4` (contracts), `c91ce18` (impulse), `6da76d5` (KeyL), `9961259` (oracle), `3228f48` (tests)
 - builder: builder-mimo / mimo-v2.5
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 1
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate PLAYABLE-BASIC-SHOT to builder-mimo. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-SECOND-SLOT to builder-qwen. After ACCEPT + integration, atomic-commit and push.
