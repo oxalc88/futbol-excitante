@@ -14,3 +14,12 @@ export interface Vec3 {
   y: number;
   z: number;
 }
+
+/** A heading angle in radians. Normalized to [-π, π) at serialization boundaries. */
+export type Heading = number;
+
+/** A rational number expressed as numerator / denominator (denominator > 0). */
+export interface Rational {
+  numerator: number;
+  denominator: number;
+}
