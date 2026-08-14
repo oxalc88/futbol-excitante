@@ -1,0 +1,117 @@
+/**
+ * @module @pes/eval/contracts/suites
+ *
+ * SuiteDefinition records for the three foundation-lab suites:
+ * fast, locomotion, and ball.
+ *
+ * Materialized from GAMEPLAY_EVALUATION_SPEC.md §8.
+ * impact_closure is NONE so expansion = direct set + common criteria,
+ * not a graph walk.
+ *
+ * No Math.random, Date, performance, DOM, or Node I/O.
+ */
+
+import type { SuiteDefinition } from "./types.js";
+
+export const FAST_SUITE: SuiteDefinition = {
+  suite_id: "fast",
+  suite_version: "suite-fast-v1",
+  direct_test_ids: ["BALL-IND-001", "LOC-ACC-001", "BALL-GND-001"],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+  ],
+  impact_closure: "NONE",
+  prerequisite_capabilities: ["DETERMINISTIC_CORE", "HEADLESS_SCENARIOS"],
+  seed_matrix_id: "seeds-smoke-v1",
+  config_matrix_id: "config-default-v1",
+  held_out_policy_id: null,
+  browser_case_ids: [],
+  resource_policy_id: "resources-fast-v1",
+  outcome_reduction_profile_id: "required-hard-v1",
+  expected_expansion_manifest_id: "expansion-fast-v1",
+};
+
+export const LOCOMOTION_SUITE: SuiteDefinition = {
+  suite_id: "locomotion",
+  suite_version: "suite-locomotion-v1",
+  direct_test_ids: [
+    "LOC-ACC-001",
+    "LOC-ACC-002",
+    "LOC-MAX-001",
+    "LOC-DEC-001",
+    "LOC-REV-001",
+    "LOC-T45-001",
+    "LOC-T90-001",
+    "LOC-ORI-001",
+    "LOC-BALL-001",
+    "CTRL-LAT-001",
+  ],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+    "COMMON-BOUNDS",
+  ],
+  impact_closure: "NONE",
+  prerequisite_capabilities: ["LOCOMOTION"],
+  seed_matrix_id: "seeds-family-v1",
+  config_matrix_id: "config-locomotion-v1",
+  held_out_policy_id: null,
+  browser_case_ids: [],
+  resource_policy_id: "resources-family-v1",
+  outcome_reduction_profile_id: "profile-selected-v1",
+  expected_expansion_manifest_id: "expansion-locomotion-v1",
+};
+
+export const BALL_SUITE: SuiteDefinition = {
+  suite_id: "ball",
+  suite_version: "suite-ball-v1",
+  direct_test_ids: [
+    "BALL-IND-001",
+    "BALL-GND-001",
+    "BALL-GND-002",
+    "BALL-BNC-001",
+    "BALL-SPN-001",
+    "BALL-SPN-002",
+  ],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+    "COMMON-BOUNDS",
+  ],
+  impact_closure: "NONE",
+  prerequisite_capabilities: ["INDEPENDENT_BALL"],
+  seed_matrix_id: "seeds-family-v1",
+  config_matrix_id: "config-ball-v1",
+  held_out_policy_id: null,
+  browser_case_ids: [],
+  resource_policy_id: "resources-family-v1",
+  outcome_reduction_profile_id: "profile-selected-v1",
+  expected_expansion_manifest_id: "expansion-ball-v1",
+};
+
+/** All registered suites keyed by suite_id. */
+export const SUITES: Record<string, SuiteDefinition> = {
+  [FAST_SUITE.suite_id]: FAST_SUITE,
+  [LOCOMOTION_SUITE.suite_id]: LOCOMOTION_SUITE,
+  [BALL_SUITE.suite_id]: BALL_SUITE,
+};
+
+/**
+ * Get a suite definition by suite_id.
+ */
+export function getSuite(suiteId: string): SuiteDefinition | undefined {
+  return SUITES[suiteId];
+}
+
+/**
+ * The three required foundation suites as an array.
+ */
+export const FOUNDATION_SUITES: SuiteDefinition[] = [
+  FAST_SUITE,
+  LOCOMOTION_SUITE,
+  BALL_SUITE,
+];
