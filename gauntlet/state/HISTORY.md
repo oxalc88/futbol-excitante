@@ -24,3 +24,14 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - result: accepted
 - commit: 2d22a2995ae074108219c103fe318cf6cb566eac
 - notes: Pinned mise Node 24.18.0 and pnpm 11.10.0, private ESM package, core/node/browser tsconfigs, Vite/Vitest skeleton, honest isolation/version/build/smoke tests, artifacts/.gitkeep. First critic RETRY for theatrical tests; rewrite plus clean-env `mise install --locked` evidence accepted. No PES fidelity or FOUNDATION_LAB_PASS claimed.
+
+## Iteration 2 — 2026-08-13
+
+- objective_id: BOOTSTRAP-02
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: 6d40bc2caaa8172215fdec25cf73f04827b45dd5
+- notes: Portable contracts (Vec2/Vec3, InputFrame, control assignment, PlayerState, independent BallState, WorldState, ScenarioDefinition, SimulationEvent, PresentationSnapshot, telemetry, ReplayV1), immutable versioned FOUNDATION_CONFIG with provisional locomotion/ball coefficients, and table-driven validation. 90 node tests. No PES fidelity or FOUNDATION_LAB_PASS claimed.

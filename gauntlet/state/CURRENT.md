@@ -3,16 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: BOOTSTRAP
-next_objective_id: BOOTSTRAP-02
+next_objective_id: BOOTSTRAP-03
 best_known:
-  commit: 2d22a29
-  note: "BOOTSTRAP-01 accepted. Pinned mise/Node/pnpm TypeScript skeleton is the best-known engine baseline."
+  commit: 6d40bc2
+  note: "BOOTSTRAP-02 accepted. Portable contracts, versioned foundation config, and validation are the best-known engine baseline."
 active_candidate:
-  objective_id: BOOTSTRAP-02
+  objective_id: BOOTSTRAP-03
   builder: builder-qwen
   critic: critic
-  started_from_commit: 2d22a29
-  pre_builder_git_status: dirty-harness-and-gauntlet-state
+  started_from_commit: 6d40bc2
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -21,20 +20,20 @@ max_retries_per_objective: 3
 nan_builder_failures: 0
 accepted:
   - BOOTSTRAP-01
+  - BOOTSTRAP-02
 blocked: []
-selection_note: "Highest-value remaining gap is portable contracts and versioned foundation config. Toolchain exists; simulation, input, locomotion, and ball cannot start without the shared vocabulary."
+selection_note: "Highest-value remaining gap is deterministic primitives (PRNG, canonical encoding, hash, finite checks). Contracts exist; world startup and the simulation loop cannot be reproducible without this substrate."
 ```
 
 ## Last accepted objective
 
-BOOTSTRAP-01 — pin mise/Node/pnpm and create the executable TypeScript skeleton.
+BOOTSTRAP-02 — portable contracts and versioned foundation config.
 
-- commit: `2d22a2995ae074108219c103fe318cf6cb566eac`
+- commit: `6d40bc2caaa8172215fdec25cf73f04827b45dd5`
 - builder: builder-qwen / qwen3.6
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- retry_count: 1
 
 ## Next action
 
-Delegate BOOTSTRAP-02 to builder-qwen. After critic + integration ACCEPT, atomic-commit and reassess.
+Delegate BOOTSTRAP-03 to builder-qwen. After critic + integration ACCEPT, atomic-commit and reassess.
