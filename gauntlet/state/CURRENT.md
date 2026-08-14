@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-next_objective_id: PLAYABLE-FIRST-TOUCH
+next_objective_id: PLAYABLE-BASIC-PASS
 best_known:
-  commit: d4a7fc7
-  note: "CAPABILITY-DESIGN-PROFILE accepted. Fictional capability-design-v1 exists. ENGINE_DESIGN_TARGET stays NOT_EVALUATED until a runner. MEASURED_TARGET stays BLOCKED. Not PES."
+  commit: 8e19fcc
+  note: "PLAYABLE-FIRST-TOUCH accepted. Independent ball first-touch via FIRST_TOUCH_BIT. Advisory: KeyJ is actionBit 0. Not PES."
 active_candidate:
-  objective_id: PLAYABLE-FIRST-TOUCH
+  objective_id: PLAYABLE-BASIC-PASS
   builder: builder-mimo
   critic: critic
-  started_from_commit: d4a7fc7
+  started_from_commit: 8e19fcc
   last_verdict: null
 builder_in_use: builder-mimo
 critic_in_use: critic
@@ -39,19 +39,20 @@ accepted:
   - FOUNDATION-MUTANT-REDUCTION
   - FOUNDATION-PROMOTION
   - CAPABILITY-DESIGN-PROFILE
+  - PLAYABLE-FIRST-TOUCH
 blocked: []
-selection_note: "Profile exists. Highest-value remaining PLAYABLE-1V1 gap is first-touch: independent ball, explicit contact event, no parenting. Do not invent PES envelopes. Do not start 11v11."
+selection_note: "First-touch exists. Next PLAYABLE-1V1 gap is a directed pass: new PASS_BIT not bit 0, remap KeyJ, independent ball, explicit pass event. Do not invent PES envelopes. Do not start 11v11."
 ```
 
 ## Last accepted objective
 
-CAPABILITY-DESIGN-PROFILE — versioned fictional CapabilityDesignProfile.
+PLAYABLE-FIRST-TOUCH — player-ball first-touch contact.
 
-- commits: `11eb171` (types), `c122196` (profile+loader), `d4a7fc7` (tests)
-- builder: builder-qwen / qwen3.6
+- commits: `7a99632` (contracts), `8b2a7ab` (config), `57f7cd5` (contact system), `8e19fcc` (tests)
+- builder: builder-mimo / mimo-v2.5
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate PLAYABLE-FIRST-TOUCH to builder-mimo. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-BASIC-PASS to builder-mimo. After ACCEPT + integration, atomic-commit and push.

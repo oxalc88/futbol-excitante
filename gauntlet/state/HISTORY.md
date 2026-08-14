@@ -663,6 +663,48 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 21 — 2026-08-14
+
+- objective_id: PLAYABLE-FIRST-TOUCH
+- builder: builder-mimo / mimo-v2.5
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: 7a99632 contracts; 8b2a7ab FOUNDATION_CONTACT_V1; 57f7cd5 contact system; 8e19fcc tests
+- notes: Proximity + FIRST_TOUCH_BIT emits player-ball-contact, sets lastTouchRef, impulse velocity only. Ball never parented/teleported. 651 node + 16 browser. Advisory: KeyJ actionBit 0 now equals FIRST_TOUCH_BIT. No PES claim.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-FIRST-TOUCH
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-mimo
+- builder_model: mimo-v2.5
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-FIRST-TOUCH
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 651/651; test-browser 16/16
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 
