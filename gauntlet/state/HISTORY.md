@@ -495,6 +495,48 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 17 — 2026-08-14
+
+- objective_id: FOUNDATION-DETERMINISTIC
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: cd23a34 two-run evaluator; 7acc394 tests
+- notes: compareAndEvaluateFoundation runs evaluate() twice; COMMON-DETERMINISTIC PASS on hash match, FAIL on PRNG snapshot/restore divergence. Single-run path still NOT_EVALUATED. 541 node tests. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. No FOUNDATION_LAB_PASS. Advisory: evidence labels are schematic jsonl names; FAIL tests call compareRuns not the wrapper end-to-end.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: FOUNDATION-DETERMINISTIC
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: FOUNDATION-DETERMINISTIC
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 541/541
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 

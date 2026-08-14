@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: FOUNDATION
-next_objective_id: FOUNDATION-DETERMINISTIC
+next_objective_id: FOUNDATION-MUTANT-REDUCTION
 best_known:
-  commit: 963ebdd
-  note: "FOUNDATION-BROWSER accepted. Required RESET/STEP cases gate evaluateFoundation. Dummy hashes INVALID_RUN. No FOUNDATION_LAB_PASS."
+  commit: 7acc394
+  note: "FOUNDATION-DETERMINISTIC accepted. Two-run COMMON-DETERMINISTIC PASS/FAIL exists. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. No FOUNDATION_LAB_PASS."
 active_candidate:
-  objective_id: FOUNDATION-DETERMINISTIC
+  objective_id: FOUNDATION-MUTANT-REDUCTION
   builder: builder-qwen
   critic: critic
-  started_from_commit: 963ebdd
+  started_from_commit: 7acc394
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -35,19 +35,20 @@ accepted:
   - FOUNDATION-ORACLES
   - FOUNDATION-HARD
   - FOUNDATION-BROWSER
+  - FOUNDATION-DETERMINISTIC
 blocked: []
-selection_note: "Catalog foundation IDs REGISTRIES/ORACLES/HARD/BROWSER are accepted. Highest-value remaining spec gap is COMMON-DETERMINISTIC as a real two-run path (FOUNDATION_LAB exit prerequisite COMMON_DETERMINISTIC_PASS). MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. Do not claim FOUNDATION_LAB_PASS."
+selection_note: "COMMON-DETERMINISTIC two-run path exists. Highest-value remaining spec gap is formal MUTANT_CORE reduction over the implementable canaries (FOUNDATION_LAB exit prerequisite MUTANT_CORE_PASS). Deferred contact/team/transition stay not_evaluated. Do not claim FOUNDATION_LAB_PASS."
 ```
 
 ## Last accepted objective
 
-FOUNDATION-BROWSER — required BROWSER-CORE-RESET-001 and BROWSER-CORE-STEP-001 gate the foundation evaluator.
+FOUNDATION-DETERMINISTIC — two-run COMMON-DETERMINISTIC HARD_INVARIANT.
 
-- commits: `e588033` (registry), `3adc812` (evaluator gate), `963ebdd` (tests)
+- commits: `cd23a34` (evaluator), `7acc394` (tests)
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT after RETRY×3
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate FOUNDATION-DETERMINISTIC (two-run COMMON-DETERMINISTIC) to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate FOUNDATION-MUTANT-REDUCTION to builder-qwen. After ACCEPT + integration, atomic-commit and push.
