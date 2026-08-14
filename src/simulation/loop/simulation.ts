@@ -57,7 +57,8 @@ import {
   NEUTRAL_INPUT,
 } from "../input/input-system.js";
 import { stepLocomotion } from "../locomotion/locomotion-system.js";
-import { FOUNDATION_LOCOMOTION_V1 } from "../config/foundation.js";
+import { stepBall } from "../ball/ball-system.js";
+import { FOUNDATION_LOCOMOTION_V1, FOUNDATION_BALL_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -341,13 +342,17 @@ export function createSimulation(
   }
 
   /**
-   * Stage: ball integration (no-op in bootstrap).
+   * Stage: ball integration.
    *
-   * In the full engine this would integrate ball physics (gravity,
-   * air drag, rolling, bouncing). Bootstrap: no-op.
+   * Applies gravity, air drag, swept pitch-plane impact, bounce/restitution,
+   * ground resistance, and spin decay. Emits ordered pitch-contact events.
    */
-  function ballIntegrationNoOp(): void {
-    // No ball system exists yet.
+  function ballIntegrationStage(): SimulationEvent[] {
+    const dt = state.fixedDt.numerator / state.fixedDt.denominator;
+    const counter = { value: eventCounter };
+    const events = stepBall(state.ball, dt, FOUNDATION_BALL_V1, counter, state.tick);
+    eventCounter = counter.value;
+    return events;
   }
 
   /**
@@ -610,12 +615,15 @@ export function createSimulation(
       // 4. Locomotion
       locomotionStep();
 
-      // 5. Ball integration (no-op)
-      ballIntegrationNoOp();
+      // 5. Ball integration
+      const ballEvents = ballIntegrationStage();
+      for (const ev of ballEvents) {
+        state.events = [...state.events, ev];
+      }
 
       // 6. Invariant validation
       const invariantsOk = validateInvariants();
-      const allStepEvents = [...oldTickEvents, ...schedEvents];
+      const allStepEvents = [...oldTickEvents, ...schedEvents, ...ballEvents];
       const obsData = buildObservation(newTick, allStepEvents, currentFrames);
       if (invariantsOk) {
         obsData.stateHash = hashFnv1a64(
