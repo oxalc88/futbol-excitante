@@ -17,7 +17,10 @@
 import { createWorld } from "../../simulation/world/create.js";
 import { createSimulation } from "../../simulation/loop/simulation.js";
 import { createPresentationSession } from "../../adapters/renderer-three/renderer.js";
-import { createKeyboardAdapter } from "../../adapters/input-browser/keyboard.js";
+import {
+  createKeyboardAdapter,
+  DEFAULT_KEYBOARD_CONFIG,
+} from "../../adapters/input-browser/keyboard.js";
 import { FOUNDATION_SCENARIO } from "./foundation-scenario.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { Simulation } from "../../simulation/loop/simulation.js";
@@ -70,18 +73,7 @@ function main(): void {
   const sim: Simulation = createSimulation(world);
 
   // 3. Create keyboard adapter for the bootstrap control slot.
-  const keyboard = createKeyboardAdapter({
-    controlSlot: "slot-1",
-    horizontalAxis: { negative: "KeyA", positive: "KeyD" },
-    verticalAxis: { negative: "KeyS", positive: "KeyW" },
-    sprintButton: { key: "ShiftLeft", actionBit: -1 },
-    buttons: [
-      { key: "KeyJ", actionBit: 0 },
-      { key: "KeyK", actionBit: 1 },
-      { key: "KeyL", actionBit: 2 },
-      { key: "Space", actionBit: 3 },
-    ],
-  });
+  const keyboard = createKeyboardAdapter(DEFAULT_KEYBOARD_CONFIG);
 
   // 4. Connect keyboard to window for physical input.
   keyboard.connect(window);
