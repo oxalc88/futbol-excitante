@@ -3,17 +3,17 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-next_objective_id: CAPABILITY-DESIGN-PROFILE
+next_objective_id: PLAYABLE-FIRST-TOUCH
 best_known:
-  commit: 60c502a
-  note: "FOUNDATION-PROMOTION accepted. evaluateFoundationLab can emit milestoneVerdict PASS for required HARD_INVARIANTs + browser cases + COMMON-DETERMINISTIC + MUTANT_CORE. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. Not a PES claim."
+  commit: d4a7fc7
+  note: "CAPABILITY-DESIGN-PROFILE accepted. Fictional capability-design-v1 exists. ENGINE_DESIGN_TARGET stays NOT_EVALUATED until a runner. MEASURED_TARGET stays BLOCKED. Not PES."
 active_candidate:
-  objective_id: CAPABILITY-DESIGN-PROFILE
-  builder: builder-qwen
+  objective_id: PLAYABLE-FIRST-TOUCH
+  builder: builder-mimo
   critic: critic
-  started_from_commit: 60c502a
+  started_from_commit: d4a7fc7
   last_verdict: null
-builder_in_use: builder-qwen
+builder_in_use: builder-mimo
 critic_in_use: critic
 retry_count: 0
 max_retries_per_objective: 3
@@ -38,19 +38,20 @@ accepted:
   - FOUNDATION-DETERMINISTIC
   - FOUNDATION-MUTANT-REDUCTION
   - FOUNDATION-PROMOTION
+  - CAPABILITY-DESIGN-PROFILE
 blocked: []
-selection_note: "FOUNDATION_LAB required-class milestone reducer exists and can PASS. PLAYABLE-1V1 still needs a versioned CapabilityDesignProfile (fictional archetypes, not PES ratings). Do not invent PES envelopes. Do not start 11v11."
+selection_note: "Profile exists. Highest-value remaining PLAYABLE-1V1 gap is first-touch: independent ball, explicit contact event, no parenting. Do not invent PES envelopes. Do not start 11v11."
 ```
 
 ## Last accepted objective
 
-FOUNDATION-PROMOTION — FOUNDATION_LAB milestone reducer.
+CAPABILITY-DESIGN-PROFILE — versioned fictional CapabilityDesignProfile.
 
-- commits: `4f5b8bc` (skipBrowserValidation), `2823952` (reducer), `60c502a` (tests)
+- commits: `11eb171` (types), `c122196` (profile+loader), `d4a7fc7` (tests)
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 1
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate CAPABILITY-DESIGN-PROFILE to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-FIRST-TOUCH to builder-mimo. After ACCEPT + integration, atomic-commit and push.

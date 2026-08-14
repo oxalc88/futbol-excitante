@@ -621,6 +621,48 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 20 — 2026-08-14
+
+- objective_id: CAPABILITY-DESIGN-PROFILE
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: 11eb171 types; c122196 profile+loader; d4a7fc7 tests
+- notes: capability-design-v1 with transient-acceleration IMPLEMENTED (no runner → NOT_EVALUATED) and four DEFERRED axes. Loader rejects PES language. Not wired into loadRegistrySet (optional follow-up). 622 node tests. No PES claim.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: CAPABILITY-DESIGN-PROFILE
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CAPABILITY-DESIGN-PROFILE
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 622/622
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 
