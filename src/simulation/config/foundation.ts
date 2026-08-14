@@ -102,6 +102,28 @@ export const FOUNDATION_CONTACT_V1 = {
   defaultExitSpeed: { value: 3.0, unit: "m/s", note: "provisional exit speed for near-stationary ball" },
 } as const;
 
+// -- Pass coefficients (provisional) ------------------------------------------
+
+/**
+ * Provisional pass coefficients.
+ *
+ * Every value is provisional — hand-tuned for laboratory testing only.
+ * No PES 2017 calibration claim is made.
+ *
+ * A pass applies an impulse along the player's body heading. The ball
+ * remains an independent 3D entity; position is never teleported.
+ */
+export const FOUNDATION_PASS_V1 = {
+  id: "foundation-pass-v1",
+  label: "provisional",
+  /** Proximity radius (metres) at which a pass is geometrically possible. */
+  passRadius: { value: 1.2, unit: "m", note: "provisional pass proximity radius" },
+  /** Exit speed (m/s) applied to the ball along body heading. */
+  exitSpeed: { value: 8.0, unit: "m/s", note: "provisional pass exit speed" },
+  /** Vertical launch component: fraction of exitSpeed projected upward. */
+  verticalComponent: { value: 0.05, note: "provisional upward velocity fraction" },
+} as const;
+
 // -- Foundation config object -------------------------------------------------
 
 /**
@@ -119,6 +141,7 @@ export const FOUNDATION_CONFIG = {
   locomotion: FOUNDATION_LOCOMOTION_V1,
   ball: FOUNDATION_BALL_V1,
   contact: FOUNDATION_CONTACT_V1,
+  pass: FOUNDATION_PASS_V1,
 } as const;
 
 /** Runtime type guard: this module exports the versioned config. */

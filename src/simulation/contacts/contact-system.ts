@@ -19,8 +19,8 @@
 import type { BallState, PlayerState } from "../../contracts/state.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { SimulationEvent } from "../../contracts/scenario.js";
-import { FIRST_TOUCH_BIT } from "../../contracts/input.js";
-import { FOUNDATION_CONTACT_V1 } from "../config/foundation.js";
+import { FIRST_TOUCH_BIT, PASS_BIT } from "../../contracts/input.js";
+import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -35,6 +35,15 @@ interface ContactConfig {
   impulseFraction: { value: number };
   verticalDamping: { value: number };
   defaultExitSpeed: { value: number };
+}
+
+/**
+ * Pass config shape (matches FOUNDATION_PASS_V1).
+ */
+interface PassConfig {
+  passRadius: { value: number };
+  exitSpeed: { value: number };
+  verticalComponent: { value: number };
 }
 
 /**
@@ -116,6 +125,28 @@ function computeOutgoingVelocity(
   return { vx, vy, vz };
 }
 
+/**
+ * Compute outgoing velocity for a directed pass along body heading.
+ *
+ * The pass applies the configured exit speed in the player's body
+ * heading direction with a small vertical component for loft.
+ * Ball position is never modified — only velocity.
+ */
+function computePassVelocity(
+  player: PlayerState,
+  config: PassConfig,
+): { vx: number; vy: number; vz: number } {
+  const dirX = Math.cos(player.bodyHeading);
+  const dirY = Math.sin(player.bodyHeading);
+  const speed = config.exitSpeed.value;
+
+  return {
+    vx: dirX * speed,
+    vy: dirY * speed,
+    vz: speed * config.verticalComponent.value,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -139,9 +170,13 @@ export interface ContactStepResult {
  *
  * Contact eligibility:
  *  1. Planar distance between player ground position and ball position
- *     is ≤ contactRadius.
- *  2. The player's FIRST_TOUCH bit is set in pressedButtons for this tick.
+ *     is ≤ contactRadius (or passRadius for pass).
+ *  2. The player's PASS_BIT or FIRST_TOUCH_BIT is set in pressedButtons.
  *  3. Ball approach speed ≤ maxApproachSpeed (out of range = miss).
+ *
+ * PASS_BIT takes priority: if pressed and in range, a directed pass is
+ * executed along body heading. Otherwise, FIRST_TOUCH_BIT triggers the
+ * existing first-touch impulse model.
  *
  * At most one player can touch the ball per tick. If multiple players
  * are eligible, the one closest to the ball wins (stable by playerId
@@ -164,6 +199,7 @@ export function stepContacts(
   config: ContactConfig = FOUNDATION_CONTACT_V1,
   eventCounter: { value: number },
   tick: number,
+  passConfig: PassConfig = FOUNDATION_PASS_V1,
 ): ContactStepResult {
   const events: SimulationEvent[] = [];
   const radius = config.contactRadius.value;
@@ -187,15 +223,19 @@ export function stepContacts(
     }
   }
 
-  // Find eligible players — within radius + FIRST_TOUCH bit set.
-  const candidates: PlayerState[] = [];
+  // Find eligible players — within radius + PASS_BIT or FIRST_TOUCH_BIT set.
+  const candidates: Array<{ player: PlayerState; action: "pass" | "first-touch" }> = [];
 
   for (const player of players) {
     const frame = frameByPlayerId.get(player.playerId);
     if (!frame) continue;
 
-    // Check the FIRST_TOUCH bit in pressedButtons.
-    if ((frame.pressedButtons & FIRST_TOUCH_BIT) === 0) continue;
+    // Check PASS_BIT first (directed pass takes priority).
+    const hasPassBit = (frame.pressedButtons & PASS_BIT) !== 0;
+    // Check FIRST_TOUCH_BIT.
+    const hasFirstTouchBit = (frame.pressedButtons & FIRST_TOUCH_BIT) !== 0;
+
+    if (!hasPassBit && !hasFirstTouchBit) continue;
 
     const dist = planarDistance(
       player.groundPosition.x,
@@ -204,7 +244,12 @@ export function stepContacts(
       ball.position.y,
     );
 
-    if (dist <= radius) {
+    // Use passRadius for pass, contactRadius for first-touch.
+    const effectiveRadius = hasPassBit
+      ? passConfig.passRadius.value
+      : radius;
+
+    if (dist <= effectiveRadius) {
       // Check approach speed.
       const hSpeed = Math.sqrt(
         ball.linearVelocity.x * ball.linearVelocity.x +
@@ -212,7 +257,10 @@ export function stepContacts(
       );
       if (hSpeed > maxApproach) continue;
 
-      candidates.push(player);
+      candidates.push({
+        player,
+        action: hasPassBit ? "pass" : "first-touch",
+      });
     }
   }
 
@@ -223,22 +271,24 @@ export function stepContacts(
   // Deterministic selection: closest player wins; tie-break by playerId.
   candidates.sort((a, b) => {
     const distA = planarDistance(
-      a.groundPosition.x,
-      a.groundPosition.y,
+      a.player.groundPosition.x,
+      a.player.groundPosition.y,
       ball.position.x,
       ball.position.y,
     );
     const distB = planarDistance(
-      b.groundPosition.x,
-      b.groundPosition.y,
+      b.player.groundPosition.x,
+      b.player.groundPosition.y,
       ball.position.x,
       ball.position.y,
     );
     if (distA !== distB) return distA - distB;
-    return a.playerId.localeCompare(b.playerId);
+    return a.player.playerId.localeCompare(b.player.playerId);
   });
 
-  const contactPlayer = candidates[0];
+  const winner = candidates[0];
+  const contactPlayer = winner.player;
+  const action = winner.action;
 
   // Snapshot incoming ball state.
   const incoming: BallContactStateSnapshot = {
@@ -260,8 +310,24 @@ export function stepContacts(
     regime: ball.regime,
   };
 
-  // Compute and apply outgoing velocity.
-  const out = computeOutgoingVelocity(contactPlayer, ball, config);
+  // Compute and apply outgoing velocity based on action type.
+  let out: { vx: number; vy: number; vz: number };
+  let eventKind: "pass" | "player-ball-contact";
+  let contactType: string;
+  let eventLabel: string;
+
+  if (action === "pass") {
+    out = computePassVelocity(contactPlayer, passConfig);
+    eventKind = "pass";
+    contactType = "pass";
+    eventLabel = `Player ${contactPlayer.playerId} directed pass`;
+  } else {
+    out = computeOutgoingVelocity(contactPlayer, ball, config);
+    eventKind = "player-ball-contact";
+    contactType = "first-touch";
+    eventLabel = `Player ${contactPlayer.playerId} first-touch contact`;
+  }
+
   ball.linearVelocity.x = out.vx;
   ball.linearVelocity.y = out.vy;
   ball.linearVelocity.z = out.vz;
@@ -298,20 +364,20 @@ export function stepContacts(
 
   // Emit ordered event.
   eventCounter.value++;
-  const eventId = `player-ball-contact-${tick}-${eventCounter.value}`;
+  const eventId = `${eventKind === "pass" ? "pass" : "player-ball-contact"}-${tick}-${eventCounter.value}`;
 
   const event: SimulationEvent = {
     id: eventId,
     tick,
     sequence: eventCounter.value,
-    kind: "player-ball-contact",
-    label: `Player ${contactPlayer.playerId} first-touch contact`,
+    kind: eventKind,
+    label: eventLabel,
     payload: {
       playerId: contactPlayer.playerId,
       teamId: contactPlayer.teamId,
       incoming,
       outgoing,
-      contactType: "first-touch",
+      contactType,
       planarDistance: planarDistance(
         contactPlayer.groundPosition.x,
         contactPlayer.groundPosition.y,
