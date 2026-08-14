@@ -1,0 +1,12 @@
+# Project permission rules for Gauntlet. Path denies stay out of this
+# file: a session-wide Edit(src/**) deny would also block builders.
+
+[permission]
+deny = [
+  "Bash(git push*)",
+  "Bash(git commit*)",
+  "Bash(git rebase*)",
+  "Bash(sudo *)",
+  "Bash(rm -rf /)",
+  "Bash(rm -rf /*)",
+]
