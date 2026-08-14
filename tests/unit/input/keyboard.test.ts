@@ -224,14 +224,14 @@ describe("KEYBOARD-HELD-001: held buttons persist between samples", () => {
   });
 
   it("action button held persists across samples", () => {
-    target.press("KeyJ"); // pass (bit 0)
+    target.press("KeyK"); // first-touch (bit 0)
     const frame1 = adapter.sample(0);
     expect(frame1.heldButtons & (1 << 0)).not.toBe(0);
 
     const frame2 = adapter.sample(1);
     expect(frame2.heldButtons & (1 << 0)).not.toBe(0);
 
-    target.release("KeyJ");
+    target.release("KeyK");
     const frame3 = adapter.sample(2);
     expect(frame3.heldButtons & (1 << 0)).toBe(0);
   });
@@ -252,7 +252,7 @@ describe("KEYBOARD-EDGES-001: pressed/released edges are one-shot per tick", () 
   });
 
   it("press event produces pressedButtons on first sample only", () => {
-    target.press("KeyJ"); // pass (bit 0)
+    target.press("KeyK"); // first-touch (bit 0)
     const frame1 = adapter.sample(0);
     expect(frame1.pressedButtons & (1 << 0)).not.toBe(0);
     expect(frame1.heldButtons & (1 << 0)).not.toBe(0);
@@ -264,10 +264,10 @@ describe("KEYBOARD-EDGES-001: pressed/released edges are one-shot per tick", () 
   });
 
   it("release event produces releasedButtons on first sample only", () => {
-    target.press("KeyJ");
+    target.press("KeyK");
     adapter.sample(0); // consume the press
 
-    target.release("KeyJ");
+    target.release("KeyK");
     const frame1 = adapter.sample(1);
     expect(frame1.releasedButtons & (1 << 0)).not.toBe(0);
     expect(frame1.heldButtons & (1 << 0)).toBe(0);
@@ -280,8 +280,8 @@ describe("KEYBOARD-EDGES-001: pressed/released edges are one-shot per tick", () 
 
   it("press and release in same tick window: pressed clears released", () => {
     // Press and release before sampling.
-    target.press("KeyJ");
-    target.release("KeyJ");
+    target.press("KeyK");
+    target.release("KeyK");
     const frame = adapter.sample(0);
     // Released should be present, pressed should be cleared.
     expect(frame.releasedButtons & (1 << 0)).not.toBe(0);
@@ -290,13 +290,13 @@ describe("KEYBOARD-EDGES-001: pressed/released edges are one-shot per tick", () 
   });
 
   it("multiple buttons have independent edges", () => {
-    target.press("KeyJ"); // bit 0
-    target.press("KeyK"); // bit 1
+    target.press("KeyK"); // bit 0 (first-touch)
+    target.press("KeyJ"); // bit 1 (pass)
     const frame1 = adapter.sample(0);
     expect(frame1.pressedButtons & (1 << 0)).not.toBe(0);
     expect(frame1.pressedButtons & (1 << 1)).not.toBe(0);
 
-    target.release("KeyJ");
+    target.release("KeyK");
     const frame2 = adapter.sample(1);
     expect(frame2.releasedButtons & (1 << 0)).not.toBe(0);
     expect(frame2.pressedButtons & (1 << 1)).toBe(0);
@@ -322,7 +322,7 @@ describe("KEYBOARD-BLUR-001: blur clears all keyboard state", () => {
     target.press("KeyD");
     target.press("KeyW");
     target.press("ShiftLeft");
-    target.press("KeyJ");
+    target.press("KeyK");
 
     // Blur — all keys released.
     target.blur();
@@ -364,7 +364,7 @@ describe("KEYBOARD-RESET-001: reset clears all keyboard state", () => {
   it("reset produces neutral frame", () => {
     target.press("KeyD");
     target.press("ShiftLeft");
-    target.press("KeyJ");
+    target.press("KeyK");
 
     adapter.reset();
 
@@ -502,14 +502,14 @@ describe("KEYBOARD-QUERY-001: currentHeldButtons()", () => {
     expect(adapter.currentHeldButtons()).toBe(0);
   });
 
-  it("KeyJ held → bit 0 set", () => {
-    target.press("KeyJ");
+  it("KeyK held → bit 0 set", () => {
+    target.press("KeyK");
     expect(adapter.currentHeldButtons() & (1 << 0)).not.toBe(0);
   });
 
-  it("KeyJ + KeyK held → bits 0 and 1 set", () => {
-    target.press("KeyJ");
+  it("KeyK + KeyJ held → bits 0 and 1 set", () => {
     target.press("KeyK");
+    target.press("KeyJ");
     const held = adapter.currentHeldButtons();
     expect(held & (1 << 0)).not.toBe(0);
     expect(held & (1 << 1)).not.toBe(0);
@@ -571,5 +571,17 @@ describe("KEYBOARD-CONFIG-001: default configuration", () => {
 
   it("DEFAULT_KEYBOARD_CONFIG has action buttons", () => {
     expect(DEFAULT_KEYBOARD_CONFIG.buttons.length).toBe(4);
+  });
+
+  it("KeyJ maps to PASS_BIT (actionBit 1)", () => {
+    const passBtn = DEFAULT_KEYBOARD_CONFIG.buttons.find((b) => b.key === "KeyJ");
+    expect(passBtn).toBeDefined();
+    expect(passBtn!.actionBit).toBe(1);
+  });
+
+  it("KeyK maps to FIRST_TOUCH (actionBit 0)", () => {
+    const ftBtn = DEFAULT_KEYBOARD_CONFIG.buttons.find((b) => b.key === "KeyK");
+    expect(ftBtn).toBeDefined();
+    expect(ftBtn!.actionBit).toBe(0);
   });
 });

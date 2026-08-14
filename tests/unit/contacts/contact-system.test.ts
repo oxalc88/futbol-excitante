@@ -20,8 +20,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 
 import { stepContacts } from "../../../src/simulation/contacts/contact-system.js";
-import { FOUNDATION_CONTACT_V1 } from "../../../src/simulation/config/foundation.js";
-import { FIRST_TOUCH_BIT } from "../../../src/contracts/input.js";
+import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1 } from "../../../src/simulation/config/foundation.js";
+import { FIRST_TOUCH_BIT, PASS_BIT } from "../../../src/contracts/input.js";
 import type { BallState, PlayerState } from "../../../src/contracts/state.js";
 import type { InputFrame } from "../../../src/contracts/input.js";
 import type { SimulationEvent } from "../../../src/contracts/scenario.js";
@@ -996,6 +996,241 @@ describe("CONTACT-REGRESSION-001: existing systems still work", () => {
     );
     expect(speed).toBeLessThan(0.1);
     expect(snap.ball.regime).toBe("settled");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 12. PASS_BIT: directed pass along body heading
+// ---------------------------------------------------------------------------
+
+describe("CONTACT-PASS-001: directed pass contact", () => {
+  it("emits a pass event when player is in range with PASS_BIT", () => {
+    const player = makePlayer({
+      groundPosition: { x: 0.3, y: 0 },
+      bodyHeading: 0,
+    });
+    const ball = makeBall({
+      position: { x: 0.5, y: 0, z: 0.11 },
+      linearVelocity: { x: 0.5, y: 0, z: 0 },
+    });
+    const frames = [makeFrame(1, { pressedButtons: PASS_BIT })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    const result = stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+
+    expect(result.touched).toBe(true);
+    expect(result.events.length).toBe(1);
+    expect(result.events[0].kind).toBe("pass");
+    expect(result.events[0].tick).toBe(1);
+  });
+
+  it("sets ball.lastTouchRef to the pass event id", () => {
+    const player = makePlayer({
+      groundPosition: { x: 0.3, y: 0 },
+      bodyHeading: 0,
+    });
+    const ball = makeBall({
+      position: { x: 0.5, y: 0, z: 0.11 },
+      linearVelocity: { x: 0.5, y: 0, z: 0 },
+    });
+    const frames = [makeFrame(1, { pressedButtons: PASS_BIT })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    const result = stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+
+    expect(ball.lastTouchRef).toBe(result.events[0].id);
+    expect(ball.lastTouchRef).toMatch(/^pass-1-/);
+  });
+
+  it("ball velocity is along body heading at exitSpeed", () => {
+    const heading = Math.PI / 2; // facing +Y
+    const player = makePlayer({
+      groundPosition: { x: 0.3, y: 0 },
+      bodyHeading: heading,
+    });
+    const ball = makeBall({
+      position: { x: 0.5, y: 0, z: 0.11 },
+      linearVelocity: { x: 0.5, y: 0, z: 0 },
+    });
+    const frames = [makeFrame(1, { pressedButtons: PASS_BIT })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+
+    // Ball should move in +Y direction (body heading).
+    expect(ball.linearVelocity.x).toBeCloseTo(0, 1);
+    expect(ball.linearVelocity.y).toBeGreaterThan(0);
+    // Horizontal speed should be exitSpeed.
+    const hSpeed = Math.sqrt(ball.linearVelocity.x ** 2 + ball.linearVelocity.y ** 2);
+    expect(hSpeed).toBeCloseTo(FOUNDATION_PASS_V1.exitSpeed.value, 1);
+  });
+
+  it("does not teleport ball position", () => {
+    const player = makePlayer({
+      groundPosition: { x: 0, y: 0 },
+      bodyHeading: 0,
+    });
+    const ball = makeBall({
+      position: { x: 0.5, y: 0.3, z: 0.5 },
+      linearVelocity: { x: 0.5, y: 0, z: 0 },
+      regime: "airborne",
+    });
+    const frames = [makeFrame(1, { pressedButtons: PASS_BIT })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    const ballPosBefore = { ...ball.position };
+    stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+
+    expect(ball.position.x).toBe(ballPosBefore.x);
+    expect(ball.position.y).toBe(ballPosBefore.y);
+    expect(ball.position.z).toBe(ballPosBefore.z);
+  });
+
+  it("pass event payload contains contactType 'pass'", () => {
+    const player = makePlayer({
+      groundPosition: { x: 0.3, y: 0 },
+      bodyHeading: 0,
+    });
+    const ball = makeBall({
+      position: { x: 0.5, y: 0, z: 0.11 },
+      linearVelocity: { x: 0.5, y: 0, z: 0 },
+    });
+    const frames = [makeFrame(1, { pressedButtons: PASS_BIT })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    const result = stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+    const payload = result.events[0].payload as Record<string, unknown>;
+
+    expect(payload.contactType).toBe("pass");
+    expect(payload.playerId).toBe("p1");
+    expect(payload.teamId).toBe("team-a");
+    expect(payload.incoming).toBeDefined();
+    expect(payload.outgoing).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 13. PASS_BIT without proximity → no pass
+// ---------------------------------------------------------------------------
+
+describe("CONTACT-PASS-002: no pass without proximity", () => {
+  it("no pass event when player is out of range", () => {
+    const player = makePlayer({
+      groundPosition: { x: 5.0, y: 0 },
+      bodyHeading: 0,
+    });
+    const ball = makeBall({
+      position: { x: 0, y: 0, z: 0.11 },
+      linearVelocity: { x: 0.5, y: 0, z: 0 },
+    });
+    const frames = [makeFrame(1, { pressedButtons: PASS_BIT })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    const result = stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+
+    expect(result.touched).toBe(false);
+    expect(result.events.length).toBe(0);
+    expect(ball.lastTouchRef).toBeNull();
+  });
+
+  it("no pass when PASS_BIT not set even if in range", () => {
+    const player = makePlayer({
+      groundPosition: { x: 0.3, y: 0 },
+    });
+    const ball = makeBall({
+      position: { x: 0.5, y: 0, z: 0.11 },
+      linearVelocity: { x: 0.5, y: 0, z: 0 },
+    });
+    const frames = [makeFrame(1, { pressedButtons: 0 })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    const result = stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+
+    expect(result.touched).toBe(false);
+    expect(result.events.length).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 14. FIRST_TOUCH_BIT still does first-touch (regression)
+// ---------------------------------------------------------------------------
+
+describe("CONTACT-REGRESSION-002: FIRST_TOUCH_BIT still works", () => {
+  it("FIRST_TOUCH_BIT produces player-ball-contact event, not pass", () => {
+    const player = makePlayer({
+      groundPosition: { x: 0.3, y: 0 },
+      bodyHeading: 0,
+    });
+    const ball = makeBall({
+      position: { x: 0.5, y: 0, z: 0.11 },
+      linearVelocity: { x: 2.0, y: 0, z: 0 },
+    });
+    const frames = [makeFrame(1, { pressedButtons: FIRST_TOUCH_BIT })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    const result = stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+
+    expect(result.touched).toBe(true);
+    expect(result.events.length).toBe(1);
+    expect(result.events[0].kind).toBe("player-ball-contact");
+    expect(result.events[0].payload.contactType).toBe("first-touch");
+  });
+
+  it("both PASS_BIT and FIRST_TOUCH_BIT → PASS_BIT wins (priority)", () => {
+    const player = makePlayer({
+      groundPosition: { x: 0.3, y: 0 },
+      bodyHeading: 0,
+    });
+    const ball = makeBall({
+      position: { x: 0.5, y: 0, z: 0.11 },
+      linearVelocity: { x: 2.0, y: 0, z: 0 },
+    });
+    // Both bits set simultaneously.
+    const frames = [makeFrame(1, { pressedButtons: PASS_BIT | FIRST_TOUCH_BIT })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    const result = stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+
+    expect(result.touched).toBe(true);
+    expect(result.events[0].kind).toBe("pass");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 15. Possession-evidence oracle for pass: lastTouchRef without event → FAIL
+// ---------------------------------------------------------------------------
+
+describe("CONTACT-PASS-POSSESSION-001: pass possession evidence", () => {
+  it("lastTouchRef change after pass is backed by a pass event", () => {
+    const player = makePlayer({
+      groundPosition: { x: 0.3, y: 0 },
+      bodyHeading: 0,
+    });
+    const ball = makeBall({
+      position: { x: 0.5, y: 0, z: 0.11 },
+      linearVelocity: { x: 0.5, y: 0, z: 0 },
+    });
+    const frames = [makeFrame(1, { pressedButtons: PASS_BIT })];
+    const assignments = makeAssignments({ slot: "slot-1", playerId: "p1", teamId: "team-a" });
+    const counter = makeCounter();
+
+    const prevRef = ball.lastTouchRef;
+    const result = stepContacts([player], ball, frames, assignments, CFG, counter, 1);
+
+    if (ball.lastTouchRef !== prevRef) {
+      const passEvents = result.events.filter((e) => e.kind === "pass");
+      expect(passEvents.length).toBeGreaterThanOrEqual(1);
+      expect(ball.lastTouchRef).toBe(passEvents[0].id);
+    }
   });
 });
 
