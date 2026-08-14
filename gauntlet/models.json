@@ -1,33 +1,36 @@
 {
-  "version": "gauntlet-models-v1",
-  "notes": "OpenCode agent frontmatter and opencode.json must stay in sync with this file. See gauntlet/README.md.",
+  "version": "gauntlet-models-v2",
+  "notes": "Grok agent frontmatter model fields and ~/.grok/config.toml [subagents.models] must stay in sync with this file. NaN endpoints are registered in ~/.grok/config.toml (user-level). Quote dotted keys as [model.\"qwen3.6\"]. See gauntlet/README.md.",
   "roles": {
     "orchestrator": {
       "agent": "orchestrator",
       "mode": "primary",
       "provider": "xai",
-      "model": "xai/grok-4.6",
-      "fallback": ["xai/grok-4.6-fast"]
+      "model": "grok-4.6",
+      "fallback": ["grok-4.6"]
     },
     "builder_qwen": {
       "agent": "builder-qwen",
       "mode": "subagent",
       "provider": "nan",
-      "model": "nan/qwen3.6",
-      "fallback": ["nan/mimo-v2.5"]
+      "model": "qwen3.6",
+      "api_model": "qwen3.6",
+      "fallback": ["mimo-v2.5"]
     },
     "builder_mimo": {
       "agent": "builder-mimo",
       "mode": "subagent",
       "provider": "nan",
-      "model": "nan/mimo-v2.5",
-      "fallback": ["nan/qwen3.6"]
+      "model": "mimo-v2.5",
+      "api_model": "mimo-v2.5",
+      "fallback": ["qwen3.6"]
     },
     "critic": {
       "agent": "critic",
       "mode": "subagent",
       "provider": "nan",
-      "model": "nan/deepseek-v4-flash-0731",
+      "model": "deepseek-v4-flash-0731",
+      "api_model": "deepseek-v4-flash-0731",
       "fallback": ["critic-qwen", "critic-mimo"],
       "constraint": "Never use the same model that implemented the candidate under review."
     },
@@ -36,33 +39,37 @@
       "mode": "subagent",
       "hidden": true,
       "provider": "nan",
-      "model": "nan/qwen3.6"
+      "model": "qwen3.6",
+      "api_model": "qwen3.6"
     },
     "critic_mimo": {
       "agent": "critic-mimo",
       "mode": "subagent",
       "hidden": true,
       "provider": "nan",
-      "model": "nan/mimo-v2.5"
+      "model": "mimo-v2.5",
+      "api_model": "mimo-v2.5"
     },
     "integration_reviewer": {
       "agent": "integration-reviewer",
       "mode": "subagent",
       "provider": "nan",
-      "model": "nan/deepseek-v4-flash-0731",
-      "fallback": ["nan/qwen3.6", "nan/mimo-v2.5"],
+      "model": "deepseek-v4-flash-0731",
+      "api_model": "deepseek-v4-flash-0731",
+      "fallback": ["qwen3.6", "mimo-v2.5"],
       "constraint": "Prefer DeepSeek. If unavailable, use a NaN model different from the builder under review."
     },
     "aux": {
       "agent": "aux",
       "mode": "subagent",
       "provider": "nan",
-      "model": "nan/gemma4",
-      "fallback": ["nan/qwen3.6"]
+      "model": "gemma4",
+      "api_model": "gemma4",
+      "fallback": ["qwen3.6"]
     }
   },
-  "cheap_auxiliary": ["nan/gemma4", "nan/qwen3.6"],
-  "high_volume": ["nan/qwen3.6", "nan/mimo-v2.5", "nan/deepseek-v4-flash-0731", "nan/gemma4"],
+  "cheap_auxiliary": ["gemma4", "qwen3.6"],
+  "high_volume": ["qwen3.6", "mimo-v2.5", "deepseek-v4-flash-0731", "gemma4"],
   "grok_uses": [
     "orchestration",
     "prioritization",

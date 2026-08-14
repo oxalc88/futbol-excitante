@@ -12,7 +12,7 @@ Use these in this order. Do not invent a competing architecture.
 4. `BOOTSTRAP_PLAN.md` as bootstrap guidance, not a forced backlog
 5. `VISION.md` and `research/` as background. If research documents conflict, `research/RESEARCH_AUDIT.md` governs.
 
-The Gauntlet loop lives in `gauntlet/`. Launch and model routing are documented in `gauntlet/README.md`.
+The Gauntlet loop lives in `gauntlet/`. Launch and model routing are documented in `gauntlet/README.md`. Project agents are in `.grok/agents/`.
 
 ## Hard boundaries
 

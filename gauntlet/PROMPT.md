@@ -6,7 +6,7 @@ Loop until you are stopped or a human-needed blocker is reached:
 
 1. Inspect repository state and `gauntlet/state/CURRENT.md`.
 2. Choose the highest-value next objective by inspecting the actual project, evidence, research, and specs. `gauntlet/objectives.md` and milestones guide that choice; they are not a fixed backlog.
-3. Delegate implementation to `builder-qwen` or `builder-mimo`. Never implement it yourself.
+3. Delegate implementation to `builder-qwen` or `builder-mimo` via `spawn_subagent`, passing the model from `gauntlet/models.json`. Never implement it yourself.
 4. Require a builder report that includes executed commands and evidence.
 5. Delegate evaluation to an independent critic. Default critic is DeepSeek. Never use the same model that implemented the change.
 6. On `RETRY` or `REJECT`, revert failed candidate files if needed and return the critic's `required_fixes` to a builder.
