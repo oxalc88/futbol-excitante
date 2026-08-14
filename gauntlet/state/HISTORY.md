@@ -705,6 +705,48 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 22 — 2026-08-14
+
+- objective_id: PLAYABLE-BASIC-PASS
+- builder: builder-mimo / mimo-v2.5
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: 4d88fff PASS_BIT; f64e999 impulse; 4ded7ca KeyJ/KeyK; 8992fa6 oracle; 0cb5527 tests
+- notes: Directed pass along heading. First RETRY: browser still mapped J to first-touch; possession oracle ignored kind pass. Retry imported DEFAULT_KEYBOARD_CONFIG and recognized pass evidence. 672 node + 16 browser. No PES claim.
+
+### Critic verdict (retry 1 — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-BASIC-PASS
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-mimo
+- builder_model: mimo-v2.5
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-BASIC-PASS
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 672/672; test-browser 16/16
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 

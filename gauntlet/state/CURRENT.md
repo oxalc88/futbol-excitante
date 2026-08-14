@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-next_objective_id: PLAYABLE-BASIC-PASS
+next_objective_id: PLAYABLE-BASIC-SHOT
 best_known:
-  commit: 8e19fcc
-  note: "PLAYABLE-FIRST-TOUCH accepted. Independent ball first-touch via FIRST_TOUCH_BIT. Advisory: KeyJ is actionBit 0. Not PES."
+  commit: 0cb5527
+  note: "PLAYABLE-BASIC-PASS accepted. PASS_BIT, KeyJ pass, KeyK first-touch. Independent ball. Not PES."
 active_candidate:
-  objective_id: PLAYABLE-BASIC-PASS
+  objective_id: PLAYABLE-BASIC-SHOT
   builder: builder-mimo
   critic: critic
-  started_from_commit: 8e19fcc
+  started_from_commit: 0cb5527
   last_verdict: null
 builder_in_use: builder-mimo
 critic_in_use: critic
@@ -40,19 +40,20 @@ accepted:
   - FOUNDATION-PROMOTION
   - CAPABILITY-DESIGN-PROFILE
   - PLAYABLE-FIRST-TOUCH
+  - PLAYABLE-BASIC-PASS
 blocked: []
-selection_note: "First-touch exists. Next PLAYABLE-1V1 gap is a directed pass: new PASS_BIT not bit 0, remap KeyJ, independent ball, explicit pass event. Do not invent PES envelopes. Do not start 11v11."
+selection_note: "Pass exists. Next BASIC_ACTIONS gap is a directed shot: new SHOT_BIT, independent ball, explicit shot event, provisional config. Do not invent PES envelopes. Do not start 11v11."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-FIRST-TOUCH — player-ball first-touch contact.
+PLAYABLE-BASIC-PASS — directed pass.
 
-- commits: `7a99632` (contracts), `8b2a7ab` (config), `57f7cd5` (contact system), `8e19fcc` (tests)
+- commits: `4d88fff` (contracts), `f64e999` (impulse), `4ded7ca` (keys), `8992fa6` (oracle), `0cb5527` (tests)
 - builder: builder-mimo / mimo-v2.5
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 1
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate PLAYABLE-BASIC-PASS to builder-mimo. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-BASIC-SHOT to builder-mimo. After ACCEPT + integration, atomic-commit and push.
