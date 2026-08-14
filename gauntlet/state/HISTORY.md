@@ -102,6 +102,18 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - commit: bb1556d82395252daf2f2df4cd90f0b7a06419e4
 - notes: Independent 3D ball with gravity, swept pitch impact, bounce, non-reversing ground resistance, spin decay. Pitch-contact events with incoming/outgoing snapshots. 264 node tests. No PES ball claim.
 
+## Iteration 9 — 2026-08-13
+
+- objective_id: BOOTSTRAP-09
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: c96de25d8a4f44136b1efae8b7aa16d98239b93c
+- notes: ReplayV1 codec, recorder, reusable verifyReplay with earliest divergence + state slice, restore-capable checkpoints. First critic RETRY for missing verifier/full checkpoints. 318 node tests. No alternative physics.
+
+
 
 
 

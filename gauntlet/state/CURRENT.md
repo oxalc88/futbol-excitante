@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: BOOTSTRAP
-next_objective_id: BOOTSTRAP-09
+next_objective_id: BOOTSTRAP-10
 best_known:
-  commit: bb1556d
-  note: "BOOTSTRAP-08 accepted. Independent 3D ball is the new best-known engine baseline."
+  commit: c96de25
+  note: "BOOTSTRAP-09 accepted. Replay codec, recorder, and verifyReplay are the new best-known engine baseline."
 active_candidate:
-  objective_id: BOOTSTRAP-09
+  objective_id: BOOTSTRAP-10
   builder: builder-qwen
   critic: critic
-  started_from_commit: bb1556d
+  started_from_commit: c96de25
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -27,19 +27,20 @@ accepted:
   - BOOTSTRAP-06
   - BOOTSTRAP-07
   - BOOTSTRAP-08
+  - BOOTSTRAP-09
 blocked: []
-selection_note: "Highest-value remaining gap is checkpoints, input recording, and replay verification. Player and ball now move; runs are not yet reconstructible from a ReplayV1 record."
+selection_note: "Highest-value remaining gap is telemetry, bootstrap invariants, metrics, and the headless runner. Runs can be replayed; they are not yet a machine-readable laboratory loop."
 ```
 
 ## Last accepted objective
 
-BOOTSTRAP-08 — primitive independent 3D ball.
+BOOTSTRAP-09 — checkpoints, input recording, replay verification.
 
-- commit: `bb1556d82395252daf2f2df4cd90f0b7a06419e4`
-- builder: builder-mimo / mimo-v2.5
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT
+- commit: `c96de25d8a4f44136b1efae8b7aa16d98239b93c`
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 1
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate BOOTSTRAP-09 to builder-qwen. After critic + integration ACCEPT, atomic-commit and push.
+Delegate BOOTSTRAP-10 to builder-qwen. After ACCEPT + integration, atomic-commit and push.
