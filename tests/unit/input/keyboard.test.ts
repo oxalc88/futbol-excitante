@@ -514,6 +514,18 @@ describe("KEYBOARD-QUERY-001: currentHeldButtons()", () => {
     expect(held & (1 << 0)).not.toBe(0);
     expect(held & (1 << 1)).not.toBe(0);
   });
+
+  it("KeyL held → bit 2 (SHOT_BIT) set", () => {
+    target.press("KeyL");
+    expect(adapter.currentHeldButtons() & (1 << 2)).not.toBe(0);
+  });
+
+  it("KeyL press produces SHOT_BIT in pressedButtons", () => {
+    target.press("KeyL");
+    const frame = adapter.sample(0);
+    expect(frame.pressedButtons & (1 << 2)).not.toBe(0);
+    expect(frame.pressedButtons).toBe(1 << 2);
+  });
 });
 
 // ===========================================================================
@@ -583,5 +595,11 @@ describe("KEYBOARD-CONFIG-001: default configuration", () => {
     const ftBtn = DEFAULT_KEYBOARD_CONFIG.buttons.find((b) => b.key === "KeyK");
     expect(ftBtn).toBeDefined();
     expect(ftBtn!.actionBit).toBe(0);
+  });
+
+  it("KeyL maps to SHOT (actionBit 2)", () => {
+    const shotBtn = DEFAULT_KEYBOARD_CONFIG.buttons.find((b) => b.key === "KeyL");
+    expect(shotBtn).toBeDefined();
+    expect(shotBtn!.actionBit).toBe(2);
   });
 });

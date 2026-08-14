@@ -122,6 +122,26 @@ describe("checkPossessionEvidence: pass-backed lastTouchRef", () => {
     const fails = results.filter((r) => r.status === "fail");
     expect(fails).toHaveLength(0);
   });
+
+  it("PASSes when lastTouchRef changes and a 'shot' event is present", () => {
+    const obs0 = baseObs(0);
+    const obs1 = baseObs(1, {
+      ball: {
+        position: { x: 1, y: 0, z: 0.5 },
+        linearVelocity: { x: 10, y: 0, z: 2 },
+        angularVelocity: { x: 0, y: 0, z: 0 },
+        regime: "airborne",
+        lastTouchRef: "evt-shot-1",
+      },
+      events: [
+        { id: "evt-shot-1", tick: 1, sequence: 0, kind: "shot", label: "shot" },
+      ],
+    });
+
+    const results = checkPossessionEvidence([obs0, obs1]);
+    const fails = results.filter((r) => r.status === "fail");
+    expect(fails).toHaveLength(0);
+  });
 });
 
 // ---------------------------------------------------------------------------
