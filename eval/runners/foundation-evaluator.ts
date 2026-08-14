@@ -456,6 +456,8 @@ export function evaluateFoundation(
     };
     /** Browser case results from a browser evaluation run. */
     browserCases?: BrowserCaseResult[];
+    /** Skip browser-case validation (evaluates suites only; caller handles browser). */
+    skipBrowserValidation?: boolean;
   },
 ): FoundationEvaluationResult {
   // Load the registry.
@@ -478,17 +480,28 @@ export function evaluateFoundation(
 
   // Validate required browser case execution.
   const browserCaseResults: BrowserCaseResult[] = opts?.browserCases ?? [];
-  const { validationErrors, validationFails } = validateBrowserCases(
-    profile,
-    browserCaseResults,
-    headlessRef,
-  );
+  let validationErrors: string[] = [];
+  let validationFails: string[] = [];
+
+  // When skipBrowserValidation is true, skip browser validation so the
+  // caller (e.g. foundation-lab promotion layer) can handle it independently.
+  if (!opts?.skipBrowserValidation) {
+    const { validationErrors: ve, validationFails: vf } = validateBrowserCases(
+      profile,
+      browserCaseResults,
+      headlessRef,
+    );
+    validationErrors = ve;
+    validationFails = vf;
+  }
   const browserInvalid = validationErrors.length > 0;
 
   // If browser is a required execution path and required browser cases
   // were not executed or validated (evidence issues), the overall result
   // is INVALID_RUN.  Evidence-valid but passed:false cases produce FAIL.
-  let overallOutcome: EvaluationOutcome | undefined = browserInvalid
+  // When skipBrowserValidation is true, let suites determine overall.
+  let overallOutcome: EvaluationOutcome | undefined = !opts?.skipBrowserValidation
+    && browserInvalid
     ? "INVALID_RUN"
     : undefined;
 
