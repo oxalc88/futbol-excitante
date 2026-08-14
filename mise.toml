@@ -4,3 +4,35 @@ pnpm = "11.10.0"
 
 [settings]
 lockfile = true
+
+# ---------------------------------------------------------------------------
+# Tasks — all invoke pnpm under the pinned Node environment.
+# ---------------------------------------------------------------------------
+
+[tasks.dev]
+description = "Start the Vite browser laboratory"
+run = "pnpm dev"
+
+[tasks.sim-smoke]
+description = "Run the versioned foundation scenario headlessly"
+run = "pnpm run sim-smoke"
+
+[tasks.replay-verify]
+description = "Verify deterministic reconstruction from a replay.json"
+run = "pnpm run replay-verify"
+
+[tasks.eval-compare]
+description = "Compare two artifact dirs; DELTA_ONLY never PASS"
+run = "pnpm run eval-compare"
+
+[tasks.test]
+description = "Run Node Vitest project"
+run = "pnpm run test"
+
+[tasks.test-browser]
+description = "Run browser Vitest + Playwright"
+run = "pnpm run test-browser"
+
+[tasks.test-all]
+description = "Frozen-install check, typecheck, architecture/node/browser tests, headless smoke, Vite production build"
+run = "pnpm run test-all"

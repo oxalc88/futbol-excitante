@@ -8,9 +8,12 @@
     "typecheck": "tsc --noEmit -p tsconfig.core.json && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.browser.json",
     "build": "vite build",
     "dev": "vite",
+    "sim-smoke": "tsx src/apps/headless/cli.ts --scenario eval/scenarios/foundation-move-and-roll.v1.json --out artifacts/sim-smoke",
+    "replay-verify": "tsx src/apps/headless/replay-verify-cli.ts",
+    "eval-compare": "tsx src/apps/headless/eval-compare-cli.ts",
     "test": "vitest run --project node",
     "test-browser": "vitest run --project browser",
-    "test-all": "vitest run"
+    "test-all": "CI=1 pnpm install --frozen-lockfile && CI=1 pnpm run typecheck && CI=1 pnpm run test && CI=1 pnpm run test-browser && CI=1 pnpm run sim-smoke && pnpm run build"
   },
   "dependencies": {
     "three": "^0.170.0"
