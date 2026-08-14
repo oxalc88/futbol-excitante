@@ -58,3 +58,15 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - commit: 900aa50596654df57d10880ed606014842926248
 - notes: Deterministic createWorld from declarative scenario + config + seed. Fixture foundation-move-and-roll.v1. Same-start hash identity. Advisory: createWorld currently discards input-uniqueness errors; must be closed when the loop consumes inputProgram.
 
+## Iteration 5 — 2026-08-13
+
+- objective_id: BOOTSTRAP-05
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: 7853fc26bf258432c71e49007608078f2f6bea65
+- notes: Synchronous Simulation API (tick, applyInputs, step, snapshot, presentation, restore, stateHash). System-free locomotion/ball stages. createWorld uniqueness fail-closed. 194 node tests. Non-blocking: cross-call applyInputs duplicates and scheduledEvents wiring for BOOTSTRAP-06.
+
+
