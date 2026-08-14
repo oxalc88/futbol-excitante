@@ -29,10 +29,15 @@ import { evaluate } from "./evaluate.js";
 import { loadRegistrySet } from "../contracts/loader.js";
 import { COMMON_CRITERIA } from "../contracts/common-criteria.js";
 import { executeOracle } from "../oracles/oracle-registry.js";
+import { validateBrowserCaseResults, type BrowserCaseResult } from "../contracts/browser-cases.js";
 
 // Import wire.ts to register all built-in oracles in the protected registry.
 // This is a side-effect-only import; no exports are needed.
 import "../oracles/wire.js";
+
+// Imports for reference-hash generation (used by browser evidence cross-check).
+import { createWorld } from "../../src/simulation/world/create.js";
+import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { InvariantResult } from "../../src/contracts/telemetry.js";
 import type {
@@ -88,7 +93,11 @@ export interface FoundationEvaluationResult {
     required_criterion_classes: string[];
     required_suite_ids: string[];
   };
+  /** Overall evaluation outcome — INVALID_RUN when required execution paths are missing. */
+  overall: EvaluationOutcome;
   suites: SuiteEvaluationResult[];
+  /** Browser case results from a browser evaluation run (may be empty). */
+  browserCases: BrowserCaseResult[];
 }
 
 // ---------------------------------------------------------------------------
@@ -294,6 +303,141 @@ function computeOverallOutcome(
 // ---------------------------------------------------------------------------
 
 /**
+ * Generate reference hashes from a scenario using the simulation core.
+ * Returns the initial state hash (before any steps) and per-tick hashes.
+ * This is the headless reference used to cross-check browser evidence.
+ */
+function generateReferenceHashes(
+  scenario: Parameters<typeof evaluate>[0]["scenario"],
+): { initialHash: string; perTickHashes: string[] } {
+  const world = createWorld({ scenario });
+  const sim = createSimulation(world);
+  const initialHash = sim.stateHash();
+  const perTickHashes: string[] = [];
+  for (let i = 0; i < scenario.durationTicks; i++) {
+    const tickInputs = scenario.inputProgram[sim.tick] ?? [];
+    if (tickInputs.length > 0) {
+      sim.applyInputs(tickInputs);
+    }
+    const result = sim.step();
+    perTickHashes.push(result.stateHash);
+  }
+  return { initialHash, perTickHashes };
+}
+
+/**
+ * Validate a BrowserCaseResult's evidence and cross-check it against
+ * headless simulation hashes.
+ *
+ * Evidence is valid when:
+ *  - initialHash is a non-empty string.
+ *  - perTickHashes (when present) is an array of non-empty strings.
+ *  - initialHash matches the headless reference initialHash.
+ *  - Each perTickHash matches the corresponding headless per-tick hash.
+ *
+ * Dummy strings like "dummy-never-produced" will fail cross-check and
+ * return an error — bare passed:true without matching evidence is INVALID_RUN.
+ *
+ * @param result - Browser case result to validate.
+ * @param headless - Headless reference hashes from the same scenario.
+ * @returns An error string if invalid, or undefined if valid.
+ */
+function validateBrowserEvidence(
+  result: BrowserCaseResult,
+  headless: { initialHash: string; perTickHashes: string[] },
+): string | undefined {
+  if (
+    typeof result.evidence !== "object" ||
+    result.evidence === null ||
+    typeof result.evidence.initialHash !== "string" ||
+    result.evidence.initialHash.length === 0
+  ) {
+    return `Missing or empty initialHash for case "${result.case_id}"`;
+  }
+
+  // Cross-check initialHash against headless reference.
+  if (result.evidence.initialHash !== headless.initialHash) {
+    return `Evidence initialHash does not match headless reference for case "${result.case_id}"`;
+  }
+
+  if (result.evidence.perTickHashes !== undefined && result.evidence.perTickHashes.length > 0) {
+    if (!Array.isArray(result.evidence.perTickHashes)) {
+      return `perTickHashes must be an array for case "${result.case_id}"`;
+    }
+    for (let i = 0; i < result.evidence.perTickHashes.length; i++) {
+      if (typeof result.evidence.perTickHashes[i] !== "string" || result.evidence.perTickHashes[i].length === 0) {
+        return `Empty perTickHash entry at index ${i} for case "${result.case_id}"`;
+      }
+      // Cross-check each per-tick hash against the headless reference.
+      // perTickHashes are only valid when generated from the same
+      // input program as the headless run (e.g., same scenario + same inputs).
+      if (result.evidence.perTickHashes[i] !== headless.perTickHashes[i]) {
+        return `Per-tick hash mismatch at tick ${i} for case "${result.case_id}"`;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Validate required browser cases for a profile.
+ *
+ * Checks:
+ *  1. All case_ids are known (registered).
+ *  2. All required case_ids are present in results.
+ *  3. Every required case has valid evidence matching headless hashes.
+ *  4. Every required case has passed === true.
+ *
+ * Returns separate arrays:
+ *  - validationErrors: evidence issues → INVALID_RUN overall.
+ *  - validationFails: evidence valid but case failed → FAIL overall.
+ *
+ * @param profile - The milestone profile to check.
+ * @param browserCases - Browser case results from a browser evaluation run.
+ * @param headless - Headless reference hashes from the same scenario.
+ * @returns { validationErrors, validationFails } — error arrays.
+ */
+function validateBrowserCases(
+  profile: { required_browser_case_ids: string[] },
+  browserCases: BrowserCaseResult[],
+  headless: { initialHash: string; perTickHashes: string[] },
+): { validationErrors: string[]; validationFails: string[] } {
+  const validationErrors: string[] = [];
+  const validationFails: string[] = [];
+
+  // 1. Reject unknown case_ids.
+  const knownCaseIds = validateBrowserCaseResults(browserCases);
+  validationErrors.push(...knownCaseIds);
+
+  // 2–4. Check required cases.
+  const requiredIds = profile.required_browser_case_ids;
+  if (requiredIds.length === 0) {
+    return { validationErrors, validationFails };
+  }
+  for (const caseId of requiredIds) {
+    const found = browserCases.find((r) => r.case_id === caseId);
+    if (!found) {
+      validationErrors.push(`Missing required browser case "${caseId}"`);
+      continue;
+    }
+    // Cross-check evidence against headless reference.
+    const evidenceError = validateBrowserEvidence(found, headless);
+    if (evidenceError) {
+      validationErrors.push(evidenceError);
+      continue;
+    }
+    // Evidence is valid — check pass status.
+    if (!found.passed) {
+      validationFails.push(
+        `Required browser case "${caseId}" has passed:false`,
+      );
+    }
+  }
+  return { validationErrors, validationFails };
+}
+
+/**
  * Evaluate a scenario against all suites in the FOUNDATION_LAB profile.
  *
  * @param scenario - The scenario to evaluate (must be valid for the simulation core).
@@ -310,6 +454,8 @@ export function evaluateFoundation(
       minZ: number;
       maxZ: number;
     };
+    /** Browser case results from a browser evaluation run. */
+    browserCases?: BrowserCaseResult[];
   },
 ): FoundationEvaluationResult {
   // Load the registry.
@@ -326,6 +472,25 @@ export function evaluateFoundation(
     scenario,
     safetyBounds: opts?.safetyBounds,
   });
+
+  // Generate headless reference hashes for browser evidence cross-check.
+  const headlessRef = generateReferenceHashes(scenario);
+
+  // Validate required browser case execution.
+  const browserCaseResults: BrowserCaseResult[] = opts?.browserCases ?? [];
+  const { validationErrors, validationFails } = validateBrowserCases(
+    profile,
+    browserCaseResults,
+    headlessRef,
+  );
+  const browserInvalid = validationErrors.length > 0;
+
+  // If browser is a required execution path and required browser cases
+  // were not executed or validated (evidence issues), the overall result
+  // is INVALID_RUN.  Evidence-valid but passed:false cases produce FAIL.
+  let overallOutcome: EvaluationOutcome | undefined = browserInvalid
+    ? "INVALID_RUN"
+    : undefined;
 
   const results: SuiteEvaluationResult[] = [];
 
@@ -437,6 +602,28 @@ export function evaluateFoundation(
     });
   }
 
+  // When browser cases are valid, compute overall from suite test outcomes.
+  if (overallOutcome === undefined) {
+    // Evidence-valid but passed:false on a required case → FAIL.
+    if (validationFails.length > 0) {
+      overallOutcome = "FAIL";
+    } else {
+      // Collect all per-test overall outcomes across suites.
+      const testOutcomes = results.flatMap((s) => s.tests.map((t) => t.overall));
+      if (testOutcomes.includes("FAIL")) {
+        overallOutcome = "FAIL";
+      } else if (testOutcomes.includes("PASS")) {
+        overallOutcome = "PASS";
+      } else if (testOutcomes.includes("BLOCKED_MISSING_REFERENCE")) {
+        overallOutcome = "BLOCKED_MISSING_REFERENCE";
+      } else if (testOutcomes.includes("NOT_EVALUATED")) {
+        overallOutcome = "NOT_EVALUATED";
+      } else {
+        overallOutcome = "NOT_EVALUATED";
+      }
+    }
+  }
+
   return {
     registry_set_id: registry.registry_set_id,
     profile: {
@@ -445,7 +632,9 @@ export function evaluateFoundation(
       required_criterion_classes: profile.required_criterion_classes,
       required_suite_ids: profile.required_suite_ids,
     },
+    overall: overallOutcome,
     suites: results,
+    browserCases: browserCaseResults,
   };
 }
 
