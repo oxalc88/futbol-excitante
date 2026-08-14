@@ -71,5 +71,17 @@ export function checkPossessionEvidence(
     }
   }
 
+  // No violations found — the oracle ran and found nothing wrong.
+  // Return a single pass so computeOutcome yields PASS rather than
+  // NOT_EVALUATED (empty results would otherwise be treated as
+  // "no oracle ran").
+  if (results.length === 0) {
+    results.push({
+      id: "possession-clean",
+      status: "pass",
+      description: "Ball lastTouchRef changes are backed by touch event evidence throughout run",
+    });
+  }
+
   return results;
 }
