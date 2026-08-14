@@ -46,3 +46,15 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - result: accepted
 - commit: 2b402c361be74b5360b403220a0bbe1d53bd32b3
 - notes: Determinism substrate — mulberry32-v1, canonical-json-v1, fnv1a64-v1, UTF-8 encoder, finite checks, core-boundary scan. First critic RETRY for non-canonical Mulberry32, FNV offset rounding, and UTF-8 surrogate bug. Retry aligned algorithms to cited references. 143 node tests. No PES fidelity claimed.
+
+## Iteration 4 — 2026-08-13
+
+- objective_id: BOOTSTRAP-04
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commit: 900aa50596654df57d10880ed606014842926248
+- notes: Deterministic createWorld from declarative scenario + config + seed. Fixture foundation-move-and-roll.v1. Same-start hash identity. Advisory: createWorld currently discards input-uniqueness errors; must be closed when the loop consumes inputProgram.
+
