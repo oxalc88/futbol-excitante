@@ -2,16 +2,16 @@
 
 ```yaml
 gauntlet_version: gauntlet-loop-v1
-phase: FOUNDATION
-next_objective_id: FOUNDATION-PROMOTION
+phase: PLAYABLE
+next_objective_id: CAPABILITY-DESIGN-PROFILE
 best_known:
-  commit: 8084f79
-  note: "FOUNDATION-MUTANT-REDUCTION accepted. evaluateMutantCore reduces implementable canaries. Skip is INVALID_RUN. No FOUNDATION_LAB_PASS."
+  commit: 60c502a
+  note: "FOUNDATION-PROMOTION accepted. evaluateFoundationLab can emit milestoneVerdict PASS for required HARD_INVARIANTs + browser cases + COMMON-DETERMINISTIC + MUTANT_CORE. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. Not a PES claim."
 active_candidate:
-  objective_id: FOUNDATION-PROMOTION
+  objective_id: CAPABILITY-DESIGN-PROFILE
   builder: builder-qwen
   critic: critic
-  started_from_commit: 8084f79
+  started_from_commit: 60c502a
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -37,19 +37,20 @@ accepted:
   - FOUNDATION-BROWSER
   - FOUNDATION-DETERMINISTIC
   - FOUNDATION-MUTANT-REDUCTION
+  - FOUNDATION-PROMOTION
 blocked: []
-selection_note: "Reducers exist separately. Highest-value remaining spec gap is a FOUNDATION_LAB milestone reducer that joins HARD_INVARIANT suites, required browser cases, COMMON-DETERMINISTIC two-run, and MUTANT_CORE. Do not emit FOUNDATION_LAB_PASS unless that reducer actually PASSes every required item. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE."
+selection_note: "FOUNDATION_LAB required-class milestone reducer exists and can PASS. PLAYABLE-1V1 still needs a versioned CapabilityDesignProfile (fictional archetypes, not PES ratings). Do not invent PES envelopes. Do not start 11v11."
 ```
 
 ## Last accepted objective
 
-FOUNDATION-MUTANT-REDUCTION — formal MUTANT_CORE reduction.
+FOUNDATION-PROMOTION — FOUNDATION_LAB milestone reducer.
 
-- commits: `50a7453` (clean-pass), `8d2f49a` (prng-order+registry), `b3e5428` (reducer), `8084f79` (tests)
+- commits: `4f5b8bc` (skipBrowserValidation), `2823952` (reducer), `60c502a` (tests)
 - builder: builder-qwen / qwen3.6
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 1
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate FOUNDATION-PROMOTION to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate CAPABILITY-DESIGN-PROFILE to builder-qwen. After ACCEPT + integration, atomic-commit and push.

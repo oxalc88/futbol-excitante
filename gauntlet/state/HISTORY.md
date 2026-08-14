@@ -579,6 +579,48 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 19 — 2026-08-14
+
+- objective_id: FOUNDATION-PROMOTION
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: 4f5b8bc skipBrowserValidation; 2823952 reducer; 60c502a tests
+- notes: evaluateFoundationLab joins HARD_INVARIANT suites, browser-case hashes, COMMON-DETERMINISTIC, MUTANT_CORE. First RETRY: FAIL checked before INVALID_RUN. Retry swapped precedence. Happy path milestoneVerdict PASS on foundation scenario for required HARD_INVARIANT class. MEASURED_TARGET stays BLOCKED. Not a PES claim. 590 node tests.
+
+### Critic verdict (retry 1 — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: FOUNDATION-PROMOTION (retry 1)
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: FOUNDATION-PROMOTION
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 590/590; test-browser 16/16
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 
