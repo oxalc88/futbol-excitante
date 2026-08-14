@@ -10,6 +10,7 @@
 
 import type { ScenarioDefinition } from "../../contracts/scenario.js";
 import foundationScenarioJson from "@pes/eval/scenarios/foundation-move-and-roll.v1.json";
+import twoPlayerScenarioJson from "@pes/eval/scenarios/two-player-duel.v1.json";
 
 /**
  * The foundation scenario — identical fixture used by the headless
@@ -20,3 +21,10 @@ import foundationScenarioJson from "@pes/eval/scenarios/foundation-move-and-roll
  */
 export const FOUNDATION_SCENARIO: ScenarioDefinition =
   foundationScenarioJson as unknown as ScenarioDefinition;
+
+/**
+ * Two-player duel scenario — two human players on opposite teams.
+ * Loaded from the versioned JSON at eval/scenarios/two-player-duel.v1.json.
+ */
+export const FOUNDATION_SCENARIO_TWO_PLAYER: ScenarioDefinition =
+  twoPlayerScenarioJson as unknown as ScenarioDefinition;
