@@ -1,0 +1,120 @@
+{
+  "id": "two-player-duel-v1",
+  "version": "1.0.0",
+  "family": "two-player",
+  "durationTicks": 60,
+  "seed": 42,
+  "prngAlgorithmId": "mulberry32-v1",
+  "schemaVersion": "state-v1",
+  "simulationVersion": "sim-v1",
+  "configVersion": "foundation-config-v1",
+  "profile": "LABORATORY",
+  "pitchLength": 105,
+  "pitchWidth": 68,
+  "safetyBounds": {
+    "maxX": 52.5,
+    "maxY": 34,
+    "minZ": -0.5,
+    "maxZ": 20
+  },
+  "players": [
+    {
+      "playerId": "player-a",
+      "teamId": "team-a",
+      "groundPosition": { "x": 0, "y": 0 },
+      "linearVelocity": { "x": 0, "y": 0 },
+      "desiredVelocity": { "x": 0, "y": 0 },
+      "bodyHeading": 0,
+      "desiredHeading": 0
+    },
+    {
+      "playerId": "player-b",
+      "teamId": "team-b",
+      "groundPosition": { "x": 5, "y": 0 },
+      "linearVelocity": { "x": 0, "y": 0 },
+      "desiredVelocity": { "x": 0, "y": 0 },
+      "bodyHeading": 3.141592653589793,
+      "desiredHeading": 3.141592653589793
+    }
+  ],
+  "ball": {
+    "position": { "x": 2.5, "y": 0, "z": 0.11 },
+    "linearVelocity": { "x": 0, "y": 0, "z": 0 },
+    "angularVelocity": { "x": 0, "y": 0, "z": 0 },
+    "regime": "ground-roll"
+  },
+  "controlAssignments": {
+    "slot-1": {
+      "controlSlot": "slot-1",
+      "teamId": "team-a",
+      "controlledPlayerId": "player-a",
+      "mode": "HUMAN"
+    },
+    "slot-2": {
+      "controlSlot": "slot-2",
+      "teamId": "team-b",
+      "controlledPlayerId": "player-b",
+      "mode": "HUMAN"
+    }
+  },
+  "missingInputPolicy": "REPEAT_HELD_WITH_ZERO_EDGES",
+  "maxConsecutiveMissing": 3,
+  "inputProgram": {
+    "0": [
+      {
+        "tick": 0,
+        "sourceId": "test-input",
+        "controlSlot": "slot-1",
+        "moveX": 1,
+        "moveY": 0,
+        "sprint": 0,
+        "heldButtons": 0,
+        "pressedButtons": 0,
+        "releasedButtons": 0
+      },
+      {
+        "tick": 0,
+        "sourceId": "test-input",
+        "controlSlot": "slot-2",
+        "moveX": -1,
+        "moveY": 0,
+        "sprint": 0,
+        "heldButtons": 0,
+        "pressedButtons": 0,
+        "releasedButtons": 0
+      }
+    ],
+    "1": [
+      {
+        "tick": 1,
+        "sourceId": "test-input",
+        "controlSlot": "slot-1",
+        "moveX": 1,
+        "moveY": 0,
+        "sprint": 0,
+        "heldButtons": 0,
+        "pressedButtons": 0,
+        "releasedButtons": 0
+      },
+      {
+        "tick": 1,
+        "sourceId": "test-input",
+        "controlSlot": "slot-2",
+        "moveX": -1,
+        "moveY": 0,
+        "sprint": 0,
+        "heldButtons": 0,
+        "pressedButtons": 0,
+        "releasedButtons": 0
+      }
+    ]
+  },
+  "scheduledEvents": {},
+  "observationWindows": [
+    { "startTick": 0, "endTick": 60 }
+  ],
+  "requestedMetrics": [
+    "player-displacement",
+    "ball-distance"
+  ]
+}
