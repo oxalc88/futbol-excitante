@@ -20,8 +20,11 @@ import { createPresentationSession } from "../../adapters/renderer-three/rendere
 import {
   createKeyboardAdapter,
   DEFAULT_KEYBOARD_CONFIG,
+  DEFAULT_SLOT2_KEYBOARD_CONFIG,
+  type KeyboardAdapter,
 } from "../../adapters/input-browser/keyboard.js";
-import { FOUNDATION_SCENARIO } from "./foundation-scenario.js";
+import { selectBrowserScenario } from "./scenario-selector.js";
+import type { ScenarioDefinition } from "../../contracts/scenario.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { Simulation } from "../../simulation/loop/simulation.js";
 
@@ -30,12 +33,15 @@ import type { Simulation } from "../../simulation/loop/simulation.js";
 // ---------------------------------------------------------------------------
 
 /**
- * The foundation scenario — same versioned scenario as headless.
+ * The scenario loaded for this browser session.
  *
- * This is the exact same JSON fixture used by the headless runner.
- * Imported from the shared fixture module.
+ * Selected from URL query parameters so that `?scenario=two-player` loads
+ * the two-player duel fixture and the default remains the one-player
+ * foundation scenario.
  */
-const SCENARIO_DATA = FOUNDATION_SCENARIO;
+const SCENARIO_DATA: ScenarioDefinition = selectBrowserScenario(
+  window.location.search,
+);
 
 // ---------------------------------------------------------------------------
 // Real-time loop
@@ -62,21 +68,39 @@ const hashDisplay = document.getElementById("hash-display");
 /**
  * Main browser entry point.
  *
- * Creates the simulation, keyboard adapter, and renderer, then runs
+ * Creates the simulation, keyboard adapter(s), and renderer, then runs
  * the real-time loop using requestAnimationFrame + wall-clock accumulator.
+ *
+ * Supports both one-player (foundation) and two-player scenarios.
+ * Keyboard adapters are created based on the scenario's controlAssignments.
  */
 function main(): void {
+  // Detect two-player mode from scenario controlAssignments.
+  const hasTwoSlots =
+    SCENARIO_DATA.controlAssignments &&
+    SCENARIO_DATA.controlAssignments["slot-2"] !== undefined;
+
   // 1. Create world from the same scenario as headless.
   const world = createWorld({ scenario: SCENARIO_DATA });
 
   // 2. Create simulation (synchronous, DOM-free core).
   const sim: Simulation = createSimulation(world);
 
-  // 3. Create keyboard adapter for the bootstrap control slot.
-  const keyboard = createKeyboardAdapter(DEFAULT_KEYBOARD_CONFIG);
+  // 3. Create keyboard adapters based on scenario assignments.
+  type AdapterEntry = { adapter: KeyboardAdapter; config: { controlSlot: string } };
+  const adapters: AdapterEntry[] = [
+    { adapter: createKeyboardAdapter(DEFAULT_KEYBOARD_CONFIG), config: DEFAULT_KEYBOARD_CONFIG },
+  ];
 
-  // 4. Connect keyboard to window for physical input.
-  keyboard.connect(window);
+  if (hasTwoSlots) {
+    const slot2Adapter = createKeyboardAdapter(DEFAULT_SLOT2_KEYBOARD_CONFIG);
+    adapters.push({ adapter: slot2Adapter, config: DEFAULT_SLOT2_KEYBOARD_CONFIG });
+  }
+
+  // 4. Connect all keyboard adapters to window for physical input.
+  for (const { adapter } of adapters) {
+    adapter.connect(window);
+  }
 
   // 5. Create presentation session (Three.js renderer).
   const container = document.getElementById("game-container");
@@ -108,9 +132,11 @@ function main(): void {
     // Request zero or more fixed core steps.
     let stepsThisFrame = 0;
     while (accumulator >= FIXED_DT && stepsThisFrame < MAX_CATCHUP_TICKS) {
-      // Sample keyboard state into a normalized InputFrame.
-      const frame: InputFrame = keyboard.sample(sim.tick);
-      sim.applyInputs([frame]);
+      // Sample all keyboard adapters into normalized InputFrames.
+      const allFrames: InputFrame[] = adapters.map(
+        ({ adapter, config }) => adapter.sample(sim.tick),
+      );
+      sim.applyInputs(allFrames);
 
       // Advance the simulation by one fixed tick.
       sim.step();

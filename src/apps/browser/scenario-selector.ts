@@ -1,0 +1,34 @@
+/**
+ * @module apps/browser/scenario-selector
+ *
+ * Pure selector: decides which scenario fixture to load based on URL query
+ * parameters.  No DOM, no side effects — safe to call in tests.
+ *
+ * Supported queries:
+ *  - `?scenario=two-player` → returns the two-player duel scenario
+ *  - `?slots=2` (alias)     → same as above
+ *  - All other values (including empty search) → returns the foundation
+ *    one-player scenario.
+ */
+
+import type { ScenarioDefinition } from "../../contracts/scenario.js";
+import { FOUNDATION_SCENARIO } from "./foundation-scenario.js";
+import { FOUNDATION_SCENARIO_TWO_PLAYER } from "./foundation-scenario.js";
+
+/**
+ * Select a scenario from the URL search string.
+ *
+ * @param search — the raw `search` portion of a URL (e.g. `?scenario=two-player`
+ *                 or `""`).
+ * @returns the `ScenarioDefinition` to use for the current browser session.
+ */
+export function selectBrowserScenario(search: string): ScenarioDefinition {
+  const params = new URLSearchParams(search);
+  const scenarioParam = params.get("scenario") ?? params.get("slots");
+
+  if (scenarioParam === "two-player" || scenarioParam === "2") {
+    return FOUNDATION_SCENARIO_TWO_PLAYER;
+  }
+
+  return FOUNDATION_SCENARIO;
+}
