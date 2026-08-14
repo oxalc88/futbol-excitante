@@ -29,6 +29,7 @@ export interface SimulationEvent {
     | "pitch-contact"
     | "player-ball-contact"
     | "pass"
+    | "shot"
     | "rule"
     | "input-rejection"
     | "invariant"

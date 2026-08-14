@@ -16,6 +16,12 @@ export type ActionBits = number;
  * on the current tick. Pressed while within contact radius of the ball.
  * The contact system resolves the actual pass; pressing this bit does
  * not guarantee a pass occurs (range, timing, and priority govern).
+ *
+ * Bit 2: SHOT — the player intends to shoot the ball with a stronger
+ * lofted impulse along body heading. Pressed while within contact
+ * radius of the ball. The contact system resolves the actual shot;
+ * pressing this bit does not guarantee a shot occurs (range, timing,
+ * and priority govern).
  */
 export const FIRST_TOUCH_BIT = 1 << 0;
 
@@ -25,6 +31,13 @@ export const FIRST_TOUCH_BIT = 1 << 0;
  * event. The ball remains an independent 3D entity.
  */
 export const PASS_BIT = 1 << 1;
+
+/**
+ * SHOT_BIT: directed shot action. The controlled player applies a
+ * stronger lofted impulse along body heading to the ball, emitting
+ * an ordered shot event. The ball remains an independent 3D entity.
+ */
+export const SHOT_BIT = 1 << 2;
 
 /**
  * A tick-indexed input frame from any source (keyboard, gamepad, replay, AI, test).
