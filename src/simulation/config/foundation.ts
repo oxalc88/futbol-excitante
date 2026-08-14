@@ -75,6 +75,33 @@ export const FOUNDATION_BALL_V1 = {
   airDrag: { value: 0.001, note: "provisional air drag coefficient (speed-proportional)" },
 } as const;
 
+// -- Player-ball contact (provisional) ----------------------------------------
+
+/**
+ * Provisional player-ball contact / first-touch coefficients.
+ *
+ * Every value is provisional — hand-tuned for laboratory testing only.
+ * No PES 2017 calibration claim is made.
+ *
+ * The contact system uses proximity + an explicit input bit to resolve
+ * first-touch events. Ball velocity is modified by an impulse model;
+ * position is never teleported.
+ */
+export const FOUNDATION_CONTACT_V1 = {
+  id: "foundation-contact-v1",
+  label: "provisional",
+  /** Proximity radius (metres) at which a first-touch is geometrically possible. */
+  contactRadius: { value: 1.2, unit: "m", note: "provisional contact proximity radius" },
+  /** Maximum horizontal speed the ball can have on contact and still be controlled. */
+  maxApproachSpeed: { value: 30.0, unit: "m/s", note: "provisional max controllable approach speed" },
+  /** Impulse fraction: what fraction of the approach speed is applied as redirection. */
+  impulseFraction: { value: 0.8, note: "provisional outgoing velocity fraction of incoming speed" },
+  /** Vertical damping: fraction of z-velocity retained on a ground-level first-touch. */
+  verticalDamping: { value: 0.2, note: "provisional z-velocity retention on ground touch" },
+  /** Default outgoing horizontal speed when the ball is nearly stopped. */
+  defaultExitSpeed: { value: 3.0, unit: "m/s", note: "provisional exit speed for near-stationary ball" },
+} as const;
+
 // -- Foundation config object -------------------------------------------------
 
 /**
@@ -91,6 +118,7 @@ export const FOUNDATION_CONFIG = {
   hashId: FOUNDATION_HASH_V1.id,
   locomotion: FOUNDATION_LOCOMOTION_V1,
   ball: FOUNDATION_BALL_V1,
+  contact: FOUNDATION_CONTACT_V1,
 } as const;
 
 /** Runtime type guard: this module exports the versioned config. */
