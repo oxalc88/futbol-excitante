@@ -71,7 +71,7 @@ export interface KeyboardAdapterConfig {
  * Default keyboard configuration for the bootstrap.
  *
  * Uses WASD for movement and Space for sprint.
- * Action bits: bit 0 = first-touch, bit 1 = pass, bit 2 = tackle, bit 3 = switch.
+ * Action bits: bit 0 = first-touch, bit 1 = pass, bit 2 = shot, bit 3 = switch.
  */
 export const DEFAULT_KEYBOARD_CONFIG: KeyboardAdapterConfig = {
   controlSlot: "slot-1",
@@ -81,7 +81,7 @@ export const DEFAULT_KEYBOARD_CONFIG: KeyboardAdapterConfig = {
   buttons: [
     { key: "KeyK", actionBit: 0 }, // first-touch
     { key: "KeyJ", actionBit: 1 }, // pass
-    { key: "KeyL", actionBit: 2 }, // tackle
+    { key: "KeyL", actionBit: 2 }, // shot
     { key: "Space", actionBit: 3 }, // switch
   ],
 };
