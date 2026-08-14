@@ -4,9 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PES Simulator</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div id="app">PES Simulator</div>
+  <div id="app">
+    <div id="game-container"></div>
+    <div id="hud">
+      <div id="tick-display">Tick: 0</div>
+      <div id="hash-display">Hash: —</div>
+    </div>
+    <div id="controls-hint">
+      WASD: Move | Shift: Sprint | J: Pass | K: Shoot | L: Tackle | Space: Switch
+    </div>
+  </div>
   <script type="module" src="./main.ts"></script>
 </body>
 </html>

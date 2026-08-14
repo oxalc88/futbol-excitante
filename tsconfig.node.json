@@ -15,6 +15,7 @@
     "dist",
     "src/adapters/renderer-three/**/*",
     "src/adapters/input-browser/**/*",
+    "src/apps/browser/**/*",
     "tests/**/*"
   ]
 }

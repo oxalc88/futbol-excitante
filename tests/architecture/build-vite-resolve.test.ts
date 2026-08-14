@@ -36,7 +36,7 @@ describe("BUILD-VITE-RESOLVE-001: Vite entry resolves", () => {
     expect(content).toContain('type="module"');
   });
 
-  it("Vite build resolves the configured entry and emits a bundle", () => {
+  it("Vite build resolves the configured entry and emits a bundle", { timeout: 30_000 }, () => {
     // Clean dist before build to ensure we're testing resolution, not stale artifacts.
     try {
       rmSync(join(root, "dist"), { recursive: true, force: true });

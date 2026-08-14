@@ -392,6 +392,17 @@ export function createSimulation(
    * Stage: derive a read-only presentation snapshot.
    */
   function derivePresentation(): PresentationSnapshot {
+    // Determine which players are controlled by a human slot.
+    const controlledPlayerIds = new Set<string>();
+    if (state.controlAssignments) {
+      for (const slot of Object.keys(state.controlAssignments)) {
+        const assignment = state.controlAssignments[slot];
+        if (assignment?.mode === "HUMAN" && assignment.controlledPlayerId) {
+          controlledPlayerIds.add(assignment.controlledPlayerId);
+        }
+      }
+    }
+
     const players: PlayerPresentation[] = state.players.map(
       (p): PlayerPresentation => {
         const speed = Math.sqrt(
@@ -405,7 +416,7 @@ export function createSimulation(
           bodyHeading: p.bodyHeading,
           speed,
           locomotionPhase: "idle",
-          isControlled: false,
+          isControlled: controlledPlayerIds.has(p.playerId),
           actionState: null,
           contactState: null,
         };
