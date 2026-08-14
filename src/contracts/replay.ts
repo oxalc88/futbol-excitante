@@ -70,4 +70,21 @@ export interface ReplayV1 {
   hashes: ReplayStateCheckpoint[];
   /** Optional full checkpoints (state snapshots) for seeking / recovery. */
   checkpoints: Array<ReplayStateCheckpoint>;
+  /** Full checkpoint data: encoded WorldState snapshots keyed by tick for restore. */
+  checkpointsState: ReplayCheckpoint[];
+}
+
+/**
+ * A full checkpoint payload — encoded WorldState for restore.
+ *
+ * The `encodedState` field contains the output of `encodeCheckpoint()`
+ * (a checkpoint-v1 envelope with the full WorldState JSON).
+ */
+export interface ReplayCheckpoint {
+  /** Tick at which this checkpoint was captured. */
+  tick: number;
+  /** Canonical state hash at this tick. */
+  stateHash: string;
+  /** Checkpoint envelope (checkpoint-v1 JSON) for full restore. */
+  encodedState: string;
 }

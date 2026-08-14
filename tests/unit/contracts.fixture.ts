@@ -288,5 +288,6 @@ export function makeReplayV1(): ReplayV1 {
     checkpoints: [
       { tick: 0, stateHash: "hash-0" },
     ],
+    checkpointsState: [],
   };
 }
