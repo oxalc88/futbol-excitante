@@ -1,4 +1,5 @@
 node_modules/
+.mise-home-tmp/
 .opencode/node_modules/
 .opencode/package.json
 .opencode/package-lock.json

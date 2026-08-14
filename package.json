@@ -1,0 +1,28 @@
+{
+  "name": "pes-simulator",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.10.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.core.json && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.browser.json",
+    "build": "vite build",
+    "dev": "vite",
+    "test": "vitest run --project node",
+    "test-browser": "vitest run --project browser",
+    "test-all": "vitest run"
+  },
+  "dependencies": {
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "vite": "^6.3.5",
+    "vitest": "^3.1.1",
+    "@vitest/browser": "^3.1.1",
+    "playwright": "^1.51.0",
+    "tsx": "^4.19.3",
+    "@types/three": "^0.174.0",
+    "@types/node": "^22.13.10"
+  }
+}

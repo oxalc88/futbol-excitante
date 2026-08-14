@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["node"]
+  },
+  "include": [
+    "src/contracts/**/*.ts",
+    "src/simulation/**/*.ts",
+    "src/apps/headless/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/adapters/renderer-three/**/*",
+    "src/adapters/input-browser/**/*",
+    "tests/**/*",
+    "eval/**/*"
+  ]
+}
