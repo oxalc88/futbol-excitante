@@ -307,6 +307,64 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - required_fixes: none
 ```
 
+## Iteration 13 — 2026-08-14
+
+- objective_id: FOUNDATION-REGISTRIES
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: d1c7de9 types/profile/suites; e153414 definitions/policies; bc3ae90 bindings/loader; 1c7c746 tests
+- notes: First builder session died HTTP 499 mid-write; retry finished loader/bindings/tests. 441 node tests. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. No FOUNDATION_LAB_PASS or PES claim. Optional nits: COMMON-* criterion_bindings all map to finite-number; expansion manifests still placeholder hash.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: FOUNDATION-REGISTRIES
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- evidence_reviewed:
+  - eval/contracts loader/bindings/policies/types/suites/reference-targets and related registry modules
+  - tests/unit/eval/eval-registry.test.ts (32 tests)
+  - Re-ran typecheck 0; mise run test 441/441; eval-registry 32/32; sim-smoke 0
+- criteria:
+  - bindings-complete: PASS (16 unique test_ids bound)
+  - common-criteria-bind-to-existing-invariants: PASS
+  - measured-target-blocked: PASS (never PASS/RESOLVED)
+  - loader-rejects-invalid: PASS
+  - expansion-none-closure: PASS
+  - content-hash-deterministic: PASS (canonical-json-v1 + fnv1a64-v1)
+  - no-invented-pes-envelopes: PASS
+  - core-and-renderer-untouched: PASS
+  - claimed-commands-reproduce: PASS
+  - no-forbidden-claims: PASS
+- architecture_violations: none
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: FOUNDATION-REGISTRIES
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: none — mise run test 441/441; locomotion, ball, input, replay, architecture, evaluator intact
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
 
 

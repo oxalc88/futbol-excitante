@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: FOUNDATION
-next_objective_id: FOUNDATION-REGISTRIES
+next_objective_id: FOUNDATION-ORACLES
 best_known:
-  commit: ab568a6
-  note: "BOOTSTRAP-12 accepted. mise tasks, README, test-all gate, and replay-verify/eval-compare CLIs are the new best-known baseline."
+  commit: 1c7c746
+  note: "FOUNDATION-REGISTRIES accepted. eval/contracts now has typed registries, bindings, and a loader for fast/locomotion/ball. MEASURED_TARGET stays BLOCKED_MISSING_REFERENCE. No FOUNDATION_LAB_PASS."
 active_candidate:
-  objective_id: FOUNDATION-REGISTRIES
+  objective_id: FOUNDATION-ORACLES
   builder: builder-qwen
   critic: critic
-  started_from_commit: ab568a6
+  started_from_commit: 1c7c746
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -31,19 +31,20 @@ accepted:
   - BOOTSTRAP-10
   - BOOTSTRAP-11
   - BOOTSTRAP-12
+  - FOUNDATION-REGISTRIES
 blocked: []
-selection_note: "Bootstrap exit criteria are met. Highest-value spec-backed gap is FOUNDATION-REGISTRIES: eval/contracts only has a bootstrap fixture ID list, not executable catalog bindings or suite/metric/invariant/schema/policy registries for fast, locomotion, and ball. Do not claim FOUNDATION_LAB_PASS."
+selection_note: "Registries exist but protected oracles and the core mutant/canary suite do not. Highest-value next gap is FOUNDATION-ORACLES. Do not invent PES envelopes. Do not claim FOUNDATION_LAB_PASS."
 ```
 
 ## Last accepted objective
 
-BOOTSTRAP-12 — automated mise gate, README, and iteration workflow.
+FOUNDATION-REGISTRIES — executable eval/contracts for fast, locomotion, ball.
 
-- commits: `edcaf04` (CLIs), `6899492` (mise/package gate), `ab568a6` (README)
+- commits: `d1c7de9` (types/profile/suites), `e153414` (definitions/policies), `bc3ae90` (bindings/loader), `1c7c746` (tests)
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT after retry 1
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate FOUNDATION-REGISTRIES to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate FOUNDATION-ORACLES to builder-qwen. After ACCEPT + integration, atomic-commit and push.
