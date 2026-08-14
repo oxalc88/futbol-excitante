@@ -59,7 +59,8 @@ import {
 import { stepLocomotion } from "../locomotion/locomotion-system.js";
 import { stepBall } from "../ball/ball-system.js";
 import { stepContacts } from "../contacts/contact-system.js";
-import { FOUNDATION_LOCOMOTION_V1, FOUNDATION_BALL_V1, FOUNDATION_CLOSE_CONTROL_V1 } from "../config/foundation.js";
+import { stepPlayerContacts } from "../player-contact/player-contact-system.js";
+import { FOUNDATION_LOCOMOTION_V1, FOUNDATION_BALL_V1, FOUNDATION_CLOSE_CONTROL_V1, FOUNDATION_PLAYER_CONTACT_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -345,6 +346,26 @@ export function createSimulation(
   function locomotionStep(): void {
     const dt = state.fixedDt.numerator / state.fixedDt.denominator;
     stepLocomotion(state.players, dt, FOUNDATION_LOCOMOTION_V1);
+  }
+
+  /**
+   * Stage: player-player contact resolution.
+   *
+   * Runs AFTER locomotion (players at tick-advanced positions) and
+   * BEFORE player-ball contacts and ball integration. Detects planar
+   * overlaps between player collision discs and applies symmetric
+   * separation. Does NOT modify ball state.
+   */
+  function playerContactStage(): SimulationEvent[] {
+    const counter = { value: eventCounter };
+    const { events } = stepPlayerContacts(
+      state.players,
+      counter,
+      state.tick,
+      FOUNDATION_PLAYER_CONTACT_V1,
+    );
+    eventCounter = counter.value;
+    return events;
   }
 
   /**
@@ -705,6 +726,12 @@ export function createSimulation(
       // 4. Locomotion
       locomotionStep();
 
+      // 4.25. Player-player contact resolution (after locomotion, before player-ball contacts)
+      const playerContactEvents = playerContactStage();
+      for (const ev of playerContactEvents) {
+        state.events = [...state.events, ev];
+      }
+
       // 4.5. Player-ball contact detection (after locomotion, before ball integration)
       const contactEvents = contactDetectionStage(currentFrames);
       for (const ev of contactEvents) {
@@ -719,7 +746,7 @@ export function createSimulation(
 
       // 6. Invariant validation
       const invariantsOk = validateInvariants();
-      const allStepEvents = [...oldTickEvents, ...schedEvents, ...contactEvents, ...ballEvents];
+      const allStepEvents = [...oldTickEvents, ...schedEvents, ...playerContactEvents, ...contactEvents, ...ballEvents];
       const obsData = buildObservation(newTick, allStepEvents, currentFrames);
 
       // Compute hash once (freezeWorldState copies, does not mutate).
