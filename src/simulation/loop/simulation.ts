@@ -21,7 +21,7 @@
  * |---------------------|---------------------|------------------------------|-----------------------------|
  * | Scheduled events    | committed state     | appends to `events` buffer   | `(tick, ++eventCounter)`    |
  * | Input resolution    | buffered inputs     | mutates schedulerMemory    | `(tick, ++eventCounter)` for rejections/fallbacks |
- * | Locomotion          | committed state     | none (no-op in bootstrap)    | N/A                         |
+ * | Locomotion          | committed state     | player velocity/heading/pos  | N/A                         |
  * | Ball integration    | committed state     | none (no-op in bootstrap)    | N/A                         |
  * | Invariant validation| committed state     | none (diagnostic only)       | N/A                         |
  * | Presentation        | committed state     | none (derive-only)           | N/A                         |
@@ -56,6 +56,8 @@ import {
   createRejectionEvent,
   NEUTRAL_INPUT,
 } from "../input/input-system.js";
+import { stepLocomotion } from "../locomotion/locomotion-system.js";
+import { FOUNDATION_LOCOMOTION_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -112,7 +114,7 @@ export interface Simulation {
    *  1. Increment world tick (t → t+1)
    *  2. Scheduled scenario events (read committed state, append events)
    *  3. Input resolution (consume buffered inputs for new tick)
-   *  4. Locomotion (no-op in bootstrap)
+   *  4. Locomotion (converge velocity/heading, integrate position)
    *  5. Ball integration (no-op in bootstrap)
    *  6. Invariant validation (finite checks)
    *  7. Presentation derivation (derive read-only snapshot)
@@ -253,12 +255,26 @@ export function createSimulation(
       // Clone schedulerMemory for mutation safety.
       const sm = deepClone(state.schedulerMemory) as SchedulerMemory;
 
-      const { resolved: _intent, events: playerEvents } = resolveInputForPlayer(
+      const { resolved: intent, events: playerEvents } = resolveInputForPlayer(
         player,
         frameForSlot,
         sm,
         slot,
       );
+
+      // Apply resolved intent to player state — input changes
+      // desiredVelocity / desiredHeading immediately.
+      player.desiredVelocity.x = intent.desiredVelocity.x;
+      player.desiredVelocity.y = intent.desiredVelocity.y;
+      const inputMag = Math.sqrt(
+        intent.desiredVelocity.x ** 2 + intent.desiredVelocity.y ** 2,
+      );
+      if (inputMag > 0) {
+        player.desiredHeading = Math.atan2(
+          intent.desiredVelocity.y,
+          intent.desiredVelocity.x,
+        );
+      }
 
       // Update schedulerMemory in-place (canonical continuation state).
       state.schedulerMemory = sm;
@@ -312,13 +328,16 @@ export function createSimulation(
   }
 
   /**
-   * Stage: locomotion integration (no-op in bootstrap).
+   * Stage: locomotion integration.
    *
-   * In the full engine this would integrate desired velocity into
-   * ground position, handle turning, sprint, etc. Bootstrap: no-op.
+   * Reads desiredVelocity / desiredHeading that were set by input
+   * resolution, converges actual linearVelocity / bodyHeading under
+   * provisional acceleration, braking, max speed, and turn-rate limits,
+   * then integrates ground position from velocity.
    */
-  function locomotionNoOp(): void {
-    // No locomotion system exists yet.
+  function locomotionStep(): void {
+    const dt = state.fixedDt.numerator / state.fixedDt.denominator;
+    stepLocomotion(state.players, dt, FOUNDATION_LOCOMOTION_V1);
   }
 
   /**
@@ -588,8 +607,8 @@ export function createSimulation(
         }
       }
 
-      // 4. Locomotion (no-op)
-      locomotionNoOp();
+      // 4. Locomotion
+      locomotionStep();
 
       // 5. Ball integration (no-op)
       ballIntegrationNoOp();
