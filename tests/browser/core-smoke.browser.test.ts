@@ -24,7 +24,7 @@
  * No Math.random, Date, DOM, or Node I/O in the simulation core.
  */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, beforeAll } from "vitest";
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { encodeCanonical } from "../../src/simulation/determinism/canonical.js";
@@ -207,12 +207,10 @@ describe("BROWSER-CORE-STEP-001", () => {
   it("bridge step hashes match headless per-tick hashes (shared fixture, 5 ticks)", async () => {
     const ticksToRun = 5;
 
-    // Run headless with the shared fixture's inputProgram.
-    const headlessHashes = runHeadlessWithInputs(SHARED_SCENARIO, ticksToRun);
-
-    // Run bridge with the same inputs from the shared fixture.
+    // Record evidence for evaluation consumers.
     await bridge.reset();
-    const bridgeHashes: string[] = [];
+    const initialHash = bridge.stateHash();
+    const perTickHashes: string[] = [];
 
     for (let tick = 0; tick < ticksToRun; tick++) {
       const inputs = (SHARED_SCENARIO.inputProgram as Record<string, InputFrame[]>)[String(tick)] ?? [];
@@ -220,11 +218,14 @@ describe("BROWSER-CORE-STEP-001", () => {
         bridge.injectInputs(inputs.map((f) => ({ ...f })));
       }
       const result = bridge.step(1);
-      bridgeHashes.push(result[0]);
+      perTickHashes.push(result[0]);
     }
 
+    // Run headless with the same inputs for comparison.
+    const headlessHashes = runHeadlessWithInputs(SHARED_SCENARIO, ticksToRun);
+
     // Per-tick hashes must match.
-    expect(bridgeHashes).toEqual(headlessHashes);
+    expect(perTickHashes).toEqual(headlessHashes);
   });
 
   it("bridge final hash matches headless final hash (shared fixture, 10 ticks)", async () => {

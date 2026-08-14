@@ -62,6 +62,11 @@ function buildInputProgram(
   return program;
 }
 
+function createHeadlessSim(scenario: ScenarioDefinition) {
+  const world = createWorld({ scenario });
+  return createSimulation(world);
+}
+
 // ---------------------------------------------------------------------------
 // 1. Clean run: HARD_INVARIANT criteria PASS
 // ---------------------------------------------------------------------------
@@ -636,5 +641,194 @@ describe("LOC-BALL-001-FREE regression: criterion binding", () => {
     );
     expect(freeCriterion).toBeDefined();
     expect(freeCriterion!.outcome).toBe("FAIL");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 10. Browser case validation
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate browser-case evidence from a scenario using the simulation core.
+ * This produces real hashes so evaluateFoundation cannot be tricked with bare {passed:true}.
+ * Uses the scenario's actual input program so evidence matches the headless ref.
+ */
+function generateBrowserEvidence(scenario: ScenarioDefinition) {
+  const headless = createHeadlessSim(scenario);
+  const initialHash = headless.stateHash();
+
+  // Generate perTickHashes from a simulation using the scenario's actual inputs.
+  const sim2 = createHeadlessSim(scenario);
+  const perTickHashes: string[] = [];
+  const ticks = Math.min(5, scenario.durationTicks);
+  for (let tick = 0; tick < ticks; tick++) {
+    const inputs = scenario.inputProgram[sim2.tick] ?? [];
+    if (inputs.length > 0) {
+      sim2.applyInputs(inputs);
+    }
+    const result = sim2.step();
+    perTickHashes.push(result.stateHash);
+  }
+
+  return {
+    reset: { initialHash },
+    step: { initialHash, perTickHashes },
+  };
+}
+
+describe("Browser case validation", () => {
+  it("missing required browser case yields INVALID_RUN overall", () => {
+    const scenario = loadFixture();
+    const result = evaluateFoundation(scenario);
+    expect(result.overall).toBe("INVALID_RUN");
+  });
+
+  it("both required browser cases with evidence yields PASS overall", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+
+    const browserCases = [
+      {
+        case_id: "BROWSER-CORE-RESET-001",
+        passed: true,
+        evidence: { initialHash: evidence.reset.initialHash },
+      },
+      {
+        case_id: "BROWSER-CORE-STEP-001",
+        passed: true,
+        evidence: { initialHash: evidence.step.initialHash, perTickHashes: evidence.step.perTickHashes },
+      },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("PASS");
+  });
+
+  it("required browser case with passed:false yields FAIL overall (evidence valid)", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+
+    const browserCases = [
+      {
+        case_id: "BROWSER-CORE-RESET-001",
+        passed: false,
+        error: "hash mismatch",
+        evidence: { initialHash: evidence.reset.initialHash },
+      },
+      {
+        case_id: "BROWSER-CORE-STEP-001",
+        passed: true,
+        evidence: { initialHash: evidence.step.initialHash, perTickHashes: evidence.step.perTickHashes },
+      },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    // Evidence is valid (matches headless) but case failed → FAIL.
+    expect(result.overall).toBe("FAIL");
+  });
+
+  it("partial browser cases (one missing) yields INVALID_RUN overall", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+
+    const browserCases = [
+      {
+        case_id: "BROWSER-CORE-RESET-001",
+        passed: true,
+        evidence: { initialHash: evidence.reset.initialHash },
+      },
+      // BROWSER-CORE-STEP-001 is missing.
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("INVALID_RUN");
+  });
+
+  it("browser case without evidence yields INVALID_RUN overall", () => {
+    const scenario = loadFixture();
+
+    // No evidence → should be INVALID_RUN.
+    const browserCases: Parameters<typeof evaluateFoundation>[0]["browserCases"] = [
+      { case_id: "BROWSER-CORE-RESET-001", passed: true, evidence: { initialHash: "" } },
+      { case_id: "BROWSER-CORE-STEP-001", passed: true, evidence: { initialHash: "" } },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("INVALID_RUN");
+  });
+
+  it("results contain browserCases field", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+
+    const browserCases = [
+      {
+        case_id: "BROWSER-CORE-RESET-001",
+        passed: true,
+        evidence: { initialHash: evidence.reset.initialHash },
+      },
+      {
+        case_id: "BROWSER-CORE-STEP-001",
+        passed: true,
+        evidence: { initialHash: evidence.step.initialHash, perTickHashes: evidence.step.perTickHashes },
+      },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.browserCases).toEqual(browserCases);
+  });
+
+  it("dummy initialHash (not matching headless) yields INVALID_RUN", () => {
+    const scenario = loadFixture();
+    const browserCases = [
+      {
+        case_id: "BROWSER-CORE-RESET-001",
+        passed: true,
+        evidence: { initialHash: "dummy-never-produced" },
+      },
+      {
+        case_id: "BROWSER-CORE-STEP-001",
+        passed: true,
+        evidence: { initialHash: "also-dummy" },
+      },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("INVALID_RUN");
+  });
+
+  it("dummy perTickHash (not matching headless) yields INVALID_RUN", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+    // Correct initialHash but dummy perTickHash.
+    const browserCases = [
+      {
+        case_id: "BROWSER-CORE-RESET-001",
+        passed: true,
+        evidence: { initialHash: evidence.reset.initialHash },
+      },
+      {
+        case_id: "BROWSER-CORE-STEP-001",
+        passed: true,
+        evidence: { initialHash: evidence.step.initialHash, perTickHashes: ["fake-hash"] },
+      },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("INVALID_RUN");
+  });
+
+  it("passed:false with matching evidence yields FAIL overall", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+
+    const browserCases = [
+      {
+        case_id: "BROWSER-CORE-RESET-001",
+        passed: false,
+        error: "hash mismatch",
+        evidence: { initialHash: evidence.reset.initialHash },
+      },
+      {
+        case_id: "BROWSER-CORE-STEP-001",
+        passed: true,
+        evidence: { initialHash: evidence.step.initialHash, perTickHashes: evidence.step.perTickHashes },
+      },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("FAIL");
   });
 });

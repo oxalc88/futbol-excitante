@@ -22,6 +22,10 @@ import { CAPABILITY_MANIFESTS } from "../../../eval/contracts/capabilities.js";
 import { getRegistryEntry } from "../../../eval/contracts/bootstrap-registry.js";
 import type { TestImplementationBinding } from "../../../eval/contracts/types.js";
 
+import { createWorld } from "../../../src/simulation/world/create.js";
+import { createSimulation } from "../../../src/simulation/loop/simulation.js";
+import { makeInputFrame } from "../contracts.fixture.js";
+
 // ---------------------------------------------------------------------------
 // Helper: build a shallow-cloned registry set (isolated per test)
 // ---------------------------------------------------------------------------
@@ -408,6 +412,207 @@ describe("policies completeness", () => {
     for (const suite of Object.values(SUITES)) {
       expect(registry.expansion_manifests[suite.expected_expansion_manifest_id]).toBeDefined();
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Browser case registry — loading and resolution
+// ---------------------------------------------------------------------------
+
+import {
+  BROWSER_CASES,
+  getBrowserCase,
+  ALL_BROWSER_CASE_IDS,
+  validateBrowserCaseResults,
+} from "../../../eval/contracts/browser-cases.js";
+
+describe("browser case registry", () => {
+  it("contains both required browser case IDs from FOUNDATION_LAB profile", () => {
+    const profile = MILESTONE_PROFILES["FOUNDATION_LAB"];
+    expect(profile.required_browser_case_ids).toContain("BROWSER-CORE-RESET-001");
+    expect(profile.required_browser_case_ids).toContain("BROWSER-CORE-STEP-001");
+  });
+
+  it("BROWSER-CORE-RESET-001 resolves from the registry", () => {
+    const case_ = getBrowserCase("BROWSER-CORE-RESET-001");
+    expect(case_).toBeDefined();
+    expect(case_!.case_id).toBe("BROWSER-CORE-RESET-001");
+  });
+
+  it("BROWSER-CORE-STEP-001 resolves from the registry", () => {
+    const case_ = getBrowserCase("BROWSER-CORE-STEP-001");
+    expect(case_).toBeDefined();
+    expect(case_!.case_id).toBe("BROWSER-CORE-STEP-001");
+  });
+
+  it("unknown case_id returns undefined", () => {
+    expect(getBrowserCase("NONEXISTENT-001")).toBeUndefined();
+  });
+
+  it("ALL_BROWSER_CASE_IDS includes both cases", () => {
+    expect(ALL_BROWSER_CASE_IDS).toContain("BROWSER-CORE-RESET-001");
+    expect(ALL_BROWSER_CASE_IDS).toContain("BROWSER-CORE-STEP-001");
+  });
+
+  it("registry set contains browser_cases array", () => {
+    const registry = loadRegistrySet();
+    expect(registry.browser_cases).toBeDefined();
+    expect(Array.isArray(registry.browser_cases)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Browser case validation — missing required → INVALID_RUN
+// ---------------------------------------------------------------------------
+
+import {
+  evaluateFoundation,
+  type FoundationEvaluationResult,
+} from "../../../eval/runners/foundation-evaluator.js";
+import type { BrowserCaseResult } from "../../../eval/contracts/types.js";
+import { readFileSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+function loadFixture(): Parameters<typeof evaluateFoundation>[0]["scenario"] {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const fixturePath = join(
+    __dirname,
+    "../../../eval/scenarios/foundation-move-and-roll.v1.json",
+  );
+  const raw = readFileSync(fixturePath, "utf-8");
+  return JSON.parse(raw) as Parameters<typeof evaluateFoundation>[0]["scenario"];
+}
+
+/**
+ * Generate browser-case evidence from a scenario using the simulation core.
+ * Uses the scenario's actual input program so evidence matches the headless ref.
+ */
+function generateBrowserEvidence(scenario: Parameters<typeof evaluateFoundation>[0]["scenario"]) {
+  const headless = createHeadlessSim(scenario);
+  const initialHash = headless.stateHash();
+
+  // Generate perTickHashes from a simulation using the scenario's actual inputs.
+  const sim2 = createHeadlessSim(scenario);
+  const perTickHashes: string[] = [];
+  const ticks = Math.min(5, scenario.durationTicks);
+  for (let tick = 0; tick < ticks; tick++) {
+    const inputs = scenario.inputProgram[sim2.tick] ?? [];
+    if (inputs.length > 0) {
+      sim2.applyInputs(inputs);
+    }
+    const result = sim2.step();
+    perTickHashes.push(result.stateHash);
+  }
+
+  return { reset: { initialHash }, step: { initialHash, perTickHashes } };
+}
+
+function createHeadlessSim(scenario: Parameters<typeof evaluateFoundation>[0]["scenario"]) {
+  const world = createWorld({ scenario });
+  return createSimulation(world);
+}
+
+describe("browser case validation", () => {
+  it("missing required browser case → INVALID_RUN overall", () => {
+    const scenario = loadFixture();
+    // No browser cases provided — should be INVALID_RUN.
+    const result = evaluateFoundation(scenario);
+    expect(result.overall).toBe("INVALID_RUN");
+  });
+
+  it("both required browser cases with evidence → PASS overall", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+    const browserCases: BrowserCaseResult[] = [
+      { case_id: "BROWSER-CORE-RESET-001", passed: true, evidence: { initialHash: evidence.reset.initialHash } },
+      { case_id: "BROWSER-CORE-STEP-001", passed: true, evidence: { initialHash: evidence.step.initialHash, perTickHashes: evidence.step.perTickHashes } },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    // With browser cases provided, overall comes from suite evaluation.
+    expect(result.overall).toBe("PASS");
+  });
+
+  it("browser case provided but failed → overall FAIL", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+    const browserCases: BrowserCaseResult[] = [
+      { case_id: "BROWSER-CORE-RESET-001", passed: false, error: "hash mismatch", evidence: { initialHash: evidence.reset.initialHash } },
+      { case_id: "BROWSER-CORE-STEP-001", passed: true, evidence: { initialHash: evidence.step.initialHash, perTickHashes: evidence.step.perTickHashes } },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    // Evidence is valid (matches headless) but case failed → FAIL.
+    expect(result.overall).toBe("FAIL");
+  });
+
+  it("missing one of two required cases → INVALID_RUN", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+    const browserCases: BrowserCaseResult[] = [
+      { case_id: "BROWSER-CORE-RESET-001", passed: true, evidence: { initialHash: evidence.reset.initialHash } },
+      // BROWSER-CORE-STEP-001 is missing.
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("INVALID_RUN");
+  });
+
+  it("registry.browser_cases is populated from opts", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+    const browserCases: BrowserCaseResult[] = [
+      { case_id: "BROWSER-CORE-RESET-001", passed: true, evidence: { initialHash: evidence.reset.initialHash } },
+      { case_id: "BROWSER-CORE-STEP-001", passed: true, evidence: { initialHash: evidence.step.initialHash, perTickHashes: evidence.step.perTickHashes } },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.browserCases).toEqual(browserCases);
+  });
+
+  it("validateBrowserCaseResults rejects unknown case_id", () => {
+    const errors = validateBrowserCaseResults([
+      { case_id: "NONEXISTENT-001", passed: true, evidence: { initialHash: "abc" } },
+    ]);
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors[0]).toContain("NONEXISTENT-001");
+  });
+
+  it("validateBrowserCaseResults passes for known case_ids", () => {
+    const errors = validateBrowserCaseResults([
+      { case_id: "BROWSER-CORE-RESET-001", passed: true, evidence: { initialHash: "abc" } },
+      { case_id: "BROWSER-CORE-STEP-001", passed: false, error: "some error", evidence: { initialHash: "def" } },
+    ]);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("dummy initialHash (not matching headless) yields INVALID_RUN", () => {
+    const scenario = loadFixture();
+    const browserCases: BrowserCaseResult[] = [
+      { case_id: "BROWSER-CORE-RESET-001", passed: true, evidence: { initialHash: "dummy-never-produced" } },
+      { case_id: "BROWSER-CORE-STEP-001", passed: true, evidence: { initialHash: "also-dummy" } },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("INVALID_RUN");
+  });
+
+  it("dummy perTickHash (not matching headless) yields INVALID_RUN", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+    const browserCases: BrowserCaseResult[] = [
+      { case_id: "BROWSER-CORE-RESET-001", passed: true, evidence: { initialHash: evidence.reset.initialHash } },
+      { case_id: "BROWSER-CORE-STEP-001", passed: true, evidence: { initialHash: evidence.step.initialHash, perTickHashes: ["fake-hash"] } },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("INVALID_RUN");
+  });
+
+  it("passed:false with matching evidence yields FAIL overall", () => {
+    const scenario = loadFixture();
+    const evidence = generateBrowserEvidence(scenario);
+    const browserCases: BrowserCaseResult[] = [
+      { case_id: "BROWSER-CORE-RESET-001", passed: false, error: "hash mismatch", evidence: { initialHash: evidence.reset.initialHash } },
+      { case_id: "BROWSER-CORE-STEP-001", passed: true, evidence: { initialHash: evidence.step.initialHash, perTickHashes: evidence.step.perTickHashes } },
+    ];
+    const result = evaluateFoundation(scenario, { browserCases });
+    expect(result.overall).toBe("FAIL");
   });
 });
 
