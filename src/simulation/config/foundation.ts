@@ -147,6 +147,32 @@ export const FOUNDATION_SHOT_V1 = {
   verticalComponent: { value: 0.15, note: "provisional upward velocity fraction for loft" },
 } as const;
 
+// -- Close-control / dribble-touch (provisional) ------------------------------
+
+/**
+ * Provisional close-control / dribble-touch coefficients.
+ *
+ * Every value is provisional — hand-tuned for laboratory testing only.
+ * No PES 2017 calibration claim is made.
+ *
+ * Close control is the repeated feasibility of micro-contacts while a
+ * player moves with FIRST_TOUCH held and is within range.  The ball
+ * remains an independent 3D entity; only its velocity is modified.
+ * Position is never teleported.  Ownership is never assigned.
+ */
+export const FOUNDATION_CLOSE_CONTROL_V1 = {
+  id: "foundation-close-control-v1",
+  label: "provisional",
+  /** Proximity radius (metres) within which dribble-touches are possible. */
+  dribbleRadius: { value: 1.2, unit: "m", note: "provisional dribble proximity radius" },
+  /** Multiplier of player speed applied as outgoing ball horizontal speed. */
+  pushAheadFraction: { value: 0.7, note: "provisional fraction of player speed transferred to ball" },
+  /** Minimum ticks between successive dribble-touches per player. */
+  cooldownTicks: { value: 6, unit: "ticks", note: "provisional minimum ticks between dribble-touches" },
+  /** Minimum player speed (m/s) required for movement-direction dribble. */
+  minPlayerSpeed: { value: 0.3, unit: "m/s", note: "provisional minimum player speed for direction-based dribble" },
+} as const;
+
 // -- Foundation config object -------------------------------------------------
 
 /**
@@ -166,6 +192,7 @@ export const FOUNDATION_CONFIG = {
   contact: FOUNDATION_CONTACT_V1,
   pass: FOUNDATION_PASS_V1,
   shot: FOUNDATION_SHOT_V1,
+  closeControl: FOUNDATION_CLOSE_CONTROL_V1,
 } as const;
 
 /** Runtime type guard: this module exports the versioned config. */
