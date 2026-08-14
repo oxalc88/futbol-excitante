@@ -173,6 +173,39 @@ export const FOUNDATION_CLOSE_CONTROL_V1 = {
   minPlayerSpeed: { value: 0.3, unit: "m/s", note: "provisional minimum player speed for direction-based dribble" },
 } as const;
 
+// -- Player-player contact (provisional) --------------------------------------
+
+/**
+ * Provisional player-player contact / duel coefficients.
+ *
+ * Every value is provisional — hand-tuned for laboratory testing only.
+ * No PES 2017 calibration claim is made.
+ *
+ * The resolver uses simple planar collision geometry with a symmetric
+ * separation model. Both players receive equal correction; there is
+ * no "higher stat wins" mechanism. Position and velocity are corrected
+ * continuously — no teleporting past the configured maximum per tick.
+ *
+ * §12.4 of TECHNICAL_SPEC: "Normal players use simple planar collision
+ * geometry and a deterministic custom resolver."
+ */
+export const FOUNDATION_PLAYER_CONTACT_V1 = {
+  id: "foundation-player-contact-v1",
+  label: "provisional",
+  /** Planar radius (metres) of each player's collision disc. */
+  playerRadius: { value: 0.25, unit: "m", note: "provisional planar collision radius" },
+  /** Maximum positional correction (metres) applied per tick per player. */
+  maxCorrectionPerTick: { value: 0.15, unit: "m", note: "provisional max separation displacement per tick" },
+  /** Positional separation stiffness (fraction of overlap to correct). */
+  separationStiffness: { value: 0.5, note: "provisional fraction of overlap to resolve per tick [0..1]" },
+  /** Velocity damping factor along the contact normal [0..1]. */
+  velocityDampingNormal: { value: 0.3, note: "provisional velocity damping along contact normal" },
+  /** Velocity damping factor perpendicular to the contact normal [0..1]. */
+  velocityDampingTangent: { value: 0.0, note: "provisional velocity damping along tangent (0 = no friction)" },
+  /** Minimum planar distance to avoid numerical instability on coincident centres. */
+  minSeparationEpsilon: { value: 0.001, unit: "m", note: "provisional epsilon for coincident-centre fallback axis" },
+} as const;
+
 // -- Foundation config object -------------------------------------------------
 
 /**
@@ -193,6 +226,7 @@ export const FOUNDATION_CONFIG = {
   pass: FOUNDATION_PASS_V1,
   shot: FOUNDATION_SHOT_V1,
   closeControl: FOUNDATION_CLOSE_CONTROL_V1,
+  playerContact: FOUNDATION_PLAYER_CONTACT_V1,
 } as const;
 
 /** Runtime type guard: this module exports the versioned config. */
