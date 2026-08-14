@@ -789,8 +789,62 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 24 — 2026-08-14
 
+- objective_id: PLAYABLE-SECOND-SLOT
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: 69a98b5 scenario; 09f37c9 slot-2 keys; 132dff0 fixture export; 48f6f32 selector+adapter; 0578f03 tests
+- notes: Two HUMAN slots on opposite teams. Browser `?scenario=two-player` or `?slots=2` binds slot-2 KeyboardAdapter. First critic RETRY: default path still loaded one-player; theatrical ball test. Retry wired selector and fixed the assertion. 718 node + 16 browser. No PES claim.
 
+### Critic verdict (retry 0 — RETRY)
 
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-SECOND-SLOT
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: RETRY
+- required_fixes:
+  - Wire the browser composition so the two-player scenario is actually loaded and reachable so hasTwoSlots becomes true and the slot-2 KeyboardAdapter is actually created; remove or use the unused FOUNDATION_SCENARIO_TWO_PLAYER import.
+  - Fix the "creates world with exactly one ball" test to actually assert the ball (it currently asserts players.length === 2).
+```
+
+### Critic verdict (retry 1 — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-SECOND-SLOT
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-SECOND-SLOT
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 718/718; test-browser 16/16
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
 
 
