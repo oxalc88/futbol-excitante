@@ -3,16 +3,19 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
+orchestrator_in_use: orchestrator
+overflow_orchestrator: orchestrator-deepseek
+handoff_at_percent: 95
 next_objective_id: PLAYABLE-DUELS-SUITE
 best_known:
-  commit: HEAD
+  commit: 3bd282a
   note: "PLAYABLE-TOUCH-ACTIONS-SUITE accepted. PLAYABLE_1V1 still cannot PASS (duels suite missing). Not PES."
 active_candidate:
   objective_id: PLAYABLE-DUELS-SUITE
   builder: builder-qwen
   critic: critic
-  started_from_commit: HEAD
-  last_verdict: null
+  started_from_commit: 3bd282a
+  last_verdict: REJECT
 builder_in_use: builder-qwen
 critic_in_use: critic
 retry_count: 0
