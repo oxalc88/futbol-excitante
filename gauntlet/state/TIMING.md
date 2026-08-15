@@ -77,7 +77,7 @@ Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-15 ~02:12 UTC`.
 | PLAYABLE-FICTIONAL-ARCHETYPES | accepted | 39m | 27m | 5m | 6m | 1.5m | 8.84M | 259k |
 | PLAYABLE-BROWSER-1V1 | accepted | 18m | 8m | 4m | 4m | 1.5m | 2.73M | 173k |
 | PLAYABLE-1V1-PROFILE | accepted | 21m | 9m | 5m | 5m | 1.5m | 3.80M | 195k |
-| PLAYABLE-TOUCH-ACTIONS-SUITE | in flight | 28m | 24m | 4m | — | — | 12.15M | 231k |
+| PLAYABLE-TOUCH-ACTIONS-SUITE (2 retries) | accepted | ~59m | 32m | 19m | 8.5m | (this turn) | 12.15M+ | 231k+ |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -200,7 +200,7 @@ on an H task is the interesting result.
 | PLAYABLE-FICTIONAL-ARCHETYPES | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Burst/steady per player |
 | PLAYABLE-BROWSER-1V1 | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Two-slot browser control |
 | PLAYABLE-1V1-PROFILE | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Honest profile that cannot PASS |
-| PLAYABLE-TOUCH-ACTIONS-SUITE | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 1+ | I | First critic: dishonest contact/impulse oracles. Retry not re-accepted |
+| PLAYABLE-TOUCH-ACTIONS-SUITE | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 2 | C | Retry 0: ball-continuity mappings / catalog-only. Retry 1: four silent-PASS tests + stale CONTACT binding |
 
 ### Builder scoreboard
 

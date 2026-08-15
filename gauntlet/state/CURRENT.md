@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-next_objective_id: PLAYABLE-TOUCH-ACTIONS-SUITE
+next_objective_id: PLAYABLE-DUELS-SUITE
 best_known:
-  commit: f0c37ea
-  note: "PLAYABLE-1V1-PROFILE accepted. Milestone cannot PASS. Not PES."
+  commit: HEAD
+  note: "PLAYABLE-TOUCH-ACTIONS-SUITE accepted. PLAYABLE_1V1 still cannot PASS (duels suite missing). Not PES."
 active_candidate:
-  objective_id: PLAYABLE-TOUCH-ACTIONS-SUITE
+  objective_id: PLAYABLE-DUELS-SUITE
   builder: builder-qwen
   critic: critic
-  started_from_commit: f0c37ea
+  started_from_commit: HEAD
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -49,19 +49,20 @@ accepted:
   - PLAYABLE-FICTIONAL-ARCHETYPES
   - PLAYABLE-BROWSER-1V1
   - PLAYABLE-1V1-PROFILE
+  - PLAYABLE-TOUCH-ACTIONS-SUITE
 blocked: []
-selection_note: "PLAYABLE_1V1 evaluator exists and cannot PASS. Next executable gap is a versioned touch_and_actions suite bound to existing first-touch/pass/shot oracles. Do not invent PES envelopes. Do not claim PLAYABLE_1V1_PASS."
+selection_note: "touch_and_actions is registered and evaluateSuite runs honestly. PLAYABLE_1V1 still cannot PASS: required duels suite is missing, ARCH-DIFF-001 is NEEDS_PERCEPTUAL_REVIEW, MUTANT_1V1 / blinded comparison stay NOT_EVALUATED. Next executable gap is a versioned duels suite bound only to existing player-contact oracles. Unimplemented catalog tests stay NOT_EVALUATED. Do not invent PES envelopes. Do not claim PLAYABLE_1V1_PASS."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-1V1-PROFILE — honest milestone profile + evaluator.
+PLAYABLE-TOUCH-ACTIONS-SUITE — versioned suite + honest evaluateSuite path.
 
-- commits: `d311ab8` (profile), `8c8eb06` (runner), `f0c37ea` (tests)
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT (after retry 2)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
+- 841 node tests. No PLAYABLE_1V1_PASS / PES claim.
 
 ## Next action
 
-Delegate PLAYABLE-TOUCH-ACTIONS-SUITE to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-DUELS-SUITE to builder-qwen. After ACCEPT + integration, atomic-commit and push.

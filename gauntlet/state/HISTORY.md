@@ -1131,4 +1131,47 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 31 — 2026-08-15
+
+- objective_id: PLAYABLE-TOUCH-ACTIONS-SUITE
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 2)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- notes: Versioned `touch_and_actions` suite. TOUCH-SLOW-001-CONTACT executes via possession-evidence (FAIL if lastTouchRef changes without a touch event). PASS/SHOT impulse criteria and unimplemented HEAD-FREE / TOUCH-WF / SHOT-SWV / CROSS-HI stay NOT_EVALUATED. PHY-SHLD and HEAD-DUEL removed from this non-duel suite. First critic RETRY: contact/impulse mapped to ball-continuity, suite never executed, empty input programs. Retry 1 critic RETRY: four catalog tests still silent-PASS; stale binding said ball-continuity. 841 node tests. Advisory: compare-foundation retains inert impulse→ball-continuity entries unused by FOUNDATION_LAB. No PLAYABLE_1V1_PASS or PES claim.
+
+### Critic verdict (retry 2 — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-TOUCH-ACTIONS-SUITE (retry 2 of 3)
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+Prior critic passes: RETRY (dishonest ball-continuity mappings, catalog-only suite, empty inputs, PHY-SHLD/HEAD-DUEL); RETRY (HEAD-FREE/TOUCH-WF/SHOT-SWV/CROSS-HI silent PASS; stale CONTACT binding).
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-TOUCH-ACTIONS-SUITE
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: typecheck 0; mise run test 841/841; browser 24/24
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
