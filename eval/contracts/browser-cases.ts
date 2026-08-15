@@ -15,6 +15,10 @@
  *  - BROWSER-CORE-STEP-001: exact injected frames and tick count
  *    yield the same per-tick/final hashes as headless.
  *
+ * Cases from PLAYABLE-1V1 (1v1-control.browser.test.ts):
+ *  - BROWSER-1V1-CONTROL-001: two HUMAN slots with independent inputs.
+ *  - ARCH-DIFF-001: human perceptual blinded comparison (NEEDS_PERCEPTUAL_REVIEW).
+ *
  * No Math.random, Date, performance, DOM, or Node I/O.
  */
 
@@ -83,10 +87,49 @@ export const BROWSER_CASE_CORE_STEP_001: BrowserCaseDefinition = {
     "different input frames produce different hashes.",
 };
 
+// ---------------------------------------------------------------------------
+// Case definitions (PLAYABLE-1V1)
+// ---------------------------------------------------------------------------
+
+export const BROWSER_CASE_1V1_CONTROL_001: BrowserCaseDefinition = {
+  case_id: "BROWSER-1V1-CONTROL-001",
+  case_version: "browser-case-1v1-control-v1",
+  description:
+    "Two HUMAN slots with independently injected InputFrames yield the same " +
+    "per-tick/final hashes as headless for the same two-slot input program; " +
+    "slot-1 input moves only slot-1's controlled player; slot-2 input moves only slot-2's controlled player.",
+  test_source: "tests/browser/1v1-control.browser.test.ts",
+  acceptance_criteria:
+    "Bridge per-tick hashes match headless per-tick hashes for the " +
+    "two-player scenario with both slots driven; rendering extra frames " +
+    "without stepping does not change the hash; slot-1 input only affects " +
+    "slot-1's player and slot-2 input only affects slot-2's player.",
+};
+
+export const BROWSER_CASE_ARCH_DIFF_001: BrowserCaseDefinition = {
+  case_id: "ARCH-DIFF-001",
+  case_version: "browser-case-arch-diff-v1",
+  description:
+    "Human perceptual blinded comparison of burst vs steady archetypes. " +
+    "Identical visual models, hidden labels, identical replay/task conditions, " +
+    "randomized/counterbalanced order.",
+  test_source: "tests/browser/1v1-control.browser.test.ts",
+  acceptance_criteria:
+    "NEEDS_PERCEPTUAL_REVIEW — objective comparison requires a versioned " +
+    "rubric, randomized presentation, and human subject data. Not executable " +
+    "without those artifacts.",
+};
+
+// ---------------------------------------------------------------------------
+// Registry
+// ---------------------------------------------------------------------------
+
 /** All registered browser-case definitions keyed by case_id. */
 export const BROWSER_CASES: Record<string, BrowserCaseDefinition> = {
   [BROWSER_CASE_CORE_RESET_001.case_id]: BROWSER_CASE_CORE_RESET_001,
   [BROWSER_CASE_CORE_STEP_001.case_id]: BROWSER_CASE_CORE_STEP_001,
+  [BROWSER_CASE_1V1_CONTROL_001.case_id]: BROWSER_CASE_1V1_CONTROL_001,
+  [BROWSER_CASE_ARCH_DIFF_001.case_id]: BROWSER_CASE_ARCH_DIFF_001,
 };
 
 /**
@@ -103,6 +146,8 @@ export function getBrowserCase(
 export const ALL_BROWSER_CASE_IDS: string[] = [
   BROWSER_CASE_CORE_RESET_001.case_id,
   BROWSER_CASE_CORE_STEP_001.case_id,
+  BROWSER_CASE_1V1_CONTROL_001.case_id,
+  BROWSER_CASE_ARCH_DIFF_001.case_id,
 ];
 
 /**
