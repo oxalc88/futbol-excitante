@@ -55,6 +55,33 @@ export const FOUNDATION_LOCOMOTION_V1 = {
   lateralResistance: { value: 0.7, note: "provisional lateral velocity damping factor [0..1]" },
   sprintMultiplier: { value: 1.2, note: "provisional sprint speed multiplier" },
   neutralBrakeThreshold: { value: 0.01, unit: "m/s", note: "provisional residual velocity below which braking stops" },
+  /**
+   * Transient acceleration coefficient [0..1].
+   * 0 = no early-speed bonus (pure baseline acceleration).
+   * 1 = maximum early-speed bonus (explosive initial acceleration).
+   * Only affects early-phase acceleration; sustainable-speed plateau is unchanged.
+   */
+  transientAcceleration: { value: 0, note: "provisional transient acceleration coefficient [0..1]" },
+} as const;
+
+/**
+ * Transient-acceleration locomotion config.
+ *
+ * Identical to FOUNDATION_LOCOMOTION_V1 but with a default
+ * transientAcceleration of 0.0 — the neutral baseline for the
+ * capability-design evaluator to compare high vs low values.
+ */
+export const TRANSIENT_ACCEL_LOCOMOTION_V1 = {
+  id: "foundation-locomotion-v1",
+  label: "provisional",
+  maxSpeed: { value: 7.0, unit: "m/s", note: "provisional top speed" },
+  acceleration: { value: 12.0, unit: "m/s²", note: "provisional linear acceleration" },
+  braking: { value: 15.0, unit: "m/s²", note: "provisional deceleration rate" },
+  turnRate: { value: 4.5, unit: "rad/s", note: "provisional angular turn rate" },
+  lateralResistance: { value: 0.7, note: "provisional lateral velocity damping factor [0..1]" },
+  sprintMultiplier: { value: 1.2, note: "provisional sprint speed multiplier" },
+  neutralBrakeThreshold: { value: 0.01, unit: "m/s", note: "provisional residual velocity below which braking stops" },
+  transientAcceleration: { value: 0, note: "provisional transient acceleration coefficient [0..1]" },
 } as const;
 
 // -- Ball physics (provisional) -----------------------------------------------
