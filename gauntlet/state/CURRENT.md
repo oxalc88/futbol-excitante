@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-next_objective_id: PLAYABLE-1V1-PROFILE
+next_objective_id: PLAYABLE-TOUCH-ACTIONS-SUITE
 best_known:
-  commit: bb7a247
-  note: "PLAYABLE-BROWSER-1V1 accepted. BROWSER-1V1-CONTROL-001. ARCH-DIFF NEEDS_PERCEPTUAL_REVIEW. Not PES."
+  commit: f0c37ea
+  note: "PLAYABLE-1V1-PROFILE accepted. Milestone cannot PASS. Not PES."
 active_candidate:
-  objective_id: PLAYABLE-1V1-PROFILE
+  objective_id: PLAYABLE-TOUCH-ACTIONS-SUITE
   builder: builder-qwen
   critic: critic
-  started_from_commit: bb7a247
+  started_from_commit: f0c37ea
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -48,19 +48,20 @@ accepted:
   - PLAYABLE-ENGINE-DESIGN-RUNNER
   - PLAYABLE-FICTIONAL-ARCHETYPES
   - PLAYABLE-BROWSER-1V1
+  - PLAYABLE-1V1-PROFILE
 blocked: []
-selection_note: "1v1 playable pieces exist. Next gap is a versioned PLAYABLE-1V1 milestone profile that evaluates what can run and keeps ARCH-DIFF as NEEDS_PERCEPTUAL_REVIEW. Do not claim PLAYABLE_1V1_PASS. Do not invent PES envelopes. Do not start 11v11."
+selection_note: "PLAYABLE_1V1 evaluator exists and cannot PASS. Next executable gap is a versioned touch_and_actions suite bound to existing first-touch/pass/shot oracles. Do not invent PES envelopes. Do not claim PLAYABLE_1V1_PASS."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-BROWSER-1V1 — two-slot browser control case.
+PLAYABLE-1V1-PROFILE — honest milestone profile + evaluator.
 
-- commits: `c4fa809` (scenario), `3313612` (registry), `2777c7d` (bridge), `bb7a247` (tests)
+- commits: `d311ab8` (profile), `8c8eb06` (runner), `f0c37ea` (tests)
 - builder: builder-qwen / qwen3.6
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate PLAYABLE-1V1-PROFILE to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-TOUCH-ACTIONS-SUITE to builder-qwen. After ACCEPT + integration, atomic-commit and push.
