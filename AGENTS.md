@@ -30,7 +30,13 @@ The Gauntlet loop lives in `gauntlet/`. Launch and model routing are documented 
 
 ## Prioritization
 
-The repo may start empty. `BOOTSTRAP-01` is the initial objective only while there is no toolchain or `src/`. After each accepted objective, inspect the actual project, evidence, research, and specs, then pick the highest-value next gap. Milestones in `gauntlet/objectives.md` guide that choice; they do not force a predetermined order.
+The repo may start empty. `BOOTSTRAP-01` is the initial objective only while there is no toolchain or `src/`.
+
+Strategic prioritization uses the temporary rolling horizon in `gauntlet/state/HORIZON.md`. At startup, handoff, horizon exhaustion, or material invalidation, inspect actual project state, evidence, research, specs, and `gauntlet/objectives.md`, then select roughly 4–8 candidate objectives. The horizon is not a fixed backlog.
+
+After an accepted objective, continue the next applicable horizon objective without a global reprioritization pass unless the horizon is invalidated by a blocker, architectural constraint, dependency change, inapplicable planned objective, unsafe newly discovered defect, materially higher-value evidence, or a human-needed spec/legal blocker.
+
+Where technically reasonable, each horizon should lead toward at least one observable playable/browser-facing capability. Infrastructure-only horizons must justify why that work must precede visible gameplay progress.
 
 Do not skip the architecture boundaries to jump to 11v11, tactics, polished art, networking, Rapier, workers, WASM, or WebGPU.
 
@@ -42,10 +48,10 @@ Do not skip the architecture boundaries to jump to 11v11, tactics, polished art,
 
 ## Gauntlet roles
 
-- `orchestrator` (Grok 4.6) decides and delegates. It does not implement. At ≥89% SuperGrok weekly usage (`/usage`) it writes `gauntlet/state/HANDOFF.md` and hands off to `orchestrator-deepseek`.
-- `orchestrator-deepseek` prefers `deepseek-v4-flash-0731` and falls back to `deepseek-v4-flash` only when the provider explicitly reports the snapshot unavailable. Same loop. It picks up from `HANDOFF.md` + `CURRENT.md`. It does not implement.
+- `orchestrator` (Grok 4.6) plans/replans the rolling horizon at strategic boundaries, then decides and delegates inside it. It does not implement. At ≥89% SuperGrok weekly usage (`/usage`) it writes `gauntlet/state/HANDOFF.md` and hands off to `orchestrator-deepseek`.
+- `orchestrator-deepseek` uses the configured DeepSeek overflow model. Same loop. It picks up from `HANDOFF.md` + `CURRENT.md` + `HORIZON.md`. It does not implement.
 - `builder-qwen` / `builder-mimo` implement one isolated objective and produce evidence.
 - `critic` (DeepSeek by default) judges evidence independently. Never review with the same model that implemented the change.
-- `integration-reviewer` checks architecture and neighboring regressions after acceptance.
+- `integration-reviewer` checks architecture and neighboring regressions after critic acceptance. Critic ACCEPT alone is never final.
 - `aux` does cheap summaries and inspection only.
 - `git-committer` (`gemma4`) makes atomic commits. Grok must not `git commit`.

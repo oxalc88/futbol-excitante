@@ -1,6 +1,6 @@
 ---
 name: gauntlet-continue
-description: Resume the PES Simulator Gauntlet from CURRENT.md and HANDOFF.md on the DeepSeek overflow orchestrator. Use when SuperGrok weekly usage hits 89%, or when the user runs /gauntlet-continue.
+description: Resume the PES Simulator Gauntlet from persisted CURRENT/HANDOFF/HORIZON state on the DeepSeek overflow orchestrator.
 user-invocable: true
 disable-model-invocation: true
 model: deepseek-v4-flash
@@ -9,21 +9,17 @@ argument-hint: optional focus, e.g. finish PLAYABLE-DUELS-SUITE only
 
 Resume the PES Simulator Gauntlet from disk. Do not start over.
 
-You are the overflow orchestrator (`orchestrator-deepseek`), using
-`deepseek-v4-flash` by default and `deepseek-v4-flash-0731` as the explicit
-fallback. Do not implement gameplay.
+You are the overflow orchestrator (`orchestrator-deepseek`). Do not implement gameplay.
 
-1. Read `gauntlet/state/HANDOFF.md`, then `gauntlet/state/CURRENT.md`, then the last `HISTORY.md` iteration.
+1. Read `gauntlet/state/HANDOFF.md` if present, then `CURRENT.md`, then `HORIZON.md`, then the last `HISTORY.md` iteration.
 2. Run `git status --short` and `git log -8 --oneline`.
-3. Continue the in-flight `active_candidate`. Do not restart accepted objectives. Do not revert dirty files unless HANDOFF says the last verdict was REJECT and lists files to restore.
-4. Follow `gauntlet/PROMPT.md`, `gauntlet/README.md`, and `.grok/agents/orchestrator-deepseek.md`.
-5. Delegate with `spawn_subagent` as in `/gauntlet`. Commits go to `git-committer` / `gemma4`.
-6. Critic independence is versus the builder, not versus you. Default critic remains DeepSeek when the builder was Qwen or MiMo.
-7. When refreshing timing output, use this session's exact model ID. Keep `deepseek-v4-flash` and `deepseek-v4-flash-0731` in separate model-and-role totals even though both use `orchestrator-deepseek`.
+3. Continue any in-flight `active_candidate`. Do not restart accepted objectives.
+4. If no candidate is in flight and the rolling horizon is valid, continue the next applicable horizon objective without a global project reassessment.
+5. Reassess globally only when the horizon is missing, exhausted, or materially invalidated under `gauntlet/PROMPT.md`.
+6. Follow `gauntlet/PROMPT.md`, `gauntlet/README.md`, and `.grok/agents/orchestrator-deepseek.md`.
+7. Preserve builder → critic → retry/fix → critic → integration-reviewer → accept. Critic ACCEPT alone is insufficient.
+8. After acceptance, advance `HORIZON.md` along with the normal CURRENT/HISTORY/TIMING updates and commit through `git-committer` / `gemma4`.
 
-This skill is the DeepSeek overflow entry point. The Grok CLI and its generic
-system prompt may call the runtime "Grok" when either DeepSeek model is selected;
-that product label is not the model identity. Do not hand off again or stop
-because of it. Continue from `HANDOFF.md` as `orchestrator-deepseek`.
+This skill is the DeepSeek overflow entry point. Do not discard a valid persisted horizon merely because the orchestrator session changed.
 
-If the user passed extra focus after `/gauntlet-continue`, apply it to pickup only. Do not skip critic or integration review.
+If the user passed extra focus after `/gauntlet-continue`, apply it to pickup/strategic selection only. Do not skip critic or integration review.
