@@ -57,7 +57,8 @@ Optional extra focus after `/gauntlet`:
 
 | Agent | Kind | Default model | Writes | Job |
 |---|---|---|---|---|
-| `orchestrator` | primary | `grok-4.6` | `gauntlet/state/**`, `gauntlet/objectives.md` | Inspect, prioritize, delegate, accept/revert, choose the next objective |
+| `orchestrator` | primary | `grok-4.6` | `gauntlet/state/**`, `gauntlet/objectives.md` | Inspect, prioritize, delegate, accept/revert, choose the next objective. Hands off at 95% of the 500k window. |
+| `orchestrator-deepseek` | primary (overflow) | `deepseek-v4-flash-0731` | `gauntlet/state/**`, `gauntlet/objectives.md` | Same loop. Picks up from `HANDOFF.md` + `CURRENT.md` after Grok hits the ceiling. |
 | `builder-qwen` | subagent | `qwen3.6` | implementation files | Structured TypeScript, toolchain, contracts, tests, registries |
 | `builder-mimo` | subagent | `mimo-v2.5` | implementation files | Large-context gameplay/presentation work |
 | `critic` | subagent | `deepseek-v4-flash-0731` | none | Independent evaluation of builder evidence |
@@ -101,7 +102,8 @@ The usual isolatable pair is `BOOTSTRAP-07` and `BOOTSTRAP-08` once input exists
 
 | Role | Exact model | Fallback |
 |---|---|---|
-| Orchestrator | `grok-4.6` | none. Do not fall back to Grok 4, 4.5, or 4.20. |
+| Orchestrator | `grok-4.6` | `orchestrator-deepseek` at ≥95% of the 500k window. Do not fall back to Grok 4, 4.5, or 4.20. |
+| Overflow orchestrator | `deepseek-v4-flash-0731` | none. Launch with `--model deepseek-v4-flash-0731`. |
 | Primary builders | `qwen3.6` and `mimo-v2.5` | the other builder |
 | Primary critic | `deepseek-v4-flash-0731` | `critic-mimo` if the builder was Qwen; `critic-qwen` if the builder was MiMo |
 | Integration reviewer | `deepseek-v4-flash-0731` | a NaN model that is not the builder under review |
@@ -110,7 +112,15 @@ The usual isolatable pair is `BOOTSTRAP-07` and `BOOTSTRAP-08` once input exists
 
 Hard rule: the critic model must differ from the implementation model for that candidate.
 
-Use NaN models for high-token implementation, test fixing, experimentation, and repeated criticism. Use `gemma4` for summaries and git commits. Use Grok 4.6 for orchestration, prioritization, delegation, integration decisions, and what happens next.
+Use NaN models for high-token implementation, test fixing, experimentation, and repeated criticism. Use `gemma4` for summaries and git commits. Use Grok 4.6 for orchestration until the parent window hits 95%. Then continue on `orchestrator-deepseek` (`deepseek-v4-flash-0731`) from `gauntlet/state/HANDOFF.md`. Auto-compact is 65% of the 500k window (`~/.grok/config.toml` `[session] auto_compact_threshold_percent = 65`). That setting lives in the user config, not project `.grok/config.toml`.
+
+Overflow launch (always pass `--model`):
+
+```bash
+grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
+```
+
+Then `/gauntlet-continue`.
 
 ## NaN models
 
@@ -163,6 +173,10 @@ critic-mimo = "mimo-v2.5"
 integration-reviewer = "deepseek-v4-flash-0731"
 aux = "gemma4"
 git-committer = "gemma4"
+orchestrator-deepseek = "deepseek-v4-flash-0731"
+
+[session]
+auto_compact_threshold_percent = 65
 ```
 
 Confirm with `grok models`. The process must have `NAN_API_KEY` set. A missing key registers the names but every NaN request fails with 401.
@@ -239,6 +253,7 @@ gauntlet/
   state/CURRENT.md          live board
   state/HISTORY.md          append-only iteration log
   state/TIMING.md           session wall-clock, tokens, model grades
+  state/HANDOFF.md          overflow pickup for orchestrator-deepseek
   artifacts/                generated, gitignored
 
 .grok/agents/               project-local agent prompts (not global)
@@ -254,7 +269,7 @@ Do not add these agents under `~/.grok/agents/`. That would make them appear in 
 1. Edit `gauntlet/models.json`.
 2. Copy the same Grok slugs into `.grok/agents/<name>.md` frontmatter `model`.
 3. If a NaN API id or endpoint changes, update the matching `[model.*]` block and `[subagents.models]` map in `~/.grok/config.toml`.
-4. Keep the orchestrator on `grok-4.6`. Do not point it at Grok 4, 4.5, 4.20, or another non-4.6 ID.
+4. Keep the default orchestrator on `grok-4.6`. Overflow is `orchestrator-deepseek` / `deepseek-v4-flash-0731`. Do not point the Grok orchestrator at Grok 4, 4.5, 4.20, or another non-4.6 ID.
 5. Confirm with `grok models` that the IDs exist.
 6. Record the change in `gauntlet/state/HISTORY.md`.
 

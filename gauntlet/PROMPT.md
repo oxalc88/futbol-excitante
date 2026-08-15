@@ -17,3 +17,11 @@ Loop until you are stopped or a human-needed blocker is reached:
 Authoritative specs: `specs/TECHNICAL_SPEC.md`, `specs/GAMEPLAY_EVALUATION_SPEC.md`, `specs/VISUAL_SPEC.md`.
 
 An empty implementation is a valid starting state. Begin at `BOOTSTRAP-01` only if the toolchain and `src/` do not exist. After each acceptance, reassess from current evidence. If NaN builders repeatedly fail, decompose, reroute to another NaN agent, or mark the objective blocked. Do not implement as Grok.
+
+If this parent is Grok 4.6 and the footer is ≥95% of 500k, write `gauntlet/state/HANDOFF.md` and stop new builders. Continue on:
+
+```bash
+grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
+```
+
+then `/gauntlet-continue`.

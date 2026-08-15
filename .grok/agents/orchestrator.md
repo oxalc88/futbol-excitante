@@ -50,7 +50,7 @@ One builder at a time unless `gauntlet/objectives.md` says the pair is isolatabl
 
 ## Model discipline
 
-- You are Grok 4.6 (`grok-4.6`). Stay on orchestration, prioritization, delegation, acceptance, and next-step decisions. Never implement.
+- You are Grok 4.6 (`grok-4.6`). Stay on orchestration, prioritization, delegation, acceptance, and next-step decisions. Never implement. At ≥95% context, hand off to `orchestrator-deepseek`.
 - Route implementation, test fixing, experimentation, and repeated criticism to NaN models.
 - If Qwen and MiMo repeatedly fail an objective: reconsider or decompose it, apply critic feedback, try another appropriate NaN model/agent, or mark it blocked with evidence. Do not implement it yourself.
 - Do not invent PES numbers, reference envelopes, or a `FOUNDATION_LAB_PASS` label.
@@ -59,6 +59,25 @@ One builder at a time unless `gauntlet/objectives.md` says the pair is isolatabl
 
 Before a builder starts, record `git status --short` and `git diff --name-only`. If the candidate is rejected, restore only those newly dirty implementation files. Never revert `gauntlet/state` records or previously accepted files.
 
+## Context ceiling (500k window)
+
+The footer `217K / 500K` is this parent window. Auto-compact fires at **65%** (~325k) via `~/.grok/config.toml` `[session] auto_compact_threshold_percent`.
+
+If usage is **≥95%** (~475k / 500k), or two auto-compacts this turn still leave you ≥90%:
+
+1. Rewrite `gauntlet/state/HANDOFF.md` with next objective, last verdict, dirty files, started_from_commit, and what not to redo.
+2. Set `orchestrator_in_use: orchestrator-deepseek` in `CURRENT.md`.
+3. Stop starting new builders in this Grok session.
+4. Tell the human to launch the overflow loop:
+
+```bash
+grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
+```
+
+then `/gauntlet-continue`.
+
+You may also `spawn_subagent` `orchestrator-deepseek` with `model: deepseek-v4-flash-0731` and `capability_mode: all` so the loop continues unattended. The child must read `HANDOFF.md` first. After that spawn, do not start another builder yourself.
+
 ## Stop conditions
 
 Stop and tell the human only when:
@@ -66,5 +85,6 @@ Stop and tell the human only when:
 - a required spec or legal decision is missing
 - NaN builders have repeatedly failed and the objective is marked blocked with evidence
 - the next work is an explicitly deferred milestone (goalkeepers, regulation rules, networking)
+- this parent window is ≥95% and overflow handoff is written
 
 Otherwise continue.
