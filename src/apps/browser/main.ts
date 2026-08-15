@@ -27,6 +27,7 @@ import { selectBrowserScenario } from "./scenario-selector.js";
 import type { ScenarioDefinition } from "../../contracts/scenario.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { Simulation } from "../../simulation/loop/simulation.js";
+import { createCpuAdapter, buildCpuObservation } from "../../adapters/input-browser/cpu-adapter.js";
 
 // ---------------------------------------------------------------------------
 // Scenario loading
@@ -97,6 +98,16 @@ function main(): void {
     adapters.push({ adapter: slot2Adapter, config: DEFAULT_SLOT2_KEYBOARD_CONFIG });
   }
 
+  // 3.5 Create CPU adapter for any non-HUMAN control slots.
+  let cpuAdapter: ReturnType<typeof createCpuAdapter> | undefined;
+  for (const _slot of Object.keys(SCENARIO_DATA.controlAssignments)) {
+    const assignment = SCENARIO_DATA.controlAssignments[_slot];
+    if (assignment && assignment.mode !== "HUMAN") {
+      cpuAdapter = createCpuAdapter();
+      break;
+    }
+  }
+
   // 4. Connect all keyboard adapters to window for physical input.
   for (const { adapter } of adapters) {
     adapter.connect(window);
@@ -136,6 +147,14 @@ function main(): void {
       const allFrames: InputFrame[] = adapters.map(
         ({ adapter, config }) => adapter.sample(sim.tick),
       );
+
+      // Add CPU frame if a CPU adapter is present for AI_FALLBACK slots.
+      if (cpuAdapter) {
+        const obs = buildCpuObservation(sim.snapshot());
+        const cpuFrame = cpuAdapter.sample(sim.tick, obs);
+        allFrames.push(cpuFrame);
+      }
+
       sim.applyInputs(allFrames);
 
       // Advance the simulation by one fixed tick.
