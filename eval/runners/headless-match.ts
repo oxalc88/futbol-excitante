@@ -1,0 +1,268 @@
+/**
+ * @module @pes/eval/runners/headless-match
+ *
+ * Headless CPU-vs-CPU match runner.
+ *
+ * Creates two `CpuAdapter` instances (one per team), runs them against
+ * each other in a headless simulation (no browser, no keyboard), and
+ * returns all events, observations, and state hashes.
+ *
+ * No Math.random, Date, DOM, or Node I/O.
+ * Deterministic: same scenario (with same seed) → same results.
+ */
+
+import { createWorld } from "../../src/simulation/world/create.js";
+import { createSimulation } from "../../src/simulation/loop/simulation.js";
+import { createCpuAdapter, buildCpuObservation, type CpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
+import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
+import type { SimulationObserver } from "../../src/simulation/telemetry/observer.js";
+import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
+import type { SimulationEvent } from "../../src/contracts/scenario.js";
+import type { ScenarioDefinition } from "../../src/contracts/scenario.js";
+
+// ---------------------------------------------------------------------------
+// Public types
+// ---------------------------------------------------------------------------
+
+/**
+ * Configuration for a headless CPU-vs-CPU match.
+ */
+export interface HeadlessMatchConfig {
+  /** Scenario definition — must have two players, both AI_FALLBACK. */
+  scenario: ScenarioDefinition;
+  /** Total ticks to simulate (default: 600). */
+  maxTicks?: number;
+  /** Optional telemetry observer. */
+  observer?: SimulationObserver;
+}
+
+/**
+ * Result of a headless CPU-vs-CPU match.
+ */
+export interface HeadlessMatchResult {
+  /** Final committed tick (equals maxTicks). */
+  tick: number;
+  /** All simulation events. */
+  events: SimulationEvent[];
+  /** Per-tick telemetry observations. */
+  observations: TelemetryObservation[];
+  /** State hash per tick (indexed by tick). */
+  stateHashes: string[];
+}
+
+// ---------------------------------------------------------------------------
+// Scenario fixture — two-player AI duel
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a minimal two-player AI match scenario.
+ *
+ * Two players on opposite sides, ball between them.
+ * Both slots use AI_FALLBACK so the CPU adapters drive both teams.
+ */
+export function makeAiMatchScenario(): ScenarioDefinition {
+  return {
+    id: "ai-match-v1",
+    version: "1.0.0",
+    family: "ai-match",
+    durationTicks: 600,
+    seed: 42,
+    prngAlgorithmId: "mulberry32-v1",
+    schemaVersion: "state-v1",
+    simulationVersion: "sim-v1",
+    configVersion: "foundation-config-v1",
+    profile: "LABORATORY",
+    pitchLength: 105,
+    pitchWidth: 68,
+    safetyBounds: {
+      maxX: 52.5,
+      maxY: 34,
+      minZ: -0.5,
+      maxZ: 20,
+    },
+    players: [
+      {
+        playerId: "cpu-a",
+        teamId: "team-a",
+        groundPosition: { x: 0, y: 0 },
+        linearVelocity: { x: 0, y: 0 },
+        desiredVelocity: { x: 0, y: 0 },
+        bodyHeading: 0,
+        desiredHeading: 0,
+        archetypeId: "archetype-burst-v1",
+      },
+      {
+        playerId: "cpu-b",
+        teamId: "team-b",
+        groundPosition: { x: 40, y: 0 },
+        linearVelocity: { x: 0, y: 0 },
+        desiredVelocity: { x: 0, y: 0 },
+        bodyHeading: Math.PI,
+        desiredHeading: Math.PI,
+        archetypeId: "archetype-steady-v1",
+      },
+    ],
+    ball: {
+      position: { x: 0.5, y: 0, z: 0.11 },
+      linearVelocity: { x: 0, y: 0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "ground-roll",
+    },
+    controlAssignments: {
+      "slot-a": {
+        controlSlot: "slot-a",
+        teamId: "team-a",
+        controlledPlayerId: "cpu-a",
+        mode: "AI_FALLBACK",
+      },
+      "slot-b": {
+        controlSlot: "slot-b",
+        teamId: "team-b",
+        controlledPlayerId: "cpu-b",
+        mode: "AI_FALLBACK",
+      },
+    },
+    missingInputPolicy: "REPEAT_HELD_WITH_ZERO_EDGES",
+    maxConsecutiveMissing: 3,
+    inputProgram: {},
+    scheduledEvents: {},
+    observationWindows: [{ startTick: 0, endTick: 600 }],
+    requestedMetrics: ["player-displacement", "ball-distance"],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Match runner
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a CpuObservation filtered for a specific team.
+ *
+ * The CpuAdapter uses `players[0]` as the controlled player.
+ * We filter to ensure the controlled player (from the given teamId)
+ * appears first in the array.
+ */
+function buildTeamCpuObservation(
+  fullObs: {
+    players: CpuObservation["players"];
+    ball: CpuObservation["ball"];
+    pitchLength: number;
+    pitchWidth: number;
+  },
+  teamId: string,
+): CpuObservation {
+  // Filter and reorder: controlled team's player first.
+  const teamPlayers = fullObs.players.filter(
+    (p) => p.teamId === teamId,
+  );
+  const otherPlayers = fullObs.players.filter(
+    (p) => p.teamId !== teamId,
+  );
+  const orderedPlayers = [...teamPlayers, ...otherPlayers];
+
+  return {
+    players: orderedPlayers,
+    ball: { ...fullObs.ball },
+    pitchLength: fullObs.pitchLength,
+    pitchWidth: fullObs.pitchWidth,
+    cpuTeamId: teamId,
+  };
+}
+
+/**
+ * Run a headless CPU-vs-CPU match.
+ */
+export function runHeadlessMatch(
+  config: HeadlessMatchConfig,
+): HeadlessMatchResult {
+  const {
+    scenario,
+    maxTicks = scenario.durationTicks,
+    observer,
+  } = config;
+
+  // 1. Create world and simulation.
+  const world = createWorld({ scenario });
+  const observations: TelemetryObservation[] = [];
+
+  // Build observer that collects observations AND delegates to any user observer.
+  // We can't use spread because user onObservation would override ours.
+  const collectObserver: SimulationObserver = {
+    onBeforeStep: observer?.onBeforeStep,
+    onAfterStep: observer?.onAfterStep,
+    onObservation(obs: TelemetryObservation) {
+      observations.push(obs);
+      observer?.onObservation?.(obs);
+    },
+    onInvariantPass: observer?.onInvariantPass,
+    onInvariantFail: observer?.onInvariantFail,
+    onPresent: observer?.onPresent,
+  };
+  const sim = createSimulation(world, collectObserver);
+
+  // 2. Create two CPU adapters — one per team.
+  //    Each adapter has its own internal state (hasPossession, ballWasInRange),
+  //    so they don't interfere with each other.
+  const cpuA = createCpuAdapter();
+  const cpuB = createCpuAdapter();
+
+  // Build a teamId → controlSlot mapping from the scenario's assignments
+  // so we can assign each CPU frame the correct slot.
+  const teamToSlot = new Map<string, string>();
+  for (const [slot, assignment] of Object.entries(scenario.controlAssignments)) {
+    const mode = (assignment as { mode?: string }).mode;
+    if (mode === "AI_FALLBACK") {
+      teamToSlot.set(assignment.teamId, assignment.controlSlot);
+    }
+  }
+
+  // 3. Run the match loop.
+  const events: SimulationEvent[] = [];
+  const stateHashes: string[] = [];
+
+  for (let i = 0; i < maxTicks; i++) {
+    // a. Snapshot the world (deep clone — CPU adapters only read).
+    const snapshot = sim.snapshot();
+
+    // b. Build full CpuObservation, then filter per team.
+    //    Each CPU sees the full world but its OWN player is always first
+    //    in the array (so the CpuAdapter picks the right player).
+    const fullObs = buildCpuObservation(snapshot);
+    const obsA = buildTeamCpuObservation(fullObs, "team-a");
+    const obsB = buildTeamCpuObservation(fullObs, "team-b");
+
+    // c. Sample input frames from each CPU adapter.
+    const tick = sim.tick;
+    const frameA = cpuA.sample(tick, obsA);
+    const frameB = cpuB.sample(tick, obsB);
+
+    // d. Set the correct controlSlot for each frame (matching scenario assignments).
+    //    The CpuAdapter uses a default "slot-cpu"; we override it to match
+    //    the actual slot in the scenario so the simulation can resolve inputs.
+    frameA.controlSlot = teamToSlot.get("team-a") ?? frameA.controlSlot;
+    frameB.controlSlot = teamToSlot.get("team-b") ?? frameB.controlSlot;
+
+    // e. Apply both input frames to the simulation.
+    sim.applyInputs([frameA, frameB]);
+
+    // f. Advance simulation by one tick.
+    const stepResult = sim.step();
+
+    // g. Collect results.
+    stateHashes.push(stepResult.stateHash);
+    for (const evt of stepResult.events) {
+      events.push(evt);
+    }
+  }
+
+  // 4. Clean up CPU adapters.
+  cpuA.reset();
+  cpuB.reset();
+
+  return {
+    tick: sim.tick,
+    events,
+    observations,
+    stateHashes,
+  };
+}
