@@ -140,26 +140,22 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "ball-continuity",
     oracle_version: "oracle-continuity-v1",
   },
-  "PASS-LOW-001-IMPULSE": {
-    oracle_id: "ball-continuity",
-    oracle_version: "oracle-continuity-v1",
-  },
-  "PASS-LOFT-001-IMPULSE": {
-    oracle_id: "ball-continuity",
-    oracle_version: "oracle-continuity-v1",
-  },
+  // TOUCH-SLOW-001-CONTACT uses possession-evidence oracle:
+  // lastTouchRef changes must be backed by touch event evidence,
+  // not just ball continuity.
   "TOUCH-SLOW-001-CONTACT": {
-    oracle_id: "ball-continuity",
-    oracle_version: "oracle-continuity-v1",
+    oracle_id: "possession-evidence",
+    oracle_version: "oracle-possession-v1",
   },
   "LOC-BALL-001-FREE": {
     oracle_id: "ball-continuity",
     oracle_version: "oracle-continuity-v1",
   },
-  "PHY-SHLD-001-CONT": {
-    oracle_id: "ball-continuity",
-    oracle_version: "oracle-continuity-v1",
-  },
+  // Note: PASS-LOW-001-IMPULSE, PASS-LOFT-001-IMPULSE,
+  // SHOT-PWR-001-IMPULSE are NOT mapped to any oracle.
+  // They require contact/impulse oracles that do not yet exist.
+  // These criteria will evaluate to NOT_EVALUATED.
+  // PHY-SHLD-001-CONT removed — duel/shielding is out of scope.
 };
 
 // ---------------------------------------------------------------------------
@@ -179,17 +175,21 @@ function criterionToOracle(
   }
 
   // BOOTSTRAP-level test criteria that map to known invariants.
+  // This is a fallback for criteria not registered in CRITERION_TO_ORACLE.
+  // PASS-LOW-001-IMPULSE, PASS-LOFT-001-IMPULSE, SHOT-PWR-001-IMPULSE
+  // are NOT mapped — they require contact/impulse oracles that do not exist.
   const bootstrapMapping: Record<string, string> = {
     "BALL-IND-001-CONT": "ball-continuity",
     "BALL-IND-001-POSS": "possession-evidence",
     "BALL-GND-001-CONTACT": "ball-continuity",
     "BALL-BNC-001-EVENT": "ball-continuity",
     "BALL-SPN-001-SYM": "ball-continuity",
-    "PASS-LOW-001-IMPULSE": "ball-continuity",
-    "PASS-LOFT-001-IMPULSE": "ball-continuity",
-    "TOUCH-SLOW-001-CONTACT": "ball-continuity",
+    "TOUCH-SLOW-001-CONTACT": "possession-evidence",
     "LOC-BALL-001-FREE": "ball-continuity",
-    "PHY-SHLD-001-CONT": "ball-continuity",
+    // Note: TOUCH-SLOW-001-CONTACT is also registered in CRITERION_TO_ORACLE
+    // above; this bootstrapMapping entry is a fallback for criteria not yet
+    // mapped in CRITERION_TO_ORACLE.  It uses "possession-evidence" to match
+    // the criterion_bindings mapping in bindings.ts.
   };
 
   if (class_ === "HARD_INVARIANT" && bootstrapMapping[criterionId]) {

@@ -126,18 +126,20 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "ball-continuity",
     oracle_version: "oracle-continuity-v1",
   },
+  // TOUCH-SLOW-001-CONTACT uses possession-evidence oracle.
   "TOUCH-SLOW-001-CONTACT": {
-    oracle_id: "ball-continuity",
-    oracle_version: "oracle-continuity-v1",
+    oracle_id: "possession-evidence",
+    oracle_version: "oracle-possession-v1",
   },
   "LOC-BALL-001-FREE": {
     oracle_id: "ball-continuity",
     oracle_version: "oracle-continuity-v1",
   },
-  "PHY-SHLD-001-CONT": {
-    oracle_id: "ball-continuity",
-    oracle_version: "oracle-continuity-v1",
-  },
+  // Note: PASS-LOW-001-IMPULSE, PASS-LOFT-001-IMPULSE,
+  // SHOT-PWR-001-IMPULSE are NOT mapped here — they require
+  // contact/impulse oracles that do not yet exist.
+  // These criteria will evaluate to NOT_EVALUATED.
+  // PHY-SHLD-001-CONT removed — duel/shielding is out of scope.
 };
 
 // ---------------------------------------------------------------------------
@@ -159,11 +161,9 @@ function criterionToOracle(
     "BALL-GND-001-CONTACT": "ball-continuity",
     "BALL-BNC-001-EVENT": "ball-continuity",
     "BALL-SPN-001-SYM": "ball-continuity",
-    "PASS-LOW-001-IMPULSE": "ball-continuity",
-    "PASS-LOFT-001-IMPULSE": "ball-continuity",
-    "TOUCH-SLOW-001-CONTACT": "ball-continuity",
+    // TOUCH-SLOW-001-CONTACT uses possession-evidence oracle.
+    "TOUCH-SLOW-001-CONTACT": "possession-evidence",
     "LOC-BALL-001-FREE": "ball-continuity",
-    "PHY-SHLD-001-CONT": "ball-continuity",
   };
 
   if (class_ === "HARD_INVARIANT" && bootstrapMapping[criterionId]) {
