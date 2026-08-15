@@ -260,7 +260,8 @@ describe("CPU-GOAL-001: goal awareness", () => {
     const frame = adapter.sample(1, obs); // hasPossession = true → OFFENSE
 
     expect(frame.moveX).toBeGreaterThan(0);
-    expect(Math.abs(frame.moveY)).toBeLessThan(0.01);
+    // moveY may be non-zero due to deterministic lateral shot aim offset.
+    expect(Math.abs(frame.moveY)).toBeLessThan(0.2);
   });
 
   it("CPU team B steers toward -x goal when in possession", () => {
@@ -273,7 +274,8 @@ describe("CPU-GOAL-001: goal awareness", () => {
     const frame = adapter.sample(1, obs);
 
     expect(frame.moveX).toBeLessThan(0);
-    expect(Math.abs(frame.moveY)).toBeLessThan(0.01);
+    // moveY may be non-zero due to deterministic lateral shot aim offset.
+    expect(Math.abs(frame.moveY)).toBeLessThan(0.2);
   });
 
   it("CPU shoots when within 15m of goal and facing goal", () => {

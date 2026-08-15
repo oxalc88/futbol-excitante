@@ -7,7 +7,9 @@
  * Responsibilities:
  *  - Read-only world observation (no mutation).
  *  - Goal-aware steering: toward opponent's goal when in possession.
- *  - Shooting: press SHOT_BIT when within range and facing the goal.
+ *  - Shooting: press SHOT_BIT when in range and facing the goal,
+ *    with distance-based thresholds.
+ *  - Post-shot cooldown: suppress FIRST_TOUCH after shooting.
  *  - Chase-ball: default defense behavior when not in possession.
  *  - FIRST_TOUCH: press when within ~1.5 m of a slow ball (defense).
  *  - Always sprint (sprint = 1).
@@ -15,6 +17,13 @@
  *
  * Deterministic: same (tick, observation) → same InputFrame.
  * No Math.random, Date, DOM, or Node I/O.
+ *
+ * Provisional constants (unmeasured PES 2017 values):
+ *  - POSSESSION_RANGE, SHOT_RANGE_CLOSE, SHOT_RANGE_WIDE
+ *  - FACING_TOLERANCE_CLOSE, FACING_TOLERANCE_WIDE
+ *  - FIRST_TOUCH_RANGE, FIRST_TOUCH_SPEED_THRESHOLD
+ *  - POSSESSION_SPEED_THRESHOLD, FACING_TOLERANCE_BACKUP
+ *  - SHOT_COOLDOWN_TICKS
  */
 
 import type { InputFrame } from "../../contracts/input.js";
@@ -25,7 +34,12 @@ import type { WorldState } from "../../contracts/state.js";
 // CpuObservation — minimal read-only subset of world state
 // ---------------------------------------------------------------------------
 
-/** Minimal observation the CPU adapter needs from world state. */
+/**
+ * Minimal observation the CPU adapter needs from world state.
+ *
+ * scoreDifferential is an optional score-state awareness signal:
+ * (cpuTeamGoals - opponentGoals).  Positive means CPU is ahead.
+ */
 export interface CpuObservation {
   /** All players on the pitch. */
   players: Array<{
@@ -46,6 +60,8 @@ export interface CpuObservation {
   pitchWidth: number;
   /** Team ID this CPU controls (determines attacking direction). */
   cpuTeamId?: string;
+  /** Optional score differential (cpuGoals - opponentGoals). */
+  scoreDifferential?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -131,6 +147,8 @@ interface CpuInternalState {
   ballWasInRange: boolean;
   /** Whether the CPU currently has ball possession. */
   hasPossession: boolean;
+  /** Remaining cooldown ticks after a shot (prevents immediate re-possession). */
+  shotCooldownRemaining: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -140,11 +158,21 @@ interface CpuInternalState {
 /** Goal centre x-coordinate (half of 105 m pitch). */
 const GOAL_CENTRE_X = 52.5;
 
+/**
+ * Goal lateral half-width (metres).
+ * Full goal width = 7.32 m → half-width = 3.66 m.
+ * Provisional: unmeasured PES 2017 value.
+ */
+const GOAL_HALF_WIDTH = 3.66;
+
 /** Possession range — ball within this distance = in possession (metres). */
 const POSSESSION_RANGE = 2;
 
-/** Shot range — shoot when within this distance of the goal (metres). */
-const SHOT_RANGE = 15;
+/** Close-range shot threshold (metres). Within this distance, always shoot. */
+const SHOT_RANGE_CLOSE = 5;
+
+/** Wide-range shot threshold (metres). Beyond this, never auto-shoot. */
+const SHOT_RANGE_WIDE = 20;
 
 /** First-touch range — press FIRST_TOUCH within this distance (metres). */
 const FIRST_TOUCH_RANGE = 1.5;
@@ -155,8 +183,36 @@ const FIRST_TOUCH_SPEED_THRESHOLD = 2;
 /** Ball horizontal speed threshold for possession (m/s). */
 const POSSESSION_SPEED_THRESHOLD = 3;
 
-/** Heading tolerance for shooting (radians, ±45°). */
-const FACING_TOLERANCE = Math.PI / 4;
+/** Facing tolerance for close-range shooting (radians, ±π/3 ≈ 60°). */
+const FACING_TOLERANCE_CLOSE = Math.PI / 3;
+
+/**
+ * Facing tolerance for wide-range shooting (radians, ±π/2 ≈ 90°).
+ * Provisional: unmeasured PES 2017 value.
+ */
+const FACING_TOLERANCE_WIDE = Math.PI / 2;
+
+/**
+ * Facing tolerance when CPU is behind (aggressive).
+ * Provisional: unmeasured PES 2017 value.
+ */
+const FACING_TOLERANCE_BACKUP = Math.PI * 0.75;
+
+/**
+ * Post-shot cooldown (ticks). Prevents immediate re-possession
+ * by suppressing FIRST_TOUCH after a shot.  15 ticks ≈ 0.25 s at 60 Hz.
+ * Provisional: unmeasured PES 2017 value.
+ */
+const SHOT_COOLDOWN_TICKS = 15;
+
+/**
+ * Minimum possession range when in shot cooldown.
+ * Extends the effective POSSESSION_RANGE during cooldown
+ * so the CPU doesn't lose possession the moment the ball
+ * stops moving right next to it.
+ * Provisional: unmeasured PES 2017 value.
+ */
+const POSSESSION_RANGE_COOLDOWN = 3;
 
 /**
  * Get the opponent goal x-coordinate for a given team.
@@ -166,6 +222,49 @@ const FACING_TOLERANCE = Math.PI / 4;
 function getOpponentGoalX(cpuTeamId: string): number {
   if (cpuTeamId === "team-b") return -GOAL_CENTRE_X;
   return GOAL_CENTRE_X;
+}
+
+/**
+ * Simple deterministic hash: map a uint32 tick to a float in [-0.5, 0.5].
+ * Uses a lightweight XOR-shift mixing approach.
+ *
+ * This is NOT a PRNG — it is a hash used only for deterministic
+ * lateral aim offsets.  Same (tick) always produces the same value.
+ */
+function tickToFloat01(tick: number): number {
+  let x = (tick ^ 0x5bd1e995) | 0;
+  x = ((x >>> 13) ^ x) | 0;
+  x = (x * 0x5bd1e995) | 0;
+  x = (x ^ (x >>> 15)) | 0;
+  // Map signed int → [0, 1) via unsigned conversion, then → [-0.5, 0.5].
+  return ((x >>> 0) / 4294967296) - 0.5;
+}
+
+/**
+ * Deterministic lateral shot aim offset (metres) within the goal.
+ *
+ * Aims at a random offset in [-GOAL_HALF_WIDTH, GOAL_HALF_WIDTH]
+ * relative to the goal centre, seeded by tick.  Same tick → same offset.
+ *
+ * Provisional: unmeasured PES 2017 value.
+ */
+function getShotAimOffsetY(tick: number): number {
+  return tickToFloat01(tick) * GOAL_HALF_WIDTH * 2;
+}
+
+/**
+ * Compute score-state urgency multiplier.
+ *
+ * - scoreDiff >= 2: CPU is ahead → caution mode (reduced urgency).
+ * - scoreDiff <= -2: CPU is behind → aggressive mode.
+ * - otherwise: neutral.
+ *
+ * Returns a factor in [0.5, 2] that scales shooting/wide-angle thresholds.
+ */
+function getScoreUrgency(scoreDiff?: number): number {
+  if (typeof scoreDiff === "number" && scoreDiff >= 2) return 0.5;
+  if (typeof scoreDiff === "number" && scoreDiff <= -2) return 2;
+  return 1;
 }
 
 /**
@@ -182,17 +281,34 @@ function normalizeAngle(angle: number): number {
  * Create a new CPU adapter with goal-aware strategy.
  *
  * Two modes:
- *  - OFFENSE (possession): steer toward opponent's goal, shoot when in range.
+ *  - OFFENSE (possession): steer toward opponent's goal,
+ *    shoot when in range (distance-based thresholds).
  *  - DEFENSE (no possession): chase the ball, press FIRST_TOUCH when near.
+ *
+ * Distance-based shooting (provisional PES 2017 values):
+ *  - ≤ 5 m: always shoot if in range.
+ *  - 5–20 m: shoot if facing within ±60° of goal (scaled by urgency).
+ *  - > 20 m: dribble only.
+ *
+ * Post-shot cooldown: after shooting, the CPU waits
+ * `SHOT_COOLDOWN_TICKS` before pressing FIRST_TOUCH again.
+ *
+ * Score-state awareness: if scoreDifferential is provided,
+ * CPU ahead ≥ 2 goals reduces urgency; behind ≥ 2 increases it.
  *
  * Possession is gained when the ball enters FIRST_TOUCH range on one tick,
  * then confirmed on the next tick (ballWasInRange → hasPossession).
- * Possession is lost when the ball moves beyond POSSESSION_RANGE or after shooting.
+ * Possession is lost when the ball moves beyond POSSESSION_RANGE
+ * or after shooting.
  *
  * @returns A CpuAdapter instance.
  */
 export function createCpuAdapter(): CpuAdapter {
-  const state: CpuInternalState = { ballWasInRange: false, hasPossession: false };
+  const state: CpuInternalState = {
+    ballWasInRange: false,
+    hasPossession: false,
+    shotCooldownRemaining: 0,
+  };
 
   return {
     sample(tick: number, observation: CpuObservation): InputFrame {
@@ -233,11 +349,14 @@ export function createCpuAdapter(): CpuAdapter {
 
       // Update possession state:
       //   Gain: ball was in range on previous tick (confirming control).
-      //   Lose: ball beyond POSSESSION_RANGE.
+      //   Lose: ball beyond POSSESSION_RANGE (or COOLDOWN threshold during cooldown).
       if (state.ballWasInRange) {
         state.hasPossession = true;
       }
-      if (distToBall > POSSESSION_RANGE) {
+      const effectivePossessionRange = state.shotCooldownRemaining > 0
+        ? POSSESSION_RANGE_COOLDOWN
+        : POSSESSION_RANGE;
+      if (distToBall > effectivePossessionRange) {
         state.hasPossession = false;
       }
 
@@ -245,9 +364,17 @@ export function createCpuAdapter(): CpuAdapter {
       let moveY = 0;
       let heldButtons = 0;
       let pressedButtons = 0;
-      let shotFired = false;
+
+      // ------------------------------------------------------------------
+      // Post-shot cooldown: decrement
+      // ------------------------------------------------------------------
+      if (state.shotCooldownRemaining > 0) {
+        state.shotCooldownRemaining--;
+      }
 
       const cpuTeamId = observation.cpuTeamId;
+      const scoreDiff = observation.scoreDifferential;
+      const urgency = getScoreUrgency(scoreDiff);
 
       if (state.hasPossession && cpuTeamId) {
         // ----------------------------------------------------------------
@@ -258,23 +385,42 @@ export function createCpuAdapter(): CpuAdapter {
         const gdy = 0 - playerY; // goal is on the centre line (y=0)
         const distToGoal = Math.sqrt(gdx * gdx + gdy * gdy);
 
-        // Normalized direction toward the goal.
+        // Normalized direction toward the goal aim point.
+        // Aim at a deterministic lateral offset within goal width.
         if (distToGoal > 0.001) {
-          const distUnit = Math.min(distToGoal, 1);
-          moveX = (gdx / distToGoal) * distUnit;
-          moveY = (gdy / distToGoal) * distUnit;
+          const aimY = getShotAimOffsetY(tick);
+          const goalAimX = goalX;
+          const goalAimY = aimY;
+          const aimDx = goalAimX - playerX;
+          const aimDy = goalAimY - playerY;
+          const distAim = Math.sqrt(aimDx * aimDx + aimDy * aimDy);
+          const distUnit = Math.min(distAim, 1);
+          moveX = (aimDx / distAim) * distUnit;
+          moveY = (aimDy / distAim) * distUnit;
         }
 
-        // Shoot: within range and facing the goal.
-        if (distToGoal < SHOT_RANGE) {
-          const goalAngle = Math.atan2(gdy, gdx);
-          const headingDiff = normalizeAngle(cpuPlayer.bodyHeading - goalAngle);
-          if (Math.abs(headingDiff) <= FACING_TOLERANCE) {
+        // Distance-based shooting decision.
+        if (distToGoal <= SHOT_RANGE_CLOSE) {
+          // Very close: always shoot (high chance).
+          // Apply urgency multiplier to lower the distance threshold for backup.
+          const adjustedCloseRange = SHOT_RANGE_CLOSE / urgency;
+          if (distToGoal <= adjustedCloseRange) {
             heldButtons |= SHOT_BIT;
             pressedButtons |= SHOT_BIT;
-            shotFired = true;
+          }
+        } else if (distToGoal <= SHOT_RANGE_WIDE) {
+          // Medium range: shoot if facing within tolerance.
+          // Use urgency to widen the tolerance when behind.
+          const adjustedTolerance = FACING_TOLERANCE_CLOSE * urgency;
+          const cappedTolerance = Math.min(adjustedTolerance, Math.PI);
+          const goalAngle = Math.atan2(gdy, gdx);
+          const headingDiff = normalizeAngle(cpuPlayer.bodyHeading - goalAngle);
+          if (Math.abs(headingDiff) <= cappedTolerance) {
+            heldButtons |= SHOT_BIT;
+            pressedButtons |= SHOT_BIT;
           }
         }
+        // Beyond SHOT_RANGE_WIDE: dribble only, no shot.
       } else {
         // ----------------------------------------------------------------
         // DEFENSE MODE — chase ball
@@ -286,17 +432,32 @@ export function createCpuAdapter(): CpuAdapter {
         }
 
         // FIRST_TOUCH: press when entering range, hold while in range.
-        pressedButtons |= ballInRange && !state.ballWasInRange
-          ? FIRST_TOUCH_BIT
-          : 0;
-        heldButtons |= ballInRange ? FIRST_TOUCH_BIT : 0;
+        // During shot cooldown, suppress FIRST_TOUCH to simulate recovery.
+        const inCooldown = state.shotCooldownRemaining > 0;
+        pressedButtons |= (!ballInRange || state.ballWasInRange || inCooldown)
+          ? 0
+          : FIRST_TOUCH_BIT;
+        heldButtons |= (!ballInRange || inCooldown)
+          ? 0
+          : FIRST_TOUCH_BIT;
       }
+
+      // Track shot firing for cooldown state update.
+      // We detect a shot by checking if SHOT_BIT is in pressedButtons
+      // (not heldButtons) — this is a new press.
+      const shotJustPressed = (pressedButtons & SHOT_BIT) !== 0;
+      const anyButtonPressed = pressedButtons !== 0;
 
       // Update ballWasInRange for next tick.
       // After a shot, clear it to prevent immediate re-possession.
-      if (shotFired) {
+      if (shotJustPressed) {
         state.hasPossession = false;
         state.ballWasInRange = false;
+        state.shotCooldownRemaining = SHOT_COOLDOWN_TICKS;
+      } else if (anyButtonPressed && state.hasPossession) {
+        // Some other action was pressed while in possession (not a shot).
+        // We still maintain possession.
+        state.ballWasInRange = ballInRange;
       } else {
         state.ballWasInRange = ballInRange;
       }
@@ -317,6 +478,7 @@ export function createCpuAdapter(): CpuAdapter {
     reset(): void {
       state.ballWasInRange = false;
       state.hasPossession = false;
+      state.shotCooldownRemaining = 0;
     },
   };
 }

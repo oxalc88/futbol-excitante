@@ -7,15 +7,15 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: AI-GOAL-IMPROVEMENT
+next_objective_id: MATCH-ORACLE
 best_known:
-  commit: 0dba0b8
-  note: "MATCH-LIFECYCLE accepted. Match phase tracking (kickoff→first-half→halftime→second-half→fulltime) added to headless runner. Next: AI-GOAL-IMPROVEMENT — improve CPU goal-awareness and shooting accuracy."
+  commit: 33d9463
+  note: "AI-GOAL-IMPROVEMENT accepted. CPU adapter improved with deterministic lateral aim, distance-based shooting, post-shot cooldown, and score awareness. Next: MATCH-ORACLE — add match-scoring oracles to the evaluator suite."
 active_candidate:
-  objective_id: AI-GOAL-IMPROVEMENT
+  objective_id: MATCH-ORACLE
   builder: builder-qwen
   critic: critic
-  started_from_commit: 0dba0b8
+  started_from_commit: 33d9463
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -37,6 +37,7 @@ accepted:
   - MATCH-SCORING
   - BROWSER-SCOREBOARD
   - MATCH-LIFECYCLE
+  - AI-GOAL-IMPROVEMENT
 blocked: []
 selection_note: "HEADLESS-CPU-MATCH accepted. Next: match scoring — add a simple tick-based match clock and score tracker that listens for 'goal' simulation events and increments team scores. Wire into the headless match runner. This completes the basic football structure: locomotion → ball → contacts → goals → scoring. PLAYABLE_1V1 remains blocked on perceptual gates (must not invent)."
 ```

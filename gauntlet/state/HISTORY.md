@@ -1545,3 +1545,14 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: pending (git-committer)
 - notes: Match phase tracking added to headless runner. MatchPhase type with 5 values (kickoff/first-half/halftime/second-half/fulltime). halfDurationTicks config (default = matchDurationTicks / 2). Goal events trigger post-goal kickoff phase. 31 new tests. No simulation core changes. Contract: "kickoff" added to SimulationEvent.kind union.
+
+## Iteration 41 — 2026-08-15
+
+- objective_id: AI-GOAL-IMPROVEMENT
+- builder: builder-qwen / qwen3.6
+- critic: critic-mimo / mimo-v2.5 (fallback)
+- verdict: ACCEPT (first pass)
+- integration: ACCEPT (integration-reviewer / mimo-v2.5, fallback)
+- result: accepted
+- commits: pending (git-committer)
+- notes: CPU adapter improved: deterministic lateral shot aim via tick-seeded hash (±3.66m within goal width), distance-based shooting thresholds (≤5m always shoot, 5-20m facing-dependent, >20m dribble only), 15-tick post-shot cooldown suppressing re-possession, score-state awareness (behind→aggressive, ahead→cautious). 16 new tests. No core changes.
