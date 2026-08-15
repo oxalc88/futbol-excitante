@@ -149,11 +149,11 @@ describe("PLAYABLE_1V1 profile registration", () => {
 // ---------------------------------------------------------------------------
 
 describe("PLAYABLE_1V1 evaluator: missing suites", () => {
-  it("missing touch_and_actions and duels suites → overall is not PASS", () => {
+  it("missing touch_and_actions → overall is not PASS (duels is now registered)", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
-    // touch_and_actions and duels do not exist in the registry.
+    // touch_and_actions is still missing from the registry.
     // Their presence as required suites makes the overall verdict
     // NOT_EVALUATED (or INVALID_RUN for required suites).
     expect(result.milestoneVerdict).not.toBe("PASS");
@@ -163,13 +163,13 @@ describe("PLAYABLE_1V1 evaluator: missing suites", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
+    // Both touch_and_actions and duels are now registered in SUITES,
+    // so checkMissingSuites returns an empty array.  The overall verdict
+    // is still NOT_PASS for other reasons (DEFERRED capabilities, etc.).
     const missingSuiteComponents = result.subComponents.filter(
       (s) => s.componentId.startsWith("MISSING_SUITE:"),
     );
-    expect(missingSuiteComponents.length).toBeGreaterThan(0);
-    for (const ms of missingSuiteComponents) {
-      expect(ms.outcome).toBe("INVALID_RUN");
-    }
+    expect(missingSuiteComponents.length).toBe(0);
   });
 
   it("HARD_INVARIANT suites that exist still evaluate correctly", () => {
