@@ -25,7 +25,8 @@
       "linearVelocity": { "x": 0, "y": 0 },
       "desiredVelocity": { "x": 0, "y": 0 },
       "bodyHeading": 0,
-      "desiredHeading": 0
+      "desiredHeading": 0,
+      "archetypeId": "archetype-burst-v1"
     },
     {
       "playerId": "player-b",
@@ -34,7 +35,8 @@
       "linearVelocity": { "x": 0, "y": 0 },
       "desiredVelocity": { "x": 0, "y": 0 },
       "bodyHeading": 3.141592653589793,
-      "desiredHeading": 3.141592653589793
+      "desiredHeading": 3.141592653589793,
+      "archetypeId": "archetype-steady-v1"
     }
   ],
   "ball": {
