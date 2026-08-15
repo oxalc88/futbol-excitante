@@ -13,6 +13,7 @@ import type { InputFrame } from "../../contracts/input.js";
 import type { PlayerState, BallState, WorldState } from "../../contracts/state.js";
 import type { ScenarioDefinition, SimulationEvent } from "../../contracts/scenario.js";
 import { FOUNDATION_CONFIG } from "../config/foundation.js";
+import { ARCHETYPE_REGISTRY } from "../config/foundation.js";
 import { createMulberry32 } from "../determinism/rng.js";
 import {
   validateScenario,
@@ -26,6 +27,14 @@ import { freezeWorldState, freezeScenario } from "./clone.js";
 // Helpers — deterministic, no randomness, no I/O
 // ---------------------------------------------------------------------------
 
+/** Resolve archetype id → transient acceleration coefficient (default 0). */
+function resolveArchetypeTransientAccel(archetypeId: string | undefined): number {
+  if (!archetypeId) return 0;
+  const def = ARCHETYPE_REGISTRY[archetypeId];
+  if (!def) return 0;
+  return def.transientAcceleration.value;
+}
+
 /** Convert a ScenarioPlayerEntry into a PlayerState at tick 0. */
 function scenarioPlayerToState(
   entry: {
@@ -36,6 +45,7 @@ function scenarioPlayerToState(
     desiredVelocity: Vec2;
     bodyHeading: number;
     desiredHeading: number;
+    archetypeId?: string;
   }
 ): PlayerState {
   return {
@@ -46,6 +56,8 @@ function scenarioPlayerToState(
     desiredVelocity: { ...entry.desiredVelocity },
     bodyHeading: entry.bodyHeading,
     desiredHeading: entry.desiredHeading,
+    archetypeId: entry.archetypeId,
+    archetypeTransientAccel: resolveArchetypeTransientAccel(entry.archetypeId),
   };
 }
 
