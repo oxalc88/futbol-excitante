@@ -96,6 +96,13 @@ export interface CapabilityAxis {
   estimator_version: string;
   /** Policy version for this axis. */
   policy_version: string;
+  /**
+   * Optional auxiliary knobs used by specific axis runners.
+   * E.g., lateralResistance for the body-control axis combined
+   * with turnRate to produce cross-coupling divergence.
+   */
+  lateral_resistance_low?: { value: number; note?: string };
+  lateral_resistance_high?: { value: number; note?: string };
 }
 
 // ---------------------------------------------------------------------------

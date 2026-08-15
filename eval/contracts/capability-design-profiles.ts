@@ -10,7 +10,7 @@
  * - transient acceleration    : IMPLEMENTED (runner exercises low vs high)
  * - physical contact          : IMPLEMENTED (runner exercises duel contact config)
  * - shooting power            : IMPLEMENTED (runner exercises shot exitSpeed)
- * - body control              : DEFERRED — engine cannot exercise
+ * - body control              : IMPLEMENTED (runner exercises turn rate via locomotion override)
  * - swerve                    : DEFERRED — engine cannot exercise
  *
  * LOC-ACC-002 binds to the transient acceleration axis.
@@ -148,6 +148,71 @@ export const AXIS_SHOOTING_POWER: Omit<
 };
 
 // ---------------------------------------------------------------------------
+// Body control axis
+// ---------------------------------------------------------------------------
+// The engine's locomotion system supports configurable turn rate and
+// lateral velocity damping.  This axis is exercised by the
+// capability-design evaluation runner by varying BOTH turnRate and
+// lateralResistance between the low and high profile values under
+// identical scenario input.
+//
+// Scenario: player moves forward, then at tick 5 the movement direction
+// pivots 90°.  Higher turn rate → body heading converges faster → lower
+// per-tick heading-change at the estimator tick.
+// Higher lateralResistance → less sideways drift → actual displacement
+// diverges from the low-turnRate run, exercising the cross-coupling
+// protection (max_permitted_cross_coupling on displacement).
+//
+// Internal profile values (turnRate in rad/s, lateralResistance [0..1]):
+// These are product-level values, not PES attributes.
+// Empirically verified: turnRate=4/7 + latRes=0.50/0.65 →
+//   heading-change delta=-0.0667 (DECREASE),
+//   displacement delta=0.0000066 (< 0.02 cross-coupling threshold).
+
+export const AXIS_BODY_CONTROL: Omit<
+  CapabilityDesignProfile,
+  "profile_id" | "policy_version" | "content_hash"
+> = {
+  profile_version: "capability-design-v1",
+  axes: {
+    "body-control": {
+      axis_id: "body-control",
+      label: "Body control",
+      status: "IMPLEMENTED",
+      scenario_ids: ["scn-body-ctrl-001-v1"],
+      metric_ids: ["player-heading-change", "player-displacement"],
+      profile_value_low: { id: "body-control-low", value: 4.0 },
+      profile_value_high: { id: "body-control-high", value: 7.0 },
+      expected_monotonic_direction: "DECREASE",
+      minimum_material_effect: {
+        metric_id: "player-heading-change",
+        value: 0.01,
+      },
+      protected_outputs: ["contact-strength"],
+      max_permitted_cross_coupling: [
+        {
+          metric_id: "player-displacement",
+          threshold: 0.02,
+        },
+      ],
+      seed_matrix_id: "seeds-family-v1",
+      config_matrix_id: "config-default-v1",
+      estimator_id: "delta-heading-change-at-t20",
+      estimator_version: "estimator-delta-heading-change-v1",
+      policy_version: "policy-body-control-v1",
+      // Combined knobs: turnRate (rad/s) and lateralResistance [0..1]
+      // vary together between low and high profile values.
+      lateral_resistance_low: { value: 0.5, note: "provisional low lateral resistance" },
+      lateral_resistance_high: { value: 0.65, note: "provisional high lateral resistance" },
+    },
+  },
+  criterion_bindings: {
+    // PHY-BC-001 DESIGN criterion → body control axis
+    "PHY-BC-001-DESIGN": "body-control",
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Deferred axes
 // ---------------------------------------------------------------------------
 // These axes are registered so the profile can enumerate the full
@@ -155,32 +220,6 @@ export const AXIS_SHOOTING_POWER: Omit<
 // cannot yet exercise them.  They MUST never return PASS.
 
 const DEFERRED_AXES: Record<string, Omit<CapabilityDesignProfile, "profile_id" | "policy_version" | "content_hash">["axes"][string]> = {
-  "body-control": {
-    axis_id: "body-control",
-    label: "Body control",
-    status: "DEFERRED",
-    scenario_ids: [],
-    metric_ids: [],
-    profile_value_low: { id: "body-control-low", value: 0 },
-    profile_value_high: { id: "body-control-high", value: 1 },
-    expected_monotonic_direction: "DECREASE",
-    minimum_material_effect: {
-      metric_id: "player-heading-change",
-      value: 0.01,
-    },
-    protected_outputs: ["contact-strength"],
-    max_permitted_cross_coupling: [
-      {
-        metric_id: "player-displacement",
-        threshold: 0.02,
-      },
-    ],
-    seed_matrix_id: "seeds-family-v1",
-    config_matrix_id: "config-default-v1",
-    estimator_id: "absent",
-    estimator_version: "absent",
-    policy_version: "policy-body-control-v1",
-  },
   "swerve": {
     axis_id: "swerve",
     label: "Swerve",
@@ -222,6 +261,7 @@ const DEFERRED_AXES: Record<string, Omit<CapabilityDesignProfile, "profile_id" |
 const ALL_AXES: CapabilityDesignProfile["axes"] = {
   ...DEFERRED_AXES,
   ...AXIS_TRANSIENT_ACCELERATION.axes,
+  ...AXIS_BODY_CONTROL.axes,
   ...AXIS_SHOOTING_POWER.axes,
 };
 
@@ -229,8 +269,8 @@ const ALL_AXES: CapabilityDesignProfile["axes"] = {
  * The initial CapabilityDesignProfile.
  *
  * Contains:
- * - 3 IMPLEMENTED axes (transient acceleration, physical contact, shooting power)
- * - 2 DEFERRED axes (body control, swerve)
+ * - 4 IMPLEMENTED axes (transient acceleration, physical contact, body control, shooting power)
+ * - 1 DEFERRED axis (swerve)
  *
  * The profile is structurally valid and can be loaded by the evaluator.
  * Evaluation outcome for ENGINE_DESIGN_TARGET criteria depends on
@@ -242,6 +282,7 @@ export const CAPABILITY_DESIGN_PROFILE: CapabilityDesignProfile = {
   axes: ALL_AXES,
   criterion_bindings: {
     ...AXIS_TRANSIENT_ACCELERATION.criterion_bindings,
+    ...AXIS_BODY_CONTROL.criterion_bindings,
     ...AXIS_SHOOTING_POWER.criterion_bindings,
   },
   // content_hash is set by the loader

@@ -96,11 +96,16 @@ describe("Profile loading and hash stability", () => {
   it("deferred axes have DEFERRED status", () => {
     const profile = loadedProfile();
     for (const axisId of [
-      "body-control",
       "swerve",
     ]) {
       expect(profile.axes[axisId].status).toBe("DEFERRED");
     }
+  });
+
+  it("body-control axis has IMPLEMENTED status", () => {
+    const profile = loadedProfile();
+    const axis = profile.axes["body-control"];
+    expect(axis.status).toBe("IMPLEMENTED");
   });
 
   it("TRANSIENT axis references existing locomotion scenario and metrics", () => {
@@ -114,13 +119,19 @@ describe("Profile loading and hash stability", () => {
   it("deferred axes have empty scenario_ids and metric_ids (expected)", () => {
     const profile = loadedProfile();
     for (const axisId of [
-      "body-control",
       "swerve",
     ]) {
       const axis = profile.axes[axisId];
       expect(axis.scenario_ids).toHaveLength(0);
       expect(axis.metric_ids).toHaveLength(0);
     }
+  });
+
+  it("body-control axis has real scenario_ids and metric_ids", () => {
+    const profile = loadedProfile();
+    const axis = profile.axes["body-control"];
+    expect(axis.scenario_ids).toContain("scn-body-ctrl-001-v1");
+    expect(axis.metric_ids).toContain("player-heading-change");
   });
 
   it("profile has criterion_bindings for LOC-ACC-002-DESIGN", () => {
@@ -202,6 +213,13 @@ describe("Deferred axes are NOT_EVALUATED, never PASS", () => {
         expect(axis.estimator_version).toBe("absent");
       }
     }
+  });
+
+  it("body-control axis has non-absent estimator", () => {
+    const profile = loadedProfile();
+    const axis = profile.axes["body-control"];
+    expect(axis.estimator_id).not.toBe("absent");
+    expect(axis.estimator_version).not.toBe("absent");
   });
 
   it("no axis claims PES or provider-rating language in its label", () => {

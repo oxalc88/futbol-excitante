@@ -68,6 +68,13 @@ function unit(v: { x: number; y: number }): { x: number; y: number } {
  *     applied during the acceleration phase.  The bonus scales with
  *     the coefficient and the gap between current and maximum speed,
  *     tapering to zero at the sustainable-speed plateau.
+ *  5. When `config.lateralResistance > 0`, the velocity component
+ *     perpendicular to desiredHeading (movement direction) is damped
+ *     each tick.  This makes the player's actual movement direction
+ *     converge toward the intended direction faster — higher
+ *     lateralResistance means "tighter" turns with less drifting
+ *     sideways.  Damping is relative to desiredHeading (not bodyHeading)
+ *     to preserve mirrored-input symmetry during heading convergence.
  *
  * All coefficient values come from the versioned config parameter.
  * Unmeasured values are labelled provisional.
@@ -85,6 +92,7 @@ export function stepLocomotion(
   const accel = config.acceleration.value;
   const brake = config.braking.value;
   const turnRate = config.turnRate.value;
+  const lateralRes = config.lateralResistance.value;
   const transientAccel = config.transientAcceleration?.value ?? 0;
 
   for (const player of players) {
@@ -162,6 +170,22 @@ export function stepLocomotion(
       player.bodyHeading += (angleDiff > 0 ? 1 : -1) * maxTurn;
     }
     player.bodyHeading = normalizeAngle(player.bodyHeading);
+
+    // -- 3.5. Lateral velocity damping (provisional, symmetric) ---------------
+    // Damp the velocity component perpendicular to desiredHeading
+    // (the movement direction), NOT bodyHeading.  Using desiredHeading
+    // preserves mirrored-input symmetry (LOCOMOTION-MIRROR-001): when a
+    // player's desired direction is +X, the lateral axis is Y for both
+    // heading 0 and heading π, so mirrored inputs produce mirrored
+    // positions.  Using bodyHeading would break symmetry during heading
+    // convergence (e.g. π → 0 rotation).
+    const cosD = Math.cos(player.desiredHeading);
+    const sinD = Math.sin(player.desiredHeading);
+    const dotVD = player.linearVelocity.x * cosD + player.linearVelocity.y * sinD;
+    const vLatX = player.linearVelocity.x - dotVD * cosD;
+    const vLatY = player.linearVelocity.y - dotVD * sinD;
+    player.linearVelocity.x = dotVD * cosD + vLatX * (1 - lateralRes);
+    player.linearVelocity.y = dotVD * sinD + vLatY * (1 - lateralRes);
 
     // -- 4. Integrate position from velocity -----------------------------
 

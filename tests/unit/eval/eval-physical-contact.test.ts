@@ -239,9 +239,9 @@ describe("Zero-stiffness knob → FAIL", () => {
 // ---------------------------------------------------------------------------
 
 describe("DEFERRED axes stay DEFERRED", () => {
-  it("body-control is DEFERRED", () => {
+  it("body-control is IMPLEMENTED", () => {
     const profile = loadDefaultCapabilityDesignProfile();
-    expect(profile.axes["body-control"].status).toBe("DEFERRED");
+    expect(profile.axes["body-control"].status).toBe("IMPLEMENTED");
   });
 
   it("shooting-power is IMPLEMENTED", () => {

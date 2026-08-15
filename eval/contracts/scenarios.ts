@@ -667,6 +667,75 @@ export const SCENARIO_DUELS_INT_PASS_001 = makeScenarioStub(
   { test_focus: "intercept-pass" },
 );
 
+// ---------------------------------------------------------------------------
+// body-control evaluation scenario
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a tick-indexed input program for a body-control turn test.
+ *
+ * The player starts stationary, moves east for a few ticks, then
+ * abruptly pivots north at tick 5, forcing the body heading to rotate.
+ * This creates heading-change events that measure the locomotion turn rate.
+ */
+function makeBodyControlInputProgram(
+  durationTicks: number,
+): Record<
+  number,
+  {
+    tick: number;
+    sourceId: string;
+    controlSlot: string;
+    moveX: number;
+    moveY: number;
+    sprint: number;
+    heldButtons: number;
+    pressedButtons: number;
+    releasedButtons: number;
+  }[]
+> {
+  const program: Record<
+    number,
+    {
+      tick: number;
+      sourceId: string;
+      controlSlot: string;
+      moveX: number;
+      moveY: number;
+      sprint: number;
+      heldButtons: number;
+      pressedButtons: number;
+      releasedButtons: number;
+    }[]
+  > = {};
+  for (let t = 0; t < durationTicks; t++) {
+    const isEast = t < 5;
+    program[t] = [
+      {
+        tick: t,
+        sourceId: "capability-test",
+        controlSlot: "slot-1",
+        moveX: isEast ? 1 : 0,
+        moveY: isEast ? 0 : 1,
+        sprint: 1,
+        heldButtons: 0,
+        pressedButtons: 0,
+        releasedButtons: 0,
+      },
+    ];
+  }
+  return program;
+}
+
+export const SCENARIO_BODY_CTRL_001 = makeScenarioStub(
+  "scn-body-ctrl-001-v1",
+  60,
+  ["LOCOMOTION"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "body-control-turn-rate" },
+  makeBodyControlInputProgram(60),
+);
+
 export const SCENARIO_DUELS_INT_FAST_001 = makeScenarioStub(
   "scn-duels-int-fast-001-v1",
   60,
@@ -723,6 +792,9 @@ export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
   [SCENARIO_DUELS_TACK_ANG_001.scenario_id]: SCENARIO_DUELS_TACK_ANG_001,
   [SCENARIO_DUELS_INT_PASS_001.scenario_id]: SCENARIO_DUELS_INT_PASS_001,
   [SCENARIO_DUELS_INT_FAST_001.scenario_id]: SCENARIO_DUELS_INT_FAST_001,
+
+  // body-control evaluation scenario
+  [SCENARIO_BODY_CTRL_001.scenario_id]: SCENARIO_BODY_CTRL_001,
 };
 
 /**

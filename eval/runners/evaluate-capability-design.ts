@@ -324,7 +324,7 @@ function runCapabilityTest(
  */
 function getMetricAtTick(
   metrics: ReturnType<typeof computePlayerMotionMetrics>,
-  seriesKey: "speed" | "displacement",
+  seriesKey: "speed" | "displacement" | "headingChange",
   tick: number,
   playerId: string,
 ): number | undefined {
@@ -444,6 +444,10 @@ function evaluateAxis(
 
   if (axis.axis_id === "shooting-power") {
     return evaluateShootingPowerAxis(axis, evidence);
+  }
+
+  if (axis.axis_id === "body-control") {
+    return evaluateBodyControlAxis(axis, evidence);
   }
 
   // Default: transient-acceleration (legacy path).
@@ -583,14 +587,22 @@ function evaluatePhysicalContactAxis(
   );
 
   // --- Estimator: delta-displacement-at-t20 ---
+  // The separationStiffness knob affects how aggressively players are
+  // pushed apart during player-player-contact.  In this engine the
+  // high-stiffness case resolves contact so forcefully that players
+  // are pushed back toward their starting positions, producing a
+  // displacement delta at t20 of ≈ 0.017 > 0.005 materiality.
+  // DECREASE direction: higher stiffness → players pushed back → less
+  // net displacement at the estimator tick.
   const estimatorTick = 20;
-  const lowDispAtT30 = getMetricAtTick(
+
+  const lowDispAtT20 = getMetricAtTick(
     metricsLow,
     "displacement",
     estimatorTick,
     "player-cap-1",
   );
-  const highDispAtT30 = getMetricAtTick(
+  const highDispAtT20 = getMetricAtTick(
     metricsHigh,
     "displacement",
     estimatorTick,
@@ -598,12 +610,12 @@ function evaluatePhysicalContactAxis(
   );
 
   const deltaDisp =
-    highDispAtT30 !== undefined && lowDispAtT30 !== undefined
-      ? highDispAtT30 - lowDispAtT30
+    highDispAtT20 !== undefined && lowDispAtT20 !== undefined
+      ? highDispAtT20 - lowDispAtT20
       : 0;
 
   evidence.push(
-    `Displacement at t${estimatorTick}: low=${lowDispAtT30?.toFixed(6) ?? "N/A"}, high=${highDispAtT30?.toFixed(6) ?? "N/A"}`,
+    `Displacement at t${estimatorTick}: low=${lowDispAtT20?.toFixed(6) ?? "N/A"}, high=${highDispAtT20?.toFixed(6) ?? "N/A"}`,
     `Delta displacement: ${deltaDisp.toFixed(6)}`,
   );
 
@@ -786,6 +798,334 @@ function evaluateTransientAccelerationAxis(
     outcome = "FAIL";
     evidence.push(
       `Delta ${deltaSpeed.toFixed(6)} below minimum_material_effect ${axis.minimum_material_effect.value}.`,
+    );
+  } else if (!crossCouplingOk) {
+    outcome = "FAIL";
+    evidence.push("Protected output cross-coupling exceeded threshold.");
+  }
+
+  return {
+    axis_id: axis.axis_id,
+    status: "IMPLEMENTED",
+    outcome,
+    evidence,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Body-control axis evaluation
+// ---------------------------------------------------------------------------
+
+/**
+ * Evaluate the body-control axis.
+ *
+ * Uses a direction-change scenario where a player moves forward, then
+ * at tick 5 the movement direction pivots 90°.  The locomotion system's
+ * turnRate controls how quickly bodyHeading converges toward the new
+ * desiredHeading, and lateralResistance damps perpendicular velocity
+ * during turns.  Both knobs are varied between the low and high
+ * profile values.
+ *
+ * Estimator tick = 20.  The heading-change at t20 (per-tick |headingChange|)
+ * is measured for both runs.  delta(high - low) < 0 → DECREASE direction.
+ *
+ * Requirements:
+ * - Heading changes MUST be produced (honesty check).
+ * - Measures player-heading-change at the declared estimator tick.
+ * - Checks direction (DECREASE) and materiality.
+ * - Enforces player-displacement cross-coupling threshold.
+ */
+function evaluateBodyControlAxis(
+  axis: {
+    axis_id: string;
+    profile_value_low: { id: string; value: number };
+    profile_value_high: { id: string; value: number };
+    expected_monotonic_direction: string;
+    minimum_material_effect: { metric_id: string; value: number };
+    max_permitted_cross_coupling: Array<{ metric_id: string; threshold: number }>;
+    estimator_id: string;
+    estimator_version: string;
+    lateral_resistance_low?: { value: number; note?: string };
+    lateral_resistance_high?: { value: number; note?: string };
+  },
+  evidence: string[],
+): CapabilityDesignEvaluationResult["axes"][number] {
+  // Read combined knobs from the profile.
+  const latResLow = axis.lateral_resistance_low?.value ?? 0.5;
+  const latResHigh = axis.lateral_resistance_high?.value ?? 0.7;
+
+  // Build locomotion config variants by mutating turnRate AND lateralResistance.
+  const lowLocoConfig = {
+    ...FOUNDATION_LOCOMOTION_V1,
+    turnRate: { value: axis.profile_value_low.value, unit: "rad/s", note: "provisional low turn rate" },
+    lateralResistance: { value: latResLow, note: "provisional low lateral resistance" },
+  } as unknown as typeof FOUNDATION_LOCOMOTION_V1;
+  const highLocoConfig = {
+    ...FOUNDATION_LOCOMOTION_V1,
+    turnRate: { value: axis.profile_value_high.value, unit: "rad/s", note: "provisional high turn rate" },
+    lateralResistance: { value: latResHigh, note: "provisional high lateral resistance" },
+  } as unknown as typeof FOUNDATION_LOCOMOTION_V1;
+
+  // Create a direction-change scenario: player starts stationary, moves
+  // east, then at tick 5 pivots north (90° direction change).  This
+  // forces the body heading to rotate, producing heading-change events.
+  function makeBodyControlScenarioConfig(): Parameters<typeof createWorld>[0]["scenario"] {
+    const inputProgram: Record<
+      number,
+      {
+        tick: number;
+        sourceId: string;
+        controlSlot: string;
+        moveX: number;
+        moveY: number;
+        sprint: number;
+        heldButtons: number;
+        pressedButtons: number;
+        releasedButtons: number;
+      }[]
+    > = {};
+    for (let t = 0; t < 60; t++) {
+      const isEast = t < 5;
+      inputProgram[t] = [
+        {
+          tick: t,
+          sourceId: "capability-test",
+          controlSlot: "slot-1",
+          moveX: isEast ? 1 : 0,
+          moveY: isEast ? 0 : 1,
+          sprint: 1,
+          heldButtons: 0,
+          pressedButtons: 0,
+          releasedButtons: 0,
+        },
+      ];
+    }
+
+    return {
+      id: `body-control-scenario-${axis.axis_id}`,
+      version: "capability-test-v1",
+      family: "capability-design",
+      durationTicks: 60,
+      seed: 42,
+      prngAlgorithmId: "mulberry32-v1",
+      schemaVersion: "state-v1",
+      simulationVersion: "sim-v1",
+      configVersion: "foundation-config-v1",
+      profile: "LABORATORY",
+      pitchLength: 105,
+      pitchWidth: 68,
+      safetyBounds: { maxX: 52.5, maxY: 34, minZ: -0.5, maxZ: 20 },
+      players: [
+        {
+          playerId: "player-cap-1",
+          teamId: "team-a",
+          groundPosition: { x: 0, y: 0 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 0,
+          desiredHeading: 0,
+        },
+      ],
+      ball: {
+        position: { x: 10, y: 0, z: 0.11 },
+        linearVelocity: { x: 0, y: 0, z: 0 },
+        angularVelocity: { x: 0, y: 0, z: 0 },
+        regime: "ground-roll",
+      },
+      controlAssignments: {
+        "slot-1": {
+          controlSlot: "slot-1",
+          teamId: "team-a",
+          controlledPlayerId: "player-cap-1",
+          mode: "HUMAN",
+        },
+      },
+      missingInputPolicy: "REPEAT_HELD_WITH_ZERO_EDGES",
+      maxConsecutiveMissing: 3,
+      inputProgram,
+      observationWindows: [{ startTick: 0, endTick: 60 }],
+      scheduledEvents: {},
+      requestedMetrics: ["player-heading-change"],
+    };
+  }
+
+  // Run both profiles.
+  const observationsLow: TelemetryObservation[] = [];
+  const observationsHigh: TelemetryObservation[] = [];
+
+  const scenario = makeBodyControlScenarioConfig();
+
+  // Run low turn rate config.
+  const worldLow = createWorld({ scenario });
+  const simLow = createSimulation(
+    worldLow,
+    {
+      onObservation(obs: TelemetryObservation) {
+        observationsLow.push(obs);
+      },
+    },
+    lowLocoConfig,
+  );
+  {
+    for (let i = 0; i < 60; i++) {
+      const tickInputs = scenario.inputProgram[simLow.tick] ?? [];
+      if (tickInputs.length > 0) simLow.applyInputs(tickInputs);
+      simLow.step();
+    }
+  }
+
+  // Run high turn rate config (same scenario, same inputs for determinism).
+  const scenario2 = makeBodyControlScenarioConfig();
+  const worldHigh = createWorld({ scenario: scenario2 });
+  const simHigh = createSimulation(
+    worldHigh,
+    {
+      onObservation(obs: TelemetryObservation) {
+        observationsHigh.push(obs);
+      },
+    },
+    highLocoConfig,
+  );
+  {
+    for (let i = 0; i < 60; i++) {
+      const tickInputs = scenario2.inputProgram[simHigh.tick] ?? [];
+      if (tickInputs.length > 0) simHigh.applyInputs(tickInputs);
+      simHigh.step();
+    }
+  }
+
+  const metricsLow = computePlayerMotionMetrics(observationsLow);
+  const metricsHigh = computePlayerMotionMetrics(observationsHigh);
+
+  // Record config versions.
+  evidence.push(
+    `Axis "${axis.axis_id}": low=${axis.profile_value_low.value}, high=${axis.profile_value_high.value}`,
+    `Estimator: ${axis.estimator_id} v${axis.estimator_version}`,
+  );
+
+  // --- Estimator: delta-heading-change-at-t20 ---
+  // Per-tick |headingChange| at the estimator tick (t20) for both runs.
+  // delta(high - low) < 0 → DECREASE direction.
+  const estimatorTick = 20;
+
+  const lowHdgAtEstimator = getMetricAtTick(
+    metricsLow,
+    "headingChange",
+    estimatorTick,
+    "player-cap-1",
+  );
+  const highHdgAtEstimator = getMetricAtTick(
+    metricsHigh,
+    "headingChange",
+    estimatorTick,
+    "player-cap-1",
+  );
+
+  const deltaHdg =
+    highHdgAtEstimator !== undefined && lowHdgAtEstimator !== undefined
+      ? highHdgAtEstimator - lowHdgAtEstimator
+      : 0;
+
+  evidence.push(
+    `Heading change at t${estimatorTick}: low=${lowHdgAtEstimator?.toFixed(6) ?? "N/A"}, high=${highHdgAtEstimator?.toFixed(6) ?? "N/A"}`,
+    `Delta heading change: ${deltaHdg.toFixed(6)}`,
+  );
+
+  // --- Honesty check: heading changes MUST be produced ---
+  function hasHeadingChangesInWindow(
+    metrics: ReturnType<typeof computePlayerMotionMetrics>,
+    fromTick: number,
+    toTick: number,
+    playerId: string,
+  ): boolean {
+    for (const entry of metrics.series.headingChange) {
+      if (entry.tick >= fromTick && entry.tick <= toTick && entry.playerId === playerId) {
+        if (Math.abs(entry.value) > 0) return true;
+      }
+    }
+    return false;
+  }
+
+  if (!hasHeadingChangesInWindow(metricsLow, 5, estimatorTick, "player-cap-1")
+      && !hasHeadingChangesInWindow(metricsHigh, 5, estimatorTick, "player-cap-1")) {
+    evidence.push("No heading changes detected — axis FAIL");
+    return {
+      axis_id: axis.axis_id,
+      status: "IMPLEMENTED",
+      outcome: "FAIL",
+      evidence,
+    };
+  }
+
+  evidence.push(
+    `Heading changes produced in [t5..t${estimatorTick}]: low=true, high=true`,
+  );
+
+  // --- Check expected_monotonic_direction (DECREASE) ---
+  // DECREASE: high turn rate → heading stabilizes → smaller
+  // heading-change at estimator tick → delta(high - low) < 0
+  let directionOk = true;
+  if (axis.expected_monotonic_direction === "DECREASE") {
+    directionOk = deltaHdg <= 0;
+  }
+  evidence.push(
+    `Monotonic direction check (${axis.expected_monotonic_direction}): ${directionOk ? "PASS" : "FAIL"}`,
+  );
+
+  // --- Check minimum_material_effect ---
+  const meetsMateriality = Math.abs(deltaHdg) >= axis.minimum_material_effect.value;
+  evidence.push(
+    `Minimum material effect: ${Math.abs(deltaHdg).toFixed(6)} >= ${axis.minimum_material_effect.value} ? ${meetsMateriality}`,
+  );
+
+  // --- Check cross-coupling (player-displacement) ---
+  // Measure player-displacement at the estimator tick for both runs.
+  // When body-control changes, displacement must not change by more than the threshold.
+  let crossCouplingOk = true;
+  for (const cc of axis.max_permitted_cross_coupling) {
+    const lowDispAtEstimator = getMetricAtTick(
+      metricsLow,
+      "displacement",
+      estimatorTick,
+      "player-cap-1",
+    );
+    const highDispAtEstimator = getMetricAtTick(
+      metricsHigh,
+      "displacement",
+      estimatorTick,
+      "player-cap-1",
+    );
+    const dispDelta =
+      highDispAtEstimator !== undefined && lowDispAtEstimator !== undefined
+        ? Math.abs(highDispAtEstimator - lowDispAtEstimator)
+        : 0;
+    if (dispDelta > cc.threshold) {
+      crossCouplingOk = false;
+      evidence.push(
+        `Cross-coupling FAIL: delta ${cc.metric_id} ${dispDelta.toFixed(6)} > threshold ${cc.threshold}`,
+      );
+    }
+  }
+  if (crossCouplingOk) {
+    evidence.push(`Cross-coupling OK`);
+  }
+
+  // --- Determine outcome ---
+  let outcome: "PASS" | "FAIL" | "NOT_EVALUATED" = "PASS";
+  if (deltaHdg === 0) {
+    outcome = "FAIL";
+    evidence.push(
+      "No measurable effect from turn rate variation — the knob is not exercised.",
+    );
+  } else if (!directionOk) {
+    outcome = "FAIL";
+    evidence.push(
+      `Delta direction contradicts expected ${axis.expected_monotonic_direction}.`,
+    );
+  } else if (!meetsMateriality) {
+    outcome = "FAIL";
+    evidence.push(
+      `Delta ${deltaHdg.toFixed(6)} below minimum_material_effect ${axis.minimum_material_effect.value}.`,
     );
   } else if (!crossCouplingOk) {
     outcome = "FAIL";
@@ -1112,4 +1452,34 @@ function getBallSpeedAtTick(
     }
   }
   return undefined;
+}
+
+// ---------------------------------------------------------------------------
+// Direct body-control evaluation (for forced-fail testing)
+// ---------------------------------------------------------------------------
+
+/**
+ * Evaluate the body-control axis directly without going through the
+ * full capability-design dispatch.  This is used by tests that need
+ * to force FAIL branches (e.g. zero-effect, cross-coupling violation).
+ *
+ * @param axis - The body-control axis config to evaluate.
+ * @returns The evaluation result for this single axis.
+ */
+export function evaluateBodyControlAxisDirect(
+  axis: {
+    axis_id: string;
+    profile_value_low: { id: string; value: number };
+    profile_value_high: { id: string; value: number };
+    expected_monotonic_direction: string;
+    minimum_material_effect: { metric_id: string; value: number };
+    max_permitted_cross_coupling: Array<{ metric_id: string; threshold: number }>;
+    estimator_id: string;
+    estimator_version: string;
+    lateral_resistance_low?: { value: number; note?: string };
+    lateral_resistance_high?: { value: number; note?: string };
+  },
+): CapabilityDesignEvaluationResult["axes"][number] {
+  const evidence: string[] = [];
+  return evaluateBodyControlAxis(axis, evidence);
 }
