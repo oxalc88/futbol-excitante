@@ -5,9 +5,10 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-15T02:12:00Z
+measured_at: 2026-08-15T06:25:00Z
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
+overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1 row measured from this overflow session's meta.json
 ```
 
 ## How to read this
@@ -35,13 +36,16 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 24h 53m |
+| Calendar span (first work → measurement) | 29h 05m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | 19h 35m |
-| Sum of per-step agent time | 18h 17m |
-| Orchestrator thinking between steps | ~1h 18m |
+| Active work (anything running) | 23h 49m |
+| Sum of per-step agent time | 20h 20m |
+| Orchestrator thinking between steps | ~3h 29m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-15 ~02:12 UTC`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-15 ~06:25 UTC`.
+The per-step total now includes DUELS-SUITE (1h 40m) and MUTANT-1V1 (23m);
+"orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
+bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window.
 
 ## Per-step time and tokens
 
@@ -78,10 +82,18 @@ Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-15 ~02:12 UTC`.
 | PLAYABLE-BROWSER-1V1 | accepted | 18m | 8m | 4m | 4m | 1.5m | 2.73M | 173k |
 | PLAYABLE-1V1-PROFILE | accepted | 21m | 9m | 5m | 5m | 1.5m | 3.80M | 195k |
 | PLAYABLE-TOUCH-ACTIONS-SUITE (2 retries) | accepted | ~59m | 32m | 19m | 8.5m | (this turn) | 12.15M+ | 231k+ |
+| PLAYABLE-DUELS-SUITE (3 retries + REJECT) | accepted | ~1h 40m | 49m | 44m | 6m | 0.5m | n/a* | n/a* |
+| PLAYABLE-MUTANT-1V1 | accepted | ~23m | 9.9m | 6.7m | 5.8m | 0.4m | ~3.4M | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
 not first-pass implementation.
+
+\* DUELS-SUITE prompt/completion tokens were not re-aggregated from the prior
+session; durations are from that session's subagent meta.json.
+\*\* MUTANT-1V1 completion is not separately split (updates.jsonl records a
+final `totalTokens` snapshot per role; `Prompt` is the summed final totals:
+builder 1.95M + critic 0.89M + integrator 0.52M).
 
 ## By phase
 
@@ -91,6 +103,8 @@ not first-pass implementation.
 | Foundation lab + capability | 6h 00m | 88M | 2.68M |
 | Playable 1v1 (accepted) | 4h 54m | 79M | 2.04M |
 | Touch-actions suite (not accepted) | 28m | 12M | 0.23M |
+| Duels suite (accepted) | 1h 40m | n/a* | n/a* |
+| Mutant 1v1 (accepted) | 23m | ~3.4M | n/a** |
 
 ## By model (tokens and wall)
 
@@ -105,7 +119,7 @@ These were previously added together as “grok-4.6”. They are different jobs.
 |---|---|---|---:|---:|---:|---:|---:|
 | Orchestrator | parent session (not in Tasks) | grok-4.6 | 1 session | **160.12M** | 898k | 781 | 400k |
 | Git-committer (legacy) | `git-committer` children | grok-4.6 | 81 | **6.41M** | 469k | 649 | — |
-| Git-committer (now) | `git-committer` children | gemma4 | 3 | **263k** | n/a | 26 | — |
+| Git-committer (now) | `git-committer` children | gemma4 | 4 | **~350k** | n/a | 34 | — |
 | **Grok 4.6 total** | parent + old committer | grok-4.6 | | **166.53M** | 1.37M | 1,430 | |
 
 Orchestrator input is large because parent context grew to ~400k and was
@@ -113,8 +127,8 @@ re-sent on every orchestrator call (including while waiting on children).
 That cost is **not** git-committer.
 
 The 81 Grok committer runs were bookkeeping (conventional commits / push).
-That role is now `git-committer` / `gemma4`. The three Gemma runs so far
-are 263k processed prompt tokens (~25× cheaper per comparable commit
+That role is now `git-committer` / `gemma4`. The four Gemma runs so far
+are ~350k processed prompt tokens (~25× cheaper per comparable commit
 batch than the Grok committer average of ~79k prompt tokens/run). Gemma
 completion growth is not recorded the same way in `updates.jsonl`
 (streams often have a single `totalTokens` snapshot), so that cell is
@@ -126,16 +140,19 @@ completion growth is not recorded the same way in `updates.jsonl`
 |---|---|---:|---:|---:|
 | grok-4.6 | **orchestrator only** | parent | 160.12M | 898k |
 | grok-4.6 | **git-committer (legacy)** | 81 | 6.41M | 469k |
-| gemma4 | **git-committer** | 3 | 0.26M | n/a |
-| qwen3.6 | builder | 52 | 200.55M | 3.57M |
-| deepseek-v4-flash-0731 | critic | 64 | 41.41M | 2.57M |
-| deepseek-v4-flash-0731 | integrator | 32 | 23.86M | 1.20M |
+| gemma4 | **git-committer** | 4 | 0.35M | n/a |
+| qwen3.6 | builder | 53 | 202.50M | 3.57M |
+| deepseek-v4-flash-0731 | critic | 65 | 42.30M | 2.57M |
+| deepseek-v4-flash-0731 | integrator | 33 | 24.38M | 1.20M |
 | mimo-v2.5 | builder | 13 | 50.42M | 0.79M |
-| **All processed** | | | **~483M** | **~9.5M** |
+| **All processed** | | | **~486M** | **~9.5M** |
 
 Builder/critic/integrator counts are higher than the first TIMING snapshot
 because later playable steps added child sessions. Use the Grok split above
-when asking how much orchestration cost versus commits.
+when asking how much orchestration cost versus commits. The MUTANT-1V1 row
+adds one qwen3.6 builder run (1.95M), one critic run (0.89M), one integrator
+run (0.52M), and one gemma4 commit run (~0.09M est.); DUELS-SUITE tokens are
+not re-aggregated (n/a*).
 
 ---
 
@@ -210,6 +227,8 @@ on an H task is the interesting result.
 | PLAYABLE-BROWSER-1V1 | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Two-slot browser control |
 | PLAYABLE-1V1-PROFILE | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Honest profile that cannot PASS |
 | PLAYABLE-TOUCH-ACTIONS-SUITE | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 2 | C | Retry 0: ball-continuity mappings / catalog-only. Retry 1: four silent-PASS tests + stale CONTACT binding |
+| PLAYABLE-DUELS-SUITE | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 3 + REJECT | R | Retries: non-contact registered scenario, false test comment. REJECT: shared computeOutcome let NOT_EVALUATED mask FAIL. Scoped restore |
+| PLAYABLE-MUTANT-1V1 | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 0 | A | Executable 1v1 mutant path (clean PASS + poison FAIL); critic proved FAIL reachability |
 
 ### Builder scoreboard
 
@@ -217,7 +236,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 22 | 10 | 7 | 1 | 3 | 1 | 45% | 1.14 | ~38m |
+| qwen3.6 | 25 | 11 | 7 | 2 | 3 | 2 | 44% | 1.04 | ~40m |
 | mimo-v2.5 | 8 | 4 | 3 | 1 | 0 | 0 | 50% | 0.63 | ~31m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
@@ -225,7 +244,7 @@ Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 | Builder | Objectives | Weighted grade / difficulty | Read as |
 |---|---:|---:|---|
 | mimo-v2.5 | 8, all H | 3.1 / 3.0 | First-pass locomotion and ball; misses were local (mapping, restore, pair order) |
-| qwen3.6 | 22, mixed M–VH | 2.6 / 2.6 | Reliable on contracts and profiles; expensive on honest-eval / CLI / browser evidence |
+| qwen3.6 | 25, mixed M–VH | 2.7 / 2.6 | Reliable on contracts and profiles; expensive on honest-eval / CLI / browser evidence |
 
 ### What that means for routing
 
@@ -236,12 +255,14 @@ eval work, not a physics miss. Keep MiMo on feel, contacts, and large-spec
 playable systems.
 
 **qwen3.6** is the workhorse and the right default for contracts, registries,
-profiles, and typed glue. Ten first-pass ACCEPTs, including capability-design
+profiles, and typed glue. Eleven first-pass ACCEPTs, including capability-design
 and the honest PLAYABLE_1V1 profile. It is weaker when the critic can demand
 an oracle that actually fails: FOUNDATION-ORACLES (REJECT), HARD, BROWSER, and
 BOOTSTRAP-10 burned the retry budget on theatrical or unbound evidence. Prefer
 Qwen there still (structured TypeScript), but the orchestrator prompt must
-forbid “always-pass” tests up front.
+forbid “always-pass” tests up front. MUTANT-1V1 was a first-pass A on exactly
+that VH class — the brief forbade theatrical canaries and the critic proved
+the FAIL path.
 
 **deepseek-v4-flash-0731** is not graded as a builder. Its job is to force
 retries. The expensive Qwen D/R rows are evidence it is doing that job:

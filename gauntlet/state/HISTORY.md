@@ -1215,4 +1215,48 @@ Prior critic passes: RETRY (dishonest ball-continuity mappings, catalog-only sui
 - required_fixes: none
 ```
 
+## Iteration 33 — 2026-08-15
+
+- objective_id: PLAYABLE-MUTANT-1V1
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (first pass, 0 retries)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: (feat) eval/runners/mutant-1v1.ts + playable-evaluator wiring + tests; (docs) state refresh
+- notes: `evaluateMutant1v1()` executes the 7 implementable mutants (non-finite, prng-order, velocity-snap, ball-no-decay, ball-teleport, possession-no-evidence, camera-hash) against the real two-player fixture `eval/scenarios/two-player-duel.v1.json` — clean oracle PASS + poisoned oracle FAIL per mutant, INVALID_RUN on skip, deferred NOT_EVALUATED — reusing `executeOracle` + `IMPLEMENTABLE_MUTANTS` (no oracle module touched). `checkExitPrerequisites()` wires `MUTANT_1V1_PASS` to the executable reduction (PASS/FAIL/INVALID_RUN); `ARCHETYPE_BLINDED_COMPARISON_PASS` stays NOT_EVALUATED (perceptual rubric not invented). Overall milestone still cannot PASS (ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW). 906 node tests (was 872). No PLAYABLE_1V1_PASS or PES claim. Critic independently proved the FAIL path with a mocked-oracle-miss harness; non-blocking nits: one committed end-to-end FAIL test and shared injection helpers.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-MUTANT-1V1
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 906/906; empirically proved `evaluateMutant1v1()` returns FAIL (and EXIT_PREREQ:MUTANT_1V1_PASS reports FAIL) when `executeOracle` is mocked to miss; confirmed `src/` and `eval/oracles/` untouched; no theatrical canaries.
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-MUTANT-1V1
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: typecheck 0; mise run test 906/906 (+34 = new mutant-1v1.test.ts); browser suite untouched; git status --short src empty
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 

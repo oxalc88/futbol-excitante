@@ -7,12 +7,12 @@ orchestrator_in_use: orchestrator
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: PLAYABLE-MUTANT-1V1
+next_objective_id: CAPABILITY-PHYSICAL-CONTACT
 best_known:
   commit: HEAD
-  note: "PLAYABLE-DUELS-SUITE accepted. PLAYABLE_1V1 still cannot PASS (ARCH-DIFF + MUTANT_1V1). Not PES."
+  note: "PLAYABLE-MUTANT-1V1 accepted. PLAYABLE_1V1 still cannot PASS (ARCH-DIFF-001 perceptual + ARCHETYPE_BLINDED_COMPARISON NOT_EVALUATED). Not PES."
 active_candidate:
-  objective_id: PLAYABLE-MUTANT-1V1
+  objective_id: CAPABILITY-PHYSICAL-CONTACT
   builder: builder-qwen
   critic: critic
   started_from_commit: HEAD
@@ -55,19 +55,20 @@ accepted:
   - PLAYABLE-1V1-PROFILE
   - PLAYABLE-TOUCH-ACTIONS-SUITE
   - PLAYABLE-DUELS-SUITE
+  - PLAYABLE-MUTANT-1V1
 blocked: []
-selection_note: "duels suite is registered. evaluateSuite(duels) runs. PHY-SHLD-001-CONT uses player-contact-evidence. TACK/INT stay NOT_EVALUATED. PLAYABLE_1V1 still cannot PASS: ARCH-DIFF-001 is NEEDS_PERCEPTUAL_REVIEW, MUTANT_1V1 / blinded comparison stay NOT_EVALUATED. Next executable gap is a 1v1 mutant/canary path that can FAIL. Do not invent a perceptual rubric. Do not invent PES envelopes. Do not claim PLAYABLE_1V1_PASS."
+selection_note: "MUTANT_1V1_PASS is now executable (evaluateMutant1v1, clean PASS + poison FAIL per implementable mutant on the two-player fixture). The only remaining non-PASS drivers for PLAYABLE_1V1 are perceptual gates — ARCH-DIFF-001 (NEEDS_PERCEPTUAL_REVIEW) and ARCHETYPE_BLINDED_COMPARISON_PASS (NOT_EVALUATED) — which must not be invented. Next executable gap: the capability-design profile still lists physical-contact as DEFERRED with the stale premise 'engine cannot exercise this capability', but player duels, player-contact-evidence oracle, and foundation-player-contact-v1 (separationStiffness, velocityDampingNormal, maxCorrectionPerTick) now exist. Materialize the physical-contact axis as IMPLEMENTED with a runner (duels scenario, low vs high contact config, contact-gated displacement estimator) so ENGINE_DESIGN_TARGET covers 2 of 5 axes. Fictional product values only; no PES claim."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-DUELS-SUITE — versioned suite + player-contact-evidence oracle.
+PLAYABLE-MUTANT-1V1 — executable 1v1 mutant/canary path.
 
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT (after REJECT, then scoped computeOutcome restore)
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT (first pass)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- 872 node tests. No PLAYABLE_1V1_PASS / PES claim.
+- 906 node tests. MUTANT_1V1_PASS exit prerequisite now executable; ARCHETYPE_BLINDED_COMPARISON_PASS stays NOT_EVALUATED. No PLAYABLE_1V1_PASS / PES claim.
 
 ## Next action
 
-Delegate PLAYABLE-MUTANT-1V1 to builder-qwen. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.
+Delegate CAPABILITY-PHYSICAL-CONTACT to builder-qwen. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.
