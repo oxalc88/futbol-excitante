@@ -130,10 +130,14 @@ export interface TestBridge {
  * Create a test bridge for browser evaluation.
  *
  * @param container - DOM element for the renderer.
+ * @param scenario - Optional scenario to load instead of the default
+ *   foundation scenario.  When omitted, the bridge uses
+ *   `FOUNDATION_SCENARIO`.
  * @returns A TestBridge instance.
  */
 export function createTestBridge(
   container: HTMLElement,
+  scenario?: import("../../contracts/scenario.js").ScenarioDefinition,
 ): TestBridge {
   let sim: Simulation;
   let session: PresentationSession;
@@ -142,7 +146,7 @@ export function createTestBridge(
    * Initialize the simulation and presentation from the foundation scenario.
    */
   function initSimulation(): void {
-    const world = createWorld({ scenario: FOUNDATION_SCENARIO });
+    const world = createWorld({ scenario: scenario ?? FOUNDATION_SCENARIO });
     sim = createSimulation(world);
     session = createPresentationSession(container);
   }
