@@ -89,7 +89,8 @@ export const TRANSIENT_ACCEL_LOCOMOTION_V1 = {
 /**
  * Provisional ball physics coefficients.
  *
- * Every value is provisional. No Magnus/curve, no player contact, no possession.
+ * Every value is provisional. No Magnus/curve magnitude claim (curve is
+ * driven by a spin-dependent Magnus force in ball-system.ts).
  */
 export const FOUNDATION_BALL_V1 = {
   id: "foundation-ball-v1",
@@ -100,6 +101,17 @@ export const FOUNDATION_BALL_V1 = {
   spinDecay: { value: 0.95, note: "provisional per-second angular velocity retention factor" },
   ballRadius: { value: 0.11, unit: "m", note: "provisional ball radius" },
   airDrag: { value: 0.001, note: "provisional air drag coefficient (speed-proportional)" },
+  /**
+   * Magnus-style curve coefficient (provisional).
+   *
+   * During free flight the ball's horizontal spin (angularVelocity.z)
+   * generates a lateral acceleration perpendicular to the velocity:
+   *   a_curve = curveCoefficient × |v_h| × ω_z
+   * Zero angular velocity → zero curve force → zero deviation.
+   *
+   * Fictional product value — NOT a PES 2017 calibration claim.
+   */
+  curveCoefficient: { value: 0.0005, note: "provisional Magnus curve coefficient (ball physics)" },
 } as const;
 
 // -- Player-ball contact (provisional) ----------------------------------------

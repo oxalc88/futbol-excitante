@@ -398,9 +398,9 @@ describe("DEFERRED axes stay DEFERRED", () => {
     expect(profile.axes["body-control"].status).toBe("IMPLEMENTED");
   });
 
-  it("swerve is DEFERRED", () => {
+  it("swerve is IMPLEMENTED", () => {
     const profile = loadDefaultCapabilityDesignProfile();
-    expect(profile.axes["swerve"].status).toBe("DEFERRED");
+    expect(profile.axes["swerve"].status).toBe("IMPLEMENTED");
   });
 
   it("no DEFERRED axis returns PASS from runner", () => {

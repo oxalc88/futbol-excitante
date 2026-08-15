@@ -93,13 +93,10 @@ describe("Profile loading and hash stability", () => {
     expect(axis.status).toBe("IMPLEMENTED");
   });
 
-  it("deferred axes have DEFERRED status", () => {
+  it("swerve axis has IMPLEMENTED status", () => {
     const profile = loadedProfile();
-    for (const axisId of [
-      "swerve",
-    ]) {
-      expect(profile.axes[axisId].status).toBe("DEFERRED");
-    }
+    const axis = profile.axes["swerve"];
+    expect(axis.status).toBe("IMPLEMENTED");
   });
 
   it("body-control axis has IMPLEMENTED status", () => {
@@ -116,15 +113,11 @@ describe("Profile loading and hash stability", () => {
     expect(axis.metric_ids).toContain("player-displacement");
   });
 
-  it("deferred axes have empty scenario_ids and metric_ids (expected)", () => {
+  it("swerve axis has real scenario_ids and metric_ids", () => {
     const profile = loadedProfile();
-    for (const axisId of [
-      "swerve",
-    ]) {
-      const axis = profile.axes[axisId];
-      expect(axis.scenario_ids).toHaveLength(0);
-      expect(axis.metric_ids).toHaveLength(0);
-    }
+    const axis = profile.axes["swerve"];
+    expect(axis.scenario_ids).toContain("scn-swn-001-v1");
+    expect(axis.metric_ids).toContain("ball-distance");
   });
 
   it("body-control axis has real scenario_ids and metric_ids", () => {

@@ -207,22 +207,22 @@ describe("body-control: cross-coupling violation → FAIL", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 5. Swerve stays DEFERRED
+// 5. Swerve is IMPLEMENTED
 // ---------------------------------------------------------------------------
 
-describe("swerve stays DEFERRED", () => {
-  it("swerve axis has DEFERRED status", () => {
+describe("swerve is IMPLEMENTED", () => {
+  it("swerve axis has IMPLEMENTED status", () => {
     const profile = loadDefaultCapabilityDesignProfile();
     const axis = profile.axes["swerve"];
-    expect(axis.status).toBe("DEFERRED");
+    expect(axis.status).toBe("IMPLEMENTED");
   });
 
-  it("swerve returns DEFERRED outcome, never PASS", () => {
+  it("swerve returns PASS outcome, not DEFERRED", () => {
     const profile = loadDefaultCapabilityDesignProfile();
     const result = evaluateCapabilityDesign({ profile });
     const axisResult = result.axes.find((a) => a.axis_id === "swerve");
-    expect(axisResult!.outcome).toBe("DEFERRED");
-    expect(axisResult!.outcome).not.toBe("PASS");
+    expect(axisResult!.outcome).toBe("PASS");
+    expect(axisResult!.outcome).not.toBe("DEFERRED");
   });
 });
 

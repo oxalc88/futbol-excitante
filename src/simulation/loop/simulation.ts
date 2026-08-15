@@ -83,6 +83,14 @@ interface ShotConfigOverride {
   verticalComponent: { value: number };
 }
 
+/**
+ * Minimal ball config shape used for capability evaluation overrides.
+ * Only curveCoefficient is overridden; other fields come from FOUNDATION_BALL_V1.
+ */
+interface BallConfigOverride {
+  curveCoefficient: { value: number };
+}
+
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
@@ -201,6 +209,10 @@ export interface Simulation {
  *   If provided, used instead of `FOUNDATION_SHOT_V1` for shot resolution.
  *   Useful for capability evaluation where low/high exitSpeed values need
  *   different shot power (e.g., exitSpeed 8.0 vs 16.0 m/s).
+ * @param ballConfigOverride - Optional ball config override.
+ *   If provided, used instead of `FOUNDATION_BALL_V1` for ball integration.
+ *   Useful for capability evaluation where low/high curve coefficients
+ *   need different ball physics (e.g., curveCoefficient 0.0005 vs 0.003).
  * @returns A simulation instance.
  */
 export function createSimulation(
@@ -209,6 +221,7 @@ export function createSimulation(
   locomotionConfigOverride?: typeof FOUNDATION_LOCOMOTION_V1,
   contactConfigOverride?: typeof FOUNDATION_PLAYER_CONTACT_V1,
   shotConfigOverride?: ShotConfigOverride,
+  ballConfigOverride?: BallConfigOverride,
 ): Simulation {
   const obs = observer ?? NO_OP_OBSERVER;
 
@@ -432,7 +445,19 @@ export function createSimulation(
   function ballIntegrationStage(): SimulationEvent[] {
     const dt = state.fixedDt.numerator / state.fixedDt.denominator;
     const counter = { value: eventCounter };
-    const events = stepBall(state.ball, dt, FOUNDATION_BALL_V1, counter, state.tick);
+    // Merge ball config override on top of FOUNDATION_BALL_V1.
+    let ballCfg: Parameters<typeof import("../ball/ball-system.js").stepBall>[2];
+    if (ballConfigOverride) {
+      ballCfg = {
+        ...FOUNDATION_BALL_V1,
+        curveCoefficient: {
+          value: ballConfigOverride.curveCoefficient.value,
+        },
+      };
+    } else {
+      ballCfg = FOUNDATION_BALL_V1;
+    }
+    const events = stepBall(state.ball, dt, ballCfg, counter, state.tick);
     eventCounter = counter.value;
     return events;
   }

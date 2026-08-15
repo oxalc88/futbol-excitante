@@ -736,6 +736,39 @@ export const SCENARIO_BODY_CTRL_001 = makeScenarioStub(
   makeBodyControlInputProgram(60),
 );
 
+// ---------------------------------------------------------------------------
+// swerve evaluation scenario
+// ---------------------------------------------------------------------------
+
+/**
+ * Scenario for swerve capability evaluation.
+ *
+ * A ball is launched airborne with a lateral velocity and significant
+ * spin (angularVelocity.z). The Magnus curve force acts on the spinning
+ * ball during flight, producing lateral deviation from the straight-line
+ * trajectory.  This scenario is used by the swerve axis runner to
+ * compare low vs high curve coefficients.
+ */
+export const SCENARIO_SWERVE_001 = makeScenarioStub(
+  "scn-swn-001-v1",
+  120,
+  ["INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "swerve-curve" },
+  undefined,
+);
+
+// Override initial ball state: airborne with lateral velocity and spin.
+Object.assign(
+  SCENARIO_SWERVE_001.initial_state.ball as Record<string, unknown>,
+  {
+    position: { x: 10, y: 0, z: 3.0 },
+    linearVelocity: { x: 4.0, y: 2.0, z: 8.0 },
+    angularVelocity: { x: 0, y: 0, z: 15.0 },
+    regime: "airborne" as const,
+  },
+);
+
 export const SCENARIO_DUELS_INT_FAST_001 = makeScenarioStub(
   "scn-duels-int-fast-001-v1",
   60,
@@ -795,6 +828,9 @@ export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
 
   // body-control evaluation scenario
   [SCENARIO_BODY_CTRL_001.scenario_id]: SCENARIO_BODY_CTRL_001,
+
+  // swerve evaluation scenario
+  [SCENARIO_SWERVE_001.scenario_id]: SCENARIO_SWERVE_001,
 };
 
 /**

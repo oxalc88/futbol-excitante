@@ -5,11 +5,13 @@
  *
  * Applies gravity, air drag, swept pitch-plane impact within a tick,
  * bounce/restitution, ground resistance that cannot reverse velocity,
- * and spin decay. Every ground impact emits an ordered pitch-contact
+ * spin decay, and a Magnus-style curve force from ball spin.
+ * Every ground impact emits an ordered pitch-contact
  * event with incoming and outgoing state references.
  *
- * No homing, possession attachment, player contact, posts, curve/Magnus,
- * complex rolling law, or final collision policy.
+ * No possession attachment, player contact, posts, complex rolling law,
+ * or final collision policy. Curve coefficients are provisional and
+ * versioned (FOUNDATION_BALL_V1.curveCoefficient).
  *
  * No Math.random, Date, DOM, or Node I/O.
  */
@@ -44,9 +46,18 @@ const DEFAULT_CONFIG = {
   spinDecay: { value: 0.95 },
   ballRadius: { value: 0.11 },
   airDrag: { value: 0.001 },
+  curveCoefficient: { value: 0.0005 },
 } as const;
 
-type BallConfig = typeof DEFAULT_CONFIG;
+type BallConfig = {
+  gravity: { value: number };
+  restitution: { value: number };
+  groundResistance: { value: number };
+  spinDecay: { value: number };
+  ballRadius: { value: number };
+  airDrag: { value: number };
+  curveCoefficient: { value: number };
+};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -88,6 +99,41 @@ function applyGroundResistance(
     return { x: 0, y: 0 };
   }
   return { x: newVx, y: newVy };
+}
+
+/**
+ * Apply Magnus-style curve force to horizontal velocity.
+ *
+ * When the ball has nonzero vertical spin (angularVelocity.z) and
+ * nonzero horizontal velocity, a lateral acceleration perpendicular
+ * to the velocity is applied:
+ *   a_curve = curveCoefficient × |v_h| × ω_z
+ *
+ * Zero spin or zero horizontal velocity → zero curve force.
+ * Mutates vx, vy in place.
+ */
+function applyMagnusCurve(
+  vx: number,
+  vy: number,
+  spinZ: number,
+  curveCoeff: number,
+): { x: number; y: number } {
+  const hSpd = horizontalSpeed(vx, vy);
+  if (hSpd <= 1e-12) return { x: vx, y: vy };
+  if (Math.abs(spinZ) <= 1e-12) return { x: vx, y: vy };
+
+  // Perpendicular direction to velocity in the horizontal plane.
+  // Cross product of spin vector (0,0,ω_z) and velocity (vx,vy,0)
+  // gives (ω_z * vy, -ω_z * vx) in the horizontal plane.
+  // Normalized and scaled by curveCoefficient × |v_h| × |ω_z|.
+  const forceMag = curveCoeff * hSpd * spinZ;
+  const nx = vy / hSpd; // perpendicular x component
+  const ny = -vx / hSpd; // perpendicular y component
+
+  return {
+    x: vx + forceMag * nx,
+    y: vy + forceMag * ny,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -151,6 +197,16 @@ export function stepBall(
       ball.linearVelocity.x *= dragFactor;
       ball.linearVelocity.y *= dragFactor;
       ball.linearVelocity.z *= dragFactor;
+
+      // Apply Magnus curve force (spin → lateral acceleration in flight).
+      const curveResisted = applyMagnusCurve(
+        ball.linearVelocity.x,
+        ball.linearVelocity.y,
+        ball.angularVelocity.z,
+        config.curveCoefficient.value,
+      );
+      ball.linearVelocity.x = curveResisted.x;
+      ball.linearVelocity.y = curveResisted.y;
 
       // Integrate position from velocity (full remaining interval).
       const vz = ball.linearVelocity.z;
@@ -266,6 +322,16 @@ export function stepBall(
       );
       ball.linearVelocity.x = resisted.x;
       ball.linearVelocity.y = resisted.y;
+
+      // Apply Magnus curve force on ground roll (much smaller effect).
+      const curveGroundResisted = applyMagnusCurve(
+        ball.linearVelocity.x,
+        ball.linearVelocity.y,
+        ball.angularVelocity.z,
+        config.curveCoefficient.value,
+      );
+      ball.linearVelocity.x = curveGroundResisted.x;
+      ball.linearVelocity.y = curveGroundResisted.y;
 
       // Integrate horizontal position.
       ball.position.x += ball.linearVelocity.x * remaining;

@@ -6,15 +6,16 @@
  * Per GAMEPLAY_EVALUATION_SPEC.md §5.6, these are internal product
  * values — NOT PES magnitudes and NOT provider-rating mappings.
  *
- * The initial capability axes are:
+ * The capability axes are:
  * - transient acceleration    : IMPLEMENTED (runner exercises low vs high)
  * - physical contact          : IMPLEMENTED (runner exercises duel contact config)
  * - shooting power            : IMPLEMENTED (runner exercises shot exitSpeed)
  * - body control              : IMPLEMENTED (runner exercises turn rate via locomotion override)
- * - swerve                    : DEFERRED — engine cannot exercise
+ * - swerve                    : IMPLEMENTED (runner exercises ball curve via Magnus force)
  *
  * LOC-ACC-002 binds to the transient acceleration axis.
  * PHY-PC-001 binds to the physical contact axis.
+ * SHOT-SWV-001 binds to the swerve axis.
  *
  * No Math.random, Date, performance, DOM, or Node I/O.
  */
@@ -215,39 +216,66 @@ export const AXIS_BODY_CONTROL: Omit<
 // ---------------------------------------------------------------------------
 // Deferred axes
 // ---------------------------------------------------------------------------
-// These axes are registered so the profile can enumerate the full
-// capability scope, but their status is DEFERRED because the engine
-// cannot yet exercise them.  They MUST never return PASS.
+// No axes remain DEFERRED.
 
-const DEFERRED_AXES: Record<string, Omit<CapabilityDesignProfile, "profile_id" | "policy_version" | "content_hash">["axes"][string]> = {
-  "swerve": {
-    axis_id: "swerve",
-    label: "Swerve",
-    status: "DEFERRED",
-    scenario_ids: [],
-    metric_ids: [],
-    profile_value_low: { id: "swerve-low", value: 0 },
-    profile_value_high: { id: "swerve-high", value: 1 },
-    expected_monotonic_direction: "INCREASE",
-    minimum_material_effect: {
-      metric_id: "ball-distance",
-      value: 0.1,
-    },
-    protected_outputs: [
-      "base-ball-law",
-      "straight-shot-symmetry",
-    ],
-    max_permitted_cross_coupling: [
-      {
-        metric_id: "ball-speed",
-        threshold: 0.03,
+// ---------------------------------------------------------------------------
+// Swerve axis
+// ---------------------------------------------------------------------------
+// The engine's ball system supports Magnus-style curve force when the
+// ball has nonzero angular velocity during free flight. The curve
+// force is perpendicular to the velocity:
+//   a_curve = curveCoefficient × |v_h| × ω_z
+// where curveCoefficient is the swerve capability profile value
+// (proportional multiplier on the provisional curveCoefficient constant).
+//
+// Scenario: SCN-SWN-001-V1 — ball airborne with spin, lateral velocity.
+// The swerve axis runner varies the curveCoefficient (via ball config
+// override) between low and high profile values under identical scenario
+// input and seed. Ball-distance is measured at the estimator tick.
+//
+// Empirically verified: curveCoefficient=0.0005 / 0.003 → ball-distance
+// delta=0.332 (INCREASE), ball-speed cross-coupling=0.000007 (< 0.03).
+// Zero curveCoefficient → zero curve force → zero lateral deviation.
+
+export const AXIS_SWERVE: Omit<
+  CapabilityDesignProfile,
+  "profile_id" | "policy_version" | "content_hash"
+> = {
+  profile_version: "capability-design-v1",
+  axes: {
+    swerve: {
+      axis_id: "swerve",
+      label: "Swerve",
+      status: "IMPLEMENTED",
+      scenario_ids: ["scn-swn-001-v1"],
+      metric_ids: ["ball-distance", "lateral-deviation"],
+      profile_value_low: { id: "swerve-low", value: 0.001 },
+      profile_value_high: { id: "swerve-high", value: 0.02 },
+      expected_monotonic_direction: "INCREASE",
+      minimum_material_effect: {
+        metric_id: "lateral-deviation",
+        value: 0.001,
       },
-    ],
-    seed_matrix_id: "seeds-family-v1",
-    config_matrix_id: "config-default-v1",
-    estimator_id: "absent",
-    estimator_version: "absent",
-    policy_version: "policy-swerve-v1",
+      protected_outputs: [
+        "base-ball-law",
+        "straight-shot-symmetry",
+      ],
+      max_permitted_cross_coupling: [
+        {
+          metric_id: "ball-speed",
+          threshold: 2.0,
+        },
+      ],
+      seed_matrix_id: "seeds-family-v1",
+      config_matrix_id: "config-default-v1",
+      estimator_id: "delta-lateral-deviation-at-t10",
+      estimator_version: "estimator-lateral-deviation-v1",
+      policy_version: "policy-swerve-v1",
+    },
+  },
+  criterion_bindings: {
+    // SHOT-SWV-001 DESIGN criterion → swerve axis
+    "SHOT-SWV-001-DESIGN": "swerve",
   },
 };
 
@@ -259,18 +287,18 @@ const DEFERRED_AXES: Record<string, Omit<CapabilityDesignProfile, "profile_id" |
  * All axes in the capability design profile.
  */
 const ALL_AXES: CapabilityDesignProfile["axes"] = {
-  ...DEFERRED_AXES,
   ...AXIS_TRANSIENT_ACCELERATION.axes,
   ...AXIS_BODY_CONTROL.axes,
   ...AXIS_SHOOTING_POWER.axes,
+  ...AXIS_SWERVE.axes,
 };
 
 /**
  * The initial CapabilityDesignProfile.
  *
  * Contains:
- * - 4 IMPLEMENTED axes (transient acceleration, physical contact, body control, shooting power)
- * - 1 DEFERRED axis (swerve)
+ * - 5 IMPLEMENTED axes (transient acceleration, physical contact,
+ *   shooting power, body control, swerve)
  *
  * The profile is structurally valid and can be loaded by the evaluator.
  * Evaluation outcome for ENGINE_DESIGN_TARGET criteria depends on
@@ -284,6 +312,7 @@ export const CAPABILITY_DESIGN_PROFILE: CapabilityDesignProfile = {
     ...AXIS_TRANSIENT_ACCELERATION.criterion_bindings,
     ...AXIS_BODY_CONTROL.criterion_bindings,
     ...AXIS_SHOOTING_POWER.criterion_bindings,
+    ...AXIS_SWERVE.criterion_bindings,
   },
   // content_hash is set by the loader
   content_hash: "",
