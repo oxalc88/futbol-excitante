@@ -261,3 +261,53 @@ export type FoundationConfig = typeof FOUNDATION_CONFIG;
 
 /** Backward-compatible placeholder export for BOOTSTRAP-01 smoke test. */
 export const placeholder = true;
+
+// ---------------------------------------------------------------------------
+// Fictional archetypes (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Versioned fictional archetypes applied per-player.
+ *
+ * These are engine-design targets (NOT PES player names or provider ratings).
+ * Every coefficient is provisional and versioned so changes are auditable.
+ */
+
+export interface ArchetypeDefinition {
+  /** Stable archetype identifier (e.g. "archetype-burst-v1"). */
+  id: string;
+  /** Human-readable label (e.g. "provisional"). */
+  label: string;
+  /** Transient acceleration coefficient [0..1]. 0 = no bonus (steady), 1 = maximum early-speed bonus. */
+  transientAcceleration: { value: number; note: string };
+  /** Optional sprint multiplier override (undefined = use locomotion config default). */
+  sprintMultiplier?: { value: number; note: string };
+}
+
+/**
+ * Burst archetype — higher transient acceleration for explosive early speed.
+ *
+ * Fictional product name, not a PES player name or rating.
+ */
+export const ARCHETYPE_BURST_V1: ArchetypeDefinition = {
+  id: "archetype-burst-v1",
+  label: "provisional",
+  transientAcceleration: { value: 1.0, note: "provisional max early-speed bonus — no PES calibration" },
+} as const;
+
+/**
+ * Steady archetype — baseline locomotion, no transient acceleration bonus.
+ *
+ * This is the default so existing one-player scenarios stay identical.
+ */
+export const ARCHETYPE_STEADY_V1: ArchetypeDefinition = {
+  id: "archetype-steady-v1",
+  label: "provisional",
+  transientAcceleration: { value: 0, note: "provisional zero bonus — baseline locomotion" },
+} as const;
+
+/** Map of all registered archetype definitions by id. */
+export const ARCHETYPE_REGISTRY: Record<string, ArchetypeDefinition> = {
+  [ARCHETYPE_BURST_V1.id]: ARCHETYPE_BURST_V1,
+  [ARCHETYPE_STEADY_V1.id]: ARCHETYPE_STEADY_V1,
+};
