@@ -4,6 +4,48 @@ Human-readable history of meaningful changes to the Gauntlet's **rules, prompts,
 
 This changelog does **not** record normal gameplay objectives or routine live-state updates produced by the running Gauntlet. Git remains the source of truth for exact file contents and diffs.
 
+## 2026-08-15 — Mandatory evidence and horizon invariant gates
+
+**Prompt version:** `v3-evidence-horizon-gates`
+**Implementation commit:** `220bb47b18f1ada4325e62da96d9d3f17c52aada`
+
+### Changed
+
+- Made mandatory evidence an explicit acceptance gate. Gameplay/presentation objectives require an existing screenshot artifact; tests alone cannot substitute for perceptual evidence.
+- Required critics to determine applicable evidence, verify artifact existence, and return `mandatory_evidence_ok: true` before `ACCEPT`.
+- Required integration reviewers to repeat that check independently and reject a critic `ACCEPT` issued while mandatory evidence was missing.
+- Required orchestrators to verify both reviewer gates and mandatory artifacts before recording acceptance, advancing the horizon, or delegating the acceptance commit.
+- Added deterministic rolling-horizon invariants: unique objective IDs, no accepted objective pending, coherent prerequisites, zero-based `current_index`, and agreement between the indexed and selected next objective.
+- Required acceptance to update the existing horizon entry in place. Candidate bookkeeping is repaired and revalidated before persistence without another agent, historical rewrites, or global strategic reassessment.
+- Corrected stale global-reassessment wording in `gauntlet/README.md` so it matches the rolling-horizon rules.
+
+### Why
+
+Commit `0dba0b8e405563c015c83b24e4f33db03444a014` accepted the browser/presentation objective `BROWSER-SCOREBOARD` without the screenshot required by the evidence contract. The same commit inserted a second `BROWSER-SCOREBOARD` horizon entry instead of updating the existing entry. The implementation was not retroactively changed; the future acceptance and horizon-generation rules were corrected.
+
+The instruction-regression audit found that `eba48b211fc0661beda289f04d722876427b9d46` added the screenshot rule only to builder-report guidance. The later rolling-horizon change retained that rule but did not propagate it to critic, integration, or orchestrator gates. Horizon validation was also absent from the initial rolling-horizon rules, while the README retained one stale global-replan sentence. This change closes those gaps without reverting rolling horizons.
+
+### Preserved
+
+- Builder/critic model separation and independent integration review.
+- Adversarial retries, max retries, blockers, deterministic tests, state persistence, protected-oracle/PES-claim restrictions, and the rolling strategic horizon.
+- Existing generated state, evidence, screenshots, artifacts, and the accepted `BROWSER-SCOREBOARD` objective.
+
+### Prompt/rule surface
+
+- `gauntlet/PROMPT.md`
+- `gauntlet/README.md`
+- `gauntlet/evidence-contract.md`
+- `.grok/agents/orchestrator.md`
+- `.grok/agents/orchestrator-deepseek.md`
+- `.grok/agents/critic*.md`
+- `.grok/agents/integration-reviewer.md`
+- `.grok/skills/gauntlet/SKILL.md`
+- `.grok/skills/gauntlet-continue/SKILL.md`
+- `AGENTS.md`
+
+---
+
 ## 2026-08-15 — Rolling strategic horizon
 
 **Introduced by:** `7886a88ea0edeb677f2d261c001725d56ade9896`  
