@@ -3,15 +3,15 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-next_objective_id: PLAYABLE-FICTIONAL-ARCHETYPES
+next_objective_id: PLAYABLE-BROWSER-1V1
 best_known:
-  commit: 7505476
-  note: "PLAYABLE-ENGINE-DESIGN-RUNNER accepted. LOC-ACC-002-DESIGN exercisable. Not PES."
+  commit: 2bd5fcc
+  note: "PLAYABLE-FICTIONAL-ARCHETYPES accepted. Burst vs steady per player. Not PES."
 active_candidate:
-  objective_id: PLAYABLE-FICTIONAL-ARCHETYPES
+  objective_id: PLAYABLE-BROWSER-1V1
   builder: builder-qwen
   critic: critic
-  started_from_commit: 7505476
+  started_from_commit: 2bd5fcc
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -46,19 +46,20 @@ accepted:
   - PLAYABLE-CLOSE-CONTROL
   - PLAYABLE-PLAYER-DUEL
   - PLAYABLE-ENGINE-DESIGN-RUNNER
+  - PLAYABLE-FICTIONAL-ARCHETYPES
 blocked: []
-selection_note: "ENGINE_DESIGN_TARGET runner exists for transient-acceleration. Next PLAYABLE-1V1 gap is versioned fictional archetypes so two humans can feel different without PES ratings. Do not invent PES envelopes. Do not start 11v11."
+selection_note: "Archetypes exist in the core but the two-player browser path still uses identical default players. Next PLAYABLE-1V1 gap is BROWSER-1V1-CONTROL-001 / ARCH-DIFF-001. Do not invent PES envelopes. Do not start 11v11."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-ENGINE-DESIGN-RUNNER — LOC-ACC-002-DESIGN evaluation.
+PLAYABLE-FICTIONAL-ARCHETYPES — burst vs steady per player.
 
-- commits: `b3947f9` (coeff), `c287991` (bonus), `3c966e7` (override), `dc847a3` (runner), `7505476` (tests)
+- commits: `4e24bcb` (contracts), `f387d94` (registry), `c4d3c80` (createWorld), `13a7250` (locomotion), `2bd5fcc` (tests)
 - builder: builder-qwen / qwen3.6
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
 
 ## Next action
 
-Delegate PLAYABLE-FICTIONAL-ARCHETYPES to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-BROWSER-1V1 to builder-qwen. After ACCEPT + integration, atomic-commit and push.
