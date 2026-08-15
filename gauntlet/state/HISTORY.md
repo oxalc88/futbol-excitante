@@ -196,6 +196,82 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - required_fixes: none
 ```
 
+## Iteration 37 — 2026-08-15
+
+- objective_id: CAPABILITY-SWERVE
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (first pass)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: 57f554d feat(ball); c1c2b35 docs(eval) screenshot capture; eba48b2 docs(gauntlet) evidence-contract
+- notes: Provisional Magnus-style curve force on ball (applyMagnusCurve function). The ball's angularVelocity.z generates a lateral acceleration perpendicular to velocity in the horizontal plane: a_curve = curveCoefficient × |v_h| × ω_z. Zero angular velocity → zero curve force → zero deviation (bit-identical for existing zero-spin fixtures). Zero curveCoefficient → zero curve force regardless of spin. The swerve axis is now IMPLEMENTED in the capability-design profile (AXIS_SWERVE with low=0.001, high=0.02 curveCoefficient, estimator delta-lateral-deviation-at-t10, INCREASE direction). ENGINE_DESIGN_TARGET now 5/5 axes IMPLEMENTED. Screenshot capture foundation (eval/capture-snapshot.ts, tests/browser/capture-wip.browser.test.ts, package.json capture-wip script). 17 eval-swerve tests, 6 BALL-CURVE-001 tests, 35 capability-design tests all PASS. No PES claim. No FOUNDATION_LAB_PASS claim.
+
+### Critic verdict (ACCEPT — first pass)
+
+```markdown
+## Critic verdict
+- objective_id: CAPABILITY-SWERVE
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- evidence_reviewed:
+  - eval-swerve.test.ts — 17/17 PASS
+  - ball-system.test.ts — BALL-CURVE-001 tests PASS
+  - capability-design.test.ts — 35/35 PASS
+  - File changes in 8 source files reviewed
+- criteria:
+  - id: SHOT-SWV-001-DESIGN
+    class: ENGINE_DESIGN_TARGET
+    outcome: PASS
+    note: Swerve axis is IMPLEMENTED, runner exercises low vs high curveCoefficient, lateral deviation delta is INCREASE and meets minimum_material_effect (0.001).
+  - id: STRAIGHT-SHOT-SYMMETRY
+    class: PROTECTED_OUTPUT
+    outcome: PASS
+    note: Zero spin → zero curve force via applyMagnusCurve early exit. Zero curveCoefficient → zero curve regardless of spin.
+  - id: CROSS-COUPLING-BALL-SPEED
+    class: PROTECTED_OUTPUT
+    outcome: PASS
+    note: Ball-speed delta well under 2.0 threshold.
+  - id: DETERMINISM
+    class: COMMON
+    outcome: PASS
+    note: Same axis produces identical outcomes. Ball integration is a pure function.
+  - id: NO-PES-CLAIMS
+    class: INTEGRITY
+    outcome: PASS
+    note: No "pes fidelity", "pes 2017", or "FOUNDATION_LAB_PASS" strings. Labels as "fictional product values" and "provisional".
+- architecture_violations: None — core boundaries respected: pure function, ball is independent 3D entity, config versioned.
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CAPABILITY-SWERVE
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+  - grep for eval/test/browser imports in src/simulation/ball/ → zero matches.
+- neighboring_regressions: 6 suites, 139/139 PASS
+  - ball-system.test.ts 23/23
+  - capability-design.test.ts 35/35
+  - eval-swerve.test.ts 17/17
+  - eval-body-control.test.ts 19/19
+  - eval-physical-contact.test.ts 20/20
+  - eval-shooting-power.test.ts 25/25
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS — all 5 axes dispatched correctly, swerve branch inserted after body-control, no existing axis touched.
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 ## Iteration 12 — 2026-08-14
 
 - objective_id: BOOTSTRAP-12
