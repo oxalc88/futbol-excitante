@@ -1174,4 +1174,45 @@ Prior critic passes: RETRY (dishonest ball-continuity mappings, catalog-only sui
 - required_fixes: none
 ```
 
+## Iteration 32 — 2026-08-15
+
+- objective_id: PLAYABLE-DUELS-SUITE
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after 3 RETRIES, one REJECT, then a scoped post-REJECT hypothesis)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- notes: suite-duels-v1 registered. PHY-SHLD-001-CONT executes via player-contact-evidence (PASS on registered overlapping run, FAIL if 2+ players have no contact events, NOT_EVALUATED on single-player). TACK/INT and PHY-STR/BC/PC design stay NOT_EVALUATED. First RETRIES were a non-contact registered scenario and a false test comment. REJECT: shared computeOutcome let NOT_EVALUATED mask FAIL. Restore: anyFail first; oracle returns [] when preconditions unmet. 872 node tests. No PLAYABLE_1V1_PASS or PES claim.
+
+### Critic verdict (post-REJECT — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-DUELS-SUITE (post-REJECT)
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-DUELS-SUITE
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: typecheck 0; mise run test 872/872
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 

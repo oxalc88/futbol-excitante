@@ -6,16 +6,16 @@ phase: PLAYABLE
 orchestrator_in_use: orchestrator
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 95
-next_objective_id: PLAYABLE-DUELS-SUITE
+next_objective_id: PLAYABLE-MUTANT-1V1
 best_known:
-  commit: 3bd282a
-  note: "PLAYABLE-TOUCH-ACTIONS-SUITE accepted. PLAYABLE_1V1 still cannot PASS (duels suite missing). Not PES."
+  commit: HEAD
+  note: "PLAYABLE-DUELS-SUITE accepted. PLAYABLE_1V1 still cannot PASS (ARCH-DIFF + MUTANT_1V1). Not PES."
 active_candidate:
-  objective_id: PLAYABLE-DUELS-SUITE
+  objective_id: PLAYABLE-MUTANT-1V1
   builder: builder-qwen
   critic: critic
-  started_from_commit: 3bd282a
-  last_verdict: REJECT
+  started_from_commit: HEAD
+  last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
 retry_count: 0
@@ -53,19 +53,20 @@ accepted:
   - PLAYABLE-BROWSER-1V1
   - PLAYABLE-1V1-PROFILE
   - PLAYABLE-TOUCH-ACTIONS-SUITE
+  - PLAYABLE-DUELS-SUITE
 blocked: []
-selection_note: "touch_and_actions is registered and evaluateSuite runs honestly. PLAYABLE_1V1 still cannot PASS: required duels suite is missing, ARCH-DIFF-001 is NEEDS_PERCEPTUAL_REVIEW, MUTANT_1V1 / blinded comparison stay NOT_EVALUATED. Next executable gap is a versioned duels suite bound only to existing player-contact oracles. Unimplemented catalog tests stay NOT_EVALUATED. Do not invent PES envelopes. Do not claim PLAYABLE_1V1_PASS."
+selection_note: "duels suite is registered. evaluateSuite(duels) runs. PHY-SHLD-001-CONT uses player-contact-evidence. TACK/INT stay NOT_EVALUATED. PLAYABLE_1V1 still cannot PASS: ARCH-DIFF-001 is NEEDS_PERCEPTUAL_REVIEW, MUTANT_1V1 / blinded comparison stay NOT_EVALUATED. Next executable gap is a 1v1 mutant/canary path that can FAIL. Do not invent a perceptual rubric. Do not invent PES envelopes. Do not claim PLAYABLE_1V1_PASS."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-TOUCH-ACTIONS-SUITE — versioned suite + honest evaluateSuite path.
+PLAYABLE-DUELS-SUITE — versioned suite + player-contact-evidence oracle.
 
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT (after retry 2)
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT (after REJECT, then scoped computeOutcome restore)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- 841 node tests. No PLAYABLE_1V1_PASS / PES claim.
+- 872 node tests. No PLAYABLE_1V1_PASS / PES claim.
 
 ## Next action
 
-Delegate PLAYABLE-DUELS-SUITE to builder-qwen. After ACCEPT + integration, atomic-commit and push.
+Delegate PLAYABLE-MUTANT-1V1 to builder-qwen. After ACCEPT + integration, atomic-commit and push. If this Grok window is ≥95%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.

@@ -23,44 +23,16 @@ export NAN_API_KEY=...
 grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
 ```
 
-Then `/gauntlet-continue`.
+Then `/gauntlet-continue`. Always pass `--model`.
 
-`--agent` alone keeps the session default (`grok-4.6`). Always pass `--model`.
+## Board
 
-## Board at last Grok write
+- last accepted: PLAYABLE-DUELS-SUITE (critic + integration ACCEPT)
+- `next_objective_id`: PLAYABLE-MUTANT-1V1
+- PLAYABLE_1V1 still cannot PASS (`ARCH-DIFF-001` NEEDS_PERCEPTUAL_REVIEW; `MUTANT_1V1` / blinded comparison NOT_EVALUATED)
+- Do not invent a perceptual rubric or PES envelopes
+- `git-committer` is `gemma4`
 
-- `next_objective_id`: PLAYABLE-DUELS-SUITE (in flight)
-- last accepted: PLAYABLE-TOUCH-ACTIONS-SUITE (`3bd282a` docs commit; suite on `main`)
-- `active_candidate.last_verdict` was REJECT (shared `computeOutcome` masked FAIL), then a post-REJECT hypothesis restored FAIL-if-any-fail
-- Independent critic **ACCEPT** on that post-REJECT hypothesis
-- Integration review was started and **cancelled** — next action is `integration-reviewer` on the dirty tree, not a new builder
-- Do not claim PLAYABLE_1V1_PASS or PES
-- Do not restart touch_and_actions
+## After DUELS commits land
 
-## Dirty tree (do not revert unless REJECT)
-
-In-flight DUELS candidate (leave it):
-
-- `eval/contracts/bindings.ts`
-- `eval/contracts/common-criteria.ts`
-- `eval/contracts/invariant-definitions.ts`
-- `eval/contracts/policies.ts`
-- `eval/contracts/scenarios.ts`
-- `eval/contracts/suites.ts`
-- `eval/contracts/types.ts`
-- `eval/oracles/wire.ts`
-- `eval/oracles/player-contact.ts` (untracked)
-- `eval/runners/foundation-evaluator.ts`
-- `tests/unit/eval/eval-registry.test.ts`
-- `tests/unit/eval/playable-evaluator.test.ts`
-- `tests/unit/eval/duels-suite.test.ts` (untracked)
-- `gauntlet/state/CURRENT.md` (retry bookkeeping only)
-
-## Do not redo
-
-Accepted bootstrap, foundation lab, playable 1v1 pieces through TOUCH-ACTIONS-SUITE.
-`git-committer` is `gemma4`. Orchestrator must not `git commit`.
-
-## After you accept DUELS
-
-Atomic commits + push via `git-committer`. Then reassess. PLAYABLE_1V1 still cannot PASS (`ARCH-DIFF-001` NEEDS_PERCEPTUAL_REVIEW, `MUTANT_1V1` / blinded comparison NOT_EVALUATED). Next executable gap is likely `PLAYABLE-MUTANT-1V1` or fail-closed unknown archetypes — inspect, do not assume.
+Working tree should be clean of eval/duels candidate files. If any remain, they are leftover — inspect before starting MUTANT_1V1.
