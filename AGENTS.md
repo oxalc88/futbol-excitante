@@ -34,6 +34,8 @@ The repo may start empty. `BOOTSTRAP-01` is the initial objective only while the
 
 Strategic prioritization uses the temporary rolling horizon in `gauntlet/state/HORIZON.md`. At startup, handoff, horizon exhaustion, or material invalidation, inspect actual project state, evidence, research, specs, and `gauntlet/objectives.md`, then select roughly 4–8 candidate objectives. The horizon is not a fixed backlog.
 
+Every horizon must have unique objective IDs, coherent prerequisites, and a zero-based `current_index` pointing to the next applicable non-accepted objective. Already accepted objectives must not reappear as pending. Acceptance updates the existing entry in place; validate candidate horizon/current state before persisting. Repair ordinary bookkeeping errors without another agent, historical rewrites, or global replanning.
+
 After an accepted objective, continue the next applicable horizon objective without a global reprioritization pass unless the horizon is invalidated by a blocker, architectural constraint, dependency change, inapplicable planned objective, unsafe newly discovered defect, materially higher-value evidence, or a human-needed spec/legal blocker.
 
 Where technically reasonable, each horizon should lead toward at least one observable playable/browser-facing capability. Infrastructure-only horizons must justify why that work must precede visible gameplay progress.
@@ -51,7 +53,8 @@ Do not skip the architecture boundaries to jump to 11v11, tactics, polished art,
 - `orchestrator` (Grok 4.6) plans/replans the rolling horizon at strategic boundaries, then decides and delegates inside it. It does not implement. At ≥89% SuperGrok weekly usage (`/usage`) it writes `gauntlet/state/HANDOFF.md` and hands off to `orchestrator-deepseek`.
 - `orchestrator-deepseek` uses the configured DeepSeek overflow model. Same loop. It picks up from `HANDOFF.md` + `CURRENT.md` + `HORIZON.md`. It does not implement.
 - `builder-qwen` / `builder-mimo` implement one isolated objective and produce evidence.
-- `critic` (DeepSeek by default) judges evidence independently. Never review with the same model that implemented the change.
-- `integration-reviewer` checks architecture and neighboring regressions after critic acceptance. Critic ACCEPT alone is never final.
+- `critic` (DeepSeek by default) judges evidence independently and cannot accept until mandatory evidence exists. Never review with the same model that implemented the change.
+- `integration-reviewer` independently verifies mandatory evidence, audits the critic evidence gate, and checks architecture and neighboring regressions. Critic ACCEPT alone is never final.
+- The orchestrator records acceptance only after critic ACCEPT, integration ACCEPT, and its own verification of every mandatory artifact. Tests do not replace required perceptual evidence.
 - `aux` does cheap summaries and inspection only.
 - `git-committer` (`gemma4`) makes atomic commits. Grok must not `git commit`.

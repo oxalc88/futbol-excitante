@@ -28,26 +28,39 @@ At startup, after a handoff, or when `gauntlet/state/HORIZON.md` is missing, exh
 
 1. Inspect `git status --short`, recent commits, `CURRENT.md`, evidence, relevant research, specs, and `objectives.md`.
 2. Select a temporary rolling horizon of roughly 4–8 objectives, respecting dependencies and current value.
-3. Persist only concise planning state in `HORIZON.md`: objective IDs, short reasons, order/dependency notes, current index, observable-progress target, and invalidation reason when applicable.
+3. Validate the generated horizon using the deterministic invariants below, then persist only concise planning state in `HORIZON.md`: objective IDs, short reasons, order/dependency notes, current index, observable-progress target, and invalidation reason when applicable.
 4. Prefer a horizon that leads to at least one observable playable/browser-facing capability where technically reasonable. If the horizon is infrastructure/evaluation only, record why that work must precede visible gameplay progress.
 
 Invalidate/replan early only for a blocker, architectural invalidation, dependency change, an objective becoming inapplicable, a newly discovered defect making the remaining order unsafe, materially higher-value new evidence, or a human-needed spec/legal blocker. Ordinary retries and the existence of other possible improvements do not trigger global replanning.
+
+## Deterministic horizon validation
+
+Before selecting from or writing `HORIZON.md`, scan the ordered objective list once and require:
+
+- unique objective IDs;
+- no objective already accepted in `CURRENT.md`/`HISTORY.md` represented as pending;
+- every prerequisite names an earlier horizon entry or an already accepted objective, and prerequisites of the selected next entry are accepted;
+- zero-based `current_index` points to the first applicable non-accepted entry, or equals the objective count when exhausted;
+- `CURRENT.md`'s next/active objective and the objective selected for delegation match that indexed entry.
+
+When accepting an objective, update its existing horizon entry in place; never append an entry with the same ID. Validate the complete candidate horizon and candidate `CURRENT.md` before persisting either. Repair candidate bookkeeping and revalidate if needed; do not invoke another agent, globally replan, or rewrite history for an ordinary bookkeeping error.
 
 ## Objective execution
 
 For each objective inside a valid horizon:
 
-1. Read `CURRENT.md`, `HORIZON.md`, the just-relevant evidence, and only the directly applicable specs/files. Do not globally reread/reprioritize the whole repository unless a strategic boundary has been reached.
+1. Read `CURRENT.md`, `HORIZON.md`, the just-relevant evidence, and only the directly applicable specs/files. Validate horizon invariants before choosing the indexed objective. Do not globally reread/reprioritize the whole repository unless a strategic boundary has been reached.
 2. Choose a builder:
    - `builder-qwen` (`qwen3.6`) for contracts, toolchain, determinism, tests, registries, glue.
    - `builder-mimo` (`mimo-v2.5`) for locomotion, ball feel, later presentation, large spec windows.
 3. Delegate one isolated change with `spawn_subagent`. Use `capability_mode: all` for builders and `capability_mode: execute` for critics, integration-reviewer, `aux`, and `git-committer`. Pass the model from `gauntlet/models.json`. Do not let a child inherit `grok-4.6`.
-4. Demand executed evidence. A plan with no command output is incomplete.
-5. Run an independent critic. Never use the implementation model as critic.
+4. Determine mandatory evidence from `gauntlet/evidence-contract.md`. Demand executed evidence and existing artifact paths before review. Gameplay/presentation objectives require their screenshot; tests alone are insufficient.
+5. Run an independent critic. Never use the implementation model as critic. Critic `ACCEPT` requires `mandatory_evidence_ok: true`.
 6. `RETRY` returns `required_fixes` to a builder. `REJECT` restores only failed candidate files and starts a new hypothesis. Keep accepted work.
-7. Critic `ACCEPT` is not final. Invoke `integration-reviewer` and require independent acceptance.
-8. Only after both accept: update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` if appropriate, advance `HORIZON.md`, then delegate atomic commits/push to `git-committer` (`gemma4`). Never commit or push yourself.
-9. If the horizon remains valid, start the next horizon objective directly. Reassess globally only at a strategic boundary.
+7. Critic `ACCEPT` is not final. Invoke `integration-reviewer`; require it to independently verify mandatory evidence and confirm the critic did not accept with evidence missing.
+8. After both accept, perform the final orchestrator gate: verify both review evidence fields and every mandatory artifact path. If any gate fails, do not persist acceptance or advance the horizon; return concrete fixes through the existing retry/review path.
+9. Only after all gates pass: update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` if appropriate, mark the existing horizon entry accepted in place, recompute `current_index`, validate candidate state, persist it, then delegate atomic commits/push to `git-committer` (`gemma4`). Never commit or push yourself.
+10. If the horizon remains valid, start the next horizon objective directly. Reassess globally only at a strategic boundary.
 
 Use `aux` (`gemma4`, fallback `qwen3.6`) to condense long diffs, logs, or artifact directories when orchestration needs a short persisted summary. Do not replace the critic/integration evidence with summaries.
 

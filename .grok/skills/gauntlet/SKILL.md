@@ -15,7 +15,7 @@ Follow `gauntlet/PROMPT.md` and `gauntlet/README.md`. Live execution state is `g
 
 Inspect `git status --short`, recent commits, `CURRENT.md`, and `HORIZON.md` before the first delegation.
 
-If `HORIZON.md` is uninitialized, exhausted, or materially invalidated, perform the strategic reassessment defined in `gauntlet/PROMPT.md` and persist a concise 4–8 objective horizon. Otherwise continue the next applicable horizon objective without globally reprioritizing the whole project.
+If `HORIZON.md` is uninitialized, exhausted, or materially invalidated, perform the strategic reassessment defined in `gauntlet/PROMPT.md`, validate the generated candidate, and persist a concise 4–8 objective horizon. Otherwise validate and continue the indexed next applicable horizon objective without globally reprioritizing the whole project. Horizon IDs must be unique; accepted objectives cannot be pending; prerequisites, zero-based `current_index`, and the selected next objective must agree.
 
 Delegate with `spawn_subagent`:
 
@@ -25,9 +25,9 @@ Delegate with `spawn_subagent`:
 - pass `model` from `gauntlet/models.json`; do not let a child inherit `grok-4.6`
 - commits and pushes go to `git-committer` / `gemma4`
 
-Preserve the adversarial loop: builder → critic → retry/fix as needed → critic → integration-reviewer → accept. Critic ACCEPT alone is never final.
+Preserve the adversarial loop: builder → required evidence → critic → retry/fix as needed → critic → integration-reviewer → orchestrator evidence gate → accept. Critic ACCEPT alone is never final. Determine required evidence from `gauntlet/evidence-contract.md`; gameplay/presentation screenshots are mandatory and tests cannot substitute for them.
 
-After both critic and integration review accept, update `CURRENT.md` and `HISTORY.md`, refresh `TIMING.md` when appropriate, advance `HORIZON.md`, and delegate commits to `git-committer`. If the horizon is still valid, continue directly to its next objective. Replan globally only at a strategic boundary.
+After both reviews accept, independently verify their mandatory-evidence fields and every required artifact. Only then update `CURRENT.md` and `HISTORY.md`, refresh `TIMING.md` when appropriate, mark the existing horizon entry accepted in place, recompute `current_index`, validate candidate state, and persist. Never append a duplicate entry. Repair bookkeeping locally; replan globally only at a strategic boundary.
 
 If SuperGrok weekly usage (`/usage`) is ≥89%, write `HANDOFF.md`, preserve the horizon, and tell the human to run `/gauntlet-continue` on `orchestrator-deepseek` instead of starting another builder here.
 

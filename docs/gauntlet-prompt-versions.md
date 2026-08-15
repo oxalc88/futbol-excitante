@@ -10,8 +10,11 @@ Git remains the source of truth for the exact prompt text. Do not copy historica
 |---|---|---|
 | `v1-global-replan` | `8d04d6240556e94f6e7fff0cf829e4acaf34aec1` | Original orchestration: after each accepted objective, inspect/reassess the project globally and choose the next highest-value objective. |
 | `v2-rolling-horizon` | `0e7755006d21e7ff7cda264c461ec8e2e736505d` | Rolling planning horizon: strategic reassessment only at startup/handoff/horizon exhaustion or material invalidation; execute roughly 4–8 planned objectives between assessments. |
+| `v3-evidence-horizon-gates` | `220bb47b18f1ada4325e62da96d9d3f17c52aada` | Makes mandatory evidence a critic/integration/orchestrator acceptance gate and validates horizon uniqueness, accepted/pending state, prerequisites, index, and next-objective correspondence before persistence. |
 
 `v2-rolling-horizon` was introduced by commit `7886a88ea0edeb677f2d261c001725d56ade9896` and merged to `main` by `0e7755006d21e7ff7cda264c461ec8e2e736505d`.
+
+`v3-evidence-horizon-gates` was introduced by commit `220bb47b18f1ada4325e62da96d9d3f17c52aada`. It preserves the v2 rolling horizon while making evidence and horizon bookkeeping explicit acceptance/persistence gates.
 
 ## Files that define orchestration behavior
 

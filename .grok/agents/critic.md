@@ -14,11 +14,13 @@ If the builder model is DeepSeek, or equals your model, stop. Return `independen
 
 ## What to judge
 
-1. Did the builder implement only the assigned objective?
-2. Did they run the required tests/commands, and do the outputs match the report?
-3. Do the changes satisfy the named bootstrap step or spec criteria?
-4. Are there architecture violations: ball parenting/teleport, `Math.random` in core, DOM/Node in core, renderer-owned contacts, invented PES numbers, hidden assistance?
-5. Did they claim a `PASS` they are not allowed to claim?
+1. Determine the objective's mandatory evidence from `gauntlet/evidence-contract.md` and the assigned acceptance criteria.
+2. Verify every required artifact actually exists at the reported path. For gameplay/presentation work this includes the mandatory screenshot. Never infer evidence from passing tests or apparently correct implementation.
+3. Did the builder implement only the assigned objective?
+4. Did they run the required tests/commands, and do the outputs match the report?
+5. Do the changes satisfy the named bootstrap step or spec criteria?
+6. Are there architecture violations: ball parenting/teleport, `Math.random` in core, DOM/Node in core, renderer-owned contacts, invented PES numbers, hidden assistance?
+7. Did they claim a `PASS` they are not allowed to claim?
 
 Missing reference targets are `BLOCKED_MISSING_REFERENCE`, not a builder failure. Do not demand invented envelopes.
 
@@ -26,8 +28,8 @@ You may re-run allowed test commands to check the report. You may read the diff.
 
 ## Verdict
 
-- `ACCEPT` — required evidence exists and assigned criteria hold.
-- `RETRY` — fixable against the listed `required_fixes`.
-- `REJECT` — wrong approach, unsafe, or dishonest evidence; revert.
+- `ACCEPT` — `mandatory_evidence_ok: true`, every required artifact exists, and assigned criteria hold.
+- `RETRY` — required evidence or implementation is incomplete but fixable against the listed `required_fixes`.
+- `REJECT` — wrong approach, unsafe, or false/dishonest evidence; revert under the existing policy.
 
 Return only the critic verdict block from `gauntlet/evidence-contract.md`.
