@@ -1523,3 +1523,14 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: pending (git-committer)
 - notes: Tick-based match clock (matchDurationTicks, elapsedTicks, remainingTicks, matchTimeSeconds, formatMatchTime) and score tracker (score keyed by teamId, goalEvents list with scoringTeamId, GoalTeamMapping config). Pure functions — computeMatchStats() and formatMatchTime(). 28 new tests in tests/integration/match-scoring.test.ts. No core changes. No PES claim. Architecture: all scoring/clock logic in eval/runners/ (adapter layer).
+
+## Iteration 39 — 2026-08-15
+
+- objective_id: BROWSER-SCOREBOARD
+- builder: builder-mimo / mimo-v2.5
+- critic: critic-qwen / qwen3.6 (fallback — DeepSeek allowance exhausted)
+- verdict: ACCEPT (first pass)
+- integration: ACCEPT (integration-reviewer / qwen3.6, fallback — DeepSeek exhausted)
+- result: accepted
+- commits: pending (git-committer)
+- notes: Scoreboard HTML/CSS overlay in browser adapter. Match clock (mm:ss from sim.tick × 1/60) and team scores (goalIndex 0 → team-a, goalIndex 1 → team-b) displayed at top center. HOME (blue) / AWAY (red) team colors. All 57/58 test files pass (1 pre-existing browser failure). No core changes.

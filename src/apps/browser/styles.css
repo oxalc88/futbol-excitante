@@ -38,6 +38,72 @@ html, body {
   height: 100%;
 }
 
+#scoreboard {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 6px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 20;
+  font-family: "Courier New", Courier, monospace;
+  user-select: none;
+}
+
+#scoreboard-team-a,
+#scoreboard-team-b {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+}
+
+#scoreboard-team-a {
+  background: rgba(30, 60, 120, 0.85);
+}
+
+#scoreboard-team-b {
+  background: rgba(120, 30, 30, 0.85);
+}
+
+.scoreboard-team-name {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.scoreboard-score {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+#scoreboard-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+#scoreboard-clock {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
 #hud {
   position: absolute;
   top: 10px;

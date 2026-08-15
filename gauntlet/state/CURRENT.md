@@ -7,11 +7,16 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: BROWSER-SCOREBOARD
+next_objective_id: MATCH-LIFECYCLE
 best_known:
-  commit: a57edf2
-  note: "MATCH-SCORING accepted. Headless match runner now reports tick-based clock and team scores. Next: wire scoreboard into browser renderer."
-active_candidate: null
+  commit: 9aaf32e
+  note: "BROWSER-SCOREBOARD accepted. Browser now displays match clock and team scores via HTML/CSS overlay. Next: MATCH-LIFECYCLE — add match phases (kickoff, halftime auto-reset, fulltime stop) with goal-triggered kickoff reset."
+active_candidate:
+  objective_id: MATCH-LIFECYCLE
+  builder: builder-qwen
+  critic: critic
+  started_from_commit: 9aaf32e
+  last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
 retry_count: 0
@@ -30,6 +35,7 @@ accepted:
   - CPU-GOAL-AWARENESS
   - HEADLESS-CPU-MATCH
   - MATCH-SCORING
+  - BROWSER-SCOREBOARD
 blocked: []
 selection_note: "HEADLESS-CPU-MATCH accepted. Next: match scoring — add a simple tick-based match clock and score tracker that listens for 'goal' simulation events and increments team scores. Wire into the headless match runner. This completes the basic football structure: locomotion → ball → contacts → goals → scoring. PLAYABLE_1V1 remains blocked on perceptual gates (must not invent)."
 ```

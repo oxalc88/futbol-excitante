@@ -91,6 +91,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | CAPABILITY-SWERVE | accepted | ~40m | 25.0m | 8.9m | 5.1m | 0.8m | ~0.5M | n/a** |
 | CPU-OPPONENT-1V1 | accepted | ~21m | 11.8m | 3.0m | 5.3m | 0.5m | ~0.1M | n/a** |
 | MATCH-SCORING | accepted | ~33m | 26.8m | 4.8m | 5.0m | 0.5m | ~8.5M | n/a** |
+| BROWSER-SCOREBOARD | accepted | ~14m | 10.2m | 4.3m | 4.4m | 0.5m | ~5.2M | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,

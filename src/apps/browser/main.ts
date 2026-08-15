@@ -67,6 +67,15 @@ const tickDisplay = document.getElementById("tick-display");
 const hashDisplay = document.getElementById("hash-display");
 
 /**
+ * DOM elements for scoreboard display.
+ */
+const scoreboardClock = document.getElementById("scoreboard-clock");
+const scoreboardScoreA = document.getElementById("scoreboard-score-a");
+const scoreboardScoreB = document.getElementById("scoreboard-score-b");
+const scoreboardNameA = document.getElementById("scoreboard-name-a");
+const scoreboardNameB = document.getElementById("scoreboard-name-b");
+
+/**
  * Main browser entry point.
  *
  * Creates the simulation, keyboard adapter(s), and renderer, then runs
@@ -134,6 +143,10 @@ function main(): void {
   let lastTime = performance.now();
   let accumulator = 0;
 
+  // Scoreboard state — pure derivation from simulation events.
+  let scoreA = 0;
+  let scoreB = 0;
+
   function gameLoop(now: number): void {
     // Wall-clock delta (for pacing only — never passed to gameplay).
     const deltaTime = (now - lastTime) / 1000; // seconds
@@ -160,9 +173,21 @@ function main(): void {
       sim.applyInputs(allFrames);
 
       // Advance the simulation by one fixed tick.
-      sim.step();
+      const stepResult = sim.step();
       accumulator -= FIXED_DT;
       stepsThisFrame++;
+
+      // Process goal events from this step.
+      for (const evt of stepResult.events) {
+        if (evt.kind === "goal") {
+          const goalIndex = (evt.payload.goalIndex as number) ?? -1;
+          if (goalIndex === 0) {
+            scoreA++;
+          } else if (goalIndex === 1) {
+            scoreB++;
+          }
+        }
+      }
     }
 
     // Render from the latest presentation snapshot.
@@ -179,6 +204,21 @@ function main(): void {
     }
     if (hashDisplay) {
       hashDisplay.textContent = `Hash: ${sim.stateHash().slice(0, 20)}...`;
+    }
+
+    // Update scoreboard — match clock derived from tick, scores from events.
+    if (scoreboardClock) {
+      const totalSeconds = Math.floor(sim.tick * FIXED_DT);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      scoreboardClock.textContent =
+        `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+    if (scoreboardScoreA) {
+      scoreboardScoreA.textContent = String(scoreA);
+    }
+    if (scoreboardScoreB) {
+      scoreboardScoreB.textContent = String(scoreB);
     }
 
     // Continue loop.
