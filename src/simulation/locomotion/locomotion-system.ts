@@ -64,6 +64,10 @@ function unit(v: { x: number; y: number }): { x: number; y: number } {
  *     angular turn rate.  Movement direction, body heading, and desired
  *     heading remain distinct fields.
  *  3. Position is integrated as `groundPosition += linearVelocity × dt`.
+ *  4. When `config.transientAcceleration > 0`, an early-speed bonus is
+ *     applied during the acceleration phase.  The bonus scales with
+ *     the coefficient and the gap between current and maximum speed,
+ *     tapering to zero at the sustainable-speed plateau.
  *
  * All coefficient values come from the versioned config parameter.
  * Unmeasured values are labelled provisional.
@@ -81,6 +85,7 @@ export function stepLocomotion(
   const accel = config.acceleration.value;
   const brake = config.braking.value;
   const turnRate = config.turnRate.value;
+  const transientAccel = config.transientAcceleration?.value ?? 0;
 
   for (const player of players) {
     // -- 1. Compute target velocity from desiredVelocity direction --------
@@ -97,6 +102,13 @@ export function stepLocomotion(
       y: targetDir.y * targetSpeed,
     };
 
+    // -- 1.5. Transient acceleration bonus (early-speed only) ----------
+    // The bonus scales with the coefficient and the gap between current
+    // speed and maximum speed, tapering to zero at the plateau.
+    const currentSpeed = mag(player.linearVelocity);
+    const speedGap = maxSpeed - currentSpeed;
+    const transientBonus = transientAccel * accel * Math.max(0, speedGap) / maxSpeed;
+
     // -- 2. Converge linearVelocity toward targetVelocity ----------------
 
     const errX = targetVelocity.x - player.linearVelocity.x;
@@ -106,8 +118,10 @@ export function stepLocomotion(
     if (errMag > 0) {
       // Choose acceleration or braking limit based on whether we are
       // gaining or losing speed along the error direction.
-      const currentSpeed = mag(player.linearVelocity);
-      const maxDelta = targetSpeed >= currentSpeed ? accel * dt : brake * dt;
+      const isAccelerating = targetSpeed >= currentSpeed;
+      // Apply transient acceleration bonus only during acceleration phase.
+      const baseMaxDelta = isAccelerating ? accel * dt : brake * dt;
+      const maxDelta = isAccelerating ? baseMaxDelta + transientBonus * dt : baseMaxDelta;
 
       if (errMag <= maxDelta) {
         // Error is small enough to close in one tick.
