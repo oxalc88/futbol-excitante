@@ -60,7 +60,14 @@ import { stepLocomotion } from "../locomotion/locomotion-system.js";
 import { stepBall } from "../ball/ball-system.js";
 import { stepContacts } from "../contacts/contact-system.js";
 import { stepPlayerContacts } from "../player-contact/player-contact-system.js";
-import { FOUNDATION_LOCOMOTION_V1, FOUNDATION_BALL_V1, FOUNDATION_CLOSE_CONTROL_V1, FOUNDATION_PLAYER_CONTACT_V1 } from "../config/foundation.js";
+import {
+  FOUNDATION_LOCOMOTION_V1,
+  FOUNDATION_BALL_V1,
+  FOUNDATION_CLOSE_CONTROL_V1,
+  FOUNDATION_PLAYER_CONTACT_V1,
+  FOUNDATION_CONFIG,
+  TRANSIENT_ACCEL_LOCOMOTION_V1,
+} from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -169,11 +176,15 @@ export interface Simulation {
  *
  * @param world - The initial world state (must not be mutated by callers).
  * @param observer - Telemetry observer; defaults to no-op.
+ * @param locomotionConfigOverride - Optional locomotion config override.
+ *   If provided, used instead of the world state's config for locomotion.
+ *   Useful for capability evaluation where low/high values need different configs.
  * @returns A simulation instance.
  */
 export function createSimulation(
   world: WorldState,
   observer?: SimulationObserver,
+  locomotionConfigOverride?: typeof FOUNDATION_LOCOMOTION_V1,
 ): Simulation {
   const obs = observer ?? NO_OP_OBSERVER;
 
@@ -338,14 +349,30 @@ export function createSimulation(
   /**
    * Stage: locomotion integration.
    *
-   * Reads desiredVelocity / desiredHeading that were set by input
-   * resolution, converges actual linearVelocity / bodyHeading under
-   * provisional acceleration, braking, max speed, and turn-rate limits,
-   * then integrates ground position from velocity.
+   * Reads the locomotion config from world state and uses it to
+   * converge actual velocity/heading/position under configurable
+   * limits, including the versioned transient acceleration bonus.
    */
   function locomotionStep(): void {
     const dt = state.fixedDt.numerator / state.fixedDt.denominator;
-    stepLocomotion(state.players, dt, FOUNDATION_LOCOMOTION_V1);
+    // Prefer the override (used by capability evaluation for low vs high configs),
+    // otherwise read from world state configVersion.
+    let locoConfig: typeof FOUNDATION_LOCOMOTION_V1;
+    if (locomotionConfigOverride) {
+      locoConfig = locomotionConfigOverride;
+    } else {
+      switch (state.configVersion) {
+        case "foundation-config-v1":
+          locoConfig = FOUNDATION_LOCOMOTION_V1;
+          break;
+        case "transient-accel-locomotion-v1":
+          locoConfig = TRANSIENT_ACCEL_LOCOMOTION_V1;
+          break;
+        default:
+          locoConfig = FOUNDATION_LOCOMOTION_V1;
+      }
+    }
+    stepLocomotion(state.players, dt, locoConfig);
   }
 
   /**
