@@ -140,23 +140,23 @@ loops did that take, given the difficulty of the objective.
 
 **Difficulty** is the job, not the outcome:
 
-| Band | Meaning |
-|---|---|
-| L | Thin wiring, docs, or a single contract with an existing test harness |
-| M | New module, but the oracle/contract already exists |
-| H | New physics, input, or browser path that can violate architecture |
-| VH | Protected oracles, honest FAIL paths, or anything the critic can call theatrical |
+| Band | Level | Meaning |
+|---|---|---|
+| L | Low | Thin wiring, docs, or a single contract with an existing test harness |
+| M | Medium | New module, but the oracle/contract already exists |
+| H | High | New physics, input, or browser path that can violate architecture |
+| VH | Very High | Protected oracles, honest FAIL paths, or anything the critic can call theatrical |
 
 **Builder grade** is first-pass quality against the critic:
 
-| Grade | Meaning |
-|---|---|
-| A | Critic ACCEPT on the first candidate |
-| B | 1 critic RETRY, then ACCEPT |
-| C | 2 critic RETRIES, then ACCEPT |
-| D | 3 critic RETRIES (budget exhausted), then ACCEPT |
-| R | Critic REJECT, then a recovered ACCEPT |
-| I | In flight / not accepted |
+| Grade | Name | Meaning |
+|---|---|---|
+| A | First pass | Critic ACCEPT on the first candidate |
+| B | One retry | 1 critic RETRY, then ACCEPT |
+| C | Two retries | 2 critic RETRIES, then ACCEPT |
+| D | Budget used | 3 critic RETRIES (budget exhausted), then ACCEPT |
+| R | Recovered reject | Critic REJECT, then a recovered ACCEPT |
+| I | Incomplete | In flight / not accepted |
 
 Retries here are **critic loops**, from `gauntlet/state/HISTORY.md`. An HTTP
 499 mid-write that was resumed without a critic RETRY is noted, not graded as
@@ -168,39 +168,39 @@ on an H task is the interesting result.
 
 ### Per-objective grade
 
-| Step | Builder | Diff | Critic loops | Grade | What the loops were about |
-|---|---|---|---:|---|---|
-| BOOTSTRAP-01 | qwen3.6 | M | 1 | B | Theatrical isolation/version/build tests |
-| BOOTSTRAP-02 | qwen3.6 | M | 0 | A | Contracts + versioned config |
-| BOOTSTRAP-03 | qwen3.6 | H | 1 | B | Non-canonical PRNG / FNV / UTF-8 |
-| BOOTSTRAP-04 | qwen3.6 | M | 0 | A | Deterministic `createWorld` |
-| BOOTSTRAP-05 | qwen3.6 | M | 0 | A | Sync Simulation API |
-| BOOTSTRAP-06 | qwen3.6 | H | 2 | C | Dead slot wiring, then tick/unassigned |
-| BOOTSTRAP-07 | mimo-v2.5 | H | 0 | A | One-player kinematic locomotion |
-| BOOTSTRAP-08 | mimo-v2.5 | H | 0 | A | Independent 3D ball |
-| BOOTSTRAP-09 | qwen3.6 | M | 1 | B | Missing verifier / full checkpoints |
-| BOOTSTRAP-10 | qwen3.6 | H | 3 | D | Theatrical canaries; CLI replay verify |
-| BOOTSTRAP-11 | mimo-v2.5 | H | 2 | C | Theatrical screenshot smoke (twice) |
-| BOOTSTRAP-12 | qwen3.6 | M | 1 | B | argv offset; compare flag order |
-| FOUNDATION-REGISTRIES | qwen3.6 | M | 0 | A | First session died HTTP 499; critic accepted the finished candidate |
-| FOUNDATION-ORACLES | qwen3.6 | VH | 3 + REJECT | R | Theatrical camera-hash/decay; public `mutatePrng` |
-| FOUNDATION-HARD | qwen3.6 | VH | 3 | D | HARD_INVARIANTs not actually bound |
-| FOUNDATION-BROWSER | qwen3.6 | H | 3 | D | Browser hash / smoke evidence |
-| FOUNDATION-DETERMINISTIC | qwen3.6 | M | 0 | A | Same-start / replay identity |
-| FOUNDATION-MUTANT-REDUCTION | qwen3.6 | H | 1 | B | Reduction / mutant wiring |
-| FOUNDATION-PROMOTION | qwen3.6 | H | 1 | B | Promotion gate honesty |
-| CAPABILITY-DESIGN-PROFILE | qwen3.6 | M | 0 | A | Capability-design profile |
-| PLAYABLE-FIRST-TOUCH | mimo-v2.5 | H | 0 | A | Independent-ball first touch |
-| PLAYABLE-BASIC-PASS | mimo-v2.5 | H | 1 | B | J still first-touch; pass oracle ignored `kind` |
-| PLAYABLE-BASIC-SHOT | mimo-v2.5 | H | 0 | A | Directed shot impulse |
-| PLAYABLE-SECOND-SLOT | qwen3.6 | M | 1 | B | Unused two-player scenario; theatrical ball test |
-| PLAYABLE-CLOSE-CONTROL | mimo-v2.5 | H | 1 | B | `restore()` dropped dribble cooldown |
-| PLAYABLE-PLAYER-DUEL | mimo-v2.5 | H | 1 | B | Pair order followed array index, not stable IDs |
-| PLAYABLE-ENGINE-DESIGN-RUNNER | qwen3.6 | M | 0 | A | Transient-accel runner |
-| PLAYABLE-FICTIONAL-ARCHETYPES | qwen3.6 | M | 0 | A | Burst/steady per player |
-| PLAYABLE-BROWSER-1V1 | qwen3.6 | M | 0 | A | Two-slot browser control |
-| PLAYABLE-1V1-PROFILE | qwen3.6 | M | 0 | A | Honest profile that cannot PASS |
-| PLAYABLE-TOUCH-ACTIONS-SUITE | qwen3.6 | VH | 1+ | I | First critic: dishonest contact/impulse oracles. Retry not re-accepted |
+| Step | Builder | Diff | Level | Critic loops | Grade | What the loops were about |
+|---|---|---|---|---:|---|---|
+| BOOTSTRAP-01 | qwen3.6 | M | Medium — new module, existing harness | 1 | B | Theatrical isolation/version/build tests |
+| BOOTSTRAP-02 | qwen3.6 | M | Medium — new module, existing harness | 0 | A | Contracts + versioned config |
+| BOOTSTRAP-03 | qwen3.6 | H | High — can violate architecture | 1 | B | Non-canonical PRNG / FNV / UTF-8 |
+| BOOTSTRAP-04 | qwen3.6 | M | Medium — new module, existing harness | 0 | A | Deterministic `createWorld` |
+| BOOTSTRAP-05 | qwen3.6 | M | Medium — new module, existing harness | 0 | A | Sync Simulation API |
+| BOOTSTRAP-06 | qwen3.6 | H | High — new input path | 2 | C | Dead slot wiring, then tick/unassigned |
+| BOOTSTRAP-07 | mimo-v2.5 | H | High — new physics | 0 | A | One-player kinematic locomotion |
+| BOOTSTRAP-08 | mimo-v2.5 | H | High — new physics | 0 | A | Independent 3D ball |
+| BOOTSTRAP-09 | qwen3.6 | M | Medium — new module, existing harness | 1 | B | Missing verifier / full checkpoints |
+| BOOTSTRAP-10 | qwen3.6 | H | High — CLI / eval path | 3 | D | Theatrical canaries; CLI replay verify |
+| BOOTSTRAP-11 | mimo-v2.5 | H | High — new browser path | 2 | C | Theatrical screenshot smoke (twice) |
+| BOOTSTRAP-12 | qwen3.6 | M | Medium — wiring / existing harness | 1 | B | argv offset; compare flag order |
+| FOUNDATION-REGISTRIES | qwen3.6 | M | Medium — new module, existing contract | 0 | A | First session died HTTP 499; critic accepted the finished candidate |
+| FOUNDATION-ORACLES | qwen3.6 | VH | Very High — honest FAIL / theatrical risk | 3 + REJECT | R | Theatrical camera-hash/decay; public `mutatePrng` |
+| FOUNDATION-HARD | qwen3.6 | VH | Very High — protected oracles | 3 | D | HARD_INVARIANTs not actually bound |
+| FOUNDATION-BROWSER | qwen3.6 | H | High — new browser path | 3 | D | Browser hash / smoke evidence |
+| FOUNDATION-DETERMINISTIC | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Same-start / replay identity |
+| FOUNDATION-MUTANT-REDUCTION | qwen3.6 | H | High — eval path can lie | 1 | B | Reduction / mutant wiring |
+| FOUNDATION-PROMOTION | qwen3.6 | H | High — eval path can lie | 1 | B | Promotion gate honesty |
+| CAPABILITY-DESIGN-PROFILE | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Capability-design profile |
+| PLAYABLE-FIRST-TOUCH | mimo-v2.5 | H | High — new physics / contact | 0 | A | Independent-ball first touch |
+| PLAYABLE-BASIC-PASS | mimo-v2.5 | H | High — new physics / input | 1 | B | J still first-touch; pass oracle ignored `kind` |
+| PLAYABLE-BASIC-SHOT | mimo-v2.5 | H | High — new physics / input | 0 | A | Directed shot impulse |
+| PLAYABLE-SECOND-SLOT | qwen3.6 | M | Medium — new module, existing contract | 1 | B | Unused two-player scenario; theatrical ball test |
+| PLAYABLE-CLOSE-CONTROL | mimo-v2.5 | H | High — new physics / restore | 1 | B | `restore()` dropped dribble cooldown |
+| PLAYABLE-PLAYER-DUEL | mimo-v2.5 | H | High — new physics | 1 | B | Pair order followed array index, not stable IDs |
+| PLAYABLE-ENGINE-DESIGN-RUNNER | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Transient-accel runner |
+| PLAYABLE-FICTIONAL-ARCHETYPES | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Burst/steady per player |
+| PLAYABLE-BROWSER-1V1 | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Two-slot browser control |
+| PLAYABLE-1V1-PROFILE | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Honest profile that cannot PASS |
+| PLAYABLE-TOUCH-ACTIONS-SUITE | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 1+ | I | First critic: dishonest contact/impulse oracles. Retry not re-accepted |
 
 ### Builder scoreboard
 
