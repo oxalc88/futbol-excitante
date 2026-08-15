@@ -1,7 +1,7 @@
 # Gauntlet handoff
 
 Overflow pickup file. The DeepSeek orchestrator reads this before `CURRENT.md`.
-Grok 4.6 rewrites this when the parent window hits 95% (475k of 500k).
+Grok 4.6 rewrites this when SuperGrok weekly usage (`/usage`) hits 89%. That is not the 500k context footer.
 
 ```yaml
 handoff_version: 1
@@ -11,7 +11,8 @@ to_orchestrator: orchestrator-deepseek
 from_model: grok-4.6
 to_model: deepseek-v4-flash-0731
 parent_window: 500000
-handoff_at_percent: 95
+handoff_at_percent: 89
+handoff_metric: super_grok_weekly_usage
 auto_compact_percent: 65
 ```
 

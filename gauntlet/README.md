@@ -57,7 +57,7 @@ Optional extra focus after `/gauntlet`:
 
 | Agent | Kind | Default model | Writes | Job |
 |---|---|---|---|---|
-| `orchestrator` | primary | `grok-4.6` | `gauntlet/state/**`, `gauntlet/objectives.md` | Inspect, prioritize, delegate, accept/revert, choose the next objective. Hands off at 95% of the 500k window. |
+| `orchestrator` | primary | `grok-4.6` | `gauntlet/state/**`, `gauntlet/objectives.md` | Inspect, prioritize, delegate, accept/revert, choose the next objective. Hands off at 89% SuperGrok weekly usage (`/usage`). |
 | `orchestrator-deepseek` | primary (overflow) | `deepseek-v4-flash-0731` | `gauntlet/state/**`, `gauntlet/objectives.md` | Same loop. Picks up from `HANDOFF.md` + `CURRENT.md` after Grok hits the ceiling. |
 | `builder-qwen` | subagent | `qwen3.6` | implementation files | Structured TypeScript, toolchain, contracts, tests, registries |
 | `builder-mimo` | subagent | `mimo-v2.5` | implementation files | Large-context gameplay/presentation work |
@@ -102,7 +102,7 @@ The usual isolatable pair is `BOOTSTRAP-07` and `BOOTSTRAP-08` once input exists
 
 | Role | Exact model | Fallback |
 |---|---|---|
-| Orchestrator | `grok-4.6` | `orchestrator-deepseek` at ≥95% of the 500k window. Do not fall back to Grok 4, 4.5, or 4.20. |
+| Orchestrator | `grok-4.6` | `orchestrator-deepseek` at ≥89% SuperGrok weekly usage (`/usage`). Do not fall back to Grok 4, 4.5, or 4.20. |
 | Overflow orchestrator | `deepseek-v4-flash-0731` | none. Launch with `--model deepseek-v4-flash-0731`. |
 | Primary builders | `qwen3.6` and `mimo-v2.5` | the other builder |
 | Primary critic | `deepseek-v4-flash-0731` | `critic-mimo` if the builder was Qwen; `critic-qwen` if the builder was MiMo |
@@ -112,7 +112,7 @@ The usual isolatable pair is `BOOTSTRAP-07` and `BOOTSTRAP-08` once input exists
 
 Hard rule: the critic model must differ from the implementation model for that candidate.
 
-Use NaN models for high-token implementation, test fixing, experimentation, and repeated criticism. Use `gemma4` for summaries and git commits. Use Grok 4.6 for orchestration until the parent window hits 95%. Then continue on `orchestrator-deepseek` (`deepseek-v4-flash-0731`) from `gauntlet/state/HANDOFF.md`. Auto-compact is 65% of the 500k window (`~/.grok/config.toml` `[session] auto_compact_threshold_percent = 65`). That setting lives in the user config, not project `.grok/config.toml`.
+Use NaN models for high-token implementation, test fixing, experimentation, and repeated criticism. Use `gemma4` for summaries and git commits. Use Grok 4.6 for orchestration until **SuperGrok weekly usage** (`/usage`, not the `217K / 500K` context footer) hits **89%**. Then continue on `orchestrator-deepseek` (`deepseek-v4-flash-0731`) from `gauntlet/state/HANDOFF.md`. Auto-compact is still 65% of the 500k **context** window (`~/.grok/config.toml` `[session] auto_compact_threshold_percent = 65`). That setting lives in the user config, not project `.grok/config.toml`.
 
 Overflow launch (always pass `--model`):
 

@@ -25,6 +25,6 @@ Delegate with `spawn_subagent`:
 
 Default critic is DeepSeek. Never review an implementation with the same model that built it. After critic ACCEPT, run `integration-reviewer`. Then update `gauntlet/state/CURRENT.md` and `gauntlet/state/HISTORY.md`, refresh `gauntlet/state/TIMING.md` when a step finishes, and delegate commits to `git-committer` (`gemma4`). If Qwen and MiMo repeatedly fail, decompose, try another NaN agent, or mark the objective blocked. Grok must not implement or commit.
 
-If this Grok session is ≥95% of the 500k window, write `gauntlet/state/HANDOFF.md` and tell the human to run `/gauntlet-continue` on `orchestrator-deepseek` instead of starting another builder here.
+If SuperGrok weekly usage (`/usage`) is ≥89%, write `gauntlet/state/HANDOFF.md` and tell the human to run `/gauntlet-continue` on `orchestrator-deepseek` instead of starting another builder here. That bar is not the 500k context footer.
 
 If the user passed extra focus after `/gauntlet`, apply it to objective selection only. Do not skip critic or integration review.

@@ -58,7 +58,7 @@ You may write only `gauntlet/state/**` and `gauntlet/objectives.md`. Do not edit
 
 - You are DeepSeek overflow. Stay on orchestration. Never implement.
 - Do not invent PES numbers, envelopes, or `FOUNDATION_LAB_PASS` / `PLAYABLE_1V1_PASS`.
-- If your own footer is ≥95% of the 500k window after auto-compact, update `HANDOFF.md` and stop for the human. Do not start another builder.
+- SuperGrok weekly usage does not apply to you (NaN). If your own 500k context footer is ≥95% after auto-compact, update `HANDOFF.md` and stop for the human. Do not start another builder.
 
 ## Stop conditions
 

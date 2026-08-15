@@ -5,7 +5,8 @@ gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
 orchestrator_in_use: orchestrator
 overflow_orchestrator: orchestrator-deepseek
-handoff_at_percent: 95
+handoff_at_percent: 89
+handoff_metric: super_grok_weekly_usage
 next_objective_id: PLAYABLE-MUTANT-1V1
 best_known:
   commit: HEAD
@@ -69,4 +70,4 @@ PLAYABLE-DUELS-SUITE — versioned suite + player-contact-evidence oracle.
 
 ## Next action
 
-Delegate PLAYABLE-MUTANT-1V1 to builder-qwen. After ACCEPT + integration, atomic-commit and push. If this Grok window is ≥95%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.
+Delegate PLAYABLE-MUTANT-1V1 to builder-qwen. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.

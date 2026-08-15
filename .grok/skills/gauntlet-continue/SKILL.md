@@ -1,6 +1,6 @@
 ---
 name: gauntlet-continue
-description: Resume the PES Simulator Gauntlet from CURRENT.md and HANDOFF.md on the DeepSeek overflow orchestrator. Use when Grok 4.6 hit the context ceiling, or when the user runs /gauntlet-continue.
+description: Resume the PES Simulator Gauntlet from CURRENT.md and HANDOFF.md on the DeepSeek overflow orchestrator. Use when SuperGrok weekly usage hits 89%, or when the user runs /gauntlet-continue.
 user-invocable: true
 disable-model-invocation: true
 model: deepseek-v4-flash-0731
