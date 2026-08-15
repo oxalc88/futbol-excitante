@@ -3,78 +3,53 @@
 ```yaml
 gauntlet_version: gauntlet-loop-v1
 phase: PLAYABLE
-orchestrator_in_use: orchestrator
+orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CPU-OPPONENT-1V1
+next_objective_id: CPU-GOAL-AWARENESS
 best_known:
-  commit: eba48b2
-  note: "CAPABILITY-SWERVE accepted. ENGINE_DESIGN_TARGET 5/5 axes IMPLEMENTED. PLAYABLE_1V1 still cannot PASS (perceptual gates only). Not PES. Next: CPU opponent for second slot."
+  commit: HEAD
+  note: "BALL-GOAL-COLLISION accepted. Ball detects posts, crossbars, and goals. Next: CPU goal awareness — steer toward opponent's goal and shoot."
 active_candidate:
-  objective_id: CPU-OPPONENT-1V1
-  builder: builder-qwen
+  objective_id: CPU-GOAL-AWARENESS
+  builder: builder-mimo
   critic: critic
-  started_from_commit: eba48b2
+  started_from_commit: HEAD
   last_verdict: null
-builder_in_use: builder-qwen
+builder_in_use: builder-mimo
 critic_in_use: critic
 retry_count: 0
 max_retries_per_objective: 3
 nan_builder_failures: 0
 accepted:
-  - BOOTSTRAP-01
-  - BOOTSTRAP-02
-  - BOOTSTRAP-03
-  - BOOTSTRAP-04
-  - BOOTSTRAP-05
-  - BOOTSTRAP-06
-  - BOOTSTRAP-07
-  - BOOTSTRAP-08
-  - BOOTSTRAP-09
-  - BOOTSTRAP-10
-  - BOOTSTRAP-11
-  - BOOTSTRAP-12
-  - FOUNDATION-REGISTRIES
-  - FOUNDATION-ORACLES
-  - FOUNDATION-HARD
-  - FOUNDATION-BROWSER
-  - FOUNDATION-DETERMINISTIC
-  - FOUNDATION-MUTANT-REDUCTION
-  - FOUNDATION-PROMOTION
+  - BOOTSTRAP-01 through BOOTSTRAP-12
+  - FOUNDATION-REGISTRIES through FOUNDATION-PROMOTION
   - CAPABILITY-DESIGN-PROFILE
-  - PLAYABLE-FIRST-TOUCH
-  - PLAYABLE-BASIC-PASS
-  - PLAYABLE-BASIC-SHOT
-  - PLAYABLE-SECOND-SLOT
-  - PLAYABLE-CLOSE-CONTROL
-  - PLAYABLE-PLAYER-DUEL
-  - PLAYABLE-ENGINE-DESIGN-RUNNER
-  - PLAYABLE-FICTIONAL-ARCHETYPES
-  - PLAYABLE-BROWSER-1V1
-  - PLAYABLE-1V1-PROFILE
-  - PLAYABLE-TOUCH-ACTIONS-SUITE
-  - PLAYABLE-DUELS-SUITE
-  - PLAYABLE-MUTANT-1V1
-  - CAPABILITY-PHYSICAL-CONTACT
-  - CAPABILITY-SHOOTING-POWER
-  - CAPABILITY-BODY-CONTROL
+  - PLAYABLE-FIRST-TOUCH through PLAYABLE-MUTANT-1V1
+  - CAPABILITY-PHYSICAL-CONTACT through CAPABILITY-BODY-CONTROL
   - LOCOMOTION-LATERAL-DRIFT
   - CAPABILITY-SWERVE
+  - CPU-OPPONENT-1V1
+  - BALL-GOAL-COLLISION
 blocked: []
-selection_note: "CAPABILITY-SWERVE accepted. ENGINE_DESIGN_TARGET now 5/5 axes IMPLEMENTED (transient acceleration, physical contact, shooting power, body control, swerve). PLAYABLE_1V1 remains blocked only on perceptual gates (ARCH-DIFF-001, ARCHETYPE_BLINDED_COMPARISON_PASS), which must not be invented. The highest-value next gap is a CPU/AI opponent for the second slot: the contracts already define mode: HUMAN | AI_FALLBACK, no implementation exists. Adding a simple chase-ball CPU player would make 1v1 actually playable (human vs CPU) and unlocks the next meaningful gameplay progression. Goal/post collision detection is the runner-up gap."
+selection_note: "BALL-GOAL-COLLISION accepted. Goal/post collision, crossbar, and goal-entered detection now in the ball system. Next: make the CPU opponent goal-aware — steer toward opponent's goal when in possession, shoot when in range. This makes 1v1 actually playable end-to-end (CPU can score). PLAYABLE_1V1 remains blocked on perceptual gates (must not invent)."
 ```
 
 ## Last accepted objective
 
-CAPABILITY-SWERVE — Magnus curve force and swerve capability axis.
+BALL-GOAL-COLLISION — post, crossbar, and goal detection.
 
-- builder: builder-qwen / qwen3.6
+- builder: builder-mimo / mimo-v2.5
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT (first pass)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- commits: 57f554d, c1c2b35, eba48b2
-- ENGINE_DESIGN_TARGET 5/5 axes IMPLEMENTED. No PLAYABLE_1V1_PASS / PES claim.
+- commits: (pending git-committer)
 
 ## Next action
 
-Delegate CPU-OPPONENT-1V1 to builder-qwen or builder-mimo. The objective: implement a simple CPU/AI decision system that generates InputFrame values for a CPU-controlled player slot (mode: AI_FALLBACK), enabling a one-HUMAN + one-CPU 1v1. The contracts (input.ts, scenario.ts, state.ts) already declare `mode: "HUMAN" | "AI_FALLBACK"` but no CPU input generator exists. The CPU player needs at minimum: chase-ball or move-toward-goal steering, and a way to inject generated input frames into the slot that would otherwise expect HUMAN keyboard input. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.
+Delegate CPU-GOAL-AWARENESS to builder-mimo. Enhance the CpuAdapter to:
+1. Know which goal is the opponent's (based on CPU player's teamId and pitch direction)
+2. Steer toward opponent's goal when carrying the ball
+3. Shoot (SHOT_BIT) when within ~15m of goal and facing the goal
+4. Keep chase-ball behavior when not in possession
+5. Tests for each new behavior

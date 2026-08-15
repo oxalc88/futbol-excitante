@@ -5,10 +5,10 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-15T09:55:00Z
+measured_at: 2026-08-15T16:44:00Z
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
-overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, and the lateral-drift row are measured from this overflow session's meta.json
+overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
 ```
 
 ## How to read this
@@ -36,16 +36,16 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 29h 05m |
+| Calendar span (first work → measurement) | 39h 25m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | 23h 49m |
-| Sum of per-step agent time | 20h 20m |
-| Orchestrator thinking between steps | ~3h 29m |
+| Active work (anything running) | 34h 09m |
+| Sum of per-step agent time | 21h 21m |
+| Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-15 ~06:25 UTC`.
-The per-step total now includes DUELS-SUITE (1h 40m) and MUTANT-1V1 (23m);
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-15 ~16:44 UTC`.
+The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
-bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window.
+bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
 
 ## Per-step time and tokens
 
@@ -89,6 +89,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window.
 | CAPABILITY-BODY-CONTROL (2 retries) | accepted | ~1h 28m | 65.4m | 15.1m | 7.7m | 0.5m | ~13.2M | n/a** |
 | LOCOMOTION-LATERAL-DRIFT | accepted | ~24m | 12.9m | 4.5m | 6.6m | 0.5m | ~1.7M | n/a** |
 | CAPABILITY-SWERVE | accepted | ~40m | 25.0m | 8.9m | 5.1m | 0.8m | ~0.5M | n/a** |
+| CPU-OPPONENT-1V1 | accepted | ~21m | 11.8m | 3.0m | 5.3m | 0.5m | ~0.1M | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -119,6 +120,7 @@ LATERAL-DRIFT: builder 1.17M + critic 0.19M + integrator 0.32M; SWERVE: estimate
 | Body-control axis (accepted) | 1h 28m | ~13.2M | n/a** |
 | Lateral-drift regression (accepted) | 24m | ~1.7M | n/a** |
 | Swerve axis (accepted) | 40m | ~0.5M | n/a** |
+| CPU opponent (accepted) | 21m | ~0.1M | n/a** |
 
 ## By model (tokens and wall)
 
@@ -127,13 +129,13 @@ processed input (context re-sent each call), not unique text.
 
 ### Grok 4.6 split — orchestrator vs committer
 
-These were previously added together as “grok-4.6”. They are different jobs.
+These were previously added together as "grok-4.6". They are different jobs.
 
 | Job | Where it lives | Model | Runs | Prompt | Completion (est.) | Calls | Peak context |
 |---|---|---|---:|---:|---:|---:|---:|
 | Orchestrator | parent session (not in Tasks) | grok-4.6 | 1 session | **160.12M** | 898k | 781 | 400k |
 | Git-committer (legacy) | `git-committer` children | grok-4.6 | 81 | **6.41M** | 469k | 649 | — |
-| Git-committer (now) | `git-committer` children | gemma4 | 12 | **~1.08M** | n/a | 104 | — |
+| Git-committer (now) | `git-committer` children | gemma4 | 14 | **~1.28M** | n/a | 122 | — |
 | **Grok 4.6 total** | parent + old committer | grok-4.6 | | **166.53M** | 1.37M | 1,430 | |
 
 Orchestrator input is large because parent context grew to ~400k and was
@@ -141,8 +143,8 @@ re-sent on every orchestrator call (including while waiting on children).
 That cost is **not** git-committer.
 
 The 81 Grok committer runs were bookkeeping (conventional commits / push).
-That role is now `git-committer` / `gemma4`. The eleven Gemma runs so far
-are ~1.08M processed prompt tokens (~25× cheaper per comparable commit
+That role is now `git-committer` / `gemma4`. The fourteen Gemma runs so far
+are ~1.28M processed prompt tokens (~25× cheaper per comparable commit
 batch than the Grok committer average of ~79k prompt tokens/run). Gemma
 completion growth is not recorded the same way in `updates.jsonl`
 (streams often have a single `totalTokens` snapshot), so that cell is
@@ -154,12 +156,14 @@ completion growth is not recorded the same way in `updates.jsonl`
 |---|---|---:|---:|---:|
 | grok-4.6 | **orchestrator only** | parent | 160.12M | 898k |
 | grok-4.6 | **git-committer (legacy)** | 81 | 6.41M | 469k |
-| gemma4 | **git-committer** | 12 | 1.08M | n/a |
-| qwen3.6 | builder | 57 | 230.60M | 3.57M |
-| deepseek-v4-flash-0731 | critic | 69 | 46.58M | 2.57M |
-| deepseek-v4-flash-0731 | integrator | 37 | 27.08M | 1.20M |
+| gemma4 | **git-committer** | 14 | 1.28M | n/a |
+| qwen3.6 | builder | 58 | 232.60M | 3.57M |
+| deepseek-v4-flash | **critic** (base deployment) | 0 | 0 | 0 |
+| deepseek-v4-flash | **integrator** (base deployment) | 0 | 0 | 0 |
+| deepseek-v4-flash-0731 | critic | 71 | 47.48M | 2.57M |
+| deepseek-v4-flash-0731 | integrator | 38 | 27.38M | 1.20M |
 | mimo-v2.5 | builder | 13 | 50.42M | 0.79M |
-| **All processed** | | | **~523M** | **~9.5M** |
+| **All processed** | | | **~526M** | **~9.5M** |
 
 Builder/critic/integrator counts are higher than the first TIMING snapshot
 because later playable steps added child sessions. Use the Grok split above
@@ -257,6 +261,7 @@ on an H task is the interesting result.
 | CAPABILITY-BODY-CONTROL | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 2 | C | Estimator declaration mismatch; cross-coupling FAIL unreachable (turnRate cosmetic) — fixed with lateralResistance knob |
 | LOCOMOTION-LATERAL-DRIFT | qwen3.6 | H | High — can violate architecture | 0 | A | Default-config lateral-drift regression tests; negative control proves FAIL direction |
 | CAPABILITY-SWERVE | qwen3.6 | H | High — new physics + new runner | 0 | A | Provisional Magnus curve force, swerve axis runner; zero-spin protected; critic ACCEPT first pass |
+| CPU-OPPONENT-1V1 | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Simple chase-ball CPU opponent for AI_FALLBACK slots; critic ACCEPT first pass |
 
 ### Builder scoreboard
 
@@ -264,7 +269,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 30 | 14 | 8 | 3 | 3 | 2 | 47% | 1.03 | ~42m |
+| qwen3.6 | 31 | 15 | 8 | 3 | 3 | 2 | 48% | 1.00 | ~42m |
 | mimo-v2.5 | 8 | 4 | 3 | 1 | 0 | 0 | 50% | 0.63 | ~31m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
@@ -272,7 +277,7 @@ Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 | Builder | Objectives | Weighted grade / difficulty | Read as |
 |---|---:|---:|---|
 | mimo-v2.5 | 8, all H | 3.1 / 3.0 | First-pass locomotion and ball; misses were local (mapping, restore, pair order) |
-| qwen3.6 | 30, mixed M–VH | 3.1 / 2.8 | Reliable on contracts and profiles; expensive on honest-eval / CLI / browser evidence |
+| qwen3.6 | 31, mixed M–VH | 3.3 / 2.8 | Reliable on contracts and profiles; expensive on honest-eval / CLI / browser evidence |
 
 ### What that means for routing
 
@@ -288,7 +293,7 @@ and the honest PLAYABLE_1V1 profile. It is weaker when the critic can demand
 an oracle that actually fails: FOUNDATION-ORACLES (REJECT), HARD, BROWSER, and
 BOOTSTRAP-10 burned the retry budget on theatrical or unbound evidence. Prefer
 Qwen there still (structured TypeScript), but the orchestrator prompt must
-forbid “always-pass” tests up front. MUTANT-1V1 and CAPABILITY-PHYSICAL-CONTACT
+forbid "always-pass" tests up front. MUTANT-1V1 and CAPABILITY-PHYSICAL-CONTACT
 were first-pass A on exactly that VH class. The later capability-axis retries
 were honest-eval misses of a different kind: SHOOTING-POWER's estimator
 declaration disagreed with its runner, and BODY-CONTROL's first attempt used a
@@ -296,6 +301,7 @@ cosmetic knob (turnRate changes heading, not movement) so its cross-coupling
 check could never fail — the second retry introduced the lateralResistance
 damping that made the axis real. The critic caught both.
 
+**deepseek-v4-flash** (base deployment) was unreferenced in this session — all sub-steps used the 0731 snapshot.  
 **deepseek-v4-flash-0731** is not graded as a builder. Its job is to force
 retries. The expensive Qwen D/R rows are evidence it is doing that job:
 camera-hash, `mutatePrng`, unbound HARD_INVARIANTs, unused two-player
@@ -317,13 +323,13 @@ review.
 1. Theatrical tests (file exists, luminance always passes, canaries that
    cannot fail).
 2. Honest-eval gaps: criterion listed, oracle unbound or mapped to a weak
-   proxy (ball-continuity as “last touch”).
+   proxy (ball-continuity as "last touch").
 3. Restore / serialization dropping transient state (close-control cooldown).
 4. CLI argv and compare-flag order.
 5. Browser smoke that does not drive the test-bridge.
 
-When a retry is one of these, say so in HISTORY. Do not count it as “the
-model cannot play football.”
+When a retry is one of these, say so in HISTORY. Do not count it as "the
+model cannot play football."
 
 ## How to refresh
 
