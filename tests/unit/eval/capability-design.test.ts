@@ -97,7 +97,6 @@ describe("Profile loading and hash stability", () => {
     const profile = loadedProfile();
     for (const axisId of [
       "body-control",
-      "shooting-power",
       "swerve",
     ]) {
       expect(profile.axes[axisId].status).toBe("DEFERRED");
@@ -116,7 +115,6 @@ describe("Profile loading and hash stability", () => {
     const profile = loadedProfile();
     for (const axisId of [
       "body-control",
-      "shooting-power",
       "swerve",
     ]) {
       const axis = profile.axes[axisId];

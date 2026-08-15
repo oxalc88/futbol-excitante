@@ -31,6 +31,7 @@ import {
   FOUNDATION_PLAYER_CONTACT_V1,
 } from "../../src/simulation/config/foundation.js";
 import { computePlayerMotionMetrics } from "../metrics/player-motion.js";
+import { computeBallMotionMetrics } from "../metrics/ball-motion.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -441,6 +442,10 @@ function evaluateAxis(
     return evaluatePhysicalContactAxis(axis, evidence);
   }
 
+  if (axis.axis_id === "shooting-power") {
+    return evaluateShootingPowerAxis(axis, evidence);
+  }
+
   // Default: transient-acceleration (legacy path).
   return evaluateTransientAccelerationAxis(axis, evidence);
 }
@@ -793,4 +798,318 @@ function evaluateTransientAccelerationAxis(
     outcome,
     evidence,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Shooting-power axis evaluation
+// ---------------------------------------------------------------------------
+
+/**
+ * Evaluate the shooting-power axis.
+ *
+ * Uses a shot scenario where a player moves toward the ball and
+ * presses the SHOT_BIT. Runs low vs high shot exitSpeed profiles
+ * under identical scenario input.
+ *
+ * Requirements:
+ * - A shot event MUST occur in the run (honesty check).
+ * - Measures ball-speed delta at the declared estimator tick.
+ * - Checks direction (INCREASE) and materiality.
+ */
+function evaluateShootingPowerAxis(
+  axis: {
+    axis_id: string;
+    profile_value_low: { id: string; value: number };
+    profile_value_high: { id: string; value: number };
+    expected_monotonic_direction: string;
+    minimum_material_effect: { metric_id: string; value: number };
+    max_permitted_cross_coupling: Array<{ metric_id: string; threshold: number }>;
+    estimator_id: string;
+    estimator_version: string;
+  },
+  evidence: string[],
+): CapabilityDesignEvaluationResult["axes"][number] {
+  // Build shot config variants by mutating exitSpeed.
+  // Low exitSpeed = 8.0 m/s, high exitSpeed = 16.0 m/s (fictional product values).
+  const lowShotCfg: {
+    shotRadius: { value: number };
+    exitSpeed: { value: number };
+    verticalComponent: { value: number };
+  } = {
+    shotRadius: { value: 1.2 },
+    exitSpeed: { value: axis.profile_value_low.value },
+    verticalComponent: { value: 0.15 },
+  };
+  const highShotCfg: {
+    shotRadius: { value: number };
+    exitSpeed: { value: number };
+    verticalComponent: { value: number };
+  } = {
+    shotRadius: { value: 1.2 },
+    exitSpeed: { value: axis.profile_value_high.value },
+    verticalComponent: { value: 0.15 },
+  };
+
+  // Create a shot scenario: player at (0,0), ball at (0.2,0,0.11)
+  // (within shotRadius 1.2m). Player stays still, presses SHOT_BIT at tick 5.
+  function makeShotScenarioConfig(): Parameters<typeof createWorld>[0]["scenario"] {
+    const inputProgram: Record<
+      number,
+      {
+        tick: number;
+        sourceId: string;
+        controlSlot: string;
+        moveX: number;
+        moveY: number;
+        sprint: number;
+        heldButtons: number;
+        pressedButtons: number;
+        releasedButtons: number;
+      }[]
+    > = {};
+    for (let t = 0; t < 60; t++) {
+      const isShotWindow = t >= 5 && t < 10;
+      inputProgram[t] = [
+        {
+          tick: t,
+          sourceId: "capability-test",
+          controlSlot: "slot-1",
+          moveX: 0,
+          moveY: 0,
+          sprint: isShotWindow ? 1 : 0,
+          heldButtons: isShotWindow ? 4 : 0,
+          pressedButtons: isShotWindow && t === 5 ? 4 : 0,
+          releasedButtons: isShotWindow && t === 10 ? 4 : 0,
+        },
+      ];
+    }
+
+    return {
+      id: `shot-capability-scenario-${axis.axis_id}`,
+      version: "capability-test-v1",
+      family: "capability-design",
+      durationTicks: 60,
+      seed: 42,
+      prngAlgorithmId: "mulberry32-v1",
+      schemaVersion: "state-v1",
+      simulationVersion: "sim-v1",
+      configVersion: "foundation-config-v1",
+      profile: "LABORATORY",
+      pitchLength: 105,
+      pitchWidth: 68,
+      safetyBounds: { maxX: 52.5, maxY: 34, minZ: -0.5, maxZ: 20 },
+      players: [
+        {
+          playerId: "player-cap-1",
+          teamId: "team-a",
+          groundPosition: { x: 0, y: 0 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 0,
+          desiredHeading: 0,
+        },
+      ],
+      ball: {
+        position: { x: 0.2, y: 0, z: 0.11 },
+        linearVelocity: { x: 0, y: 0, z: 0 },
+        angularVelocity: { x: 0, y: 0, z: 0 },
+        regime: "ground-roll",
+      },
+      controlAssignments: {
+        "slot-1": {
+          controlSlot: "slot-1",
+          teamId: "team-a",
+          controlledPlayerId: "player-cap-1",
+          mode: "HUMAN",
+        },
+      },
+      missingInputPolicy: "REPEAT_HELD_WITH_ZERO_EDGES",
+      maxConsecutiveMissing: 3,
+      inputProgram,
+      observationWindows: [{ startTick: 0, endTick: 60 }],
+      scheduledEvents: {},
+      requestedMetrics: ["ball-speed"],
+    };
+  }
+
+  // Run both profiles.
+  const observationsLow: TelemetryObservation[] = [];
+  const observationsHigh: TelemetryObservation[] = [];
+  const allEventsLow: import("../../src/contracts/scenario.js").SimulationEvent[] = [];
+  const allEventsHigh: import("../../src/contracts/scenario.js").SimulationEvent[] = [];
+
+  const scenario = makeShotScenarioConfig();
+
+  // Run low shot config.
+  const worldLow = createWorld({ scenario });
+  const simLow = createSimulation(
+    worldLow,
+    {
+      onObservation(obs: TelemetryObservation) {
+        observationsLow.push(obs);
+      },
+    },
+    undefined,
+    undefined,
+    lowShotCfg,
+  );
+  {
+    for (let i = 0; i < 60; i++) {
+      const tickInputs = scenario.inputProgram[simLow.tick] ?? [];
+      if (tickInputs.length > 0) simLow.applyInputs(tickInputs);
+      const result = simLow.step();
+      allEventsLow.push(...result.events);
+    }
+  }
+
+  // Run high shot config (same scenario, same inputs for determinism).
+  const scenario2 = makeShotScenarioConfig();
+  const worldHigh = createWorld({ scenario: scenario2 });
+  const simHigh = createSimulation(
+    worldHigh,
+    {
+      onObservation(obs: TelemetryObservation) {
+        observationsHigh.push(obs);
+      },
+    },
+    undefined,
+    undefined,
+    highShotCfg,
+  );
+  {
+    for (let i = 0; i < 60; i++) {
+      const tickInputs = scenario2.inputProgram[simHigh.tick] ?? [];
+      if (tickInputs.length > 0) simHigh.applyInputs(tickInputs);
+      const result = simHigh.step();
+      allEventsHigh.push(...result.events);
+    }
+  }
+
+  const metricsLow = computeBallMotionMetrics(observationsLow);
+  const metricsHigh = computeBallMotionMetrics(observationsHigh);
+
+  // Record config versions.
+  evidence.push(
+    `Axis "${axis.axis_id}": low=${axis.profile_value_low.value}, high=${axis.profile_value_high.value}`,
+    `Estimator: ${axis.estimator_id} v${axis.estimator_version}`,
+  );
+
+  // --- Honesty check: shot events MUST exist ---
+  const shotEventsLow = allEventsLow.filter((e) => e.kind === "shot");
+  const shotEventsHigh = allEventsHigh.filter((e) => e.kind === "shot");
+
+  if (shotEventsLow.length === 0) {
+    evidence.push("No shot events in low run — axis FAIL");
+    return {
+      axis_id: axis.axis_id,
+      status: "IMPLEMENTED",
+      outcome: "FAIL",
+      evidence,
+    };
+  }
+  if (shotEventsHigh.length === 0) {
+    evidence.push("No shot events in high run — axis FAIL");
+    return {
+      axis_id: axis.axis_id,
+      status: "IMPLEMENTED",
+      outcome: "FAIL",
+      evidence,
+    };
+  }
+
+  evidence.push(
+    `Shot events: low=${shotEventsLow.length}, high=${shotEventsHigh.length}`,
+  );
+
+  // --- Estimator: delta-ball-speed-at-t10 ---
+  // The shot fires at tick 5 (player is within shot radius, SHOT_BIT pressed).
+  // Ball speed at tick 10+ should be in flight and meaningful.
+  const estimatorTick = 10;
+  const lowSpeedAtT20 = getBallSpeedAtTick(metricsLow, estimatorTick);
+  const highSpeedAtT20 = getBallSpeedAtTick(metricsHigh, estimatorTick);
+
+  const deltaBallSpeed =
+    highSpeedAtT20 !== undefined && lowSpeedAtT20 !== undefined
+      ? highSpeedAtT20 - lowSpeedAtT20
+      : 0;
+
+  evidence.push(
+    `Ball speed at t${estimatorTick}: low=${lowSpeedAtT20?.toFixed(6) ?? "N/A"}, high=${highSpeedAtT20?.toFixed(6) ?? "N/A"}`,
+    `Delta ball speed: ${deltaBallSpeed.toFixed(6)}`,
+  );
+
+  // --- Check expected_monotonic_direction ---
+  let directionOk = true;
+  if (axis.expected_monotonic_direction === "INCREASE") {
+    directionOk = deltaBallSpeed >= 0;
+  } else if (axis.expected_monotonic_direction === "DECREASE") {
+    directionOk = deltaBallSpeed <= 0;
+  }
+  evidence.push(
+    `Monotonic direction check (${axis.expected_monotonic_direction}): ${directionOk ? "PASS" : "FAIL"}`,
+  );
+
+  // --- Check minimum_material_effect ---
+  const meetsMateriality = Math.abs(deltaBallSpeed) >= axis.minimum_material_effect.value;
+  evidence.push(
+    `Minimum material effect: ${Math.abs(deltaBallSpeed).toFixed(6)} >= ${axis.minimum_material_effect.value} ? ${meetsMateriality}`,
+  );
+
+  // --- Check cross-coupling ---
+  let crossCouplingOk = true;
+  for (const cc of axis.max_permitted_cross_coupling) {
+    if (cc.metric_id === "ball-speed" && Math.abs(deltaBallSpeed) > cc.threshold) {
+      crossCouplingOk = false;
+      evidence.push(
+        `Cross-coupling FAIL: delta ball speed ${Math.abs(deltaBallSpeed).toFixed(6)} > threshold ${cc.threshold}`,
+      );
+    }
+  }
+  if (crossCouplingOk) {
+    evidence.push(`Cross-coupling OK`);
+  }
+
+  // --- Determine outcome ---
+  let outcome: "PASS" | "FAIL" | "NOT_EVALUATED" = "PASS";
+  if (deltaBallSpeed === 0) {
+    outcome = "FAIL";
+    evidence.push(
+      "No measurable effect from shot config variation — the knob is not exercised.",
+    );
+  } else if (!directionOk) {
+    outcome = "FAIL";
+    evidence.push(
+      `Delta direction contradicts expected ${axis.expected_monotonic_direction}.`,
+    );
+  } else if (!meetsMateriality) {
+    outcome = "FAIL";
+    evidence.push(
+      `Delta ${deltaBallSpeed.toFixed(6)} below minimum_material_effect ${axis.minimum_material_effect.value}.`,
+    );
+  } else if (!crossCouplingOk) {
+    outcome = "FAIL";
+    evidence.push("Protected output cross-coupling exceeded threshold.");
+  }
+
+  return {
+    axis_id: axis.axis_id,
+    status: "IMPLEMENTED",
+    outcome,
+    evidence,
+  };
+}
+
+/**
+ * Get ball speed from ball motion metrics at a specific tick.
+ */
+function getBallSpeedAtTick(
+  metrics: ReturnType<typeof computeBallMotionMetrics>,
+  tick: number,
+): number | undefined {
+  for (const entry of metrics.series.speed) {
+    if (entry.tick === tick) {
+      return entry.value;
+    }
+  }
+  return undefined;
 }

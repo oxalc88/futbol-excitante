@@ -9,8 +9,8 @@
  * The initial capability axes are:
  * - transient acceleration    : IMPLEMENTED (runner exercises low vs high)
  * - physical contact          : IMPLEMENTED (runner exercises duel contact config)
+ * - shooting power            : IMPLEMENTED (runner exercises shot exitSpeed)
  * - body control              : DEFERRED — engine cannot exercise
- * - shooting power            : DEFERRED — engine cannot exercise
  * - swerve                    : DEFERRED — engine cannot exercise
  *
  * LOC-ACC-002 binds to the transient acceleration axis.
@@ -101,6 +101,53 @@ export const AXIS_TRANSIENT_ACCELERATION: Omit<
 };
 
 // ---------------------------------------------------------------------------
+// Shooting power axis
+// ---------------------------------------------------------------------------
+// The engine's contact system supports shot impulses with configurable
+// exitSpeed. This axis is exercised by the capability-design evaluation
+// runner using the shotConfigOverride parameter on createSimulation.
+//
+// Internal profile values (fictional product exitSpeed in m/s):
+// These are product-level values, not PES attributes.
+
+export const AXIS_SHOOTING_POWER: Omit<
+  CapabilityDesignProfile,
+  "profile_id" | "policy_version" | "content_hash"
+> = {
+  profile_version: "capability-design-v1",
+  axes: {
+    "shooting-power": {
+      axis_id: "shooting-power",
+      label: "Shooting power",
+      status: "IMPLEMENTED",
+      scenario_ids: ["scn-shot-pwr-001-v1"],
+      metric_ids: ["ball-speed"],
+      profile_value_low: { id: "shooting-power-low", value: 8.0 },
+      profile_value_high: { id: "shooting-power-high", value: 16.0 },
+      expected_monotonic_direction: "INCREASE",
+      minimum_material_effect: {
+        metric_id: "ball-speed",
+        value: 0.5,
+      },
+      protected_outputs: [
+        "unrelated-accuracy",
+        "preparation-timing",
+      ],
+      max_permitted_cross_coupling: [],
+      seed_matrix_id: "seeds-family-v1",
+      config_matrix_id: "config-default-v1",
+      estimator_id: "delta-ball-speed-at-t10",
+      estimator_version: "estimator-delta-ball-speed-v1",
+      policy_version: "policy-shoot-power-v1",
+    },
+  },
+  criterion_bindings: {
+    // SHOT-PWR-001 DESIGN criterion → shooting power axis
+    "SHOT-PWR-001-DESIGN": "shooting-power",
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Deferred axes
 // ---------------------------------------------------------------------------
 // These axes are registered so the profile can enumerate the full
@@ -133,30 +180,6 @@ const DEFERRED_AXES: Record<string, Omit<CapabilityDesignProfile, "profile_id" |
     estimator_id: "absent",
     estimator_version: "absent",
     policy_version: "policy-body-control-v1",
-  },
-  "shooting-power": {
-    axis_id: "shooting-power",
-    label: "Shooting power",
-    status: "DEFERRED",
-    scenario_ids: [],
-    metric_ids: [],
-    profile_value_low: { id: "shooting-power-low", value: 0 },
-    profile_value_high: { id: "shooting-power-high", value: 1 },
-    expected_monotonic_direction: "INCREASE",
-    minimum_material_effect: {
-      metric_id: "ball-speed",
-      value: 0.5,
-    },
-    protected_outputs: [
-      "unrelated-accuracy",
-      "preparation-timing",
-    ],
-    max_permitted_cross_coupling: [],
-    seed_matrix_id: "seeds-family-v1",
-    config_matrix_id: "config-default-v1",
-    estimator_id: "absent",
-    estimator_version: "absent",
-    policy_version: "policy-shoot-power-v1",
   },
   "swerve": {
     axis_id: "swerve",
@@ -199,14 +222,15 @@ const DEFERRED_AXES: Record<string, Omit<CapabilityDesignProfile, "profile_id" |
 const ALL_AXES: CapabilityDesignProfile["axes"] = {
   ...DEFERRED_AXES,
   ...AXIS_TRANSIENT_ACCELERATION.axes,
+  ...AXIS_SHOOTING_POWER.axes,
 };
 
 /**
  * The initial CapabilityDesignProfile.
  *
  * Contains:
- * - 2 IMPLEMENTED axes (transient acceleration, physical contact)
- * - 3 DEFERRED axes (body control, shooting power, swerve)
+ * - 3 IMPLEMENTED axes (transient acceleration, physical contact, shooting power)
+ * - 2 DEFERRED axes (body control, swerve)
  *
  * The profile is structurally valid and can be loaded by the evaluator.
  * Evaluation outcome for ENGINE_DESIGN_TARGET criteria depends on
@@ -216,7 +240,10 @@ export const CAPABILITY_DESIGN_PROFILE: CapabilityDesignProfile = {
   profile_id: "capability-design-v1",
   profile_version: "capability-design-v1",
   axes: ALL_AXES,
-  criterion_bindings: AXIS_TRANSIENT_ACCELERATION.criterion_bindings,
+  criterion_bindings: {
+    ...AXIS_TRANSIENT_ACCELERATION.criterion_bindings,
+    ...AXIS_SHOOTING_POWER.criterion_bindings,
+  },
   // content_hash is set by the loader
   content_hash: "",
   policy_version: "capability-policy-v1",

@@ -244,9 +244,9 @@ describe("DEFERRED axes stay DEFERRED", () => {
     expect(profile.axes["body-control"].status).toBe("DEFERRED");
   });
 
-  it("shooting-power is DEFERRED", () => {
+  it("shooting-power is IMPLEMENTED", () => {
     const profile = loadDefaultCapabilityDesignProfile();
-    expect(profile.axes["shooting-power"].status).toBe("DEFERRED");
+    expect(profile.axes["shooting-power"].status).toBe("IMPLEMENTED");
   });
 
   it("swerve is DEFERRED", () => {

@@ -70,6 +70,20 @@ import {
 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
+// Internal types
+// ---------------------------------------------------------------------------
+
+/**
+ * Minimal shot config shape used for capability evaluation overrides.
+ * Matches the properties consumed by the shot velocity computation.
+ */
+interface ShotConfigOverride {
+  shotRadius: { value: number };
+  exitSpeed: { value: number };
+  verticalComponent: { value: number };
+}
+
+// ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
 
@@ -183,6 +197,10 @@ export interface Simulation {
  *   If provided, used instead of `FOUNDATION_PLAYER_CONTACT_V1` for player contact
  *   resolution. Useful for capability evaluation where low/high values need different
  *   contact knobs (e.g., separationStiffness).
+ * @param shotConfigOverride - Optional shot config override.
+ *   If provided, used instead of `FOUNDATION_SHOT_V1` for shot resolution.
+ *   Useful for capability evaluation where low/high exitSpeed values need
+ *   different shot power (e.g., exitSpeed 8.0 vs 16.0 m/s).
  * @returns A simulation instance.
  */
 export function createSimulation(
@@ -190,6 +208,7 @@ export function createSimulation(
   observer?: SimulationObserver,
   locomotionConfigOverride?: typeof FOUNDATION_LOCOMOTION_V1,
   contactConfigOverride?: typeof FOUNDATION_PLAYER_CONTACT_V1,
+  shotConfigOverride?: ShotConfigOverride,
 ): Simulation {
   const obs = observer ?? NO_OP_OBSERVER;
 
@@ -205,6 +224,10 @@ export function createSimulation(
   // Per-player dribble-touch cooldown — maps playerId → last tick a dribble-touch occurred.
   // Lives in the simulation closure; does not affect world state or hashing.
   const dribbleCooldowns: Map<string, number> = new Map();
+
+  // Shot config override (used by capability evaluation for low vs high exitSpeed).
+  // Lives in the closure; does not affect world state or hashing.
+  const effectiveShotConfig = shotConfigOverride ?? undefined;
 
   // ------------------------------------------------------------------
   // Internal: drain all buffers into a single flat array (ordered by tick, then insertion).
@@ -434,7 +457,7 @@ export function createSimulation(
       counter,
       state.tick,
       undefined,
-      undefined,
+      effectiveShotConfig,
       FOUNDATION_CLOSE_CONTROL_V1,
       dribbleCooldowns,
     );
