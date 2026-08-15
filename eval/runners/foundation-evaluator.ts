@@ -15,7 +15,10 @@
  *  4. Produce CriterionEvaluationResult[] per test and overall.
  *
  * Criterion outcome rules:
- *  - HARD_INVARIANT: PASS if all oracle results pass; FAIL if any fail.
+ *  - HARD_INVARIANT: FAIL if any oracle result fails.
+ *    PASS if all oracle results pass (and no fails).
+ *    NOT_EVALUATED only when all results are not_evaluated (or empty).
+ *    NOT_EVALUATED never masks a FAIL — check anyFail first.
  *  - MEASURED_TARGET: BLOCKED_MISSING_REFERENCE.
  *  - REGRESSION: NOT_EVALUATED (no regression policy).
  *  - ENGINE_DESIGN_TARGET: NOT_EVALUATED (no CapabilityDesignProfile).
@@ -155,7 +158,12 @@ const CRITERION_TO_ORACLE: Record<
   // SHOT-PWR-001-IMPULSE are NOT mapped to any oracle.
   // They require contact/impulse oracles that do not yet exist.
   // These criteria will evaluate to NOT_EVALUATED.
-  // PHY-SHLD-001-CONT removed — duel/shielding is out of scope.
+  // PHY-SHLD-001-CONT uses player-contact-evidence: validates that
+  // player-player-contact events exist and are well-formed.
+  "PHY-SHLD-001-CONT": {
+    oracle_id: "player-contact-evidence",
+    oracle_version: "oracle-player-contact-v1",
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -217,7 +225,10 @@ function computeOutcome(
   oracleResults: InvariantResult[],
   criterionClass: CriterionClass,
 ): EvaluationOutcome {
-  // HARD_INVARIANT: PASS if all oracle results pass, FAIL if any fail.
+  // HARD_INVARIANT: FAIL if any oracle result fails.
+  // PASS if all results pass.
+  // NOT_EVALUATED only when all results are not_evaluated (or empty).
+  // NOT_EVALUATED must never mask a FAIL — check anyFail first.
   if (criterionClass === "HARD_INVARIANT") {
     if (oracleResults.length === 0) {
       return "NOT_EVALUATED";
@@ -225,6 +236,10 @@ function computeOutcome(
     const anyFail = oracleResults.some((r) => r.status === "fail");
     if (anyFail) {
       return "FAIL";
+    }
+    const anyNotEval = oracleResults.some((r) => r.status === "not_evaluated");
+    if (anyNotEval) {
+      return "NOT_EVALUATED";
     }
     const allPass = oracleResults.every((r) => r.status === "pass");
     if (allPass) {

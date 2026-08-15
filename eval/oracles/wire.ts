@@ -20,6 +20,7 @@ import { checkPossessionEvidence } from "./possession.js";
 import { checkCameraHashConsistency } from "./camera-hash.js";
 import { checkDeferredMutants } from "./deferred-mutants.js";
 import { checkPrngOrderOracle } from "./prng-order.js";
+import { checkPlayerContactEvidence } from "./player-contact.js";
 import type { OracleEntry } from "./oracle-registry.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 
@@ -92,6 +93,11 @@ const entries: OracleEntry[] = [
     oracle_id: "prng-order",
     oracle_version: "oracle-prng-order-v1",
     fn: checkPrngOrderOracle,
+  },
+  {
+    oracle_id: "player-contact-evidence",
+    oracle_version: "oracle-player-contact-v1",
+    fn: checkPlayerContactEvidence,
   },
 ];
 
