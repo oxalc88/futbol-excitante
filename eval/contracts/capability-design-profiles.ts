@@ -7,13 +7,14 @@
  * values — NOT PES magnitudes and NOT provider-rating mappings.
  *
  * The initial capability axes are:
- * - transient acceleration    : IMPLEMENTED (but NOT_EVALUATED until a runner exists)
- * - physical contact          : DEFERRED — engine cannot exercise
+ * - transient acceleration    : IMPLEMENTED (runner exercises low vs high)
+ * - physical contact          : IMPLEMENTED (runner exercises duel contact config)
  * - body control              : DEFERRED — engine cannot exercise
  * - shooting power            : DEFERRED — engine cannot exercise
  * - swerve                    : DEFERRED — engine cannot exercise
  *
  * LOC-ACC-002 binds to the transient acceleration axis.
+ * PHY-PC-001 binds to the physical contact axis.
  *
  * No Math.random, Date, performance, DOM, or Node I/O.
  */
@@ -24,8 +25,7 @@ import type { CapabilityDesignProfile } from "./capability-design.js";
 // Transient acceleration axis
 // ---------------------------------------------------------------------------
 // The engine's locomotion system supports capability-driven acceleration.
-// This axis is IMPLEMENTED but NOT_EVALUATED because no evaluation runner
-// currently exercises differential capability profiles.
+// This axis is exercised by the capability-design evaluation runner.
 //
 // The intended effect: earlier speed/distance gain under matched
 // sustainable speed, while protecting the plateau.
@@ -65,10 +65,38 @@ export const AXIS_TRANSIENT_ACCELERATION: Omit<
       estimator_version: "estimator-delta-speed-v1",
       policy_version: "policy-acceleration-v1",
     },
+    "physical-contact": {
+      axis_id: "physical-contact",
+      label: "Physical contact",
+      status: "IMPLEMENTED",
+      scenario_ids: ["scn-duels-phy-shld-001-v1"],
+      metric_ids: ["player-displacement"],
+      profile_value_low: { id: "physical-contact-low", value: 0.1 },
+      profile_value_high: { id: "physical-contact-high", value: 1.0 },
+      expected_monotonic_direction: "DECREASE",
+      minimum_material_effect: {
+        metric_id: "player-displacement",
+        value: 0.005,
+      },
+      protected_outputs: [
+        "raw-locomotion-speed",
+        "ai-aggression",
+        "automatic-possession",
+        "foul-policy",
+      ],
+      max_permitted_cross_coupling: [],
+      seed_matrix_id: "seeds-family-v1",
+      config_matrix_id: "config-player-contact-v1",
+      estimator_id: "delta-displacement-at-t20",
+      estimator_version: "estimator-delta-displacement-v1",
+      policy_version: "policy-contact-v1",
+    },
   },
   criterion_bindings: {
     // LOC-ACC-002 DESIGN criterion → transient acceleration axis
     "LOC-ACC-002-DESIGN": "transient-acceleration",
+    // PHY-PC-001 DESIGN criterion → physical contact axis
+    "PHY-PC-001-DESIGN": "physical-contact",
   },
 };
 
@@ -80,32 +108,6 @@ export const AXIS_TRANSIENT_ACCELERATION: Omit<
 // cannot yet exercise them.  They MUST never return PASS.
 
 const DEFERRED_AXES: Record<string, Omit<CapabilityDesignProfile, "profile_id" | "policy_version" | "content_hash">["axes"][string]> = {
-  "physical-contact": {
-    axis_id: "physical-contact",
-    label: "Physical contact",
-    status: "DEFERRED",
-    scenario_ids: [],
-    metric_ids: [],
-    profile_value_low: { id: "physical-contact-low", value: 0 },
-    profile_value_high: { id: "physical-contact-high", value: 1 },
-    expected_monotonic_direction: "INCREASE",
-    minimum_material_effect: {
-      metric_id: "player-displacement",
-      value: 0.01,
-    },
-    protected_outputs: [
-      "raw-locomotion-speed",
-      "ai-aggression",
-      "automatic-possession",
-      "foul-policy",
-    ],
-    max_permitted_cross_coupling: [],
-    seed_matrix_id: "seeds-family-v1",
-    config_matrix_id: "config-default-v1",
-    estimator_id: "absent",
-    estimator_version: "absent",
-    policy_version: "policy-contact-v1",
-  },
   "body-control": {
     axis_id: "body-control",
     label: "Body control",
@@ -203,8 +205,8 @@ const ALL_AXES: CapabilityDesignProfile["axes"] = {
  * The initial CapabilityDesignProfile.
  *
  * Contains:
- * - 1 IMPLEMENTED axis (transient acceleration)
- * - 4 DEFERRED axes (physical contact, body control, shooting power, swerve)
+ * - 2 IMPLEMENTED axes (transient acceleration, physical contact)
+ * - 3 DEFERRED axes (body control, shooting power, swerve)
  *
  * The profile is structurally valid and can be loaded by the evaluator.
  * Evaluation outcome for ENGINE_DESIGN_TARGET criteria depends on

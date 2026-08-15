@@ -96,7 +96,6 @@ describe("Profile loading and hash stability", () => {
   it("deferred axes have DEFERRED status", () => {
     const profile = loadedProfile();
     for (const axisId of [
-      "physical-contact",
       "body-control",
       "shooting-power",
       "swerve",
@@ -116,7 +115,6 @@ describe("Profile loading and hash stability", () => {
   it("deferred axes have empty scenario_ids and metric_ids (expected)", () => {
     const profile = loadedProfile();
     for (const axisId of [
-      "physical-contact",
       "body-control",
       "shooting-power",
       "swerve",

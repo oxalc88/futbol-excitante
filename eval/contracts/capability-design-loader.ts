@@ -63,6 +63,7 @@ function containsPesLanguage(text: string): boolean {
  */
 const KNOWN_SCENARIO_IDS = new Set([
   "scn-loc-acc-002-v1",
+  "scn-duels-phy-shld-001-v1",
 ]);
 
 const KNOWN_METRIC_IDS = new Set([

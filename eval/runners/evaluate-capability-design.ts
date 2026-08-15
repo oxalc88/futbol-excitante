@@ -23,10 +23,12 @@ import { loadDefaultCapabilityDesignProfile } from "../contracts/capability-desi
 import { SCENARIO_REGISTRY } from "../contracts/scenarios.js";
 import type { CapabilityDesignProfile } from "../contracts/capability-design.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
+import type { SimulationEvent } from "../../src/contracts/scenario.js";
 import type { SimulationObserver } from "../../src/simulation/telemetry/observer.js";
 import {
   TRANSIENT_ACCEL_LOCOMOTION_V1,
   FOUNDATION_LOCOMOTION_V1,
+  FOUNDATION_PLAYER_CONTACT_V1,
 } from "../../src/simulation/config/foundation.js";
 import { computePlayerMotionMetrics } from "../metrics/player-motion.js";
 
@@ -142,17 +144,132 @@ function makeCapabilityScenario(
   };
 }
 
+/**
+ * Create a two-player duel scenario suitable for capability testing.
+ * Two players start close together and run toward each other,
+ * producing player-player-contact events.
+ */
+function makeDuelScenario(configVersion: string): Parameters<typeof createWorld>[0]["scenario"] {
+  const inputProgram: Record<
+    number,
+    {
+      tick: number;
+      sourceId: string;
+      controlSlot: string;
+      moveX: number;
+      moveY: number;
+      sprint: number;
+      heldButtons: number;
+      pressedButtons: number;
+      releasedButtons: number;
+    }[]
+  > = {};
+  for (let t = 0; t < 60; t++) {
+    inputProgram[t] = [
+      {
+        tick: t,
+        sourceId: "capability-test",
+        controlSlot: "slot-1",
+        moveX: 0,
+        moveY: 1,
+        sprint: 1,
+        heldButtons: 0,
+        pressedButtons: 0,
+        releasedButtons: 0,
+      },
+      {
+        tick: t,
+        sourceId: "capability-test",
+        controlSlot: "slot-2",
+        moveX: 0,
+        moveY: -1,
+        sprint: 1,
+        heldButtons: 0,
+        pressedButtons: 0,
+        releasedButtons: 0,
+      },
+    ];
+  }
+  return {
+    id: `duel-capability-scenario-${configVersion}`,
+    version: "capability-test-v1",
+    family: "capability-design",
+    durationTicks: 60,
+    seed: 42,
+    prngAlgorithmId: "mulberry32-v1",
+    schemaVersion: "state-v1",
+    simulationVersion: "sim-v1",
+    configVersion,
+    profile: "LABORATORY",
+    pitchLength: 105,
+    pitchWidth: 68,
+    safetyBounds: {
+      maxX: 52.5,
+      maxY: 34,
+      minZ: -0.5,
+      maxZ: 20,
+    },
+    players: [
+      {
+        playerId: "player-cap-1",
+        teamId: "team-a",
+        groundPosition: { x: 0, y: 0 },
+        linearVelocity: { x: 0, y: 0 },
+        desiredVelocity: { x: 0, y: 0 },
+        bodyHeading: 0,
+        desiredHeading: 0,
+      },
+      {
+        playerId: "player-cap-2",
+        teamId: "team-b",
+        groundPosition: { x: 0, y: 1.5 },
+        linearVelocity: { x: 0, y: 0 },
+        desiredVelocity: { x: 0, y: 0 },
+        bodyHeading: Math.PI,
+        desiredHeading: Math.PI,
+      },
+    ],
+    ball: {
+      position: { x: 0, y: 0.75, z: 0.11 },
+      linearVelocity: { x: 0, y: 0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "ground-roll",
+    },
+    controlAssignments: {
+      "slot-1": {
+        controlSlot: "slot-1",
+        teamId: "team-a",
+        controlledPlayerId: "player-cap-1",
+        mode: "HUMAN",
+      },
+      "slot-2": {
+        controlSlot: "slot-2",
+        teamId: "team-b",
+        controlledPlayerId: "player-cap-2",
+        mode: "HUMAN",
+      },
+    },
+    missingInputPolicy: "REPEAT_HELD_WITH_ZERO_EDGES",
+    maxConsecutiveMissing: 3,
+    inputProgram,
+    observationWindows: [{ startTick: 0, endTick: 60 }],
+    scheduledEvents: {},
+    requestedMetrics: ["player-displacement"],
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Internal: run a simulation and collect observations + metrics
 // ---------------------------------------------------------------------------
 
 /**
- * Run a simulation for a given config version with an optional locomotion config override,
- * collecting observations.
+ * Run a simulation for a given config version with optional config
+ * overrides (locomotion and/or contact), collecting observations.
  */
 function runCapabilityTest(
   configVersion: string,
   locomotionConfigOverride?: typeof TRANSIENT_ACCEL_LOCOMOTION_V1,
+  contactConfigOverride?: typeof FOUNDATION_PLAYER_CONTACT_V1,
 ): {
   observations: TelemetryObservation[];
   metrics: ReturnType<typeof computePlayerMotionMetrics>;
@@ -160,6 +277,7 @@ function runCapabilityTest(
   scenario: Parameters<typeof createWorld>[0]["scenario"];
 } {
   const observations: TelemetryObservation[] = [];
+  const allEvents: SimulationEvent[] = [];
 
   const collectObserver: SimulationObserver = {
     onObservation(obs: TelemetryObservation) {
@@ -169,7 +287,12 @@ function runCapabilityTest(
 
   const scenario = makeCapabilityScenario(configVersion);
   const world = createWorld({ scenario });
-  const sim = createSimulation(world, collectObserver, locomotionConfigOverride);
+  const sim = createSimulation(
+    world,
+    collectObserver,
+    locomotionConfigOverride,
+    contactConfigOverride,
+  );
 
   const runTicks = 60;
   for (let i = 0; i < runTicks; i++) {
@@ -177,12 +300,18 @@ function runCapabilityTest(
     if (tickInputs.length > 0) {
       sim.applyInputs(tickInputs);
     }
-    sim.step();
+    const result = sim.step();
+    allEvents.push(...result.events);
   }
 
   const metrics = computePlayerMotionMetrics(observations);
 
-  return { observations, metrics, playerId: "player-cap-1", scenario };
+  return {
+    observations,
+    metrics,
+    playerId: "player-cap-1",
+    scenario,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -307,6 +436,249 @@ function evaluateAxis(
     };
   }
 
+  // Dispatch to axis-specific evaluation.
+  if (axis.axis_id === "physical-contact") {
+    return evaluatePhysicalContactAxis(axis, evidence);
+  }
+
+  // Default: transient-acceleration (legacy path).
+  return evaluateTransientAccelerationAxis(axis, evidence);
+}
+
+/**
+ * Evaluate the physical-contact axis.
+ *
+ * Uses the duels scenario (scn-duels-phy-shld-001-v1) with a two-player
+ * contact-producing input program. Runs low vs high contact config
+ * (separationStiffness) under identical scenario input.
+ *
+ * Requirements:
+ * - player-player-contact events MUST occur (honesty check).
+ * - Measures player-displacement delta at the declared estimator tick.
+ * - Checks direction and materiality.
+ */
+function evaluatePhysicalContactAxis(
+  axis: {
+    axis_id: string;
+    profile_value_low: { id: string; value: number };
+    profile_value_high: { id: string; value: number };
+    expected_monotonic_direction: string;
+    minimum_material_effect: { metric_id: string; value: number };
+    max_permitted_cross_coupling: Array<{ metric_id: string; threshold: number }>;
+    estimator_id: string;
+    estimator_version: string;
+  },
+  evidence: string[],
+): CapabilityDesignEvaluationResult["axes"][number] {
+  // Build contact config variants by mutating separationStiffness.
+  const lowContactCfg: typeof FOUNDATION_PLAYER_CONTACT_V1 = {
+    ...FOUNDATION_PLAYER_CONTACT_V1,
+    separationStiffness: { value: axis.profile_value_low.value, note: "provisional fraction of overlap to resolve per tick [0..1]" },
+  } as typeof FOUNDATION_PLAYER_CONTACT_V1;
+  const highContactCfg: typeof FOUNDATION_PLAYER_CONTACT_V1 = {
+    ...FOUNDATION_PLAYER_CONTACT_V1,
+    separationStiffness: { value: axis.profile_value_high.value, note: "provisional fraction of overlap to resolve per tick [0..1]" },
+  } as typeof FOUNDATION_PLAYER_CONTACT_V1;
+
+  // Run both profiles with the duel scenario and different contact configs.
+  const observationsLow: TelemetryObservation[] = [];
+  const observationsHigh: TelemetryObservation[] = [];
+  const allEventsLow: SimulationEvent[] = [];
+  const allEventsHigh: SimulationEvent[] = [];
+
+  const scenario = makeDuelScenario(`capability-low-${axis.axis_id}-v1`);
+
+  // Run low contact config.
+  const worldLow = createWorld({ scenario });
+  const simLow = createSimulation(
+    worldLow,
+    {
+      onObservation(obs: TelemetryObservation) {
+        observationsLow.push(obs);
+      },
+    },
+    undefined,
+    lowContactCfg,
+  );
+  {
+    const runTicks = 60;
+    for (let i = 0; i < runTicks; i++) {
+      const tickInputs = scenario.inputProgram[simLow.tick] ?? [];
+      if (tickInputs.length > 0) {
+        simLow.applyInputs(tickInputs);
+      }
+      const result = simLow.step();
+      allEventsLow.push(...result.events);
+    }
+  }
+
+  // Run high contact config.
+  const scenario2 = makeDuelScenario(`capability-high-${axis.axis_id}-v1`);
+  const worldHigh = createWorld({ scenario: scenario2 });
+  const simHigh = createSimulation(
+    worldHigh,
+    {
+      onObservation(obs: TelemetryObservation) {
+        observationsHigh.push(obs);
+      },
+    },
+    undefined,
+    highContactCfg,
+  );
+  {
+    const runTicks = 60;
+    for (let i = 0; i < runTicks; i++) {
+      const tickInputs = scenario2.inputProgram[simHigh.tick] ?? [];
+      if (tickInputs.length > 0) {
+        simHigh.applyInputs(tickInputs);
+      }
+      const result = simHigh.step();
+      allEventsHigh.push(...result.events);
+    }
+  }
+
+  const metricsLow = computePlayerMotionMetrics(observationsLow);
+  const metricsHigh = computePlayerMotionMetrics(observationsHigh);
+
+  // Record config versions.
+  evidence.push(
+    `Axis "${axis.axis_id}": low=${axis.profile_value_low.value}, high=${axis.profile_value_high.value}`,
+    `Estimator: ${axis.estimator_id} v${axis.estimator_version}`,
+  );
+
+  // --- Honesty check: contact events MUST exist ---
+  const contactEventsLow = allEventsLow.filter(
+    (e) => e.kind === "player-player-contact",
+  );
+  const contactEventsHigh = allEventsHigh.filter(
+    (e) => e.kind === "player-player-contact",
+  );
+
+  if (contactEventsLow.length === 0) {
+    evidence.push("No player-player-contact events in low run — axis FAIL");
+    return {
+      axis_id: axis.axis_id,
+      status: "IMPLEMENTED",
+      outcome: "FAIL",
+      evidence,
+    };
+  }
+  if (contactEventsHigh.length === 0) {
+    evidence.push("No player-player-contact events in high run — axis FAIL");
+    return {
+      axis_id: axis.axis_id,
+      status: "IMPLEMENTED",
+      outcome: "FAIL",
+      evidence,
+    };
+  }
+
+  evidence.push(
+    `Contact events: low=${contactEventsLow.length}, high=${contactEventsHigh.length}`,
+  );
+
+  // --- Estimator: delta-displacement-at-t20 ---
+  const estimatorTick = 20;
+  const lowDispAtT30 = getMetricAtTick(
+    metricsLow,
+    "displacement",
+    estimatorTick,
+    "player-cap-1",
+  );
+  const highDispAtT30 = getMetricAtTick(
+    metricsHigh,
+    "displacement",
+    estimatorTick,
+    "player-cap-1",
+  );
+
+  const deltaDisp =
+    highDispAtT30 !== undefined && lowDispAtT30 !== undefined
+      ? highDispAtT30 - lowDispAtT30
+      : 0;
+
+  evidence.push(
+    `Displacement at t${estimatorTick}: low=${lowDispAtT30?.toFixed(6) ?? "N/A"}, high=${highDispAtT30?.toFixed(6) ?? "N/A"}`,
+    `Delta displacement: ${deltaDisp.toFixed(6)}`,
+  );
+
+  // --- Check expected_monotonic_direction ---
+  let directionOk = true;
+  if (axis.expected_monotonic_direction === "INCREASE") {
+    directionOk = deltaDisp >= 0;
+  } else if (axis.expected_monotonic_direction === "DECREASE") {
+    directionOk = deltaDisp <= 0;
+  }
+  evidence.push(
+    `Monotonic direction check (${axis.expected_monotonic_direction}): ${directionOk ? "PASS" : "FAIL"}`,
+  );
+
+  // --- Check minimum_material_effect ---
+  const meetsMateriality = Math.abs(deltaDisp) >= axis.minimum_material_effect.value;
+  evidence.push(
+    `Minimum material effect: ${Math.abs(deltaDisp).toFixed(6)} >= ${axis.minimum_material_effect.value} ? ${meetsMateriality}`,
+  );
+
+  // --- Check cross-coupling ---
+  let crossCouplingOk = true;
+  for (const cc of axis.max_permitted_cross_coupling) {
+    if (cc.metric_id === "player-displacement" && Math.abs(deltaDisp) > cc.threshold) {
+      crossCouplingOk = false;
+      evidence.push(
+        `Cross-coupling FAIL: delta displacement ${Math.abs(deltaDisp).toFixed(6)} > threshold ${cc.threshold}`,
+      );
+    }
+  }
+  if (crossCouplingOk) {
+    evidence.push(`Cross-coupling OK`);
+  }
+
+  // --- Determine outcome ---
+  let outcome: "PASS" | "FAIL" | "NOT_EVALUATED" = "PASS";
+  if (deltaDisp === 0) {
+    outcome = "FAIL";
+    evidence.push(
+      "No measurable effect from contact config variation — the knob is not exercised.",
+    );
+  } else if (!directionOk) {
+    outcome = "FAIL";
+    evidence.push(
+      `Delta direction contradicts expected ${axis.expected_monotonic_direction}.`,
+    );
+  } else if (!meetsMateriality) {
+    outcome = "FAIL";
+    evidence.push(
+      `Delta ${deltaDisp.toFixed(6)} below minimum_material_effect ${axis.minimum_material_effect.value}.`,
+    );
+  } else if (!crossCouplingOk) {
+    outcome = "FAIL";
+    evidence.push("Protected output cross-coupling exceeded threshold.");
+  }
+
+  return {
+    axis_id: axis.axis_id,
+    status: "IMPLEMENTED",
+    outcome,
+    evidence,
+  };
+}
+
+/**
+ * Evaluate the transient-acceleration axis (legacy path).
+ */
+function evaluateTransientAccelerationAxis(
+  axis: {
+    axis_id: string;
+    profile_value_low: { id: string; value: number };
+    profile_value_high: { id: string; value: number };
+    expected_monotonic_direction: string;
+    minimum_material_effect: { metric_id: string; value: number };
+    max_permitted_cross_coupling: Array<{ metric_id: string; threshold: number }>;
+    estimator_id: string;
+    estimator_version: string;
+  },
+  _evidence: string[],
+): CapabilityDesignEvaluationResult["axes"][number] {
   // 2. Define config versions for low and high capability runs.
   const lowConfigVersion = `capability-low-${axis.axis_id}-v1`;
   const highConfigVersion = `capability-high-${axis.axis_id}-v1`;
@@ -350,14 +722,14 @@ function evaluateAxis(
     Math.abs((highSpeedAtEnd ?? 0) - (lowSpeedAtEnd ?? 0));
 
   // --- Record evidence ---
-  evidence.push(
+  const evidence = [
     `Axis "${axis.axis_id}": low=${axis.profile_value_low.value}, high=${axis.profile_value_high.value}`,
     `Estimator: ${axis.estimator_id} v${axis.estimator_version}, tick=${estimatorTick}`,
     `Speed at t${estimatorTick}: low=${lowSpeedAtT10?.toFixed(6) ?? "N/A"}, high=${highSpeedAtT10?.toFixed(6) ?? "N/A"}`,
     `Delta speed: ${deltaSpeed.toFixed(6)}`,
     `Sustainable-speed plateau: low=${lowSpeedAtEnd?.toFixed(6) ?? "N/A"}, high=${highSpeedAtEnd?.toFixed(6) ?? "N/A"}`,
     `Plateau delta: ${plateauDelta.toFixed(6)}`,
-  );
+  ];
 
   // 6. Check expected_monotonic_direction.
   let directionOk = true;

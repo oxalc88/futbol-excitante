@@ -179,12 +179,17 @@ export interface Simulation {
  * @param locomotionConfigOverride - Optional locomotion config override.
  *   If provided, used instead of the world state's config for locomotion.
  *   Useful for capability evaluation where low/high values need different configs.
+ * @param contactConfigOverride - Optional player-contact config override.
+ *   If provided, used instead of `FOUNDATION_PLAYER_CONTACT_V1` for player contact
+ *   resolution. Useful for capability evaluation where low/high values need different
+ *   contact knobs (e.g., separationStiffness).
  * @returns A simulation instance.
  */
 export function createSimulation(
   world: WorldState,
   observer?: SimulationObserver,
   locomotionConfigOverride?: typeof FOUNDATION_LOCOMOTION_V1,
+  contactConfigOverride?: typeof FOUNDATION_PLAYER_CONTACT_V1,
 ): Simulation {
   const obs = observer ?? NO_OP_OBSERVER;
 
@@ -389,7 +394,7 @@ export function createSimulation(
       state.players,
       counter,
       state.tick,
-      FOUNDATION_PLAYER_CONTACT_V1,
+      contactConfigOverride ?? FOUNDATION_PLAYER_CONTACT_V1,
     );
     eventCounter = counter.value;
     return events;
