@@ -76,6 +76,22 @@ export const INV_BALL_CONTINUITY: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+/**
+ * Player-contact-evidence invariant: checks that player-player-contact
+ * events exist and reference known players. Used by duels suite.
+ */
+export const INV_PLAYER_CONTACT: InvariantDefinition = {
+  invariant_id: "player-contact-evidence",
+  invariant_version: "invariant-player-contact-v1",
+  input_observation_ids: ["obs-per-tick-v1"],
+  oracle_id: "protected-evaluator-v1",
+  oracle_version: "oracle-protected-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 /** All registered invariant definitions keyed by invariant_id. */
 export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FINITE.invariant_id]: INV_FINITE,
@@ -83,6 +99,7 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_REFERENCES.invariant_id]: INV_REFERENCES,
   [INV_BOUNDS.invariant_id]: INV_BOUNDS,
   [INV_BALL_CONTINUITY.invariant_id]: INV_BALL_CONTINUITY,
+  [INV_PLAYER_CONTACT.invariant_id]: INV_PLAYER_CONTACT,
 };
 
 /**

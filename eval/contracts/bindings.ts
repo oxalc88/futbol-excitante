@@ -498,6 +498,174 @@ export const BINDING_CTRL_ACT_001: TestImplementationBinding = makeTestBindingWi
 );
 
 // ---------------------------------------------------------------------------
+// duels suite test bindings
+// ---------------------------------------------------------------------------
+
+/**
+ * PHY-SHLD-001 — parallel shoulder contact.
+ * PHY-SHLD-001-CONT maps to player-contact-evidence oracle.
+ * PHY-SHLD-001-REF (MEASURED_TARGET) and PHY-SHLD-001-REG (REGRESSION)
+ * are in criterion_bindings but have no oracle → evaluated as their class.
+ */
+export const BINDING_DUELS_PHY_SHLD_001: TestImplementationBinding = makeTestBindingWith(
+  "PHY-SHLD-001",
+  ["scn-duels-phy-shld-001-v1"],
+  ["player-speed", "player-displacement"],
+  ["finite-number", "event-references", "player-contact-evidence"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "PHY-SHLD-001-CONT": ["player-contact-evidence"],
+    // MEASURED_TARGET: no reference target → BLOCKED_MISSING_REFERENCE.
+    "PHY-SHLD-001-REF": [],
+    // REGRESSION: no policy → NOT_EVALUATED.
+    "PHY-SHLD-001-REG": [],
+  },
+);
+
+/**
+ * PHY-STR-001 — physical resistance capability.
+ * PHY-STR-001-DESIGN (ENGINE_DESIGN_TARGET), PHY-STR-001-CAUSAL (UNKNOWN),
+ * PHY-STR-001-REG (REGRESSION) — all no oracle → NOT_EVALUATED.
+ */
+export const BINDING_DUELS_PHY_STR_001: TestImplementationBinding = makeTestBindingWith(
+  "PHY-STR-001",
+  ["scn-duels-phy-str-001-v1"],
+  ["player-speed"],
+  ["finite-number", "event-references"],
+  ["obs-per-tick-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "PHY-STR-001-DESIGN": [],
+    "PHY-STR-001-CAUSAL": [],
+    "PHY-STR-001-REG": [],
+  },
+);
+
+/**
+ * PHY-BC-001 — body-control capability.
+ * PHY-BC-001-DESIGN (ENGINE_DESIGN_TARGET), PHY-BC-001-CAUSAL (UNKNOWN),
+ * PHY-BC-001-REG (REGRESSION) — all no oracle → NOT_EVALUATED.
+ */
+export const BINDING_DUELS_PHY_BC_001: TestImplementationBinding = makeTestBindingWith(
+  "PHY-BC-001",
+  ["scn-duels-phy-bc-001-v1"],
+  ["player-speed"],
+  ["finite-number", "event-references"],
+  ["obs-per-tick-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "PHY-BC-001-DESIGN": [],
+    "PHY-BC-001-CAUSAL": [],
+    "PHY-BC-001-REG": [],
+  },
+);
+
+/**
+ * PHY-PC-001 — physical-contact capability variation.
+ * PHY-PC-001-DESIGN (ENGINE_DESIGN_TARGET), PHY-PC-001-CAUSAL (UNKNOWN),
+ * PHY-PC-001-REG (REGRESSION) — all no oracle → NOT_EVALUATED.
+ */
+export const BINDING_DUELS_PHY_PC_001: TestImplementationBinding = makeTestBindingWith(
+  "PHY-PC-001",
+  ["scn-duels-phy-pc-001-v1"],
+  ["player-speed"],
+  ["finite-number", "event-references"],
+  ["obs-per-tick-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "PHY-PC-001-DESIGN": [],
+    "PHY-PC-001-CAUSAL": [],
+    "PHY-PC-001-REG": [],
+  },
+);
+
+/**
+ * TACK-ST-001 — standing tackle.
+ * Tackles not implemented → UNKNOWN and REGRESSION → NOT_EVALUATED.
+ */
+export const BINDING_DUELS_TACK_ST_001: TestImplementationBinding = makeTestBindingWith(
+  "TACK-ST-001",
+  ["scn-duels-tack-st-001-v1"],
+  ["player-speed"],
+  ["finite-number", "event-references"],
+  ["obs-per-tick-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "TACK-ST-001-CAUSAL": [],
+    "TACK-ST-001-REG": [],
+  },
+);
+
+/**
+ * TACK-SL-001 — sliding tackle.
+ * Tackles not implemented → UNKNOWN and REGRESSION → NOT_EVALUATED.
+ */
+export const BINDING_DUELS_TACK_SL_001: TestImplementationBinding = makeTestBindingWith(
+  "TACK-SL-001",
+  ["scn-duels-tack-sl-001-v1"],
+  ["player-speed"],
+  ["finite-number", "event-references"],
+  ["obs-per-tick-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "TACK-SL-001-CAUSAL": [],
+    "TACK-SL-001-REG": [],
+  },
+);
+
+/**
+ * TACK-ANG-001 — tackle angle.
+ * Tackles not implemented → UNKNOWN and REGRESSION → NOT_EVALUATED.
+ */
+export const BINDING_DUELS_TACK_ANG_001: TestImplementationBinding = makeTestBindingWith(
+  "TACK-ANG-001",
+  ["scn-duels-tack-ang-001-v1"],
+  ["player-speed"],
+  ["finite-number", "event-references"],
+  ["obs-per-tick-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "TACK-ANG-001-CAUSAL": [],
+    "TACK-ANG-001-REG": [],
+  },
+);
+
+/**
+ * INT-PASS-001 — intercept pass.
+ * Intercepts not implemented → UNKNOWN and REGRESSION → NOT_EVALUATED.
+ */
+export const BINDING_DUELS_INT_PASS_001: TestImplementationBinding = makeTestBindingWith(
+  "INT-PASS-001",
+  ["scn-duels-int-pass-001-v1"],
+  ["player-speed"],
+  ["finite-number", "event-references"],
+  ["obs-per-tick-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "INT-PASS-001-CAUSAL": [],
+    "INT-PASS-001-REG": [],
+  },
+);
+
+/**
+ * INT-FAST-001 — fast intercept.
+ * Intercepts not implemented → UNKNOWN and REGRESSION → NOT_EVALUATED.
+ */
+export const BINDING_DUELS_INT_FAST_001: TestImplementationBinding = makeTestBindingWith(
+  "INT-FAST-001",
+  ["scn-duels-int-fast-001-v1"],
+  ["player-speed"],
+  ["finite-number", "event-references"],
+  ["obs-per-tick-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "INT-FAST-001-CAUSAL": [],
+    "INT-FAST-001-REG": [],
+  },
+);
+
+// ---------------------------------------------------------------------------
 // Registry — all bindings keyed by test_id
 // ---------------------------------------------------------------------------
 
@@ -537,6 +705,17 @@ export const TEST_BINDINGS: Record<string, TestImplementationBinding> = {
   [BINDING_HEAD_FREE_001.test_id]: BINDING_HEAD_FREE_001,
   [BINDING_HEAD_DUEL_001.test_id]: BINDING_HEAD_DUEL_001,
   [BINDING_CTRL_ACT_001.test_id]: BINDING_CTRL_ACT_001,
+
+  // duels suite bindings
+  [BINDING_DUELS_PHY_SHLD_001.test_id]: BINDING_DUELS_PHY_SHLD_001,
+  [BINDING_DUELS_PHY_STR_001.test_id]: BINDING_DUELS_PHY_STR_001,
+  [BINDING_DUELS_PHY_BC_001.test_id]: BINDING_DUELS_PHY_BC_001,
+  [BINDING_DUELS_PHY_PC_001.test_id]: BINDING_DUELS_PHY_PC_001,
+  [BINDING_DUELS_TACK_ST_001.test_id]: BINDING_DUELS_TACK_ST_001,
+  [BINDING_DUELS_TACK_SL_001.test_id]: BINDING_DUELS_TACK_SL_001,
+  [BINDING_DUELS_TACK_ANG_001.test_id]: BINDING_DUELS_TACK_ANG_001,
+  [BINDING_DUELS_INT_PASS_001.test_id]: BINDING_DUELS_INT_PASS_001,
+  [BINDING_DUELS_INT_FAST_001.test_id]: BINDING_DUELS_INT_FAST_001,
 };
 
 /**

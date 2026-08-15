@@ -141,6 +141,15 @@ export const CONFIG_ACTIONS_V1: ConfigMatrixPolicy = {
   description: "Touch-and-actions-suite config.",
 };
 
+export const CONFIG_DUELS_V1: ConfigMatrixPolicy = {
+  policy_id: "config-duels-v1",
+  policy_version: "config-matrix-duels-v1",
+  config_refs: {
+    foundation: "foundation-locomotion-v1",
+  },
+  description: "Duels-suite config.",
+};
+
 // ---------------------------------------------------------------------------
 // Resource policies (referenced by suite resource_policy_id)
 // ---------------------------------------------------------------------------
@@ -361,6 +370,50 @@ export const EXPANSION_TOUCH_ACTIONS_V1: ExpansionManifest = {
   content_hash: "placeholder",
 };
 
+/**
+ * Expansion manifest for the duels suite.
+ *
+ * impact_closure is NONE so expanded = direct set + common criteria.
+ * HEAD-DUEL-001 is not listed (headers not implemented).
+ */
+export const EXPANSION_DUELS_V1: ExpansionManifest = {
+  policy_id: "expansion-duels-v1",
+  suite_id: "duels",
+  suite_version: "suite-duels-v1",
+  direct_test_ids: [
+    "PHY-SHLD-001",
+    "PHY-STR-001",
+    "PHY-BC-001",
+    "PHY-PC-001",
+    "TACK-ST-001",
+    "TACK-SL-001",
+    "TACK-ANG-001",
+    "INT-PASS-001",
+    "INT-FAST-001",
+  ],
+  expanded_test_ids: [
+    "INT-FAST-001",
+    "INT-PASS-001",
+    "PHY-BC-001",
+    "PHY-PC-001",
+    "PHY-SHLD-001",
+    "PHY-STR-001",
+    "TACK-ANG-001",
+    "TACK-SL-001",
+    "TACK-ST-001",
+  ],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+    "COMMON-BOUNDS",
+  ],
+  impact_closure: "NONE",
+  catalog_version: "gameplay-evaluation-v2",
+  registry_set_id: "placeholder",
+  content_hash: "placeholder",
+};
+
 // ---------------------------------------------------------------------------
 // Policy registries
 // ---------------------------------------------------------------------------
@@ -377,6 +430,7 @@ export const CONFIG_POLICIES: Record<string, ConfigMatrixPolicy> = {
   [CONFIG_LOCOMOTION_V1.policy_id]: CONFIG_LOCOMOTION_V1,
   [CONFIG_BALL_V1.policy_id]: CONFIG_BALL_V1,
   [CONFIG_ACTIONS_V1.policy_id]: CONFIG_ACTIONS_V1,
+  [CONFIG_DUELS_V1.policy_id]: CONFIG_DUELS_V1,
 };
 
 /** Resource policies keyed by policy_id. */
@@ -401,6 +455,7 @@ export const EXPANSION_MANIFESTS: Record<string, ExpansionManifest> = {
   "expansion-locomotion-v1": EXPANSION_LOCOMOTION_V1,
   "expansion-ball-v1": EXPANSION_BALL_V1,
   "expansion-touch-actions-v1": EXPANSION_TOUCH_ACTIONS_V1,
+  "expansion-duels-v1": EXPANSION_DUELS_V1,
 };
 
 // ---------------------------------------------------------------------------

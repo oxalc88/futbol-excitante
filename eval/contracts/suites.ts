@@ -132,12 +132,52 @@ export const TOUCH_AND_ACTIONS_SUITE: SuiteDefinition = {
   expected_expansion_manifest_id: "expansion-touch-actions-v1",
 };
 
+/**
+ * Duels suite — physical contact and ball-competition criteria.
+ *
+ * Direct tests: PHY-SHLD-001, PHY-STR-001, PHY-BC-001, PHY-PC-001,
+ *   TACK-ST-001, TACK-SL-001, TACK-ANG-001, INT-PASS-001, INT-FAST-001.
+ *
+ * HEAD-DUEL-001 is NOT included (headers not implemented).
+ */
+export const DUELS_SUITE: SuiteDefinition = {
+  suite_id: "duels",
+  suite_version: "suite-duels-v1",
+  direct_test_ids: [
+    "PHY-SHLD-001",
+    "PHY-STR-001",
+    "PHY-BC-001",
+    "PHY-PC-001",
+    "TACK-ST-001",
+    "TACK-SL-001",
+    "TACK-ANG-001",
+    "INT-PASS-001",
+    "INT-FAST-001",
+  ],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+    "COMMON-BOUNDS",
+  ],
+  impact_closure: "NONE",
+  prerequisite_capabilities: ["PLAYER_DUELS"],
+  seed_matrix_id: "seeds-family-v1",
+  config_matrix_id: "config-duels-v1",
+  held_out_policy_id: null,
+  browser_case_ids: [],
+  resource_policy_id: "resources-family-v1",
+  outcome_reduction_profile_id: "profile-selected-v1",
+  expected_expansion_manifest_id: "expansion-duels-v1",
+};
+
 /** All registered suites keyed by suite_id. */
 export const SUITES: Record<string, SuiteDefinition> = {
   [FAST_SUITE.suite_id]: FAST_SUITE,
   [LOCOMOTION_SUITE.suite_id]: LOCOMOTION_SUITE,
   [BALL_SUITE.suite_id]: BALL_SUITE,
   [TOUCH_AND_ACTIONS_SUITE.suite_id]: TOUCH_AND_ACTIONS_SUITE,
+  [DUELS_SUITE.suite_id]: DUELS_SUITE,
 };
 
 /**

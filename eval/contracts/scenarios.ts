@@ -461,6 +461,220 @@ export const SCENARIO_CTRL_ACT_001 = makeScenarioStub(
   { test_focus: "action-command-timing" },
 );
 
+// ---------------------------------------------------------------------------
+// duels suite scenarios
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a tick-indexed input program that drives two players toward
+ * each other along the Y axis so they overlap and trigger
+ * player-player-contact events.  Player-a starts at (0,0) moving
+ * +Y; player-b starts at (0,1.5) moving −Y.  Both move at full
+ * sprint for the entire window so contact is guaranteed well before
+ * the scenario ends.
+ */
+function makeDuelInputProgram(
+  durationTicks: number,
+): Record<
+  number,
+  {
+    tick: number;
+    sourceId: string;
+    controlSlot: string;
+    moveX: number;
+    moveY: number;
+    sprint: number;
+    heldButtons: number;
+    pressedButtons: number;
+    releasedButtons: number;
+  }[]
+> {
+  const program: Record<
+    number,
+    {
+      tick: number;
+      sourceId: string;
+      controlSlot: string;
+      moveX: number;
+      moveY: number;
+      sprint: number;
+      heldButtons: number;
+      pressedButtons: number;
+      releasedButtons: number;
+    }[]
+  > = {};
+  for (let t = 0; t < durationTicks; t++) {
+    program[t] = [
+      {
+        tick: t,
+        sourceId: "eval-input",
+        controlSlot: "slot-1",
+        moveX: 0,
+        moveY: 1,
+        sprint: 1,
+        heldButtons: 0,
+        pressedButtons: t === 0 ? 0 : 0,
+        releasedButtons: 0,
+      },
+      {
+        tick: t,
+        sourceId: "eval-input",
+        controlSlot: "slot-2",
+        moveX: 0,
+        moveY: -1,
+        sprint: 1,
+        heldButtons: 0,
+        pressedButtons: t === 0 ? 0 : 0,
+        releasedButtons: 0,
+      },
+    ];
+  }
+  return program;
+}
+
+/**
+ * Create a two-player duel scenario stub.
+ * Two players start close together and run toward each other,
+ * suitable for phy-shield/duel evaluation.
+ */
+function makeDuelScenarioStub(
+  scenarioId: string,
+  durationTicks: number,
+  capabilityRequirements: string[],
+  seedPolicy: { kind: "FIXED"; values_or_set_id: string },
+  configRefs: Record<string, string> = {},
+): ScenarioDefinition {
+  const inputProgram = makeDuelInputProgram(durationTicks);
+  return {
+    scenario_id: scenarioId,
+    scenario_version: "scenario-v1",
+    capability_requirements: capabilityRequirements,
+    duration_ticks: durationTicks,
+    seed_policy: seedPolicy,
+    initial_state_schema: "state-v1",
+    initial_state: {
+      players: [
+        {
+          playerId: "player-a",
+          teamId: "team-A",
+          groundPosition: { x: 0, y: 0 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 0,
+          desiredHeading: 0,
+        },
+        {
+          playerId: "player-b",
+          teamId: "team-B",
+          groundPosition: { x: 0, y: 1.5 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 3.141592653589793,
+          desiredHeading: 3.141592653589793,
+        },
+      ],
+      ball: {
+        position: { x: 0, y: 0.75, z: 0.11 },
+        linearVelocity: { x: 0, y: 0, z: 0 },
+        angularVelocity: { x: 0, y: 0, z: 0 },
+        regime: "ground-roll",
+      },
+    },
+    config_refs: {
+      foundation: "foundation-locomotion-v1",
+      ...configRefs,
+    },
+    input_program: {
+      schema_id: "input-frame-v1",
+      schema_version: "schema-input-v1",
+      value: inputProgram,
+    },
+    scheduled_events: [],
+    observation_windows: [
+      {
+        window_id: "full-run-v1",
+        start: { kind: "ABSOLUTE_TICK", tick: 0, offset_ticks: 0, missing_boundary_behavior: "INVALID_RUN" },
+        end: { kind: "SCENARIO_END", offset_ticks: 0, missing_boundary_behavior: "INVALID_RUN" },
+        boundary_inclusion: "CLOSED",
+        discontinuity_policy: "OBSERVE",
+      },
+    ],
+    requested_observation_ids: ["obs-per-tick-v1"],
+  };
+}
+
+export const SCENARIO_DUELS_PHY_SHLD_001 = makeDuelScenarioStub(
+  "scn-duels-phy-shld-001-v1",
+  60,
+  ["PLAYER_DUELS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "parallel-shoulder-contact" },
+);
+
+export const SCENARIO_DUELS_PHY_STR_001 = makeScenarioStub(
+  "scn-duels-phy-str-001-v1",
+  60,
+  ["PLAYER_DUELS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "physical-resistance-isolation" },
+);
+
+export const SCENARIO_DUELS_PHY_BC_001 = makeScenarioStub(
+  "scn-duels-phy-bc-001-v1",
+  60,
+  ["PLAYER_DUELS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "body-control-perturbation" },
+);
+
+export const SCENARIO_DUELS_PHY_PC_001 = makeScenarioStub(
+  "scn-duels-phy-pc-001-v1",
+  60,
+  ["PLAYER_DUELS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "physical-contact-variation" },
+);
+
+export const SCENARIO_DUELS_TACK_ST_001 = makeScenarioStub(
+  "scn-duels-tack-st-001-v1",
+  60,
+  ["PLAYER_DUELS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "standing-tackle" },
+);
+
+export const SCENARIO_DUELS_TACK_SL_001 = makeScenarioStub(
+  "scn-duels-tack-sl-001-v1",
+  60,
+  ["PLAYER_DUELS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "sliding-tackle" },
+);
+
+export const SCENARIO_DUELS_TACK_ANG_001 = makeScenarioStub(
+  "scn-duels-tack-ang-001-v1",
+  60,
+  ["PLAYER_DUELS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "tackle-angle" },
+);
+
+export const SCENARIO_DUELS_INT_PASS_001 = makeScenarioStub(
+  "scn-duels-int-pass-001-v1",
+  60,
+  ["PLAYER_DUELS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "intercept-pass" },
+);
+
+export const SCENARIO_DUELS_INT_FAST_001 = makeScenarioStub(
+  "scn-duels-int-fast-001-v1",
+  60,
+  ["PLAYER_DUELS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "fast-intercept" },
+);
+
 /** All registered scenario stubs keyed by scenario_id. */
 export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
   [SCENARIO_BALL_IND_001.scenario_id]: SCENARIO_BALL_IND_001,
@@ -498,6 +712,17 @@ export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
   [SCENARIO_HEAD_FREE_001.scenario_id]: SCENARIO_HEAD_FREE_001,
   [SCENARIO_HEAD_DUEL_001.scenario_id]: SCENARIO_HEAD_DUEL_001,
   [SCENARIO_CTRL_ACT_001.scenario_id]: SCENARIO_CTRL_ACT_001,
+
+  // duels suite scenarios
+  [SCENARIO_DUELS_PHY_SHLD_001.scenario_id]: SCENARIO_DUELS_PHY_SHLD_001,
+  [SCENARIO_DUELS_PHY_STR_001.scenario_id]: SCENARIO_DUELS_PHY_STR_001,
+  [SCENARIO_DUELS_PHY_BC_001.scenario_id]: SCENARIO_DUELS_PHY_BC_001,
+  [SCENARIO_DUELS_PHY_PC_001.scenario_id]: SCENARIO_DUELS_PHY_PC_001,
+  [SCENARIO_DUELS_TACK_ST_001.scenario_id]: SCENARIO_DUELS_TACK_ST_001,
+  [SCENARIO_DUELS_TACK_SL_001.scenario_id]: SCENARIO_DUELS_TACK_SL_001,
+  [SCENARIO_DUELS_TACK_ANG_001.scenario_id]: SCENARIO_DUELS_TACK_ANG_001,
+  [SCENARIO_DUELS_INT_PASS_001.scenario_id]: SCENARIO_DUELS_INT_PASS_001,
+  [SCENARIO_DUELS_INT_FAST_001.scenario_id]: SCENARIO_DUELS_INT_FAST_001,
 };
 
 /**

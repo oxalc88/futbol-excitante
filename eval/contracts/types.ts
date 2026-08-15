@@ -100,7 +100,7 @@ export interface ScenarioDefinition {
   duration_ticks: number;
   seed_policy: { kind: "FIXED" | "MATRIX" | "HELD_OUT"; values_or_set_id: string };
   initial_state_schema: string;
-  initial_state: unknown;
+  initial_state: { players: unknown[]; ball: unknown };
   config_refs: Record<string, string>;
   input_program: { schema_id: string; schema_version: string; value: unknown };
   scheduled_events: unknown[];
