@@ -7,12 +7,12 @@ orchestrator_in_use: orchestrator
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: LOCOMOTION-LATERAL-DRIFT
+next_objective_id: CAPABILITY-SWERVE
 best_known:
   commit: HEAD
-  note: "CAPABILITY-BODY-CONTROL accepted. ENGINE_DESIGN_TARGET now 4/5 axes IMPLEMENTED (only swerve DEFERRED). PLAYABLE_1V1 still cannot PASS (perceptual gates only). Not PES."
+  note: "LOCOMOTION-LATERAL-DRIFT accepted. ENGINE_DESIGN_TARGET 4/5 axes IMPLEMENTED. PLAYABLE_1V1 still cannot PASS (perceptual gates only). Not PES."
 active_candidate:
-  objective_id: LOCOMOTION-LATERAL-DRIFT
+  objective_id: CAPABILITY-SWERVE
   builder: builder-qwen
   critic: critic
   started_from_commit: HEAD
@@ -59,19 +59,20 @@ accepted:
   - CAPABILITY-PHYSICAL-CONTACT
   - CAPABILITY-SHOOTING-POWER
   - CAPABILITY-BODY-CONTROL
+  - LOCOMOTION-LATERAL-DRIFT
 blocked: []
-selection_note: "ENGINE_DESIGN_TARGET exercises 4 of 5 capability axes; only swerve stays DEFERRED (genuinely not exercisable — no Magnus/curve in FOUNDATION_BALL_V1). PLAYABLE_1V1 remains blocked only on perceptual gates (ARCH-DIFF-001, ARCHETYPE_BLINDED_COMPARISON_PASS), which must not be invented. Integration reviewer flagged a follow-up: the default configs (FOUNDATION_LOCOMOTION_V1 / TRANSIENT_ACCEL_LOCOMOTION_V1, lateralResistance 0.7) now apply active lateral damping but no dedicated default-config scenario asserts the lateral-drift decay — the now-active parameter needs a protected regression target. Next objective: a default-config lateral-drift acceptance test (turn 90°, assert perpendicular velocity decays toward zero within N ticks, straight-line unchanged) that FAILs if the damping is removed. This closes the gap opened by the body-control core change."
+selection_note: "ENGINE_DESIGN_TARGET exercises 4 of 5 capability axes; swerve is the only remaining DEFERRED axis, genuinely not exercisable because the ball has no curve (FOUNDATION_BALL_V1: 'No Magnus/curve'). The ball already carries angularVelocity and spinDecay, so the missing piece is a provisional spin→curve coupling (Magnus-style lateral force) in the ball stage plus a versioned config. Next objective: implement provisional ball curve (no spin → no curve, behavior-safe for existing zero-spin fixtures), then materialize the swerve axis as IMPLEMENTED with a runner (metric ball-distance or lateral deviation; honest FAIL on no measurable effect). Fictional product values only; no PES claim. PLAYABLE_1V1 remains blocked only on perceptual gates (ARCH-DIFF-001, ARCHETYPE_BLINDED_COMPARISON_PASS), which must not be invented."
 ```
 
 ## Last accepted objective
 
-CAPABILITY-BODY-CONTROL — body-control capability axis IMPLEMENTED with runner.
+LOCOMOTION-LATERAL-DRIFT — protected regression tests for default-config lateral damping.
 
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT (after retry 2)
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT (first pass)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- 973 node tests + 24 browser. ENGINE_DESIGN_TARGET now 4/5 axes IMPLEMENTED (only swerve DEFERRED). No PLAYABLE_1V1_PASS / PES claim.
+- 980 node tests. Test-only objective (no src/ change). No PLAYABLE_1V1_PASS / PES claim.
 
 ## Next action
 
-Delegate LOCOMOTION-LATERAL-DRIFT to builder-qwen. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.
+Delegate CAPABILITY-SWERVE to builder-qwen. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.

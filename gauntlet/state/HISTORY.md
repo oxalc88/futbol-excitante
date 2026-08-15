@@ -1391,4 +1391,48 @@ Prior critic passes: RETRY 1 (estimator declaration cumulative-t5-to-t20 vs meas
 - required_fixes: none
 ```
 
+## Iteration 37 — 2026-08-15
+
+- objective_id: LOCOMOTION-LATERAL-DRIFT
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (first pass, 0 retries)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: (feat) lateral-drift regression tests; (docs) state refresh
+- notes: New `tests/unit/locomotion/lateral-drift.test.ts` (7 tests) protects the now-active default-config `lateralResistance: 0.7` damping (from CAPABILITY-BODY-CONTROL): default-config 90°-turn lateral decay (7.0 → 0.00036 by tick 8, assertion < 0.1), straight-line unchanged (lateral exactly 0), negative control (`lateralResistance: 0` → lateral 5.87 at tick 8 so the decay assertion genuinely FAILs), determinism (bit-identical per-tick values). Test-only objective (no src/ change). 980 node tests (was 973). No PES claim. Non-blocking nit: 001 header comment cites "tick 0 lateral ≈ 2.06" / "< 0.05 by tick 4" while measured values are 7.0 at tick 0 / 0.0508 at tick 4 — no assertion depends on these figures.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: LOCOMOTION-LATERAL-DRIFT
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980; independently reproduced decay trajectory, negative-control FAIL direction (no-damping lateral 5.87 at tick 8 > 0.1 threshold), and bit-identical determinism; confirmed test-only scope.
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: LOCOMOTION-LATERAL-DRIFT
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: typecheck 0; mise run test 980/980 (51 files, +7 = lateral-drift.test.ts); locomotion/ball/contact/close-control/capability/determinism/core-boundary neighbors green; no src/ or existing-test changes
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 

@@ -5,10 +5,10 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-15T09:10:00Z
+measured_at: 2026-08-15T09:55:00Z
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
-overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1 and the three capability-axis rows are measured from this overflow session's meta.json
+overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, and the lateral-drift row are measured from this overflow session's meta.json
 ```
 
 ## How to read this
@@ -87,6 +87,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window.
 | CAPABILITY-PHYSICAL-CONTACT | accepted | ~40m | 22.7m | 8.3m | 9.0m | 0.5m | ~9.6M | n/a** |
 | CAPABILITY-SHOOTING-POWER (1 retry) | accepted | ~1h 10m | 49.4m | 12.1m | 8.0m | 0.5m | ~10.6M | n/a** |
 | CAPABILITY-BODY-CONTROL (2 retries) | accepted | ~1h 28m | 65.4m | 15.1m | 7.7m | 0.5m | ~13.2M | n/a** |
+| LOCOMOTION-LATERAL-DRIFT | accepted | ~24m | 12.9m | 4.5m | 6.6m | 0.5m | ~1.7M | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -94,12 +95,13 @@ not first-pass implementation.
 
 \* DUELS-SUITE prompt/completion tokens were not re-aggregated from the prior
 session; durations are from that session's subagent meta.json.
-\*\* MUTANT-1V1 and the three capability-axis steps are not separately split
+\*\* MUTANT-1V1 and the later overflow-session steps are not separately split
 for completion (updates.jsonl records a final `totalTokens` snapshot per
 role); `Prompt` is the summed final totals (MUTANT-1V1: builder 1.95M +
 critic 0.89M + integrator 0.52M; PHYSICAL-CONTACT: 7.66M + 1.21M + 0.73M;
 SHOOTING-POWER: 8.59M + 1.45M + 0.57M; BODY-CONTROL: builder 10.68M + critic
-1.43M + integrator 1.08M, retry rounds share the builder/critic sessions).
+1.43M + integrator 1.08M, retry rounds share the builder/critic sessions;
+LATERAL-DRIFT: builder 1.17M + critic 0.19M + integrator 0.32M).
 
 ## By phase
 
@@ -114,6 +116,7 @@ SHOOTING-POWER: 8.59M + 1.45M + 0.57M; BODY-CONTROL: builder 10.68M + critic
 | Physical-contact axis (accepted) | 40m | ~9.6M | n/a** |
 | Shooting-power axis (accepted) | 1h 10m | ~10.6M | n/a** |
 | Body-control axis (accepted) | 1h 28m | ~13.2M | n/a** |
+| Lateral-drift regression (accepted) | 24m | ~1.7M | n/a** |
 
 ## By model (tokens and wall)
 
@@ -128,7 +131,7 @@ These were previously added together as “grok-4.6”. They are different jobs.
 |---|---|---|---:|---:|---:|---:|---:|
 | Orchestrator | parent session (not in Tasks) | grok-4.6 | 1 session | **160.12M** | 898k | 781 | 400k |
 | Git-committer (legacy) | `git-committer` children | grok-4.6 | 81 | **6.41M** | 469k | 649 | — |
-| Git-committer (now) | `git-committer` children | gemma4 | 9 | **~800k** | n/a | 77 | — |
+| Git-committer (now) | `git-committer` children | gemma4 | 11 | **~980k** | n/a | 91 | — |
 | **Grok 4.6 total** | parent + old committer | grok-4.6 | | **166.53M** | 1.37M | 1,430 | |
 
 Orchestrator input is large because parent context grew to ~400k and was
@@ -136,8 +139,8 @@ re-sent on every orchestrator call (including while waiting on children).
 That cost is **not** git-committer.
 
 The 81 Grok committer runs were bookkeeping (conventional commits / push).
-That role is now `git-committer` / `gemma4`. The nine Gemma runs so far
-are ~800k processed prompt tokens (~25× cheaper per comparable commit
+That role is now `git-committer` / `gemma4`. The eleven Gemma runs so far
+are ~980k processed prompt tokens (~25× cheaper per comparable commit
 batch than the Grok committer average of ~79k prompt tokens/run). Gemma
 completion growth is not recorded the same way in `updates.jsonl`
 (streams often have a single `totalTokens` snapshot), so that cell is
@@ -149,12 +152,12 @@ completion growth is not recorded the same way in `updates.jsonl`
 |---|---|---:|---:|---:|
 | grok-4.6 | **orchestrator only** | parent | 160.12M | 898k |
 | grok-4.6 | **git-committer (legacy)** | 81 | 6.41M | 469k |
-| gemma4 | **git-committer** | 9 | 0.80M | n/a |
-| qwen3.6 | builder | 56 | 229.43M | 3.57M |
-| deepseek-v4-flash-0731 | critic | 68 | 46.39M | 2.57M |
-| deepseek-v4-flash-0731 | integrator | 36 | 26.76M | 1.20M |
+| gemma4 | **git-committer** | 11 | 0.98M | n/a |
+| qwen3.6 | builder | 57 | 230.60M | 3.57M |
+| deepseek-v4-flash-0731 | critic | 69 | 46.58M | 2.57M |
+| deepseek-v4-flash-0731 | integrator | 37 | 27.08M | 1.20M |
 | mimo-v2.5 | builder | 13 | 50.42M | 0.79M |
-| **All processed** | | | **~520M** | **~9.5M** |
+| **All processed** | | | **~522M** | **~9.5M** |
 
 Builder/critic/integrator counts are higher than the first TIMING snapshot
 because later playable steps added child sessions. Use the Grok split above
@@ -168,6 +171,8 @@ qwen3.6 builder session (8.59M, incl. the retry round), one critic session
 commit runs (~0.18M est.). BODY-CONTROL added one qwen3.6 builder session
 (10.68M, incl. two retry rounds + comment fix), one critic session (1.43M,
 incl. two retry rounds), one integrator run (1.08M), two gemma4 commit runs
+(~0.18M est.). LATERAL-DRIFT added one qwen3.6 builder run (1.17M), one
+critic run (0.19M), one integrator run (0.32M), two gemma4 commit runs
 (~0.18M est.). DUELS-SUITE tokens are not re-aggregated (n/a*).
 
 ---
@@ -248,6 +253,7 @@ on an H task is the interesting result.
 | CAPABILITY-PHYSICAL-CONTACT | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 0 | A | Physical-contact axis + contact-config override; critic forced all FAIL branches |
 | CAPABILITY-SHOOTING-POWER | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 1 | B | Estimator declaration t20 vs runner t10; fixed |
 | CAPABILITY-BODY-CONTROL | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 2 | C | Estimator declaration mismatch; cross-coupling FAIL unreachable (turnRate cosmetic) — fixed with lateralResistance knob |
+| LOCOMOTION-LATERAL-DRIFT | qwen3.6 | H | High — can violate architecture | 0 | A | Default-config lateral-drift regression tests; negative control proves FAIL direction |
 
 ### Builder scoreboard
 
@@ -255,7 +261,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 28 | 12 | 8 | 3 | 3 | 2 | 43% | 1.00 | ~43m |
+| qwen3.6 | 29 | 13 | 8 | 3 | 3 | 2 | 45% | 0.97 | ~42m |
 | mimo-v2.5 | 8 | 4 | 3 | 1 | 0 | 0 | 50% | 0.63 | ~31m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
@@ -263,7 +269,7 @@ Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 | Builder | Objectives | Weighted grade / difficulty | Read as |
 |---|---:|---:|---|
 | mimo-v2.5 | 8, all H | 3.1 / 3.0 | First-pass locomotion and ball; misses were local (mapping, restore, pair order) |
-| qwen3.6 | 28, mixed M–VH | 2.7 / 2.8 | Reliable on contracts and profiles; expensive on honest-eval / CLI / browser evidence |
+| qwen3.6 | 29, mixed M–VH | 2.8 / 2.8 | Reliable on contracts and profiles; expensive on honest-eval / CLI / browser evidence |
 
 ### What that means for routing
 
