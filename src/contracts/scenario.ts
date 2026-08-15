@@ -63,6 +63,8 @@ export interface ScenarioPlayerEntry {
   bodyHeading: number;
   /** Initial desired heading (radians). */
   desiredHeading: number;
+  /** Fictional archetype assigned to this player (e.g. "archetype-burst-v1"). */
+  archetypeId?: string;
 }
 
 /**

@@ -29,6 +29,10 @@ export interface PlayerState {
   bodyHeading: Heading;
   /** Desired heading in radians (action/movement target). */
   desiredHeading: Heading;
+  /** Fictional archetype assigned to this player (e.g. "archetype-burst-v1"). */
+  archetypeId?: string;
+  /** Transient acceleration override from the archetype (0 = baseline). */
+  archetypeTransientAccel?: number;
   // -----------------------------------------------------------------
   // Fields present from bootstrap but not yet implemented:
   // - actionState
