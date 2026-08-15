@@ -103,11 +103,19 @@ export function stepLocomotion(
     };
 
     // -- 1.5. Transient acceleration bonus (early-speed only) ----------
-    // The bonus scales with the coefficient and the gap between current
-    // speed and maximum speed, tapering to zero at the plateau.
+    // The locomotion config's transient acceleration is the authoritative
+    // source (it may be a config override from the simulation).  The
+    // player's archetypeTransientAccel is a per-player modifier that
+    // adds to the config value.  When the player has no archetype, the
+    // config value is used directly.
+    //
+    // Precedence: config override (always used) + archetype bonus (when present).
+    const ps = player as PlayerState & { archetypeTransientAccel?: number };
+    const configTransient = config.transientAcceleration?.value ?? 0;
+    const effectiveTransientAccel = configTransient + (ps.archetypeTransientAccel ?? 0);
     const currentSpeed = mag(player.linearVelocity);
     const speedGap = maxSpeed - currentSpeed;
-    const transientBonus = transientAccel * accel * Math.max(0, speedGap) / maxSpeed;
+    const transientBonus = effectiveTransientAccel * accel * Math.max(0, speedGap) / maxSpeed;
 
     // -- 2. Converge linearVelocity toward targetVelocity ----------------
 
