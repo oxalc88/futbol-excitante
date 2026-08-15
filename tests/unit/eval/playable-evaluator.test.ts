@@ -25,7 +25,8 @@ import { createSimulation } from "../../../src/simulation/loop/simulation.js";
 import { PLAYABLE_1V1_PROFILE, getMilestoneProfile, MILESTONE_PROFILES } from "../../../eval/contracts/profiles.js";
 import { evaluatePlayable1v1 } from "../../../eval/runners/playable-evaluator.js";
 import { evaluateCapabilityDesign } from "../../../eval/runners/evaluate-capability-design.js";
-import { evaluateFoundation } from "../../../eval/runners/foundation-evaluator.js";
+import { evaluateFoundation, evaluateSuite } from "../../../eval/runners/foundation-evaluator.js";
+import { evaluate } from "../../../eval/runners/evaluate.js";
 import { BROWSER_CASES } from "../../../eval/contracts/browser-cases.js";
 import { loadRegistrySet } from "../../../eval/contracts/loader.js";
 import type { ScenarioDefinition } from "../../../src/contracts/scenario.js";
@@ -503,5 +504,50 @@ describe("No PES claims", () => {
         }
       }
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 10. TOUCH_AND_ACTIONS unimplemented tests are NOT_EVALUATED
+// ---------------------------------------------------------------------------
+
+describe("TOUCH_AND_ACTIONS: unimplemented tests are NOT_EVALUATED", () => {
+  function runTouchSuite(suiteId: string) {
+    const scenario = loadFixture();
+    const evalResult = evaluate({ scenario });
+    return evaluateSuite(suiteId, evalResult.observations);
+  }
+
+  it("HEAD-FREE-001 overall is NOT_EVALUATED", () => {
+    const touchSuite = runTouchSuite("touch_and_actions");
+    expect(touchSuite.suite_id).toBe("touch_and_actions");
+
+    const headFree = touchSuite.tests.find((t) => t.test_id === "HEAD-FREE-001");
+    expect(headFree).toBeDefined();
+    expect(headFree!.overall).toBe("NOT_EVALUATED");
+  });
+
+  it("TOUCH-WF-001 overall is NOT_EVALUATED", () => {
+    const touchSuite = runTouchSuite("touch_and_actions");
+
+    const touchWf = touchSuite.tests.find((t) => t.test_id === "TOUCH-WF-001");
+    expect(touchWf).toBeDefined();
+    expect(touchWf!.overall).toBe("NOT_EVALUATED");
+  });
+
+  it("SHOT-SWV-001 overall is NOT_EVALUATED", () => {
+    const touchSuite = runTouchSuite("touch_and_actions");
+
+    const shotSv = touchSuite.tests.find((t) => t.test_id === "SHOT-SWV-001");
+    expect(shotSv).toBeDefined();
+    expect(shotSv!.overall).toBe("NOT_EVALUATED");
+  });
+
+  it("CROSS-HI-001 overall is NOT_EVALUATED", () => {
+    const touchSuite = runTouchSuite("touch_and_actions");
+
+    const crossHi = touchSuite.tests.find((t) => t.test_id === "CROSS-HI-001");
+    expect(crossHi).toBeDefined();
+    expect(crossHi!.overall).toBe("NOT_EVALUATED");
   });
 });

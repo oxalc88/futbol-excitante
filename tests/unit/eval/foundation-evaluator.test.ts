@@ -832,3 +832,139 @@ describe("Browser case validation", () => {
     expect(result.overall).toBe("FAIL");
   });
 });
+
+// ---------------------------------------------------------------------------
+// 11. touch_and_actions suite evaluation
+// ---------------------------------------------------------------------------
+
+describe("touch_and_actions suite evaluation", () => {
+  it("touch_and_actions suite can be evaluated via evaluateSuite", () => {
+    const scenario = loadFixture();
+    const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+    modified.inputProgram = buildInputProgram(5, "slot-1", { moveX: 0.3 });
+    modified.durationTicks = 5;
+
+    const evalResult = evaluate({ scenario: modified });
+    const registry = loadRegistrySet();
+    const result = evaluateSuite("touch_and_actions", evalResult.observations, { registry });
+
+    // touch_and_actions suite must have tests.
+    expect(result.suite_id).toBe("touch_and_actions");
+    expect(result.tests.length).toBeGreaterThan(0);
+
+    // Verify expected test IDs are present.
+    const testIds = result.tests.map((t) => t.test_id);
+    expect(testIds).toContain("TOUCH-SLOW-001");
+    expect(testIds).toContain("PASS-LOW-001");
+    expect(testIds).toContain("SHOT-PWR-001");
+    // HEAD-DUEL-001 must NOT be present (duels are out of scope).
+    expect(testIds).not.toContain("HEAD-DUEL-001");
+  });
+
+  it("TOUCH-SLOW-001-CONTACT uses possession-evidence oracle", () => {
+    const scenario = loadFixture();
+    const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+    modified.inputProgram = buildInputProgram(5, "slot-1", { moveX: 0.3 });
+    modified.durationTicks = 5;
+
+    const evalResult = evaluate({ scenario: modified });
+    const registry = loadRegistrySet();
+    const result = evaluateSuite("touch_and_actions", evalResult.observations, { registry });
+
+    // TOUCH-SLOW-001 should appear in touch_and_actions suite.
+    const touchSlow = result.tests.find((t) => t.test_id === "TOUCH-SLOW-001");
+    expect(touchSlow).toBeDefined();
+
+    // TOUCH-SLOW-001-CONTACT must be evaluated (not NOT_EVALUATED)
+    // because it maps to the possession-evidence oracle.
+    const contactCriterion = touchSlow!.criteria.find(
+      (c) => c.criterion_id === "TOUCH-SLOW-001-CONTACT",
+    );
+    expect(contactCriterion).toBeDefined();
+    expect(contactCriterion!.class).toBe("HARD_INVARIANT");
+    // On a clean run without lastTouchRef changes, the oracle passes.
+    expect(contactCriterion!.outcome).toBe("PASS");
+  });
+
+  it("PASS-LOW-001-IMPULSE is NOT_EVALUATED (no contact/impulse oracle)", () => {
+    const scenario = loadFixture();
+    const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+    modified.inputProgram = buildInputProgram(5, "slot-1", { moveX: 0.3 });
+    modified.durationTicks = 5;
+
+    const evalResult = evaluate({ scenario: modified });
+    const registry = loadRegistrySet();
+    const result = evaluateSuite("touch_and_actions", evalResult.observations, { registry });
+
+    const passLow = result.tests.find((t) => t.test_id === "PASS-LOW-001");
+    expect(passLow).toBeDefined();
+
+    const impulseCriterion = passLow!.criteria.find(
+      (c) => c.criterion_id === "PASS-LOW-001-IMPULSE",
+    );
+    expect(impulseCriterion).toBeDefined();
+    expect(impulseCriterion!.class).toBe("HARD_INVARIANT");
+    // No oracle maps this criterion → NOT_EVALUATED.
+    expect(impulseCriterion!.outcome).toBe("NOT_EVALUATED");
+  });
+
+  it("SHOT-PWR-001-IMPULSE is NOT_EVALUATED (no contact/impulse oracle)", () => {
+    const scenario = loadFixture();
+    const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+    modified.inputProgram = buildInputProgram(5, "slot-1", { moveX: 0.3 });
+    modified.durationTicks = 5;
+
+    const evalResult = evaluate({ scenario: modified });
+    const registry = loadRegistrySet();
+    const result = evaluateSuite("touch_and_actions", evalResult.observations, { registry });
+
+    const shotPwr = result.tests.find((t) => t.test_id === "SHOT-PWR-001");
+    expect(shotPwr).toBeDefined();
+
+    const impulseCriterion = shotPwr!.criteria.find(
+      (c) => c.criterion_id === "SHOT-PWR-001-IMPULSE",
+    );
+    expect(impulseCriterion).toBeDefined();
+    expect(impulseCriterion!.class).toBe("HARD_INVARIANT");
+    // No oracle maps this criterion → NOT_EVALUATED.
+    expect(impulseCriterion!.outcome).toBe("NOT_EVALUATED");
+  });
+
+  it("HEAD-DUEL-001 is NOT in touch_and_actions suite", () => {
+    const scenario = loadFixture();
+    const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+    modified.inputProgram = buildInputProgram(5, "slot-1", { moveX: 0.3 });
+    modified.durationTicks = 5;
+
+    const evalResult = evaluate({ scenario: modified });
+    const registry = loadRegistrySet();
+    const result = evaluateSuite("touch_and_actions", evalResult.observations, { registry });
+
+    // HEAD-DUEL-001 should NOT be in the suite (duels are out of scope).
+    const headDuel = result.tests.find((t) => t.test_id === "HEAD-DUEL-001");
+    expect(headDuel).toBeUndefined();
+  });
+
+  it("clean run: all touch_and_actions suite criteria are PASS or NOT_EVALUATED", () => {
+    const scenario = loadFixture();
+    const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+    modified.inputProgram = buildInputProgram(5, "slot-1", { moveX: 0.3 });
+    modified.durationTicks = 5;
+
+    const evalResult = evaluate({ scenario: modified });
+    const registry = loadRegistrySet();
+    const result = evaluateSuite("touch_and_actions", evalResult.observations, { registry });
+
+    for (const test of result.tests) {
+      for (const criterion of test.criteria) {
+        if (criterion.class === "HARD_INVARIANT") {
+          // No criterion should FAIL on a clean run.
+          expect(
+            criterion.outcome,
+            `HARD_INVARIANT ${criterion.criterion_id} for test ${test.test_id}`,
+          ).not.toBe("FAIL");
+        }
+      }
+    }
+  });
+});
