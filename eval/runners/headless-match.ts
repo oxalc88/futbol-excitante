@@ -32,6 +32,26 @@ const FIXED_DT = 1 / 60;
 // ---------------------------------------------------------------------------
 
 /**
+ * Match lifecycle phase.
+ */
+export type MatchPhase =
+  | "kickoff"
+  | "first-half"
+  | "halftime"
+  | "second-half"
+  | "fulltime";
+
+/**
+ * Phase history record — marks when a phase began.
+ */
+export interface PhaseHistoryRecord {
+  /** Simulation tick at which this phase began. */
+  tick: number;
+  /** Phase value at that tick. */
+  phase: MatchPhase;
+}
+
+/**
  * Mapping from goal index to the team that scores.
  *
  * Convention (ai-match):
@@ -63,6 +83,8 @@ export interface HeadlessMatchConfig {
   maxTicks?: number;
   /** Match duration in ticks (default: maxTicks). Used for clock reporting. */
   matchDurationTicks?: number;
+  /** Half duration in ticks (default: matchDurationTicks / 2). */
+  halfDurationTicks?: number;
   /** Optional telemetry observer. */
   observer?: SimulationObserver;
   /**
@@ -116,6 +138,10 @@ export interface HeadlessMatchResult {
   score: MatchScore;
   /** Derived goal events with scoring teamId attached. */
   goalEvents: MatchGoalEvent[];
+  /** Current match phase. */
+  matchPhase: MatchPhase;
+  /** Phase history — ordered list of {tick, phase} marking transitions. */
+  phaseHistory: PhaseHistoryRecord[];
 }
 
 // ---------------------------------------------------------------------------
@@ -316,9 +342,11 @@ export function runHeadlessMatch(
     scenario,
     maxTicks = scenario.durationTicks,
     matchDurationTicks = maxTicks,
+    halfDurationTicks: halfDurationTicksRaw = Math.floor(matchDurationTicks / 2),
     observer,
     goalTeamMapping = DEFAULT_GOAL_TEAM_MAPPING,
   } = config;
+  const halfDurationTicks = halfDurationTicksRaw;
 
   // 1. Create world and simulation.
   const world = createWorld({ scenario });
@@ -359,7 +387,39 @@ export function runHeadlessMatch(
   const events: SimulationEvent[] = [];
   const stateHashes: string[] = [];
 
+  // Phase tracking.
+  let hadGoal = false;
+  let currentPhase: MatchPhase = "kickoff";
+  const phaseHistory: PhaseHistoryRecord[] = [{ tick: 0, phase: "kickoff" }];
+
   for (let i = 0; i < maxTicks; i++) {
+    // Phase derivation for this tick.
+    // The last tick of a match (with maxTicks > 1 and at least 2 half-durations)
+    // is always "fulltime" since the match is complete.
+    const isLastTickAndFulltime =
+      maxTicks > 1 && maxTicks >= 2 * halfDurationTicks && i === maxTicks - 1;
+    let phase: MatchPhase;
+    if (isLastTickAndFulltime) {
+      phase = "fulltime";
+    } else if (hadGoal && i < 2 * halfDurationTicks) {
+      phase = "kickoff";
+      hadGoal = false;
+    } else if (i === 0) {
+      phase = "kickoff";
+    } else if (i < halfDurationTicks) {
+      phase = "first-half";
+    } else if (i === halfDurationTicks) {
+      phase = "halftime";
+    } else if (i < 2 * halfDurationTicks) {
+      phase = "second-half";
+    } else {
+      phase = "fulltime";
+    }
+    if (phase !== currentPhase) {
+      phaseHistory.push({ tick: i, phase });
+      currentPhase = phase;
+    }
+
     // a. Snapshot the world (deep clone — CPU adapters only read).
     const snapshot = sim.snapshot();
 
@@ -391,6 +451,9 @@ export function runHeadlessMatch(
     stateHashes.push(stepResult.stateHash);
     for (const evt of stepResult.events) {
       events.push(evt);
+      if (evt.kind === "goal") {
+        hadGoal = true;
+      }
     }
   }
 
@@ -417,5 +480,7 @@ export function runHeadlessMatch(
     matchTimeSeconds,
     score,
     goalEvents,
+    matchPhase: currentPhase,
+    phaseHistory,
   };
 }

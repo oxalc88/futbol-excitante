@@ -1534,3 +1534,14 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: pending (git-committer)
 - notes: Scoreboard HTML/CSS overlay in browser adapter. Match clock (mm:ss from sim.tick × 1/60) and team scores (goalIndex 0 → team-a, goalIndex 1 → team-b) displayed at top center. HOME (blue) / AWAY (red) team colors. All 57/58 test files pass (1 pre-existing browser failure). No core changes.
+
+## Iteration 40 — 2026-08-15
+
+- objective_id: MATCH-LIFECYCLE
+- builder: builder-qwen / qwen3.6
+- critic: critic-mimo / mimo-v2.5 (fallback — DeepSeek allowance exhausted)
+- verdict: ACCEPT (first pass)
+- integration: ACCEPT (integration-reviewer / mimo-v2.5, fallback — DeepSeek exhausted)
+- result: accepted
+- commits: pending (git-committer)
+- notes: Match phase tracking added to headless runner. MatchPhase type with 5 values (kickoff/first-half/halftime/second-half/fulltime). halfDurationTicks config (default = matchDurationTicks / 2). Goal events trigger post-goal kickoff phase. 31 new tests. No simulation core changes. Contract: "kickoff" added to SimulationEvent.kind union.

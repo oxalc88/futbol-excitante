@@ -26,6 +26,7 @@ export interface SimulationEvent {
   kind:
     | "scenario-start"
     | "scenario-stop"
+    | "kickoff"
     | "pitch-contact"
     | "goal-post-contact"
     | "crossbar-contact"

@@ -7,7 +7,7 @@ horizon_id: "playable-v1"
 created_from_commit: a57edf2
 created_at: 2026-08-15
 reason: "HEADLESS-CPU-MATCH accepted. Match scoring is the active candidate. Horizon covers the remaining playable match infrastructure: scoring, browser-wired scoreboard, match lifecycle, and AI improvement."
-current_index: 2
+current_index: 3
 objectives:
   - id: MATCH-SCORING
     reason: "Add tick-based match clock + score tracker that listens for 'goal' events and increments team scores. Wire into HeadlessMatchResult."
@@ -16,6 +16,11 @@ objectives:
   - id: BROWSER-SCOREBOARD
     reason: "Wire match clock and score into the browser renderer (PresentationSnapshot and Three.js overlay). Makes scoring observable."
     builder: builder-mimo
+    prerequisite: MATCH-SCORING
+    status: accepted
+  - id: MATCH-LIFECYCLE
+    reason: "Add match phases (kickoff, halftime auto-reset, fulltime stop). Goal events trigger kickoff reset."
+    builder: builder-qwen
     prerequisite: MATCH-SCORING
     status: accepted
   - id: BROWSER-SCOREBOARD
