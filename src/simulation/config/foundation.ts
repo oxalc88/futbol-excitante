@@ -245,6 +245,26 @@ export const FOUNDATION_PLAYER_CONTACT_V1 = {
   minSeparationEpsilon: { value: 0.001, unit: "m", note: "provisional epsilon for coincident-centre fallback axis" },
 } as const;
 
+// -- Goal geometry (provisional) ----------------------------------------------
+
+/**
+ * Provisional goal geometry.
+ *
+ * Every value is provisional — standard football dimensions labelled
+ * provisional. No PES 2017 calibration claim is made.
+ */
+export const FOUNDATION_GOAL_V1 = {
+  id: "foundation-goal-v1",
+  label: "provisional",
+  postRadius: { value: 0.05, unit: "m", note: "provisional goal post radius" },
+  crossbarRadius: { value: 0.05, unit: "m", note: "provisional crossbar radius" },
+  goalWidth: { value: 7.32, unit: "m", note: "standard goal width between posts" },
+  goalHeight: { value: 2.44, unit: "m", note: "standard goal height from ground to crossbar" },
+} as const;
+
+/** Goal configuration type. */
+export type GoalConfig = typeof FOUNDATION_GOAL_V1;
+
 // -- Foundation config object -------------------------------------------------
 
 /**
@@ -266,6 +286,7 @@ export const FOUNDATION_CONFIG = {
   shot: FOUNDATION_SHOT_V1,
   closeControl: FOUNDATION_CLOSE_CONTROL_V1,
   playerContact: FOUNDATION_PLAYER_CONTACT_V1,
+  goal: FOUNDATION_GOAL_V1,
 } as const;
 
 /** Runtime type guard: this module exports the versioned config. */

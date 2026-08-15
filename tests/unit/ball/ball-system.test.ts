@@ -15,7 +15,7 @@
 
 import { describe, it, expect } from "vitest";
 import { stepBall } from "../../../src/simulation/ball/ball-system.js";
-import { FOUNDATION_BALL_V1 } from "../../../src/simulation/config/foundation.js";
+import { FOUNDATION_BALL_V1, FOUNDATION_GOAL_V1 } from "../../../src/simulation/config/foundation.js";
 import type { BallState } from "../../../src/contracts/state.js";
 
 // ---------------------------------------------------------------------------
@@ -860,5 +860,178 @@ describe("BALL-CURVE-001: Magnus curve force", () => {
     expect(ball2.linearVelocity.y).toBe(ball1.linearVelocity.y);
     expect(ball2.linearVelocity.z).toBe(ball1.linearVelocity.z);
     expect(ball2.regime).toBe(ball1.regime);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 9. Goal-post and crossbar collision, goal detection
+// ---------------------------------------------------------------------------
+
+describe("BALL-GOAL-001: post and crossbar collision", () => {
+  const GOAL_CFG = { ...CFG, goal: FOUNDATION_GOAL_V1 } as typeof CFG;
+
+  it("ball traveling toward goal post bounces off", () => {
+    // Ball aimed at left post of goal-a (x=52.5, y=-3.66).
+    // Position ball close enough that the swept line segment intersects the post.
+    // With vx=40 and dt=1/60, ball moves ~0.67m per tick.
+    const ball = makeBall({
+      position: { x: 52.35, y: -3.58, z: 0.5 },
+      linearVelocity: { x: 40.0, y: -2.0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "airborne",
+    });
+
+    const counter = makeCounter();
+    const events = stepBall(ball, DT, GOAL_CFG, counter, 1);
+
+    // Must emit a goal-post-contact event.
+    const postEvents = events.filter((e) => e.kind === "goal-post-contact");
+    expect(postEvents.length).toBeGreaterThanOrEqual(1);
+
+    const payload = postEvents[0].payload as Record<string, unknown>;
+    expect(payload.goalIndex).toBe(0);
+    expect(["post-left", "post-right"]).toContain(payload.part);
+    expect(payload.ballState).toBeDefined();
+  });
+
+  it("ball traveling through goal center emits goal event", () => {
+    // Ball at (x=52.0, y=0, z=1.0) moving fast +x toward goal at x=52.5.
+    // With vx=50, ball moves ~0.83m per tick, crossing x=52.5.
+    const ball = makeBall({
+      position: { x: 52.0, y: 0, z: 1.0 },
+      linearVelocity: { x: 50.0, y: 0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "airborne",
+    });
+
+    const counter = makeCounter();
+    const events = stepBall(ball, DT, GOAL_CFG, counter, 1);
+
+    // Must emit a "goal" event.
+    const goalEvents = events.filter((e) => e.kind === "goal");
+    expect(goalEvents.length).toBe(1);
+
+    const payload = goalEvents[0].payload as Record<string, unknown>;
+    expect(payload.goalIndex).toBe(0);
+    expect(payload.ballState).toBeDefined();
+
+    // Ball should have crossed x=52.5.
+    expect(ball.position.x).toBeGreaterThanOrEqual(52.5 - EPSILON);
+  });
+
+  it("ball hitting crossbar bounces down", () => {
+    // Ball at (x=52.35, y=0, z=2.35) moving +x toward crossbar at z=2.44.
+    // Position close enough that swept line intersects the crossbar.
+    const ball = makeBall({
+      position: { x: 52.35, y: 0, z: 2.35 },
+      linearVelocity: { x: 40.0, y: 0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "airborne",
+    });
+
+    const counter = makeCounter();
+    const events = stepBall(ball, DT, GOAL_CFG, counter, 1);
+
+    // Must emit a crossbar-contact event.
+    const cbEvents = events.filter((e) => e.kind === "crossbar-contact");
+    expect(cbEvents.length).toBe(1);
+
+    const payload = cbEvents[0].payload as Record<string, unknown>;
+    expect(payload.goalIndex).toBe(0);
+    expect(payload.part).toBe("crossbar");
+    expect(payload.ballState).toBeDefined();
+
+    // Ball z velocity should have been reflected (was moving toward crossbar, should bounce away).
+    expect(ball.linearVelocity.z).toBeLessThan(0);
+  });
+
+  it("ball far from goal does not emit post events", () => {
+    // Ball at (x=0, y=0, z=1.0) — no goal-post events expected.
+    const ball = makeBall({
+      position: { x: 0, y: 0, z: 1.0 },
+      linearVelocity: { x: 2.0, y: 0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "ground-roll",
+    });
+
+    const counter = makeCounter();
+    const events = stepBall(ball, DT, GOAL_CFG, counter, 1);
+
+    const postEvents = events.filter(
+      (e) => e.kind === "goal-post-contact" || e.kind === "crossbar-contact",
+    );
+    expect(postEvents.length).toBe(0);
+  });
+
+  it("post collision does not create energy", () => {
+    // Ball aimed at left post — KE before > KE after (energy loss on collision).
+    const ball = makeBall({
+      position: { x: 52.35, y: -3.58, z: 0.5 },
+      linearVelocity: { x: 40.0, y: -2.0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "airborne",
+    });
+
+    const keBefore = energy3d(ball);
+
+    const counter = makeCounter();
+    stepBall(ball, DT, GOAL_CFG, counter, 1);
+
+    const keAfter = energy3d(ball);
+
+    // Post collision with restitution < 1 should lose energy.
+    // Allow small tolerance for numerical drift.
+    expect(keAfter).toBeLessThanOrEqual(keBefore + EPSILON);
+  });
+
+  it("goal event has correct goalIndex for goal-b (x=-52.5)", () => {
+    // Ball moving toward goal-b (x=-52.5), should emit goalIndex: 1.
+    const ball = makeBall({
+      position: { x: -52.0, y: 0, z: 1.0 },
+      linearVelocity: { x: -50.0, y: 0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "airborne",
+    });
+
+    const counter = makeCounter();
+    const events = stepBall(ball, DT, GOAL_CFG, counter, 1);
+
+    const goalEvents = events.filter((e) => e.kind === "goal");
+    expect(goalEvents.length).toBe(1);
+
+    const payload = goalEvents[0].payload as Record<string, unknown>;
+    expect(payload.goalIndex).toBe(1);
+  });
+
+  it("ball above crossbar height passes over without collision", () => {
+    // Ball at z=3.0 (above crossbar at z=2.44) — should not collide with crossbar.
+    const ball = makeBall({
+      position: { x: 52.35, y: 0, z: 3.0 },
+      linearVelocity: { x: 40.0, y: 0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "airborne",
+    });
+
+    const counter = makeCounter();
+    const events = stepBall(ball, DT, GOAL_CFG, counter, 1);
+
+    const cbEvents = events.filter((e) => e.kind === "crossbar-contact");
+    expect(cbEvents.length).toBe(0);
+  });
+
+  it("ball outside post y-range passes by without collision", () => {
+    // Ball at y=5.0 (outside ±3.66) — should not collide with posts.
+    const ball = makeBall({
+      position: { x: 52.35, y: 5.0, z: 0.5 },
+      linearVelocity: { x: 40.0, y: 0, z: 0 },
+      angularVelocity: { x: 0, y: 0, z: 0 },
+      regime: "airborne",
+    });
+
+    const counter = makeCounter();
+    const events = stepBall(ball, DT, GOAL_CFG, counter, 1);
+
+    const postEvents = events.filter((e) => e.kind === "goal-post-contact");
+    expect(postEvents.length).toBe(0);
   });
 });

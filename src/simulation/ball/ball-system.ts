@@ -9,8 +9,9 @@
  * Every ground impact emits an ordered pitch-contact
  * event with incoming and outgoing state references.
  *
- * No possession attachment, player contact, posts, complex rolling law,
- * or final collision policy. Curve coefficients are provisional and
+ * No possession attachment, player contact, complex rolling law,
+ * or final collision policy. Goal-post and crossbar collisions are
+ * geometric (provisional). Curve coefficients are provisional and
  * versioned (FOUNDATION_BALL_V1.curveCoefficient).
  *
  * No Math.random, Date, DOM, or Node I/O.
@@ -18,6 +19,7 @@
 
 import type { BallState } from "../../contracts/state.js";
 import type { SimulationEvent } from "../../contracts/scenario.js";
+import type { GoalConfig } from "../../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -47,6 +49,12 @@ const DEFAULT_CONFIG = {
   ballRadius: { value: 0.11 },
   airDrag: { value: 0.001 },
   curveCoefficient: { value: 0.0005 },
+  goal: {
+    postRadius: { value: 0.05 },
+    crossbarRadius: { value: 0.05 },
+    goalWidth: { value: 7.32 },
+    goalHeight: { value: 2.44 },
+  },
 } as const;
 
 type BallConfig = {
@@ -57,6 +65,7 @@ type BallConfig = {
   ballRadius: { value: number };
   airDrag: { value: number };
   curveCoefficient: { value: number };
+  goal?: GoalConfig;
 };
 
 // ---------------------------------------------------------------------------
@@ -71,6 +80,13 @@ const BOUNCE_THRESHOLD = 0.05;
 
 /** Maximum swept-test iterations per tick (safety limit). */
 const MAX_SWEPT_ITERATIONS = 4;
+
+// -- Goal geometry (hard-coded pitch constants) -------------------------------
+
+/** Pitch half-length: goal line at x = ±52.5 m (105 m pitch, origin at centre). */
+const GOAL_LINE_X = 52.5;
+/** Goal half-width: posts at y = ±3.66 m (7.32 m standard goal width). */
+const GOAL_HALF_WIDTH = 3.66;
 
 /**
  * Compute horizontal speed from 3D linear velocity.
@@ -146,12 +162,16 @@ function applyMagnusCurve(
  * The ball state is mutated in place. Events are returned separately
  * so the simulation loop can assign authoritative tick/sequence values.
  *
+ * After physics integration, the ball trajectory is tested against
+ * goal posts, crossbar, and the goal line using a swept line-segment
+ * test from the pre-integration position to the post-integration position.
+ *
  * @param ball - Mutable ball state (mutated in place).
  * @param dt - Fixed tick duration in seconds.
  * @param config - Provisional ball coefficients (default: FOUNDATION_BALL_V1 shape).
  * @param eventCounter - Starting event sequence counter (incremented in place).
  * @param tick - Current simulation tick for event attribution.
- * @returns Pitch-contact events generated during this tick.
+ * @returns Events generated during this tick (pitch-contact, goal-post-contact, crossbar-contact, goal).
  */
 export function stepBall(
   ball: BallState,
@@ -171,6 +191,9 @@ export function stepBall(
   const events: SimulationEvent[] = [];
   let remaining = dt;
   let iterCount = 0;
+
+  // Capture pre-integration state for goal-post / crossbar swept test.
+  const posA = { x: ball.position.x, y: ball.position.y, z: ball.position.z };
 
   // Loop to handle multiple bounces within a single tick.
   while (remaining > 1e-12 && iterCount < MAX_SWEPT_ITERATIONS) {
@@ -363,6 +386,187 @@ export function stepBall(
     } else {
       // "settled" — no physics.
       remaining = 0;
+    }
+  }
+
+  // -- Goal-post and crossbar collision (swept line-segment test) -----------
+  // Check whether the ball's path during this tick intersected a goal post
+  // or the crossbar. Uses the pre-integration position (posA) and the
+  // current (post-integration) position as the swept line segment.
+  const posB = { x: ball.position.x, y: ball.position.y, z: ball.position.z };
+  const ballRadius = config.ballRadius.value;
+  const postRadius = config.goal?.postRadius?.value ?? 0.05;
+  const crossbarRadius = config.goal?.crossbarRadius?.value ?? 0.05;
+  const goalHeight = config.goal?.goalHeight?.value ?? 2.44;
+  const goalHalfWidth = (config.goal?.goalWidth?.value ?? 7.32) / 2;
+
+  let goalPostHit = false;
+
+  for (let gi = 0; gi < 2 && !goalPostHit; gi++) {
+    const goalX = gi === 0 ? GOAL_LINE_X : -GOAL_LINE_X;
+    const postYPositions = [-goalHalfWidth, goalHalfWidth];
+    const postPartNames: Array<"post-left" | "post-right"> = ["post-left", "post-right"];
+
+    // Check left and right posts (vertical cylinders at goalX, ±goalHalfWidth).
+    for (let pi = 0; pi < 2 && !goalPostHit; pi++) {
+      const postY = postYPositions[pi];
+      const combinedR = postRadius + ballRadius;
+
+      // Closest point on the swept line segment (posA → posB) to the post axis (goalX, postY).
+      const dx = posB.x - posA.x;
+      const dy = posB.y - posA.y;
+      const lenSq = dx * dx + dy * dy;
+
+      let tClosest: number;
+      if (lenSq < 1e-18) {
+        tClosest = 0;
+      } else {
+        tClosest = ((goalX - posA.x) * dx + (postY - posA.y) * dy) / lenSq;
+        tClosest = Math.max(0, Math.min(1, tClosest));
+      }
+
+      const cx = posA.x + tClosest * dx;
+      const cy = posA.y + tClosest * dy;
+      const distSq = (cx - goalX) * (cx - goalX) + (cy - postY) * (cy - postY);
+
+      if (distSq < combinedR * combinedR) {
+        goalPostHit = true;
+
+        // Collision normal: from post centre toward ball contact point.
+        const dist = Math.sqrt(distSq);
+        const nx = dist > 1e-12 ? (cx - goalX) / dist : (gi === 0 ? -1 : 1);
+        const ny = dist > 1e-12 ? (cy - postY) / dist : 0;
+
+        // Reflect velocity along the collision normal.
+        const vDotN = ball.linearVelocity.x * nx + ball.linearVelocity.y * ny;
+        if (vDotN < 0) {
+          const postRestitution = 0.7;
+          ball.linearVelocity.x -= (1 + postRestitution) * vDotN * nx;
+          ball.linearVelocity.y -= (1 + postRestitution) * vDotN * ny;
+        }
+
+        // Push ball out of post.
+        const penetration = combinedR - dist;
+        if (penetration > 0) {
+          ball.position.x += nx * penetration;
+          ball.position.y += ny * penetration;
+        }
+
+        const partName = postPartNames[pi];
+        eventCounter.value++;
+        events.push({
+          id: `ball-goal-post-contact-${tick}-${eventCounter.value}`,
+          tick,
+          sequence: eventCounter.value,
+          kind: "goal-post-contact",
+          label: `Ball ${partName} contact`,
+          payload: {
+            goalIndex: gi as 0 | 1,
+            part: partName,
+            ballState: {
+              position: { x: posA.x, y: posA.y, z: posA.z },
+              linearVelocity: { x: ball.linearVelocity.x, y: ball.linearVelocity.y, z: ball.linearVelocity.z },
+              angularVelocity: { x: ball.angularVelocity.x, y: ball.angularVelocity.y, z: ball.angularVelocity.z },
+              regime: ball.regime,
+            } as BallStateSnapshot,
+          },
+        });
+      }
+    }
+
+    // Check crossbar (horizontal cylinder at goalX, z = goalHeight, along Y).
+    if (!goalPostHit) {
+      const combinedRcb = crossbarRadius + ballRadius;
+      const dx = posB.x - posA.x;
+      const dz = posB.z - posA.z;
+      const lenSqXZ = dx * dx + dz * dz;
+
+      let tClosestCb: number;
+      if (lenSqXZ < 1e-18) {
+        tClosestCb = 0;
+      } else {
+        tClosestCb = ((goalX - posA.x) * dx + (goalHeight - posA.z) * dz) / lenSqXZ;
+        tClosestCb = Math.max(0, Math.min(1, tClosestCb));
+      }
+
+      const cbx = posA.x + tClosestCb * dx;
+      const cbz = posA.z + tClosestCb * dz;
+      const distSqCb = (cbx - goalX) * (cbx - goalX) + (cbz - goalHeight) * (cbz - goalHeight);
+
+      if (distSqCb < combinedRcb * combinedRcb) {
+        goalPostHit = true;
+
+        const distCb = Math.sqrt(distSqCb);
+        const nxCb = distCb > 1e-12 ? (cbx - goalX) / distCb : (gi === 0 ? -1 : 1);
+        const nzCb = distCb > 1e-12 ? (cbz - goalHeight) / distCb : -1;
+
+        const vDotNCb = ball.linearVelocity.x * nxCb + ball.linearVelocity.z * nzCb;
+        if (vDotNCb < 0) {
+          const cbRestitution = 0.65;
+          ball.linearVelocity.x -= (1 + cbRestitution) * vDotNCb * nxCb;
+          ball.linearVelocity.z -= (1 + cbRestitution) * vDotNCb * nzCb;
+        }
+
+        const penetrationCb = combinedRcb - distCb;
+        if (penetrationCb > 0) {
+          ball.position.x += nxCb * penetrationCb;
+          ball.position.z += nzCb * penetrationCb;
+        }
+
+        eventCounter.value++;
+        events.push({
+          id: `ball-crossbar-contact-${tick}-${eventCounter.value}`,
+          tick,
+          sequence: eventCounter.value,
+          kind: "crossbar-contact",
+          label: "Ball crossbar contact",
+          payload: {
+            goalIndex: gi as 0 | 1,
+            part: "crossbar" as const,
+            ballState: {
+              position: { x: posA.x, y: posA.y, z: posA.z },
+              linearVelocity: { x: ball.linearVelocity.x, y: ball.linearVelocity.y, z: ball.linearVelocity.z },
+              angularVelocity: { x: ball.angularVelocity.x, y: ball.angularVelocity.y, z: ball.angularVelocity.z },
+              regime: ball.regime,
+            } as BallStateSnapshot,
+          },
+        });
+      }
+    }
+
+    // -- Goal-line detection (ball crosses goal line between posts, under crossbar) --
+    if (!goalPostHit) {
+      const crossedRight = (posA.x < goalX && posB.x >= goalX) || (posA.x > goalX && posB.x <= goalX);
+      if (crossedRight) {
+        const dxSeg = posB.x - posA.x;
+        if (Math.abs(dxSeg) > 1e-12) {
+          const tGoal = (goalX - posA.x) / dxSeg;
+          if (tGoal >= 0 && tGoal <= 1) {
+            const goalY = posA.y + tGoal * (posB.y - posA.y);
+            const goalZ = posA.z + tGoal * (posB.z - posA.z);
+
+            if (Math.abs(goalY) < goalHalfWidth && goalZ > 0 && goalZ < goalHeight) {
+              eventCounter.value++;
+              events.push({
+                id: `ball-goal-${tick}-${eventCounter.value}`,
+                tick,
+                sequence: eventCounter.value,
+                kind: "goal",
+                label: "Goal",
+                payload: {
+                  goalIndex: gi as 0 | 1,
+                  ballState: {
+                    position: { x: posA.x, y: posA.y, z: posA.z },
+                    linearVelocity: { x: ball.linearVelocity.x, y: ball.linearVelocity.y, z: ball.linearVelocity.z },
+                    angularVelocity: { x: ball.angularVelocity.x, y: ball.angularVelocity.y, z: ball.angularVelocity.z },
+                    regime: ball.regime,
+                  } as BallStateSnapshot,
+                },
+              });
+            }
+          }
+        }
+      }
     }
   }
 
