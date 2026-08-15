@@ -17,6 +17,14 @@ import type { ScenarioDefinition } from "./types.js";
 
 /**
  * Create a minimal scenario stub for a test catalog entry.
+ *
+ * @param scenarioId - Unique scenario identifier.
+ * @param durationTicks - Number of simulation ticks.
+ * @param capabilityRequirements - Required capability flags.
+ * @param seedPolicy - PRNG seed configuration.
+ * @param configRefs - Additional config references.
+ * @param inputProgram - Optional tick-indexed input program. When omitted,
+ *   the scenario has an empty input program (static ball).
  */
 function makeScenarioStub(
   scenarioId: string,
@@ -24,6 +32,20 @@ function makeScenarioStub(
   capabilityRequirements: string[],
   seedPolicy: { kind: "FIXED"; values_or_set_id: string },
   configRefs: Record<string, string> = {},
+  inputProgram?: Record<
+    number,
+    {
+      tick: number;
+      sourceId: string;
+      controlSlot: string;
+      moveX: number;
+      moveY: number;
+      sprint: number;
+      heldButtons: number;
+      pressedButtons: number;
+      releasedButtons: number;
+    }[]
+  >,
 ): ScenarioDefinition {
   return {
     scenario_id: scenarioId,
@@ -55,11 +77,17 @@ function makeScenarioStub(
       foundation: "foundation-locomotion-v1",
       ...configRefs,
     },
-    input_program: {
-      schema_id: "input-frame-v1",
-      schema_version: "schema-input-v1",
-      value: {},
-    },
+    input_program: inputProgram
+      ? {
+          schema_id: "input-frame-v1",
+          schema_version: "schema-input-v1",
+          value: inputProgram,
+        }
+      : {
+          schema_id: "input-frame-v1",
+          schema_version: "schema-input-v1",
+          value: {},
+        },
     scheduled_events: [],
     observation_windows: [
       {
@@ -214,6 +242,225 @@ export const SCENARIO_BALL_SPN_002 = makeScenarioStub(
   { test_focus: "spin-curve-power" },
 );
 
+// ---------------------------------------------------------------------------
+// touch_and_actions suite scenarios
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a tick-indexed input program for a first-touch reception.
+ * Player moves toward the ball (position ~10m away), holds FIRST_TOUCH
+ * bit for a few ticks to initiate contact.
+ */
+function makeTouchInputProgram(durationTicks: number): Record<number, { tick: number; sourceId: string; controlSlot: string; moveX: number; moveY: number; sprint: number; heldButtons: number; pressedButtons: number; releasedButtons: number }[]> {
+  const program: Record<number, { tick: number; sourceId: string; controlSlot: string; moveX: number; moveY: number; sprint: number; heldButtons: number; pressedButtons: number; releasedButtons: number }[]> = {};
+  for (let t = 0; t < durationTicks; t++) {
+    const isContactWindow = t >= 10 && t < 20;
+    program[t] = [
+      {
+        tick: t,
+        sourceId: "eval-input",
+        controlSlot: "slot-1",
+        moveX: t < 10 ? 0.5 : 0,
+        moveY: 0,
+        sprint: 0,
+        heldButtons: isContactWindow ? 1 : 0, // FIRST_TOUCH_BIT
+        pressedButtons: isContactWindow && t === 10 ? 1 : 0,
+        releasedButtons: isContactWindow && t === 20 ? 1 : 0,
+      },
+    ];
+  }
+  return program;
+}
+
+/**
+ * Generate a tick-indexed input program for a low pass.
+ * Player moves toward ball, holds PASS bit to initiate pass, then releases.
+ */
+function makePassInputProgram(durationTicks: number): Record<number, { tick: number; sourceId: string; controlSlot: string; moveX: number; moveY: number; sprint: number; heldButtons: number; pressedButtons: number; releasedButtons: number }[]> {
+  const program: Record<number, { tick: number; sourceId: string; controlSlot: string; moveX: number; moveY: number; sprint: number; heldButtons: number; pressedButtons: number; releasedButtons: number }[]> = {};
+  for (let t = 0; t < durationTicks; t++) {
+    const isPassWindow = t >= 10 && t < 20;
+    program[t] = [
+      {
+        tick: t,
+        sourceId: "eval-input",
+        controlSlot: "slot-1",
+        moveX: t < 10 ? 0.5 : 0,
+        moveY: 0,
+        sprint: 0,
+        heldButtons: isPassWindow ? 2 : 0, // PASS_BIT
+        pressedButtons: isPassWindow && t === 10 ? 2 : 0,
+        releasedButtons: isPassWindow && t === 20 ? 2 : 0,
+      },
+    ];
+  }
+  return program;
+}
+
+/**
+ * Generate a tick-indexed input program for a shot.
+ * Player moves toward ball, holds SHOT bit to initiate shot.
+ */
+function makeShotInputProgram(durationTicks: number): Record<number, { tick: number; sourceId: string; controlSlot: string; moveX: number; moveY: number; sprint: number; heldButtons: number; pressedButtons: number; releasedButtons: number }[]> {
+  const program: Record<number, { tick: number; sourceId: string; controlSlot: string; moveX: number; moveY: number; sprint: number; heldButtons: number; pressedButtons: number; releasedButtons: number }[]> = {};
+  for (let t = 0; t < durationTicks; t++) {
+    const isShotWindow = t >= 10 && t < 20;
+    program[t] = [
+      {
+        tick: t,
+        sourceId: "eval-input",
+        controlSlot: "slot-1",
+        moveX: t < 10 ? 0.5 : 0,
+        moveY: 0,
+        sprint: 1,
+        heldButtons: isShotWindow ? 4 : 0, // SHOT_BIT
+        pressedButtons: isShotWindow && t === 10 ? 4 : 0,
+        releasedButtons: isShotWindow && t === 20 ? 4 : 0,
+      },
+    ];
+  }
+  return program;
+}
+
+export const SCENARIO_TOUCH_SLOW_001 = makeScenarioStub(
+  "scn-touch-slow-001-v1",
+  120,
+  ["FIRST_TOUCH", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "slow-pass-reception" },
+  makeTouchInputProgram(120),
+);
+
+export const SCENARIO_TOUCH_FAST_001 = makeScenarioStub(
+  "scn-touch-fast-001-v1",
+  120,
+  ["FIRST_TOUCH", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "fast-pass-reception" },
+);
+
+export const SCENARIO_TOUCH_BACK_001 = makeScenarioStub(
+  "scn-touch-back-001-v1",
+  120,
+  ["FIRST_TOUCH", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "back-orientation-reception" },
+);
+
+export const SCENARIO_TOUCH_90_001 = makeScenarioStub(
+  "scn-touch-90-001-v1",
+  120,
+  ["FIRST_TOUCH", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "side-on-reception" },
+);
+
+export const SCENARIO_TOUCH_WF_001 = makeScenarioStub(
+  "scn-touch-wf-001-v1",
+  120,
+  ["FIRST_TOUCH", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "weak-foot-reception" },
+);
+
+export const SCENARIO_PASS_LOW_001 = makeScenarioStub(
+  "scn-pass-low-001-v1",
+  120,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "low-pass" },
+  makePassInputProgram(120),
+);
+
+export const SCENARIO_PASS_ANG_001 = makeScenarioStub(
+  "scn-pass-ang-001-v1",
+  120,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "orientation-dependent-pass" },
+);
+
+export const SCENARIO_PASS_RUN_001 = makeScenarioStub(
+  "scn-pass-run-001-v1",
+  120,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "leading-pass" },
+);
+
+export const SCENARIO_PASS_THR_001 = makeScenarioStub(
+  "scn-pass-thr-001-v1",
+  120,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "through-pass" },
+);
+
+export const SCENARIO_PASS_LOFT_001 = makeScenarioStub(
+  "scn-pass-loft-001-v1",
+  180,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "lofted-pass" },
+);
+
+export const SCENARIO_CROSS_HI_001 = makeScenarioStub(
+  "scn-cross-hi-001-v1",
+  180,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "high-cross" },
+);
+
+export const SCENARIO_SHOT_PWR_001 = makeScenarioStub(
+  "scn-shot-pwr-001-v1",
+  120,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "shot-power" },
+  makeShotInputProgram(120),
+);
+
+export const SCENARIO_SHOT_IND_001 = makeScenarioStub(
+  "scn-shot-ind-001-v1",
+  120,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "shooting-power-isolation" },
+);
+
+export const SCENARIO_SHOT_SWV_001 = makeScenarioStub(
+  "scn-shot-spw-001-v1",
+  120,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "shot-curve" },
+);
+
+export const SCENARIO_HEAD_FREE_001 = makeScenarioStub(
+  "scn-head-free-001-v1",
+  120,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "unopposed-header" },
+);
+
+export const SCENARIO_HEAD_DUEL_001 = makeScenarioStub(
+  "scn-head-duel-001-v1",
+  120,
+  ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "contested-header" },
+);
+
+export const SCENARIO_CTRL_ACT_001 = makeScenarioStub(
+  "scn-ctrl-act-001-v1",
+  120,
+  ["BASIC_ACTIONS"],
+  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+  { test_focus: "action-command-timing" },
+);
+
 /** All registered scenario stubs keyed by scenario_id. */
 export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
   [SCENARIO_BALL_IND_001.scenario_id]: SCENARIO_BALL_IND_001,
@@ -232,6 +479,25 @@ export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
   [SCENARIO_BALL_BNC_001.scenario_id]: SCENARIO_BALL_BNC_001,
   [SCENARIO_BALL_SPN_001.scenario_id]: SCENARIO_BALL_SPN_001,
   [SCENARIO_BALL_SPN_002.scenario_id]: SCENARIO_BALL_SPN_002,
+
+  // touch_and_actions suite scenarios
+  [SCENARIO_TOUCH_SLOW_001.scenario_id]: SCENARIO_TOUCH_SLOW_001,
+  [SCENARIO_TOUCH_FAST_001.scenario_id]: SCENARIO_TOUCH_FAST_001,
+  [SCENARIO_TOUCH_BACK_001.scenario_id]: SCENARIO_TOUCH_BACK_001,
+  [SCENARIO_TOUCH_90_001.scenario_id]: SCENARIO_TOUCH_90_001,
+  [SCENARIO_TOUCH_WF_001.scenario_id]: SCENARIO_TOUCH_WF_001,
+  [SCENARIO_PASS_LOW_001.scenario_id]: SCENARIO_PASS_LOW_001,
+  [SCENARIO_PASS_ANG_001.scenario_id]: SCENARIO_PASS_ANG_001,
+  [SCENARIO_PASS_RUN_001.scenario_id]: SCENARIO_PASS_RUN_001,
+  [SCENARIO_PASS_THR_001.scenario_id]: SCENARIO_PASS_THR_001,
+  [SCENARIO_PASS_LOFT_001.scenario_id]: SCENARIO_PASS_LOFT_001,
+  [SCENARIO_CROSS_HI_001.scenario_id]: SCENARIO_CROSS_HI_001,
+  [SCENARIO_SHOT_PWR_001.scenario_id]: SCENARIO_SHOT_PWR_001,
+  [SCENARIO_SHOT_IND_001.scenario_id]: SCENARIO_SHOT_IND_001,
+  [SCENARIO_SHOT_SWV_001.scenario_id]: SCENARIO_SHOT_SWV_001,
+  [SCENARIO_HEAD_FREE_001.scenario_id]: SCENARIO_HEAD_FREE_001,
+  [SCENARIO_HEAD_DUEL_001.scenario_id]: SCENARIO_HEAD_DUEL_001,
+  [SCENARIO_CTRL_ACT_001.scenario_id]: SCENARIO_CTRL_ACT_001,
 };
 
 /**

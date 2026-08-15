@@ -112,6 +112,86 @@ export const LOC_BALL_001_FREE: EvaluationCriterion = {
   rule: "Ball position relative to player must not exhibit unexpected contact transitions.",
 };
 
+/**
+ * TOUCH-SLOW-001-CONTACT — first touch is an explicit feasible contact on an independent ball, not a possession toggle.
+ * Class: HARD_INVARIANT (spec §7.3).
+ */
+export const TOUCH_SLOW_001_CONTACT: EvaluationCriterion = {
+  criterion_id: "TOUCH-SLOW-001-CONTACT",
+  class: "HARD_INVARIANT",
+  rule: "First touch is an explicit feasible contact on an independent ball, not a possession toggle.",
+};
+
+/**
+ * PASS-LOW-001-IMPULSE — pass resolves one recorded contact/impulse; it never moves the ball toward a target after release.
+ * Class: HARD_INVARIANT (spec §7.3).
+ */
+export const PASS_LOW_001_IMPULSE: EvaluationCriterion = {
+  criterion_id: "PASS-LOW-001-IMPULSE",
+  class: "HARD_INVARIANT",
+  rule: "Pass resolves one recorded contact/impulse; it never moves the ball toward a target after release.",
+};
+
+/**
+ * PASS-LOFT-001-IMPULSE — one canonical action contact creates the ball state; no guided arc after release.
+ * Class: HARD_INVARIANT (spec §7.3).
+ */
+export const PASS_LOFT_001_IMPULSE: EvaluationCriterion = {
+  criterion_id: "PASS-LOFT-001-IMPULSE",
+  class: "HARD_INVARIANT",
+  rule: "One canonical action contact creates the ball state; no guided arc after release.",
+};
+
+/**
+ * SHOT-PWR-001-IMPULSE — shot is an explicit contact impulse plus spin/error, never a guided outcome.
+ * Class: HARD_INVARIANT (spec §7.3).
+ */
+export const SHOT_PWR_001_IMPULSE: EvaluationCriterion = {
+  criterion_id: "SHOT-PWR-001-IMPULSE",
+  class: "HARD_INVARIANT",
+  rule: "Shot is an explicit contact impulse plus spin/error, never a guided outcome.",
+};
+
+/**
+ * HEAD-FREE-001-HEAD — header trajectory must follow gravity without player guidance.
+ * Class: HARD_INVARIANT.  Oracle not yet implemented; see HEAD-DUEL-001 scope.
+ */
+export const HEAD_FREE_001_HEAD: EvaluationCriterion = {
+  criterion_id: "HEAD-FREE-001-HEAD",
+  class: "HARD_INVARIANT",
+  rule: "Header must produce a gravity-only arc after head-ball contact.",
+};
+
+/**
+ * TOUCH-WF-001-WEAKFOOT — weak-foot pass must follow correct physics, not a guided arc.
+ * Class: HARD_INVARIANT.  Weak-foot oracle not yet implemented.
+ */
+export const TOUCH_WF_001_WEAKFOOT: EvaluationCriterion = {
+  criterion_id: "TOUCH-WF-001-WEAKFOOT",
+  class: "HARD_INVARIANT",
+  rule: "Weak-foot pass must not be guided after contact.",
+};
+
+/**
+ * SHOT-SWV-001-CURVE — shot trajectory must include spin-induced deviation from straight line.
+ * Class: HARD_INVARIANT.  Curve oracle not yet implemented.
+ */
+export const SHOT_SWV_001_CURVE: EvaluationCriterion = {
+  criterion_id: "SHOT-SWV-001-CURVE",
+  class: "HARD_INVARIANT",
+  rule: "Shot must exhibit spin-induced curve, not a purely ballistic trajectory.",
+};
+
+/**
+ * CROSS-HI-001-TRAJECTORY — cross delivery must follow high-arcing trajectory to target area.
+ * Class: HARD_INVARIANT.  Cross trajectory oracle not yet implemented.
+ */
+export const CROSS_HI_001_TRAJECTORY: EvaluationCriterion = {
+  criterion_id: "CROSS-HI-001-TRAJECTORY",
+  class: "HARD_INVARIANT",
+  rule: "Cross delivery must reach target area via high arc.",
+};
+
 /** All common criteria keyed by criterion_id. */
 export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [COMMON_FINITE.criterion_id]: COMMON_FINITE,
@@ -124,6 +204,18 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [BALL_GND_001_CONTACT.criterion_id]: BALL_GND_001_CONTACT,
   [BALL_SPD_001_REF.criterion_id]: BALL_SPD_001_REF,
   [LOC_BALL_001_FREE.criterion_id]: LOC_BALL_001_FREE,
+
+  // touch_and_actions HARD_INVARIANT criteria
+  [TOUCH_SLOW_001_CONTACT.criterion_id]: TOUCH_SLOW_001_CONTACT,
+  [PASS_LOW_001_IMPULSE.criterion_id]: PASS_LOW_001_IMPULSE,
+  [PASS_LOFT_001_IMPULSE.criterion_id]: PASS_LOFT_001_IMPULSE,
+  [SHOT_PWR_001_IMPULSE.criterion_id]: SHOT_PWR_001_IMPULSE,
+  // Placeholder criteria — no oracle implemented yet; yield NOT_EVALUATED.
+  [HEAD_FREE_001_HEAD.criterion_id]: HEAD_FREE_001_HEAD,
+  [TOUCH_WF_001_WEAKFOOT.criterion_id]: TOUCH_WF_001_WEAKFOOT,
+  [SHOT_SWV_001_CURVE.criterion_id]: SHOT_SWV_001_CURVE,
+  [CROSS_HI_001_TRAJECTORY.criterion_id]: CROSS_HI_001_TRAJECTORY,
+  // PHY-SHLD-001-CONT removed — duel/shielding is out of scope.
 };
 
 /**

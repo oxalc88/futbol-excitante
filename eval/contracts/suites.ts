@@ -93,11 +93,51 @@ export const BALL_SUITE: SuiteDefinition = {
   expected_expansion_manifest_id: "expansion-ball-v1",
 };
 
+export const TOUCH_AND_ACTIONS_SUITE: SuiteDefinition = {
+  suite_id: "touch_and_actions",
+  suite_version: "suite-touch-actions-v1",
+  direct_test_ids: [
+    "TOUCH-SLOW-001",
+    "TOUCH-FAST-001",
+    "TOUCH-BACK-001",
+    "TOUCH-90-001",
+    "TOUCH-WF-001",
+    "PASS-LOW-001",
+    "PASS-ANG-001",
+    "PASS-RUN-001",
+    "PASS-THR-001",
+    "PASS-LOFT-001",
+    "CROSS-HI-001",
+    "SHOT-PWR-001",
+    "SHOT-IND-001",
+    "SHOT-SWV-001",
+    "HEAD-FREE-001",
+    // HEAD-DUEL-001 removed — duels are out of scope for this non-duel suite.
+    "CTRL-ACT-001",
+  ],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+    "COMMON-BOUNDS",
+  ],
+  impact_closure: "NONE",
+  prerequisite_capabilities: ["FIRST_TOUCH", "BASIC_ACTIONS"],
+  seed_matrix_id: "seeds-family-v1",
+  config_matrix_id: "config-actions-v1",
+  held_out_policy_id: null,
+  browser_case_ids: [],
+  resource_policy_id: "resources-family-v1",
+  outcome_reduction_profile_id: "profile-selected-v1",
+  expected_expansion_manifest_id: "expansion-touch-actions-v1",
+};
+
 /** All registered suites keyed by suite_id. */
 export const SUITES: Record<string, SuiteDefinition> = {
   [FAST_SUITE.suite_id]: FAST_SUITE,
   [LOCOMOTION_SUITE.suite_id]: LOCOMOTION_SUITE,
   [BALL_SUITE.suite_id]: BALL_SUITE,
+  [TOUCH_AND_ACTIONS_SUITE.suite_id]: TOUCH_AND_ACTIONS_SUITE,
 };
 
 /**

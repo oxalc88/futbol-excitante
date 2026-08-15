@@ -298,6 +298,206 @@ export const BINDING_BALL_SPN_002: TestImplementationBinding = makeTestBinding(
 );
 
 // ---------------------------------------------------------------------------
+// touch_and_actions suite test bindings
+// ---------------------------------------------------------------------------
+
+// Tests with HARD_INVARIANT oracle-mapped criteria:
+// TOUCH-SLOW-001-CONTACT → possession-evidence (not ball-continuity)
+// PASS-LOW-001-IMPULSE → ball-continuity
+// PASS-LOFT-001-IMPULSE → ball-continuity
+// SHOT-PWR-001-IMPULSE → ball-continuity (oracle already maps via bootstrapMapping)
+
+// Tests with specific criteria that have no oracle mapping yet (NOT_EVALUATED):
+// HEAD-FREE-001-HEAD → head-trajectory oracle (not implemented)
+// TOUCH-WF-001-WEAKFOOT → weak-foot oracle (not implemented)
+// SHOT-SWV-001-CURVE → curve oracle (not implemented)
+// CROSS-HI-001-TRAJECTORY → cross-trajectory oracle (not implemented)
+
+// Reconciled mapping for TOUCH-SLOW-001-CONTACT:
+// The criterion_bindings entry changed from ["ball-continuity"] to
+// ["possession-evidence"] to match the CRITERION_TO_ORACLE mapping in
+// foundation-evaluator.ts.  HEAD-SLOW-001-CONTACT is NOT ball-continuity
+// — it requires possession evidence (touch event correlation).
+
+export const BINDING_TOUCH_SLOW_001: TestImplementationBinding = makeTestBindingWith(
+  "TOUCH-SLOW-001",
+  ["scn-touch-slow-001-v1"],
+  ["ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    // Reconciled: uses possession-evidence to match CRITERION_TO_ORACLE.
+    "TOUCH-SLOW-001-CONTACT": ["possession-evidence"],
+  },
+);
+
+export const BINDING_TOUCH_FAST_001: TestImplementationBinding = makeTestBindingWith(
+  "TOUCH-FAST-001",
+  ["scn-touch-fast-001-v1"],
+  ["ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+);
+
+export const BINDING_TOUCH_BACK_001: TestImplementationBinding = makeTestBindingWith(
+  "TOUCH-BACK-001",
+  ["scn-touch-back-001-v1"],
+  ["ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+);
+
+export const BINDING_TOUCH_90_001: TestImplementationBinding = makeTestBindingWith(
+  "TOUCH-90-001",
+  ["scn-touch-90-001-v1"],
+  ["ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+);
+
+export const BINDING_TOUCH_WF_001: TestImplementationBinding = makeTestBindingWith(
+  "TOUCH-WF-001",
+  ["scn-touch-wf-001-v1"],
+  ["ball-speed", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "TOUCH-WF-001-WEAKFOOT": ["weak-foot-trajectory"],
+  },
+);
+
+export const BINDING_PASS_LOW_001: TestImplementationBinding = makeTestBindingWith(
+  "PASS-LOW-001",
+  ["scn-pass-low-001-v1"],
+  ["ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "PASS-LOW-001-IMPULSE": ["ball-continuity"],
+  },
+);
+
+export const BINDING_PASS_ANG_001: TestImplementationBinding = makeTestBindingWith(
+  "PASS-ANG-001",
+  ["scn-pass-ang-001-v1"],
+  ["ball-speed", "ball-distance"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+);
+
+export const BINDING_PASS_RUN_001: TestImplementationBinding = makeTestBindingWith(
+  "PASS-RUN-001",
+  ["scn-pass-run-001-v1"],
+  ["ball-speed", "ball-distance"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+);
+
+export const BINDING_PASS_THR_001: TestImplementationBinding = makeTestBindingWith(
+  "PASS-THR-001",
+  ["scn-pass-thr-001-v1"],
+  ["ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+);
+
+export const BINDING_PASS_LOFT_001: TestImplementationBinding = makeTestBindingWith(
+  "PASS-LOFT-001",
+  ["scn-pass-loft-001-v1"],
+  ["ball-speed", "ball-distance", "ball-height", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "PASS-LOFT-001-IMPULSE": ["ball-continuity"],
+  },
+);
+
+export const BINDING_CROSS_HI_001: TestImplementationBinding = makeTestBindingWith(
+  "CROSS-HI-001",
+  ["scn-cross-hi-001-v1"],
+  ["ball-speed", "ball-distance", "ball-height"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "CROSS-HI-001-TRAJECTORY": ["cross-trajectory"],
+  },
+);
+
+export const BINDING_SHOT_PWR_001: TestImplementationBinding = makeTestBindingWith(
+  "SHOT-PWR-001",
+  ["scn-shot-pwr-001-v1"],
+  ["ball-speed", "ball-distance", "ball-height", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "SHOT-PWR-001-IMPULSE": ["ball-continuity"],
+  },
+);
+
+export const BINDING_SHOT_IND_001: TestImplementationBinding = makeTestBindingWith(
+  "SHOT-IND-001",
+  ["scn-shot-ind-001-v1"],
+  ["ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+);
+
+export const BINDING_SHOT_SWV_001: TestImplementationBinding = makeTestBindingWith(
+  "SHOT-SWV-001",
+  ["scn-shot-spw-001-v1"],
+  ["ball-speed", "ball-distance", "ball-height"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "SHOT-SWV-001-CURVE": ["curve-trajectory"],
+  },
+);
+
+export const BINDING_HEAD_FREE_001: TestImplementationBinding = makeTestBindingWith(
+  "HEAD-FREE-001",
+  ["scn-head-free-001-v1"],
+  ["ball-speed", "ball-height", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "HEAD-FREE-001-HEAD": ["head-trajectory"],
+  },
+);
+
+export const BINDING_HEAD_DUEL_001: TestImplementationBinding = makeTestBindingWith(
+  "HEAD-DUEL-001",
+  ["scn-head-duel-001-v1"],
+  ["ball-speed", "ball-height", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1", "obs-ball-motion-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+);
+
+export const BINDING_CTRL_ACT_001: TestImplementationBinding = makeTestBindingWith(
+  "CTRL-ACT-001",
+  ["scn-ctrl-act-001-v1"],
+  ["player-speed", "player-displacement", "ball-contact"],
+  ["finite-number", "ball-continuity", "event-references"],
+  ["obs-per-tick-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+);
+
+// ---------------------------------------------------------------------------
 // Registry — all bindings keyed by test_id
 // ---------------------------------------------------------------------------
 
@@ -318,6 +518,25 @@ export const TEST_BINDINGS: Record<string, TestImplementationBinding> = {
   [BINDING_BALL_BNC_001.test_id]: BINDING_BALL_BNC_001,
   [BINDING_BALL_SPN_001.test_id]: BINDING_BALL_SPN_001,
   [BINDING_BALL_SPN_002.test_id]: BINDING_BALL_SPN_002,
+
+  // touch_and_actions suite bindings
+  [BINDING_TOUCH_SLOW_001.test_id]: BINDING_TOUCH_SLOW_001,
+  [BINDING_TOUCH_FAST_001.test_id]: BINDING_TOUCH_FAST_001,
+  [BINDING_TOUCH_BACK_001.test_id]: BINDING_TOUCH_BACK_001,
+  [BINDING_TOUCH_90_001.test_id]: BINDING_TOUCH_90_001,
+  [BINDING_TOUCH_WF_001.test_id]: BINDING_TOUCH_WF_001,
+  [BINDING_PASS_LOW_001.test_id]: BINDING_PASS_LOW_001,
+  [BINDING_PASS_ANG_001.test_id]: BINDING_PASS_ANG_001,
+  [BINDING_PASS_RUN_001.test_id]: BINDING_PASS_RUN_001,
+  [BINDING_PASS_THR_001.test_id]: BINDING_PASS_THR_001,
+  [BINDING_PASS_LOFT_001.test_id]: BINDING_PASS_LOFT_001,
+  [BINDING_CROSS_HI_001.test_id]: BINDING_CROSS_HI_001,
+  [BINDING_SHOT_PWR_001.test_id]: BINDING_SHOT_PWR_001,
+  [BINDING_SHOT_IND_001.test_id]: BINDING_SHOT_IND_001,
+  [BINDING_SHOT_SWV_001.test_id]: BINDING_SHOT_SWV_001,
+  [BINDING_HEAD_FREE_001.test_id]: BINDING_HEAD_FREE_001,
+  [BINDING_HEAD_DUEL_001.test_id]: BINDING_HEAD_DUEL_001,
+  [BINDING_CTRL_ACT_001.test_id]: BINDING_CTRL_ACT_001,
 };
 
 /**

@@ -132,6 +132,15 @@ export const CONFIG_BALL_V1: ConfigMatrixPolicy = {
   description: "Ball-suite config.",
 };
 
+export const CONFIG_ACTIONS_V1: ConfigMatrixPolicy = {
+  policy_id: "config-actions-v1",
+  policy_version: "config-matrix-actions-v1",
+  config_refs: {
+    foundation: "foundation-locomotion-v1",
+  },
+  description: "Touch-and-actions-suite config.",
+};
+
 // ---------------------------------------------------------------------------
 // Resource policies (referenced by suite resource_policy_id)
 // ---------------------------------------------------------------------------
@@ -299,6 +308,59 @@ export const EXPANSION_BALL_V1: ExpansionManifest = {
   content_hash: "placeholder",
 };
 
+export const EXPANSION_TOUCH_ACTIONS_V1: ExpansionManifest = {
+  policy_id: "expansion-touch-actions-v1",
+  suite_id: "touch_and_actions",
+  suite_version: "suite-touch-actions-v1",
+  direct_test_ids: [
+    "TOUCH-SLOW-001",
+    "TOUCH-FAST-001",
+    "TOUCH-BACK-001",
+    "TOUCH-90-001",
+    "TOUCH-WF-001",
+    "PASS-LOW-001",
+    "PASS-ANG-001",
+    "PASS-RUN-001",
+    "PASS-THR-001",
+    "PASS-LOFT-001",
+    "CROSS-HI-001",
+    "SHOT-PWR-001",
+    "SHOT-IND-001",
+    "SHOT-SWV-001",
+    "HEAD-FREE-001",
+    // HEAD-DUEL-001 removed — duels are out of scope for this non-duel suite.
+    "CTRL-ACT-001",
+  ],
+  expanded_test_ids: [
+    "CROSS-HI-001",
+    "CTRL-ACT-001",
+    "HEAD-FREE-001",
+    "PASS-ANG-001",
+    "PASS-LOW-001",
+    "PASS-LOFT-001",
+    "PASS-RUN-001",
+    "PASS-THR-001",
+    "SHOT-IND-001",
+    "SHOT-PWR-001",
+    "SHOT-SWV-001",
+    "TOUCH-90-001",
+    "TOUCH-BACK-001",
+    "TOUCH-FAST-001",
+    "TOUCH-SLOW-001",
+    "TOUCH-WF-001",
+  ],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+    "COMMON-BOUNDS",
+  ],
+  impact_closure: "NONE",
+  catalog_version: "gameplay-evaluation-v2",
+  registry_set_id: "placeholder",
+  content_hash: "placeholder",
+};
+
 // ---------------------------------------------------------------------------
 // Policy registries
 // ---------------------------------------------------------------------------
@@ -314,6 +376,7 @@ export const CONFIG_POLICIES: Record<string, ConfigMatrixPolicy> = {
   [CONFIG_DEFAULT_V1.policy_id]: CONFIG_DEFAULT_V1,
   [CONFIG_LOCOMOTION_V1.policy_id]: CONFIG_LOCOMOTION_V1,
   [CONFIG_BALL_V1.policy_id]: CONFIG_BALL_V1,
+  [CONFIG_ACTIONS_V1.policy_id]: CONFIG_ACTIONS_V1,
 };
 
 /** Resource policies keyed by policy_id. */
@@ -337,6 +400,7 @@ export const EXPANSION_MANIFESTS: Record<string, ExpansionManifest> = {
   "expansion-fast-v1": EXPANSION_FAST_V1,
   "expansion-locomotion-v1": EXPANSION_LOCOMOTION_V1,
   "expansion-ball-v1": EXPANSION_BALL_V1,
+  "expansion-touch-actions-v1": EXPANSION_TOUCH_ACTIONS_V1,
 };
 
 // ---------------------------------------------------------------------------
