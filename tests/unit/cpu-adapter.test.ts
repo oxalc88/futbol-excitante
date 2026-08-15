@@ -21,7 +21,7 @@ import {
   type CpuAdapter,
   type CpuObservation,
 } from "../../src/adapters/input-browser/cpu-adapter.js";
-import { FIRST_TOUCH_BIT } from "../../src/contracts/input.js";
+import { FIRST_TOUCH_BIT, SHOT_BIT } from "../../src/contracts/input.js";
 import { makeWorldState } from "./contracts.fixture.js";
 
 // ===========================================================================
@@ -241,6 +241,87 @@ describe("CPU-BUILD-OBS-001: buildCpuObservation extracts fields", () => {
 });
 
 // ===========================================================================
+// 5. Goal awareness: OFFENSE mode steers toward opponent's goal
+// ===========================================================================
+
+describe("CPU-GOAL-001: goal awareness", () => {
+  let adapter: CpuAdapter;
+
+  beforeEach(() => {
+    adapter = createCpuAdapter();
+  });
+
+  it("CPU team A steers toward +x goal when in possession", () => {
+    // CPU player at (30, 0), ball at (31, 0) — CPU has possession.
+    // Team A attacks +x, opponent goal at (52.5, 0).
+    // First call establishes ballWasInRange; second call enters OFFENSE.
+    const obs: CpuObservation = makeObservation(30, 0, 31, 0, 0, 0, "team-a");
+    adapter.sample(0, obs); // gain FIRST_TOUCH → ballWasInRange = true
+    const frame = adapter.sample(1, obs); // hasPossession = true → OFFENSE
+
+    expect(frame.moveX).toBeGreaterThan(0);
+    expect(Math.abs(frame.moveY)).toBeLessThan(0.01);
+  });
+
+  it("CPU team B steers toward -x goal when in possession", () => {
+    // CPU player at (-30, 0), ball at (-31, 0).
+    // Team B attacks -x, opponent goal at (-52.5, 0).
+    const obs: CpuObservation = makeObservation(
+      -30, 0, -31, 0, 0, 0, "team-b",
+    );
+    adapter.sample(0, obs);
+    const frame = adapter.sample(1, obs);
+
+    expect(frame.moveX).toBeLessThan(0);
+    expect(Math.abs(frame.moveY)).toBeLessThan(0.01);
+  });
+
+  it("CPU shoots when within 15m of goal and facing goal", () => {
+    // CPU at (40, 0), ball at (40.5, 0) — near opponent goal.
+    // Team A attacks +x, goal at (52.5, 0), dist = 12.5 m.
+    // bodyHeading = 0 faces +x (toward goal).
+    const obs: CpuObservation = makeObservation(40, 0, 40.5, 0, 0, 0, "team-a");
+    obs.players[0].bodyHeading = 0; // facing +x
+    adapter.sample(0, obs);
+    const frame = adapter.sample(1, obs);
+
+    expect(frame.heldButtons & SHOT_BIT).not.toBe(0);
+    expect(frame.pressedButtons & SHOT_BIT).not.toBe(0);
+  });
+
+  it("CPU does not shoot when far from goal", () => {
+    // CPU at (10, 0), ball at (10.5, 0) — far from goal.
+    // Team A attacks +x, goal at (52.5, 0), dist = 42.5 m.
+    const obs: CpuObservation = makeObservation(10, 0, 10.5, 0, 0, 0, "team-a");
+    adapter.sample(0, obs);
+    const frame = adapter.sample(1, obs);
+
+    expect(frame.heldButtons & SHOT_BIT).toBe(0);
+  });
+
+  it("CPU chases ball when not in possession (ball far away)", () => {
+    // CPU at (0, 0), ball at (20, 0) — far from ball.
+    // Should chase ball regardless of team.
+    const obs: CpuObservation = makeObservation(0, 0, 20, 0, 0, 0, "team-a");
+    const frame = adapter.sample(0, obs);
+
+    // Chase-ball: moveX toward ball at x=20.
+    expect(frame.moveX).toBeGreaterThan(0);
+    expect(frame.heldButtons & FIRST_TOUCH_BIT).toBe(0);
+  });
+
+  it("CPU presses FIRST_TOUCH when near ball in defense mode", () => {
+    // CPU at (5, 0), ball at (5.5, 0), close to ball but not yet in possession
+    // (first tick — ballWasInRange not yet set from prior tick).
+    const obs: CpuObservation = makeObservation(5, 0, 5.5, 0, 0, 0, "team-a");
+    const frame = adapter.sample(0, obs);
+
+    expect(frame.heldButtons & FIRST_TOUCH_BIT).not.toBe(0);
+    expect(frame.pressedButtons & FIRST_TOUCH_BIT).not.toBe(0);
+  });
+});
+
+// ===========================================================================
 // Helper: create a CpuObservation with given player/ball positions
 // ===========================================================================
 
@@ -251,6 +332,7 @@ function makeObservation(
   ballY: number,
   ballVx: number,
   ballVy: number,
+  cpuTeamId?: string,
 ): CpuObservation {
   return {
     players: [
@@ -269,5 +351,6 @@ function makeObservation(
     },
     pitchLength: 105,
     pitchWidth: 68,
+    cpuTeamId,
   };
 }

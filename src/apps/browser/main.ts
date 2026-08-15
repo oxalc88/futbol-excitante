@@ -100,10 +100,12 @@ function main(): void {
 
   // 3.5 Create CPU adapter for any non-HUMAN control slots.
   let cpuAdapter: ReturnType<typeof createCpuAdapter> | undefined;
+  let cpuTeamId: string | undefined;
   for (const _slot of Object.keys(SCENARIO_DATA.controlAssignments)) {
     const assignment = SCENARIO_DATA.controlAssignments[_slot];
     if (assignment && assignment.mode !== "HUMAN") {
       cpuAdapter = createCpuAdapter();
+      cpuTeamId = assignment.teamId;
       break;
     }
   }
@@ -150,7 +152,7 @@ function main(): void {
 
       // Add CPU frame if a CPU adapter is present for AI_FALLBACK slots.
       if (cpuAdapter) {
-        const obs = buildCpuObservation(sim.snapshot());
+        const obs = buildCpuObservation(sim.snapshot(), cpuTeamId);
         const cpuFrame = cpuAdapter.sample(sim.tick, obs);
         allFrames.push(cpuFrame);
       }

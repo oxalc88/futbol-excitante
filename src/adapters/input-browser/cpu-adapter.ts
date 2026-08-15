@@ -6,8 +6,10 @@
  *
  * Responsibilities:
  *  - Read-only world observation (no mutation).
- *  - Chase-ball steering: compute direction from CPU player to ball.
- *  - FIRST_TOUCH: press when within ~1.5 m of a slow ball.
+ *  - Goal-aware steering: toward opponent's goal when in possession.
+ *  - Shooting: press SHOT_BIT when within range and facing the goal.
+ *  - Chase-ball: default defense behavior when not in possession.
+ *  - FIRST_TOUCH: press when within ~1.5 m of a slow ball (defense).
  *  - Always sprint (sprint = 1).
  *  - sourceId is "cpu" — pure provenance, never affects gameplay.
  *
@@ -16,7 +18,7 @@
  */
 
 import type { InputFrame } from "../../contracts/input.js";
-import { FIRST_TOUCH_BIT } from "../../contracts/input.js";
+import { FIRST_TOUCH_BIT, SHOT_BIT } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
 
 // ---------------------------------------------------------------------------
@@ -42,6 +44,8 @@ export interface CpuObservation {
   /** Pitch dimensions (metres). */
   pitchLength: number;
   pitchWidth: number;
+  /** Team ID this CPU controls (determines attacking direction). */
+  cpuTeamId?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -53,10 +57,12 @@ export interface CpuObservation {
  * from the authoritative world state.
  *
  * @param world — authoritative WorldState (not mutated).
+ * @param cpuTeamId — team ID the CPU controls (determines attacking direction).
  * @returns a CpuObservation containing the fields the CPU needs.
  */
 export function buildCpuObservation(
   world: WorldState,
+  cpuTeamId?: string,
 ): CpuObservation {
   // Determine pitch dimensions from scenario meta, falling back to defaults.
   let pitchLength = 105;
@@ -91,6 +97,7 @@ export function buildCpuObservation(
     },
     pitchLength,
     pitchWidth,
+    cpuTeamId,
   };
 }
 
@@ -118,25 +125,74 @@ export interface CpuAdapter {
   reset(): void;
 }
 
-/** Simple internal state for the CPU adapter. */
+/** Internal state for the goal-aware CPU adapter. */
 interface CpuInternalState {
-  /** Whether the ball was within range on the previous sample call. */
+  /** Whether the ball was within FIRST_TOUCH range on the previous sample. */
   ballWasInRange: boolean;
+  /** Whether the CPU currently has ball possession. */
+  hasPossession: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Constants for goal-awareness
+// ---------------------------------------------------------------------------
+
+/** Goal centre x-coordinate (half of 105 m pitch). */
+const GOAL_CENTRE_X = 52.5;
+
+/** Possession range — ball within this distance = in possession (metres). */
+const POSSESSION_RANGE = 2;
+
+/** Shot range — shoot when within this distance of the goal (metres). */
+const SHOT_RANGE = 15;
+
+/** First-touch range — press FIRST_TOUCH within this distance (metres). */
+const FIRST_TOUCH_RANGE = 1.5;
+
+/** Ball horizontal speed threshold for FIRST_TOUCH (m/s). */
+const FIRST_TOUCH_SPEED_THRESHOLD = 2;
+
+/** Ball horizontal speed threshold for possession (m/s). */
+const POSSESSION_SPEED_THRESHOLD = 3;
+
+/** Heading tolerance for shooting (radians, ±45°). */
+const FACING_TOLERANCE = Math.PI / 4;
+
+/**
+ * Get the opponent goal x-coordinate for a given team.
+ *
+ * Convention: team-a attacks +x, team-b attacks -x.
+ */
+function getOpponentGoalX(cpuTeamId: string): number {
+  if (cpuTeamId === "team-b") return -GOAL_CENTRE_X;
+  return GOAL_CENTRE_X;
 }
 
 /**
- * Create a new CPU adapter with default chase-ball strategy.
+ * Normalize an angle to the range [-PI, PI].
+ */
+function normalizeAngle(angle: number): number {
+  let a = angle;
+  while (a > Math.PI) a -= 2 * Math.PI;
+  while (a < -Math.PI) a += 2 * Math.PI;
+  return a;
+}
+
+/**
+ * Create a new CPU adapter with goal-aware strategy.
  *
- * The CPU chases the ball:
- *  - Computes direction from CPU player to ball.
- *  - Moves toward the ball (normalized direction).
- *  - Sprints always.
- *  - Presses FIRST_TOUCH when within ~1.5 m of a slow ball (< 2 m/s horizontal).
+ * Two modes:
+ *  - OFFENSE (possession): steer toward opponent's goal, shoot when in range.
+ *  - DEFENSE (no possession): chase the ball, press FIRST_TOUCH when near.
+ *
+ * Possession is gained when the ball enters FIRST_TOUCH range on one tick,
+ * then confirmed on the next tick (ballWasInRange → hasPossession).
+ * Possession is lost when the ball moves beyond POSSESSION_RANGE or after shooting.
  *
  * @returns A CpuAdapter instance.
  */
 export function createCpuAdapter(): CpuAdapter {
-  const state: CpuInternalState = { ballWasInRange: false };
+  const state: CpuInternalState = { ballWasInRange: false, hasPossession: false };
 
   return {
     sample(tick: number, observation: CpuObservation): InputFrame {
@@ -164,32 +220,86 @@ export function createCpuAdapter(): CpuAdapter {
       // Compute vector from CPU player to ball.
       const dx = ball.position.x - playerX;
       const dy = ball.position.y - playerY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distToBall = Math.sqrt(dx * dx + dy * dy);
 
-      // Normalized direction (clamped to max magnitude 1).
-      let moveX = 0;
-      let moveY = 0;
-      if (distance > 0.001) {
-        const distanceUnit = Math.min(distance, 1);
-        moveX = (dx / distance) * distanceUnit;
-        moveY = (dy / distance) * distanceUnit;
-      }
-
-      // FIRST_TOUCH logic: within 1.5 m and ball horizontal speed < 2 m/s.
+      // Ball horizontal speed.
       const ballHSpeed = Math.sqrt(
         ball.linearVelocity.x ** 2 + ball.linearVelocity.y ** 2,
       );
-      const ballInRange = distance < 1.5 && ballHSpeed < 2;
 
-      // pressedButtons: set on first entry into range.
-      const pressed = ballInRange && !state.ballWasInRange
-        ? FIRST_TOUCH_BIT
-        : 0;
+      // Is ball in FIRST_TOUCH range this tick?
+      const ballInRange =
+        distToBall < FIRST_TOUCH_RANGE && ballHSpeed < FIRST_TOUCH_SPEED_THRESHOLD;
 
-      // heldButtons: set while in range.
-      const held = ballInRange ? FIRST_TOUCH_BIT : 0;
+      // Update possession state:
+      //   Gain: ball was in range on previous tick (confirming control).
+      //   Lose: ball beyond POSSESSION_RANGE.
+      if (state.ballWasInRange) {
+        state.hasPossession = true;
+      }
+      if (distToBall > POSSESSION_RANGE) {
+        state.hasPossession = false;
+      }
 
-      state.ballWasInRange = ballInRange;
+      let moveX = 0;
+      let moveY = 0;
+      let heldButtons = 0;
+      let pressedButtons = 0;
+      let shotFired = false;
+
+      const cpuTeamId = observation.cpuTeamId;
+
+      if (state.hasPossession && cpuTeamId) {
+        // ----------------------------------------------------------------
+        // OFFENSE MODE — steer toward opponent's goal
+        // ----------------------------------------------------------------
+        const goalX = getOpponentGoalX(cpuTeamId);
+        const gdx = goalX - playerX;
+        const gdy = 0 - playerY; // goal is on the centre line (y=0)
+        const distToGoal = Math.sqrt(gdx * gdx + gdy * gdy);
+
+        // Normalized direction toward the goal.
+        if (distToGoal > 0.001) {
+          const distUnit = Math.min(distToGoal, 1);
+          moveX = (gdx / distToGoal) * distUnit;
+          moveY = (gdy / distToGoal) * distUnit;
+        }
+
+        // Shoot: within range and facing the goal.
+        if (distToGoal < SHOT_RANGE) {
+          const goalAngle = Math.atan2(gdy, gdx);
+          const headingDiff = normalizeAngle(cpuPlayer.bodyHeading - goalAngle);
+          if (Math.abs(headingDiff) <= FACING_TOLERANCE) {
+            heldButtons |= SHOT_BIT;
+            pressedButtons |= SHOT_BIT;
+            shotFired = true;
+          }
+        }
+      } else {
+        // ----------------------------------------------------------------
+        // DEFENSE MODE — chase ball
+        // ----------------------------------------------------------------
+        if (distToBall > 0.001) {
+          const distUnit = Math.min(distToBall, 1);
+          moveX = (dx / distToBall) * distUnit;
+          moveY = (dy / distToBall) * distUnit;
+        }
+
+        // FIRST_TOUCH: press when entering range, hold while in range.
+        pressedButtons |= ballInRange && !state.ballWasInRange
+          ? FIRST_TOUCH_BIT
+          : 0;
+        heldButtons |= ballInRange ? FIRST_TOUCH_BIT : 0;
+      }
+
+      // Update ballWasInRange for next tick.
+      // After a shot, clear it to prevent immediate re-possession.
+      if (shotFired) {
+        state.hasPossession = false;
+        state.ballWasInRange = false;
+      } else {
+        state.ballWasInRange = ballInRange;
+      }
 
       return {
         tick,
@@ -198,14 +308,15 @@ export function createCpuAdapter(): CpuAdapter {
         moveX,
         moveY,
         sprint: 1,
-        heldButtons: held,
-        pressedButtons: pressed,
+        heldButtons,
+        pressedButtons,
         releasedButtons: 0,
       };
     },
 
     reset(): void {
       state.ballWasInRange = false;
+      state.hasPossession = false;
     },
   };
 }
