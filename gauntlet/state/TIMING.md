@@ -94,39 +94,48 @@ not first-pass implementation.
 
 ## By model (tokens and wall)
 
-Subagents only (227 recorded child sessions):
+Refreshed `2026-08-15` from the same session logs. Prompt tokens are still
+processed input (context re-sent each call), not unique text.
 
-| Model | Role | Runs | Wall | Prompt | Completion |
-|---|---|---:|---:|---:|---:|
-| qwen3.6 | builder | 46 | 8h 59m | 179M | 3.19M |
-| deepseek-v4-flash-0731 | critic + integrator | 87 | 6h 07m | 55M | 3.26M |
-| mimo-v2.5 | builder | 13 | 2h 29m | 50M | 0.79M |
-| grok-4.6 | git-committer (until this change) | 81 | 42m | 6.4M | 0.47M |
-| **Subagent total** | | 227 | 18h 17m | **291M** | **7.7M** |
+### Grok 4.6 split — orchestrator vs committer
 
-Parent orchestrator (`grok-4.6`, not in the Tasks list):
+These were previously added together as “grok-4.6”. They are different jobs.
 
-| | |
-|---|---:|
-| Parent turns (includes waiting on children) | 14h 54m |
-| Prompt tokens processed | 148M |
-| Completion (est.) | 0.81M |
-| Model calls | 714 |
-| Peak context | 400k |
+| Job | Where it lives | Model | Runs | Prompt | Completion (est.) | Calls | Peak context |
+|---|---|---|---:|---:|---:|---:|---:|
+| Orchestrator | parent session (not in Tasks) | grok-4.6 | 1 session | **160.12M** | 898k | 781 | 400k |
+| Git-committer (legacy) | `git-committer` children | grok-4.6 | 81 | **6.41M** | 469k | 649 | — |
+| Git-committer (now) | `git-committer` children | gemma4 | 3 | **263k** | n/a | 26 | — |
+| **Grok 4.6 total** | parent + old committer | grok-4.6 | | **166.53M** | 1.37M | 1,430 | |
 
-Parent input is large because orchestrator context grew to ~400k and was
-re-sent on every call. Combined processed tokens: **~439M prompt + 8.5M
-completion**.
+Orchestrator input is large because parent context grew to ~400k and was
+re-sent on every orchestrator call (including while waiting on children).
+That cost is **not** git-committer.
 
-| Model | Prompt + completion (est.) |
-|---|---:|
-| grok-4.6 (orchestrator + old committer) | 155M |
-| qwen3.6 | 182M |
-| deepseek-v4-flash-0731 | 59M |
-| mimo-v2.5 | 51M |
+The 81 Grok committer runs were bookkeeping (conventional commits / push).
+That role is now `git-committer` / `gemma4`. The three Gemma runs so far
+are 263k processed prompt tokens (~25× cheaper per comparable commit
+batch than the Grok committer average of ~79k prompt tokens/run). Gemma
+completion growth is not recorded the same way in `updates.jsonl`
+(streams often have a single `totalTokens` snapshot), so that cell is
+`n/a`, not proof of zero output.
 
-Commits now route to `git-committer` / `gemma4`. Later rows should show
-Gemma on the commit column, not Grok 4.6.
+### All roles
+
+| Model | Role | Runs | Prompt | Completion (est.) |
+|---|---|---:|---:|---:|
+| grok-4.6 | **orchestrator only** | parent | 160.12M | 898k |
+| grok-4.6 | **git-committer (legacy)** | 81 | 6.41M | 469k |
+| gemma4 | **git-committer** | 3 | 0.26M | n/a |
+| qwen3.6 | builder | 52 | 200.55M | 3.57M |
+| deepseek-v4-flash-0731 | critic | 64 | 41.41M | 2.57M |
+| deepseek-v4-flash-0731 | integrator | 32 | 23.86M | 1.20M |
+| mimo-v2.5 | builder | 13 | 50.42M | 0.79M |
+| **All processed** | | | **~483M** | **~9.5M** |
+
+Builder/critic/integrator counts are higher than the first TIMING snapshot
+because later playable steps added child sessions. Use the Grok split above
+when asking how much orchestration cost versus commits.
 
 ---
 
@@ -240,9 +249,11 @@ camera-hash, `mutatePrng`, unbound HARD_INVARIANTs, unused two-player
 scenario, cooldown-on-restore. Do not treat a high DeepSeek token count as
 waste.
 
-**grok-4.6** as git-committer was a routing bug: 81 runs, 42 minutes, 6.4M
-processed prompt tokens for conventional-commit bookkeeping. That role is now
-`git-committer` / `gemma4`. Grok 4.6 stays on orchestration only.
+**grok-4.6 orchestrator** (160M prompt) is the parent loop: inspect, delegate,
+wait, write CURRENT/HISTORY. **grok-4.6 git-committer** (6.4M prompt, 81 runs)
+was a routing bug — bookkeeping only. That role is now `git-committer` /
+`gemma4` (263k prompt on the first 3 runs). Do not add those two Grok lines
+together when judging orchestration quality.
 
 **gemma4** had no builder/critic samples in this session (`aux` was unused).
 It is the cheap auxiliary and committer. Do not send it implementation or
