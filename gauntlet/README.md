@@ -5,7 +5,7 @@ Grok Build orchestration for this football simulation. It is project-specific. I
 The loop is:
 
 ```text
-orchestrator → builder → evidence → critic → fix/retry → acceptance → regression → next objective
+orchestrator → builder → required evidence → critic → fix/retry → integration → evidence gate → accept → next horizon objective
 ```
 
 The orchestrator is Grok 4.6 (`grok-4.6`), not Grok 4 or another 4.x ID. High-token implementation, testing, fixing, experimentation, and repeated criticism stay on NaN models.
@@ -14,7 +14,7 @@ All Gauntlet agents, the `/gauntlet` skill, and model routing live **in this rep
 
 NaN model endpoints cannot live in the repo. Register them once in `~/.grok/config.toml` (see [NaN models](#nan-models)). Runtime auth is `NAN_API_KEY`. Grok cannot reuse an OpenCode persisted `nan` login.
 
-An empty implementation is a valid start. `BOOTSTRAP-01` is the initial objective only while the toolchain and `src/` are missing. After each accepted objective the orchestrator reassesses from actual project state, evidence, research, and specs.
+An empty implementation is a valid start. `BOOTSTRAP-01` is the initial objective only while the toolchain and `src/` are missing. Strategic reassessment occurs at rolling-horizon boundaries; ordinary acceptance advances to the next validated horizon entry.
 
 `.opencode/` and `opencode.json` are unused leftovers from the OpenCode harness. Do not launch this loop with `opencode`.
 
@@ -208,7 +208,7 @@ select next objective
 choose builder (Qwen or MiMo)
         │
         ▼
-builder implements and runs evidence
+builder implements and produces required evidence
         │
         ▼
 independent critic
@@ -222,20 +222,23 @@ integration-reviewer
    └── ACCEPT
         │
         ▼
-record acceptance, reassess, next objective
+orchestrator verifies mandatory evidence
+        │
+        ▼
+record acceptance, validate/advance horizon, next objective
 ```
 
 Details:
 
-1. Inspect `git status`, the tree, `gauntlet/state/CURRENT.md`, current evidence, research, and specs.
-2. Choose the highest-value next gap. `gauntlet/objectives.md` and milestones guide that choice; they are not a fixed backlog. Use `BOOTSTRAP-01` only while the repo is empty of toolchain/`src/`.
+1. Inspect `git status`, the tree, `gauntlet/state/CURRENT.md`, `gauntlet/state/HORIZON.md`, and directly relevant evidence/specs. Validate horizon bookkeeping before selecting from it.
+2. At a strategic boundary, create a 4–8 objective horizon from actual project state. Otherwise choose its indexed next applicable objective without global replanning. Objective IDs must be unique; accepted objectives cannot be pending; prerequisites, zero-based `current_index`, and selected objective must agree.
 3. Delegate one coherent change. Quote the spec sections and acceptance tests in the task.
-4. Require the builder report in `gauntlet/evidence-contract.md`. Commands must have been executed.
-5. Invoke `critic` with the report, diff, and required tests. Default model is DeepSeek.
+4. Require the builder report and mandatory artifacts in `gauntlet/evidence-contract.md`. Commands must have been executed. Gameplay/presentation screenshots are mandatory; tests do not replace them.
+5. Invoke `critic` with the report, diff, required tests, and evidence requirements. Default model is DeepSeek. It verifies artifact existence before `ACCEPT`.
 6. On `RETRY`/`REJECT`, keep previously accepted work. Revert only the failed candidate files, then send `required_fixes` back.
-7. Critic `ACCEPT` is not final. Run `integration-reviewer`.
-8. After both pass, update `CURRENT.md` and append `HISTORY.md`.
-9. Reassess from the new project state and choose the next objective. Stop only for a human-needed legal/spec blocker or when a repeatedly failed objective is marked blocked with evidence.
+7. Critic `ACCEPT` is not final. Run `integration-reviewer`, which independently verifies evidence and audits the critic gate.
+8. After both pass, the orchestrator independently verifies mandatory evidence. Only then update state, mark the existing horizon entry accepted in place, recompute/validate `current_index`, and persist acceptance.
+9. Continue the validated horizon directly. Reassess only at horizon exhaustion/material invalidation. Repair bookkeeping errors locally rather than globally replanning. Stop only for a human-needed legal/spec blocker or when a repeatedly failed objective is marked blocked with evidence.
 
 Retry budget per objective: 3, then switch NaN builder. If both still fail, Grok decomposes, reroutes to another NaN agent, or blocks the objective. Grok does not implement.
 
@@ -297,5 +300,5 @@ Unattended Gauntlet is the intended mode. Launch with `grok --agent orchestrator
 - Orchestrator cannot edit `src/`, `eval/`, or specs. It writes Gauntlet state only. That limit is in the agent prompt; Grok project denies are session-wide and would also block builders if pointed at `src/`.
 - Builders can create and edit implementation files. They cannot edit specs, research, or `.grok/agents/`.
 - Critics and the integration reviewer cannot edit files. They may run read-only validation (`git`, `mise`, `pnpm`, `npx`, `node`, `vitest`, and inspect commands).
-- Orchestrator, builders, critics, and `aux` must not `git commit`, `git push`, `git rebase`, `sudo`, or `rm -rf /`. After critic + integration ACCEPT (or when the human asks), the orchestrator delegates commits to `git-committer` (`gemma4`). That agent may `git add` / `git commit`, and `git push` only when the parent prompt says so.
+- Orchestrator, builders, critics, and `aux` must not `git commit`, `git push`, `git rebase`, `sudo`, or `rm -rf /`. After critic + integration ACCEPT and the orchestrator evidence gate (or when the human asks), the orchestrator delegates commits to `git-committer` (`gemma4`). That agent may `git add` / `git commit`, and `git push` only when the parent prompt says so.
 - Builders must run installs non-interactively (`CI=1`, `mise trust --all` after writing `mise.toml`).

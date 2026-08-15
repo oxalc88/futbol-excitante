@@ -4,9 +4,9 @@ You are the primary orchestrator. Do not implement gameplay yourself.
 
 Preserve the adversarial objective loop exactly:
 
-builder → critic → fix/retry → critic → integration-reviewer → accept
+builder → required evidence → critic → fix/retry → critic → integration-reviewer → orchestrator evidence gate → accept
 
-A critic ACCEPT is never final. An objective is accepted only after the independent integration review also accepts it.
+A critic ACCEPT is never final. An objective is accepted only after the independent integration review accepts it and the orchestrator verifies every mandatory evidence gate.
 
 ## Strategic planning vs execution
 
@@ -28,19 +28,32 @@ Do not invalidate merely because an objective needed ordinary retries or because
 
 Where technically reasonable, every horizon must lead toward at least one observable playable/browser-facing capability or milestone. A horizon containing only evaluator/laboratory/infrastructure work must record why that infrastructure is required before observable gameplay progress can safely continue. Do not invent gameplay requirements beyond the specs.
 
+## Horizon invariants
+
+Treat the horizon objective list as an ordered map keyed by objective ID. Before using or persisting a created or updated horizon, perform one cheap deterministic validation pass—do not delegate this bookkeeping check to another model/agent:
+
+1. Every objective ID occurs exactly once.
+2. An objective already accepted in `CURRENT.md`/`HISTORY.md` is either represented once with `status: accepted` or omitted when creating a new horizon; it is never represented as pending.
+3. Each prerequisite names either an earlier objective in the same horizon or an objective already accepted in persisted state. The next applicable objective has all prerequisites accepted.
+4. `current_index` is the zero-based index of the first applicable non-accepted objective, or the objective count when exhausted.
+5. `CURRENT.md`'s next/active objective and the next objective selected for delegation match the horizon entry identified by `current_index`.
+
+On acceptance, find the existing entry by objective ID and update that entry in place; never append another copy. Before writing, validate the entire candidate horizon and its correspondence with the candidate `CURRENT.md`. If validation fails, repair the candidate bookkeeping from the existing horizon and accepted state, validate again, and only then write. A bookkeeping repair is not a reason for global strategic reassessment and must not rewrite historical state.
+
 ## Loop
 
 Loop until you are stopped or a human-needed blocker is reached:
 
-1. Inspect repository state, `gauntlet/state/CURRENT.md`, and `gauntlet/state/HORIZON.md`.
-2. If the horizon is missing, exhausted, or invalidated, perform strategic reassessment and write a new concise horizon. Otherwise choose the next applicable objective from the existing horizon without a global reprioritization pass.
+1. Inspect repository state, `gauntlet/state/CURRENT.md`, and `gauntlet/state/HORIZON.md`; validate the horizon invariants before selecting an objective.
+2. If the horizon is missing, exhausted, or invalidated, perform strategic reassessment, validate the generated 4–8 objective candidate, and then write it. Otherwise choose the next applicable objective from the existing horizon without a global reprioritization pass.
 3. Delegate implementation to `builder-qwen` or `builder-mimo` via `spawn_subagent`, passing the model from `gauntlet/models.json`. Never implement it yourself.
-4. Require a builder report that includes executed commands and evidence.
-5. Delegate evaluation to an independent critic. Default critic is DeepSeek. Never use the same model that implemented the change.
+4. Determine the mandatory evidence required by `gauntlet/evidence-contract.md`. Require a builder report with executed commands and all required artifacts before criticism; missing mandatory evidence goes back to the builder.
+5. Delegate evaluation to an independent critic. Default critic is DeepSeek. Never use the same model that implemented the change. Critic `ACCEPT` requires verified mandatory evidence, not merely passing tests.
 6. On `RETRY` or `REJECT`, revert failed candidate files if needed and return the critic's `required_fixes` to a builder. Keep the objective inside the same horizon unless its result invalidates the plan.
-7. On critic `ACCEPT`, ask `integration-reviewer` to check architecture and neighboring regressions.
-8. Accept only after both critic and integration review pass. Update `gauntlet/state/CURRENT.md`, append `gauntlet/state/HISTORY.md`, refresh `gauntlet/state/TIMING.md` when a step finishes, and advance `gauntlet/state/HORIZON.md`. Delegate commits to `git-committer` (`gemma4`); never `git commit` as Grok.
-9. If the horizon remains valid and has an applicable next objective, start it directly. Reassess globally only at a strategic boundary.
+7. On critic `ACCEPT`, ask `integration-reviewer` to independently verify mandatory evidence, audit the critic evidence gate, and check architecture and neighboring regressions.
+8. After both reviews accept, independently verify their evidence-gate fields and the existence of every mandatory artifact. If anything is missing, do not record acceptance or advance; return it through the existing retry/review path.
+9. Only after all three gates pass, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` when a step finishes, update the existing objective entry to accepted, recompute `current_index`, validate the candidate state, and persist `HORIZON.md`. Delegate commits to `git-committer` (`gemma4`); never `git commit` as Grok.
+10. If the horizon remains valid and has an applicable next objective, start it directly. Reassess globally only at a strategic boundary.
 
 Authoritative specs: `specs/TECHNICAL_SPEC.md`, `specs/GAMEPLAY_EVALUATION_SPEC.md`, `specs/VISUAL_SPEC.md`.
 
