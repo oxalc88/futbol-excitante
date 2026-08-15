@@ -25,3 +25,8 @@ grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-appro
 ```
 
 then `/gauntlet-continue`.
+
+If the provider explicitly reports `deepseek-v4-flash-0731` unknown or
+unavailable, retry the same overflow role with
+`--model deepseek-v4-flash`. Do not use this fallback for authentication,
+network, context, test, or ordinary task failures.

@@ -58,7 +58,7 @@ Optional extra focus after `/gauntlet`:
 | Agent | Kind | Default model | Writes | Job |
 |---|---|---|---|---|
 | `orchestrator` | primary | `grok-4.6` | `gauntlet/state/**`, `gauntlet/objectives.md` | Inspect, prioritize, delegate, accept/revert, choose the next objective. Hands off at 89% SuperGrok weekly usage (`/usage`). |
-| `orchestrator-deepseek` | primary (overflow) | `deepseek-v4-flash-0731` | `gauntlet/state/**`, `gauntlet/objectives.md` | Same loop. Picks up from `HANDOFF.md` + `CURRENT.md` after Grok hits the ceiling. |
+| `orchestrator-deepseek` | primary (overflow) | `deepseek-v4-flash-0731`, fallback `deepseek-v4-flash` | `gauntlet/state/**`, `gauntlet/objectives.md` | Same loop. Picks up from `HANDOFF.md` + `CURRENT.md` after Grok hits the ceiling. |
 | `builder-qwen` | subagent | `qwen3.6` | implementation files | Structured TypeScript, toolchain, contracts, tests, registries |
 | `builder-mimo` | subagent | `mimo-v2.5` | implementation files | Large-context gameplay/presentation work |
 | `critic` | subagent | `deepseek-v4-flash-0731` | none | Independent evaluation of builder evidence |
@@ -70,7 +70,7 @@ Optional extra focus after `/gauntlet`:
 
 Exact IDs are in `gauntlet/models.json` and must match `.grok/agents/<name>.md` frontmatter `model` plus the `[model.*]` blocks in `~/.grok/config.toml`.
 
-The orchestrator delegates with `spawn_subagent`. `subagent_type` is the agent name. Builders use `capability_mode: all`. Critics, the integration reviewer, `aux`, and `git-committer` use `capability_mode: execute`. Pass `model` from `gauntlet/models.json`. A child that inherits `grok-4.6` is a routing bug. Commits go to `git-committer` / `gemma4`, never to the orchestrator.
+The orchestrator delegates with `spawn_subagent`. `subagent_type` is the agent name. Builders use `capability_mode: all`. Critics, the integration reviewer, `aux`, and `git-committer` use `capability_mode: execute`. Pass `model` from `gauntlet/models.json`. If the provider explicitly reports the 0731 snapshot unavailable, retry the same DeepSeek role once with `deepseek-v4-flash`. Do not change models for authentication, network, context, test, or ordinary task failures. A child that inherits `grok-4.6` is a routing bug. Commits go to `git-committer` / `gemma4`, never to the orchestrator.
 
 Direct CLI launches of a NaN agent must also set `--model`, because `--agent` alone keeps the session default:
 
@@ -103,10 +103,10 @@ The usual isolatable pair is `BOOTSTRAP-07` and `BOOTSTRAP-08` once input exists
 | Role | Exact model | Fallback |
 |---|---|---|
 | Orchestrator | `grok-4.6` | `orchestrator-deepseek` at ≥89% SuperGrok weekly usage (`/usage`). Do not fall back to Grok 4, 4.5, or 4.20. |
-| Overflow orchestrator | `deepseek-v4-flash-0731` | none. Launch with `--model deepseek-v4-flash-0731`. |
+| Overflow orchestrator | `deepseek-v4-flash-0731` | `deepseek-v4-flash` only when the provider explicitly reports 0731 unavailable |
 | Primary builders | `qwen3.6` and `mimo-v2.5` | the other builder |
-| Primary critic | `deepseek-v4-flash-0731` | `critic-mimo` if the builder was Qwen; `critic-qwen` if the builder was MiMo |
-| Integration reviewer | `deepseek-v4-flash-0731` | a NaN model that is not the builder under review |
+| Primary critic | `deepseek-v4-flash-0731` | `deepseek-v4-flash`, then `critic-mimo` if the builder was Qwen or `critic-qwen` if the builder was MiMo |
+| Integration reviewer | `deepseek-v4-flash-0731` | `deepseek-v4-flash`, then a NaN model that is not the builder under review |
 | Cheap auxiliary | `gemma4` | `qwen3.6` |
 | Git committer | `gemma4` | `qwen3.6` |
 
@@ -121,6 +121,13 @@ grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-appro
 ```
 
 Then `/gauntlet-continue`.
+
+If and only if the provider reports the 0731 model unknown or unavailable,
+launch the same role with the current model and run `/gauntlet-continue`:
+
+```bash
+grok --agent orchestrator-deepseek --model deepseek-v4-flash --always-approve
+```
 
 ## NaN models
 
@@ -140,6 +147,14 @@ api_backend = "chat_completions"
 model = "mimo-v2.5"
 base_url = "https://api.nan.builders/v1"
 name = "Xiaomi MiMo V2.5 (NaN)"
+env_key = "NAN_API_KEY"
+context_window = 500000
+api_backend = "chat_completions"
+
+[model."deepseek-v4-flash"]
+model = "deepseek-v4-flash"
+base_url = "https://api.nan.builders/v1"
+name = "DeepSeek V4-Flash (NaN)"
 env_key = "NAN_API_KEY"
 context_window = 500000
 api_backend = "chat_completions"
@@ -269,7 +284,7 @@ Do not add these agents under `~/.grok/agents/`. That would make them appear in 
 1. Edit `gauntlet/models.json`.
 2. Copy the same Grok slugs into `.grok/agents/<name>.md` frontmatter `model`.
 3. If a NaN API id or endpoint changes, update the matching `[model.*]` block and `[subagents.models]` map in `~/.grok/config.toml`.
-4. Keep the default orchestrator on `grok-4.6`. Overflow is `orchestrator-deepseek` / `deepseek-v4-flash-0731`. Do not point the Grok orchestrator at Grok 4, 4.5, 4.20, or another non-4.6 ID.
+4. Keep the default orchestrator on `grok-4.6`. Overflow is `orchestrator-deepseek`, preferring `deepseek-v4-flash-0731` and falling back to `deepseek-v4-flash` only when the snapshot is explicitly unavailable. Do not point the Grok orchestrator at Grok 4, 4.5, 4.20, or another non-4.6 ID.
 5. Confirm with `grok models` that the IDs exist.
 6. Record the change in `gauntlet/state/HISTORY.md`.
 

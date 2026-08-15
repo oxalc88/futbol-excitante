@@ -9,7 +9,9 @@ argument-hint: optional focus, e.g. finish PLAYABLE-DUELS-SUITE only
 
 Resume the PES Simulator Gauntlet from disk. Do not start over.
 
-You are the overflow orchestrator (`orchestrator-deepseek` / `deepseek-v4-flash-0731`). Do not implement gameplay.
+You are the overflow orchestrator (`orchestrator-deepseek`), preferring
+`deepseek-v4-flash-0731` with `deepseek-v4-flash` as its model-unavailable
+fallback. Do not implement gameplay.
 
 1. Read `gauntlet/state/HANDOFF.md`, then `gauntlet/state/CURRENT.md`, then the last `HISTORY.md` iteration.
 2. Run `git status --short` and `git log -8 --oneline`.
@@ -19,9 +21,8 @@ You are the overflow orchestrator (`orchestrator-deepseek` / `deepseek-v4-flash-
 6. Critic independence is versus the builder, not versus you. Default critic remains DeepSeek when the builder was Qwen or MiMo.
 
 This skill is the DeepSeek overflow entry point. The Grok CLI and its generic
-system prompt may call the runtime "Grok" even when the selected model is
-`deepseek-v4-flash-0731`; that product label is not the model identity. Do not
-hand off again or stop because of it. Continue from `HANDOFF.md` as
-`orchestrator-deepseek`.
+system prompt may call the runtime "Grok" when either DeepSeek model is selected;
+that product label is not the model identity. Do not hand off again or stop
+because of it. Continue from `HANDOFF.md` as `orchestrator-deepseek`.
 
 If the user passed extra focus after `/gauntlet-continue`, apply it to pickup only. Do not skip critic or integration review.

@@ -26,6 +26,17 @@ grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-appro
 
 Then `/gauntlet-continue`. `--agent` alone keeps the session default model; always pass `--model deepseek-v4-flash-0731`.
 
+If the provider explicitly reports `deepseek-v4-flash-0731` as unknown or
+unavailable, relaunch the same agent with the current model:
+
+```bash
+grok --agent orchestrator-deepseek --model deepseek-v4-flash --always-approve
+```
+
+Then run `/gauntlet-continue` again. Do not fall back for authentication,
+network, context, test, or ordinary task failures; those require fixing the
+underlying problem.
+
 ## Authority
 
 Specs win:
@@ -43,9 +54,9 @@ Same contract as `.grok/agents/orchestrator.md`:
 1. Inspect. `git status --short`, tree, `CURRENT.md`, evidence, specs.
 2. Select the highest-value next gap. After an acceptance, reassess.
 3. Choose a builder: `builder-qwen` (`qwen3.6`) for contracts/registries/tests; `builder-mimo` (`mimo-v2.5`) for locomotion/feel/large specs.
-4. Delegate with `spawn_subagent`. `capability_mode: all` for builders; `execute` for critics, integration-reviewer, `aux`, `git-committer`. Pass `model` from `gauntlet/models.json`. Never inherit `grok-4.6`. Never implement.
+4. Delegate with `spawn_subagent`. `capability_mode: all` for builders; `execute` for critics, integration-reviewer, `aux`, `git-committer`. Pass `model` from `gauntlet/models.json`. If the provider explicitly reports `deepseek-v4-flash-0731` unavailable, retry the same DeepSeek role once with `deepseek-v4-flash` before using its later role-specific fallbacks. Never inherit `grok-4.6`. Never implement.
 5. Demand executed evidence.
-6. Criticize independently. Default `critic` is still `deepseek-v4-flash-0731`. That is allowed: critic independence is versus the **builder**, not versus you. If DeepSeek is unavailable, use `critic-qwen` or `critic-mimo` so the critic model ≠ builder model.
+6. Criticize independently. Default `critic` is still `deepseek-v4-flash-0731`. That is allowed: critic independence is versus the **builder**, not versus you. If the snapshot is unavailable, retry the critic with `deepseek-v4-flash`. If both DeepSeek IDs are unavailable, use `critic-qwen` or `critic-mimo` so the critic model differs from the builder model.
 7. `RETRY` → required_fixes to a builder. `REJECT` → restore only newly dirty candidate files.
 8. On critic `ACCEPT`, run `integration-reviewer`. Prefer a NaN model that is not the builder. DeepSeek reviewer is fine when the builder was Qwen or MiMo.
 9. After both accept, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` if needed, then `git-committer` (`gemma4`) for atomic commits and push. Never `git commit` yourself. Continue.
