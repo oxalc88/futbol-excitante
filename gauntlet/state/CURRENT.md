@@ -7,17 +7,17 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CPU-GOAL-AWARENESS
+next_objective_id: HEADLESS-CPU-MATCH
 best_known:
-  commit: HEAD
-  note: "BALL-GOAL-COLLISION accepted. Ball detects posts, crossbars, and goals. Next: CPU goal awareness — steer toward opponent's goal and shoot."
+  commit: 5b84446
+  note: "CPU-GOAL-AWARENESS accepted. CPU steers toward goal, shoots within 15m. 1v1 human-vs-CPU fully playable. Next: headless CPU-vs-CPU match scenario for automated evaluation."
 active_candidate:
-  objective_id: CPU-GOAL-AWARENESS
-  builder: builder-mimo
+  objective_id: HEADLESS-CPU-MATCH
+  builder: builder-qwen
   critic: critic
-  started_from_commit: HEAD
+  started_from_commit: 5b84446
   last_verdict: null
-builder_in_use: builder-mimo
+builder_in_use: builder-qwen
 critic_in_use: critic
 retry_count: 0
 max_retries_per_objective: 3
@@ -32,24 +32,20 @@ accepted:
   - CAPABILITY-SWERVE
   - CPU-OPPONENT-1V1
   - BALL-GOAL-COLLISION
+  - CPU-GOAL-AWARENESS
 blocked: []
-selection_note: "BALL-GOAL-COLLISION accepted. Goal/post collision, crossbar, and goal-entered detection now in the ball system. Next: make the CPU opponent goal-aware — steer toward opponent's goal when in possession, shoot when in range. This makes 1v1 actually playable end-to-end (CPU can score). PLAYABLE_1V1 remains blocked on perceptual gates (must not invent)."
+selection_note: "CPU-GOAL-AWARENESS accepted. Next: headless CPU-vs-CPU match scenario — a programmatic scenario that runs two CPU adapters in a headless simulation, collects goal events, and enables automated evaluation of the full 1v1 pipeline without browser interaction. PLAYABLE_1V1 remains blocked on perceptual gates (must not invent)."
 ```
 
 ## Last accepted objective
 
-BALL-GOAL-COLLISION — post, crossbar, and goal detection.
+CPU-GOAL-AWARENESS — goal-aware CPU with steering and shooting.
 
 - builder: builder-mimo / mimo-v2.5
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT (first pass)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- commits: (pending git-committer)
+- commits: 5b84446
 
 ## Next action
 
-Delegate CPU-GOAL-AWARENESS to builder-mimo. Enhance the CpuAdapter to:
-1. Know which goal is the opponent's (based on CPU player's teamId and pitch direction)
-2. Steer toward opponent's goal when carrying the ball
-3. Shoot (SHOT_BIT) when within ~15m of goal and facing the goal
-4. Keep chase-ball behavior when not in possession
-5. Tests for each new behavior
+Delegate HEADLESS-CPU-MATCH to builder-qwen. The objective: create a headless CPU-vs-CPU match program. Instead of running CPU adapters through the browser main.ts loop, create a headless scenario runner that creates two CpuAdapter instances, feeds them observations from the simulation, and collects their input frames. Run for N ticks (e.g., 600 ticks = 10 seconds at 60Hz), record goal events. Add a test that runs this headless match and asserts goal events can fire.
