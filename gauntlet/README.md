@@ -51,7 +51,7 @@ Optional extra focus after `/gauntlet`:
 /gauntlet continue from BOOTSTRAP-07 only
 ```
 
-`--always-approve` skips permission prompts. Project `.grok/config.toml` still denies `git push`, `git commit`, `git rebase`, `sudo`, and `rm -rf /`. Do not start Grok on the built-in `general-purpose` agent for this loop unless you then run `/gauntlet` and stay on Grok 4.6.
+`--always-approve` skips permission prompts. Project `.grok/config.toml` still denies `git rebase`, `sudo`, and `rm -rf /`. `git commit` / `git push` are allowed only so `git-committer` can run them; the orchestrator and builders must not. Do not start Grok on the built-in `general-purpose` agent for this loop unless you then run `/gauntlet` and stay on Grok 4.6.
 
 ## Agents
 
@@ -65,10 +65,11 @@ Optional extra focus after `/gauntlet`:
 | `critic-mimo` | fallback subagent | `mimo-v2.5` | none | Fallback critic when DeepSeek is unavailable and MiMo did not implement |
 | `integration-reviewer` | subagent | `deepseek-v4-flash-0731` | none | Architecture and neighboring-regression review after critic accept |
 | `aux` | subagent | `gemma4` | none | Cheap summaries, file lists, artifact condensation |
+| `git-committer` | subagent | `gemma4` | git only | Atomic conventional commits (and push when asked). Not Grok. |
 
 Exact IDs are in `gauntlet/models.json` and must match `.grok/agents/<name>.md` frontmatter `model` plus the `[model.*]` blocks in `~/.grok/config.toml`.
 
-The orchestrator delegates with `spawn_subagent`. `subagent_type` is the agent name. Builders use `capability_mode: all`. Critics, the integration reviewer, and `aux` use `capability_mode: execute`. Pass `model` from `gauntlet/models.json`. A child that inherits `grok-4.6` is a routing bug.
+The orchestrator delegates with `spawn_subagent`. `subagent_type` is the agent name. Builders use `capability_mode: all`. Critics, the integration reviewer, `aux`, and `git-committer` use `capability_mode: execute`. Pass `model` from `gauntlet/models.json`. A child that inherits `grok-4.6` is a routing bug. Commits go to `git-committer` / `gemma4`, never to the orchestrator.
 
 Direct CLI launches of a NaN agent must also set `--model`, because `--agent` alone keeps the session default:
 
@@ -105,10 +106,11 @@ The usual isolatable pair is `BOOTSTRAP-07` and `BOOTSTRAP-08` once input exists
 | Primary critic | `deepseek-v4-flash-0731` | `critic-mimo` if the builder was Qwen; `critic-qwen` if the builder was MiMo |
 | Integration reviewer | `deepseek-v4-flash-0731` | a NaN model that is not the builder under review |
 | Cheap auxiliary | `gemma4` | `qwen3.6` |
+| Git committer | `gemma4` | `qwen3.6` |
 
 Hard rule: the critic model must differ from the implementation model for that candidate.
 
-Use NaN models for high-token implementation, test fixing, experimentation, and repeated criticism. Use Grok 4.6 for orchestration, prioritization, delegation, integration decisions, and what happens next.
+Use NaN models for high-token implementation, test fixing, experimentation, and repeated criticism. Use `gemma4` for summaries and git commits. Use Grok 4.6 for orchestration, prioritization, delegation, integration decisions, and what happens next.
 
 ## NaN models
 
@@ -160,6 +162,7 @@ critic-qwen = "qwen3.6"
 critic-mimo = "mimo-v2.5"
 integration-reviewer = "deepseek-v4-flash-0731"
 aux = "gemma4"
+git-committer = "gemma4"
 ```
 
 Confirm with `grok models`. The process must have `NAN_API_KEY` set. A missing key registers the names but every NaN request fails with 401.
@@ -235,6 +238,7 @@ gauntlet/
   evidence-contract.md      builder/critic/review report shape
   state/CURRENT.md          live board
   state/HISTORY.md          append-only iteration log
+  state/TIMING.md           session wall-clock, tokens, model grades
   artifacts/                generated, gitignored
 
 .grok/agents/               project-local agent prompts (not global)
@@ -263,5 +267,5 @@ Unattended Gauntlet is the intended mode. Launch with `grok --agent orchestrator
 - Orchestrator cannot edit `src/`, `eval/`, or specs. It writes Gauntlet state only. That limit is in the agent prompt; Grok project denies are session-wide and would also block builders if pointed at `src/`.
 - Builders can create and edit implementation files. They cannot edit specs, research, or `.grok/agents/`.
 - Critics and the integration reviewer cannot edit files. They may run read-only validation (`git`, `mise`, `pnpm`, `npx`, `node`, `vitest`, and inspect commands).
-- Nobody in this loop should `git push`, `git commit`, `git rebase`, `sudo`, or `rm -rf /`. Commits are optional and outside the default loop; accepted work stays in the working tree.
+- Orchestrator, builders, critics, and `aux` must not `git commit`, `git push`, `git rebase`, `sudo`, or `rm -rf /`. After critic + integration ACCEPT (or when the human asks), the orchestrator delegates commits to `git-committer` (`gemma4`). That agent may `git add` / `git commit`, and `git push` only when the parent prompt says so.
 - Builders must run installs non-interactively (`CI=1`, `mise trust --all` after writing `mise.toml`).

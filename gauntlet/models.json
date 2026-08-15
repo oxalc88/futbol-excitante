@@ -66,6 +66,15 @@
       "model": "gemma4",
       "api_model": "gemma4",
       "fallback": ["qwen3.6"]
+    },
+    "git_committer": {
+      "agent": "git-committer",
+      "mode": "subagent",
+      "provider": "nan",
+      "model": "gemma4",
+      "api_model": "gemma4",
+      "fallback": ["qwen3.6"],
+      "constraint": "Bookkeeping only. Never inherit grok-4.6. Never implement or review."
     }
   },
   "cheap_auxiliary": ["gemma4", "qwen3.6"],
@@ -82,6 +91,8 @@
     "test fixing",
     "parameter experimentation",
     "routine criticism",
-    "narrow unblocker after NaN failures"
+    "narrow unblocker after NaN failures",
+    "git commit",
+    "git push"
   ]
 }

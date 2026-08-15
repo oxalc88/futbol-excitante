@@ -27,7 +27,7 @@ Specs win:
 3. Choose a builder:
    - `builder-qwen` (`qwen3.6`) for contracts, toolchain, determinism, tests, registries, glue.
    - `builder-mimo` (`mimo-v2.5`) for locomotion, ball feel, later presentation, large spec windows.
-4. Delegate one isolated change with `spawn_subagent`. Set `subagent_type` to the agent name. Use `capability_mode: all` for builders and `capability_mode: execute` for critics, the integration reviewer, and `aux`. Pass `model` from `gauntlet/models.json` (`qwen3.6`, `mimo-v2.5`, `deepseek-v4-flash-0731`, `gemma4`). Do not let a child inherit `grok-4.6`. In the task, include objective ID, allowed files, spec sections, required tests, and the evidence contract. Tell the builder to run every command non-interactively (`CI=1`, `mise trust --all` after writing `mise.toml`, no TTY confirmations).
+4. Delegate one isolated change with `spawn_subagent`. Set `subagent_type` to the agent name. Use `capability_mode: all` for builders and `capability_mode: execute` for critics, the integration reviewer, `aux`, and `git-committer`. Pass `model` from `gauntlet/models.json` (`qwen3.6`, `mimo-v2.5`, `deepseek-v4-flash-0731`, `gemma4`). Do not let a child inherit `grok-4.6`. In the task, include objective ID, allowed files, spec sections, required tests, and the evidence contract. Tell the builder to run every command non-interactively (`CI=1`, `mise trust --all` after writing `mise.toml`, no TTY confirmations).
 5. Demand executed evidence. A plan with no command output is incomplete; send it back.
 6. Criticize independently:
    - default `critic` (`deepseek-v4-flash-0731`)
@@ -36,11 +36,13 @@ Specs win:
    - never invoke a critic whose model equals the builder model
 7. On `RETRY`, return `required_fixes` to a builder. On `REJECT`, restore only the failed candidate files and start a new hypothesis. Keep accepted work.
 8. On critic `ACCEPT`, invoke `integration-reviewer`. Prefer DeepSeek. If you must fall back, use a NaN model that is not the builder.
-9. After both accept, update `CURRENT.md`, append `HISTORY.md`, then start the next objective immediately.
+9. After both accept, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` if the step is worth a row, then delegate atomic commits (and push when the human asked) to `git-committer` (`gemma4`). Never `git commit` or `git push` yourself. Then start the next objective immediately.
 
 Use `aux` (`gemma4`, fallback `qwen3.6`) only to summarize diffs, logs, or artifact directories.
 
-You may write only `gauntlet/state/**` and `gauntlet/objectives.md`. Do not edit `src/`, `eval/`, specs, research, `.grok/agents/`, or `.grok/skills/`.
+Use `git-committer` (`gemma4`, fallback `qwen3.6`) for every commit and push. That is a bookkeeping role. Do not spend Grok 4.6 on it.
+
+You may write only `gauntlet/state/**` and `gauntlet/objectives.md`. Do not edit `src/`, `eval/`, specs, research, `.grok/agents/`, or `.grok/skills/`. Do not run `git commit` or `git push`.
 
 ## Parallelism
 

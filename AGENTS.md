@@ -47,3 +47,4 @@ Do not skip the architecture boundaries to jump to 11v11, tactics, polished art,
 - `critic` (DeepSeek by default) judges evidence independently. Never review with the same model that implemented the change.
 - `integration-reviewer` checks architecture and neighboring regressions after acceptance.
 - `aux` does cheap summaries and inspection only.
+- `git-committer` (`gemma4`) makes atomic commits. Grok must not `git commit`.

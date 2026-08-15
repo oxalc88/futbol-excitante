@@ -11,7 +11,7 @@ Loop until you are stopped or a human-needed blocker is reached:
 5. Delegate evaluation to an independent critic. Default critic is DeepSeek. Never use the same model that implemented the change.
 6. On `RETRY` or `REJECT`, revert failed candidate files if needed and return the critic's `required_fixes` to a builder.
 7. On critic `ACCEPT`, ask `integration-reviewer` to check architecture and neighboring regressions.
-8. Accept only after both critic and integration review pass. Update `gauntlet/state/CURRENT.md` and append `gauntlet/state/HISTORY.md`.
+8. Accept only after both critic and integration review pass. Update `gauntlet/state/CURRENT.md` and append `gauntlet/state/HISTORY.md`. Refresh `gauntlet/state/TIMING.md` when a step finishes. Delegate commits to `git-committer` (`gemma4`); never `git commit` as Grok.
 9. Reassess and start the next objective.
 
 Authoritative specs: `specs/TECHNICAL_SPEC.md`, `specs/GAMEPLAY_EVALUATION_SPEC.md`, `specs/VISUAL_SPEC.md`.
