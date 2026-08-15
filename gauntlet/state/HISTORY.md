@@ -1303,4 +1303,48 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 926/926
 - required_fixes: none
 ```
 
+## Iteration 35 — 2026-08-15
+
+- objective_id: CAPABILITY-SHOOTING-POWER
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 1)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: (feat) shot override + shooting-power axis + runner + tests; (docs) state refresh
+- notes: `shooting-power` capability-design axis flipped DEFERRED → IMPLEMENTED (scenario `scn-shot-pwr-001-v1`, metric `ball-speed`, shot exitSpeed low 8.0 / high 16.0, INCREASE, materiality 0.5, estimator delta-ball-speed-at-t10, binding SHOT-PWR-001-DESIGN). New optional `shotConfigOverride` 5th param on `createSimulation` (default FOUNDATION_SHOT_V1, behavior-preserving) consumed by the shot stage. `evaluateShootingPowerAxis` runs low vs high under identical seed/inputs, honesty-guards on shot events (no shot → FAIL), checks INCREASE + materiality at t10, FAILs on zero effect. ENGINE_DESIGN_TARGET now 3/5 axes IMPLEMENTED; body-control + swerve stay DEFERRED (swerve genuinely not exercisable — no Magnus/curve). 951 node tests (was 926). No PLAYABLE_1V1_PASS / PES claim. First critic RETRY: versioned contract declared `delta-ball-speed-at-t20` while the runner measures t10 (values identical); fixed by aligning the estimator id to t10 + doc/import cleanup. Critic empirically verified FAIL branches (no-shot, zero-effect, reversed direction).
+
+### Critic verdict (retry 1 follow-up — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: CAPABILITY-SHOOTING-POWER (retry 1)
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+Prior critic pass: RETRY (estimator declaration t20 vs runner t10; optional doc-block/import cleanup).
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CAPABILITY-SHOOTING-POWER
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: typecheck 0; mise run test 951/951 (+25 = eval-shooting-power.test.ts; one CORE-TS-ISOLATION-001 5000ms timeout flake under parallel load, passes in isolation and on re-run, test/tsconfigs untouched); capability/contact/loop/determinism/core-boundary neighbors green; browser + renderer untouched
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
