@@ -17,7 +17,7 @@ written_at: 2026-08-15 (refresh: pickup confirmed + standing instructions)
 from_orchestrator: orchestrator
 to_orchestrator: orchestrator-deepseek
 from_model: grok-4.6
-to_model: deepseek-v4-flash
+to_model: deepseek-v4-flash-0731
 parent_window: 500000
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
@@ -28,7 +28,7 @@ auto_compact_percent: 65
 
 ```bash
 cd /home/ubuntu/projects/oxDeveloop/pes-simulator
-grok --agent orchestrator-deepseek --model deepseek-v4-flash --reasoning-effort high --always-approve
+grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
 ```
 
 Then `/gauntlet-continue`. Always pass `--model`. The workstation `grok`

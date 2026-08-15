@@ -20,7 +20,7 @@
       "api_model": "deepseek-v4-flash",
       "reasoning_effort": "high",
       "fallback": ["deepseek-v4-flash-0731"],
-      "constraint": "Overflow pickup only. Same loop as orchestrator. Critic independence is versus the builder, not this agent. Default to current Flash with high reasoning; explicitly relaunch once on the 0731 snapshot only for model-specific unknown/unavailable, 402 allowance, or capacity/rate-limit failures."
+      "constraint": "Overflow pickup only. Same loop as orchestrator. Critic independence is versus the builder, not this agent. Keep timing output separated by exact model ID and role; never combine current Flash with the 0731 snapshot."
     },
     "builder_qwen": {
       "agent": "builder-qwen",

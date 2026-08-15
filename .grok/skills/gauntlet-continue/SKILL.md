@@ -9,10 +9,9 @@ argument-hint: optional focus, e.g. finish PLAYABLE-DUELS-SUITE only
 
 Resume the PES Simulator Gauntlet from disk. Do not start over.
 
-You are the model-neutral overflow orchestrator (`orchestrator-deepseek`). New
-sessions default to `deepseek-v4-flash` with high reasoning; the fixed
-`deepseek-v4-flash-0731` snapshot is an explicit fallback. Use whichever of
-those two models the current session selected. Do not implement gameplay.
+You are the overflow orchestrator (`orchestrator-deepseek`), using
+`deepseek-v4-flash` by default and `deepseek-v4-flash-0731` as the explicit
+fallback. Do not implement gameplay.
 
 1. Read `gauntlet/state/HANDOFF.md`, then `gauntlet/state/CURRENT.md`, then the last `HISTORY.md` iteration.
 2. Run `git status --short` and `git log -8 --oneline`.
@@ -20,6 +19,7 @@ those two models the current session selected. Do not implement gameplay.
 4. Follow `gauntlet/PROMPT.md`, `gauntlet/README.md`, and `.grok/agents/orchestrator-deepseek.md`.
 5. Delegate with `spawn_subagent` as in `/gauntlet`. Commits go to `git-committer` / `gemma4`.
 6. Critic independence is versus the builder, not versus you. Default critic remains DeepSeek when the builder was Qwen or MiMo.
+7. When refreshing timing output, use this session's exact model ID. Keep `deepseek-v4-flash` and `deepseek-v4-flash-0731` in separate model-and-role totals even though both use `orchestrator-deepseek`.
 
 This skill is the DeepSeek overflow entry point. The Grok CLI and its generic
 system prompt may call the runtime "Grok" when either DeepSeek model is selected;

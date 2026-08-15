@@ -1435,9 +1435,4 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - required_fixes: none
 ```
 
-## Routing maintenance - 2026-08-15
 
-- change: Make model-neutral `orchestrator-deepseek` start new overflow sessions on `deepseek-v4-flash` with high reasoning.
-- fallback: Keep `deepseek-v4-flash-0731` as the explicit relaunch target for model-specific availability, allowance, or capacity failures.
-- scope: Configuration and documentation only. No gameplay state, objective status, or running process was changed.
-- validation: `gauntlet/models.json` parsed successfully and all documented primary launch commands resolve to current Flash.
