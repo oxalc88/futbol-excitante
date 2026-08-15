@@ -5,10 +5,10 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-15T08:10:00Z
+measured_at: 2026-08-15T09:10:00Z
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
-overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, CAPABILITY-PHYSICAL-CONTACT and CAPABILITY-SHOOTING-POWER rows measured from this overflow session's meta.json
+overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1 and the three capability-axis rows are measured from this overflow session's meta.json
 ```
 
 ## How to read this
@@ -86,6 +86,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window.
 | PLAYABLE-MUTANT-1V1 | accepted | ~23m | 9.9m | 6.7m | 5.8m | 0.4m | ~3.4M | n/a** |
 | CAPABILITY-PHYSICAL-CONTACT | accepted | ~40m | 22.7m | 8.3m | 9.0m | 0.5m | ~9.6M | n/a** |
 | CAPABILITY-SHOOTING-POWER (1 retry) | accepted | ~1h 10m | 49.4m | 12.1m | 8.0m | 0.5m | ~10.6M | n/a** |
+| CAPABILITY-BODY-CONTROL (2 retries) | accepted | ~1h 28m | 65.4m | 15.1m | 7.7m | 0.5m | ~13.2M | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -93,12 +94,12 @@ not first-pass implementation.
 
 \* DUELS-SUITE prompt/completion tokens were not re-aggregated from the prior
 session; durations are from that session's subagent meta.json.
-\*\* MUTANT-1V1, CAPABILITY-PHYSICAL-CONTACT and CAPABILITY-SHOOTING-POWER
-completions are not separately split (updates.jsonl records a final
-`totalTokens` snapshot per role); `Prompt` is the summed final totals
-(MUTANT-1V1: builder 1.95M + critic 0.89M + integrator 0.52M;
-CAPABILITY-PHYSICAL-CONTACT: builder 7.66M + critic 1.21M + integrator 0.73M;
-CAPABILITY-SHOOTING-POWER: builder 8.59M + critic 1.45M + integrator 0.57M).
+\*\* MUTANT-1V1 and the three capability-axis steps are not separately split
+for completion (updates.jsonl records a final `totalTokens` snapshot per
+role); `Prompt` is the summed final totals (MUTANT-1V1: builder 1.95M +
+critic 0.89M + integrator 0.52M; PHYSICAL-CONTACT: 7.66M + 1.21M + 0.73M;
+SHOOTING-POWER: 8.59M + 1.45M + 0.57M; BODY-CONTROL: builder 10.68M + critic
+1.43M + integrator 1.08M, retry rounds share the builder/critic sessions).
 
 ## By phase
 
@@ -112,6 +113,7 @@ CAPABILITY-SHOOTING-POWER: builder 8.59M + critic 1.45M + integrator 0.57M).
 | Mutant 1v1 (accepted) | 23m | ~3.4M | n/a** |
 | Physical-contact axis (accepted) | 40m | ~9.6M | n/a** |
 | Shooting-power axis (accepted) | 1h 10m | ~10.6M | n/a** |
+| Body-control axis (accepted) | 1h 28m | ~13.2M | n/a** |
 
 ## By model (tokens and wall)
 
@@ -126,7 +128,7 @@ These were previously added together as “grok-4.6”. They are different jobs.
 |---|---|---|---:|---:|---:|---:|---:|
 | Orchestrator | parent session (not in Tasks) | grok-4.6 | 1 session | **160.12M** | 898k | 781 | 400k |
 | Git-committer (legacy) | `git-committer` children | grok-4.6 | 81 | **6.41M** | 469k | 649 | — |
-| Git-committer (now) | `git-committer` children | gemma4 | 7 | **~620k** | n/a | 63 | — |
+| Git-committer (now) | `git-committer` children | gemma4 | 9 | **~800k** | n/a | 77 | — |
 | **Grok 4.6 total** | parent + old committer | grok-4.6 | | **166.53M** | 1.37M | 1,430 | |
 
 Orchestrator input is large because parent context grew to ~400k and was
@@ -134,8 +136,8 @@ re-sent on every orchestrator call (including while waiting on children).
 That cost is **not** git-committer.
 
 The 81 Grok committer runs were bookkeeping (conventional commits / push).
-That role is now `git-committer` / `gemma4`. The seven Gemma runs so far
-are ~620k processed prompt tokens (~25× cheaper per comparable commit
+That role is now `git-committer` / `gemma4`. The nine Gemma runs so far
+are ~800k processed prompt tokens (~25× cheaper per comparable commit
 batch than the Grok committer average of ~79k prompt tokens/run). Gemma
 completion growth is not recorded the same way in `updates.jsonl`
 (streams often have a single `totalTokens` snapshot), so that cell is
@@ -147,24 +149,26 @@ completion growth is not recorded the same way in `updates.jsonl`
 |---|---|---:|---:|---:|
 | grok-4.6 | **orchestrator only** | parent | 160.12M | 898k |
 | grok-4.6 | **git-committer (legacy)** | 81 | 6.41M | 469k |
-| gemma4 | **git-committer** | 7 | 0.62M | n/a |
-| qwen3.6 | builder | 55 | 218.75M | 3.57M |
-| deepseek-v4-flash-0731 | critic | 67 | 44.96M | 2.57M |
-| deepseek-v4-flash-0731 | integrator | 35 | 25.68M | 1.20M |
+| gemma4 | **git-committer** | 9 | 0.80M | n/a |
+| qwen3.6 | builder | 56 | 229.43M | 3.57M |
+| deepseek-v4-flash-0731 | critic | 68 | 46.39M | 2.57M |
+| deepseek-v4-flash-0731 | integrator | 36 | 26.76M | 1.20M |
 | mimo-v2.5 | builder | 13 | 50.42M | 0.79M |
-| **All processed** | | | **~507M** | **~9.5M** |
+| **All processed** | | | **~520M** | **~9.5M** |
 
 Builder/critic/integrator counts are higher than the first TIMING snapshot
 because later playable steps added child sessions. Use the Grok split above
 when asking how much orchestration cost versus commits. MUTANT-1V1 added one
 qwen3.6 builder run (1.95M), one critic run (0.89M), one integrator run
-(0.52M), one gemma4 commit run (~0.09M est.). CAPABILITY-PHYSICAL-CONTACT
-added one qwen3.6 builder run (7.66M), one critic run (1.21M), one integrator
-run (0.73M), one gemma4 commit run (~0.09M est.). CAPABILITY-SHOOTING-POWER
-added one qwen3.6 builder session (8.59M, incl. the retry round), one critic
-session (1.45M, incl. the retry round), one integrator run (0.57M), two
-gemma4 commit runs (~0.18M est.). DUELS-SUITE tokens are not re-aggregated
-(n/a*).
+(0.52M), one gemma4 commit run (~0.09M est.). PHYSICAL-CONTACT added one
+qwen3.6 builder run (7.66M), one critic run (1.21M), one integrator run
+(0.73M), one gemma4 commit run (~0.09M est.). SHOOTING-POWER added one
+qwen3.6 builder session (8.59M, incl. the retry round), one critic session
+(1.45M, incl. the retry round), one integrator run (0.57M), two gemma4
+commit runs (~0.18M est.). BODY-CONTROL added one qwen3.6 builder session
+(10.68M, incl. two retry rounds + comment fix), one critic session (1.43M,
+incl. two retry rounds), one integrator run (1.08M), two gemma4 commit runs
+(~0.18M est.). DUELS-SUITE tokens are not re-aggregated (n/a*).
 
 ---
 
@@ -243,6 +247,7 @@ on an H task is the interesting result.
 | PLAYABLE-MUTANT-1V1 | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 0 | A | Executable 1v1 mutant path (clean PASS + poison FAIL); critic proved FAIL reachability |
 | CAPABILITY-PHYSICAL-CONTACT | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 0 | A | Physical-contact axis + contact-config override; critic forced all FAIL branches |
 | CAPABILITY-SHOOTING-POWER | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 1 | B | Estimator declaration t20 vs runner t10; fixed |
+| CAPABILITY-BODY-CONTROL | qwen3.6 | VH | Very High — protected oracles / theatrical risk | 2 | C | Estimator declaration mismatch; cross-coupling FAIL unreachable (turnRate cosmetic) — fixed with lateralResistance knob |
 
 ### Builder scoreboard
 
@@ -250,7 +255,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 27 | 12 | 8 | 2 | 3 | 2 | 44% | 1.00 | ~41m |
+| qwen3.6 | 28 | 12 | 8 | 3 | 3 | 2 | 43% | 1.00 | ~43m |
 | mimo-v2.5 | 8 | 4 | 3 | 1 | 0 | 0 | 50% | 0.63 | ~31m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
@@ -258,7 +263,7 @@ Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 | Builder | Objectives | Weighted grade / difficulty | Read as |
 |---|---:|---:|---|
 | mimo-v2.5 | 8, all H | 3.1 / 3.0 | First-pass locomotion and ball; misses were local (mapping, restore, pair order) |
-| qwen3.6 | 27, mixed M–VH | 2.7 / 2.7 | Reliable on contracts and profiles; expensive on honest-eval / CLI / browser evidence |
+| qwen3.6 | 28, mixed M–VH | 2.7 / 2.8 | Reliable on contracts and profiles; expensive on honest-eval / CLI / browser evidence |
 
 ### What that means for routing
 
@@ -275,10 +280,12 @@ an oracle that actually fails: FOUNDATION-ORACLES (REJECT), HARD, BROWSER, and
 BOOTSTRAP-10 burned the retry budget on theatrical or unbound evidence. Prefer
 Qwen there still (structured TypeScript), but the orchestrator prompt must
 forbid “always-pass” tests up front. MUTANT-1V1 and CAPABILITY-PHYSICAL-CONTACT
-were first-pass A on exactly that VH class — the briefs forbade theatrical
-canaries and the critic proved the FAIL paths. SHOOTING-POWER's single retry
-was a versioned-contract declaration mismatch (estimator id), not a
-theatrical-evidence miss.
+were first-pass A on exactly that VH class. The later capability-axis retries
+were honest-eval misses of a different kind: SHOOTING-POWER's estimator
+declaration disagreed with its runner, and BODY-CONTROL's first attempt used a
+cosmetic knob (turnRate changes heading, not movement) so its cross-coupling
+check could never fail — the second retry introduced the lateralResistance
+damping that made the axis real. The critic caught both.
 
 **deepseek-v4-flash-0731** is not graded as a builder. Its job is to force
 retries. The expensive Qwen D/R rows are evidence it is doing that job:

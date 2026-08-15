@@ -7,12 +7,12 @@ orchestrator_in_use: orchestrator
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CAPABILITY-BODY-CONTROL
+next_objective_id: LOCOMOTION-LATERAL-DRIFT
 best_known:
   commit: HEAD
-  note: "CAPABILITY-SHOOTING-POWER accepted. ENGINE_DESIGN_TARGET now 3/5 axes IMPLEMENTED (transient-acceleration, physical-contact, shooting-power). PLAYABLE_1V1 still cannot PASS (perceptual gates only). Not PES."
+  note: "CAPABILITY-BODY-CONTROL accepted. ENGINE_DESIGN_TARGET now 4/5 axes IMPLEMENTED (only swerve DEFERRED). PLAYABLE_1V1 still cannot PASS (perceptual gates only). Not PES."
 active_candidate:
-  objective_id: CAPABILITY-BODY-CONTROL
+  objective_id: LOCOMOTION-LATERAL-DRIFT
   builder: builder-qwen
   critic: critic
   started_from_commit: HEAD
@@ -58,19 +58,20 @@ accepted:
   - PLAYABLE-MUTANT-1V1
   - CAPABILITY-PHYSICAL-CONTACT
   - CAPABILITY-SHOOTING-POWER
+  - CAPABILITY-BODY-CONTROL
 blocked: []
-selection_note: "ENGINE_DESIGN_TARGET exercises 3 of 5 capability axes. swerve stays DEFERRED (genuinely not exercisable — no Magnus/curve in FOUNDATION_BALL_V1). Next executable gap: materialize the body-control axis (metric player-heading-change; vary turnRate via the existing locomotionConfigOverride — no new core override needed; scenario with commanded turns so heading change is measurable; honest FAIL on no measurable effect). Fictional product values only; no PES claim. PLAYABLE_1V1 remains blocked only on perceptual gates (ARCH-DIFF-001, ARCHETYPE_BLINDED_COMPARISON_PASS), which must not be invented."
+selection_note: "ENGINE_DESIGN_TARGET exercises 4 of 5 capability axes; only swerve stays DEFERRED (genuinely not exercisable — no Magnus/curve in FOUNDATION_BALL_V1). PLAYABLE_1V1 remains blocked only on perceptual gates (ARCH-DIFF-001, ARCHETYPE_BLINDED_COMPARISON_PASS), which must not be invented. Integration reviewer flagged a follow-up: the default configs (FOUNDATION_LOCOMOTION_V1 / TRANSIENT_ACCEL_LOCOMOTION_V1, lateralResistance 0.7) now apply active lateral damping but no dedicated default-config scenario asserts the lateral-drift decay — the now-active parameter needs a protected regression target. Next objective: a default-config lateral-drift acceptance test (turn 90°, assert perpendicular velocity decays toward zero within N ticks, straight-line unchanged) that FAILs if the damping is removed. This closes the gap opened by the body-control core change."
 ```
 
 ## Last accepted objective
 
-CAPABILITY-SHOOTING-POWER — shooting-power capability axis IMPLEMENTED with runner.
+CAPABILITY-BODY-CONTROL — body-control capability axis IMPLEMENTED with runner.
 
 - builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT (after retry 1)
+- critic: critic / deepseek-v4-flash-0731 — ACCEPT (after retry 2)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- 951 node tests. ENGINE_DESIGN_TARGET now 3/5 axes IMPLEMENTED. No PLAYABLE_1V1_PASS / PES claim.
+- 973 node tests + 24 browser. ENGINE_DESIGN_TARGET now 4/5 axes IMPLEMENTED (only swerve DEFERRED). No PLAYABLE_1V1_PASS / PES claim.
 
 ## Next action
 
-Delegate CAPABILITY-BODY-CONTROL to builder-qwen. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.
+Delegate LOCOMOTION-LATERAL-DRIFT to builder-qwen. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.

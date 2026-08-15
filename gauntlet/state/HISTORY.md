@@ -1347,4 +1347,48 @@ Prior critic pass: RETRY (estimator declaration t20 vs runner t10; optional doc-
 - required_fixes: none
 ```
 
+## Iteration 36 — 2026-08-15
+
+- objective_id: CAPABILITY-BODY-CONTROL
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (after retry 2)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: (feat) body-control axis + lateral damping + runner + tests; (docs) state refresh
+- notes: `body-control` capability-design axis flipped DEFERRED → IMPLEMENTED (scenario scn-body-ctrl-001-v1 registered, metric player-heading-change, combined knobs turnRate 4.0/7.0 + lateralResistance 0.50/0.65, DECREASE, materiality 0.01, estimator delta-heading-change-at-t20, binding PHY-BC-001-DESIGN). To make the axis honest the builder implemented the previously-declared-but-unused `lateralResistance` parameter in `src/simulation/locomotion/locomotion-system.ts` (per-tick damping of velocity perpendicular to desiredHeading); the DEFAULT config (0.7) now applies lateral damping — provisional-labeled, behavior-safe (straight-line sprint bit-identical, LOCOMOTION-MIRROR-001 + all 973 tests + 24 browser tests green). ENGINE_DESIGN_TARGET now 4/5 axes IMPLEMENTED; only swerve stays DEFERRED (genuinely not exercisable — no Magnus/curve). Retry 1: estimator declared cumulative-t5-to-t20 but runner measured per-tick at t20 (same defect class as SHOOTING-POWER), plus cross-coupling FAIL structurally unreachable (turnRate affects only bodyHeading, not movement). Retry 2: estimator renamed to delta-heading-change-at-t20, lateralResistance knob makes displacement genuinely diverge (~6.6e-6) so cross-coupling FAIL is reachable, forced-FAIL tests added. Doc-accuracy nit (stale comment delta 0.0167 → 0.0667) fixed after ACCEPT. 973 node tests. No PLAYABLE_1V1_PASS / PES claim.
+
+### Critic verdict (retry 2 follow-up — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: CAPABILITY-BODY-CONTROL (retry 2)
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+Prior critic passes: RETRY 1 (estimator declaration cumulative-t5-to-t20 vs measured per-tick t20; cross-coupling FAIL structurally unreachable because turnRate does not affect movement); RETRY 2 fixed both (estimator renamed to delta-heading-change-at-t20; lateralResistance knob diverges displacement ~6.6e-6 so cross-coupling FAIL reachable; forced-FAIL tests). Critic verified straight-line sprint bit-identical for latRes 0 vs 0.7 and mirror symmetry preserved.
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CAPABILITY-BODY-CONTROL
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: typecheck 0; mise run test 973/973 (50 files) + test-browser 24/24 (hashes computed at runtime vs headless — no stale goldens under default lateral damping); locomotion/ball/close-control/contact/duels/touch/replay/determinism/core-boundary neighbors green; git diff tests/ shows only body-control-related updates, no silent expectation changes
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
