@@ -1259,4 +1259,48 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 906/906
 - required_fixes: none
 ```
 
+## Iteration 34 — 2026-08-15
+
+- objective_id: CAPABILITY-PHYSICAL-CONTACT
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT (first pass, 0 retries)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: (feat) contact override + capability axis + runner + tests; (docs) state refresh
+- notes: `physical-contact` capability-design axis flipped DEFERRED → IMPLEMENTED (scenario `scn-duels-phy-shld-001-v1`, metric `player-displacement`, separationStiffness low 0.1 / high 1.0, DECREASE, materiality 0.005, estimator delta-displacement-at-t20, binding PHY-PC-001-DESIGN). New optional `contactConfigOverride` 4th param on `createSimulation` (default `FOUNDATION_PLAYER_CONTACT_V1`, behavior-preserving) consumed by the duel resolver. `evaluatePhysicalContactAxis` runs low vs high under identical seed/inputs, honesty-guards on `player-player-contact` events (no contact → FAIL), checks direction + materiality, FAILs on zero effect. Transient-acceleration unchanged; 3 axes stay DEFERRED (body-control, shooting-power, swerve). 926 node tests (was 906). No PLAYABLE_1V1_PASS / PES claim. Critic empirically verified all FAIL branches (no-contact, zero-effect, reversed direction, materiality). Non-blocking nits: runner-level FAIL-branch tests, cosmetic names.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: CAPABILITY-PHYSICAL-CONTACT
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 926/926; empirically forced no-contact / low=high zero-effect / reversed direction / materiality-10 FAIL branches through the runner; confirmed override actually consumed (createSimulation → playerContactStage → stepPlayerContacts); `src/` diff minimal and default-preserving; no forbidden claims.
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CAPABILITY-PHYSICAL-CONTACT
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: typecheck 0; mise run test 926/926 (+20 = eval-physical-contact.test.ts); contact/duels/capability/loop/determinism/core-boundary neighbors green; browser + renderer untouched
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 

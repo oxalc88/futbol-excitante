@@ -7,12 +7,12 @@ orchestrator_in_use: orchestrator
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CAPABILITY-PHYSICAL-CONTACT
+next_objective_id: CAPABILITY-SHOOTING-POWER
 best_known:
   commit: HEAD
-  note: "PLAYABLE-MUTANT-1V1 accepted. PLAYABLE_1V1 still cannot PASS (ARCH-DIFF-001 perceptual + ARCHETYPE_BLINDED_COMPARISON NOT_EVALUATED). Not PES."
+  note: "CAPABILITY-PHYSICAL-CONTACT accepted. ENGINE_DESIGN_TARGET now 2/5 axes IMPLEMENTED. PLAYABLE_1V1 still cannot PASS (perceptual gates only). Not PES."
 active_candidate:
-  objective_id: CAPABILITY-PHYSICAL-CONTACT
+  objective_id: CAPABILITY-SHOOTING-POWER
   builder: builder-qwen
   critic: critic
   started_from_commit: HEAD
@@ -56,19 +56,20 @@ accepted:
   - PLAYABLE-TOUCH-ACTIONS-SUITE
   - PLAYABLE-DUELS-SUITE
   - PLAYABLE-MUTANT-1V1
+  - CAPABILITY-PHYSICAL-CONTACT
 blocked: []
-selection_note: "MUTANT_1V1_PASS is now executable (evaluateMutant1v1, clean PASS + poison FAIL per implementable mutant on the two-player fixture). The only remaining non-PASS drivers for PLAYABLE_1V1 are perceptual gates — ARCH-DIFF-001 (NEEDS_PERCEPTUAL_REVIEW) and ARCHETYPE_BLINDED_COMPARISON_PASS (NOT_EVALUATED) — which must not be invented. Next executable gap: the capability-design profile still lists physical-contact as DEFERRED with the stale premise 'engine cannot exercise this capability', but player duels, player-contact-evidence oracle, and foundation-player-contact-v1 (separationStiffness, velocityDampingNormal, maxCorrectionPerTick) now exist. Materialize the physical-contact axis as IMPLEMENTED with a runner (duels scenario, low vs high contact config, contact-gated displacement estimator) so ENGINE_DESIGN_TARGET covers 2 of 5 axes. Fictional product values only; no PES claim."
+selection_note: "ENGINE_DESIGN_TARGET now exercises 2 of 5 capability axes (transient-acceleration, physical-contact); body-control, shooting-power, swerve stay DEFERRED. swerve is genuinely not exercisable (no Magnus/curve in FOUNDATION_BALL_V1). Next executable gap: materialize the shooting-power axis (metric ball-speed; vary shot exit speed via a shot-config override mirroring contactConfigOverride; scenario with a player near the ball pressing SHOT so ball-speed is measurable; honest FAIL on no measurable effect). Fictional product values only; no PES claim. PLAYABLE_1V1 remains blocked only on perceptual gates (ARCH-DIFF-001, ARCHETYPE_BLINDED_COMPARISON_PASS), which must not be invented."
 ```
 
 ## Last accepted objective
 
-PLAYABLE-MUTANT-1V1 — executable 1v1 mutant/canary path.
+CAPABILITY-PHYSICAL-CONTACT — physical-contact capability axis IMPLEMENTED with runner.
 
 - builder: builder-qwen / qwen3.6
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT (first pass)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- 906 node tests. MUTANT_1V1_PASS exit prerequisite now executable; ARCHETYPE_BLINDED_COMPARISON_PASS stays NOT_EVALUATED. No PLAYABLE_1V1_PASS / PES claim.
+- 926 node tests. ENGINE_DESIGN_TARGET now 2/5 axes IMPLEMENTED. No PLAYABLE_1V1_PASS / PES claim.
 
 ## Next action
 
-Delegate CAPABILITY-PHYSICAL-CONTACT to builder-qwen. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.
+Delegate CAPABILITY-SHOOTING-POWER to builder-qwen. After ACCEPT + integration, atomic-commit and push. If SuperGrok weekly usage (`/usage`) is ≥89%, continue on `orchestrator-deepseek` / `/gauntlet-continue`.
