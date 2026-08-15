@@ -1047,4 +1047,46 @@ Prior critic passes: RETRY (theatrical camera-hash / wrong decay / no-op deferre
 - required_fixes: none
 ```
 
+## Iteration 29 — 2026-08-14
+
+- objective_id: PLAYABLE-BROWSER-1V1
+- builder: builder-qwen / qwen3.6
+- critic: critic / deepseek-v4-flash-0731
+- verdict: ACCEPT
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash-0731)
+- result: accepted
+- commits: c4fa809 scenario; 3313612 registry; 2777c7d bridge; bb7a247 tests
+- notes: BROWSER-1V1-CONTROL-001 hash parity + slot isolation. ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW, not PASS. 795 node + 24 browser. No PES claim.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: PLAYABLE-BROWSER-1V1
+- critic_agent: critic
+- critic_model: deepseek-v4-flash-0731
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: PLAYABLE-BROWSER-1V1
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash-0731
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: mise run test 795/795; test-browser 24/24
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
+
 
