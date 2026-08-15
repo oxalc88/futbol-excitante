@@ -32,6 +32,7 @@ Rules:
 - `claims_not_made` must explicitly refuse PES fidelity, `FOUNDATION_LAB_PASS`, invented reference envelopes, and regression `PASS` unless those registries exist and passed.
 - If a required command cannot run because the toolchain is not there yet, that is a failed objective unless the objective *is* creating that toolchain.
 - Do not commit, push, or rewrite specs, research, or Gauntlet agents.
+- For gameplay/presentation changes, capture at least one screenshot via `WIP_SECTION=<objective-id> pnpm run capture-wip` and list the files under `docs/screenshots/<objective-id>/` in `artifacts`.
 
 ## Critic verdict
 
