@@ -28,11 +28,11 @@ auto_compact_percent: 65
 
 ```bash
 cd /home/ubuntu/projects/oxDeveloop/pes-simulator
-export NAN_API_KEY=...
 grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
 ```
 
-Then `/gauntlet-continue`. Always pass `--model`.
+Then `/gauntlet-continue`. Always pass `--model`. The workstation `grok`
+wrapper supplies `NAN_API_KEY`; do not export or paste the credential manually.
 
 ## Board (confirmed at pickup)
 

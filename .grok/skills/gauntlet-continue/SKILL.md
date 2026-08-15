@@ -18,12 +18,10 @@ You are the overflow orchestrator (`orchestrator-deepseek` / `deepseek-v4-flash-
 5. Delegate with `spawn_subagent` as in `/gauntlet`. Commits go to `git-committer` / `gemma4`.
 6. Critic independence is versus the builder, not versus you. Default critic remains DeepSeek when the builder was Qwen or MiMo.
 
-If this session is still `grok-4.6`, do not continue as Grok. Write/update `gauntlet/state/HANDOFF.md`, then tell the human to launch:
-
-```bash
-grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
-```
-
-and run `/gauntlet-continue` there.
+This skill is the DeepSeek overflow entry point. The Grok CLI and its generic
+system prompt may call the runtime "Grok" even when the selected model is
+`deepseek-v4-flash-0731`; that product label is not the model identity. Do not
+hand off again or stop because of it. Continue from `HANDOFF.md` as
+`orchestrator-deepseek`.
 
 If the user passed extra focus after `/gauntlet-continue`, apply it to pickup only. Do not skip critic or integration review.
