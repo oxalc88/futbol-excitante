@@ -3,9 +3,17 @@
 Overflow pickup file. The DeepSeek orchestrator reads this before `CURRENT.md`.
 Grok 4.6 rewrites this when SuperGrok weekly usage (`/usage`) hits 89%. That is not the 500k context footer.
 
+## Standing instructions (human, 2026-08-15)
+
+Passed on `/gauntlet-continue`. Apply them every iteration, no exceptions:
+
+- After finishing a unit (accepted objective): make atomic commits **and push** via `git-committer` (`gemma4`). Explicitly tell the committer to push.
+- Update the timing: refresh `gauntlet/state/TIMING.md` when a step finishes — append the per-step row and recompute the builder scoreboard.
+- Always delegate tasks to the proper agent role: builder → critic → integration-reviewer → git-committer. Never let the orchestrator sit between roles. In particular, `git-committer` is `gemma4`; the legacy `grok-4.6` git-committer routing bug must not recur. Every commit goes to `git-committer`.
+
 ```yaml
 handoff_version: 1
-written_at: 2026-08-15 (refresh: pickup confirmed)
+written_at: 2026-08-15 (refresh: pickup confirmed + standing instructions)
 from_orchestrator: orchestrator
 to_orchestrator: orchestrator-deepseek
 from_model: grok-4.6
