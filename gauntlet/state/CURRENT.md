@@ -7,15 +7,15 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: HEADLESS-CPU-MATCH
+next_objective_id: MATCH-SCORING
 best_known:
-  commit: 5b84446
-  note: "CPU-GOAL-AWARENESS accepted. CPU steers toward goal, shoots within 15m. 1v1 human-vs-CPU fully playable. Next: headless CPU-vs-CPU match scenario for automated evaluation."
+  commit: a57edf2
+  note: "HEADLESS-CPU-MATCH accepted. Headless CPU-vs-CPU match runner proves full pipeline. Next: match scoring — tick-based clock + score tracking from goal events."
 active_candidate:
-  objective_id: HEADLESS-CPU-MATCH
+  objective_id: MATCH-SCORING
   builder: builder-qwen
   critic: critic
-  started_from_commit: 5b84446
+  started_from_commit: a57edf2
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -33,19 +33,20 @@ accepted:
   - CPU-OPPONENT-1V1
   - BALL-GOAL-COLLISION
   - CPU-GOAL-AWARENESS
+  - HEADLESS-CPU-MATCH
 blocked: []
-selection_note: "CPU-GOAL-AWARENESS accepted. Next: headless CPU-vs-CPU match scenario — a programmatic scenario that runs two CPU adapters in a headless simulation, collects goal events, and enables automated evaluation of the full 1v1 pipeline without browser interaction. PLAYABLE_1V1 remains blocked on perceptual gates (must not invent)."
+selection_note: "HEADLESS-CPU-MATCH accepted. Next: match scoring — add a simple tick-based match clock and score tracker that listens for 'goal' simulation events and increments team scores. Wire into the headless match runner. This completes the basic football structure: locomotion → ball → contacts → goals → scoring. PLAYABLE_1V1 remains blocked on perceptual gates (must not invent)."
 ```
 
 ## Last accepted objective
 
-CPU-GOAL-AWARENESS — goal-aware CPU with steering and shooting.
+HEADLESS-CPU-MATCH — headless CPU-vs-CPU match runner.
 
-- builder: builder-mimo / mimo-v2.5
+- builder: builder-qwen / qwen3.6
 - critic: critic / deepseek-v4-flash-0731 — ACCEPT (first pass)
 - integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- commits: 5b84446
+- commits: a57edf2
 
 ## Next action
 
-Delegate HEADLESS-CPU-MATCH to builder-qwen. The objective: create a headless CPU-vs-CPU match program. Instead of running CPU adapters through the browser main.ts loop, create a headless scenario runner that creates two CpuAdapter instances, feeds them observations from the simulation, and collects their input frames. Run for N ticks (e.g., 600 ticks = 10 seconds at 60Hz), record goal events. Add a test that runs this headless match and asserts goal events can fire.
+Delegate MATCH-SCORING to builder-qwen. Add match clock and score tracking to the headless match runner. See builder prompt for details.
