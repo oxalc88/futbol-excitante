@@ -3,15 +3,16 @@ name: gauntlet-continue
 description: Resume the PES Simulator Gauntlet from CURRENT.md and HANDOFF.md on the DeepSeek overflow orchestrator. Use when SuperGrok weekly usage hits 89%, or when the user runs /gauntlet-continue.
 user-invocable: true
 disable-model-invocation: true
-model: deepseek-v4-flash-0731
+model: deepseek-v4-flash
 argument-hint: optional focus, e.g. finish PLAYABLE-DUELS-SUITE only
 ---
 
 Resume the PES Simulator Gauntlet from disk. Do not start over.
 
-You are the overflow orchestrator (`orchestrator-deepseek`), preferring
-`deepseek-v4-flash-0731` with `deepseek-v4-flash` as its model-unavailable
-fallback. Do not implement gameplay.
+You are the model-neutral overflow orchestrator (`orchestrator-deepseek`). New
+sessions default to `deepseek-v4-flash` with high reasoning; the fixed
+`deepseek-v4-flash-0731` snapshot is an explicit fallback. Use whichever of
+those two models the current session selected. Do not implement gameplay.
 
 1. Read `gauntlet/state/HANDOFF.md`, then `gauntlet/state/CURRENT.md`, then the last `HISTORY.md` iteration.
 2. Run `git status --short` and `git log -8 --oneline`.

@@ -21,12 +21,13 @@ An empty implementation is a valid starting state. Begin at `BOOTSTRAP-01` only 
 If this parent is Grok 4.6 and SuperGrok weekly usage (`/usage`) is ≥89%, write `gauntlet/state/HANDOFF.md` and stop new builders. That is the weekly quota bar, not the 500k context footer. Continue on:
 
 ```bash
-grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
+grok --agent orchestrator-deepseek --model deepseek-v4-flash --reasoning-effort high --always-approve
 ```
 
 then `/gauntlet-continue`.
 
-If the provider explicitly reports `deepseek-v4-flash-0731` unknown or
-unavailable, retry the same overflow role with
-`--model deepseek-v4-flash`. Do not use this fallback for authentication,
+If current Flash fails with a model-specific unknown/unavailable response,
+allowance exhaustion (`402`), or model-specific capacity/rate limiting,
+relaunch the same overflow role once with
+`--model deepseek-v4-flash-0731`. Do not use this fallback for authentication,
 network, context, test, or ordinary task failures.

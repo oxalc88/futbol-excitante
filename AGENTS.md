@@ -43,7 +43,7 @@ Do not skip the architecture boundaries to jump to 11v11, tactics, polished art,
 ## Gauntlet roles
 
 - `orchestrator` (Grok 4.6) decides and delegates. It does not implement. At ≥89% SuperGrok weekly usage (`/usage`) it writes `gauntlet/state/HANDOFF.md` and hands off to `orchestrator-deepseek`.
-- `orchestrator-deepseek` prefers `deepseek-v4-flash-0731` and falls back to `deepseek-v4-flash` only when the provider explicitly reports the snapshot unavailable. Same loop. It picks up from `HANDOFF.md` + `CURRENT.md`. It does not implement.
+- `orchestrator-deepseek` is model-neutral and defaults to high-reasoning `deepseek-v4-flash`; the fixed `deepseek-v4-flash-0731` snapshot is an explicit fallback for model-specific availability, allowance, or capacity failures. Same loop. It picks up from `HANDOFF.md` + `CURRENT.md`. It does not implement.
 - `builder-qwen` / `builder-mimo` implement one isolated objective and produce evidence.
 - `critic` (DeepSeek by default) judges evidence independently. Never review with the same model that implemented the change.
 - `integration-reviewer` checks architecture and neighboring regressions after acceptance.

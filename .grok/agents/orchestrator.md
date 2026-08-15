@@ -74,12 +74,12 @@ If `/usage` shows SuperGrok weekly **≥89%**, or the human reports that bar at 
 4. Tell the human to launch the overflow loop:
 
 ```bash
-grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
+grok --agent orchestrator-deepseek --model deepseek-v4-flash --reasoning-effort high --always-approve
 ```
 
 then `/gauntlet-continue`.
 
-You may also `spawn_subagent` `orchestrator-deepseek` with `model: deepseek-v4-flash-0731` and `capability_mode: all` so the loop continues unattended on NaN. The child must read `HANDOFF.md` first. After that spawn, do not start another builder yourself.
+You may also `spawn_subagent` `orchestrator-deepseek` with `model: deepseek-v4-flash` and `capability_mode: all` so the loop continues unattended on NaN. The child must read `HANDOFF.md` first. After that spawn, do not start another builder yourself.
 
 ## Stop conditions
 
