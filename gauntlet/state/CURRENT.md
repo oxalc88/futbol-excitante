@@ -7,16 +7,11 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: MATCH-SCORING
+next_objective_id: BROWSER-SCOREBOARD
 best_known:
   commit: a57edf2
-  note: "HEADLESS-CPU-MATCH accepted. Headless CPU-vs-CPU match runner proves full pipeline. Next: match scoring — tick-based clock + score tracking from goal events."
-active_candidate:
-  objective_id: MATCH-SCORING
-  builder: builder-qwen
-  critic: critic
-  started_from_commit: a57edf2
-  last_verdict: null
+  note: "MATCH-SCORING accepted. Headless match runner now reports tick-based clock and team scores. Next: wire scoreboard into browser renderer."
+active_candidate: null
 builder_in_use: builder-qwen
 critic_in_use: critic
 retry_count: 0
@@ -34,6 +29,7 @@ accepted:
   - BALL-GOAL-COLLISION
   - CPU-GOAL-AWARENESS
   - HEADLESS-CPU-MATCH
+  - MATCH-SCORING
 blocked: []
 selection_note: "HEADLESS-CPU-MATCH accepted. Next: match scoring — add a simple tick-based match clock and score tracker that listens for 'goal' simulation events and increments team scores. Wire into the headless match runner. This completes the basic football structure: locomotion → ball → contacts → goals → scoring. PLAYABLE_1V1 remains blocked on perceptual gates (must not invent)."
 ```

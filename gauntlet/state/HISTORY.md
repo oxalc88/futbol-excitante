@@ -1512,3 +1512,14 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 ```
 
 
+
+## Iteration 38 — 2026-08-15
+
+- objective_id: MATCH-SCORING
+- builder: builder-qwen / qwen3.6
+- critic: critic-mimo / mimo-v2.5 (fallback — DeepSeek allowance exhausted)
+- verdict: ACCEPT (first pass)
+- integration: ACCEPT (integration-reviewer / mimo-v2.5, fallback — DeepSeek exhausted)
+- result: accepted
+- commits: pending (git-committer)
+- notes: Tick-based match clock (matchDurationTicks, elapsedTicks, remainingTicks, matchTimeSeconds, formatMatchTime) and score tracker (score keyed by teamId, goalEvents list with scoringTeamId, GoalTeamMapping config). Pure functions — computeMatchStats() and formatMatchTime(). 28 new tests in tests/integration/match-scoring.test.ts. No core changes. No PES claim. Architecture: all scoring/clock logic in eval/runners/ (adapter layer).

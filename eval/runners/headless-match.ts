@@ -21,8 +21,37 @@ import type { SimulationEvent } from "../../src/contracts/scenario.js";
 import type { ScenarioDefinition } from "../../src/contracts/scenario.js";
 
 // ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+/** Fixed tick duration in seconds (1/60 s). */
+const FIXED_DT = 1 / 60;
+
+// ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
+
+/**
+ * Mapping from goal index to the team that scores.
+ *
+ * Convention (ai-match):
+ *   goalIndex 0 → ball crosses x = +52.5 → the team attacking +x scores.
+ *   goalIndex 1 → ball crosses x = -52.5 → the team attacking -x scores.
+ *
+ * In the default ai-match fixture:
+ *   goalIndex 0 → team-a scores (team-a attacks +x).
+ *   goalIndex 1 → team-b scores (team-b attacks -x).
+ */
+export type GoalTeamMapping = Record<number, string>;
+
+/**
+ * Default mapping: goalIndex 0 → team-a, goalIndex 1 → team-b.
+ * This matches the ai-match fixture convention.
+ */
+const DEFAULT_GOAL_TEAM_MAPPING: GoalTeamMapping = {
+  0: "team-a",
+  1: "team-b",
+};
 
 /**
  * Configuration for a headless CPU-vs-CPU match.
@@ -32,9 +61,36 @@ export interface HeadlessMatchConfig {
   scenario: ScenarioDefinition;
   /** Total ticks to simulate (default: 600). */
   maxTicks?: number;
+  /** Match duration in ticks (default: maxTicks). Used for clock reporting. */
+  matchDurationTicks?: number;
   /** Optional telemetry observer. */
   observer?: SimulationObserver;
+  /**
+   * Mapping from goalIndex (0 or 1) to the teamId that scores.
+   * Defaults to the ai-match convention: { 0: "team-a", 1: "team-b" }.
+   *
+   * Convention:
+   *   goalIndex 0 → ball crosses x = +52.5 → team attacking +x scores.
+   *   goalIndex 1 → ball crosses x = -52.5 → team attacking -x scores.
+   */
+  goalTeamMapping?: GoalTeamMapping;
 }
+
+/**
+ * A derived goal event record that attaches the scoring teamId.
+ * Does not mutate the original SimulationEvent.
+ */
+export interface MatchGoalEvent {
+  /** The original simulation event (defensive copy). */
+  event: SimulationEvent;
+  /** The teamId that scored this goal. */
+  scoringTeamId: string;
+}
+
+/**
+ * Score keyed by teamId.
+ */
+export type MatchScore = Record<string, number>;
 
 /**
  * Result of a headless CPU-vs-CPU match.
@@ -48,6 +104,35 @@ export interface HeadlessMatchResult {
   observations: TelemetryObservation[];
   /** State hash per tick (indexed by tick). */
   stateHashes: string[];
+  /** Match clock — total configured duration in ticks. */
+  matchDurationTicks: number;
+  /** Elapsed ticks so far (equals tick for a completed match). */
+  elapsedTicks: number;
+  /** Remaining ticks (matchDurationTicks - elapsedTicks). */
+  remainingTicks: number;
+  /** Elapsed simulated time in seconds (elapsedTicks * FIXED_DT). */
+  matchTimeSeconds: number;
+  /** Score keyed by teamId. */
+  score: MatchScore;
+  /** Derived goal events with scoring teamId attached. */
+  goalEvents: MatchGoalEvent[];
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Format elapsed seconds as mm:ss (count-up).
+ *
+ * @param totalSeconds - elapsed simulated seconds (non-negative).
+ * @returns "mm:ss" string, e.g. "00:00", "00:10", "01:30".
+ */
+export function formatMatchTime(totalSeconds: number): string {
+  const totalSecs = Math.floor(totalSeconds);
+  const minutes = Math.floor(totalSecs / 60);
+  const seconds = totalSecs % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -170,6 +255,58 @@ function buildTeamCpuObservation(
 }
 
 /**
+ * Process simulation events to extract score information.
+ *
+ * This is a pure function of the event list. It does not mutate events.
+ * It is called after the match loop completes.
+ *
+ * @param events - all simulation events collected during the match.
+ * @param matchDurationTicks - total configured match duration.
+ * @param goalTeamMapping - mapping from goalIndex to scoring teamId.
+ * @param totalElapsedTicks - total ticks simulated (from simulation, not events).
+ * @returns { score, goalEvents, elapsedTicks, matchTimeSeconds }
+ */
+function computeMatchStats(
+  events: SimulationEvent[],
+  totalElapsedTicks: number,
+  matchDurationTicks: number,
+  goalTeamMapping: GoalTeamMapping,
+): {
+  score: MatchScore;
+  goalEvents: MatchGoalEvent[];
+  elapsedTicks: number;
+  matchTimeSeconds: number;
+} {
+  const score: MatchScore = {};
+  const goalEvents: MatchGoalEvent[] = [];
+
+  for (const evt of events) {
+    if (evt.kind === "goal") {
+      const goalIndex = (evt.payload.goalIndex as number) ?? -1;
+      const scoringTeamId = goalTeamMapping[goalIndex] ?? "unknown";
+
+      // Initialize team score if not present.
+      if (!(scoringTeamId in score)) {
+        score[scoringTeamId] = 0;
+      }
+      score[scoringTeamId]++;
+
+      goalEvents.push({
+        event: { ...evt },
+        scoringTeamId,
+      });
+    }
+  }
+
+  return {
+    score,
+    goalEvents,
+    elapsedTicks: totalElapsedTicks,
+    matchTimeSeconds: totalElapsedTicks * FIXED_DT,
+  };
+}
+
+/**
  * Run a headless CPU-vs-CPU match.
  */
 export function runHeadlessMatch(
@@ -178,7 +315,9 @@ export function runHeadlessMatch(
   const {
     scenario,
     maxTicks = scenario.durationTicks,
+    matchDurationTicks = maxTicks,
     observer,
+    goalTeamMapping = DEFAULT_GOAL_TEAM_MAPPING,
   } = config;
 
   // 1. Create world and simulation.
@@ -259,10 +398,24 @@ export function runHeadlessMatch(
   cpuA.reset();
   cpuB.reset();
 
+  // 5. Compute match stats (clock + score) from events.
+  const { score, goalEvents, elapsedTicks, matchTimeSeconds } = computeMatchStats(
+    events,
+    sim.tick,
+    matchDurationTicks,
+    goalTeamMapping,
+  );
+
   return {
     tick: sim.tick,
     events,
     observations,
     stateHashes,
+    matchDurationTicks,
+    elapsedTicks,
+    remainingTicks: matchDurationTicks - elapsedTicks,
+    matchTimeSeconds,
+    score,
+    goalEvents,
   };
 }

@@ -90,6 +90,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | LOCOMOTION-LATERAL-DRIFT | accepted | ~24m | 12.9m | 4.5m | 6.6m | 0.5m | ~1.7M | n/a** |
 | CAPABILITY-SWERVE | accepted | ~40m | 25.0m | 8.9m | 5.1m | 0.8m | ~0.5M | n/a** |
 | CPU-OPPONENT-1V1 | accepted | ~21m | 11.8m | 3.0m | 5.3m | 0.5m | ~0.1M | n/a** |
+| MATCH-SCORING | accepted | ~33m | 26.8m | 4.8m | 5.0m | 0.5m | ~8.5M | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -121,6 +122,7 @@ LATERAL-DRIFT: builder 1.17M + critic 0.19M + integrator 0.32M; SWERVE: estimate
 | Lateral-drift regression (accepted) | 24m | ~1.7M | n/a** |
 | Swerve axis (accepted) | 40m | ~0.5M | n/a** |
 | CPU opponent (accepted) | 21m | ~0.1M | n/a** |
+| Match scoring (accepted) | 33m | ~8.5M | n/a** |
 
 ## By model (tokens and wall)
 
@@ -269,7 +271,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 31 | 15 | 8 | 3 | 3 | 2 | 48% | 1.00 | ~42m |
+| qwen3.6 | 32 | 16 | 8 | 3 | 3 | 2 | 50% | ~0.97 | ~42m |
 | mimo-v2.5 | 8 | 4 | 3 | 1 | 0 | 0 | 50% | 0.63 | ~31m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

@@ -2,13 +2,37 @@
 
 ```yaml
 horizon_version: 1
-status: UNINITIALIZED
-horizon_id: null
-created_from_commit: null
-created_at: null
-reason: null
-current_index: 0
-objectives: []
+status: ACTIVE
+horizon_id: "playable-v1"
+created_from_commit: a57edf2
+created_at: 2026-08-15
+reason: "HEADLESS-CPU-MATCH accepted. Match scoring is the active candidate. Horizon covers the remaining playable match infrastructure: scoring, browser-wired scoreboard, match lifecycle, and AI improvement."
+current_index: 1
+objectives:
+  - id: MATCH-SCORING
+    reason: "Add tick-based match clock + score tracker that listens for 'goal' events and increments team scores. Wire into HeadlessMatchResult."
+    builder: builder-qwen
+    status: accepted
+  - id: BROWSER-SCOREBOARD
+    reason: "Wire match clock and score into the browser renderer (PresentationSnapshot and Three.js overlay). Makes scoring observable."
+    builder: builder-mimo
+    prerequisite: MATCH-SCORING
+  - id: MATCH-LIFECYCLE
+    reason: "Add match phases (kickoff, halftime auto-reset, fulltime stop). Goal events trigger kickoff reset."
+    builder: builder-qwen
+    prerequisite: MATCH-SCORING
+  - id: AI-GOAL-IMPROVEMENT
+    reason: "Improve CPU goal-awareness: shoot more accurately, celebrate goals, react to score state."
+    builder: builder-qwen
+    prerequisite: MATCH-SCORING
+  - id: MATCH-ORACLE
+    reason: "Add match-scoring oracles to the evaluator suite (score-tracker mutant, match-clock mutant)."
+    builder: builder-qwen
+    prerequisite: MATCH-LIFECYCLE
+  - id: MATCH-REPLAY-EXTENSION
+    reason: "Score-aware replay verification: replay must reproduce same score progression."
+    builder: builder-qwen
+    prerequisite: MATCH-ORACLE
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -17,7 +41,7 @@ replan_if:
   - unsafe_due_to_new_defect
   - materially_higher_value_evidence
   - human_needed_spec_or_legal_blocker
-observable_progress_target: null
+observable_progress_target: "Browser shows running match clock and team scores that update on goal events"
 infrastructure_only_justification: null
 last_invalidation_reason: null
 ```
