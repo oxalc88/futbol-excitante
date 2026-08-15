@@ -38,6 +38,7 @@ import {
   getMilestoneProfile,
 } from "../contracts/profiles.js";
 import { BROWSER_CASES } from "../contracts/browser-cases.js";
+import { evaluateMutant1v1 } from "./mutant-1v1.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -238,13 +239,50 @@ function checkExitPrerequisites(
   const results: SubComponentResult[] = [];
 
   for (const prereq of profile.exit_prerequisites) {
-    // Exit prerequisites like MUTANT_1V1_PASS and ARCHETYPE_BLINDED_COMPARISON_PASS
-    // are not yet implemented at this milestone level.
-    results.push({
-      componentId: `EXIT_PREREQ:${prereq}`,
-      outcome: "NOT_EVALUATED",
-      evidence: [`Exit prerequisite "${prereq}" is not yet implemented`],
-    });
+    if (prereq === "MUTANT_1V1_PASS") {
+      // Execute the 1v1 mutant reduction to determine if the exit prerequisite
+      // is satisfied.  This is an executable evaluation — it can PASS or FAIL.
+      try {
+        const mutantResult = evaluateMutant1v1();
+        results.push({
+          componentId: `EXIT_PREREQ:${prereq}`,
+          outcome: mutantResult.verdict as SubComponentResult["outcome"],
+          evidence: [
+            `MUTANT_1V1 reduction verdict: ${mutantResult.verdict}`,
+            `Implementable mutants detected: ${mutantResult.allImplementedDetected}`,
+            `Deferred mutants NOT_EVALUATED: ${mutantResult.allDeferredNotEvaluated}`,
+            mutantResult.details,
+          ],
+        });
+      } catch (err) {
+        results.push({
+          componentId: `EXIT_PREREQ:${prereq}`,
+          outcome: "INVALID_RUN",
+          evidence: [
+            `MUTANT_1V1 reduction threw an error: ${err instanceof Error ? err.message : String(err)}`,
+          ],
+        });
+      }
+    } else if (prereq === "ARCHETYPE_BLINDED_COMPARISON_PASS") {
+      // ARCHETYPE_BLINDED_COMPARISON_PASS is a perceptual evaluation that
+      // requires a versioned rubric and deterministic browser artifacts
+      // (e.g., rendered frames, perceptual hash comparison).  Neither the
+      // rubric nor the browser artifacts exist yet.  This MUST stay NOT_EVALUATED.
+      results.push({
+        componentId: `EXIT_PREREQ:${prereq}`,
+        outcome: "NOT_EVALUATED",
+        evidence: [
+          `Exit prerequisite "${prereq}" requires a versioned perceptual rubric and deterministic browser artifacts (rendered frames, perceptual hash comparison); these are not yet implemented`,
+        ],
+      });
+    } else {
+      // Unknown exit prerequisite — treat as NOT_EVALUATED.
+      results.push({
+        componentId: `EXIT_PREREQ:${prereq}`,
+        outcome: "NOT_EVALUATED",
+        evidence: [`Exit prerequisite "${prereq}" has no evaluation path`],
+      });
+    }
   }
 
   return results;
