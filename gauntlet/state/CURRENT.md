@@ -7,13 +7,13 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: BROWSER-2V2-PLAYABLE
+next_objective_id: ""
 best_known:
-  commit: (working tree)
-  note: "BROWSER-2V2-MATCH-KEYBOARD accepted — 2v2 browser match with keyboard controls. 4-player scenario (2 per team), slot-1 HUMAN keyboard, slots 2-4 AI_FALLBACK CPU. Routing via ?mode=2v2. 1382 node tests, 33 browser tests. Advancing to BROWSER-2V2-PLAYABLE: full playable 2v2 match in browser."
+  commit: 514847f
+  note: "BROWSER-2V2-PLAYABLE accepted — full playable 2v2 AI match with ?mode=2v2-ai URL mode. 4 CPU-controlled players, hash parity verified, 21KB canvas screenshot. Horizon 2v2-playable fully accepted. Next horizon requires strategic reassessment."
 active_candidate: null
-builder_in_use: builder-qwen
-critic_in_use: critic-flash
+builder_in_use: null
+critic_in_use: null
 retry_count: 0
 max_retries_per_objective: 3
 nan_builder_failures: 0
@@ -49,15 +49,17 @@ accepted:
   - CPU-2V2-SCORING
   - CPU-TEAM-FORMATION
   - BROWSER-2V2-MATCH-KEYBOARD
+  - BROWSER-2V2-PLAYABLE
 blocked: []
-selection_note: "Horizon playable-browser-v2 exhausted (all objectives accepted). Continuing horizon 2v2-playable."
+selection_note: "Horizon 2v2-playable exhausted (all 5 objectives accepted). Next horizon requires strategic reassessment."
 ```
 
 ## Last accepted objective
 
-BROWSER-2V2-MATCH-KEYBOARD — 2v2 browser match with keyboard controls. 4-player scenario (2 per team), slot-1 HUMAN keyboard, slots 2-4 AI_FALLBACK CPU. 12 fixture tests, 3 browser tests. 1382 node tests (73 files), 33 browser tests (7 files). Screenshot at docs/screenshots/BROWSER-2V2-MATCH-KEYBOARD/.
+BROWSER-2V2-PLAYABLE — Full playable 2v2 match in browser. `?mode=2v2-ai` URL creates autonomous AI-vs-AI 2v2 match with 4 CPU players (2 per team). HUD, scoreboard, match timer, phase transitions all work. 7 browser tests, 6 scenario selector tests. 1382 node tests, 40 browser tests. 600-tick CPU-driven trajectory. 21KB canvas screenshot.
 
-- builder: builder-mimo / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (3rd attempt, 2 retries)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 12/12 fixture tests, 33/33 browser tests, 1382/1382 full suite, screenshot artifact
+- Evidence: 7/7 browser tests, 40/40 browser suite, 1382/1382 node suite, trajectory with ball velocity contact, canvas screenshot
+- Commit: 514847f

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.8.0",
+  "objective_id": "BROWSER-2V2-PLAYABLE",
+  "accepted_at": "2026-08-16T18:07:09.769Z",
+  "candidate_commit": "514847f",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/BROWSER-2V2-PLAYABLE/frame-000.png",
+        "sha256": "eeb26e966bbe84562805ef8d9a6dadfc3a79aab66974dcc5c6d8ecba2a6a9968",
+        "git_blob": "16aa1ca6f1334901c480bb9c79b78bb33a86e15e",
+        "candidate_commit": "514847f",
+        "bytes": 20552,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/BROWSER-2V2-PLAYABLE/trajectory.json",
+      "sha256": "07fc783a0b2bf34e386a2e365208ff09c737201a6c9f2528eaaeda43c79fe56e",
+      "git_blob": "1d41d79ca4f90d83f7c8a55d1ebd6ea9dcd94364",
+      "candidate_commit": "514847f",
+      "bytes": 693647,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/BROWSER-2V2-PLAYABLE/audit.json",
+      "sha256": "a3b353aee6d0322c63da9038cc461e824966b1985134d8ea11f368d79ea53a49",
+      "git_blob": "04e1fa6946fd166e694f62fc0199a73eedaf2897",
+      "candidate_commit": "514847f",
+      "bytes": 2522,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-16/2026-08-16T18-07-09-769Z-BROWSER-2V2-PLAYABLE-acceptance.json"
+}

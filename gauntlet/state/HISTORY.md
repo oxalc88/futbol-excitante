@@ -1973,3 +1973,56 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 51 — 2026-08-16
+
+- objective_id: BROWSER-2V2-PLAYABLE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (3rd attempt, 2 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commit: 514847f
+- notes: Full playable 2v2 AI match with ?mode=2v2-ai URL mode. 4 CPU-controlled players (2 per team), hash parity verified across independent bridge runs (120 ticks). 7 browser tests, 6 scenario selector tests. 1382 node tests + 40 browser tests (8 files). 600-tick CPU-driven trajectory (ball contacted at tick ~149). 21KB canvas screenshot. Horizon 2v2-playable fully accepted (5/5). First critic RETRY: screenshot blank/static trajectory; second RETRY: ball never moves in trajectory. Fixed: canvas-captured 21KB screenshot, CPU-driven trajectory with 600 ticks showing ball velocity change and player movement.
+
+### Critic verdict (3rd attempt — ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: BROWSER-2V2-PLAYABLE
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-gameplay
+- builder_model: mimo-v2.5
+- independence_ok: true
+- deterministic_audit: PASS
+- semantic_audit: NOT_REQUIRED
+- mandatory_evidence_ok: true
+- criteria:
+  - URL-mode-2v2-ai: PASS
+  - hash-parity: PASS (deterministic across 120 ticks, 600 unique hashes)
+  - deterministic-multi-tick: PASS
+  - browser-match-display: PASS
+- architecture_violations: None
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: BROWSER-2V2-PLAYABLE
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (1382/1382 node, 40/40 browser)
+- deterministic_audit: PASS
+- critic_verdict_verified: true
+- mandatory_evidence_ok: true
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```
