@@ -55,6 +55,10 @@ export function selectBrowserScenario(search: string): ScenarioDefinition {
     return FOUNDATION_SCENARIO_2V2;
   }
 
+  if (mode === "ai-match-3v3") {
+    return FOUNDATION_SCENARIO_3V3;
+  }
+
   if (mode === "2v2") {
     return FOUNDATION_SCENARIO_2V2_KEYBOARD;
   }
