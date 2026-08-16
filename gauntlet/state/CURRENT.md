@@ -9,13 +9,13 @@ handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 next_objective_id: MATCH-ORACLE
 best_known:
-  commit: 56027d5
+  commit: b273aa8
   note: "MATCH-ORACLE accepted. Match-scoring oracles (score-tracker, match-clock) added to evaluator suite. All 9 implementable mutants detected in mutant-core and mutant-1v1 reducers. Next: MATCH-REPLAY-EXTENSION — score-aware replay verification."
 active_candidate:
   objective_id: MATCH-REPLAY-EXTENSION
   builder: builder-qwen
   critic: critic
-  started_from_commit: 56027d5
+  started_from_commit: b273aa8
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
