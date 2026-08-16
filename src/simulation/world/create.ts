@@ -178,6 +178,8 @@ export function createWorld(opts: CreateOptions): WorldState {
       lastHeldFrames: {},
     },
     controlAssignments: scenario.controlAssignments,
+    matchPhase: "playing",
+    goalResetCountdown: 0,
     meta: {
       scenarioId: scenario.id,
       scenarioVersion: scenario.version,

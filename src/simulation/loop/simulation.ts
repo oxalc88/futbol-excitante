@@ -38,7 +38,7 @@
  */
 
 import type { InputFrame } from "../../contracts/input.js";
-import type { WorldState, PlayerState, SchedulerMemory } from "../../contracts/state.js";
+import type { WorldState, PlayerState, SchedulerMemory, MatchPhase } from "../../contracts/state.js";
 import type { SimulationEvent } from "../../contracts/scenario.js";
 import type { PresentationSnapshot, PlayerPresentation } from "../../contracts/presentation.js";
 import type { TelemetryObservation } from "../../contracts/telemetry.js";
@@ -94,6 +94,19 @@ interface BallConfigOverride {
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
+
+/**
+ * Goal reset configuration for the simulation.
+ * Controls automatic restart behavior after a goal event.
+ */
+export interface GoalResetConfig {
+  /**
+   * Countdown ticks before auto-restart after a goal.
+   * Default: 60 (≈1 second at 60 FPS).
+   * Set to 0 to disable automatic restart (manual reset required).
+   */
+  goalResetTicks?: number;
+}
 
 /**
  * Result returned by a single `step()` call.
@@ -213,6 +226,8 @@ export interface Simulation {
  *   If provided, used instead of `FOUNDATION_BALL_V1` for ball integration.
  *   Useful for capability evaluation where low/high curve coefficients
  *   need different ball physics (e.g., curveCoefficient 0.0005 vs 0.003).
+ * @param goalResetConfig - Optional goal reset configuration.
+ *   Controls automatic restart behavior after a goal event.
  * @returns A simulation instance.
  */
 export function createSimulation(
@@ -222,6 +237,7 @@ export function createSimulation(
   contactConfigOverride?: typeof FOUNDATION_PLAYER_CONTACT_V1,
   shotConfigOverride?: ShotConfigOverride,
   ballConfigOverride?: BallConfigOverride,
+  goalResetConfig?: GoalResetConfig,
 ): Simulation {
   const obs = observer ?? NO_OP_OBSERVER;
 
@@ -241,6 +257,52 @@ export function createSimulation(
   // Shot config override (used by capability evaluation for low vs high exitSpeed).
   // Lives in the closure; does not affect world state or hashing.
   const effectiveShotConfig = shotConfigOverride ?? undefined;
+
+  // ------------------------------------------------------------------
+  // Goal reset — initial positions captured at creation for post-goal reset.
+  // ------------------------------------------------------------------
+
+  /** Default countdown ticks before auto-restart after a goal (≈1 second at 60 FPS). */
+  const defaultGoalResetTicks = 60;
+
+  // Capture initial positions for reset (mirrors buildGoalResetPositions in headless runner).
+  const initialPositions: Record<string, { x: number; y: number }> = {};
+  for (const p of state.players) {
+    initialPositions[p.playerId] = { x: p.groundPosition.x, y: p.groundPosition.y };
+  }
+  const initialBallPosition = { ...state.ball.position };
+  const initialBallVelocity = { ...state.ball.linearVelocity };
+  const initialBallAngularVelocity = { ...state.ball.angularVelocity };
+  const initialBallRegime = state.ball.regime;
+
+  /**
+   * Reset all players and the ball to their initial positions.
+   * Called when goalResetCountdown reaches zero.
+   */
+  function applyGoalReset(): void {
+    state.ball.position = { ...initialBallPosition };
+    state.ball.linearVelocity = { ...initialBallVelocity };
+    state.ball.angularVelocity = { ...initialBallAngularVelocity };
+    state.ball.regime = initialBallRegime;
+    for (const player of state.players) {
+      const pos = initialPositions[player.playerId];
+      if (pos) {
+        player.groundPosition = { x: pos.x, y: pos.y };
+        player.linearVelocity = { x: 0, y: 0 };
+        player.desiredVelocity = { x: 0, y: 0 };
+      }
+    }
+  }
+
+  /**
+   * Set matchPhase to "goal" and start the countdown.
+   * Called when a goal event is detected.
+   */
+  function onGoalEvent(): void {
+    if (state.matchPhase !== "playing") return;
+    state.matchPhase = "goal";
+    state.goalResetCountdown = goalResetConfig?.goalResetTicks ?? defaultGoalResetTicks;
+  }
 
   // ------------------------------------------------------------------
   // Internal: drain all buffers into a single flat array (ordered by tick, then insertion).
@@ -586,6 +648,7 @@ export function createSimulation(
       },
       events: [],
       controlAssignments: { bySlot: {} }, // stub: full resolution TBD
+      matchPhase: state.matchPhase,
     };
   }
 
@@ -827,6 +890,29 @@ export function createSimulation(
       // 6. Invariant validation
       const invariantsOk = validateInvariants();
       const allStepEvents = [...oldTickEvents, ...schedEvents, ...playerContactEvents, ...contactEvents, ...ballEvents];
+
+      // ------------------------------------------------------------------
+      // Match phase processing (MATCH-SET-PIECE)
+      // ------------------------------------------------------------------
+
+      // 6a. Process goal countdown: decrement and reset if done.
+      if (state.matchPhase === "goal") {
+        state.goalResetCountdown--;
+        if (state.goalResetCountdown <= 0) {
+          applyGoalReset();
+          state.matchPhase = "playing";
+          state.goalResetCountdown = 0;
+        }
+      }
+
+      // 6b. If any goal event fired this step (new events), trigger goal phase.
+      for (const ev of allStepEvents) {
+        if (ev.kind === "goal" && state.matchPhase === "playing") {
+          onGoalEvent();
+          break; // Only start countdown on the first goal event of the tick.
+        }
+      }
+
       const obsData = buildObservation(newTick, allStepEvents, currentFrames);
 
       // Compute hash once (freezeWorldState copies, does not mutate).

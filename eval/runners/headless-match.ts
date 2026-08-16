@@ -25,6 +25,7 @@ import type { SimulationObserver } from "../../src/simulation/telemetry/observer
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { SimulationEvent } from "../../src/contracts/scenario.js";
 import type { ScenarioDefinition } from "../../src/contracts/scenario.js";
+import type { GoalResetConfig } from "../../src/simulation/loop/simulation.js";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -451,7 +452,14 @@ export function runHeadlessMatch(
     onInvariantFail: observer?.onInvariantFail,
     onPresent: observer?.onPresent,
   };
-  const sim = createSimulation(world, collectObserver);
+
+  // Build goal reset config for the simulation's built-in phase-aware reset.
+  // The simulation handles countdown → reset → playing automatically.
+  const goalResetConfig: GoalResetConfig | undefined = doGoalReset
+    ? { goalResetTicks: 60 }
+    : undefined;
+
+  const sim = createSimulation(world, collectObserver, undefined, undefined, undefined, undefined, goalResetConfig);
 
   // 2. Create a CPU adapter per AI_FALLBACK control slot.
   //    Each adapter has its own internal state (hasPossession, ballWasInRange),
@@ -489,10 +497,7 @@ export function runHeadlessMatch(
     }
   }
 
-  // 3. Build goal reset positions (from scenario initial state).
-  const goalReset = doGoalReset ? buildGoalResetPositions(scenario) : null;
-
-  // 4. Run the match loop.
+  // 3. Run the match loop.
   const events: SimulationEvent[] = [];
   const stateHashes: string[] = [];
 
@@ -525,6 +530,36 @@ export function runHeadlessMatch(
     if (phase !== currentPhase) {
       phaseHistory.push({ tick: i, phase });
       currentPhase = phase;
+    }
+
+    // Sync high-level match lifecycle phases to the simulation core.
+    // The simulation maps: first-half → playing, halftime → halftime,
+    // second-half → playing, fulltime → fulltime, kickoff → kickoff.
+    // Goal phase is handled internally by the simulation's countdown.
+    {
+      let simPhase: import("../../src/contracts/state.js").MatchPhase;
+      switch (phase) {
+        case "first-half": case "second-half":
+          simPhase = "playing";
+          break;
+        case "halftime":
+          simPhase = "halftime";
+          break;
+        case "fulltime":
+          simPhase = "fulltime";
+          break;
+        case "kickoff":
+          simPhase = "kickoff";
+          break;
+        default:
+          simPhase = "playing";
+      }
+      // Update simulation matchPhase via deepClone/restore if different.
+      const mutable = deepClone(sim.snapshot()) as WorldState;
+      if (mutable.matchPhase !== simPhase) {
+        mutable.matchPhase = simPhase;
+        sim.restore(mutable);
+      }
     }
 
     // a. Snapshot the world (deep clone — CPU adapters only read).
@@ -575,11 +610,9 @@ export function runHeadlessMatch(
       events.push(evt);
       if (evt.kind === "goal") {
         hadGoal = true;
-
-        // Goal reset: ball to center, players to start.
-        if (doGoalReset && goalReset) {
-          resetAfterGoal(sim, goalReset);
-        }
+        // Goal reset is handled automatically by the simulation loop
+        // via its built-in goal countdown → reset → playing transition.
+        // No manual resetAfterGoal call needed.
       }
     }
   }

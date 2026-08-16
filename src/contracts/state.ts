@@ -159,4 +159,49 @@ export interface WorldState {
   controlAssignments: Record<string, { teamId: string; controlledPlayerId: string; mode: string }>;
   /** Arbitrary read-only metadata keyed by string. */
   meta?: Record<string, unknown>;
+  // ---------------------------------------------------------------------------
+  // Match phase — set-aware state for match restarts (MATCH-SET-PIECE)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Match lifecycle phase.
+   *
+   * - "playing": normal gameplay.
+   * - "goal": a goal was scored; players are resetting.
+   * - "halftime": first half ended.
+   * - "fulltime": match ended.
+   *
+   * Only "playing" allows regular tick progression. During "goal",
+   * the `goalResetCountdown` field drives the automatic restart.
+   * When countdown reaches zero, the phase transitions back to "playing".
+   */
+  matchPhase: MatchPhase;
+  /**
+   * Countdown ticks remaining before the goal restart completes.
+   *
+   * Set when a goal event fires. Decremented each tick while
+   * `matchPhase === "goal"`. When zero, `matchPhase` transitions
+   * to "playing", players are at their reset positions, and the ball
+   * is at center.
+   *
+   * Default: 0 (no active countdown).
+   */
+  goalResetCountdown: number;
 }
+
+// ---------------------------------------------------------------------------
+// Match phase type — extracted from state for reuse
+// ---------------------------------------------------------------------------
+
+/**
+ * Match lifecycle phase values.
+ *
+ * Phase progression:
+ *  kickoff → first-half → halftime → second-half → fulltime
+ *
+ * During play, a goal event triggers: playing → goal → (countdown) → playing.
+ * The "kickoff" phase here is used for post-goal restarts and the initial
+ * kick. Match lifecycle phases (first-half, etc.) are tracked by the
+ * match runner; the simulation core only needs "playing" vs "goal".
+ */
+export type MatchPhase = "playing" | "goal" | "halftime" | "fulltime" | "kickoff";

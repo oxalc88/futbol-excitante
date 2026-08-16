@@ -1,7 +1,7 @@
 /** @module @pes/contracts/presentation - Immutable presentation snapshot contracts. */
 
 import type { Vec2, Vec3, Heading } from "./math.js";
-import type { BallRegime } from "./state.js";
+import type { BallRegime, MatchPhase } from "./state.js";
 
 /**
  * Immutable presentation facts for a committed tick.
@@ -27,6 +27,8 @@ export interface PresentationSnapshot {
       controlledPlayerId: string | null;
     }>;
   };
+  /** Current match lifecycle phase (set-aware for restarts). */
+  matchPhase: MatchPhase;
 }
 
 /**
