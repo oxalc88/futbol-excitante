@@ -7,11 +7,11 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CPU-TEAM-FORMATION
+next_objective_id: BROWSER-2V2-MATCH-KEYBOARD
 best_known:
   commit: (pending acceptance)
-  note: "CPU-2V2-SCORING accepted — goal detection, scoring, match reset for 2v2. 34 tests, 1348/1348 suite pass, eval layer extended. Advancing to CPU-TEAM-FORMATION: team-specific formation layout + recovery."
-active_candidate: CPU-TEAM-FORMATION
+  note: "CPU-TEAM-FORMATION accepted — formation recovery mechanism (3-way blend: chase + formation + recovery). 16 tests, 1364/1364 suite pass. Advancing to BROWSER-2V2-MATCH-KEYBOARD: 2v2 browser match with keyboard controls."
+active_candidate: BROWSER-2V2-MATCH-KEYBOARD
 builder_in_use: builder-qwen
 critic_in_use: critic-flash
 retry_count: 0
@@ -48,9 +48,9 @@ selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal
 
 ## Last accepted objective
 
-CPU-2V2-SCORING — Extended headless-match runner for multi-slot 2v2 (per-slot CPU adapters, goal reset, autoGoalReset config, score-differential-aware AI). 34 tests covering goal detection, scoring, reset, full-time, determinism. 1348/1348 suite pass.
+CPU-TEAM-FORMATION — Formation recovery mechanism (three-way blend: chase + formation + recovery). FORMATION_RECOVERY_RATE=0.02, computeFormationRecoveryWeight, formationDisplacementTicks state. 16 tests, 1364/1364 suite pass, 0 regressions.
 
 - builder: builder-qwen / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 34/34 scoring tests, 1348/1348 full suite, no regressions
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (second pass after screenshot provided)
+- Evidence: 16/16 formation tests, 1364/1364 full suite, screenshot artifact (known pipeline limitation)

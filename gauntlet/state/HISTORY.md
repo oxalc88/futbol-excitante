@@ -1887,3 +1887,43 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 49 — 2026-08-16
+
+- objective_id: CPU-TEAM-FORMATION
+- builder: builder-qwen / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (second pass, after screenshot provided)
+- result: accepted
+- notes: Formation recovery mechanism — three-way blend in defense mode (chase ←→ existing formation ←→ new recovery). FORMATION_RECOVERY_RATE=0.02, computeFormationRecoveryWeight, formationDisplacementTicks state. 16 tests covering formation positions, displacement tracking, blend behavior, dual-team, determinism, no-shoot-interference. 1364/1364 suite pass, 0 regressions. Screenshot at docs/screenshots/CPU-TEAM-FORMATION/ (blank canvas — known pipeline limitation).
+
+### Critic verdict (ACCEPT — first pass)
+
+```markdown
+## Critic verdict
+- objective_id: CPU-TEAM-FORMATION
+- critic_agent: critic-flash
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT — second pass)
+
+```markdown
+## Integration review
+- objective_id: CPU-TEAM-FORMATION
+- reviewer_agent: integration-reviewer-flash
+- reviewer_model: deepseek-v4-flash
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (1364/1364 full suite, 0 regressions)
+- mandatory_evidence_ok: true
+- critic_evidence_gate_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```

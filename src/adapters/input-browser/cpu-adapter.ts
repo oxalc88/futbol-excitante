@@ -14,6 +14,8 @@
  *  - FIRST_TOUCH: press when within ~1.5 m of a slow ball (defense).
  *  - Always sprint (sprint = 1).
  *  - sourceId is "cpu" — pure provenance, never affects gameplay.
+ *  - Formation recovery: displaced players return toward formation
+ *    position over time, blended with chase direction.
  *
  * Deterministic: same (tick, observation) → same InputFrame.
  * No Math.random, Date, DOM, or Node I/O.
@@ -24,6 +26,8 @@
  *  - FIRST_TOUCH_RANGE, FIRST_TOUCH_SPEED_THRESHOLD
  *  - POSSESSION_SPEED_THRESHOLD, FACING_TOLERANCE_BACKUP
  *  - SHOT_COOLDOWN_TICKS
+ *  - CHASE_FORMATION_THRESHOLD
+ *  - FORMATION_RECOVERY_RATE
  */
 
 import type { InputFrame } from "../../contracts/input.js";
@@ -78,6 +82,8 @@ export interface CpuObservation {
    * Optional formation position for the controlled player.
    * When present, the CPU blends between chasing the ball and
    * holding its formation position while in defense mode.
+   * The position is team-specific and role-aware (deeper players
+   * have formation closer to own goal).
    */
   formationPosition?: { x: number; y: number };
 }
@@ -209,6 +215,9 @@ interface CpuInternalState {
   passWasPressed: boolean;
   /** Remaining cooldown ticks after a shot (prevents immediate re-possession). */
   shotCooldownRemaining: number;
+  /** Consecutive ticks the CPU player has been displaced from formation.
+   * Reset when the player is near their formation position. */
+  formationDisplacementTicks: number;
 }
 
 /**
@@ -333,6 +342,17 @@ const POSSESSION_RANGE_COOLDOWN = 3;
 const CHASE_FORMATION_THRESHOLD = 20;
 
 /**
+ * Formation recovery rate (ticks⁻¹). Controls how quickly the CPU
+ * returns to formation position after being displaced by gameplay.
+ * A value of 0.02 means the recovery weight grows by 0.02 per tick
+ * of displacement (capped at 1). This gives a natural return-to-shape
+ * that complements the existing 20% pull toward own goal.
+ *
+ * Provisional placeholder — not a measured PES value.
+ */
+const FORMATION_RECOVERY_RATE = 0.02;
+
+/**
  * Get the opponent goal x-coordinate for a given team.
  *
  * Convention: team-a attacks +x, team-b attacks -x.
@@ -386,6 +406,35 @@ function getScoreUrgency(scoreDiff?: number): number {
 }
 
 /**
+ * Compute formation recovery weight based on displacement duration
+ * and distance from formation position.
+ *
+ * Returns a value in [0, 1] where:
+ *  - 0 = no recovery influence (chase only)
+ *  - 1 = full recovery (formation only)
+ *
+ * The weight grows linearly with displacement ticks and normalized
+ * distance, creating a smooth pull back toward formation. Capped at
+ * a maximum recovery weight to prevent the CPU from being
+ * immobilised when the ball is nearby.
+ *
+ * Provisional: unmeasured PES 2017 value.
+ */
+function computeFormationRecoveryWeight(
+  displacementTicks: number,
+  distanceFromFormation: number,
+): number {
+  const maxRecoveryWeight = 0.8;
+  const recoveryWeight = Math.min(
+    displacementTicks * FORMATION_RECOVERY_RATE,
+    maxRecoveryWeight,
+  );
+  // Scale by normalized distance so very close players recover slower.
+  const normalizedDistance = Math.min(distanceFromFormation / 5, 1);
+  return recoveryWeight * (0.5 + normalizedDistance * 0.5);
+}
+
+/**
  * Normalize an angle to the range [-PI, PI].
  */
 function normalizeAngle(angle: number): number {
@@ -427,6 +476,7 @@ export function createCpuAdapter(): CpuAdapter {
     hasPossession: false,
     passWasPressed: false,
     shotCooldownRemaining: 0,
+    formationDisplacementTicks: 0,
   };
 
   return {
@@ -496,6 +546,7 @@ export function createCpuAdapter(): CpuAdapter {
       //   Lose: ball beyond POSSESSION_RANGE (or COOLDOWN threshold during cooldown).
       if (state.ballWasInRange) {
         state.hasPossession = true;
+        state.formationDisplacementTicks = 0;
       }
       const effectivePossessionRange = state.shotCooldownRemaining > 0
         ? POSSESSION_RANGE_COOLDOWN
@@ -627,15 +678,26 @@ export function createCpuAdapter(): CpuAdapter {
           const fdx = formPos.x - playerX;
           const fdy = formPos.y - playerY;
           const fDist = Math.sqrt(fdx * fdx + fdy * fdy);
-          if (fDist > 0.001) {
-            // Only blend when the ball is BEHIND the player (toward own goal).
-            // When the ball is ahead, the CPU chases fully regardless.
-            const cpuTeamId = observation.cpuTeamId;
-            const isBehind = cpuTeamId === "team-b"
-              ? ball.position.x > playerX  // team-b own goal at +x; ball > player = behind
-              : ball.position.x < playerX; // team-a own goal at -x; ball < player = behind
 
-            if (isBehind) {
+          // Only blend when the ball is BEHIND the player (toward own goal).
+          // When the ball is ahead, the CPU chases fully regardless.
+          const cpuTeamId = observation.cpuTeamId;
+          const isBehind = cpuTeamId === "team-b"
+            ? ball.position.x > playerX  // team-b own goal at +x; ball > player = behind
+            : ball.position.x < playerX; // team-a own goal at -x; ball < player = behind
+
+          if (isBehind) {
+            // --- Formation recovery: track displacement ---
+            // Reset counter when near formation (within 0.5m), otherwise
+            // increment. This ensures the recovery weight grows naturally
+            // when the player is displaced by gameplay.
+            if (fDist < 0.5) {
+              state.formationDisplacementTicks = 0;
+            } else {
+              state.formationDisplacementTicks++;
+            }
+
+            if (fDist > 0.001) {
               // Blend: 0 = chase, 1 = hold formation.
               //  Within CHASE_FORMATION_THRESHOLD → chase fully
               //  Beyond 2× threshold → formation fully
@@ -645,10 +707,30 @@ export function createCpuAdapter(): CpuAdapter {
                 1,
               );
 
-              moveX = moveX * (1 - formationWeight) + (fdx / fDist) * formationWeight;
-              moveY = moveY * (1 - formationWeight) + (fdy / fDist) * formationWeight;
+              // Formation recovery weight grows with displacement time
+              // and normalized distance from formation position.
+              const recoveryWeight = computeFormationRecoveryWeight(
+                state.formationDisplacementTicks,
+                fDist,
+              );
+
+              // Blend chase with formation direction.
+              // Then blend that result with formation recovery:
+              //  1. chase ←→ formation (distance-based)
+              //  2. intermediate ←→ formation recovery (time-based)
+              const combinedX = moveX * (1 - formationWeight) + (fdx / fDist) * formationWeight;
+              const combinedY = moveY * (1 - formationWeight) + (fdy / fDist) * formationWeight;
+              moveX = combinedX * (1 - recoveryWeight) + (fdx / fDist) * recoveryWeight;
+              moveY = combinedY * (1 - recoveryWeight) + (fdy / fDist) * recoveryWeight;
             }
+          } else {
+            // Ball ahead: reset displacement tracking since
+            // the player is actively chasing, not displaced.
+            state.formationDisplacementTicks = 0;
           }
+        } else {
+          // No formation position — reset displacement tracking.
+          state.formationDisplacementTicks = 0;
         }
 
         // FIRST_TOUCH: press when entering range, hold while in range.
@@ -700,6 +782,7 @@ export function createCpuAdapter(): CpuAdapter {
       state.hasPossession = false;
       state.passWasPressed = false;
       state.shotCooldownRemaining = 0;
+      state.formationDisplacementTicks = 0;
     },
   };
 }

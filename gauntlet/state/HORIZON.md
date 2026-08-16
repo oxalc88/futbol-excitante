@@ -7,7 +7,7 @@ horizon_id: "2v2-playable"
 created_from_commit: c5c66b0
 created_at: 2026-08-16
 reason: "Horizon cpu-team-play exhausted (5/5 accepted). PLAYABLE_1V1 milestone gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, human-needed spec). Next horizon targets a playable 2v2 AI-vs-AI match with CPU teammates passing to each other, team formations, and a full 2v2 browser match experience. These build toward the SMALL_SIDED_SHAPE milestone."
-current_index: 2
+current_index: 3
 objectives:
   - id: CPU-2V2-PASSING
     status: accepted
@@ -20,7 +20,7 @@ objectives:
     builder: builder-qwen
     prerequisite: CPU-2V2-PASSING
   - id: CPU-TEAM-FORMATION
-    status: pending
+    status: accepted
     reason: "Extend CPU-BASIC-FORMATION to include team-specific formation layout. Each team has a defined formation (e.g., 1-1 for 2v2: one defender, one attacker). When players are displaced from their formation positions, they return to formation over time. Adds a simple formation recovery mechanism to complement the existing 20% pull toward own goal."
     builder: builder-qwen
     prerequisite: CPU-BASIC-FORMATION
