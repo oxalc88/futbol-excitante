@@ -1,4 +1,4 @@
-name: Temporary PR9 Plan Applier
+name: Temporary PR9 Validator
 
 on:
   push:
@@ -6,130 +6,58 @@ on:
       - temp/capture-ai-match-video
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  apply:
+  validate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           ref: test/ai-match-ownership-regression
-          fetch-depth: 0
-      - run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Commit video capture tooling
-        run: |
-          cat > scripts/capture-ai-match-video.mjs <<'EOF'
-          import { chromium } from "playwright";
-          import fs from "node:fs";
-          import path from "node:path";
-          const objectiveId = process.env.WIP_SECTION ?? "ai-match";
-          const baseUrl = process.env.WIP_BASE_URL ?? "http://127.0.0.1:5173/src/apps/browser/index.html?mode=ai-match";
-          const durationMs = Number(process.env.WIP_VIDEO_MS ?? 15000);
-          const outDir = path.join("docs", "evidence", objectiveId);
-          const rawDir = path.join(outDir, "raw");
-          fs.mkdirSync(rawDir, { recursive: true });
-          const browser = await chromium.launch({ headless: true });
-          const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, recordVideo: { dir: rawDir, size: { width: 1280, height: 720 } } });
-          const page = await context.newPage();
-          await page.goto(baseUrl, { waitUntil: "networkidle" });
-          await page.waitForTimeout(durationMs);
-          const video = page.video();
-          await context.close();
-          const rawPath = video ? await video.path() : null;
-          await browser.close();
-          if (!rawPath) throw new Error("video capture failed");
-          const webm = path.join(outDir, "ai-match.webm");
-          fs.copyFileSync(rawPath, webm);
-          fs.writeFileSync(path.join(outDir, "video-reference.json"), JSON.stringify({ schemaVersion: 1, objectiveId, commitSha: process.env.GITHUB_SHA ?? "local", workflowRunId: process.env.GITHUB_RUN_ID ?? null, artifactName: process.env.WIP_ARTIFACT_NAME ?? `video-${objectiveId}`, source: "playwright-recordVideo", videoFile: "ai-match.webm" }, null, 2) + "\n");
-          console.log(webm);
-          EOF
-          python3 <<'PY'
-          import json
-          from pathlib import Path
-          p=Path('package.json'); d=json.loads(p.read_text()); d['scripts']['capture-ai-video']='node scripts/capture-ai-match-video.mjs'; p.write_text(json.dumps(d, indent=2)+'\n')
-          PY
-          git add scripts/capture-ai-match-video.mjs package.json
-          git commit -m "feat: add optional video evidence capture"
-          git push origin HEAD:test/ai-match-ownership-regression
-
-      - name: Commit dynamic evidence contract
-        run: |
-          python3 <<'PY'
-          from pathlib import Path
-          p=Path('gauntlet/evidence-contract.md'); s=p.read_text()
-          old='- If a required behavior cannot reasonably be demonstrated by a still image, require supported dynamic evidence only when the repository already contains a committed capture command and rule for it. Do not invent video tooling or a video requirement.\n'
-          new='- If acceptance depends on motion, temporal behavior, autonomous control, passing, shooting, pursuit, transitions, or another multi-tick behavior, a structured trajectory under `docs/evidence/<objective-id>/trajectory.json` is mandatory once the repository provides the committed capture command. Unit tests and a still screenshot alone are insufficient for that integrated behavior.\n- Video is optional diagnostic evidence. When captured, use `pnpm run capture-ai-video`; keep the binary as a GitHub Actions artifact and retain `video-reference.json` with objective ID, commit SHA, workflow run ID, and artifact name. Video does not replace the structured trajectory.\n'
-          if old not in s: raise SystemExit('evidence contract anchor not found')
-          p.write_text(s.replace(old,new))
-          PY
-          git add gauntlet/evidence-contract.md
-          git commit -m "docs: require trajectories for dynamic gameplay evidence"
-          git push origin HEAD:test/ai-match-ownership-regression
-
-      - name: Commit composition regression gate
-        run: |
-          python3 <<'PY'
-          from pathlib import Path
-          p=Path('gauntlet/evals/contracts/failures.ts'); s=p.read_text().replace('  "mandatory_evidence_missing",', '  "mandatory_evidence_missing",\n  "composition_regression",'); p.write_text(s)
-          p=Path('gauntlet/evals/contracts/scenario.ts'); s=p.read_text()
-          s=s.replace('  | "tracking_gate";', '  | "tracking_gate"\n  | "composition_gate";')
-          insert='''\nexport interface CompositionGateScenario {\n  id: string;\n  kind: "composition_gate";\n  input: {\n    objective_id: string;\n    integrated_behavior: boolean;\n    unit_tests_pass: boolean;\n    screenshot_exists: boolean;\n    integration_test_pass: boolean;\n    trajectory_exists: boolean;\n    critic_verdict: "ACCEPT" | "RETRY" | "REJECT";\n  };\n  expect: ScenarioExpectation;\n}\n'''
-          s=s.replace('\nexport type GauntletScenario =', insert+'\nexport type GauntletScenario =')
-          s=s.replace('  | TrackingGateScenario;', '  | TrackingGateScenario\n  | CompositionGateScenario;')
-          p.write_text(s)
-          p=Path('gauntlet/evals/src/evaluate-state.ts'); s=p.read_text()
-          s=s.replace('  TrackingGateScenario,', '  TrackingGateScenario,\n  CompositionGateScenario,')
-          fn='''\nfunction evaluateComposition(scenario: CompositionGateScenario): EvaluationResult {\n  const complete = !scenario.input.integrated_behavior ||\n    (scenario.input.integration_test_pass && scenario.input.trajectory_exists);\n  if (!complete && scenario.input.critic_verdict === "ACCEPT") {\n    return { scenario_id: scenario.id, decision: "reject_acceptance", failure_class: "composition_regression" };\n  }\n  return { scenario_id: scenario.id, decision: "allow_review_result" };\n}\n\n'''
-          s=s.replace('export function evaluateScenario', fn+'export function evaluateScenario')
-          s=s.replace('    case "tracking_gate":\n      return evaluateTracking(scenario);', '    case "tracking_gate":\n      return evaluateTracking(scenario);\n    case "composition_gate":\n      return evaluateComposition(scenario);')
-          p.write_text(s)
-          PY
-          cat > gauntlet/evals/scenarios/orch-reg-007-composition-regression.json <<'EOF'
-          {
-            "id": "ORCH-REG-007",
-            "kind": "composition_gate",
-            "input": {
-              "objective_id": "CPU-BALL-PURSUIT",
-              "integrated_behavior": true,
-              "unit_tests_pass": true,
-              "screenshot_exists": true,
-              "integration_test_pass": false,
-              "trajectory_exists": false,
-              "critic_verdict": "ACCEPT"
-            },
-            "expect": { "decision": "reject_acceptance", "failure_class": "composition_regression" }
-          }
-          EOF
-          git add gauntlet/evals/contracts/failures.ts gauntlet/evals/contracts/scenario.ts gauntlet/evals/src/evaluate-state.ts gauntlet/evals/scenarios/orch-reg-007-composition-regression.json
-          git commit -m "eval: reject unproven integrated behavior"
-          git push origin HEAD:test/ai-match-ownership-regression
-
-      - name: Commit orchestrator gate documentation
-        run: |
-          python3 <<'PY'
-          from pathlib import Path
-          p=Path('gauntlet/PROMPT.md'); s=p.read_text()
-          old='4. Determine the mandatory evidence required by `gauntlet/evidence-contract.md`. Any gameplay/presentation objective and any objective whose acceptance criteria require browser-visible or browser-interactive behavior is screenshot-required. Require a builder report with executed commands and all required artifacts before criticism; missing mandatory evidence goes back to the builder.'
-          new='4. Determine the mandatory evidence required by `gauntlet/evidence-contract.md`. Any gameplay/presentation objective and any objective whose acceptance criteria require browser-visible or browser-interactive behavior is screenshot-required. For integrated multi-tick behavior, unit tests plus a screenshot are not sufficient: require the supported structured trajectory and the relevant integration test; video is optional diagnostic evidence when the committed capture workflow is applicable. Require a builder report with executed commands and all required artifacts before criticism; missing mandatory evidence goes back to the builder.'
-          if old not in s: raise SystemExit('prompt anchor not found')
-          p.write_text(s.replace(old,new))
-          PY
-          git add gauntlet/PROMPT.md
-          git commit -m "docs: gate integrated capabilities on end-to-end evidence"
-          git push origin HEAD:test/ai-match-ownership-regression
-
-      - name: Validate
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
         env:
           PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
+      - name: Typecheck
+        run: pnpm run typecheck
+      - name: Focused AI-match integration regressions
+        run: pnpm exec vitest run tests/integration/ai-match-cpu-ownership.test.ts tests/integration/ai-match-autonomous-interaction.test.ts --project node
+      - name: Gauntlet regression evals
+        run: pnpm run gauntlet:eval
+      - name: Capture structured trajectory
+        run: pnpm run capture-ai-trajectory
+        env:
+          WIP_SECTION: PR9-VALIDATION
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Browser AI-match regression
+        run: pnpm exec vitest run tests/browser/ai-match-screenshot.browser.test.ts --project browser
+      - name: Start Vite
         run: |
-          corepack enable
-          corepack prepare pnpm@11.10.0 --activate
-          pnpm install --frozen-lockfile
-          pnpm run typecheck
-          pnpm run test
-          pnpm run gauntlet:eval
+          pnpm exec vite --host 127.0.0.1 > /tmp/vite.log 2>&1 &
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:5173/src/apps/browser/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/vite.log
+          exit 1
+      - name: Capture optional video evidence
+        run: pnpm run capture-ai-video
+        env:
+          WIP_SECTION: PR9-VALIDATION
+          WIP_VIDEO_MS: 3000
+          WIP_ARTIFACT_NAME: pr9-validation
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr9-validation-evidence
+          path: docs/evidence/PR9-VALIDATION/
+          if-no-files-found: error
+          retention-days: 3
