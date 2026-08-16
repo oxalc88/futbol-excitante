@@ -1,0 +1,8 @@
+{
+  "mode": "2v2-ai",
+  "tick": "600 (ball contacted at ~149)",
+  "players": 4,
+  "bytes": 20552,
+  "note": "Canvas capture via WebGL readPixels after CPU-driven 2v2 AI match. Ball velocity changed from 0 to -4.65 m/s via FIRST_TOUCH contact at ~tick 149.",
+  "timestamp": "2026-08-16T17:43:00Z"
+}

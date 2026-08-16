@@ -175,3 +175,56 @@ describe("BROWSER-SCENARIO-SELECTOR-006: ?mode=human-vs-ai", () => {
     expect(scenario.durationTicks).toBe(5400);
   });
 });
+
+// ---------------------------------------------------------------------------
+// 7. ?mode=2v2 → 2v2 keyboard scenario
+// ---------------------------------------------------------------------------
+
+describe("BROWSER-SCENARIO-SELECTOR-007: ?mode=2v2", () => {
+  it("returns 2v2 keyboard scenario for ?mode=2v2", async () => {
+    const { FOUNDATION_SCENARIO_2V2_KEYBOARD } =
+      await import("../../src/apps/browser/foundation-scenario.js");
+    const scenario = selectBrowserScenario("?mode=2v2");
+    expect(scenario).toBe(FOUNDATION_SCENARIO_2V2_KEYBOARD);
+  });
+
+  it("2v2 keyboard scenario has 4 players (2 per team)", () => {
+    const scenario = selectBrowserScenario("?mode=2v2");
+    const world = createWorld({ scenario });
+    expect(world.players.length).toBe(4);
+    const teamA = world.players.filter((p) => p.teamId === "team-a");
+    const teamB = world.players.filter((p) => p.teamId === "team-b");
+    expect(teamA).toHaveLength(2);
+    expect(teamB).toHaveLength(2);
+  });
+
+  it("2v2 keyboard scenario has 1 HUMAN slot and 3 AI_FALLBACK slots", () => {
+    const scenario = selectBrowserScenario("?mode=2v2");
+    const assignments = scenario.controlAssignments;
+    const modes = Object.values(assignments).map((a) => a.mode);
+    const humanCount = modes.filter((m) => m === "HUMAN").length;
+    const cpuCount = modes.filter((m) => m === "AI_FALLBACK").length;
+    expect(humanCount).toBe(1);
+    expect(cpuCount).toBe(3);
+  });
+
+  it("slot-1 is HUMAN and slots 2-4 are AI_FALLBACK", () => {
+    const scenario = selectBrowserScenario("?mode=2v2");
+    expect(scenario.controlAssignments["slot-1"].mode).toBe("HUMAN");
+    expect(scenario.controlAssignments["slot-1"].teamId).toBe("team-a");
+    expect(scenario.controlAssignments["slot-1"].controlledPlayerId).toBe("player-1");
+    expect(scenario.controlAssignments["slot-2"].mode).toBe("AI_FALLBACK");
+    expect(scenario.controlAssignments["slot-3"].mode).toBe("AI_FALLBACK");
+    expect(scenario.controlAssignments["slot-4"].mode).toBe("AI_FALLBACK");
+  });
+
+  it("2v2 keyboard scenario has 5400 ticks duration", () => {
+    const scenario = selectBrowserScenario("?mode=2v2");
+    expect(scenario.durationTicks).toBe(5400);
+  });
+
+  it("2v2 keyboard scenario has 4 control slots", () => {
+    const scenario = selectBrowserScenario("?mode=2v2");
+    expect(Object.keys(scenario.controlAssignments)).toHaveLength(4);
+  });
+});

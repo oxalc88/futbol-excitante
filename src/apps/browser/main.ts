@@ -45,13 +45,15 @@ const SCENARIO_DATA: ScenarioDefinition = selectBrowserScenario(
 );
 
 /**
- * Detect AI-vs-AI match mode from URL: ?mode=ai-match
+ * Detect AI-vs-AI match mode from URL: ?mode=ai-match or ?mode=2v2-ai
  *
  * When enabled, all control slots use CPU adapters (no keyboard input).
  * The match runs fully autonomously as a standalone viewer.
+ * `?mode=2v2-ai` is a shorthand alias for `?mode=ai-match&scenario=2v2`.
  */
+const URL_MODE = new URLSearchParams(window.location.search).get("mode");
 const IS_AI_MATCH =
-  new URLSearchParams(window.location.search).get("mode") === "ai-match";
+  URL_MODE === "ai-match" || URL_MODE === "2v2-ai";
 
 /**
  * Detect human-vs-CPU match mode from URL: ?mode=human-vs-ai
@@ -500,6 +502,14 @@ function main(): void {
     const hint = document.getElementById("controls-hint");
     if (hint) {
       hint.textContent = "2v2 Match — Arrow keys + Space to sprint";
+    }
+  }
+
+  // Update controls hint for 2v2-AI mode.
+  if (URL_MODE === "2v2-ai") {
+    const hint = document.getElementById("controls-hint");
+    if (hint) {
+      hint.textContent = "2v2 AI Match — fully autonomous";
     }
   }
 }
