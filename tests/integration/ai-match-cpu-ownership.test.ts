@@ -35,7 +35,7 @@ describe("AI-MATCH-E2E-001: CPU slot ownership and pursuit", () => {
     const frameA = cpuA.sample(0, buildCpuObservation(world, "team-a"));
     const frameB = cpuB.sample(0, buildCpuObservation(world, "team-b"));
 
-    // player-a starts at x=-5 and should move toward +x to reach the ball.
+    // player-a owns kickoff from x=-0.5 and should move toward +x.
     expect(frameA.moveX).toBeGreaterThan(0);
     // player-b starts at x=+5 and should move toward -x to reach the ball.
     expect(frameB.moveX).toBeLessThan(0);
