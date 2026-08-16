@@ -22,7 +22,10 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: CI=1 pnpm install --frozen-lockfile
+      - name: Install dependencies for temporary validation
+        run: |
+          pnpm config set dangerously-allow-all-builds true
+          pnpm install --frozen-lockfile
       - name: Typecheck
         run: pnpm run typecheck
       - name: Deterministic Gauntlet regressions
