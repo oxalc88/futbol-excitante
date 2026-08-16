@@ -1807,3 +1807,43 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 47 — 2026-08-16
+
+- objective_id: CPU-2V2-PASSING
+- builder: builder-qwen / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (screenshot quality noted — blank canvas, known pipeline limitation)
+- result: accepted
+- notes: No source code changes needed — existing CPU adapter passing logic from CPU-TEAMMATE-PASS already works correctly for 2v2 topology. 31 new tests (2v2-passing.test.ts) covering: beyond-shot-range PASS_BIT, pass target direction, pass overrides move direction, 2v2 forward teammate, multi-tick continuity, shot priority, determinism. 145/145 CPU adapter suite pass. Screenshot artifact at docs/screenshots/CPU-2V2-PASSING/ (blank canvas — known headless WebGL pipeline limitation).
+
+### Critic verdict (ACCEPT — first pass)
+
+```markdown
+## Critic verdict
+- objective_id: CPU-2V2-PASSING
+- critic_agent: critic-flash
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CPU-2V2-PASSING
+- reviewer_agent: integration-reviewer-flash
+- reviewer_model: deepseek-v4-flash
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (145/145 CPU adapter suite)
+- mandatory_evidence_ok: true
+- critic_evidence_gate_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```

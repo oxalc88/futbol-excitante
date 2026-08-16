@@ -7,11 +7,11 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: null
+next_objective_id: CPU-2V2-SCORING
 best_known:
   commit: (pending acceptance)
-  note: "BROWSER-HUMAN-VS-CPU accepted. ?mode=human-vs-ai URL routing, slot-1 keyboard + 3 AI_FALLBACK CPU adapters. 1283/1283 suite pass. Horizon cpu-team-play exhausted (5/5 objectives accepted)."
-active_candidate: null
+  note: "CPU-2V2-PASSING accepted — existing passing logic verified for 2v2 topology, 31 unit tests. Advancing to CPU-2V2-SCORING: goal detection, scoring, match reset for 2v2."
+active_candidate: CPU-2V2-SCORING
 builder_in_use: builder-qwen
 critic_in_use: critic-flash
 retry_count: 0
@@ -48,9 +48,9 @@ selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal
 
 ## Last accepted objective
 
-BROWSER-HUMAN-VS-CPU — ?mode=human-vs-ai URL routing. 4-player fixture: slot-1 HUMAN, slots 2-4 AI_FALLBACK. Browser keyboard adapter for HUMAN slot + per-slot CPU adapters for AI_FALLBACK. 16 selector tests, 1283/1283 full suite pass.
+CPU-2V2-PASSING — Existing CPU adapter passing logic verified for 2v2 topology. No source code changes — 31 new tests cover beyond-shot-range PASS_BIT, pass target direction, multi-tick continuity, shot priority, determinism. 145/145 CPU adapter suite pass.
 
-- builder: builder-mimo / mimo-v2.5 (crashed mid-run, work complete)
-- critic: critic-flash / deepseek-v4-flash — RETRY (screenshot quality)
+- builder: builder-qwen / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 16/16 selector tests, 1283/1283 full suite, screenshot artifact (known pipeline limitation)
+- Evidence: 31/31 passing tests, 145/145 CPU adapter suite, screenshot artifact (known pipeline limitation)

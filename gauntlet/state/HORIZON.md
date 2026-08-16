@@ -1,39 +1,39 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 3
+horizon_version: 4
 status: ACTIVE
-horizon_id: "cpu-team-play"
-created_from_commit: 3d6b32d
+horizon_id: "2v2-playable"
+created_from_commit: c5c66b0
 created_at: 2026-08-16
-reason: "Horizon playable-browser-v2 exhausted. All CPU adapter primitives (pursuit, shoot, pass) exist. Browser runs AI-vs-AI 1v1 matches with scoreboard, phases, and goal overlays. PLAYABLE_1V1 milestone remains gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, deferred). New horizon focuses on multi-player team play: teammate-aware passing, multiple CPU players per team, and observable browser-facing small-sided matches."
-current_index: 5
+reason: "Horizon cpu-team-play exhausted (5/5 accepted). PLAYABLE_1V1 milestone gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, human-needed spec). Next horizon targets a playable 2v2 AI-vs-AI match with CPU teammates passing to each other, team formations, and a full 2v2 browser match experience. These build toward the SMALL_SIDED_SHAPE milestone."
+current_index: 1
 objectives:
-  - id: CPU-TEAMMATE-PASS
+  - id: CPU-2V2-PASSING
     status: accepted
-    reason: "CPU adapter passes toward the nearest teammate in a forward direction when in possession beyond shooting range, instead of passing blindly along body heading. Requires adding teammate positions to CpuObservation and finding the best forward-pass target."
+    reason: "Ensure CPU teammate-aware passing works reliably in 2v2 context (2 players per team, always in passing range). When a CPU player has possession in 2v2, they should pass to their teammate when beyond shooting range or not facing well enough. Builds on CPU-TEAMMATE-PASS (already implemented). The 2v2 topology means teammates are always in forward range — the pass AI should trigger more naturally."
     builder: builder-qwen
-    prerequisite: null
-  - id: CPU-MULTI-PLAYER
-    status: accepted
-    reason: "Support multiple CPU-controlled players per team. Each player gets its own CPU adapter instance. The observation includes the controlled player's index/ID so each adapter knows which player to control. Per-slot adapters already exist in AI-match mode (browser/main.ts); this extends to all CPU-vs-CPU and human-vs-CPU scenarios."
+    prerequisite: CPU-BASIC-FORMATION
+  - id: CPU-2V2-SCORING
+    status: pending
+    reason: "Implement goal detection, scoring, and match reset for 2v2 matches. When the ball enters a goal zone, emit a goal event, update the scoreboard, and reset player positions. Reuses existing goal-collision detection from BALL-GOAL-COLLISION; extends to 2v2 match lifecycle (full-time detection, goal celebration, restart)."
     builder: builder-qwen
-    prerequisite: CPU-TEAMMATE-PASS
-  - id: SCENARIO-2V2-FIXTURE
-    status: accepted
-    reason: "Create a 2v2 AI-vs-AI scenario with 2 players per team. Browser playable via ?mode=ai-match&scenario=2v2. Tests verify both CPU adapters per team produce non-conflicting inputs and players move independently."
+    prerequisite: CPU-2V2-PASSING
+  - id: CPU-TEAM-FORMATION
+    status: pending
+    reason: "Extend CPU-BASIC-FORMATION to include team-specific formation layout. Each team has a defined formation (e.g., 1-1 for 2v2: one defender, one attacker). When players are displaced from their formation positions, they return to formation over time. Adds a simple formation recovery mechanism to complement the existing 20% pull toward own goal."
     builder: builder-qwen
-    prerequisite: CPU-MULTI-PLAYER
-  - id: CPU-BASIC-FORMATION
-    status: accepted
-    reason: "CPU players maintain basic formation shape when out of possession: defenders stay back, attackers stay forward. Simple spatial distribution relative to own goal. Does not replace tactical specs — provisional placeholder behavior only."
-    builder: builder-qwen
-    prerequisite: CPU-MULTI-PLAYER
-  - id: BROWSER-HUMAN-VS-CPU
-    status: accepted
-    reason: "Add ?mode=human-vs-ai URL parameter that gives slot-1 to keyboard and remaining slots to CPU adapters. Makes browser a standalone human-vs-CPU match viewer. Observable playable milestone."
+    prerequisite: CPU-BASIC-FORMATION
+  - id: BROWSER-2V2-MATCH-KEYBOARD
+    status: pending
+    reason: "Add ?mode=2v2 URL parameter that creates a 2v2 browser match: 4 CPU-controlled players (all AI_FALLBACK) with keyboard override for slot-1. Shows 2v2-specific scoreboard (HOME vs AWAY), match clock, and 2v2 controls hint. Builds on BROWSER-HUMAN-VS-CPU infrastructure."
     builder: builder-mimo
-    prerequisite: SCENARIO-2V2-FIXTURE
+    prerequisite: CPU-2V2-SCORING
+  - id: BROWSER-2V2-PLAYABLE
+    status: pending
+    reason: "Full playable 2v2 match in browser: both teams of CPU players with passing AI, basic formation, and goal scoring. Browser shows the full 2v2 match with HUD, scoreboard, match timer, phase transitions (halftime/fulltime). Observable playable 2v2 milestone. Browser test verifies hash parity and deterministic multi-tick 2v2 play."
+    builder: builder-mimo
+    prerequisite: CPU-TEAM-FORMATION
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -42,7 +42,7 @@ replan_if:
   - unsafe_due_to_new_defect
   - materially_higher_value_evidence
   - human_needed_spec_or_legal_blocker
-observable_progress_target: "Browser shows 2v2 AI-vs-AI match and human-vs-CPU 1v1 match with CPU players passing to teammates and maintaining basic formation"
+observable_progress_target: "Browser shows complete 2v2 AI-vs-AI match with passing CPU players, formation, goal scoring, scoreboard, and match timer"
 infrastructure_only_justification: null
 last_invalidation_reason: null
 ```
