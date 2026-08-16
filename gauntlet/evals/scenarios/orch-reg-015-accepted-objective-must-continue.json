@@ -1,0 +1,13 @@
+{
+  "id": "ORCH-REG-015",
+  "kind": "post_acceptance_continuation_gate",
+  "input": {
+    "acceptance_finalized": true,
+    "horizon_exhausted": true,
+    "next_objective": null,
+    "stop_reason": null
+  },
+  "expect": {
+    "decision": "replan_and_continue"
+  }
+}
