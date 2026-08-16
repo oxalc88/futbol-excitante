@@ -40,6 +40,14 @@ import type { WorldState } from "../../contracts/state.js";
  * scoreDifferential is an optional score-state awareness signal:
  * (cpuTeamGoals - opponentGoals).  Positive means CPU is ahead.
  */
+/** A teammate position known to the CPU. */
+export interface CpuTeammate {
+  /** Unique identifier for the teammate player. */
+  playerId: string;
+  /** 2-D ground position on the pitch. */
+  groundPosition: { x: number; y: number };
+}
+
 export interface CpuObservation {
   /** All players on the pitch. */
   players: Array<{
@@ -62,6 +70,10 @@ export interface CpuObservation {
   cpuTeamId?: string;
   /** Optional score differential (cpuGoals - opponentGoals). */
   scoreDifferential?: number;
+  /** Optional teammate positions (same team, other controlled players). */
+  teammates?: CpuTeammate[];
+  /** The CPU's own controlled player ID. */
+  controlledPlayerId?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -90,6 +102,22 @@ export function buildCpuObservation(
     if (typeof pw === "number") pitchWidth = pw;
   }
 
+  // Populate teammates from world state: same teamId, different playerId
+  // from the first CPU-controlled player.
+  const controlledPlayerId =
+    cpuTeamId && world.players.length > 0 ? world.players[0].playerId : undefined;
+  const teammates: CpuTeammate[] = [];
+  if (cpuTeamId) {
+    for (const p of world.players) {
+      if (p.teamId === cpuTeamId && p.playerId !== controlledPlayerId) {
+        teammates.push({
+          playerId: p.playerId,
+          groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
+        });
+      }
+    }
+  }
+
   return {
     players: world.players.map((p) => ({
       playerId: p.playerId,
@@ -114,6 +142,8 @@ export function buildCpuObservation(
     pitchLength,
     pitchWidth,
     cpuTeamId,
+    teammates: teammates.length > 0 ? teammates : undefined,
+    controlledPlayerId,
   };
 }
 
@@ -151,6 +181,52 @@ interface CpuInternalState {
   passWasPressed: boolean;
   /** Remaining cooldown ticks after a shot (prevents immediate re-possession). */
   shotCooldownRemaining: number;
+}
+
+/**
+ * Find the best teammate to pass to.
+ *
+ * Filters to teammates in a forward direction (toward opponent goal)
+ * and returns the nearest one.  Falls back to undefined when no
+ * forward teammate exists.
+ *
+ * Direction is forward when the dot product of
+ * (teammatePos - playerPos) with the attack direction is positive.
+ * Attack direction: +x for team-a, -x for team-b.
+ */
+function getBestTeammateTarget(
+  teammates: CpuTeammate[],
+  playerPos: { x: number; y: number },
+  cpuTeamId: string,
+): { x: number; y: number } | undefined {
+  const attackingX = cpuTeamId === "team-b" ? -1 : 1;
+  let best: { x: number; y: number; dist: number } | undefined;
+
+  for (const tm of teammates) {
+    const dx = tm.groundPosition.x - playerPos.x;
+    const dy = tm.groundPosition.y - playerPos.y;
+
+    // Forward check: dot product with attack direction > 0.
+    if (dx * attackingX <= 0) {
+      continue;
+    }
+
+    const distSq = dx * dx + dy * dy;
+    if (!best || distSq < best.dist) {
+      best = { x: tm.groundPosition.x, y: tm.groundPosition.y, dist: distSq };
+    }
+  }
+
+  return best ? { x: best.x, y: best.y } : undefined;
+}
+
+/**
+ * Normalize a 2-D direction vector, clamping the magnitude to 1.
+ */
+function normalizeVec2(x: number, y: number): { dx: number; dy: number } {
+  const len = Math.sqrt(x * x + y * y);
+  if (len < 0.001) return { dx: 0, dy: 0 };
+  return { dx: x / len, dy: y / len };
 }
 
 // ---------------------------------------------------------------------------
@@ -443,6 +519,23 @@ export function createCpuAdapter(): CpuAdapter {
           // Hold while condition persists.
           if (shouldPressPass) {
             heldButtons |= PASS_BIT;
+          }
+
+          // Aim the pass toward the nearest forward teammate when available.
+          if (shouldPressPass && observation.teammates &&
+              observation.teammates.length > 0 && cpuTeamId) {
+            const target = getBestTeammateTarget(
+              observation.teammates,
+              { x: playerX, y: playerY },
+              cpuTeamId,
+            );
+            if (target) {
+              const aimDx = target.x - playerX;
+              const aimDy = target.y - playerY;
+              const normalized = normalizeVec2(aimDx, aimDy);
+              moveX = normalized.dx;
+              moveY = normalized.dy;
+            }
           }
         }
 

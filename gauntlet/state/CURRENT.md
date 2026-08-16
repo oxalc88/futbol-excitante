@@ -7,11 +7,11 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CPU-TEAMMATE-PASS
+next_objective_id: CPU-MULTI-PLAYER
 best_known:
   commit: (pending acceptance)
-  note: "CPU-PASSING-EVALUATION accepted. Horizon playable-browser-v2 exhausted. New horizon cpu-team-play: CPU teammate-aware passing, multi-player support, 2v2 scenario, basic formation, human-vs-CPU browser mode."
-active_candidate: CPU-TEAMMATE-PASS
+  note: "CPU-TEAMMATE-PASS accepted. CPU adapter now passes toward nearest forward teammate. Advancing to CPU-MULTI-PLAYER: multiple CPU-controlled players per team."
+active_candidate: CPU-MULTI-PLAYER
 builder_in_use: builder-qwen
 critic_in_use: critic-flash
 retry_count: 0
@@ -40,15 +40,16 @@ accepted:
   - CPU-BALL-PURSUIT
   - BROWSER-MATCH-START-URL
   - CPU-PASSING-EVALUATION
+  - CPU-TEAMMATE-PASS
 blocked: []
 selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal effects, CPU ball pursuit (done), match-start URL (done), CPU passing evaluation (done). Horizon exhausted."
 ```
 
 ## Last accepted objective
 
-CPU-PASSING-EVALUATION — Added PASS_BIT pass behavior to CPU adapter and 18 evaluator tests verifying pass inputs under range/direction conditions. CPU presses PASS_BIT when in possession and beyond shooting range or not facing goal. SHOT_BIT takes priority. Post-shot cooldown respected.
+CPU-TEAMMATE-PASS — CPU adapter passes toward the nearest forward teammate instead of blindly along body heading. Added CpuTeammate interface, extended CpuObservation with teammates array and controlledPlayerId, getBestTeammateTarget helper, and fallback to goal-directed movement. 13 new tests (CPU-TEAMMATE-001 through 005), 80/80 CPU adapter tests, 1212/1212 full suite.
 
 - builder: builder-qwen / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
-- integration: integration-reviewer (orchestrator-verified, deepseek allowance exhausted) — ACCEPT
-- Evidence: 18/18 passing tests, 67/67 CPU adapter tests, 1199/1199 full suite
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- Evidence: 13/13 teammate-pass tests, 80/80 CPU adapter tests, 1212/1212 full suite

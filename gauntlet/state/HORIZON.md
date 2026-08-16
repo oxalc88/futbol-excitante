@@ -7,10 +7,10 @@ horizon_id: "cpu-team-play"
 created_from_commit: 3d6b32d
 created_at: 2026-08-16
 reason: "Horizon playable-browser-v2 exhausted. All CPU adapter primitives (pursuit, shoot, pass) exist. Browser runs AI-vs-AI 1v1 matches with scoreboard, phases, and goal overlays. PLAYABLE_1V1 milestone remains gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, deferred). New horizon focuses on multi-player team play: teammate-aware passing, multiple CPU players per team, and observable browser-facing small-sided matches."
-current_index: 0
+current_index: 1
 objectives:
   - id: CPU-TEAMMATE-PASS
-    status: pending
+    status: accepted
     reason: "CPU adapter passes toward the nearest teammate in a forward direction when in possession beyond shooting range, instead of passing blindly along body heading. Requires adding teammate positions to CpuObservation and finding the best forward-pass target."
     builder: builder-qwen
     prerequisite: null
