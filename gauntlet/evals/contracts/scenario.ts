@@ -6,7 +6,8 @@ export type ScenarioKind =
   | "horizon_validation"
   | "routing_fallback"
   | "continuation"
-  | "tracking_gate";
+  | "tracking_gate"
+  | "composition_gate";
 
 export interface ScenarioExpectation {
   decision: string;
@@ -78,12 +79,28 @@ export interface TrackingGateScenario {
   expect: ScenarioExpectation;
 }
 
+export interface CompositionGateScenario {
+  id: string;
+  kind: "composition_gate";
+  input: {
+    objective_id: string;
+    integrated_behavior: boolean;
+    unit_tests_pass: boolean;
+    screenshot_exists: boolean;
+    integration_test_pass: boolean;
+    trajectory_exists: boolean;
+    critic_verdict: "ACCEPT" | "RETRY" | "REJECT";
+  };
+  expect: ScenarioExpectation;
+}
+
 export type GauntletScenario =
   | EvidenceGateScenario
   | HorizonValidationScenario
   | RoutingFallbackScenario
   | ContinuationScenario
-  | TrackingGateScenario;
+  | TrackingGateScenario
+  | CompositionGateScenario;
 
 export interface EvaluationResult extends ScenarioExpectation {
   scenario_id: string;

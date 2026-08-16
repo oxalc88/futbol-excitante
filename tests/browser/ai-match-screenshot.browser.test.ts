@@ -41,7 +41,7 @@ describe("AI-vs-AI match screenshot capture", () => {
     await bridge.reset();
 
     // Advance simulation 120 ticks (2 seconds at 60 Hz) to show activity.
-    bridge.step(120);
+    bridge.stepWithCpuControllers(120);
 
     // Render and capture.
     bridge.renderFrame();

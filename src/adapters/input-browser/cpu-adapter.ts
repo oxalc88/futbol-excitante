@@ -105,15 +105,15 @@ export function buildCpuObservation(
     if (typeof pw === "number") pitchWidth = pw;
   }
 
-  // Populate teammates from world state: same teamId, different playerId.
-  // controlledPlayerId: use the explicit parameter if set, otherwise the first player.
-  const controlledPlayerId_ = controlledPlayerId ?? (cpuTeamId && world.players.length > 0
-    ? world.players[0].playerId
-    : undefined);
+  // Resolve the exact player controlled by this CPU slot. Prefer the
+  // control assignment supplied by the caller; fall back to the first player
+  // on the requested team only for legacy single-CPU callers.
+  const resolvedControlledPlayerId = controlledPlayerId ??
+    (cpuTeamId ? world.players.find((p) => p.teamId === cpuTeamId)?.playerId : world.players[0]?.playerId);
   const teammates: CpuTeammate[] = [];
   if (cpuTeamId) {
     for (const p of world.players) {
-      if (p.teamId === cpuTeamId && p.playerId !== controlledPlayerId_) {
+      if (p.teamId === cpuTeamId && p.playerId !== resolvedControlledPlayerId) {
         teammates.push({
           playerId: p.playerId,
           groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
@@ -147,7 +147,7 @@ export function buildCpuObservation(
     pitchWidth,
     cpuTeamId,
     teammates: teammates.length > 0 ? teammates : undefined,
-    controlledPlayerId: controlledPlayerId_,
+    controlledPlayerId: resolvedControlledPlayerId,
   };
 }
 

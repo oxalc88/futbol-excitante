@@ -7,6 +7,7 @@ import type {
   HorizonValidationScenario,
   RoutingFallbackScenario,
   TrackingGateScenario,
+  CompositionGateScenario,
 } from "../contracts/scenario.js";
 
 function evaluateEvidence(scenario: EvidenceGateScenario): EvaluationResult {
@@ -126,6 +127,16 @@ function evaluateTracking(scenario: TrackingGateScenario): EvaluationResult {
   return { scenario_id: scenario.id, decision: "tracking_complete" };
 }
 
+
+function evaluateComposition(scenario: CompositionGateScenario): EvaluationResult {
+  const complete = !scenario.input.integrated_behavior ||
+    (scenario.input.integration_test_pass && scenario.input.trajectory_exists);
+  if (!complete && scenario.input.critic_verdict === "ACCEPT") {
+    return { scenario_id: scenario.id, decision: "reject_acceptance", failure_class: "composition_regression" };
+  }
+  return { scenario_id: scenario.id, decision: "allow_review_result" };
+}
+
 export function evaluateScenario(scenario: GauntletScenario): EvaluationResult {
   switch (scenario.kind) {
     case "evidence_gate":
@@ -138,5 +149,7 @@ export function evaluateScenario(scenario: GauntletScenario): EvaluationResult {
       return evaluateContinuation(scenario);
     case "tracking_gate":
       return evaluateTracking(scenario);
+    case "composition_gate":
+      return evaluateComposition(scenario);
   }
 }

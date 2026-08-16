@@ -4,6 +4,7 @@ export const GAUNTLET_FAILURE_CLASSES = [
   "horizon_invariant",
   "reviewer_routing",
   "mandatory_evidence_missing",
+  "composition_regression",
   "invalid_acceptance",
   "state_transition",
   "tracking_missing",

@@ -17,7 +17,9 @@
     "test": "vitest run --project node",
     "test-browser": "vitest run --project browser",
     "capture-wip": "WIP_SECTION=${WIP_SECTION:-capture} WIP_FRAMES=${WIP_FRAMES:-1} vitest run tests/browser/capture-wip.browser.test.ts --project browser",
-    "test-all": "CI=1 pnpm install --frozen-lockfile && CI=1 pnpm run gauntlet:eval && CI=1 pnpm run typecheck && CI=1 pnpm run test && CI=1 pnpm run test-browser && CI=1 pnpm run sim-smoke && pnpm run build"
+    "test-all": "CI=1 pnpm install --frozen-lockfile && CI=1 pnpm run gauntlet:eval && CI=1 pnpm run typecheck && CI=1 pnpm run test && CI=1 pnpm run test-browser && CI=1 pnpm run sim-smoke && pnpm run build",
+    "capture-ai-trajectory": "tsx scripts/capture-ai-match-trajectory.ts",
+    "capture-ai-video": "node scripts/capture-ai-match-video.mjs"
   },
   "dependencies": {
     "three": "^0.170.0"

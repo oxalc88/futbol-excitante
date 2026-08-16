@@ -32,6 +32,7 @@ import type { PresentationSession } from "../../adapters/renderer-three/renderer
 import type { InputFrame } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
 import type { PresentationSnapshot } from "../../contracts/presentation.js";
+import { buildCpuObservation, createCpuAdapter } from "../../adapters/input-browser/cpu-adapter.js";
 
 // ---------------------------------------------------------------------------
 // Test bridge interface
@@ -71,6 +72,9 @@ export interface TestBridge {
    * @returns Array of per-tick state hashes.
    */
   step(ticks: number): string[];
+
+  /** Advance with the same per-slot CPU wiring used by the AI-match browser. */
+  stepWithCpuControllers(ticks: number): string[];
 
   /**
    * Inject normalized InputFrames for specific ticks.
@@ -154,6 +158,15 @@ export function createTestBridge(
   // Initialize on creation.
   initSimulation();
 
+  const cpuEntries = Object.entries((scenario ?? FOUNDATION_SCENARIO).controlAssignments)
+    .filter(([, assignment]) => assignment.mode !== "HUMAN")
+    .map(([controlSlot, assignment]) => ({
+      controlSlot,
+      teamId: assignment.teamId,
+      controlledPlayerId: assignment.controlledPlayerId,
+      adapter: createCpuAdapter(),
+    }));
+
   const bridge: TestBridge = {
     async reset(): Promise<void> {
       // Dispose existing presentation session.
@@ -185,6 +198,26 @@ export function createTestBridge(
         hashes.push(result.stateHash);
       }
 
+      return hashes;
+    },
+
+    stepWithCpuControllers(ticks: number): string[] {
+      const hashes: string[] = [];
+      for (let i = 0; i < ticks; i++) {
+        const snapshot = sim.snapshot();
+        const frames = cpuEntries.map((entry) => {
+          const observation = buildCpuObservation(
+            snapshot,
+            entry.teamId,
+            entry.controlledPlayerId,
+          );
+          const frame = entry.adapter.sample(sim.tick, observation);
+          frame.controlSlot = entry.controlSlot;
+          return frame;
+        });
+        sim.applyInputs(frames);
+        hashes.push(sim.step().stateHash);
+      }
       return hashes;
     },
 
