@@ -15,3 +15,23 @@ declare module "@pes/eval/scenarios/two-player-duel.v1.json" {
   const value: Record<string, unknown>;
   export default value;
 }
+
+declare module "@pes/eval/scenarios/ai-vs-ai-duel.v1.json" {
+  const value: Record<string, unknown>;
+  export default value;
+}
+
+declare module "@pes/eval/scenarios/2v2-duel.v1.json" {
+  const value: Record<string, unknown>;
+  export default value;
+}
+
+declare module "@pes/eval/scenarios/human-vs-cpu.v1.json" {
+  const value: Record<string, unknown>;
+  export default value;
+}
+
+declare module "@pes/eval/scenarios/2v2-with-keyboard.v1.json" {
+  const value: Record<string, unknown>;
+  export default value;
+}

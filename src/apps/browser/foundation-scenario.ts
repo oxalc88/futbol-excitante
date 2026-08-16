@@ -14,6 +14,7 @@ import twoPlayerScenarioJson from "@pes/eval/scenarios/two-player-duel.v1.json";
 import aiVsAiScenarioJson from "@pes/eval/scenarios/ai-vs-ai-duel.v1.json";
 import scenario2v2Json from "@pes/eval/scenarios/2v2-duel.v1.json";
 import humanVsCpuJson from "@pes/eval/scenarios/human-vs-cpu.v1.json";
+import scenario2v2KeyboardJson from "@pes/eval/scenarios/2v2-with-keyboard.v1.json";
 
 /**
  * The foundation scenario — identical fixture used by the headless
@@ -59,3 +60,13 @@ export const FOUNDATION_SCENARIO_2V2: ScenarioDefinition =
  */
 export const FOUNDATION_SCENARIO_HUMAN_VS_CPU: ScenarioDefinition =
   humanVsCpuJson as unknown as ScenarioDefinition;
+
+/**
+ * 2v2 keyboard scenario — 4 players (2v2 layout), slot-1 is keyboard-controlled
+ * (HUMAN), slots 2–4 are AI_FALLBACK.  Provides a standalone 2v2 match
+ * experience with keyboard override for the first player.
+ * Loaded from the versioned JSON at eval/scenarios/2v2-with-keyboard.v1.json.
+ * Duration is 5400 ticks (90 seconds at 60 Hz).
+ */
+export const FOUNDATION_SCENARIO_2V2_KEYBOARD: ScenarioDefinition =
+  scenario2v2KeyboardJson as unknown as ScenarioDefinition;

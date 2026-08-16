@@ -62,6 +62,16 @@ const IS_AI_MATCH =
 const IS_HUMAN_VS_CPU =
   new URLSearchParams(window.location.search).get("mode") === "human-vs-ai";
 
+/**
+ * Detect 2v2 match mode from URL: ?mode=2v2
+ *
+ * When enabled, slot-1 gets a keyboard adapter (HUMAN) and slots 2-4
+ * get CPU adapters.  Provides a 2v2 match with keyboard override for
+ * the first player.
+ */
+const IS_2V2 =
+  new URLSearchParams(window.location.search).get("mode") === "2v2";
+
 // ---------------------------------------------------------------------------
 // Real-time loop
 // ---------------------------------------------------------------------------
@@ -285,8 +295,8 @@ function main(): void {
         controlledPlayerId: assignment.controlledPlayerId ?? "",
       });
     }
-  } else if (IS_HUMAN_VS_CPU) {
-    // Human-vs-CPU mode: keyboard adapter for HUMAN slots, CPU adapters for AI_FALLBACK.
+  } else if (IS_HUMAN_VS_CPU || IS_2V2) {
+    // Human-vs-CPU / 2v2 mode: keyboard adapter for HUMAN slots, CPU adapters for AI_FALLBACK.
     for (const [slotId, assignment] of Object.entries(SCENARIO_DATA.controlAssignments)) {
       if (assignment.mode === "HUMAN") {
         // First HUMAN slot gets default keyboard config.
@@ -375,8 +385,8 @@ function main(): void {
         ({ adapter, config }) => adapter.sample(sim.tick),
       );
 
-      // Add CPU frames — per-slot adapters in AI-vs-AI or human-vs-CPU modes.
-      if (IS_AI_MATCH || IS_HUMAN_VS_CPU) {
+      // Add CPU frames — per-slot adapters in AI-vs-AI, human-vs-CPU, or 2v2 modes.
+      if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2) {
         for (const { adapter: cpuAd, controlSlot, teamId: tid, controlledPlayerId } of cpuSlots) {
           const obs = buildCpuObservation(sim.snapshot(), tid, controlledPlayerId);
           const cpuFrame = cpuAd.sample(sim.tick, obs);
@@ -482,6 +492,14 @@ function main(): void {
     const hint = document.getElementById("controls-hint");
     if (hint) {
       hint.textContent = "Human vs CPU — Arrow keys + Space to sprint";
+    }
+  }
+
+  // Update controls hint for 2v2 mode.
+  if (IS_2V2) {
+    const hint = document.getElementById("controls-hint");
+    if (hint) {
+      hint.textContent = "2v2 Match — Arrow keys + Space to sprint";
     }
   }
 }
