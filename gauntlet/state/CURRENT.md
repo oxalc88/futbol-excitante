@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: MATCH-SET-PIECE
+next_objective_id: BROWSER-3V3-MATCH
 
 best_known:
-  commit: ff5708a
-  note: "CPU-3V3-TEAMPLAY accepted. Next: MATCH-SET-PIECE — basic match restart after goals."
+  commit: def23dd
+  note: "MATCH-SET-PIECE accepted. Next: BROWSER-3V3-MATCH — playable 3v3 browser match."
 
 active_candidate: null
 builder_in_use: null
@@ -58,18 +58,19 @@ accepted:
   - SCENARIO-3V3-FIXTURE
   - CPU-3V3-FORMATION
   - CPU-3V3-TEAMPLAY
+  - MATCH-SET-PIECE
 
 blocked: []
 
-selection_note: "Horizon small-sided-match: 6 objectives toward 3v3 play. CPU-3V3-TEAMPLAY accepted. Next: MATCH-SET-PIECE."
+selection_note: "Horizon small-sided-match: 6 objectives toward 3v3 play. MATCH-SET-PIECE accepted. Next: BROWSER-3V3-MATCH."
 ```
 
 ## Last accepted objective
 
-CPU-3V3-TEAMPLAY — Verified CPU adapters work correctly in 3v3 context. No source code changes needed — existing adapter handles passing, shooting, formation recovery, and team decision with 3 teammates. 23 unit tests (passing, shooting, formation recovery, team decision, determinism). 14 integration tests (100-tick simulation, deterministic hashing). 222/222 cpu-adapter, 218/218 integration, 1252/1252 unit all pass. 120-tick trajectory. Deterministic audit PASS.
+MATCH-SET-PIECE — Match restart infrastructure. MatchPhase type (playing/goal/halftime/fulltime/kickoff) in WorldState and PresentationSnapshot. Tick-based goal countdown: goal event → "goal" phase → countdown → position/velocity reset → "playing". Ball resets to center with zero velocity. Players reset to formation positions. 21 unit tests, 11 integration tests. 1530/1530 node, 40/40 browser. 80-tick trajectory with 7 goal cycles. Deterministic audit PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 23/23 unit, 14/14 integration, 1252/1252 unit suite, 120-tick trajectory
-- Commit: ff5708a
+- Evidence: 21/21 unit, 11/11 integration, 1530/1530 node, 40/40 browser, 80-tick trajectory
+- Commit: def23dd

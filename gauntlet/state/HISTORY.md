@@ -236,6 +236,16 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - commits: ff5708a candidate(CPU-3V3-TEAMPLAY)
 - notes: Verified CPU adapters work correctly in 3v3. No source changes needed — existing adapter handles 3 teammates for passing, shooting, formation recovery, and team decision. 23 unit tests, 14 integration tests. 222/222 cpu-adapter, 218/218 integration, 1252/1252 unit all pass. 120-tick trajectory. No PES claim.
 
+## Iteration 42 — 2026-08-16
+
+- objective_id: MATCH-SET-PIECE
+- builder: builder-structured / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: def23dd candidate(MATCH-SET-PIECE)
+- notes: Match restart infrastructure. MatchPhase type (playing/goal/halftime/fulltime/kickoff) in WorldState + PresentationSnapshot. Tick-based goal countdown: goal event → "goal" → countdown → position/velocity reset → "playing". Ball resets to center. Players to formation positions. 21 unit tests, 11 integration tests. 1530/1530 node, 40/40 browser. 80-tick trajectory. No PES claim.
+
 ## Iteration 37 — 2026-08-15
 
 - objective_id: CAPABILITY-SWERVE

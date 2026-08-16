@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: CPU-3V3-TEAMPLAY
-usage_aggregates_through: CPU-3V3-TEAMPLAY
-model_evaluation_through: CPU-3V3-TEAMPLAY
+last_tracked_objective: MATCH-SET-PIECE
+usage_aggregates_through: MATCH-SET-PIECE
+model_evaluation_through: MATCH-SET-PIECE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -117,6 +117,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SCENARIO-3V3-FIXTURE | accepted | ~15m | 14.5m | 0.3m | 12m | 0.5m | ~3M est. | n/a** |
 | CPU-3V3-FORMATION | accepted | ~22m | 21m | 9m | 10m | 0.5m | ~8M est. | n/a** |
 | CPU-3V3-TEAMPLAY | accepted | ~21m | 20m | 13m | 6m | 0.5m | ~6M est. | n/a** |
+| MATCH-SET-PIECE | accepted | ~23m | 22m | 1m | 8m | 0.5m | ~9M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -305,6 +306,7 @@ on an H task is the interesting result.
 | SCENARIO-3V3-FIXTURE | qwen3.6 | M | Medium — new scenario fixture, existing pattern | 0 | A | 32 unit tests, 9 integration tests, 1438/1438 pass, critic ACCEPT first pass |
 | CPU-3V3-FORMATION | qwen3.6 | M | Medium — formation role extension, existing cpu-adapter pattern | 0 | A | 23 new tests, 483/483 total pass, role-aware defender/midfielder/attacker pulls |
 | CPU-3V3-TEAMPLAY | qwen3.6 | L | Low — test-only, no source changes needed | 0 | A | 23 unit tests, 14 integration tests, existing adapter handles 3v3 correctly |
+| MATCH-SET-PIECE | qwen3.6 | M | Medium — match restart logic, contracts + simulation loop | 0 | A | 21 unit tests, 11 integration tests, 1530/1530 total pass, countdown → reset cycle |
 
 ### Reviewer route and catches
 
@@ -340,6 +342,8 @@ on an H task is the interesting result.
 | CPU-3V3-FORMATION | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 221/221 cpu-adapter, 204/204 integration, 1501/1501 full suite |
 | CPU-3V3-TEAMPLAY | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
 | CPU-3V3-TEAMPLAY | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 222/222 cpu-adapter, 218/218 integration, 1252/1252 unit all pass |
+| MATCH-SET-PIECE | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
+| MATCH-SET-PIECE | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 32/32 new tests, 1530/1530 node, 40/40 browser, presentation_authority PASS |
 
 ### Builder scoreboard
 
@@ -347,7 +351,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 38 | 22 | 8 | 3 | 3 | 2 | 58% | ~0.82 | ~39m |
+| qwen3.6 | 39 | 23 | 8 | 3 | 3 | 2 | 59% | ~0.80 | ~38m |
 | mimo-v2.5 | 10 | 5 | 4 | 1 | 0 | 0 | 50% | ~0.70 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
