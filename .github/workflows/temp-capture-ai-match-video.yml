@@ -54,7 +54,7 @@ jobs:
       - name: Capture AI-vs-AI browser match
         run: |
           mkdir -p capture/raw capture/out
-          cat > /tmp/capture-ai-match.mjs <<'EOF'
+          cat > capture/capture-ai-match.mjs <<'EOF'
           import { chromium } from 'playwright';
           import fs from 'node:fs';
           import path from 'node:path';
@@ -84,7 +84,7 @@ jobs:
           }
           fs.copyFileSync(videoPath, 'capture/out/ai-match.webm');
           EOF
-          node /tmp/capture-ai-match.mjs
+          node capture/capture-ai-match.mjs
 
       - name: Convert to MP4
         run: |
