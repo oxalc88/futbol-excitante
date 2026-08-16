@@ -16,11 +16,21 @@ import { FOUNDATION_SCENARIO_AI_VS_AI } from "../../src/apps/browser/foundation-
  * CPU observation/adapter path used by production.
  */
 describe("AI-MATCH-E2E-001: CPU slot ownership and pursuit", () => {
+  const assignments = FOUNDATION_SCENARIO_AI_VS_AI.controlAssignments;
+
   it("builds a different controlled player observation for each team", () => {
     const world = createWorld({ scenario: FOUNDATION_SCENARIO_AI_VS_AI });
 
-    const obsA = buildCpuObservation(world, "team-a");
-    const obsB = buildCpuObservation(world, "team-b");
+    const obsA = buildCpuObservation(
+      world,
+      assignments["slot-1"].teamId,
+      assignments["slot-1"].controlledPlayerId,
+    );
+    const obsB = buildCpuObservation(
+      world,
+      assignments["slot-2"].teamId,
+      assignments["slot-2"].controlledPlayerId,
+    );
 
     expect(obsA.controlledPlayerId).toBe("player-a");
     expect(obsB.controlledPlayerId).toBe("player-b");
@@ -32,8 +42,14 @@ describe("AI-MATCH-E2E-001: CPU slot ownership and pursuit", () => {
     const cpuA = createCpuAdapter();
     const cpuB = createCpuAdapter();
 
-    const frameA = cpuA.sample(0, buildCpuObservation(world, "team-a"));
-    const frameB = cpuB.sample(0, buildCpuObservation(world, "team-b"));
+    const frameA = cpuA.sample(
+      0,
+      buildCpuObservation(world, assignments["slot-1"].teamId, assignments["slot-1"].controlledPlayerId),
+    );
+    const frameB = cpuB.sample(
+      0,
+      buildCpuObservation(world, assignments["slot-2"].teamId, assignments["slot-2"].controlledPlayerId),
+    );
 
     // player-a owns kickoff from x=-0.5 and should move toward +x.
     expect(frameA.moveX).toBeGreaterThan(0);
@@ -64,8 +80,14 @@ describe("AI-MATCH-E2E-001: CPU slot ownership and pursuit", () => {
 
     for (let i = 0; i < 60; i++) {
       const snapshot = sim.snapshot();
-      const frameA = cpuA.sample(sim.tick, buildCpuObservation(snapshot, "team-a"));
-      const frameB = cpuB.sample(sim.tick, buildCpuObservation(snapshot, "team-b"));
+      const frameA = cpuA.sample(
+        sim.tick,
+        buildCpuObservation(snapshot, assignments["slot-1"].teamId, assignments["slot-1"].controlledPlayerId),
+      );
+      const frameB = cpuB.sample(
+        sim.tick,
+        buildCpuObservation(snapshot, assignments["slot-2"].teamId, assignments["slot-2"].controlledPlayerId),
+      );
       frameA.controlSlot = "slot-1";
       frameB.controlSlot = "slot-2";
       sim.applyInputs([frameA, frameB]);
