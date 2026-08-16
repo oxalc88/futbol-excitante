@@ -49,7 +49,7 @@ The canonical 0.7 principle remains unchanged: deterministic tooling may invalid
 - Applies prospectively to objectives accepted under 0.8; pre-0.8 evidence is not backfilled automatically.
 - No manual `gauntlet/state/**` rewrite is part of this release.
 - Existing video binaries may remain external or ephemeral; when a future objective uses video, durable metadata records how to find/download it before provider expiration.
-- User-level `~/.grok/config.toml` must rename the builder mappings from `builder-qwen` / `builder-mimo` to `builder-structured = "qwen3.6"` and `builder-gameplay = "mimo-v2.5"`. Model endpoint definitions themselves do not change.
+- No user-level agent-routing migration is required. `~/.grok/config.toml` continues to register the available NaN model endpoints only; project-local `.grok/agents/*.md` frontmatter selects each agent model, with `gauntlet/models.json` kept in sync for routing/auditability.
 - `gauntlet/VERSION.json` represents the checkout; the published release is the immutable `gauntlet-vX.Y.Z` tag created after merge to `main`.
 
 ### Prompt/rule/tooling surface

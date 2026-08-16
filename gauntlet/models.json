@@ -1,13 +1,15 @@
 {
   "version": "gauntlet-models-v5",
-  "notes": "Role names describe responsibilities; model selection is routing. Agent frontmatter model fields and ~/.grok/config.toml [subagents.models] must stay in sync with this file. NaN endpoints are registered in ~/.grok/config.toml (user-level). See gauntlet/README.md.",
+  "notes": "Role names describe responsibilities; model selection is routing. Agent frontmatter model fields must stay in sync with this file. NaN endpoints are registered in ~/.grok/config.toml (user-level); agent-to-model bindings are project-local in .grok/agents/*.md. See gauntlet/README.md.",
   "roles": {
     "orchestrator": {
       "agent": "orchestrator",
       "mode": "primary",
       "provider": "xai",
       "model": "grok-4.6",
-      "fallback": ["orchestrator-deepseek"],
+      "fallback": [
+        "orchestrator-deepseek"
+      ],
       "handoff_at_percent": 89,
       "handoff_metric": "super_grok_weekly_usage",
       "auto_compact_percent": 65
@@ -19,7 +21,9 @@
       "model": "deepseek-v4-flash",
       "api_model": "deepseek-v4-flash",
       "reasoning_effort": "high",
-      "fallback": ["deepseek-v4-flash-0731"],
+      "fallback": [
+        "deepseek-v4-flash-0731"
+      ],
       "constraint": "Overflow pickup only. Same canonical orchestrator contract with runtime-specific pickup semantics. Critic independence is versus the builder, not this agent. Keep timing output separated by exact model ID and role."
     },
     "builder_structured": {
@@ -45,7 +49,11 @@
       "provider": "nan",
       "model": "deepseek-v4-flash-0731",
       "api_model": "deepseek-v4-flash-0731",
-      "fallback": ["critic-flash", "critic-qwen", "critic-mimo"],
+      "fallback": [
+        "critic-flash",
+        "critic-qwen",
+        "critic-mimo"
+      ],
       "constraint": "Never use the same model that implemented the candidate under review. If 0731 is unavailable or out of allowance, spawn critic-flash as a distinct agent type; do not override critic's model in place."
     },
     "critic_flash": {
@@ -83,7 +91,11 @@
       "provider": "nan",
       "model": "deepseek-v4-flash-0731",
       "api_model": "deepseek-v4-flash-0731",
-      "fallback": ["integration-reviewer-flash", "qwen3.6", "mimo-v2.5"],
+      "fallback": [
+        "integration-reviewer-flash",
+        "qwen3.6",
+        "mimo-v2.5"
+      ],
       "constraint": "Prefer DeepSeek. If 0731 is unavailable or out of allowance, spawn integration-reviewer-flash as a distinct agent type. Otherwise use a NaN model different from the builder under review."
     },
     "integration_reviewer_flash": {
@@ -102,7 +114,9 @@
       "provider": "nan",
       "model": "gemma4",
       "api_model": "gemma4",
-      "fallback": ["qwen3.6"]
+      "fallback": [
+        "qwen3.6"
+      ]
     },
     "git_committer": {
       "agent": "git-committer",
@@ -110,7 +124,9 @@
       "provider": "nan",
       "model": "gemma4",
       "api_model": "gemma4",
-      "fallback": ["qwen3.6"],
+      "fallback": [
+        "qwen3.6"
+      ],
       "constraint": "Bookkeeping only. Never inherit grok-4.6. Never implement or review."
     },
     "evidence_auditor": {
@@ -119,12 +135,23 @@
       "provider": "nan",
       "model": "gemma4",
       "api_model": "gemma4",
-      "fallback": ["qwen3.6"],
+      "fallback": [
+        "qwen3.6"
+      ],
       "constraint": "Bounded semantic audit only after deterministic REVIEW_REQUIRED. Never judges overall reference-bar quality and never accepts an objective."
     }
   },
-  "cheap_auxiliary": ["gemma4", "qwen3.6"],
-  "high_volume": ["qwen3.6", "mimo-v2.5", "deepseek-v4-flash-0731", "deepseek-v4-flash", "gemma4"],
+  "cheap_auxiliary": [
+    "gemma4",
+    "qwen3.6"
+  ],
+  "high_volume": [
+    "qwen3.6",
+    "mimo-v2.5",
+    "deepseek-v4-flash-0731",
+    "deepseek-v4-flash",
+    "gemma4"
+  ],
   "grok_uses": [
     "orchestration until SuperGrok weekly usage hits 89%",
     "prioritization",
