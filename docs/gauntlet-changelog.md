@@ -4,6 +4,45 @@ Human-readable history of meaningful changes to the Gauntlet's **rules, prompts,
 
 This changelog does **not** record normal gameplay objectives or routine live-state updates produced by the running Gauntlet. Git remains the source of truth for exact file contents and diffs.
 
+## 2026-08-15 — Browser evidence and model tracking gates
+
+**Prompt version:** `v6-browser-evidence-model-tracking`  
+**Core eval/tracking commit:** `1a1113f5e0e076226a637d629bfd24ee0fa2c142`  
+**PR:** `#7`
+
+### Changed
+
+- Extended mandatory screenshot evidence beyond the generic gameplay/presentation flag: any objective whose acceptance criteria require browser-visible or browser-interactive behavior is now explicitly screenshot-required.
+- Added `ORCH-REG-005` so a browser objective cannot be accepted without the required screenshot even when the scenario is not otherwise classified as gameplay/presentation.
+- Added `gauntlet/timing-contract.md`, making `TIMING.md` refresh part of acceptance persistence rather than optional bookkeeping.
+- Added machine-readable tracking markers (`last_tracked_objective`, `usage_aggregates_through`, `model_evaluation_through`) that must match the latest accepted objective.
+- Required each accepted objective to refresh its per-step timing/token usage, by-model usage aggregates, builder performance grade, and a reviewer/orchestrator route-and-catches row. Missing metrics must be `n/a` with a reason; timing, token, cost, or quality numbers may not be invented.
+- Added `ORCH-REG-006` for incomplete TIMING/model tracking.
+- Added `pnpm run gauntlet:eval:state`, a live persisted-state audit that compares `CURRENT.md` with TIMING tracking markers and required usage/evaluation rows.
+- Kept `gauntlet:eval` deterministic and independent of mutable live state; the live state audit is instead a mandatory acceptance-time gate before `git-committer` receives the acceptance commit.
+- Updated Grok and DeepSeek orchestrators plus `/gauntlet` and `/gauntlet-continue` so tracking repair is local bookkeeping and is not a reason to stop or send an accepted implementation back to a builder.
+
+### Why
+
+The existing screenshot regression covered gameplay/presentation work, but did not independently encode the stronger rule that a browser-visible/browser-interactive objective needs browser evidence. That left browser routing/input/state objectives dependent on correct informal classification.
+
+`TIMING.md` already tracks per-step wall time/tokens, by-model usage, and model performance, but the orchestration evals did not verify that it was refreshed. The committed state demonstrates the gap: `CURRENT.md` records `CPU-BALL-PURSUIT` as the latest accepted objective while the existing TIMING snapshot predates that objective and does not evaluate it. This change deliberately does not rewrite generated state; `gauntlet:eval:state` should expose the stale tracking until the running orchestrator refreshes TIMING from real session/review data.
+
+### Prompt/rule surface
+
+- `gauntlet/PROMPT.md`
+- `gauntlet/evidence-contract.md`
+- `gauntlet/timing-contract.md` (new)
+- `.grok/agents/orchestrator.md`
+- `.grok/agents/orchestrator-deepseek.md`
+- `.grok/skills/gauntlet/SKILL.md`
+- `.grok/skills/gauntlet-continue/SKILL.md`
+- `.grok/skills/gauntlet-eval/SKILL.md`
+- `gauntlet/evals/**`
+- `package.json`
+
+---
+
 ## 2026-08-15 — Orchestration evals and continuation regression guard
 
 **Prompt version:** `v5-continuation-regression-evals`  
