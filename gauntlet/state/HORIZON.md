@@ -2,12 +2,12 @@
 
 ```yaml
 horizon_version: 1
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "playable-v1"
 created_from_commit: a57edf2
 created_at: 2026-08-15
 reason: "HEADLESS-CPU-MATCH accepted. Match scoring is the active candidate. Horizon covers the remaining playable match infrastructure: scoring, browser-wired scoreboard, match lifecycle, and AI improvement."
-current_index: 5
+current_index: 6
 objectives:
   - id: MATCH-SCORING
     reason: "Add tick-based match clock + score tracker."
@@ -37,6 +37,7 @@ objectives:
     reason: "Score-aware replay verification: replay must reproduce same score progression."
     builder: builder-qwen
     prerequisite: MATCH-ORACLE
+    status: accepted
 replan_if:
   - objective_blocked
   - architectural_invalidation

@@ -9,13 +9,13 @@ handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 next_objective_id: MATCH-ORACLE
 best_known:
-  commit: b273aa8
-  note: "MATCH-ORACLE accepted. Match-scoring oracles (score-tracker, match-clock) added to evaluator suite. All 9 implementable mutants detected in mutant-core and mutant-1v1 reducers. Next: MATCH-REPLAY-EXTENSION — score-aware replay verification."
+  commit: 90c0c8b
+  note: "MATCH-REPLAY-EXTENSION accepted. Score-aware replay verification added — verifyMatchReplay compares recorded vs replayed score/goal progression. All 47 tests pass (4 new + 43 existing). Horizon playable-v1 exhausted — strategic reassessment needed."
 active_candidate:
-  objective_id: MATCH-REPLAY-EXTENSION
-  builder: builder-qwen
-  critic: critic
-  started_from_commit: b273aa8
+  objective_id: null
+  builder: null
+  critic: null
+  started_from_commit: null
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -39,8 +39,9 @@ accepted:
   - MATCH-LIFECYCLE
   - AI-GOAL-IMPROVEMENT
   - MATCH-ORACLE
+  - MATCH-REPLAY-EXTENSION
 blocked: []
-selection_note: "MATCH-ORACLE accepted. Match-scoring oracles wired into evaluator suite. Next: MATCH-REPLAY-EXTENSION — score-aware replay verification: replay must reproduce same score progression."
+selection_note: "MATCH-REPLAY-EXTENSION accepted. Horizon playable-v1 exhausted. All objectives completed: match scoring, scoreboard, lifecycle, AI improvement, match oracles, and replay extension. Strategic reassessment required for next horizon — likely browser-facing 1v1 playable capabilities."
 ```
 
 ## Last accepted objective

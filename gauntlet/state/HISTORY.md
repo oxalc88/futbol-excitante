@@ -1557,6 +1557,17 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - commits: b273aa8
 - notes: Match-scoring oracles added to evaluator suite. checkScoreTracker validates goalIndex (0/1) in goal events. checkMatchClock validates tick sequentiality via relative offset. score-tracker and match-clock mutants registered as implementable in mutant-registry, wired in wire.ts, with injection handlers in mutant-core.ts and mutant-1v1.ts. All 9 implementable mutants detected → MUTANT_CORE PASS. 91/91 tests across mutant-core (33), mutant-1v1 (38), foundation-promotion (20). No PES claim.
 
+## Iteration 44 — 2026-08-15
+
+- objective_id: MATCH-REPLAY-EXTENSION
+- builder: builder-qwen / qwen3.6
+- critic: critic-mimo / mimo-v2.5 (fallback, DeepSeek exhausted)
+- verdict: ACCEPT (first pass)
+- integration: ACCEPT (integration-reviewer / mimo-v2.5, fallback)
+- result: accepted
+- commits: pending (git-committer)
+- notes: Score-aware replay verification. verifyMatchReplay extends verifyReplay with MatchVerifierResult comparing recorded vs replayed score (scoresEqual), goal events (compareGoalEvents), and goal counts. All zero-goal and determinism cases covered. 4 new integration tests, 47 total across replay/verifier/headless-match suites. No PES claim. Horizon playable-v1 exhausted.
+
 ## Iteration 43 — 2026-08-15
 
 - objective_id: HORIZON-BOOKKEEPING
