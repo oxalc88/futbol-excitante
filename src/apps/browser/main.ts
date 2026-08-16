@@ -110,6 +110,34 @@ Object.assign(matchPhaseOverlay.style, {
 });
 document.body.appendChild(matchPhaseOverlay);
 
+/**
+ * Goal overlay element — shows "GOAL! {team}" with auto-fade.
+ * Created once, reused for each goal.
+ */
+const goalOverlay = document.createElement("div");
+goalOverlay.id = "goal-overlay";
+Object.assign(goalOverlay.style, {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  zIndex: "1100",
+  padding: "24px 48px",
+  borderRadius: "12px",
+  fontSize: "48px",
+  fontWeight: "800",
+  fontFamily: "system-ui, -apple-system, sans-serif",
+  textAlign: "center",
+  pointerEvents: "none",
+  opacity: "0",
+  transition: "opacity 2s ease-out",
+  letterSpacing: "4px",
+});
+document.body.appendChild(goalOverlay);
+
+/** Goal overlay fade timeout handle (for debounce on rapid goals). */
+let goalOverlayTimeout: ReturnType<typeof setTimeout> | null = null;
+
 /** Whether the current phase has already shown its overlay. */
 let overlayShownForPhase = false;
 
@@ -147,6 +175,47 @@ function showPhaseOverlay(text: string, color: string): void {
   setTimeout(() => {
     matchPhaseOverlay.style.opacity = "0";
   }, 1000);
+}
+
+/**
+ * Show a goal overlay with team name and auto-fade.
+ *
+ * @param teamLabel - team name to display (e.g. "HOME" or "AWAY").
+ * @param scoreTeamA - whether this was scored by team A (for scoreboard flash).
+ */
+function showGoalOverlay(
+  teamLabel: string,
+  scoreTeamA: boolean,
+): void {
+  goalOverlay.textContent = `GOAL! ${teamLabel}`;
+  goalOverlay.style.color = "#ffffff";
+  goalOverlay.style.background = "rgba(76, 175, 80, 0.9)";
+  goalOverlay.style.textShadow = "2px 2px 4px rgba(0,0,0,0.5)";
+
+  // Flash scoreboard
+  const scoreboardEl = document.getElementById("scoreboard");
+  if (scoreboardEl) {
+    scoreboardEl.classList.add("scoreboard-goal-flash");
+    // Remove the flash class after animation
+    setTimeout(() => {
+      scoreboardEl.classList.remove("scoreboard-goal-flash");
+    }, 800);
+  }
+
+  // Force reflow so the transition triggers.
+  void goalOverlay.offsetHeight;
+  goalOverlay.style.opacity = "1";
+
+  // Clear any previous fade timeout.
+  if (goalOverlayTimeout !== null) {
+    clearTimeout(goalOverlayTimeout);
+  }
+
+  // Auto-fade after 2 seconds.
+  goalOverlayTimeout = setTimeout(() => {
+    goalOverlay.style.opacity = "0";
+    goalOverlayTimeout = null;
+  }, 2000);
 }
 
 /**
@@ -260,6 +329,9 @@ function main(): void {
           } else if (goalIndex === 1) {
             scoreB++;
           }
+          // Show goal overlay — derive team name from goal index.
+          const teamLabel = goalIndex === 0 ? "HOME" : "AWAY";
+          showGoalOverlay(teamLabel, goalIndex === 0);
         }
       }
 

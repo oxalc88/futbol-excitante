@@ -7,7 +7,7 @@ horizon_id: "playable-browser-v2"
 created_from_commit: 11099d3
 created_at: 2026-08-15
 reason: "Horizon playable-v1 exhausted. All match infrastructure (scoring, lifecycle, oracles, replay) complete. PLAYABLE-1V1 milestone remains gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, deferred). New horizon focuses on observable browser progress: match-phase/goal visuals, CPU ball pursuit, and browser-as-standalone-match-viewer."
-current_index: 1
+current_index: 2
 objectives:
   - id: BROWSER-MATCH-PHASE-DISPLAY
     status: accepted
@@ -15,6 +15,7 @@ objectives:
     builder: builder-mimo
     prerequisite: null
   - id: BROWSER-GOAL-EFFECT
+    status: accepted
     reason: "Brief visual feedback on goal: overlay text 'GOAL! {team}' auto-fading after ~2s. Optional scoreboard highlight animation."
     builder: builder-mimo
     prerequisite: BROWSER-MATCH-PHASE-DISPLAY
