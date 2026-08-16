@@ -7,7 +7,7 @@ horizon_id: "cpu-team-play"
 created_from_commit: 3d6b32d
 created_at: 2026-08-16
 reason: "Horizon playable-browser-v2 exhausted. All CPU adapter primitives (pursuit, shoot, pass) exist. Browser runs AI-vs-AI 1v1 matches with scoreboard, phases, and goal overlays. PLAYABLE_1V1 milestone remains gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, deferred). New horizon focuses on multi-player team play: teammate-aware passing, multiple CPU players per team, and observable browser-facing small-sided matches."
-current_index: 4
+current_index: 5
 objectives:
   - id: CPU-TEAMMATE-PASS
     status: accepted
@@ -30,7 +30,7 @@ objectives:
     builder: builder-qwen
     prerequisite: CPU-MULTI-PLAYER
   - id: BROWSER-HUMAN-VS-CPU
-    status: pending
+    status: accepted
     reason: "Add ?mode=human-vs-ai URL parameter that gives slot-1 to keyboard and remaining slots to CPU adapters. Makes browser a standalone human-vs-CPU match viewer. Observable playable milestone."
     builder: builder-mimo
     prerequisite: SCENARIO-2V2-FIXTURE

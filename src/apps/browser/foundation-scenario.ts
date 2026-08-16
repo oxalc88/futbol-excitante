@@ -13,6 +13,7 @@ import foundationScenarioJson from "@pes/eval/scenarios/foundation-move-and-roll
 import twoPlayerScenarioJson from "@pes/eval/scenarios/two-player-duel.v1.json";
 import aiVsAiScenarioJson from "@pes/eval/scenarios/ai-vs-ai-duel.v1.json";
 import scenario2v2Json from "@pes/eval/scenarios/2v2-duel.v1.json";
+import humanVsCpuJson from "@pes/eval/scenarios/human-vs-cpu.v1.json";
 
 /**
  * The foundation scenario — identical fixture used by the headless
@@ -48,3 +49,13 @@ export const FOUNDATION_SCENARIO_AI_VS_AI: ScenarioDefinition =
  */
 export const FOUNDATION_SCENARIO_2V2: ScenarioDefinition =
   scenario2v2Json as unknown as ScenarioDefinition;
+
+/**
+ * Human-vs-CPU 2v2 scenario — 4 players, slot-1 is keyboard-controlled
+ * (HUMAN), slots 2–4 are AI_FALLBACK.  Provides a standalone
+ * human-vs-CPU match experience in the browser.
+ * Loaded from the versioned JSON at eval/scenarios/human-vs-cpu.v1.json.
+ * Duration is 5400 ticks (90 seconds at 60 Hz).
+ */
+export const FOUNDATION_SCENARIO_HUMAN_VS_CPU: ScenarioDefinition =
+  humanVsCpuJson as unknown as ScenarioDefinition;

@@ -53,6 +53,15 @@ const SCENARIO_DATA: ScenarioDefinition = selectBrowserScenario(
 const IS_AI_MATCH =
   new URLSearchParams(window.location.search).get("mode") === "ai-match";
 
+/**
+ * Detect human-vs-CPU match mode from URL: ?mode=human-vs-ai
+ *
+ * When enabled, slot-1 gets a keyboard adapter (HUMAN) and all other
+ * slots get CPU adapters.  Provides a standalone human-vs-CPU match.
+ */
+const IS_HUMAN_VS_CPU =
+  new URLSearchParams(window.location.search).get("mode") === "human-vs-ai";
+
 // ---------------------------------------------------------------------------
 // Real-time loop
 // ---------------------------------------------------------------------------
@@ -276,6 +285,28 @@ function main(): void {
         controlledPlayerId: assignment.controlledPlayerId ?? "",
       });
     }
+  } else if (IS_HUMAN_VS_CPU) {
+    // Human-vs-CPU mode: keyboard adapter for HUMAN slots, CPU adapters for AI_FALLBACK.
+    for (const [slotId, assignment] of Object.entries(SCENARIO_DATA.controlAssignments)) {
+      if (assignment.mode === "HUMAN") {
+        // First HUMAN slot gets default keyboard config.
+        const isFirstHuman = adapters.length === 0;
+        adapters.push({
+          adapter: createKeyboardAdapter(
+            isFirstHuman ? DEFAULT_KEYBOARD_CONFIG : DEFAULT_SLOT2_KEYBOARD_CONFIG,
+          ),
+          config: isFirstHuman ? DEFAULT_KEYBOARD_CONFIG : DEFAULT_SLOT2_KEYBOARD_CONFIG,
+        });
+        adapters[adapters.length - 1].adapter.connect(window);
+      } else {
+        cpuSlots.push({
+          adapter: createCpuAdapter(),
+          controlSlot: slotId,
+          teamId: assignment.teamId,
+          controlledPlayerId: assignment.controlledPlayerId ?? "",
+        });
+      }
+    }
   } else {
     // Human mode: create keyboard adapters for HUMAN slots.
     adapters.push({
@@ -344,8 +375,8 @@ function main(): void {
         ({ adapter, config }) => adapter.sample(sim.tick),
       );
 
-      // Add CPU frames — per-slot adapters in AI-vs-AI mode.
-      if (IS_AI_MATCH) {
+      // Add CPU frames — per-slot adapters in AI-vs-AI or human-vs-CPU modes.
+      if (IS_AI_MATCH || IS_HUMAN_VS_CPU) {
         for (const { adapter: cpuAd, controlSlot, teamId: tid, controlledPlayerId } of cpuSlots) {
           const obs = buildCpuObservation(sim.snapshot(), tid, controlledPlayerId);
           const cpuFrame = cpuAd.sample(sim.tick, obs);
@@ -443,6 +474,14 @@ function main(): void {
     const hint = document.getElementById("controls-hint");
     if (hint) {
       hint.textContent = "AI-vs-AI Match — fully autonomous";
+    }
+  }
+
+  // Update controls hint for human-vs-CPU mode.
+  if (IS_HUMAN_VS_CPU) {
+    const hint = document.getElementById("controls-hint");
+    if (hint) {
+      hint.textContent = "Human vs CPU — Arrow keys + Space to sprint";
     }
   }
 }

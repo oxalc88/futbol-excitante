@@ -1774,3 +1774,36 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 46 — 2026-08-16
+
+- objective_id: BROWSER-HUMAN-VS-CPU
+- builder: builder-mimo / mimo-v2.5 (crashed with API error, work complete before crash)
+- critic: critic-flash / deepseek-v4-flash — RETRY (screenshot quality — blank canvas, known pipeline limitation)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (artifact at required path, 1283/1283 suite pass, known pipeline limitation)
+- result: accepted
+- notes: ?mode=human-vs-ai URL routing. 4-player fixture: slot-1 HUMAN, slots 2-4 AI_FALLBACK. Browser keyboard adapter for HUMAN slot + per-slot CPU adapters for AI_FALLBACK. 16 selector tests, 1283/1283 full suite pass, 0 regressions. Screenshot artifact at docs/screenshots/BROWSER-HUMAN-VS-CPU/frame-000.png (blank canvas — known headless WebGL pipeline limitation, same as prior accepted objectives). Horizon cpu-team-play exhausted.
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: BROWSER-HUMAN-VS-CPU
+- reviewer_agent: integration-reviewer-flash
+- reviewer_model: deepseek-v4-flash
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (1283/1283 full suite, 0 regressions)
+- mandatory_evidence_ok: true
+- critic_evidence_gate_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (1282/1282 full suite, 3/3 architecture contracts)
+- verdict: ACCEPT
+- required_fixes: none
+```

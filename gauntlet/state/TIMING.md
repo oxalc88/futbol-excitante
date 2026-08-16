@@ -5,11 +5,11 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-16T09:15:00Z
+measured_at: 2026-08-16T09:35:00Z
 tracking_contract_version: 1
-last_tracked_objective: CPU-BASIC-FORMATION
-usage_aggregates_through: CPU-BASIC-FORMATION
-model_evaluation_through: CPU-BASIC-FORMATION
+last_tracked_objective: BROWSER-HUMAN-VS-CPU
+usage_aggregates_through: BROWSER-HUMAN-VS-CPU
+model_evaluation_through: BROWSER-HUMAN-VS-CPU
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -107,6 +107,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | CPU-MULTI-PLAYER | accepted | ~17m | 10.1m | 7.2m | 5.5m | ~0.5m | ~3.8M est. | n/a** |
 | SCENARIO-2V2-FIXTURE | accepted | ~1h 3m | 49m | 3m | 12m | ~0.5m | ~12M est. | n/a** |
 | CPU-BASIC-FORMATION | accepted | ~1h 54m | 50m | 7m | 7m | ~0.5m | ~5M est. | n/a** |
+| BROWSER-HUMAN-VS-CPU | accepted | ~2h 19m | 50m | 7m | 4m | ~0.5m | ~10M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -285,6 +286,7 @@ on an H task is the interesting result.
 | CPU-MULTI-PLAYER | qwen3.6 | M | Medium — new module, existing harness | 0 | A | controlledPlayerId-based player lookup; multi-adapter independence; 12 unit tests; critic ACCEPT first pass |
 | SCENARIO-2V2-FIXTURE | qwen3.6 | M | Medium — browser glue, selector routing, CPU adapter tests | 0 | A | ?mode=ai-match&scenario=2v2 selector routing; 14 CPU independence tests; 11 selector tests; critic ACCEPT first pass |
 | CPU-BASIC-FORMATION | qwen3.6 | H | High — new physics behavior in CPU adapter (defense mode blend) | 0 | A | 20% pull toward own goal with linear blend 20m→40m; 22 tests; no regressions; critic ACCEPT first pass |
+| BROWSER-HUMAN-VS-CPU | mimo-v2.5 | H | High — new browser path, keyboard + CPU multi-slot wiring | 0 | A | ?mode=human-vs-ai URL routing; keyboard+CPU multi-slot; 1283 tests; critic-flash RETRY (screenshot quality), integration-reviewer-flash ACCEPT |
 
 ### Reviewer route and catches
 
@@ -300,6 +302,8 @@ on an H task is the interesting result.
 | SCENARIO-2V2-FIXTURE | integration-reviewer-flash (deepseek-v4-flash) | first REJECT (scope violation: capture-extract.js); fixed, re-review ACCEPT | ACCEPT | 1282/1282 regressions, scope violation removed, blank screenshot known pipeline limitation |
 | CPU-BASIC-FORMATION | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
 | CPU-BASIC-FORMATION | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1278/1278 regressions pass, no eval file modifications, formation blend confined to adapter layer |
+| BROWSER-HUMAN-VS-CPU | critic-flash (deepseek-v4-flash) | screenshot RETRY (blank canvas) | RETRY | 0 retries on logic — screenshot quality only (known pipeline limitation) |
+| BROWSER-HUMAN-VS-CPU | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1283/1283 regressions pass, artifact at required path, known pipeline limitation |
 
 ### Builder scoreboard
 

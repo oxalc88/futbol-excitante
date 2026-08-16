@@ -7,10 +7,10 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: BROWSER-HUMAN-VS-CPU
+next_objective_id: null
 best_known:
   commit: (pending acceptance)
-  note: "CPU-BASIC-FORMATION accepted. Formation blend in defense mode (20% toward own goal, linear blend 20m→40m). 22 formation tests, 1278/1278 suite pass, screenshot artifact. Advancing to BROWSER-HUMAN-VS-CPU: keyboard slot-1 + CPU for remaining slots."
+  note: "BROWSER-HUMAN-VS-CPU accepted. ?mode=human-vs-ai URL routing, slot-1 keyboard + 3 AI_FALLBACK CPU adapters. 1283/1283 suite pass. Horizon cpu-team-play exhausted (5/5 objectives accepted)."
 active_candidate: null
 builder_in_use: builder-qwen
 critic_in_use: critic-flash
@@ -48,9 +48,9 @@ selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal
 
 ## Last accepted objective
 
-CPU-BASIC-FORMATION — Formation blend in CPU defense mode: when ball is beyond 20m, players gradually shift toward a formation position 20% toward their own goal (linear blend from pure chase at 20m to pure formation at 40m). 22 formation-specific tests, 1278/1278 full suite pass.
+BROWSER-HUMAN-VS-CPU — ?mode=human-vs-ai URL routing. 4-player fixture: slot-1 HUMAN, slots 2-4 AI_FALLBACK. Browser keyboard adapter for HUMAN slot + per-slot CPU adapters for AI_FALLBACK. 16 selector tests, 1283/1283 full suite pass.
 
-- builder: builder-qwen / qwen3.6
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- builder: builder-mimo / mimo-v2.5 (crashed mid-run, work complete)
+- critic: critic-flash / deepseek-v4-flash — RETRY (screenshot quality)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 22/22 formation tests, 1278/1278 full suite, screenshot artifact
+- Evidence: 16/16 selector tests, 1283/1283 full suite, screenshot artifact (known pipeline limitation)

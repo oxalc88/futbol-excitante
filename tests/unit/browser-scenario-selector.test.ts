@@ -133,3 +133,45 @@ describe("BROWSER-SCENARIO-SELECTOR-005: ?mode=ai-match&scenario=2v2", () => {
     expect(scenario).toBe(FOUNDATION_SCENARIO_2V2);
   });
 });
+
+// ---------------------------------------------------------------------------
+// 6. ?mode=human-vs-ai → human-vs-CPU scenario
+// ---------------------------------------------------------------------------
+
+describe("BROWSER-SCENARIO-SELECTOR-006: ?mode=human-vs-ai", () => {
+  it("returns human-vs-CPU scenario for ?mode=human-vs-ai", async () => {
+    const { FOUNDATION_SCENARIO_HUMAN_VS_CPU } =
+      await import("../../src/apps/browser/foundation-scenario.js");
+    const scenario = selectBrowserScenario("?mode=human-vs-ai");
+    expect(scenario).toBe(FOUNDATION_SCENARIO_HUMAN_VS_CPU);
+  });
+
+  it("human-vs-CPU scenario has 4 players", () => {
+    const scenario = selectBrowserScenario("?mode=human-vs-ai");
+    const world = createWorld({ scenario });
+    expect(world.players.length).toBe(4);
+  });
+
+  it("human-vs-CPU scenario has 1 HUMAN slot and 3 AI_FALLBACK slots", () => {
+    const scenario = selectBrowserScenario("?mode=human-vs-ai");
+    const assignments = scenario.controlAssignments;
+    const modes = Object.values(assignments).map((a) => a.mode);
+    const humanCount = modes.filter((m) => m === "HUMAN").length;
+    const cpuCount = modes.filter((m) => m === "AI_FALLBACK").length;
+    expect(humanCount).toBe(1);
+    expect(cpuCount).toBe(3);
+  });
+
+  it("slot-1 is HUMAN and slots 2-4 are AI_FALLBACK", () => {
+    const scenario = selectBrowserScenario("?mode=human-vs-ai");
+    expect(scenario.controlAssignments["slot-1"].mode).toBe("HUMAN");
+    expect(scenario.controlAssignments["slot-2"].mode).toBe("AI_FALLBACK");
+    expect(scenario.controlAssignments["slot-3"].mode).toBe("AI_FALLBACK");
+    expect(scenario.controlAssignments["slot-4"].mode).toBe("AI_FALLBACK");
+  });
+
+  it("human-vs-CPU scenario has 5400 ticks duration", () => {
+    const scenario = selectBrowserScenario("?mode=human-vs-ai");
+    expect(scenario.durationTicks).toBe(5400);
+  });
+});
