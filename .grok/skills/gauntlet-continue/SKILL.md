@@ -9,6 +9,10 @@ argument-hint: optional focus, e.g. finish PLAYABLE-DUELS-SUITE only
 
 Resume from persisted `HANDOFF.md`/`CURRENT.md`/`HORIZON.md`; do not start over. Read `gauntlet/PROMPT.md`, `gauntlet/principles.md`, and `gauntlet/VERSION.json` before delegation.
 
+Before any other status prose, print one compact startup line using the version read from `gauntlet/VERSION.json`:
+
+`Gauntlet <version> · orchestrator-deepseek · deepseek-v4-flash`
+
 Repair stale accepted `active_candidate` and horizon bookkeeping locally. Continue the current horizon unless a documented strategic-boundary condition requires replanning.
 
 For every candidate, preserve v0.7: builder → tests/artifacts → `pnpm run gauntlet:audit` → optional bounded semantic audit on `REVIEW_REQUIRED` → mandatory critic → integration → final gate → `GAUNTLET_ACCEPTANCE_JSON=... pnpm run gauntlet:acceptance:persist` → bookkeeping → `pnpm run gauntlet:eval:state` → accept. The critic remains mandatory after deterministic/cheap audit success.
