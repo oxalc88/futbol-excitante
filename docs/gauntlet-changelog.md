@@ -6,8 +6,10 @@ This changelog does **not** record normal gameplay objectives or routine live-st
 
 ## 2026-08-15 — Orchestration evals and continuation regression guard
 
-**Prompt version:** `v5-continuation-regression-evals`
-**Eval foundation commit:** `32f796606e7b891f9b64feab69360f2156198460`
+**Prompt version:** `v5-continuation-regression-evals`  
+**Eval foundation commit:** `32f796606e7b891f9b64feab69360f2156198460`  
+**Continuation fix commit:** `8e0dd8b805294a40ce5185eaaa56ac288e332bf6`  
+**Runtime/model eval commit:** `695838277d4b997ce542f6a60cc0f4bdd76f022b`
 
 ### Changed
 
@@ -15,15 +17,19 @@ This changelog does **not** record normal gameplay objectives or routine live-st
 - Adapted observability patterns from `aws-observability-instrumentation`: closed event/stop/failure taxonomies, stable naming, ownership boundaries, static enforcement, and structured agent-trace metadata without prompt/chain-of-thought capture.
 - Added deterministic regression scenarios for mandatory screenshot evidence, duplicate horizon entries, explicit DeepSeek reviewer fallback, and stale accepted `active_candidate` continuation.
 - Added `pnpm gauntlet:eval`, a static prompt contract gate, `/gauntlet-eval`, and a project-local Gauntlet observability skill.
+- Added optional `pnpm gauntlet:eval:model` / `/gauntlet-eval-model` so the real configured orchestrator/model can be exercised against synthetic read-only scenarios. The returned structured decision is checked deterministically against scenario expectations.
+- Added compact gitignored incident artifacts for deterministic, prompt-gate, and model-eval failures. They retain bounded metadata and expected/observed results, not complete prompts, transcripts, credentials, or chain-of-thought.
+- Wired the zero-cost deterministic Gauntlet suite into `test-all`; model-backed evals remain opt-in because they consume model allowance/tokens.
 - Made acceptance a single transition: clear the accepted objective from `active_candidate`, persist accepted/current/horizon state, commit, then continue to the indexed next objective.
 - Defined an `active_candidate` that already appears in accepted state as stale bookkeeping. Pickup repairs it locally instead of attempting to resume an already accepted objective.
 - Declared successful acceptance commits, stale-state repair, and horizon exhaustion as non-stop conditions. Horizon exhaustion triggers immediate strategic reassessment and continuation unless an explicit stop condition applies.
+- Deliberately did not add a session-end hook in v1: Grok Build documents lifecycle hooks/`PreToolUse`, but this implementation does not depend on an unverified session-end blocking event contract.
 
 ### Why
 
 A live run accepted `BROWSER-MATCH-PHASE-DISPLAY` and advanced `next_objective_id`/`HORIZON.current_index`, but `CURRENT.active_candidate` still pointed at the accepted objective. The newer pickup rules simultaneously said to resume an active candidate and not restart accepted work, creating a contradictory state that could end orchestration instead of launching the next objective.
 
-The regression was a prompt/state-machine problem, so the fix is guarded like code: a deterministic fixture captures the known failure, static prompt checks prevent removal of the continuation semantics, and future runtime/model evals can verify the actual model trajectory separately.
+The regression was a prompt/state-machine problem, so the fix is guarded like code: a deterministic fixture captures the known failure, static prompt checks prevent removal of the continuation semantics, and the optional model-backed runner can verify how the actual configured orchestrator/model interprets the same synthetic scenarios.
 
 ### Preserved
 
@@ -41,6 +47,7 @@ The regression was a prompt/state-machine problem, so the fix is guarded like co
 - `.grok/skills/gauntlet/SKILL.md`
 - `.grok/skills/gauntlet-continue/SKILL.md`
 - `.grok/skills/gauntlet-eval/SKILL.md`
+- `.grok/skills/gauntlet-eval-model/SKILL.md`
 - `.grok/skills/gauntlet-observability/SKILL.md`
 - `gauntlet/evals/**`
 
