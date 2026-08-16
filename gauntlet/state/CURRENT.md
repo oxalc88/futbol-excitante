@@ -9,7 +9,7 @@ handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 next_objective_id: BROWSER-GOAL-EFFECT
 best_known:
-  commit: (pending acceptance)
+  commit: c39f8d8
   note: "BROWSER-MATCH-PHASE-DISPLAY accepted. Advancing to next horizon objective: BROWSER-GOAL-EFFECT — brief visual feedback on goal with overlay text and scoreboard highlight."
 active_candidate:
   objective_id: BROWSER-MATCH-PHASE-DISPLAY
