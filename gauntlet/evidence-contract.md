@@ -8,6 +8,7 @@ Required evidence is an acceptance gate, not advisory guidance. For each objecti
 
 - Tests demonstrate executable behavior but never substitute for required perceptual artifacts.
 - For gameplay/presentation changes, at least one screenshot is mandatory. The artifact must exist under `docs/screenshots/<objective-id>/`; listing a nonexistent path is not evidence.
+- Any objective whose acceptance criteria require browser-visible or browser-interactive behavior is screenshot-required even when the implementation is primarily URL routing, input wiring, state selection, or other browser glue. A browser objective is not exempt merely because its code is not in the renderer.
 - If a required behavior cannot reasonably be demonstrated by a still image, require supported dynamic evidence only when the repository already contains a committed capture command and rule for it. Do not invent video tooling or a video requirement.
 - Screenshots or dynamic captures are diagnostic evidence. They do not establish PES fidelity, a perceptual `PASS`, or a protected regression `PASS` without the required versioned oracle/review policy.
 - Missing mandatory evidence prevents `ACCEPT` at every review and orchestration stage.
@@ -43,7 +44,7 @@ Rules:
 - `claims_not_made` must explicitly refuse PES fidelity, `FOUNDATION_LAB_PASS`, invented reference envelopes, and regression `PASS` unless those registries exist and passed.
 - If a required command cannot run because the toolchain is not there yet, that is a failed objective unless the objective *is* creating that toolchain.
 - Do not commit, push, or rewrite specs, research, or Gauntlet agents.
-- For gameplay/presentation changes, capture at least one screenshot via `WIP_SECTION=<objective-id> pnpm run capture-wip` and list the files under `docs/screenshots/<objective-id>/` in `artifacts`.
+- For gameplay/presentation changes and browser-visible/browser-interactive objectives, capture at least one screenshot via `WIP_SECTION=<objective-id> pnpm run capture-wip` and list the files under `docs/screenshots/<objective-id>/` in `artifacts`.
 
 ## Critic verdict
 

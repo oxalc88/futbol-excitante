@@ -5,7 +5,8 @@ export type ScenarioKind =
   | "evidence_gate"
   | "horizon_validation"
   | "routing_fallback"
-  | "continuation";
+  | "continuation"
+  | "tracking_gate";
 
 export interface ScenarioExpectation {
   decision: string;
@@ -21,6 +22,7 @@ export interface EvidenceGateScenario {
   input: {
     objective_id: string;
     gameplay_or_presentation: boolean;
+    browser_behavior?: boolean;
     screenshot_required: boolean;
     screenshot_exists: boolean;
     critic_verdict: "ACCEPT" | "RETRY" | "REJECT";
@@ -63,11 +65,25 @@ export interface ContinuationScenario {
   expect: ScenarioExpectation;
 }
 
+export interface TrackingGateScenario {
+  id: string;
+  kind: "tracking_gate";
+  input: {
+    objective_id: string;
+    tracking_markers_match: boolean;
+    per_step_usage_recorded: boolean;
+    model_aggregates_refreshed: boolean;
+    model_evaluation_recorded: boolean;
+  };
+  expect: ScenarioExpectation;
+}
+
 export type GauntletScenario =
   | EvidenceGateScenario
   | HorizonValidationScenario
   | RoutingFallbackScenario
-  | ContinuationScenario;
+  | ContinuationScenario
+  | TrackingGateScenario;
 
 export interface EvaluationResult extends ScenarioExpectation {
   scenario_id: string;

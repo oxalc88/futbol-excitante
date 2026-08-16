@@ -6,13 +6,15 @@ import type {
   EvidenceGateScenario,
   HorizonValidationScenario,
   RoutingFallbackScenario,
+  TrackingGateScenario,
 } from "../contracts/scenario.js";
 
 function evaluateEvidence(scenario: EvidenceGateScenario): EvaluationResult {
-  const missingRequiredScreenshot =
-    scenario.input.gameplay_or_presentation &&
-    scenario.input.screenshot_required &&
-    !scenario.input.screenshot_exists;
+  const screenshotIsMandatory =
+    scenario.input.gameplay_or_presentation ||
+    scenario.input.browser_behavior === true ||
+    scenario.input.screenshot_required;
+  const missingRequiredScreenshot = screenshotIsMandatory && !scenario.input.screenshot_exists;
 
   if (missingRequiredScreenshot && scenario.input.critic_verdict === "ACCEPT") {
     return {
@@ -106,6 +108,24 @@ function evaluateContinuation(scenario: ContinuationScenario): EvaluationResult 
   return { scenario_id: scenario.id, decision: "replan" };
 }
 
+function evaluateTracking(scenario: TrackingGateScenario): EvaluationResult {
+  const complete =
+    scenario.input.tracking_markers_match &&
+    scenario.input.per_step_usage_recorded &&
+    scenario.input.model_aggregates_refreshed &&
+    scenario.input.model_evaluation_recorded;
+
+  if (!complete) {
+    return {
+      scenario_id: scenario.id,
+      decision: "repair_tracking",
+      failure_class: "tracking_missing",
+    };
+  }
+
+  return { scenario_id: scenario.id, decision: "tracking_complete" };
+}
+
 export function evaluateScenario(scenario: GauntletScenario): EvaluationResult {
   switch (scenario.kind) {
     case "evidence_gate":
@@ -116,5 +136,7 @@ export function evaluateScenario(scenario: GauntletScenario): EvaluationResult {
       return evaluateRouting(scenario);
     case "continuation":
       return evaluateContinuation(scenario);
+    case "tracking_gate":
+      return evaluateTracking(scenario);
   }
 }

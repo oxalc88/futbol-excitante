@@ -46,7 +46,7 @@ function buildPrompt(scenario: GauntletScenario): string {
     "Use the orchestration rules loaded for this agent and decide what the orchestrator SHOULD do for the synthetic scenario below.",
     "Return exactly one JSON object and no prose.",
     "Allowed fields: decision, failure_class, next_objective, next_agent, clear_active_candidate.",
-    "Allowed decisions: reject_acceptance, allow_review_result, reject_state, state_valid, fallback, do_not_model_fallback, repair_and_continue, continue, replan, stop.",
+    "Allowed decisions: reject_acceptance, allow_review_result, reject_state, state_valid, fallback, do_not_model_fallback, repair_and_continue, continue, replan, stop, repair_tracking, tracking_complete.",
     "Omit fields that do not apply.",
     `Scenario: ${JSON.stringify({ id: scenario.id, kind: scenario.kind, input: scenario.input })}`,
   ].join("\n");

@@ -6,6 +6,7 @@ export const GAUNTLET_FAILURE_CLASSES = [
   "mandatory_evidence_missing",
   "invalid_acceptance",
   "state_transition",
+  "tracking_missing",
   "prompt_contract",
   "model_unavailable",
   "rate_limited",

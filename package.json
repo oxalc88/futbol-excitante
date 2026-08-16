@@ -12,6 +12,7 @@
     "replay-verify": "tsx src/apps/headless/replay-verify-cli.ts",
     "eval-compare": "tsx src/apps/headless/eval-compare-cli.ts",
     "gauntlet:eval": "tsx gauntlet/evals/src/run.ts",
+    "gauntlet:eval:state": "tsx gauntlet/evals/src/run-state-audit.ts",
     "gauntlet:eval:model": "tsx gauntlet/evals/src/run-model.ts",
     "test": "vitest run --project node",
     "test-browser": "vitest run --project browser",
