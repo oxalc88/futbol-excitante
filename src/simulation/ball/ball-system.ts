@@ -19,7 +19,7 @@
 
 import type { BallState } from "../../contracts/state.js";
 import type { SimulationEvent } from "../../contracts/scenario.js";
-import type { GoalConfig } from "../../config/foundation.js";
+import type { GoalConfig } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -50,10 +50,12 @@ const DEFAULT_CONFIG = {
   airDrag: { value: 0.001 },
   curveCoefficient: { value: 0.0005 },
   goal: {
-    postRadius: { value: 0.05 },
-    crossbarRadius: { value: 0.05 },
-    goalWidth: { value: 7.32 },
-    goalHeight: { value: 2.44 },
+    id: "foundation-goal-v1",
+    label: "provisional",
+    postRadius: { value: 0.05, unit: "m", note: "provisional goal post radius" },
+    crossbarRadius: { value: 0.05, unit: "m", note: "provisional crossbar radius" },
+    goalWidth: { value: 7.32, unit: "m", note: "standard goal width between posts" },
+    goalHeight: { value: 2.44, unit: "m", note: "standard goal height from ground to crossbar" },
   },
 } as const;
 

@@ -74,6 +74,8 @@ export interface TelemetryObservation {
     sequence: number;
     kind: string;
     label: string;
+    /** Typed payload — schema depends on kind. */
+    payload?: Record<string, unknown>;
   }>;
 }
 
