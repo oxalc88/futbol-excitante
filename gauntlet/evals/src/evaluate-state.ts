@@ -1,5 +1,23 @@
 import { isAllowedStopReason } from "../contracts/stop-reasons.js";
-import type { EvaluationResult, GauntletScenario, ContinuationScenario, EvidenceGateScenario, HorizonValidationScenario, RoutingFallbackScenario, TrackingGateScenario, CompositionGateScenario, AcceptedStateGateScenario, EvalFreshnessGateScenario, EvidenceUniquenessGateScenario, TimingConsistencyGateScenario, AcceptancePipelineGateScenario } from "../contracts/scenario.js";
+import type {
+  EvaluationResult,
+  GauntletScenario,
+  ContinuationScenario,
+  EvidenceGateScenario,
+  HorizonValidationScenario,
+  RoutingFallbackScenario,
+  TrackingGateScenario,
+  CompositionGateScenario,
+  AcceptedStateGateScenario,
+  EvalFreshnessGateScenario,
+  EvidenceUniquenessGateScenario,
+  TimingConsistencyGateScenario,
+  AcceptancePipelineGateScenario,
+  AcceptanceClaimGateScenario,
+  PostAcceptanceContinuationGateScenario,
+  ManifestGateScenario,
+  DynamicSequenceGateScenario,
+} from "../contracts/scenario.js";
 
 function evaluateEvidence(s: EvidenceGateScenario): EvaluationResult {
   const mandatory = s.input.gameplay_or_presentation || s.input.browser_behavior === true || s.input.screenshot_required;
@@ -75,6 +93,32 @@ function evaluateAcceptancePipeline(s: AcceptancePipelineGateScenario): Evaluati
   return { scenario_id: s.id, decision: "candidate_acceptance_ready" };
 }
 
+function evaluateAcceptanceClaim(s: AcceptanceClaimGateScenario): EvaluationResult {
+  const durable = s.input.acceptance_record_exists && s.input.objective_manifest_exists && s.input.state_marks_accepted && s.input.candidate_commit_exists;
+  if (s.input.claims_fully_accepted && !durable) return { scenario_id: s.id, decision: "reject_claim", failure_class: "acceptance_claim_unproven" };
+  return { scenario_id: s.id, decision: durable ? "acceptance_claim_allowed" : "candidate_not_final" };
+}
+
+function evaluatePostAcceptanceContinuation(s: PostAcceptanceContinuationGateScenario): EvaluationResult {
+  if (s.input.stop_reason && isAllowedStopReason(s.input.stop_reason)) return { scenario_id: s.id, decision: "stop" };
+  if (!s.input.acceptance_finalized) return { scenario_id: s.id, decision: "finish_acceptance" };
+  if (s.input.horizon_exhausted) return { scenario_id: s.id, decision: "replan_and_continue" };
+  if (s.input.next_objective) return { scenario_id: s.id, decision: "continue", next_objective: s.input.next_objective };
+  return { scenario_id: s.id, decision: "replan_and_continue" };
+}
+
+function evaluateManifest(s: ManifestGateScenario): EvaluationResult {
+  const applies = s.input.objective_accepted && /^0\.(?:[89]|[1-9]\d+)\./.test(s.input.gauntlet_version);
+  if (applies && (!s.input.manifest_exists || !s.input.artifact_commit_bound || !s.input.reviews_persisted)) return { scenario_id: s.id, decision: "reject_acceptance", failure_class: "manifest_missing" };
+  return { scenario_id: s.id, decision: "manifest_valid" };
+}
+
+function evaluateDynamicSequence(s: DynamicSequenceGateScenario): EvaluationResult {
+  if (s.input.evidence_class !== "DYNAMIC_VISUAL") return { scenario_id: s.id, decision: "sequence_not_required" };
+  const valid = s.input.frame_count >= 3 && s.input.frame_count <= 5 && s.input.sequence_manifest_exists && s.input.labels_complete;
+  return valid ? { scenario_id: s.id, decision: "sequence_valid" } : { scenario_id: s.id, decision: "reject_acceptance", failure_class: "dynamic_sequence_missing" };
+}
+
 export function evaluateScenario(s: GauntletScenario): EvaluationResult {
   switch (s.kind) {
     case "evidence_gate": return evaluateEvidence(s);
@@ -88,5 +132,9 @@ export function evaluateScenario(s: GauntletScenario): EvaluationResult {
     case "evidence_uniqueness_gate": return evaluateUniqueness(s);
     case "timing_consistency_gate": return evaluateTimingConsistency(s);
     case "acceptance_pipeline_gate": return evaluateAcceptancePipeline(s);
+    case "acceptance_claim_gate": return evaluateAcceptanceClaim(s);
+    case "post_acceptance_continuation_gate": return evaluatePostAcceptanceContinuation(s);
+    case "manifest_gate": return evaluateManifest(s);
+    case "dynamic_sequence_gate": return evaluateDynamicSequence(s);
   }
 }
