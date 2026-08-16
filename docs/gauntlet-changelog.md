@@ -4,6 +4,48 @@ Human-readable history of meaningful changes to the Gauntlet's **rules, prompts,
 
 This changelog does **not** record normal gameplay objectives or routine live-state updates produced by the running Gauntlet. Git remains the source of truth for exact file contents and diffs.
 
+## 2026-08-15 — Explicit DeepSeek fallback agents
+
+**Prompt version:** `v4-explicit-deepseek-fallback-agents`
+
+### Changed
+
+- Replaced the critic/reviewer fallback pattern that attempted to reuse the same agent type with a different model override.
+- Added `critic-flash`, explicitly bound to current `deepseek-v4-flash`, as the fallback for the primary `critic` on `deepseek-v4-flash-0731`.
+- Added `integration-reviewer-flash`, explicitly bound to current `deepseek-v4-flash`, as the corresponding integration-review fallback.
+- Updated `gauntlet/models.json` so fallback routing references the explicit agent types rather than a raw model ID for the same role.
+- Updated both orchestrator prompts and the main Gauntlet prompt so a 0731 model-specific availability/allowance/capacity failure spawns the explicit current-Flash fallback agent. They must not retry `critic` or `integration-reviewer` by overriding that agent's model in place.
+- Preserved later Qwen/MiMo reviewer fallbacks and the requirement that the review model differ from the builder model.
+- Kept the overflow orchestrator itself on current `deepseek-v4-flash`; this change is specifically about spawned critic/integration roles.
+
+### Why
+
+During a live run, `deepseek-v4-flash-0731` correctly returned allowance exhaustion while the current `deepseek-v4-flash` overflow orchestrator continued to work. The attempted critic fallback to current Flash then resolved back to the exhausted 0731 role before falling through to MiMo. Repository history showed that the fallback rule existed, but the critic and integration agent types remained pinned to 0731. This exposed a latent routing ambiguity/regression: an in-place model override for a spawned agent was not a reliable way to change the model selected for that agent type.
+
+Using separate agent types makes the fallback unambiguous to Grok Build while preserving the intended `0731 → current Flash → independent Qwen/MiMo` fallback behavior.
+
+### Prompt/rule surface
+
+- `gauntlet/models.json`
+- `gauntlet/PROMPT.md`
+- `.grok/agents/orchestrator.md`
+- `.grok/agents/orchestrator-deepseek.md`
+- `.grok/agents/critic-flash.md` (new)
+- `.grok/agents/integration-reviewer-flash.md` (new)
+
+### User-level configuration
+
+The repository cannot edit `~/.grok/config.toml`. Machines running this Gauntlet should add the explicit agent mappings under `[subagents.models]`:
+
+```toml
+critic-flash = "deepseek-v4-flash"
+integration-reviewer-flash = "deepseek-v4-flash"
+```
+
+The existing `critic = "deepseek-v4-flash-0731"` and `integration-reviewer = "deepseek-v4-flash-0731"` mappings remain valid because 0731 is still the preferred primary review model when its allowance is available.
+
+---
+
 ## 2026-08-15 — Mandatory evidence and horizon invariant gates
 
 **Prompt version:** `v3-evidence-horizon-gates`
