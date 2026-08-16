@@ -5,11 +5,11 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-16T08:45:00Z
+measured_at: 2026-08-16T09:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: SCENARIO-2V2-FIXTURE
-usage_aggregates_through: SCENARIO-2V2-FIXTURE
-model_evaluation_through: SCENARIO-2V2-FIXTURE
+last_tracked_objective: CPU-BASIC-FORMATION
+usage_aggregates_through: CPU-BASIC-FORMATION
+model_evaluation_through: CPU-BASIC-FORMATION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -106,6 +106,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | CPU-TEAMMATE-PASS | accepted | ~28m | 17.2m | 9.0m | 1.9m | ~0.5m | ~5.2M est. | n/a** |
 | CPU-MULTI-PLAYER | accepted | ~17m | 10.1m | 7.2m | 5.5m | ~0.5m | ~3.8M est. | n/a** |
 | SCENARIO-2V2-FIXTURE | accepted | ~1h 3m | 49m | 3m | 12m | ~0.5m | ~12M est. | n/a** |
+| CPU-BASIC-FORMATION | accepted | ~1h 54m | 50m | 7m | 7m | ~0.5m | ~5M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -283,6 +284,7 @@ on an H task is the interesting result.
 | CPU-TEAMMATE-PASS | qwen3.6 | M | Medium — new module, existing harness | 0 | A | Added teammate-aware pass targeting; getBestTeammateTarget helper; 13 unit tests; critic ACCEPT first pass |
 | CPU-MULTI-PLAYER | qwen3.6 | M | Medium — new module, existing harness | 0 | A | controlledPlayerId-based player lookup; multi-adapter independence; 12 unit tests; critic ACCEPT first pass |
 | SCENARIO-2V2-FIXTURE | qwen3.6 | M | Medium — browser glue, selector routing, CPU adapter tests | 0 | A | ?mode=ai-match&scenario=2v2 selector routing; 14 CPU independence tests; 11 selector tests; critic ACCEPT first pass |
+| CPU-BASIC-FORMATION | qwen3.6 | H | High — new physics behavior in CPU adapter (defense mode blend) | 0 | A | 20% pull toward own goal with linear blend 20m→40m; 22 tests; no regressions; critic ACCEPT first pass |
 
 ### Reviewer route and catches
 
@@ -296,6 +298,8 @@ on an H task is the interesting result.
 | CPU-MULTI-PLAYER | integration-reviewer-flash (deepseek-v4-flash) | direct 0731 exhausted, flash used | ACCEPT | dependency direction clean, no eval modifications, 1224/1224 regressions pass |
 | SCENARIO-2V2-FIXTURE | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
 | SCENARIO-2V2-FIXTURE | integration-reviewer-flash (deepseek-v4-flash) | first REJECT (scope violation: capture-extract.js); fixed, re-review ACCEPT | ACCEPT | 1282/1282 regressions, scope violation removed, blank screenshot known pipeline limitation |
+| CPU-BASIC-FORMATION | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
+| CPU-BASIC-FORMATION | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1278/1278 regressions pass, no eval file modifications, formation blend confined to adapter layer |
 
 ### Builder scoreboard
 

@@ -1698,3 +1698,79 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 45 — 2026-08-16
+
+- objective_id: CPU-BASIC-FORMATION
+- builder: builder-qwen / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- notes: Formation blend in CPU defense mode — when ball is beyond CHASE_FORMATION_THRESHOLD (20m), players gradually shift toward a formation position 20% toward their own goal. Linear blend from pure chase at 20m to pure formation at 40m. 22 formation-specific tests (CPU-FORMATION-001 through 009). 1278/1278 full suite pass. Screenshot artifact at docs/screenshots/CPU-BASIC-FORMATION/frame-000.png (20KB).
+
+### Critic verdict (ACCEPT — first pass)
+
+```markdown
+## Critic verdict
+- objective_id: CPU-BASIC-FORMATION
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CPU-BASIC-FORMATION
+- reviewer_agent: integration-reviewer-flash
+- reviewer_model: deepseek-v4-flash
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (1278/1278 full suite, 0 regressions)
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+## Iteration 44 — 2026-08-16
+
+- objective_id: SCENARIO-2V2-FIXTURE
+- builder: builder-qwen / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (after prior REJECT for scope violation; fixed by removing extra capture-extract.js file)
+- result: accepted
+- notes: ?mode=ai-match&scenario=2v2 selector routing (scenario-selector.ts now checks scenario param inside ai-match branch). 14 CPU adapter independence tests (2v2-cpu-independence.test.ts): 4 adapters per slot, non-zero frames, independent movement vectors, per-slot routing correctness, 60-tick simulation loop, determinism hash. 3 new selector tests (BROWSER-SCENARIO-SELECTOR-005). Screenshot artifact at docs/screenshots/SCENARIO-2V2-FIXTURE/frame-000.png (diagnostic — blank white, known pipeline limitation). 1282/1282 full suite pass. No core changes — only browser glue layer.
+
+### Critic verdict (ACCEPT — first pass)
+
+```markdown
+## Critic verdict
+- objective_id: SCENARIO-2V2-FIXTURE
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: SCENARIO-2V2-FIXTURE
+- reviewer_agent: integration-reviewer-flash
+- reviewer_model: deepseek-v4-flash
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (1282/1282 full suite, 3/3 architecture contracts)
+- verdict: ACCEPT
+- required_fixes: none
+```

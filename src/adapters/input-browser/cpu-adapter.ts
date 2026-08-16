@@ -74,6 +74,12 @@ export interface CpuObservation {
   teammates?: CpuTeammate[];
   /** The CPU's own controlled player ID. */
   controlledPlayerId?: string;
+  /**
+   * Optional formation position for the controlled player.
+   * When present, the CPU blends between chasing the ball and
+   * holding its formation position while in defense mode.
+   */
+  formationPosition?: { x: number; y: number };
 }
 
 // ---------------------------------------------------------------------------
@@ -122,7 +128,7 @@ export function buildCpuObservation(
     }
   }
 
-  return {
+  const result: CpuObservation = {
     players: world.players.map((p) => ({
       playerId: p.playerId,
       teamId: p.teamId,
@@ -149,6 +155,24 @@ export function buildCpuObservation(
     teammates: teammates.length > 0 ? teammates : undefined,
     controlledPlayerId: resolvedControlledPlayerId,
   };
+
+  // Derive a formation position for the controlled player: 20% toward
+  // the player's own goal from their current position.  This gives a
+  // simple "defenders stay back, attackers advance" heuristic.
+  if (cpuTeamId) {
+    const ownGoalX = cpuTeamId === "team-b" ? pitchLength / 2 : -pitchLength / 2;
+    const controlledPlayer = world.players.find(
+      (p) => p.playerId === resolvedControlledPlayerId,
+    );
+    const resolvedX = controlledPlayer?.groundPosition.x ?? world.players[0]?.groundPosition.x ?? 0;
+    const resolvedY = controlledPlayer?.groundPosition.y ?? world.players[0]?.groundPosition.y ?? 0;
+    result.formationPosition = {
+      x: resolvedX + (ownGoalX - resolvedX) * 0.2,
+      y: resolvedY,
+    };
+  }
+
+  return result;
 }
 
 // ---------------------------------------------------------------------------
@@ -287,14 +311,26 @@ const FACING_TOLERANCE_BACKUP = Math.PI * 0.75;
  */
 const SHOT_COOLDOWN_TICKS = 15;
 
-/**
- * Minimum possession range when in shot cooldown.
+/** Minimum possession range when in shot cooldown.
  * Extends the effective POSSESSION_RANGE during cooldown
  * so the CPU doesn't lose possession the moment the ball
  * stops moving right next to it.
  * Provisional: unmeasured PES 2017 value.
  */
 const POSSESSION_RANGE_COOLDOWN = 3;
+
+/**
+ * Distance (metres) at which the CPU fully commits to formation
+ * positioning during defense.  Below this threshold: chase only.
+ * 1.5× this value: formation fully active.
+ *
+ * The blend is only applied when the ball is behind the player
+ * (toward own goal); when the ball is ahead, the CPU chases fully
+ * regardless of distance.
+ *
+ * Provisional placeholder — not a measured PES value.
+ */
+const CHASE_FORMATION_THRESHOLD = 20;
 
 /**
  * Get the opponent goal x-coordinate for a given team.
@@ -573,12 +609,46 @@ export function createCpuAdapter(): CpuAdapter {
           (distToGoal > SHOT_RANGE_WIDE || !isFacingGoal);
       } else {
         // ----------------------------------------------------------------
-        // DEFENSE MODE — chase ball
+        // DEFENSE MODE — chase ball with formation blend
         // ----------------------------------------------------------------
+
+        // --- Default chase direction (always applied) ---
         if (distToBall > 0.001) {
+          // Clamp magnitude to distToBall when ball is within 1m so the CPU
+          // doesn't overshoot the ball during FIRST_TOUCH acquisition.
           const distUnit = Math.min(distToBall, 1);
           moveX = (dx / distToBall) * distUnit;
           moveY = (dy / distToBall) * distUnit;
+        }
+
+        // --- Optional formation blend (only when formationPosition is set) ---
+        const formPos = observation.formationPosition;
+        if (formPos) {
+          const fdx = formPos.x - playerX;
+          const fdy = formPos.y - playerY;
+          const fDist = Math.sqrt(fdx * fdx + fdy * fdy);
+          if (fDist > 0.001) {
+            // Only blend when the ball is BEHIND the player (toward own goal).
+            // When the ball is ahead, the CPU chases fully regardless.
+            const cpuTeamId = observation.cpuTeamId;
+            const isBehind = cpuTeamId === "team-b"
+              ? ball.position.x > playerX  // team-b own goal at +x; ball > player = behind
+              : ball.position.x < playerX; // team-a own goal at -x; ball < player = behind
+
+            if (isBehind) {
+              // Blend: 0 = chase, 1 = hold formation.
+              //  Within CHASE_FORMATION_THRESHOLD → chase fully
+              //  Beyond 2× threshold → formation fully
+              const blendRange = CHASE_FORMATION_THRESHOLD;
+              const formationWeight = Math.min(
+                Math.max((distToBall - CHASE_FORMATION_THRESHOLD) / blendRange, 0),
+                1,
+              );
+
+              moveX = moveX * (1 - formationWeight) + (fdx / fDist) * formationWeight;
+              moveY = moveY * (1 - formationWeight) + (fdy / fDist) * formationWeight;
+            }
+          }
         }
 
         // FIRST_TOUCH: press when entering range, hold while in range.
