@@ -44,11 +44,19 @@ describe("AI-MATCH-E2E-001: CPU slot ownership and pursuit", () => {
 
     const frameA = cpuA.sample(
       0,
-      buildCpuObservation(world, assignments["slot-1"].teamId, assignments["slot-1"].controlledPlayerId),
+      buildCpuObservation(
+        world,
+        assignments["slot-1"].teamId,
+        assignments["slot-1"].controlledPlayerId,
+      ),
     );
     const frameB = cpuB.sample(
       0,
-      buildCpuObservation(world, assignments["slot-2"].teamId, assignments["slot-2"].controlledPlayerId),
+      buildCpuObservation(
+        world,
+        assignments["slot-2"].teamId,
+        assignments["slot-2"].controlledPlayerId,
+      ),
     );
 
     // player-a owns kickoff from x=-0.5 and should move toward +x.
@@ -82,11 +90,19 @@ describe("AI-MATCH-E2E-001: CPU slot ownership and pursuit", () => {
       const snapshot = sim.snapshot();
       const frameA = cpuA.sample(
         sim.tick,
-        buildCpuObservation(snapshot, assignments["slot-1"].teamId, assignments["slot-1"].controlledPlayerId),
+        buildCpuObservation(
+          snapshot,
+          assignments["slot-1"].teamId,
+          assignments["slot-1"].controlledPlayerId,
+        ),
       );
       const frameB = cpuB.sample(
         sim.tick,
-        buildCpuObservation(snapshot, assignments["slot-2"].teamId, assignments["slot-2"].controlledPlayerId),
+        buildCpuObservation(
+          snapshot,
+          assignments["slot-2"].teamId,
+          assignments["slot-2"].controlledPlayerId,
+        ),
       );
       frameA.controlSlot = "slot-1";
       frameB.controlSlot = "slot-2";
