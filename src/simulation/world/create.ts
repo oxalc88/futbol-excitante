@@ -58,6 +58,8 @@ function scenarioPlayerToState(
     desiredHeading: entry.desiredHeading,
     archetypeId: entry.archetypeId,
     archetypeTransientAccel: resolveArchetypeTransientAccel(entry.archetypeId),
+    formationRole: (entry as Record<string, unknown>)
+      .formationRole as "defender" | "midfielder" | "attacker" | undefined,
   };
 }
 

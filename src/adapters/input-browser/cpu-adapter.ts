@@ -63,6 +63,13 @@ export interface CpuObservation {
     groundPosition: { x: number; y: number };
     linearVelocity: { x: number; y: number };
     bodyHeading: number;
+    /**
+     * Optional formation role that controls the strength of the
+     * pull toward own goal.  When absent, the default 20% pull applies.
+     * Roles: "defender" (strong pull), "midfielder" (moderate),
+     * "attacker" (weak pull).
+     */
+    formationRole?: "defender" | "midfielder" | "attacker";
   }>;
   /** The independent ball state. */
   ball: {
@@ -152,6 +159,11 @@ export function buildCpuObservation(
       groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
       linearVelocity: { x: p.linearVelocity.x, y: p.linearVelocity.y },
       bodyHeading: p.bodyHeading,
+      formationRole: (p as Record<string, unknown>).formationRole as
+        | "defender"
+        | "midfielder"
+        | "attacker"
+        | undefined,
     })),
     ball: {
       position: {
@@ -173,9 +185,9 @@ export function buildCpuObservation(
     controlledPlayerId: resolvedControlledPlayerId,
   };
 
-  // Derive a formation position for the controlled player: 20% toward
-  // the player's own goal from their current position.  This gives a
-  // simple "defenders stay back, attackers advance" heuristic.
+  // Derive a formation position for the controlled player: the pull
+  // fraction toward own goal depends on the player's formation role.
+  // When no role is set, defaults to the legacy 20% pull.
   if (cpuTeamId) {
     const ownGoalX = cpuTeamId === "team-b" ? pitchLength / 2 : -pitchLength / 2;
     const controlledPlayer = world.players.find(
@@ -183,8 +195,14 @@ export function buildCpuObservation(
     );
     const resolvedX = controlledPlayer?.groundPosition.x ?? world.players[0]?.groundPosition.x ?? 0;
     const resolvedY = controlledPlayer?.groundPosition.y ?? world.players[0]?.groundPosition.y ?? 0;
+    const formationRole = (controlledPlayer as Record<string, unknown>)?.formationRole as
+      | "defender"
+      | "midfielder"
+      | "attacker"
+      | undefined;
+    const pull = getFormationPull(formationRole);
     result.formationPosition = {
-      x: resolvedX + (ownGoalX - resolvedX) * 0.2,
+      x: resolvedX + (ownGoalX - resolvedX) * pull,
       y: resolvedY,
     };
   }
@@ -362,6 +380,36 @@ const CHASE_FORMATION_THRESHOLD = 20;
  * Provisional placeholder — not a measured PES value.
  */
 const FORMATION_RECOVERY_RATE = 0.02;
+
+// ---------------------------------------------------------------------------
+// Role-aware formation pull (provisional PES 2017 values)
+// ---------------------------------------------------------------------------
+
+/**
+ * Pull fraction toward own goal for each formation role.
+ *  - defender:  40%  → stays deep, holds defensive shape
+ *  - midfielder: 20% → moderate positioning (legacy default)
+ *  - attacker:   5%  → pushes forward, minimal pull
+ *
+ * A value of 0 means the player stays at their current X.
+ * A value of 1 means full pull to own-goal X.
+ *
+ * Provisional: unmeasured PES 2017 values.
+ */
+const DEFENDER_FORMATION_PULL = 0.4;
+const MIDFIELDER_FORMATION_PULL = 0.2;
+const ATTACKER_FORMATION_PULL = 0.05;
+
+/**
+ * Compute the formation pull factor for a given role.
+ * Returns the default 20% when no role is specified (backward compat).
+ */
+function getFormationPull(role?: "defender" | "midfielder" | "attacker"): number {
+  if (role === "defender") return DEFENDER_FORMATION_PULL;
+  if (role === "midfielder") return MIDFIELDER_FORMATION_PULL;
+  if (role === "attacker") return ATTACKER_FORMATION_PULL;
+  return MIDFIELDER_FORMATION_PULL; // default fallback (20%)
+}
 
 /**
  * Get the opponent goal x-coordinate for a given team.
