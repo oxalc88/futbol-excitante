@@ -1,10 +1,15 @@
+import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 
 export interface ArtifactRecord {
   path: string;
   sha256: string;
+  git_blob: string;
   candidate_commit: string;
   bytes: number;
 }
@@ -26,9 +31,22 @@ async function exists(file: string): Promise<boolean> {
 
 async function artifact(repoRoot: string, absolutePath: string, candidateCommit: string): Promise<ArtifactRecord> {
   const bytes = await readFile(absolutePath);
+  const relative = path.relative(repoRoot, absolutePath).replaceAll(path.sep, "/");
+  let committedBlob: string;
+  let localBlob: string;
+  try {
+    ({ stdout: committedBlob } = await execFileAsync("git", ["-C", repoRoot, "rev-parse", `${candidateCommit}:${relative}`], { encoding: "utf8" }));
+    ({ stdout: localBlob } = await execFileAsync("git", ["-C", repoRoot, "hash-object", absolutePath], { encoding: "utf8" }));
+  } catch {
+    throw new Error(`artifact is not present in candidate commit ${candidateCommit}: ${relative}`);
+  }
+  committedBlob = committedBlob.trim();
+  localBlob = localBlob.trim();
+  if (committedBlob !== localBlob) throw new Error(`artifact differs from candidate commit ${candidateCommit}: ${relative}`);
   return {
-    path: path.relative(repoRoot, absolutePath).replaceAll(path.sep, "/"),
+    path: relative,
     sha256: createHash("sha256").update(bytes).digest("hex"),
+    git_blob: committedBlob,
     candidate_commit: candidateCommit,
     bytes: bytes.byteLength,
   };
