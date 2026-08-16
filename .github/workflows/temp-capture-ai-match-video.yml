@@ -38,6 +38,9 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
       - name: Start Vite
         run: |
           pnpm exec vite --host 127.0.0.1 > /tmp/vite.log 2>&1 &
