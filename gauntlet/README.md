@@ -94,11 +94,10 @@ Two deterministic checks protect this split: each wrapper must reference an exis
 | `aux` | subagent | `gemma4` | none | Cheap summaries, file lists, bounded semantic audit |
 | `git-committer` | subagent | `gemma4` | git only | Atomic conventional commits and push when explicitly asked |
 
-Exact IDs are in `gauntlet/models.json` and must match `.grok/agents/<name>.md` frontmatter `model`. The user-level `~/.grok/config.toml` only needs to register the custom model endpoints themselves.
+Exact IDs are recorded in `gauntlet/models.json` and in each `.grok/agents/<name>.md` frontmatter `model`.
 
 The orchestrator delegates with `spawn_subagent`. `subagent_type` is the agent name. Builders use `capability_mode: all`. Critics, integration reviewers, `aux`, and `git-committer` use `capability_mode: execute`. Route DeepSeek reviewer fallback by agent type: if the 0731 role fails specifically for model availability, allowance exhaustion, or model-specific capacity/rate limiting, spawn `critic-flash` or `integration-reviewer-flash`. Do **not** retry `critic` or `integration-reviewer` with an in-place `model: deepseek-v4-flash` override. Do not change models for authentication, network, context, test, or ordinary task failures. A child that inherits `grok-4.6` is a routing bug. Commits go to `git-committer` / `gemma4`, never to the orchestrator.
 
-Project-local agent frontmatter owns the agent → model binding. For example, `grok --agent aux --always-approve` resolves the `model: gemma4` declared in `.grok/agents/aux.md`; an explicit `--model` override is only for intentional runtime override/debugging.
 
 ### Builder choice
 
@@ -154,7 +153,7 @@ grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-appro
 
 ## NaN models
 
-Grok loads custom model endpoint definitions from user `~/.grok/config.toml`; those global entries only make models such as `qwen3.6`, `mimo-v2.5`, `deepseek-v4-flash`, `deepseek-v4-flash-0731`, and `gemma4` available. Agent → model selection is project-local in each `.grok/agents/*.md` frontmatter and mirrored by `gauntlet/models.json` for Gauntlet routing/auditability. No user-level `[subagents.models]` migration is required for 0.8.
+The model IDs used by the Gauntlet are `qwen3.6`, `mimo-v2.5`, `deepseek-v4-flash`, `deepseek-v4-flash-0731`, and `gemma4`. No `[subagents.models]` change is part of the 0.8 repository update.
 
 Confirm with `grok models`. The process must have `NAN_API_KEY` set. A missing key registers the names but every NaN request fails with 401.
 
@@ -241,7 +240,7 @@ Do not add these agents under `~/.grok/agents/`. That would make them appear in 
 
 1. Edit `gauntlet/models.json`.
 2. Change the matching `.grok/agents/<name>.md` frontmatter `model`.
-3. If a NaN API id or endpoint changes, update the matching user-level `[model.*]` block; agent → model routing remains project-local in the corresponding wrapper frontmatter and `gauntlet/models.json`.
+3. If a NaN API id or endpoint changes, update the corresponding model configuration used by the runtime.
 4. Keep role behavior in `gauntlet/roles/**` / `gauntlet/PROMPT.md`; do not duplicate a canonical contract merely to change models.
 5. Confirm with `pnpm run gauntlet:eval` that wrapper-contract and model-routing consistency pass.
 6. Record semantic routing/rule changes in `docs/gauntlet-changelog.md`; do not write them into generated live state solely for documentation.
