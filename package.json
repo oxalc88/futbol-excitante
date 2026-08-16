@@ -11,6 +11,7 @@
     "sim-smoke": "tsx src/apps/headless/cli.ts --scenario eval/scenarios/foundation-move-and-roll.v1.json --out artifacts/sim-smoke",
     "replay-verify": "tsx src/apps/headless/replay-verify-cli.ts",
     "eval-compare": "tsx src/apps/headless/eval-compare-cli.ts",
+    "gauntlet:eval": "tsx gauntlet/evals/src/run.ts",
     "test": "vitest run --project node",
     "test-browser": "vitest run --project browser",
     "capture-wip": "WIP_SECTION=${WIP_SECTION:-capture} WIP_FRAMES=${WIP_FRAMES:-1} vitest run tests/browser/capture-wip.browser.test.ts --project browser",
