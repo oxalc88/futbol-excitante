@@ -7,7 +7,7 @@ horizon_id: "2v2-playable"
 created_from_commit: c5c66b0
 created_at: 2026-08-16
 reason: "Horizon cpu-team-play exhausted (5/5 accepted). PLAYABLE_1V1 milestone gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, human-needed spec). Next horizon targets a playable 2v2 AI-vs-AI match with CPU teammates passing to each other, team formations, and a full 2v2 browser match experience. These build toward the SMALL_SIDED_SHAPE milestone."
-current_index: 1
+current_index: 2
 objectives:
   - id: CPU-2V2-PASSING
     status: accepted
@@ -15,7 +15,7 @@ objectives:
     builder: builder-qwen
     prerequisite: CPU-BASIC-FORMATION
   - id: CPU-2V2-SCORING
-    status: pending
+    status: accepted
     reason: "Implement goal detection, scoring, and match reset for 2v2 matches. When the ball enters a goal zone, emit a goal event, update the scoreboard, and reset player positions. Reuses existing goal-collision detection from BALL-GOAL-COLLISION; extends to 2v2 match lifecycle (full-time detection, goal celebration, restart)."
     builder: builder-qwen
     prerequisite: CPU-2V2-PASSING

@@ -3,9 +3,13 @@
  *
  * Headless CPU-vs-CPU match runner.
  *
- * Creates two `CpuAdapter` instances (one per team), runs them against
- * each other in a headless simulation (no browser, no keyboard), and
- * returns all events, observations, and state hashes.
+ * Creates `CpuAdapter` instances (one per AI_FALLBACK control slot),
+ * runs them against each other in a headless simulation (no browser,
+ * no keyboard), and returns all events, observations, and state hashes.
+ *
+ * Supports multi-slot scenarios (e.g. 2v2 with 4 slots) by creating one
+ * CPU adapter per AI_FALLBACK control slot, building team-filtered
+ * observations, and submitting per-slot input frames.
  *
  * No Math.random, Date, DOM, or Node I/O.
  * Deterministic: same scenario (with same seed) → same results.
@@ -13,6 +17,8 @@
 
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
+import { deepClone } from "../../src/simulation/world/clone.js";
+import type { WorldState } from "../../src/contracts/state.js";
 import { createCpuAdapter, buildCpuObservation, type CpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
 import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
 import type { SimulationObserver } from "../../src/simulation/telemetry/observer.js";
@@ -96,6 +102,13 @@ export interface HeadlessMatchConfig {
    *   goalIndex 1 → ball crosses x = -52.5 → team attacking -x scores.
    */
   goalTeamMapping?: GoalTeamMapping;
+  /**
+   * Enable automatic goal reset: after each goal, reset ball to center
+   * and players to their starting positions.  Match clock continues
+   * (score accumulates).  Default: true for SMALL_SIDED / REGULATION
+   * profiles, false for LABORATORY profile.
+   */
+  autoGoalReset?: boolean;
 }
 
 /**
@@ -113,6 +126,18 @@ export interface MatchGoalEvent {
  * Score keyed by teamId.
  */
 export type MatchScore = Record<string, number>;
+
+/**
+ * Initial player positions for goal reset.
+ */
+export interface GoalResetPositions {
+  /** Starting ground positions for each player, keyed by playerId. */
+  playerPositions: Record<string, { x: number; y: number }>;
+  /** Starting ball position. */
+  ballPosition: { x: number; y: number; z: number };
+  /** Starting ball linear velocity. */
+  ballVelocity: { x: number; y: number; z: number };
+}
 
 /**
  * Result of a headless CPU-vs-CPU match.
@@ -147,6 +172,61 @@ export interface HeadlessMatchResult {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Build a GoalResetPositions record from the scenario's initial state.
+ *
+ * @param scenario - The scenario definition (unmutated).
+ * @returns Positions that can be used to reset after a goal.
+ */
+export function buildGoalResetPositions(
+  scenario: ScenarioDefinition,
+): GoalResetPositions {
+  const playerPositions: Record<string, { x: number; y: number }> = {};
+  for (const p of scenario.players) {
+    playerPositions[p.playerId] = {
+      x: p.groundPosition.x,
+      y: p.groundPosition.y,
+    };
+  }
+  return {
+    playerPositions,
+    ballPosition: { ...scenario.ball.position },
+    ballVelocity: { ...scenario.ball.linearVelocity },
+  };
+}
+
+/**
+ * Reset the simulation state after a goal: ball to center, players to start.
+ *
+ * Mutates the simulation in place via restore. The committed state is
+ * reset so that the next tick starts from a neutral configuration.
+ *
+ * @param sim - The simulation instance.
+ * @param reset - The goal reset positions.
+ */
+export function resetAfterGoal(
+  sim: import("../../src/simulation/loop/simulation.js").Simulation,
+  reset: GoalResetPositions,
+): void {
+  // snapshot() returns a deep-frozen clone; use deepClone to get a mutable copy.
+  const mutable = deepClone(sim.snapshot()) as WorldState;
+
+  // Reset ball position and velocity.
+  mutable.ball.position = { ...reset.ballPosition };
+  mutable.ball.linearVelocity = { ...reset.ballVelocity };
+  mutable.ball.regime = "ground-roll";
+  // Reset each player to starting position.
+  for (const player of mutable.players) {
+    const startPos = reset.playerPositions[player.playerId];
+    if (startPos) {
+      player.groundPosition = { x: startPos.x, y: startPos.y };
+      player.linearVelocity = { x: 0, y: 0 };
+      player.desiredVelocity = { x: 0, y: 0 };
+    }
+  }
+  sim.restore(mutable);
+}
 
 /**
  * Format elapsed seconds as mm:ss (count-up).
@@ -334,6 +414,9 @@ function computeMatchStats(
 
 /**
  * Run a headless CPU-vs-CPU match.
+ *
+ * Supports multi-slot scenarios (e.g. 2v2 with 4 slots) by creating one
+ * CPU adapter per AI_FALLBACK control slot.
  */
 export function runHeadlessMatch(
   config: HeadlessMatchConfig,
@@ -345,15 +428,18 @@ export function runHeadlessMatch(
     halfDurationTicks: halfDurationTicksRaw = Math.floor(matchDurationTicks / 2),
     observer,
     goalTeamMapping = DEFAULT_GOAL_TEAM_MAPPING,
+    autoGoalReset,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
+
+  // Auto-reset: enable for non-LABORATORY profiles, respect explicit config.
+  const doGoalReset = autoGoalReset ?? scenario.profile !== "LABORATORY";
 
   // 1. Create world and simulation.
   const world = createWorld({ scenario });
   const observations: TelemetryObservation[] = [];
 
   // Build observer that collects observations AND delegates to any user observer.
-  // We can't use spread because user onObservation would override ours.
   const collectObserver: SimulationObserver = {
     onBeforeStep: observer?.onBeforeStep,
     onAfterStep: observer?.onAfterStep,
@@ -367,23 +453,46 @@ export function runHeadlessMatch(
   };
   const sim = createSimulation(world, collectObserver);
 
-  // 2. Create two CPU adapters — one per team.
+  // 2. Create a CPU adapter per AI_FALLBACK control slot.
   //    Each adapter has its own internal state (hasPossession, ballWasInRange),
   //    so they don't interfere with each other.
-  const cpuA = createCpuAdapter();
-  const cpuB = createCpuAdapter();
-
-  // Build a teamId → controlSlot mapping from the scenario's assignments
-  // so we can assign each CPU frame the correct slot.
-  const teamToSlot = new Map<string, string>();
-  for (const [slot, assignment] of Object.entries(scenario.controlAssignments)) {
+  type SlotCpu = {
+    adapter: ReturnType<typeof createCpuAdapter>;
+    controlSlot: string;
+    teamId: string;
+    controlledPlayerId: string;
+  };
+  const slotCpus: SlotCpu[] = [];
+  for (const [slotId, assignment] of Object.entries(scenario.controlAssignments)) {
     const mode = (assignment as { mode?: string }).mode;
     if (mode === "AI_FALLBACK") {
-      teamToSlot.set(assignment.teamId, assignment.controlSlot);
+      slotCpus.push({
+        adapter: createCpuAdapter(),
+        controlSlot: slotId,
+        teamId: assignment.teamId,
+        controlledPlayerId: assignment.controlledPlayerId ?? "",
+      });
     }
   }
 
-  // 3. Run the match loop.
+  // Build a teamId → set of controlSlots mapping from the scenario.
+  const teamToSlots = new Map<string, Set<string>>();
+  for (const [slotId, assignment] of Object.entries(scenario.controlAssignments)) {
+    const mode = (assignment as { mode?: string }).mode;
+    if (mode === "AI_FALLBACK") {
+      let slots = teamToSlots.get(assignment.teamId);
+      if (!slots) {
+        slots = new Set();
+        teamToSlots.set(assignment.teamId, slots);
+      }
+      slots.add(slotId);
+    }
+  }
+
+  // 3. Build goal reset positions (from scenario initial state).
+  const goalReset = doGoalReset ? buildGoalResetPositions(scenario) : null;
+
+  // 4. Run the match loop.
   const events: SimulationEvent[] = [];
   const stateHashes: string[] = [];
 
@@ -394,8 +503,6 @@ export function runHeadlessMatch(
 
   for (let i = 0; i < maxTicks; i++) {
     // Phase derivation for this tick.
-    // The last tick of a match (with maxTicks > 1 and at least 2 half-durations)
-    // is always "fulltime" since the match is complete.
     const isLastTickAndFulltime =
       maxTicks > 1 && maxTicks >= 2 * halfDurationTicks && i === maxTicks - 1;
     let phase: MatchPhase;
@@ -427,41 +534,62 @@ export function runHeadlessMatch(
     //    Each CPU sees the full world but its OWN player is always first
     //    in the array (so the CpuAdapter picks the right player).
     const fullObs = buildCpuObservation(snapshot);
-    const obsA = buildTeamCpuObservation(fullObs, "team-a");
-    const obsB = buildTeamCpuObservation(fullObs, "team-b");
 
-    // c. Sample input frames from each CPU adapter.
+    // Compute score differential for score-aware AI.
+    // Use the score accumulated so far (from events processed in prior ticks).
+    const scoreAccum: MatchScore = {};
+    for (const evt of events) {
+      if (evt.kind === "goal") {
+        const goalIndex = (evt.payload.goalIndex as number) ?? -1;
+        const scoringTeamId = goalTeamMapping[goalIndex] ?? "unknown";
+        scoreAccum[scoringTeamId] = (scoreAccum[scoringTeamId] ?? 0) + 1;
+      }
+    }
+
+    // c. Sample input frames from each CPU slot.
     const tick = sim.tick;
-    const frameA = cpuA.sample(tick, obsA);
-    const frameB = cpuB.sample(tick, obsB);
+    const frames: import("../../src/contracts/input.js").InputFrame[] = [];
 
-    // d. Set the correct controlSlot for each frame (matching scenario assignments).
-    //    The CpuAdapter uses a default "slot-cpu"; we override it to match
-    //    the actual slot in the scenario so the simulation can resolve inputs.
-    frameA.controlSlot = teamToSlot.get("team-a") ?? frameA.controlSlot;
-    frameB.controlSlot = teamToSlot.get("team-b") ?? frameB.controlSlot;
+    for (const { adapter, controlSlot, teamId, controlledPlayerId } of slotCpus) {
+      const teamObs = buildTeamCpuObservation(fullObs, teamId);
+      // Inject score differential for score-aware AI.
+      const cpuGoals = scoreAccum[teamId] ?? 0;
+      const opponentTeamId = teamId === "team-a" ? "team-b" : "team-a";
+      const opponentGoals = scoreAccum[opponentTeamId] ?? 0;
+      teamObs.scoreDifferential = cpuGoals - opponentGoals;
 
-    // e. Apply both input frames to the simulation.
-    sim.applyInputs([frameA, frameB]);
+      const frame = adapter.sample(tick, teamObs);
+      frame.controlSlot = controlSlot;
+      frames.push(frame);
+    }
 
-    // f. Advance simulation by one tick.
+    // d. Apply all input frames to the simulation.
+    sim.applyInputs(frames);
+
+    // e. Advance simulation by one tick.
     const stepResult = sim.step();
 
-    // g. Collect results.
+    // f. Collect results.
     stateHashes.push(stepResult.stateHash);
     for (const evt of stepResult.events) {
       events.push(evt);
       if (evt.kind === "goal") {
         hadGoal = true;
+
+        // Goal reset: ball to center, players to start.
+        if (doGoalReset && goalReset) {
+          resetAfterGoal(sim, goalReset);
+        }
       }
     }
   }
 
-  // 4. Clean up CPU adapters.
-  cpuA.reset();
-  cpuB.reset();
+  // 5. Clean up CPU adapters.
+  for (const { adapter } of slotCpus) {
+    adapter.reset();
+  }
 
-  // 5. Compute match stats (clock + score) from events.
+  // 6. Compute match stats (clock + score) from events.
   const { score, goalEvents, elapsedTicks, matchTimeSeconds } = computeMatchStats(
     events,
     sim.tick,

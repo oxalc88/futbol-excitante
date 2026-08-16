@@ -5,11 +5,11 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-16T10:00:00Z
+measured_at: 2026-08-16T11:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: CPU-2V2-PASSING
-usage_aggregates_through: CPU-2V2-PASSING
-model_evaluation_through: CPU-2V2-PASSING
+last_tracked_objective: CPU-2V2-SCORING
+usage_aggregates_through: CPU-2V2-SCORING
+model_evaluation_through: CPU-2V2-SCORING
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -109,6 +109,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | CPU-BASIC-FORMATION | accepted | ~1h 54m | 50m | 7m | 7m | ~0.5m | ~5M est. | n/a** |
 | BROWSER-HUMAN-VS-CPU | accepted | ~2h 19m | 50m | 7m | 4m | ~0.5m | ~10M est. | n/a** |
 | CPU-2V2-PASSING | accepted | ~9m | 2m | 2m | 3m | ~0.5m | ~5M est. | n/a** |
+| CPU-2V2-SCORING | accepted | ~29m | 18m | 7m | 3m | ~0.5m | ~8M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -289,6 +290,7 @@ on an H task is the interesting result.
 | CPU-BASIC-FORMATION | qwen3.6 | H | High — new physics behavior in CPU adapter (defense mode blend) | 0 | A | 20% pull toward own goal with linear blend 20m→40m; 22 tests; no regressions; critic ACCEPT first pass |
 | BROWSER-HUMAN-VS-CPU | mimo-v2.5 | H | High — new browser path, keyboard + CPU multi-slot wiring | 0 | A | ?mode=human-vs-ai URL routing; keyboard+CPU multi-slot; 1283 tests; critic-flash RETRY (screenshot quality), integration-reviewer-flash ACCEPT |
 | CPU-2V2-PASSING | qwen3.6 | L | Low — no code changes, only test coverage for existing passing logic | 0 | A | 31 tests verify 2v2 passing behavior; existing logic already correct; critic ACCEPT first pass |
+| CPU-2V2-SCORING | qwen3.6 | H | High — new eval layer behavior (goal reset, multi-slot match runner) | 0 | A | 34 tests cover goal detection, scoring, reset, full-time, determinism; 1348 tests pass; critic ACCEPT first pass |
 
 ### Reviewer route and catches
 
@@ -308,6 +310,8 @@ on an H task is the interesting result.
 | BROWSER-HUMAN-VS-CPU | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1283/1283 regressions pass, artifact at required path, known pipeline limitation |
 | CPU-2V2-PASSING | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
 | CPU-2V2-PASSING | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 145/145 CPU adapter suite, no source code changes, artifact at required path |
+| CPU-2V2-SCORING | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
+| CPU-2V2-SCORING | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1348/1348 full suite pass, no eval file regressions, headless eval layer only |
 
 ### Builder scoreboard
 

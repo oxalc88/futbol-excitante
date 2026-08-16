@@ -1847,3 +1847,43 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 48 — 2026-08-16
+
+- objective_id: CPU-2V2-SCORING
+- builder: builder-qwen / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- notes: Extended eval/runners/headless-match.ts for multi-slot 2v2 support (per-slot CPU adapters, goal reset, autoGoalReset config, score-differential-aware AI). 34 new tests (2v2-scoring.test.ts): GOAL-2V2-001 through GOAL-2V2-012 covering goal detection, scoring, reset, full-time, determinism, team distinction. 1348/1348 full suite pass. No screenshot required (headless eval layer change).
+
+### Critic verdict (ACCEPT — first pass)
+
+```markdown
+## Critic verdict
+- objective_id: CPU-2V2-SCORING
+- critic_agent: critic-flash
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CPU-2V2-SCORING
+- reviewer_agent: integration-reviewer-flash
+- reviewer_model: deepseek-v4-flash
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (1348/1348 full suite, 0 regressions)
+- mandatory_evidence_ok: true
+- critic_evidence_gate_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```

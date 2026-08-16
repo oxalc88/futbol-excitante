@@ -7,11 +7,11 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CPU-2V2-SCORING
+next_objective_id: CPU-TEAM-FORMATION
 best_known:
   commit: (pending acceptance)
-  note: "CPU-2V2-PASSING accepted — existing passing logic verified for 2v2 topology, 31 unit tests. Advancing to CPU-2V2-SCORING: goal detection, scoring, match reset for 2v2."
-active_candidate: CPU-2V2-SCORING
+  note: "CPU-2V2-SCORING accepted — goal detection, scoring, match reset for 2v2. 34 tests, 1348/1348 suite pass, eval layer extended. Advancing to CPU-TEAM-FORMATION: team-specific formation layout + recovery."
+active_candidate: CPU-TEAM-FORMATION
 builder_in_use: builder-qwen
 critic_in_use: critic-flash
 retry_count: 0
@@ -48,9 +48,9 @@ selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal
 
 ## Last accepted objective
 
-CPU-2V2-PASSING — Existing CPU adapter passing logic verified for 2v2 topology. No source code changes — 31 new tests cover beyond-shot-range PASS_BIT, pass target direction, multi-tick continuity, shot priority, determinism. 145/145 CPU adapter suite pass.
+CPU-2V2-SCORING — Extended headless-match runner for multi-slot 2v2 (per-slot CPU adapters, goal reset, autoGoalReset config, score-differential-aware AI). 34 tests covering goal detection, scoring, reset, full-time, determinism. 1348/1348 suite pass.
 
 - builder: builder-qwen / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 31/31 passing tests, 145/145 CPU adapter suite, screenshot artifact (known pipeline limitation)
+- Evidence: 34/34 scoring tests, 1348/1348 full suite, no regressions
