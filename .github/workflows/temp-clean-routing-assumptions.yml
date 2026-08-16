@@ -1,0 +1,79 @@
+name: Temporary clean routing assumptions
+on:
+  push:
+    branches: [chore/clean-routing-assumptions]
+permissions:
+  contents: write
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove unsupported routing explanations
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+
+          readme = Path('gauntlet/README.md')
+          s = readme.read_text()
+          s = s.replace(
+            'Exact IDs are in `gauntlet/models.json` and must match `.grok/agents/<name>.md` frontmatter `model`. The user-level `~/.grok/config.toml` only needs to register the custom model endpoints themselves.',
+            'Exact IDs are recorded in `gauntlet/models.json` and in each `.grok/agents/<name>.md` frontmatter `model`.'
+          )
+          s = s.replace(
+            'Project-local agent frontmatter owns the agent → model binding. For example, `grok --agent aux --always-approve` resolves the `model: gemma4` declared in `.grok/agents/aux.md`; an explicit `--model` override is only for intentional runtime override/debugging.\n',
+            ''
+          )
+          s = s.replace(
+            'Grok loads custom model endpoint definitions from user `~/.grok/config.toml`; those global entries only make models such as `qwen3.6`, `mimo-v2.5`, `deepseek-v4-flash`, `deepseek-v4-flash-0731`, and `gemma4` available. Agent → model selection is project-local in each `.grok/agents/*.md` frontmatter and mirrored by `gauntlet/models.json` for Gauntlet routing/auditability. No user-level `[subagents.models]` migration is required for 0.8.',
+            'The model IDs used by the Gauntlet are `qwen3.6`, `mimo-v2.5`, `deepseek-v4-flash`, `deepseek-v4-flash-0731`, and `gemma4`. No `[subagents.models]` change is part of the 0.8 repository update.'
+          )
+          s = s.replace(
+            '3. If a NaN API id or endpoint changes, update the matching user-level `[model.*]` block; agent → model routing remains project-local in the corresponding wrapper frontmatter and `gauntlet/models.json`.',
+            '3. If a NaN API id or endpoint changes, update the corresponding model configuration used by the runtime.'
+          )
+          readme.write_text(s)
+
+          models = Path('gauntlet/models.json')
+          data = json.loads(models.read_text())
+          data['notes'] = 'Role names describe responsibilities; model selection is routing. Keep this file aligned with the agent model declarations used by the Gauntlet. See gauntlet/README.md.'
+          models.write_text(json.dumps(data, indent=2) + '\n')
+
+          changelog = Path('docs/gauntlet-changelog.md')
+          s = changelog.read_text()
+          s = s.replace(
+            '- No user-level agent-routing migration is required. `~/.grok/config.toml` continues to register the available NaN model endpoints only; project-local `.grok/agents/*.md` frontmatter selects each agent model, with `gauntlet/models.json` kept in sync for routing/auditability.',
+            '- No `[subagents.models]` migration is part of the 0.8 repository update.'
+          )
+          changelog.write_text(s)
+
+          forbidden = [
+            'frontmatter owns the agent',
+            'only needs to register',
+            'global entries only make models',
+            'frontmatter selects each agent model',
+            '[subagents.models] must stay in sync',
+          ]
+          joined = readme.read_text() + models.read_text() + changelog.read_text()
+          hits = [x for x in forbidden if x in joined]
+          if hits:
+            raise SystemExit(f'unsupported routing explanation remains: {hits}')
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run gauntlet:eval
+      - name: Commit cleaned files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gauntlet/README.md gauntlet/models.json docs/gauntlet-changelog.md
+          git commit -m "docs(gauntlet): remove routing assumptions"
+          git push
