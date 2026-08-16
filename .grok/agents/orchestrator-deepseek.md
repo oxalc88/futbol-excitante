@@ -46,9 +46,9 @@ DeepSeek reviewer fallback is role-based, not an in-place model override:
 - default integration reviewer: `integration-reviewer` on 0731;
 - the same model-specific 0731 failure uses `integration-reviewer-flash` on current Flash; do not override `integration-reviewer` in place.
 
-Determine mandatory evidence from `gauntlet/evidence-contract.md` before criticism. Gameplay/presentation work requires an existing screenshot artifact; passing tests do not substitute. Critic `ACCEPT` requires verified evidence. Integration must independently verify it and reject if the critic accepted while it was missing.
+Determine mandatory evidence from `gauntlet/evidence-contract.md` before criticism. Gameplay/presentation work and browser-visible/browser-interactive work require an existing screenshot artifact; passing tests do not substitute. Critic `ACCEPT` requires verified evidence. Integration must independently verify it and reject if the critic accepted while it was missing.
 
-After both reviews accept, perform the orchestrator's final gate by verifying both review evidence fields and every mandatory artifact path. Only then perform one acceptance transition: clear the accepted objective from `active_candidate`, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` as appropriate, mark the existing horizon entry accepted in place, recompute `current_index`, and validate the complete candidate state before persisting it. Never append a duplicate objective. If candidate bookkeeping fails validation, repair and revalidate it without another agent, global replanning, or historical rewrites. Then delegate the atomic commit/push to `git-committer` (`gemma4`).
+After both reviews accept, perform the orchestrator's final gate by verifying both review evidence fields and every mandatory artifact path. Only then perform one acceptance transition: clear the accepted objective from `active_candidate`, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` under `gauntlet/timing-contract.md`, mark the existing horizon entry accepted in place, recompute `current_index`, and validate the complete candidate state before persisting it. TIMING refresh must include the latest per-step usage, by-model aggregates, builder grade, reviewer/orchestrator route/catches, and tracking markers from real session/review data; never invent unavailable metrics. Run `pnpm run gauntlet:eval:state` and repair tracking locally until it passes before delegating the acceptance commit. Never append a duplicate objective. If candidate bookkeeping fails validation, repair and revalidate it without another agent, global replanning, or historical rewrites. Then delegate the atomic commit/push to `git-committer` (`gemma4`).
 
 A successful acceptance commit is not a stopping point. If the horizon remains valid, immediately spawn the builder for its indexed next applicable objective in the same session. If the horizon is exhausted, immediately perform strategic reassessment and start the first applicable objective of the new horizon.
 
@@ -62,6 +62,6 @@ SuperGrok's weekly bar does not apply to this NaN overflow session. Context auto
 
 Stop only when a required human spec/legal decision is missing, NaN builders repeatedly failed and the objective is marked blocked with evidence, or the next work is explicitly deferred by the authoritative specs.
 
-Objective acceptance, commit completion, stale-state repair, and horizon exhaustion are not stop conditions. Horizon exhaustion triggers strategic reassessment and continuation.
+Objective acceptance, commit completion, stale-state repair, tracking repair, and horizon exhaustion are not stop conditions. Horizon exhaustion triggers strategic reassessment and continuation.
 
 Otherwise continue.
