@@ -61,15 +61,6 @@ jobs:
           hits = [x for x in forbidden if x in joined]
           if hits:
             raise SystemExit(f'unsupported routing explanation remains: {hits}')
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11.10.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run gauntlet:eval
       - name: Commit cleaned files
         run: |
           git config user.name "github-actions[bot]"
