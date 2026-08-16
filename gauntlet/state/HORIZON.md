@@ -7,7 +7,7 @@ horizon_id: "small-sided-match"
 created_from_commit: 514847f
 created_at: 2026-08-16
 reason: "Horizon 2v2-playable exhausted (5/5 accepted). All 2v2 browser match infrastructure exists: CPU passing, scoring, formation, keyboard control, and autonomous AI match. Next horizon targets small-sided match evolution: 3v3 scenarios, team decision coordination, improved formation/positioning, match restarts (kickoff/goal kick), and a playable 3v3 browser match. These build toward the SMALL-SIDED milestone."
-current_index: 3
+current_index: 4
 objectives:
   - id: CPU-TEAM-DECISION-PROFILE
     status: accepted
@@ -28,10 +28,11 @@ objectives:
     prerequisite: SCENARIO-3V3-FIXTURE
     commit: 7398773
   - id: CPU-3V3-TEAMPLAY
-    status: pending
+    status: accepted
     reason: "Ensure CPU adapters work correctly in 3v3 context: passing to the correct teammate, shooting decisions, and formation recovery with 3 players per team. Extends existing CPU-TEAMMATE-PASS and CPU-2V2-PASSING logic to handle 3 teammates. All 6 CPU slots generate deterministic InputFrames."
-    builder: builder-qwen
+    builder: builder-structured / qwen3.6
     prerequisite: CPU-3V3-FORMATION
+    commit: ff5708a
   - id: MATCH-SET-PIECE
     status: pending
     reason: "Implement basic match restart: after a goal, reset players to their formation positions and the ball to center. After full-time or halftime, show the appropriate overlay. The restart logic reuses the existing goal-event detection and match-phase overlay system. Does NOT implement throw-ins, corners, or free kicks."

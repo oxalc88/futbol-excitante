@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: CPU-3V3-TEAMPLAY
+next_objective_id: MATCH-SET-PIECE
 
 best_known:
-  commit: 7398773
-  note: "CPU-3V3-FORMATION accepted. Next: CPU-3V3-TEAMPLAY — ensure CPU adapters work correctly in 3v3 context."
+  commit: ff5708a
+  note: "CPU-3V3-TEAMPLAY accepted. Next: MATCH-SET-PIECE — basic match restart after goals."
 
 active_candidate: null
 builder_in_use: null
@@ -57,18 +57,19 @@ accepted:
   - CPU-TEAM-DECISION-PROFILE
   - SCENARIO-3V3-FIXTURE
   - CPU-3V3-FORMATION
+  - CPU-3V3-TEAMPLAY
 
 blocked: []
 
-selection_note: "Horizon small-sided-match: 6 objectives toward 3v3 play. CPU-3V3-FORMATION accepted. Next: CPU-3V3-TEAMPLAY."
+selection_note: "Horizon small-sided-match: 6 objectives toward 3v3 play. CPU-3V3-TEAMPLAY accepted. Next: MATCH-SET-PIECE."
 ```
 
 ## Last accepted objective
 
-CPU-3V3-FORMATION — Role-aware formation positions for 3v3. Defender 40% pull toward own goal, midfielder 20%, attacker 5%. formationRole field in 3v3 fixture. Backward compatible: no role → default 20%. 23 new tests, 483 total all pass. 60-tick trajectory. Deterministic audit PASS.
+CPU-3V3-TEAMPLAY — Verified CPU adapters work correctly in 3v3 context. No source code changes needed — existing adapter handles passing, shooting, formation recovery, and team decision with 3 teammates. 23 unit tests (passing, shooting, formation recovery, team decision, determinism). 14 integration tests (100-tick simulation, deterministic hashing). 222/222 cpu-adapter, 218/218 integration, 1252/1252 unit all pass. 120-tick trajectory. Deterministic audit PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 221/221 cpu-adapter, 204/204 integration, 58/58 browser, 60-tick trajectory
-- Commit: 7398773
+- Evidence: 23/23 unit, 14/14 integration, 1252/1252 unit suite, 120-tick trajectory
+- Commit: ff5708a

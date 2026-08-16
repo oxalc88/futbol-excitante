@@ -226,6 +226,16 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - commits: 7398773 candidate(CPU-3V3-FORMATION)
 - notes: Role-aware formation for 3v3. Defender 40% pull, midfielder 20%, attacker 5%. formationRole field in 3v3 fixture. Backward compatible: no role → default 20%. 23 new tests, 483 total all pass. 60-tick trajectory. No PES claim.
 
+## Iteration 41 — 2026-08-16
+
+- objective_id: CPU-3V3-TEAMPLAY
+- builder: builder-structured / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: ff5708a candidate(CPU-3V3-TEAMPLAY)
+- notes: Verified CPU adapters work correctly in 3v3. No source changes needed — existing adapter handles 3 teammates for passing, shooting, formation recovery, and team decision. 23 unit tests, 14 integration tests. 222/222 cpu-adapter, 218/218 integration, 1252/1252 unit all pass. 120-tick trajectory. No PES claim.
+
 ## Iteration 37 — 2026-08-15
 
 - objective_id: CAPABILITY-SWERVE
