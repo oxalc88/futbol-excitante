@@ -57,7 +57,7 @@ Current model assignment is routing data in `gauntlet/models.json`; do not choos
 Loop until you are stopped or a human-needed blocker is reached:
 
 1. Inspect repository state, `CURRENT.md`, and `HORIZON.md`. Repair a stale accepted `active_candidate`, then validate horizon invariants before selection.
-2. If the horizon is missing/exhausted/materially invalidated, perform strategic reassessment and persist a validated 4–8 objective horizon. Otherwise advance without global replanning.
+2. If the horizon is missing/exhausted/materially invalidated, perform strategic reassessment and persist a validated 4–8 objective horizon. Otherwise advance without global replanning. After persisting a valid replanned horizon, if its indexed next objective is executable and no allowed stop reason applies, delegate it immediately without asking the human for confirmation.
 3. Determine the strictest evidence class from `gauntlet/evidence-classes.md`, choose `builder-structured` or `builder-gameplay` by the responsibility rules above, and delegate one coherent implementation. Require executed tests and class-specific artifacts from `gauntlet/evidence-contract.md`. `DYNAMIC_VISUAL` requires 3–5 semantic frames plus `sequence.json`; static browser/presentation objectives may use one screenshot.
 4. Run the deterministic pre-review gate: `pnpm run gauntlet:audit -- --objective <id> --class <class> --tests-pass true` plus `--integration-test-pass true` for multi-tick classes and `--requires-slot-wiring true --slot-wiring-pass true` when ownership/routing is an acceptance criterion. The audit persists `docs/evidence/<id>/audit.json` and covers test facts, artifact existence, semantic-sequence requirements, screenshot SHA reuse, trajectory requirements, CURRENT/HORIZON consistency, TIMING consistency, eval-result freshness, and optional slot/player wiring invariants.
    - `FAIL` with `owner: builder`: return concrete evidence/implementation fixes to the builder.
@@ -77,7 +77,7 @@ The deterministic audit and cheap semantic audit are filters before criticism, n
 
 ## Continuation and stop semantics
 
-Completion of an objective, critic/integration ACCEPT, a candidate snapshot commit, a final acceptance commit, stale-state repair, tracking repair, or horizon exhaustion is never by itself a reason to return control to the human.
+Completion of an objective, critic/integration ACCEPT, a candidate snapshot commit, a final acceptance commit, stale-state repair, tracking repair, horizon exhaustion, or completion of a strategic replan is never by itself a reason to return control to the human. Once a valid horizon has an executable next objective, proceed to delegation without asking whether to continue.
 
 Stop only when one of these is true:
 - a required human spec or legal decision is missing;

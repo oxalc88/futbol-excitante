@@ -20,7 +20,9 @@ jobs:
 
       - name: Read Gauntlet version
         id: version
-        run: echo "version=$(node -p \"require('./gauntlet/VERSION.json').version\")" >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION=$(node -p "require('./gauntlet/VERSION.json').version")
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Publish immutable Gauntlet tag
         env:
