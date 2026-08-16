@@ -5,7 +5,7 @@ Grok Build orchestration for this football simulation. It is project-specific. I
 The loop is:
 
 ```text
-orchestrator → builder → required evidence → critic → fix/retry → integration → evidence gate → accept → next horizon objective
+orchestrator → builder → required evidence → deterministic audit → critic → integration → candidate provenance → durable acceptance → next horizon objective
 ```
 
 The orchestrator is Grok 4.6 (`grok-4.6`), not Grok 4 or another 4.x ID. High-token implementation, testing, fixing, experimentation, and repeated criticism stay on NaN models.
@@ -20,11 +20,13 @@ An empty implementation is a valid start. `BOOTSTRAP-01` is the initial objectiv
 
 ## Gauntlet system version
 
-The Gauntlet is versioned as a complete harness under SemVer in `gauntlet/VERSION.json`: prompts + agents + skills + routing + deterministic tooling/evals + evidence/timing contracts + acceptance/state-audit machinery. Legacy changelog labels such as `v6-browser-evidence-model-tracking` are prompt-generation names, not SemVer releases. The normalized predecessor is `0.6.0`; this architecture is `0.7.0`.
+The Gauntlet is versioned as a complete harness under SemVer in `gauntlet/VERSION.json`: prompts + agents + skills + routing + deterministic tooling/evals + evidence/timing contracts + acceptance/state-audit machinery. Legacy changelog labels such as `v6-browser-evidence-model-tracking` are prompt-generation names, not SemVer releases. The previous system version is `0.7.0`; this architecture is **`0.8.0`**.
 
-Canonical acceptance philosophy lives in `gauntlet/principles.md` and is referenced by runtime prompts rather than duplicated into every agent. v0.7 is deterministic-first and critic-always: scripts establish facts, bounded ambiguity can be sent cheaply to `aux`/Gemma (Qwen fallback), but every candidate still reaches an independent qualitative critic before integration and final acceptance.
+Canonical acceptance philosophy lives in `gauntlet/principles.md` and is referenced by runtime prompts rather than duplicated into every agent. 0.8 remains deterministic-first and critic-always: scripts establish facts, bounded ambiguity can be sent cheaply to `aux`/Gemma (Qwen fallback), but every candidate still reaches an independent qualitative critic before integration and final acceptance.
 
-Run the pre-review audit with `pnpm run gauntlet:audit`; candidate acceptance persistence uses `pnpm run gauntlet:acceptance:persist`; post-bookkeeping consistency remains `pnpm run gauntlet:eval:state`.
+0.8 adds durable evidence provenance. Every newly accepted objective gets `docs/evidence/<objective-id>/manifest.json`; local screenshots/trajectory/audit/sequence evidence is SHA-256 hashed and byte-bound to a reviewed candidate commit. `DYNAMIC_VISUAL` objectives require 3–5 semantic frames. Historical pre-0.8 evidence is preserved rather than retroactively rewritten.
+
+Run the pre-review audit with `pnpm run gauntlet:audit`; candidate acceptance persistence uses `pnpm run gauntlet:acceptance:persist`; post-bookkeeping consistency remains `pnpm run gauntlet:eval:state`. Optional video metadata uses `pnpm run gauntlet:video:reference`; milestone summaries use `pnpm run gauntlet:milestone:bundle`.
 
 ## Launch
 
@@ -75,8 +77,8 @@ Optional extra focus after `/gauntlet`:
 | `critic-mimo` | fallback subagent | `mimo-v2.5` | none | Fallback critic when DeepSeek is unavailable and MiMo did not implement |
 | `integration-reviewer` | subagent | `deepseek-v4-flash-0731` | none | Preferred architecture and neighboring-regression review after critic accept |
 | `integration-reviewer-flash` | fallback subagent | `deepseek-v4-flash` | none | Explicit current-Flash integration fallback when 0731 is unavailable/out of allowance |
-| `aux` | subagent | `gemma4` | none | Cheap summaries, file lists, artifact condensation |
-| `git-committer` | subagent | `gemma4` | git only | Atomic conventional commits (and push when asked). Not Grok. |
+| `aux` | subagent | `gemma4` | none | Cheap summaries, bounded semantic evidence review, artifact condensation |
+| `git-committer` | subagent | `gemma4` | git only | Candidate provenance snapshots plus atomic acceptance commits (and push when asked). Not Grok. |
 
 Exact IDs are in `gauntlet/models.json` and must match `.grok/agents/<name>.md` frontmatter `model` plus the `[model.*]` blocks in `~/.grok/config.toml`.
 
@@ -216,7 +218,7 @@ BUILDER
   ↓
 tests + class-specific artifacts
   ↓
-gauntlet:audit (deterministic facts)
+gauntlet:audit (deterministic facts; persists audit.json)
   ├─ FAIL/builder → retry builder
   ├─ FAIL/orchestrator → repair state and re-audit
   └─ REVIEW_REQUIRED → bounded aux/Gemma audit → re-enter gate
@@ -227,18 +229,22 @@ INTEGRATION REVIEWER
   ↓
 FINAL EVIDENCE GATE
   ↓
-persist candidate acceptance result
+CANDIDATE SNAPSHOT COMMIT (code + exact reviewed evidence)
+  ↓
+acceptance:persist → objective manifest.json + acceptance result
   ↓
 update CURRENT/HISTORY/HORIZON/TIMING
   ↓
 gauntlet:eval:state
   ↓
-ACCEPT → next horizon objective
+FINAL ACCEPTANCE COMMIT
+  ↓
+ACCEPT → next horizon objective / strategic reassessment
 ```
 
-Deterministic and cheap semantic audits can block progression but cannot accept an objective. See `gauntlet/principles.md`, `gauntlet/evidence-classes.md`, and `gauntlet/evidence-contract.md`.
+A candidate snapshot is not acceptance. The orchestrator may only claim an objective is fully accepted/committed after durable result + manifest + accepted state + state audit + final commit exist. Deterministic and cheap semantic audits can block progression but cannot accept an objective. See `gauntlet/principles.md`, `gauntlet/evidence-classes.md`, `gauntlet/evidence-contract.md`, and `gauntlet/evidence-manifest-contract.md`.
 
-Reviewer fallback, rolling-horizon planning, retry/revert semantics, SuperGrok handoff, and builder/critic model independence remain unchanged.
+Reviewer fallback, rolling-horizon planning, retry/revert semantics, SuperGrok handoff, and builder/critic model independence remain unchanged. Horizon exhaustion triggers strategic reassessment and continuation; it is not a normal stop.
 
 ## What counts as success
 
@@ -261,16 +267,22 @@ After that, milestone verdicts follow the Gameplay Evaluation Spec:
 
 ```text
 gauntlet/
+  VERSION.json              authoritative Gauntlet SemVer
   README.md                 this document
   PROMPT.md                 the /gauntlet prompt body
   models.json               exact role → model map
   objectives.md             candidate objectives / prioritization guide
-  evidence-contract.md      builder/critic/review report shape
+  evidence-contract.md      evidence-class and review contract
+  evidence-manifest-contract.md durable objective/video/milestone provenance
   state/CURRENT.md          live board
   state/HISTORY.md          append-only iteration log
   state/TIMING.md           session wall-clock, tokens, model grades
   state/HANDOFF.md          overflow pickup for orchestrator-deepseek
+  evals/                    deterministic audits/regression scenarios/results
   artifacts/                generated, gitignored
+
+docs/evidence/<objective>/  trajectory/audit/manifest/video metadata
+docs/screenshots/<objective>/ screenshots + optional semantic sequence
 
 .grok/agents/               project-local agent prompts (not global)
 .grok/skills/gauntlet/      /gauntlet skill
@@ -298,5 +310,5 @@ Unattended Gauntlet is the intended mode. Launch with `grok --agent orchestrator
 - Orchestrator cannot edit `src/`, `eval/`, or specs. It writes Gauntlet state only. That limit is in the agent prompt; Grok project denies are session-wide and would also block builders if pointed at `src/`.
 - Builders can create and edit implementation files. They cannot edit specs, research, or `.grok/agents/`.
 - Critics and the integration reviewer cannot edit files. They may run read-only validation (`git`, `mise`, `pnpm`, `npx`, `node`, `vitest`, and inspect commands).
-- Orchestrator, builders, critics, and `aux` must not `git commit`, `git push`, `git rebase`, `sudo`, or `rm -rf /`. After critic + integration ACCEPT and the orchestrator evidence gate (or when the human asks), the orchestrator delegates commits to `git-committer` (`gemma4`). That agent may `git add` / `git commit`, and `git push` only when the parent prompt says so.
+- Orchestrator, builders, critics, and `aux` must not `git commit`, `git push`, `git rebase`, `sudo`, or `rm -rf /`. After critic + integration ACCEPT and the orchestrator evidence gate, the orchestrator may delegate a **candidate snapshot commit** to `git-committer`; after persistence + state audit it delegates the separate final acceptance/bookkeeping commit. `git-committer` may push only when the parent prompt says so.
 - Builders must run installs non-interactively (`CI=1`, `mise trust --all` after writing `mise.toml`).
