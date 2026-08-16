@@ -1568,6 +1568,21 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - commits: pending (git-committer)
 - notes: Score-aware replay verification. verifyMatchReplay extends verifyReplay with MatchVerifierResult comparing recorded vs replayed score (scoresEqual), goal events (compareGoalEvents), and goal counts. All zero-goal and determinism cases covered. 4 new integration tests, 47 total across replay/verifier/headless-match suites. No PES claim. Horizon playable-v1 exhausted.
 
+## Iteration 45 — 2026-08-16
+
+- objective_id: BROWSER-MATCH-PHASE-DISPLAY
+- builder: builder-mimo / mimo-v2.5
+- critic: critic-qwen / qwen3.6 (fallback, DeepSeek exhausted)
+- verdict: ACCEPT (first pass, 0 retries)
+- integration: ACCEPT (integration-reviewer / qwen3.6, fallback)
+- result: accepted
+- notes: Half-time/full-time visual overlays in the browser. Adds derivePhase(tick) returning "halftime"/"fulltime"/null, showPhaseOverlay() with CSS opacity transition (2s ease-out, 1s display via setTimeout), and overlayShownForPhase guard. Integrated into browser game loop. Screenshot evidence: docs/screenshots/BROWSER-MATCH-PHASE-DISPLAY/frame-000.png shows "FULL TIME" overlay at tick 96. 1148 node tests PASS; browser 24/24 PASS (1 pre-existing capture-wip failure). No core/simulation changes. Prerequisite: null.
+- verdict: ACCEPT (first pass)
+- integration: ACCEPT (integration-reviewer / mimo-v2.5, fallback)
+- result: accepted
+- commits: pending (git-committer)
+- notes: Score-aware replay verification. verifyMatchReplay extends verifyReplay with MatchVerifierResult comparing recorded vs replayed score (scoresEqual), goal events (compareGoalEvents), and goal counts. All zero-goal and determinism cases covered. 4 new integration tests, 47 total across replay/verifier/headless-match suites. No PES claim. Horizon playable-v1 exhausted.
+
 ## Iteration 43 — 2026-08-15
 
 - objective_id: HORIZON-BOOKKEEPING

@@ -75,6 +75,80 @@ const scoreboardScoreB = document.getElementById("scoreboard-score-b");
 const scoreboardNameA = document.getElementById("scoreboard-name-a");
 const scoreboardNameB = document.getElementById("scoreboard-name-b");
 
+// ---------------------------------------------------------------------------
+// Match phase overlay
+// ---------------------------------------------------------------------------
+
+/**
+ * Half-duration in ticks — derived from the scenario's durationTicks,
+ * matching the headless runner's default (Math.floor(durationTicks / 2)).
+ */
+const HALF_DURATION_TICKS = Math.floor(SCENARIO_DATA.durationTicks / 2);
+
+/**
+ * Overlay element for match phase transitions (half-time / full-time).
+ * Created once and reused for each phase transition.
+ */
+const matchPhaseOverlay = document.createElement("div");
+matchPhaseOverlay.id = "match-phase-overlay";
+Object.assign(matchPhaseOverlay.style, {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  zIndex: "1000",
+  padding: "24px 48px",
+  borderRadius: "12px",
+  fontSize: "48px",
+  fontWeight: "800",
+  fontFamily: "system-ui, -apple-system, sans-serif",
+  textAlign: "center",
+  pointerEvents: "none",
+  opacity: "0",
+  transition: "opacity 2s ease-out",
+  letterSpacing: "4px",
+});
+document.body.appendChild(matchPhaseOverlay);
+
+/** Whether the current phase has already shown its overlay. */
+let overlayShownForPhase = false;
+
+/**
+ * Phase derivation — mirrors the headless runner logic.
+ *
+ * @returns "halftime" | "fulltime" | null (no transition this tick).
+ */
+function derivePhase(tick: number): string | null {
+  if (tick === HALF_DURATION_TICKS) {
+    return "halftime";
+  }
+  if (tick === 2 * HALF_DURATION_TICKS) {
+    return "fulltime";
+  }
+  return null;
+}
+
+/**
+ * Show a match-phase overlay and schedule auto-fade.
+ *
+ * @param text  - overlay text (e.g. "HALF TIME").
+ * @param color - text color.
+ */
+function showPhaseOverlay(text: string, color: string): void {
+  matchPhaseOverlay.textContent = text;
+  matchPhaseOverlay.style.color = color;
+  matchPhaseOverlay.style.background =
+    "rgba(0, 0, 0, 0.7)";
+  // Force reflow so the transition triggers on each show.
+  void matchPhaseOverlay.offsetHeight;
+  matchPhaseOverlay.style.opacity = "1";
+
+  // Auto-fade after a short display period.
+  setTimeout(() => {
+    matchPhaseOverlay.style.opacity = "0";
+  }, 1000);
+}
+
 /**
  * Main browser entry point.
  *
@@ -186,6 +260,22 @@ function main(): void {
           } else if (goalIndex === 1) {
             scoreB++;
           }
+        }
+      }
+
+      // Check for match-phase transitions.
+      {
+        const phase = derivePhase(sim.tick);
+        if (phase !== null && !overlayShownForPhase) {
+          overlayShownForPhase = true;
+          if (phase === "halftime") {
+            showPhaseOverlay("HALF TIME", "#ffd700");
+          } else if (phase === "fulltime") {
+            showPhaseOverlay("FULL TIME", "#ff3333");
+          }
+        } else if (phase === null) {
+          // Reset when we leave a transition tick.
+          overlayShownForPhase = false;
         }
       }
     }

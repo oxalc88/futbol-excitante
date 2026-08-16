@@ -1,43 +1,35 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 1
-status: EXHAUSTED
-horizon_id: "playable-v1"
-created_from_commit: a57edf2
+horizon_version: 2
+status: ACTIVE
+horizon_id: "playable-browser-v2"
+created_from_commit: 11099d3
 created_at: 2026-08-15
-reason: "HEADLESS-CPU-MATCH accepted. Match scoring is the active candidate. Horizon covers the remaining playable match infrastructure: scoring, browser-wired scoreboard, match lifecycle, and AI improvement."
-current_index: 6
+reason: "Horizon playable-v1 exhausted. All match infrastructure (scoring, lifecycle, oracles, replay) complete. PLAYABLE-1V1 milestone remains gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, deferred). New horizon focuses on observable browser progress: match-phase/goal visuals, CPU ball pursuit, and browser-as-standalone-match-viewer."
+current_index: 1
 objectives:
-  - id: MATCH-SCORING
-    reason: "Add tick-based match clock + score tracker."
-    builder: builder-qwen
+  - id: BROWSER-MATCH-PHASE-DISPLAY
     status: accepted
-  - id: BROWSER-SCOREBOARD
-    reason: "Wire match clock and score into browser renderer."
+    reason: "Show half-time and full-time visual overlays in the browser. Use tick-based match phase detection and existing match-phase duration config. Centered text overlay auto-fades on transition."
     builder: builder-mimo
-    prerequisite: MATCH-SCORING
-    status: accepted
-  - id: MATCH-LIFECYCLE
-    reason: "Add match phases with half duration."
+    prerequisite: null
+  - id: BROWSER-GOAL-EFFECT
+    reason: "Brief visual feedback on goal: overlay text 'GOAL! {team}' auto-fading after ~2s. Optional scoreboard highlight animation."
+    builder: builder-mimo
+    prerequisite: BROWSER-MATCH-PHASE-DISPLAY
+  - id: CPU-BALL-PURSUIT
+    reason: "CPU adapter actively moves toward ball when out of possession instead of idling. Uses existing kinematic locomotion. Ball proximity detection determines when to pursue vs attack."
     builder: builder-qwen
-    prerequisite: MATCH-SCORING
-    status: accepted
-  - id: AI-GOAL-IMPROVEMENT
-    reason: "Improve CPU goal-awareness and shooting accuracy."
+    prerequisite: null
+  - id: BROWSER-MATCH-START-URL
+    reason: "Support launching a running CPU-vs-CPU match from browser URL (?mode=ai-match). Shows full scoreboard, clock, and match phases. Makes browser a standalone match viewer."
+    builder: builder-mimo
+    prerequisite: BROWSER-MATCH-PHASE-DISPLAY
+  - id: CPU-PASSING-EVALUATION
+    reason: "Add evaluator tests verifying CPU produces pass inputs under range/direction conditions. Tests at minimum that the CPU adapter generates pass action bits in appropriate game states."
     builder: builder-qwen
-    prerequisite: MATCH-SCORING
-    status: accepted
-  - id: MATCH-ORACLE
-    reason: "Add match-scoring oracles to the evaluator suite (score-tracker mutant, match-clock mutant)."
-    builder: builder-qwen
-    prerequisite: MATCH-LIFECYCLE
-    status: accepted
-  - id: MATCH-REPLAY-EXTENSION
-    reason: "Score-aware replay verification: replay must reproduce same score progression."
-    builder: builder-qwen
-    prerequisite: MATCH-ORACLE
-    status: accepted
+    prerequisite: CPU-BALL-PURSUIT
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -46,17 +38,7 @@ replan_if:
   - unsafe_due_to_new_defect
   - materially_higher_value_evidence
   - human_needed_spec_or_legal_blocker
-observable_progress_target: "Browser shows running match clock and team scores that update on goal events"
+observable_progress_target: "Browser shows half-time/full-time overlays and goal celebrations during a running CPU-vs-CPU match started from URL parameter"
 infrastructure_only_justification: null
 last_invalidation_reason: null
 ```
-
-This file is concise execution-planning state, not a backlog and not an evidence log.
-
-The orchestrator initializes it at a strategic boundary by selecting roughly 4–8 objectives from actual repository state, evidence, research, specs, and `gauntlet/objectives.md`.
-
-After an accepted objective, advance `current_index` and continue to the next applicable objective without global replanning unless one of `replan_if` is true. Ordinary retries or the mere existence of another possible improvement do not invalidate a horizon.
-
-Each horizon should, where technically reasonable, lead toward at least one observable playable/browser-facing capability or milestone. If a horizon contains only evaluator/laboratory/infrastructure objectives, populate `infrastructure_only_justification` with the reason that work must precede observable gameplay progress.
-
-Do not copy specs, research, diffs, command logs, critic reports, or history into this file. `CURRENT.md`, `HISTORY.md`, and the evidence artifacts remain authoritative for execution state and acceptance.

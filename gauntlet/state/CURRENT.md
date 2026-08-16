@@ -7,18 +7,18 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: MATCH-ORACLE
+next_objective_id: BROWSER-GOAL-EFFECT
 best_known:
-  commit: 90c0c8b
-  note: "MATCH-REPLAY-EXTENSION accepted. Score-aware replay verification added — verifyMatchReplay compares recorded vs replayed score/goal progression. All 47 tests pass (4 new + 43 existing). Horizon playable-v1 exhausted — strategic reassessment needed."
+  commit: (pending acceptance)
+  note: "BROWSER-MATCH-PHASE-DISPLAY accepted. Advancing to next horizon objective: BROWSER-GOAL-EFFECT — brief visual feedback on goal with overlay text and scoreboard highlight."
 active_candidate:
-  objective_id: null
-  builder: null
-  critic: null
-  started_from_commit: null
+  objective_id: BROWSER-MATCH-PHASE-DISPLAY
+  builder: builder-mimo
+  critic: critic
+  started_from_commit: 6abf383
   last_verdict: null
-builder_in_use: builder-qwen
-critic_in_use: critic
+builder_in_use: builder-mimo
+critic_in_use: critic-qwen
 retry_count: 0
 max_retries_per_objective: 3
 nan_builder_failures: 0
@@ -40,19 +40,20 @@ accepted:
   - AI-GOAL-IMPROVEMENT
   - MATCH-ORACLE
   - MATCH-REPLAY-EXTENSION
+  - BROWSER-MATCH-PHASE-DISPLAY
 blocked: []
-selection_note: "MATCH-REPLAY-EXTENSION accepted. Horizon playable-v1 exhausted. All objectives completed: match scoring, scoreboard, lifecycle, AI improvement, match oracles, and replay extension. Strategic reassessment required for next horizon — likely browser-facing 1v1 playable capabilities."
+selection_note: "MATCH-REPLAY-EXTENSION accepted. Horizon playable-v1 exhausted — strategic reassessment completed. New horizon playable-browser-v2: browser match-phase overlays, goal effects, CPU ball pursuit, match-start URL, CPU passing evaluation."
 ```
 
 ## Last accepted objective
 
-HEADLESS-CPU-MATCH — headless CPU-vs-CPU match runner.
+BROWSER-MATCH-PHASE-DISPLAY — half-time/full-time visual overlays in the browser app.
 
-- builder: builder-qwen / qwen3.6
-- critic: critic / deepseek-v4-flash-0731 — ACCEPT (first pass)
-- integration-reviewer: deepseek-v4-flash-0731 — ACCEPT
-- commits: a57edf2
+- builder: builder-mimo / mimo-v2.5
+- critic: critic-qwen / qwen3.6 — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer / qwen3.6 (fallback) — ACCEPT
+- Evidence: `docs/screenshots/BROWSER-MATCH-PHASE-DISPLAY/frame-000.png` — "FULL TIME" overlay at tick 96
 
 ## Next action
 
-Delegate MATCH-SCORING to builder-qwen. Add match clock and score tracking to the headless match runner. See builder prompt for details.
+Delegate BROWSER-GOAL-EFFECT to builder-mimo. Add brief visual feedback on goal: overlay text "GOAL! {team}" auto-fading after ~2s. Optional scoreboard highlight animation. Prerequisite: BROWSER-MATCH-PHASE-DISPLAY.
