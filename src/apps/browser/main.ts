@@ -257,12 +257,14 @@ function main(): void {
     adapter: ReturnType<typeof createCpuAdapter>;
     controlSlot: string;
     teamId: string;
+    controlledPlayerId: string;
   };
   const cpuSlots: CpuSlotEntry[] = [];
 
   // Legacy single-CPU adapter for mixed HUMAN/AI scenarios.
   let cpuAdapter: ReturnType<typeof createCpuAdapter> | undefined;
   let cpuTeamId: string | undefined;
+  let cpuControlledPlayerId: string | undefined;
 
   if (IS_AI_MATCH) {
     // AI-vs-AI mode: create a CPU adapter for every control slot.
@@ -271,6 +273,7 @@ function main(): void {
         adapter: createCpuAdapter(),
         controlSlot: slotId,
         teamId: assignment.teamId,
+        controlledPlayerId: assignment.controlledPlayerId ?? "",
       });
     }
   } else {
@@ -291,6 +294,7 @@ function main(): void {
       if (assignment && assignment.mode !== "HUMAN") {
         cpuAdapter = createCpuAdapter();
         cpuTeamId = assignment.teamId;
+        cpuControlledPlayerId = assignment.controlledPlayerId ?? undefined;
         break;
       }
     }
@@ -342,8 +346,8 @@ function main(): void {
 
       // Add CPU frames — per-slot adapters in AI-vs-AI mode.
       if (IS_AI_MATCH) {
-        for (const { adapter: cpuAd, controlSlot, teamId: tid } of cpuSlots) {
-          const obs = buildCpuObservation(sim.snapshot(), tid);
+        for (const { adapter: cpuAd, controlSlot, teamId: tid, controlledPlayerId } of cpuSlots) {
+          const obs = buildCpuObservation(sim.snapshot(), tid, controlledPlayerId);
           const cpuFrame = cpuAd.sample(sim.tick, obs);
           // Override controlSlot to match the scenario's slot key so
           // the simulation routes the frame to the correct player.
@@ -352,7 +356,7 @@ function main(): void {
         }
       } else if (cpuAdapter) {
         // Legacy single-CPU adapter for mixed HUMAN/AI scenarios.
-        const obs = buildCpuObservation(sim.snapshot(), cpuTeamId);
+        const obs = buildCpuObservation(sim.snapshot(), cpuTeamId, cpuControlledPlayerId);
         const cpuFrame = cpuAdapter.sample(sim.tick, obs);
         allFrames.push(cpuFrame);
       }

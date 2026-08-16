@@ -86,11 +86,14 @@ export interface CpuObservation {
  *
  * @param world — authoritative WorldState (not mutated).
  * @param cpuTeamId — team ID the CPU controls (determines attacking direction).
+ * @param controlledPlayerId — optional explicit controlled player ID.
+ *   When set, uses this ID; when not set, defaults to the first player.
  * @returns a CpuObservation containing the fields the CPU needs.
  */
 export function buildCpuObservation(
   world: WorldState,
   cpuTeamId?: string,
+  controlledPlayerId?: string,
 ): CpuObservation {
   // Determine pitch dimensions from scenario meta, falling back to defaults.
   let pitchLength = 105;
@@ -102,14 +105,15 @@ export function buildCpuObservation(
     if (typeof pw === "number") pitchWidth = pw;
   }
 
-  // Populate teammates from world state: same teamId, different playerId
-  // from the first CPU-controlled player.
-  const controlledPlayerId =
-    cpuTeamId && world.players.length > 0 ? world.players[0].playerId : undefined;
+  // Populate teammates from world state: same teamId, different playerId.
+  // controlledPlayerId: use the explicit parameter if set, otherwise the first player.
+  const controlledPlayerId_ = controlledPlayerId ?? (cpuTeamId && world.players.length > 0
+    ? world.players[0].playerId
+    : undefined);
   const teammates: CpuTeammate[] = [];
   if (cpuTeamId) {
     for (const p of world.players) {
-      if (p.teamId === cpuTeamId && p.playerId !== controlledPlayerId) {
+      if (p.teamId === cpuTeamId && p.playerId !== controlledPlayerId_) {
         teammates.push({
           playerId: p.playerId,
           groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
@@ -143,7 +147,7 @@ export function buildCpuObservation(
     pitchWidth,
     cpuTeamId,
     teammates: teammates.length > 0 ? teammates : undefined,
-    controlledPlayerId,
+    controlledPlayerId: controlledPlayerId_,
   };
 }
 
@@ -391,8 +395,33 @@ export function createCpuAdapter(): CpuAdapter {
 
   return {
     sample(tick: number, observation: CpuObservation): InputFrame {
-      // Find the first player (CPU controlled).
-      const cpuPlayer = observation.players[0];
+      // Find the controlled player by controlledPlayerId, falling back
+      // to the first player for backward compatibility.
+      const { controlledPlayerId, players } = observation;
+      let cpuPlayer: typeof players[0] | undefined;
+      if (controlledPlayerId && controlledPlayerId.length > 0) {
+        cpuPlayer = players.find((p) => p.playerId === controlledPlayerId);
+      }
+      if (!cpuPlayer) {
+        // Either controlledPlayerId was not set (fallback) or wasn't found.
+        // If controlledPlayerId was truthy but not found → neutral.
+        // If it was not set → use players[0].
+        if (controlledPlayerId && controlledPlayerId.length > 0) {
+          return {
+            tick,
+            sourceId: "cpu",
+            controlSlot: "slot-cpu",
+            moveX: 0,
+            moveY: 0,
+            sprint: 0,
+            heldButtons: 0,
+            pressedButtons: 0,
+            releasedButtons: 0,
+          };
+        }
+        cpuPlayer = players[0];
+      }
+
       if (!cpuPlayer) {
         // No player available — return neutral frame.
         return {

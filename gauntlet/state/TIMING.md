@@ -5,11 +5,11 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-16T01:40:00Z
+measured_at: 2026-08-16T02:05:00Z
 tracking_contract_version: 1
-last_tracked_objective: CPU-TEAMMATE-PASS
-usage_aggregates_through: CPU-TEAMMATE-PASS
-model_evaluation_through: CPU-TEAMMATE-PASS
+last_tracked_objective: CPU-MULTI-PLAYER
+usage_aggregates_through: CPU-MULTI-PLAYER
+model_evaluation_through: CPU-MULTI-PLAYER
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -104,6 +104,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | BROWSER-MATCH-START-URL | accepted | ~28m | 18.3m | 5.2m | 4.2m | 0.5m | (from Iteration 48) | n/a** |
 | CPU-PASSING-EVALUATION | accepted | ~21m | 12.1m | 8.3m | ~0m* | ~0.5m | ~3.4M est. | n/a** |
 | CPU-TEAMMATE-PASS | accepted | ~28m | 17.2m | 9.0m | 1.9m | ~0.5m | ~5.2M est. | n/a** |
+| CPU-MULTI-PLAYER | accepted | ~17m | 10.1m | 7.2m | 5.5m | ~0.5m | ~3.8M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -279,6 +280,7 @@ on an H task is the interesting result.
 | CPU-OPPONENT-1V1 | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Simple chase-ball CPU opponent for AI_FALLBACK slots; critic ACCEPT first pass |
 | CPU-PASSING-EVALUATION | qwen3.6 | M | Medium — new module, existing harness | 0 | A | Added PASS_BIT to CPU adapter with edge detection; 18 unit tests; critic ACCEPT first pass |
 | CPU-TEAMMATE-PASS | qwen3.6 | M | Medium — new module, existing harness | 0 | A | Added teammate-aware pass targeting; getBestTeammateTarget helper; 13 unit tests; critic ACCEPT first pass |
+| CPU-MULTI-PLAYER | qwen3.6 | M | Medium — new module, existing harness | 0 | A | controlledPlayerId-based player lookup; multi-adapter independence; 12 unit tests; critic ACCEPT first pass |
 
 ### Reviewer route and catches
 
@@ -288,6 +290,8 @@ on an H task is the interesting result.
 | CPU-PASSING-EVALUATION | integration-reviewer | deepseek allowance exhausted; orchestrator-verified | ACCEPT | dependency direction clean, no eval file modifications, 1199/1199 regressions pass |
 | CPU-TEAMMATE-PASS | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
 | CPU-TEAMMATE-PASS | integration-reviewer-flash (deepseek-v4-flash) | direct 0731 exhausted, flash used | ACCEPT | dependency direction clean, no eval modifications, 1212/1212 regressions pass |
+| CPU-MULTI-PLAYER | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
+| CPU-MULTI-PLAYER | integration-reviewer-flash (deepseek-v4-flash) | direct 0731 exhausted, flash used | ACCEPT | dependency direction clean, no eval modifications, 1224/1224 regressions pass |
 
 ### Builder scoreboard
 
@@ -295,7 +299,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 34 | 18 | 8 | 3 | 3 | 2 | 53% | ~0.91 | ~41m |
+| qwen3.6 | 35 | 19 | 8 | 3 | 3 | 2 | 54% | ~0.89 | ~41m |
 | mimo-v2.5 | 8 | 4 | 3 | 1 | 0 | 0 | 50% | 0.63 | ~31m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

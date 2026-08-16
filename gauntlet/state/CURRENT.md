@@ -7,11 +7,11 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CPU-MULTI-PLAYER
+next_objective_id: SCENARIO-2V2-FIXTURE
 best_known:
   commit: (pending acceptance)
-  note: "CPU-TEAMMATE-PASS accepted. CPU adapter now passes toward nearest forward teammate. Advancing to CPU-MULTI-PLAYER: multiple CPU-controlled players per team."
-active_candidate: CPU-MULTI-PLAYER
+  note: "CPU-MULTI-PLAYER accepted. CPU adapter now supports multiple controlled players per team via controlledPlayerId. Advancing to SCENARIO-2V2-FIXTURE: create 2v2 AI-vs-AI scenario fixture."
+active_candidate: SCENARIO-2V2-FIXTURE
 builder_in_use: builder-qwen
 critic_in_use: critic-flash
 retry_count: 0
@@ -41,15 +41,16 @@ accepted:
   - BROWSER-MATCH-START-URL
   - CPU-PASSING-EVALUATION
   - CPU-TEAMMATE-PASS
+  - CPU-MULTI-PLAYER
 blocked: []
 selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal effects, CPU ball pursuit (done), match-start URL (done), CPU passing evaluation (done). Horizon exhausted."
 ```
 
 ## Last accepted objective
 
-CPU-TEAMMATE-PASS — CPU adapter passes toward the nearest forward teammate instead of blindly along body heading. Added CpuTeammate interface, extended CpuObservation with teammates array and controlledPlayerId, getBestTeammateTarget helper, and fallback to goal-directed movement. 13 new tests (CPU-TEAMMATE-001 through 005), 80/80 CPU adapter tests, 1212/1212 full suite.
+CPU-MULTI-PLAYER — CPU adapter now uses controlledPlayerId to find its controlled player instead of blindly using players[0]. Per-slot CPU adapters in browser mode pass controlledPlayerId through buildCpuObservation. Fallback to players[0] for backward compatibility. 12 new tests (CPU-MULTIPLAYER-001 through 004), 92/92 CPU adapter tests, 1224/1224 full suite.
 
 - builder: builder-qwen / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 13/13 teammate-pass tests, 80/80 CPU adapter tests, 1212/1212 full suite
+- Evidence: 12/12 multi-player tests, 92/92 CPU adapter tests, 1224/1224 full suite
