@@ -4,6 +4,26 @@ Human-readable history of meaningful changes to the Gauntlet's **rules, prompts,
 
 This changelog does **not** record normal gameplay objectives or routine live-state updates produced by the running Gauntlet. Git remains the source of truth for exact file contents and diffs.
 
+## 2026-08-16 — Replan continuation and tag publication patch
+
+**Gauntlet system version (SemVer):** `0.8.1`  
+**Previous system version:** `0.8.0`
+
+### Changed
+
+- Added `ORCH-REG-018` for the observed post-replan stop: once strategic reassessment has produced a valid horizon with an executable next objective and no allowed stop reason applies, the orchestrator must delegate that objective immediately instead of asking the human whether to proceed.
+- Strengthened `gauntlet/PROMPT.md` and `/gauntlet-continue` with the same no-confirmation continuation rule and added a deterministic prompt gate so that wording cannot silently disappear.
+- Fixed `.github/workflows/publish-gauntlet-tag.yml` so version extraction runs as a valid multiline shell step before publishing the immutable `gauntlet-v<version>` tag. The 0.8.0 merge workflow had failed in `Read Gauntlet version`, so no 0.8.0 tag was created.
+- No generated `gauntlet/state/**` file is manually rewritten by this patch.
+
+### Why
+
+A live 0.8.0 overflow run correctly accepted `BROWSER-2V2-PLAYABLE`, detected an exhausted horizon, created the new `small-sided-match` horizon, selected `CPU-TEAM-DECISION-PROFILE`, and then stopped after asking `Shall I proceed with delegating CPU-TEAM-DECISION-PROFILE?`. `ORCH-REG-015` only protected the transition into replanning; it did not protect the next transition from a completed replan to immediate delegation.
+
+Separately, the 0.8.0 release-tag workflow did run after PR #11 merged, but failed in the version-read step and skipped tag publication. This patch repairs only that publication step; release CI still does not run Gauntlet evals or decide SemVer.
+
+---
+
 ## 2026-08-16 — Durable evidence provenance and acceptance continuation
 
 **Gauntlet system version (SemVer):** `0.8.0`  
