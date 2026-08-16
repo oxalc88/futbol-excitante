@@ -11,6 +11,10 @@ Start the PES Simulator Gauntlet Loop now. Do not implement gameplay yourself.
 
 Read `gauntlet/PROMPT.md`, `gauntlet/principles.md`, `gauntlet/VERSION.json`, `CURRENT.md`, and `HORIZON.md`. Follow the validated rolling horizon and existing model routing.
 
+Before any other status prose, print one compact startup line using the version read from `gauntlet/VERSION.json`:
+
+`Gauntlet <version> · orchestrator · grok-4.6`
+
 For each candidate: builder → tests/artifacts → `pnpm run gauntlet:audit` → optional bounded `aux`/Gemma(Qwen fallback) semantic audit only on `REVIEW_REQUIRED` → mandatory independent critic → integration reviewer → final evidence gate → `GAUNTLET_ACCEPTANCE_JSON=... pnpm run gauntlet:acceptance:persist` → bookkeeping → `pnpm run gauntlet:eval:state` → accept.
 
 Critic ACCEPT alone is never final, and deterministic/cheap-auditor success never bypasses the critic. Audit failures owned by state/bookkeeping are repaired by the orchestrator; implementation/evidence failures return to the builder.
