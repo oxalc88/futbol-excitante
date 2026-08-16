@@ -27,7 +27,7 @@
  */
 
 import type { InputFrame } from "../../contracts/input.js";
-import { FIRST_TOUCH_BIT, SHOT_BIT } from "../../contracts/input.js";
+import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
 
 // ---------------------------------------------------------------------------
@@ -147,6 +147,8 @@ interface CpuInternalState {
   ballWasInRange: boolean;
   /** Whether the CPU currently has ball possession. */
   hasPossession: boolean;
+  /** Whether PASS_BIT was pressed on the previous tick (for edge detection). */
+  passWasPressed: boolean;
   /** Remaining cooldown ticks after a shot (prevents immediate re-possession). */
   shotCooldownRemaining: number;
 }
@@ -307,6 +309,7 @@ export function createCpuAdapter(): CpuAdapter {
   const state: CpuInternalState = {
     ballWasInRange: false,
     hasPossession: false,
+    passWasPressed: false,
     shotCooldownRemaining: 0,
   };
 
@@ -400,27 +403,52 @@ export function createCpuAdapter(): CpuAdapter {
         }
 
         // Distance-based shooting decision.
+        // Compute facing check once (applies at any distance).
+        // Urgency widens tolerance when CPU is behind.
+        const adjustedTolerance = FACING_TOLERANCE_CLOSE * urgency;
+        const cappedTolerance = Math.min(adjustedTolerance, Math.PI);
+        const goalAngle = Math.atan2(gdy, gdx);
+        const headingDiff = normalizeAngle(cpuPlayer.bodyHeading - goalAngle);
+        const isFacingGoal = Math.abs(headingDiff) <= cappedTolerance;
+
+        // Close range: always shoot if within close range.
+        // Apply urgency multiplier to lower the distance threshold for backup.
+        const adjustedCloseRange = SHOT_RANGE_CLOSE / urgency;
         if (distToGoal <= SHOT_RANGE_CLOSE) {
-          // Very close: always shoot (high chance).
-          // Apply urgency multiplier to lower the distance threshold for backup.
-          const adjustedCloseRange = SHOT_RANGE_CLOSE / urgency;
           if (distToGoal <= adjustedCloseRange) {
             heldButtons |= SHOT_BIT;
             pressedButtons |= SHOT_BIT;
           }
-        } else if (distToGoal <= SHOT_RANGE_WIDE) {
+        } else if (distToGoal <= SHOT_RANGE_WIDE && isFacingGoal) {
           // Medium range: shoot if facing within tolerance.
-          // Use urgency to widen the tolerance when behind.
-          const adjustedTolerance = FACING_TOLERANCE_CLOSE * urgency;
-          const cappedTolerance = Math.min(adjustedTolerance, Math.PI);
-          const goalAngle = Math.atan2(gdy, gdx);
-          const headingDiff = normalizeAngle(cpuPlayer.bodyHeading - goalAngle);
-          if (Math.abs(headingDiff) <= cappedTolerance) {
-            heldButtons |= SHOT_BIT;
-            pressedButtons |= SHOT_BIT;
+          heldButtons |= SHOT_BIT;
+          pressedButtons |= SHOT_BIT;
+        } else if (urgency > 1 && isFacingGoal) {
+          // Urgency extends shot range beyond wide threshold.
+          // When behind (urgency > 1), the CPU shoots from farther away.
+          heldButtons |= SHOT_BIT;
+          pressedButtons |= SHOT_BIT;
+        }
+
+        // Pass decision: if not shooting, press PASS_BIT when
+        // beyond shot range or not facing well enough (edge detected).
+        const shotNotPressed = (pressedButtons & SHOT_BIT) === 0;
+        if (shotNotPressed) {
+          const shouldPressPass =
+            distToGoal > SHOT_RANGE_WIDE || !isFacingGoal;
+          // Edge detection: press only when entering the pass state.
+          if (shouldPressPass && !state.passWasPressed) {
+            pressedButtons |= PASS_BIT;
+          }
+          // Hold while condition persists.
+          if (shouldPressPass) {
+            heldButtons |= PASS_BIT;
           }
         }
-        // Beyond SHOT_RANGE_WIDE: dribble only, no shot.
+
+        // Track pass state for edge detection on next tick.
+        state.passWasPressed = shotNotPressed &&
+          (distToGoal > SHOT_RANGE_WIDE || !isFacingGoal);
       } else {
         // ----------------------------------------------------------------
         // DEFENSE MODE — chase ball
@@ -478,6 +506,7 @@ export function createCpuAdapter(): CpuAdapter {
     reset(): void {
       state.ballWasInRange = false;
       state.hasPossession = false;
+      state.passWasPressed = false;
       state.shotCooldownRemaining = 0;
     },
   };

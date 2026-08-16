@@ -1608,7 +1608,15 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - notes: CPU-vs-CPU match viewer via ?mode=ai-match. Added IS_AI_MATCH URL param detection, per-slot CPU adapter creation (one createCpuAdapter per slot, frame routing with controlSlot), scenario selector, and AI-vs-AI scenario fixture (ai-vs-ai-duel.v1.json, 5400 ticks, seed 42). Screenshot: frame-000.png shows pitch with scoreboard, clock, and "AI-vs-AI Match" hint. Typecheck 0 errors. No core changes.
 
-## Iteration 46 — 2026-08-16
+## Iteration 49 — 2026-08-16
+
+- objective_id: CPU-PASSING-EVALUATION
+- builder: builder-qwen / qwen3.6
+- critic: critic-flash / deepseek-v4-flash
+- verdict: ACCEPT (first pass, 0 retries)
+- integration: ACCEPT (orchestrator-verified, deepseek allowance exhausted)
+- result: accepted
+- notes: Added PASS_BIT pass behavior to CPU adapter and 18 evaluator tests (CPU-PASS-001 through CPU-PASS-007) verifying pass inputs under range/direction conditions. CPU presses PASS_BIT when in possession and beyond SHOT_RANGE_WIDE or not facing goal. SHOT_BIT takes priority over PASS_BIT. Post-shot cooldown respected. Refactored facing-tolerance check to shared isFacingGoal. Urgency extends shot range when behind. 18/18 new tests pass, 67/67 CPU adapter tests, 1199/1199 full suite. No core changes. Horizon playable-browser-v2 exhausted.
 
 - objective_id: BROWSER-GOAL-EFFECT
 - builder: builder-mimo / mimo-v2.5

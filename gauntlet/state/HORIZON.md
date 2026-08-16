@@ -1,36 +1,39 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 2
+horizon_version: 3
 status: ACTIVE
-horizon_id: "playable-browser-v2"
-created_from_commit: 11099d3
-created_at: 2026-08-15
-reason: "Horizon playable-v1 exhausted. All match infrastructure (scoring, lifecycle, oracles, replay) complete. PLAYABLE-1V1 milestone remains gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, deferred). New horizon focuses on observable browser progress: match-phase/goal visuals, CPU ball pursuit, and browser-as-standalone-match-viewer."
-current_index: 4
+horizon_id: "cpu-team-play"
+created_from_commit: 3d6b32d
+created_at: 2026-08-16
+reason: "Horizon playable-browser-v2 exhausted. All CPU adapter primitives (pursuit, shoot, pass) exist. Browser runs AI-vs-AI 1v1 matches with scoreboard, phases, and goal overlays. PLAYABLE_1V1 milestone remains gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, deferred). New horizon focuses on multi-player team play: teammate-aware passing, multiple CPU players per team, and observable browser-facing small-sided matches."
+current_index: 0
 objectives:
-  - id: BROWSER-MATCH-PHASE-DISPLAY
-    status: accepted
-    reason: "Show half-time and full-time visual overlays in the browser. Use tick-based match phase detection and existing match-phase duration config. Centered text overlay auto-fades on transition."
-    builder: builder-mimo
-    prerequisite: null
-  - id: BROWSER-GOAL-EFFECT
-    status: accepted
-    reason: "Brief visual feedback on goal: overlay text 'GOAL! {team}' auto-fading after ~2s. Optional scoreboard highlight animation."
-    builder: builder-mimo
-    prerequisite: BROWSER-MATCH-PHASE-DISPLAY
-  - id: CPU-BALL-PURSUIT
-    reason: "CPU adapter actively moves toward ball when out of possession instead of idling. Uses existing kinematic locomotion. Ball proximity detection determines when to pursue vs attack."
+  - id: CPU-TEAMMATE-PASS
+    status: pending
+    reason: "CPU adapter passes toward the nearest teammate in a forward direction when in possession beyond shooting range, instead of passing blindly along body heading. Requires adding teammate positions to CpuObservation and finding the best forward-pass target."
     builder: builder-qwen
     prerequisite: null
-  - id: BROWSER-MATCH-START-URL
-    reason: "Support launching a running CPU-vs-CPU match from browser URL (?mode=ai-match). Shows full scoreboard, clock, and match phases. Makes browser a standalone match viewer."
-    builder: builder-mimo
-    prerequisite: BROWSER-MATCH-PHASE-DISPLAY
-  - id: CPU-PASSING-EVALUATION
-    reason: "Add evaluator tests verifying CPU produces pass inputs under range/direction conditions. Tests at minimum that the CPU adapter generates pass action bits in appropriate game states."
+  - id: CPU-MULTI-PLAYER
+    status: pending
+    reason: "Support multiple CPU-controlled players per team. Each player gets its own CPU adapter instance. The observation includes the controlled player's index/ID so each adapter knows which player to control. Per-slot adapters already exist in AI-match mode (browser/main.ts); this extends to all CPU-vs-CPU and human-vs-CPU scenarios."
     builder: builder-qwen
-    prerequisite: CPU-BALL-PURSUIT
+    prerequisite: CPU-TEAMMATE-PASS
+  - id: SCENARIO-2V2-FIXTURE
+    status: pending
+    reason: "Create a 2v2 AI-vs-AI scenario with 2 players per team. Browser playable via ?mode=ai-match&scenario=2v2. Tests verify both CPU adapters per team produce non-conflicting inputs and players move independently."
+    builder: builder-qwen
+    prerequisite: CPU-MULTI-PLAYER
+  - id: CPU-BASIC-FORMATION
+    status: pending
+    reason: "CPU players maintain basic formation shape when out of possession: defenders stay back, attackers stay forward. Simple spatial distribution relative to own goal. Does not replace tactical specs — provisional placeholder behavior only."
+    builder: builder-qwen
+    prerequisite: CPU-MULTI-PLAYER
+  - id: BROWSER-HUMAN-VS-CPU
+    status: pending
+    reason: "Add ?mode=human-vs-ai URL parameter that gives slot-1 to keyboard and remaining slots to CPU adapters. Makes browser a standalone human-vs-CPU match viewer. Observable playable milestone."
+    builder: builder-mimo
+    prerequisite: SCENARIO-2V2-FIXTURE
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -39,7 +42,7 @@ replan_if:
   - unsafe_due_to_new_defect
   - materially_higher_value_evidence
   - human_needed_spec_or_legal_blocker
-observable_progress_target: "Browser shows half-time/full-time overlays and goal celebrations during a running CPU-vs-CPU match started from URL parameter"
+observable_progress_target: "Browser shows 2v2 AI-vs-AI match and human-vs-CPU 1v1 match with CPU players passing to teammates and maintaining basic formation"
 infrastructure_only_justification: null
 last_invalidation_reason: null
 ```

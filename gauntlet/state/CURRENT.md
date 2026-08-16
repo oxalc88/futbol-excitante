@@ -7,11 +7,11 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CPU-PASSING-EVALUATION
+next_objective_id: CPU-TEAMMATE-PASS
 best_known:
   commit: (pending acceptance)
-  note: "BROWSER-MATCH-START-URL accepted. Advancing to next horizon objective: CPU-PASSING-EVALUATION — evaluator tests verifying CPU produces pass inputs under range/direction conditions."
-active_candidate: null
+  note: "CPU-PASSING-EVALUATION accepted. Horizon playable-browser-v2 exhausted. New horizon cpu-team-play: CPU teammate-aware passing, multi-player support, 2v2 scenario, basic formation, human-vs-CPU browser mode."
+active_candidate: CPU-TEAMMATE-PASS
 builder_in_use: builder-qwen
 critic_in_use: critic-flash
 retry_count: 0
@@ -39,19 +39,16 @@ accepted:
   - BROWSER-GOAL-EFFECT
   - CPU-BALL-PURSUIT
   - BROWSER-MATCH-START-URL
+  - CPU-PASSING-EVALUATION
 blocked: []
-selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal effects, CPU ball pursuit (done), match-start URL (done), CPU passing evaluation."
+selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal effects, CPU ball pursuit (done), match-start URL (done), CPU passing evaluation (done). Horizon exhausted."
 ```
 
 ## Last accepted objective
 
-BROWSER-MATCH-START-URL — CPU-vs-CPU match viewer via ?mode=ai-match. Per-slot CPU adapters, scenario fixture, screenshot evidence.
+CPU-PASSING-EVALUATION — Added PASS_BIT pass behavior to CPU adapter and 18 evaluator tests verifying pass inputs under range/direction conditions. CPU presses PASS_BIT when in possession and beyond shooting range or not facing goal. SHOT_BIT takes priority. Post-shot cooldown respected.
 
-- builder: builder-mimo / mimo-v2.5
+- builder: builder-qwen / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
-- integration: integration-reviewer / deepseek-v4-flash (flash) — ACCEPT
-- Evidence: docs/screenshots/BROWSER-MATCH-START-URL/frame-000.png
-
-## Next action
-
-Delegate CPU-PASSING-EVALUATION to builder-qwen. Prerequisite: CPU-BALL-PURSUIT.
+- integration: integration-reviewer (orchestrator-verified, deepseek allowance exhausted) — ACCEPT
+- Evidence: 18/18 passing tests, 67/67 CPU adapter tests, 1199/1199 full suite

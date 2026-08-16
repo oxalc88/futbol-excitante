@@ -5,7 +5,11 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-15T16:44:00Z
+measured_at: 2026-08-16T00:45:00Z
+tracking_contract_version: 1
+last_tracked_objective: CPU-PASSING-EVALUATION
+usage_aggregates_through: CPU-PASSING-EVALUATION
+model_evaluation_through: CPU-PASSING-EVALUATION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -94,6 +98,11 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | BROWSER-SCOREBOARD | accepted | ~14m | 10.2m | 4.3m | 4.4m | 0.5m | ~5.2M | n/a** |
 | MATCH-LIFECYCLE | accepted | ~55m | 42.6m | 8.1m | 7.8m | 0.5m | ~10.1M | n/a** |
 | AI-GOAL-IMPROVEMENT | accepted | ~20m | 14.7m | 4.2m | 5.3m | 0.5m | ~6.3M | n/a** |
+| BROWSER-MATCH-PHASE-DISPLAY | accepted | ~45m | 29.1m | 8.6m | 7.3m | 0.5m | (from Iteration 45) | n/a** |
+| BROWSER-GOAL-EFFECT | accepted | ~35m | 22.0m | 7.1m | 5.2m | 0.5m | (from Iteration 46) | n/a** |
+| CPU-BALL-PURSUIT | accepted | ~50m | 34.5m | 7.8m | 5.9m | 0.5m | (from Iteration 47) | n/a** |
+| BROWSER-MATCH-START-URL | accepted | ~28m | 18.3m | 5.2m | 4.2m | 0.5m | (from Iteration 48) | n/a** |
+| CPU-PASSING-EVALUATION | accepted | ~21m | 12.1m | 8.3m | ~0m* | ~0.5m | ~3.4M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -267,6 +276,14 @@ on an H task is the interesting result.
 | LOCOMOTION-LATERAL-DRIFT | qwen3.6 | H | High — can violate architecture | 0 | A | Default-config lateral-drift regression tests; negative control proves FAIL direction |
 | CAPABILITY-SWERVE | qwen3.6 | H | High — new physics + new runner | 0 | A | Provisional Magnus curve force, swerve axis runner; zero-spin protected; critic ACCEPT first pass |
 | CPU-OPPONENT-1V1 | qwen3.6 | M | Medium — new module, existing contract | 0 | A | Simple chase-ball CPU opponent for AI_FALLBACK slots; critic ACCEPT first pass |
+| CPU-PASSING-EVALUATION | qwen3.6 | M | Medium — new module, existing harness | 0 | A | Added PASS_BIT to CPU adapter with edge detection; 18 unit tests; critic ACCEPT first pass |
+
+### Reviewer route and catches
+
+| Step | Reviewer | Route | Result | Catches |
+|---|---:|---:|---:|---|
+| CPU-PASSING-EVALUATION | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
+| CPU-PASSING-EVALUATION | integration-reviewer | deepseek allowance exhausted; orchestrator-verified | ACCEPT | dependency direction clean, no eval file modifications, 1199/1199 regressions pass |
 
 ### Builder scoreboard
 
@@ -274,7 +291,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 32 | 16 | 8 | 3 | 3 | 2 | 50% | ~0.97 | ~42m |
+| qwen3.6 | 33 | 17 | 8 | 3 | 3 | 2 | 52% | ~0.94 | ~41m |
 | mimo-v2.5 | 8 | 4 | 3 | 1 | 0 | 0 | 50% | 0.63 | ~31m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
@@ -282,7 +299,7 @@ Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 | Builder | Objectives | Weighted grade / difficulty | Read as |
 |---|---:|---:|---|
 | mimo-v2.5 | 8, all H | 3.1 / 3.0 | First-pass locomotion and ball; misses were local (mapping, restore, pair order) |
-| qwen3.6 | 31, mixed M–VH | 3.3 / 2.8 | Reliable on contracts and profiles; expensive on honest-eval / CLI / browser evidence |
+| qwen3.6 | 33, mixed M–VH | 3.3 / 2.8 | Reliable on contracts, profiles, and adapter wiring; expensive on honest-eval / CLI / browser evidence |
 
 ### What that means for routing
 
