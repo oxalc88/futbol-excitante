@@ -2,8 +2,10 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { GauntletScenario } from "../contracts/scenario.js";
+import { createIncident } from "../contracts/incident.js";
 import { evaluateScenario } from "./evaluate-state.js";
 import { runPromptGate } from "./prompt-gate.js";
+import { writeIncident } from "./write-incident.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../../..");
@@ -21,13 +23,30 @@ async function loadScenarios(): Promise<GauntletScenario[]> {
 }
 
 let failures = 0;
+const incidentFiles: string[] = [];
 const scenarios = await loadScenarios();
 console.log(`Gauntlet Eval v1 — ${scenarios.length} regression scenarios`);
 
 for (const scenario of scenarios) {
   const actual = evaluateScenario(scenario);
-  const pass = matchesExpected(actual as unknown as Record<string, unknown>, scenario.expect as unknown as Record<string, unknown>);
-  if (!pass) failures += 1;
+  const expected = scenario.expect as unknown as Record<string, unknown>;
+  const observed = actual as unknown as Record<string, unknown>;
+  const pass = matchesExpected(observed, expected);
+  if (!pass) {
+    failures += 1;
+    incidentFiles.push(
+      await writeIncident(
+        repoRoot,
+        createIncident({
+          source: "deterministic_eval",
+          failure_class: actual.failure_class ?? "internal_error",
+          scenario_id: scenario.id,
+          expected,
+          observed,
+        }),
+      ),
+    );
+  }
   console.log(`${pass ? "PASS" : "FAIL"} ${scenario.id} — ${actual.decision}`);
   if (!pass) {
     console.log(`  expected: ${JSON.stringify(scenario.expect)}`);
@@ -38,12 +57,28 @@ for (const scenario of scenarios) {
 const promptGate = await runPromptGate(repoRoot);
 console.log("\nPrompt gate");
 for (const result of promptGate) {
-  if (!result.pass) failures += 1;
+  if (!result.pass) {
+    failures += 1;
+    incidentFiles.push(
+      await writeIncident(
+        repoRoot,
+        createIncident({
+          source: "prompt_gate",
+          failure_class: "prompt_contract",
+          scenario_id: result.name,
+          expected: { pass: true },
+          observed: { pass: false, detail: result.detail ?? null },
+          scenario_candidate: false,
+        }),
+      ),
+    );
+  }
   console.log(`${result.pass ? "PASS" : "FAIL"} ${result.name}${result.detail ? ` — ${result.detail}` : ""}`);
 }
 
 if (failures > 0) {
   console.error(`\nGauntlet eval failed: ${failures} check(s)`);
+  if (incidentFiles.length > 0) console.error(`Incident artifacts: ${incidentFiles.join(", ")}`);
   process.exitCode = 1;
 } else {
   console.log(`\nGauntlet eval passed: ${scenarios.length} scenarios + ${promptGate.length} prompt checks`);
