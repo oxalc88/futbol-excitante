@@ -9,7 +9,8 @@ Required evidence is an acceptance gate, not advisory guidance. For each objecti
 - Tests demonstrate executable behavior but never substitute for required perceptual artifacts.
 - For gameplay/presentation changes, at least one screenshot is mandatory. The artifact must exist under `docs/screenshots/<objective-id>/`; listing a nonexistent path is not evidence.
 - Any objective whose acceptance criteria require browser-visible or browser-interactive behavior is screenshot-required even when the implementation is primarily URL routing, input wiring, state selection, or other browser glue. A browser objective is not exempt merely because its code is not in the renderer.
-- If a required behavior cannot reasonably be demonstrated by a still image, require supported dynamic evidence only when the repository already contains a committed capture command and rule for it. Do not invent video tooling or a video requirement.
+- If acceptance depends on motion, temporal behavior, autonomous control, passing, shooting, pursuit, transitions, or another multi-tick behavior, a structured trajectory under `docs/evidence/<objective-id>/trajectory.json` is mandatory once the repository provides the committed capture command. Unit tests and a still screenshot alone are insufficient for that integrated behavior.
+- Video is optional diagnostic evidence. When captured, use `pnpm run capture-ai-video`; keep the binary as a GitHub Actions artifact and retain `video-reference.json` with objective ID, commit SHA, workflow run ID, and artifact name. Video does not replace the structured trajectory.
 - Screenshots or dynamic captures are diagnostic evidence. They do not establish PES fidelity, a perceptual `PASS`, or a protected regression `PASS` without the required versioned oracle/review policy.
 - Missing mandatory evidence prevents `ACCEPT` at every review and orchestration stage.
 
