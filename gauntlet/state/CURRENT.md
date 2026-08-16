@@ -9,13 +9,13 @@ handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 next_objective_id: MATCH-ORACLE
 best_known:
-  commit: 33d9463
-  note: "AI-GOAL-IMPROVEMENT accepted. CPU adapter improved with deterministic lateral aim, distance-based shooting, post-shot cooldown, and score awareness. Next: MATCH-ORACLE — add match-scoring oracles to the evaluator suite."
+  commit: 56027d5
+  note: "MATCH-ORACLE accepted. Match-scoring oracles (score-tracker, match-clock) added to evaluator suite. All 9 implementable mutants detected in mutant-core and mutant-1v1 reducers. Next: MATCH-REPLAY-EXTENSION — score-aware replay verification."
 active_candidate:
-  objective_id: MATCH-ORACLE
+  objective_id: MATCH-REPLAY-EXTENSION
   builder: builder-qwen
   critic: critic
-  started_from_commit: 33d9463
+  started_from_commit: 56027d5
   last_verdict: null
 builder_in_use: builder-qwen
 critic_in_use: critic
@@ -38,8 +38,9 @@ accepted:
   - BROWSER-SCOREBOARD
   - MATCH-LIFECYCLE
   - AI-GOAL-IMPROVEMENT
+  - MATCH-ORACLE
 blocked: []
-selection_note: "HEADLESS-CPU-MATCH accepted. Next: match scoring — add a simple tick-based match clock and score tracker that listens for 'goal' simulation events and increments team scores. Wire into the headless match runner. This completes the basic football structure: locomotion → ball → contacts → goals → scoring. PLAYABLE_1V1 remains blocked on perceptual gates (must not invent)."
+selection_note: "MATCH-ORACLE accepted. Match-scoring oracles wired into evaluator suite. Next: MATCH-REPLAY-EXTENSION — score-aware replay verification: replay must reproduce same score progression."
 ```
 
 ## Last accepted objective

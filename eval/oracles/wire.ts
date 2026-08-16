@@ -21,6 +21,8 @@ import { checkCameraHashConsistency } from "./camera-hash.js";
 import { checkDeferredMutants } from "./deferred-mutants.js";
 import { checkPrngOrderOracle } from "./prng-order.js";
 import { checkPlayerContactEvidence } from "./player-contact.js";
+import { checkScoreTracker } from "./match.js";
+import { checkMatchClock } from "./match.js";
 import type { OracleEntry } from "./oracle-registry.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 
@@ -98,6 +100,17 @@ const entries: OracleEntry[] = [
     oracle_id: "player-contact-evidence",
     oracle_version: "oracle-player-contact-v1",
     fn: checkPlayerContactEvidence,
+  },
+  // Match-scoring oracles.
+  {
+    oracle_id: "score-tracker",
+    oracle_version: "oracle-score-tracker-v1",
+    fn: checkScoreTracker,
+  },
+  {
+    oracle_id: "match-clock",
+    oracle_version: "oracle-match-clock-v1",
+    fn: checkMatchClock,
   },
 ];
 

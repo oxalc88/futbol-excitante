@@ -250,6 +250,36 @@ function injectCameraHash(base: TelemetryObservation): TelemetryObservation {
   return { ...base, observationCoreHash: "corrupted-hash-000000" };
 }
 
+/**
+ * Build observations with an invalid goal event
+ * (score-tracker mutant).
+ */
+function injectScoreTracker(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  const obs1 = { ...base, tick: 50, simulationTime: 50 / 60 };
+  const obs2 = {
+    ...base,
+    tick: 51,
+    simulationTime: 51 / 60,
+    events: [{ kind: "goal", payload: { goalIndex: 2 } }],
+  };
+  return [obs1, obs2];
+}
+
+/**
+ * Build observations with non-sequential ticks
+ * (match-clock mutant).
+ */
+function injectMatchClock(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  // First observation has tick 0 (sequential), second skips to tick 2.
+  const obs1 = { ...base, tick: 0, simulationTime: 0 / 60 };
+  const obs2 = { ...base, tick: 2, simulationTime: 2 / 60 };
+  return [obs1, obs2];
+}
+
 // ---------------------------------------------------------------------------
 // Main reduction
 // ---------------------------------------------------------------------------
@@ -490,6 +520,46 @@ export function evaluateMutantCore(
               id: `poisoned-${mutant.oracleId}-miss`,
               status: "pass",
               description: `Oracle ${mutant.oracleId} did NOT detect camera-hash inconsistency`,
+            };
+      } else if (mutant.id === "score-tracker") {
+        // Score-tracker: inject a goal event with invalid goalIndex.
+        const corruptedObs = injectScoreTracker(cleanResult.observations[0]);
+        const poisonedResults = executeOracle(
+          mutant.oracleId,
+          mutant.oracleVersion,
+          corruptedObs,
+        );
+        const anyFail = poisonedResults.some((r) => r.status === "fail");
+        outcome.poisonedResult = anyFail
+          ? {
+              id: `poisoned-${mutant.oracleId}`,
+              status: "fail",
+              description: `Oracle ${mutant.oracleId} detected invalid goal event`,
+            }
+          : {
+              id: `poisoned-${mutant.oracleId}-miss`,
+              status: "pass",
+              description: `Oracle ${mutant.oracleId} did NOT detect invalid goal event`,
+            };
+      } else if (mutant.id === "match-clock") {
+        // Match-clock: inject observations with non-sequential ticks.
+        const corruptedObs = injectMatchClock(cleanResult.observations[0]);
+        const poisonedResults = executeOracle(
+          mutant.oracleId,
+          mutant.oracleVersion,
+          corruptedObs,
+        );
+        const anyFail = poisonedResults.some((r) => r.status === "fail");
+        outcome.poisonedResult = anyFail
+          ? {
+              id: `poisoned-${mutant.oracleId}`,
+              status: "fail",
+              description: `Oracle ${mutant.oracleId} detected non-sequential ticks`,
+            }
+          : {
+              id: `poisoned-${mutant.oracleId}-miss`,
+              status: "pass",
+              description: `Oracle ${mutant.oracleId} did NOT detect non-sequential ticks`,
             };
       }
 

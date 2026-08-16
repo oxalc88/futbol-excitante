@@ -158,6 +158,28 @@ function makeObservationsWithPossessionNoEvidence(
   return [obs1, obs2];
 }
 
+function makeObservationsWithScoreTracker(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  const obs1 = { ...base, tick: 50, simulationTime: 50 / 60 };
+  const obs2 = {
+    ...base,
+    tick: 51,
+    simulationTime: 51 / 60,
+    events: [{ kind: "goal", payload: { goalIndex: 2 } }],
+  };
+  return [obs1, obs2];
+}
+
+function makeObservationsWithMatchClock(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  // First observation has tick 0, second skips to tick 2 (missing tick 1).
+  const obs1 = { ...base, tick: 0, simulationTime: 0 / 60 };
+  const obs2 = { ...base, tick: 2, simulationTime: 2 / 60 };
+  return [obs1, obs2];
+}
+
 // ---------------------------------------------------------------------------
 // 1. Each implementable mutant: clean PASS + poisoned FAIL
 // ---------------------------------------------------------------------------
@@ -216,6 +238,10 @@ describe("Implementable mutants: clean PASS and poisoned FAIL", () => {
         corruptedObsList = [
           { ...base, observationCoreHash: "corrupted-hash-000000" },
         ];
+      } else if (mutant.id === "score-tracker") {
+        corruptedObsList = makeObservationsWithScoreTracker(base);
+      } else if (mutant.id === "match-clock") {
+        corruptedObsList = makeObservationsWithMatchClock(base);
       } else {
         corruptedObsList = [base];
       }

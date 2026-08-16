@@ -1546,13 +1546,23 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - commits: pending (git-committer)
 - notes: Match phase tracking added to headless runner. MatchPhase type with 5 values (kickoff/first-half/halftime/second-half/fulltime). halfDurationTicks config (default = matchDurationTicks / 2). Goal events trigger post-goal kickoff phase. 31 new tests. No simulation core changes. Contract: "kickoff" added to SimulationEvent.kind union.
 
-## Iteration 41 — 2026-08-15
+## Iteration 42 — 2026-08-15
 
-- objective_id: AI-GOAL-IMPROVEMENT
+- objective_id: MATCH-ORACLE
 - builder: builder-qwen / qwen3.6
-- critic: critic-mimo / mimo-v2.5 (fallback)
+- critic: critic-mimo / mimo-v2.5 (fallback, deepseek exhausted)
 - verdict: ACCEPT (first pass)
 - integration: ACCEPT (integration-reviewer / mimo-v2.5, fallback)
 - result: accepted
 - commits: pending (git-committer)
-- notes: CPU adapter improved: deterministic lateral shot aim via tick-seeded hash (±3.66m within goal width), distance-based shooting thresholds (≤5m always shoot, 5-20m facing-dependent, >20m dribble only), 15-tick post-shot cooldown suppressing re-possession, score-state awareness (behind→aggressive, ahead→cautious). 16 new tests. No core changes.
+- notes: Match-scoring oracles added to evaluator suite. checkScoreTracker validates goalIndex (0/1) in goal events. checkMatchClock validates tick sequentiality via relative offset. score-tracker and match-clock mutants registered as implementable in mutant-registry, wired in wire.ts, with injection handlers in mutant-core.ts and mutant-1v1.ts. All 9 implementable mutants detected → MUTANT_CORE PASS. 91/91 tests across mutant-core (33), mutant-1v1 (38), foundation-promotion (20). No PES claim.
+
+## Iteration 43 — 2026-08-15
+
+- objective_id: HORIZON-BOOKKEEPING
+- builder: n/a (orchestrator)
+- critic: n/a
+- verdict: n/a
+- integration: n/a
+- result: fixed
+- notes: Removed 3 duplicate pending entries from horizon (BROWSER-SCOREBOARD, MATCH-LIFECYCLE, AI-GOAL-IMPROVEMENT at indices 4-6) that were already accepted at indices 1-3. Updated current_index from 4 to 5 after MATCH-ORACLE acceptance.

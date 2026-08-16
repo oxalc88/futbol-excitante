@@ -11,6 +11,8 @@
  *   - ball-teleport:     jump ball position macroscopically → ball-teleport oracle
  *   - possession-no-evidence: change lastTouchRef without touch event → possession-evidence oracle
  *   - camera-hash:       corrupt observationCoreHash → camera-hash oracle
+ *   - score-tracker:     goal event missing or incorrectly attributed → score-tracker oracle
+ *   - match-clock:       tick sequence non-sequential → match-clock oracle
  *
  * Deferred mutants (NOT_EVALUATED until their spec exists):
  *   - impossible-contact: contact spec does not exist
@@ -95,6 +97,20 @@ export const IMPLEMENTABLE_MUTANTS: ReadonlyArray<MutationDefinition> =
         "observationCoreHash mismatch — presentation/camera mutation affecting core hash",
       oracleId: "camera-hash",
       oracleVersion: "oracle-camera-v1",
+      deferred: false,
+    },
+    {
+      id: "score-tracker",
+      description: "Goal event missing or incorrectly attributed",
+      oracleId: "score-tracker",
+      oracleVersion: "oracle-score-tracker-v1",
+      deferred: false,
+    },
+    {
+      id: "match-clock",
+      description: "Tick sequence non-sequential",
+      oracleId: "match-clock",
+      oracleVersion: "oracle-match-clock-v1",
       deferred: false,
     },
   ] as const);
