@@ -264,6 +264,7 @@ function main(): void {
   // Legacy single-CPU adapter for mixed HUMAN/AI scenarios.
   let cpuAdapter: ReturnType<typeof createCpuAdapter> | undefined;
   let cpuTeamId: string | undefined;
+  let cpuControlledPlayerId: string | undefined;
 
   if (IS_AI_MATCH) {
     // AI-vs-AI mode: create a CPU adapter for every control slot.
@@ -272,7 +273,7 @@ function main(): void {
         adapter: createCpuAdapter(),
         controlSlot: slotId,
         teamId: assignment.teamId,
-        controlledPlayerId: assignment.controlledPlayerId,
+        controlledPlayerId: assignment.controlledPlayerId ?? "",
       });
     }
   } else {
@@ -293,6 +294,7 @@ function main(): void {
       if (assignment && assignment.mode !== "HUMAN") {
         cpuAdapter = createCpuAdapter();
         cpuTeamId = assignment.teamId;
+        cpuControlledPlayerId = assignment.controlledPlayerId ?? undefined;
         break;
       }
     }
@@ -354,7 +356,7 @@ function main(): void {
         }
       } else if (cpuAdapter) {
         // Legacy single-CPU adapter for mixed HUMAN/AI scenarios.
-        const obs = buildCpuObservation(sim.snapshot(), cpuTeamId);
+        const obs = buildCpuObservation(sim.snapshot(), cpuTeamId, cpuControlledPlayerId);
         const cpuFrame = cpuAdapter.sample(sim.tick, obs);
         allFrames.push(cpuFrame);
       }

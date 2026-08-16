@@ -1628,6 +1628,16 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - notes: CPU adapter passes toward nearest forward teammate instead of blindly along body heading. Added CpuTeammate interface, extended CpuObservation with teammates[] and controlledPlayerId, getBestTeammateTarget helper (filters forward-direction teammates by dot product with attack direction, returns nearest). Pass logic aims at best teammate target; falls back to goal-directed movement when no forward teammate exists. SHOT_BIT priority preserved. 13 new tests (CPU-TEAMMATE-001 through 005), 80/80 CPU adapter tests, 1212/1212 full suite. No core changes. Horizon cpu-team-play objective 1/5 accepted.
 
+## Iteration 51 — 2026-08-16
+
+- objective_id: CPU-MULTI-PLAYER
+- builder: builder-qwen / qwen3.6
+- critic: critic-flash / deepseek-v4-flash
+- verdict: ACCEPT (first pass, 0 retries)
+- integration: ACCEPT (integration-reviewer-flash / deepseek-v4-flash)
+- result: accepted
+- notes: CPU adapter now uses controlledPlayerId to find its controlled player instead of players[0]. buildCpuObservation accepts optional controlledPlayerId; browser per-slot adapters pass it through. Fallback to players[0] for backward compatibility. Neutral frame when player not found. 12 new tests (CPU-MULTIPLAYER-001 through 004), 92/92 CPU adapter tests, 1224/1224 full suite. No core changes. Horizon cpu-team-play objective 2/5 accepted.
+
 - objective_id: BROWSER-GOAL-EFFECT
 - builder: builder-mimo / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash

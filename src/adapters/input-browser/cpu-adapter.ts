@@ -86,6 +86,8 @@ export interface CpuObservation {
  *
  * @param world — authoritative WorldState (not mutated).
  * @param cpuTeamId — team ID the CPU controls (determines attacking direction).
+ * @param controlledPlayerId — optional explicit controlled player ID.
+ *   When set, uses this ID; when not set, defaults to the first player.
  * @returns a CpuObservation containing the fields the CPU needs.
  */
 export function buildCpuObservation(
@@ -393,12 +395,33 @@ export function createCpuAdapter(): CpuAdapter {
 
   return {
     sample(tick: number, observation: CpuObservation): InputFrame {
-      // Resolve the player owned by this CPU slot. Falling back to the
-      // first player preserves legacy one-player observations, but multi-slot
-      // callers must provide controlledPlayerId.
-      const cpuPlayer = observation.controlledPlayerId
-        ? observation.players.find((p) => p.playerId === observation.controlledPlayerId)
-        : observation.players[0];
+      // Find the controlled player by controlledPlayerId, falling back
+      // to the first player for backward compatibility.
+      const { controlledPlayerId, players } = observation;
+      let cpuPlayer: typeof players[0] | undefined;
+      if (controlledPlayerId && controlledPlayerId.length > 0) {
+        cpuPlayer = players.find((p) => p.playerId === controlledPlayerId);
+      }
+      if (!cpuPlayer) {
+        // Either controlledPlayerId was not set (fallback) or wasn't found.
+        // If controlledPlayerId was truthy but not found → neutral.
+        // If it was not set → use players[0].
+        if (controlledPlayerId && controlledPlayerId.length > 0) {
+          return {
+            tick,
+            sourceId: "cpu",
+            controlSlot: "slot-cpu",
+            moveX: 0,
+            moveY: 0,
+            sprint: 0,
+            heldButtons: 0,
+            pressedButtons: 0,
+            releasedButtons: 0,
+          };
+        }
+        cpuPlayer = players[0];
+      }
+
       if (!cpuPlayer) {
         // No player available — return neutral frame.
         return {
