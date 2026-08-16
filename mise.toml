@@ -25,6 +25,10 @@ run = "pnpm run replay-verify"
 description = "Compare two artifact dirs; DELTA_ONLY never PASS"
 run = "pnpm run eval-compare"
 
+[tasks.typecheck]
+description = "Run TypeScript type checking across all configs"
+run = "pnpm run typecheck"
+
 [tasks.test]
 description = "Run Node Vitest project"
 run = "pnpm run test"

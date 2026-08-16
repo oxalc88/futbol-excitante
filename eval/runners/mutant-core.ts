@@ -262,7 +262,7 @@ function injectScoreTracker(
     ...base,
     tick: 51,
     simulationTime: 51 / 60,
-    events: [{ kind: "goal", payload: { goalIndex: 2 } }],
+    events: [{ id: "evt-goal-2", tick: 51, sequence: 0, kind: "goal", label: "goal", payload: { goalIndex: 2 } }],
   };
   return [obs1, obs2];
 }
