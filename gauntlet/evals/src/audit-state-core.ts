@@ -1,4 +1,4 @@
-import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 export interface StateCheck { name: string; pass: boolean; detail?: string; owner: "orchestrator" }
@@ -51,7 +51,7 @@ async function acceptanceRecords(repoRoot: string): Promise<Array<Record<string,
     let files: string[] = [];
     try { files = await readdir(dir); } catch { continue; }
     for (const file of files.filter((f) => f.endsWith("-acceptance.json"))) {
-      try { records.push(JSON.parse(await readFile(path.join(dir, file), "utf8")) as Record<string, unknown>); } catch { /* malformed record is handled elsewhere */ }
+      try { records.push(JSON.parse(await readFile(path.join(dir, file), "utf8")) as Record<string, unknown>); } catch { /* malformed handled elsewhere */ }
     }
   }
   return records;
@@ -69,12 +69,18 @@ function section(content: string, heading: string, nextHeadingPrefix: string): s
   return content.slice(after, next < 0 ? content.length : next);
 }
 
+async function fileExists(file: string): Promise<boolean> {
+  try { return (await stat(file)).isFile(); } catch { return false; }
+}
+
 export async function runStateChecks(repoRoot: string): Promise<{ objective: string | null; checks: StateCheck[] }> {
-  const [current, horizon, timing] = await Promise.all([
+  const [current, horizon, timing, versionFile] = await Promise.all([
     readFile(path.join(repoRoot, "gauntlet/state/CURRENT.md"), "utf8"),
     readFile(path.join(repoRoot, "gauntlet/state/HORIZON.md"), "utf8"),
     readFile(path.join(repoRoot, "gauntlet/state/TIMING.md"), "utf8"),
+    readFile(path.join(repoRoot, "gauntlet/VERSION.json"), "utf8"),
   ]);
+  const systemVersion = (JSON.parse(versionFile) as { version: string }).version;
   const objective = latestAcceptedObjective(current);
   const checks: StateCheck[] = [];
   if (!objective) return { objective, checks: [{ name: "latest accepted objective is parseable", pass: false, detail: "CURRENT.md has no Last accepted objective", owner: "orchestrator" }] };
@@ -91,8 +97,7 @@ export async function runStateChecks(repoRoot: string): Promise<{ objective: str
   const indexed = parsed.currentIndex !== null ? parsed.objectives[parsed.currentIndex]?.id ?? null : null;
   checks.push({ name: "CURRENT next objective matches HORIZON index", pass: nextObjective === indexed || (indexed === null && nextObjective === null), detail: nextObjective === indexed || (indexed === null && nextObjective === null) ? undefined : `CURRENT=${nextObjective}, HORIZON=${indexed}`, owner: "orchestrator" });
 
-  const markerKeys = ["last_tracked_objective", "usage_aggregates_through", "model_evaluation_through"];
-  for (const key of markerKeys) {
+  for (const key of ["last_tracked_objective", "usage_aggregates_through", "model_evaluation_through"]) {
     const value = yamlValue(timing, key);
     checks.push({ name: `${key} matches latest accepted`, pass: value === objective, detail: value === objective ? undefined : `expected ${objective}, found ${value ?? "missing"}`, owner: "orchestrator" });
   }
@@ -105,14 +110,28 @@ export async function runStateChecks(repoRoot: string): Promise<{ objective: str
 
   const measuredAt = yamlValue(timing, "measured_at");
   const clockMatch = timing.match(/Measurement:\s*`?(\d{4}-\d{2}-\d{2})/);
-  if (measuredAt && clockMatch?.[1]) {
-    checks.push({ name: "TIMING clock measurement date matches measured_at", pass: measuredAt.slice(0, 10) === clockMatch[1], detail: measuredAt.slice(0, 10) === clockMatch[1] ? undefined : `measured_at=${measuredAt}, clock=${clockMatch[1]}`, owner: "orchestrator" });
-  }
+  if (measuredAt && clockMatch?.[1]) checks.push({ name: "TIMING clock measurement date matches measured_at", pass: measuredAt.slice(0, 10) === clockMatch[1], detail: measuredAt.slice(0, 10) === clockMatch[1] ? undefined : `measured_at=${measuredAt}, clock=${clockMatch[1]}`, owner: "orchestrator" });
 
   const records = await acceptanceRecords(repoRoot);
-  const v07 = records.filter((r) => r.gauntlet_version === "0.7.0");
-  const hasLatest = v07.some((r) => r.objective_id === objective);
-  checks.push({ name: "v0.7 acceptance result freshness", pass: v07.length === 0 || hasLatest, detail: v07.length === 0 || hasLatest ? (v07.length === 0 ? "legacy baseline: no v0.7 acceptance records yet" : undefined) : `${objective} has no v0.7 acceptance record`, owner: "orchestrator" });
+  const durableRecords = records.filter((r) => typeof r.gauntlet_version === "string" && /^0\.(?:[7-9]|[1-9]\d+)\./.test(String(r.gauntlet_version)));
+  const hasLatestRecord = durableRecords.some((r) => r.objective_id === objective);
+  checks.push({ name: "acceptance result freshness", pass: durableRecords.length === 0 || hasLatestRecord, detail: durableRecords.length === 0 || hasLatestRecord ? (durableRecords.length === 0 ? "legacy baseline: no durable acceptance records yet" : undefined) : `${objective} has no durable acceptance record`, owner: "orchestrator" });
+
+  const has08Record = records.some((r) => r.gauntlet_version === "0.8.0");
+  if (systemVersion === "0.8.0" && has08Record) {
+    const manifestPath = path.join(repoRoot, "docs/evidence", objective, "manifest.json");
+    const manifestExists = await fileExists(manifestPath);
+    checks.push({ name: "v0.8 latest objective manifest exists", pass: manifestExists, detail: manifestExists ? undefined : `${objective} missing docs/evidence/${objective}/manifest.json`, owner: "orchestrator" });
+    if (manifestExists) {
+      try {
+        const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as { objective_id?: string; candidate_commit?: string; reviews?: { critic?: { verdict?: string }; integration?: { verdict?: string } } };
+        const valid = manifest.objective_id === objective && Boolean(manifest.candidate_commit) && manifest.reviews?.critic?.verdict === "ACCEPT" && manifest.reviews?.integration?.verdict === "ACCEPT";
+        checks.push({ name: "v0.8 latest objective manifest is acceptance-complete", pass: valid, detail: valid ? undefined : `${objective} manifest lacks candidate/reviewer provenance`, owner: "orchestrator" });
+      } catch {
+        checks.push({ name: "v0.8 latest objective manifest is acceptance-complete", pass: false, detail: `${objective} manifest is malformed`, owner: "orchestrator" });
+      }
+    }
+  }
 
   return { objective, checks };
 }
