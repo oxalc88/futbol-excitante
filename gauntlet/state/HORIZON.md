@@ -7,7 +7,7 @@ horizon_id: "2v2-playable"
 created_from_commit: c5c66b0
 created_at: 2026-08-16
 reason: "Horizon cpu-team-play exhausted (5/5 accepted). PLAYABLE_1V1 milestone gated by ARCHETYPE_BLINDED_COMPARISON_PASS (perceptual, human-needed spec). Next horizon targets a playable 2v2 AI-vs-AI match with CPU teammates passing to each other, team formations, and a full 2v2 browser match experience. These build toward the SMALL_SIDED_SHAPE milestone."
-current_index: 3
+current_index: 4
 objectives:
   - id: CPU-2V2-PASSING
     status: accepted
@@ -25,7 +25,7 @@ objectives:
     builder: builder-qwen
     prerequisite: CPU-BASIC-FORMATION
   - id: BROWSER-2V2-MATCH-KEYBOARD
-    status: pending
+    status: accepted
     reason: "Add ?mode=2v2 URL parameter that creates a 2v2 browser match: 4 CPU-controlled players (all AI_FALLBACK) with keyboard override for slot-1. Shows 2v2-specific scoreboard (HOME vs AWAY), match clock, and 2v2 controls hint. Builds on BROWSER-HUMAN-VS-CPU infrastructure."
     builder: builder-mimo
     prerequisite: CPU-2V2-SCORING

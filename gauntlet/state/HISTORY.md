@@ -1927,3 +1927,49 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 50 — 2026-08-16
+
+- objective_id: BROWSER-2V2-MATCH-KEYBOARD
+- builder: builder-mimo / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- notes: 2v2 browser match with keyboard controls. 4-player scenario (2 per team), slot-1 HUMAN keyboard, slots 2-4 AI_FALLBACK CPU. 12 fixture tests, 3 browser screenshot tests. 1382 node tests (73 files), 33 browser tests (7 files). Routing via ?mode=2v2. Screenshot at docs/screenshots/BROWSER-2V2-MATCH-KEYBOARD/. Gauntlet audit regex bugfix (tsx mishandled double-backslash in regex literal).
+
+### Critic verdict (ACCEPT — first pass)
+
+```markdown
+## Critic verdict
+- objective_id: BROWSER-2V2-MATCH-KEYBOARD
+- critic_agent: critic-flash
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-mimo
+- builder_model: mimo-v2.5
+- independence_ok: true
+- deterministic_audit: PASS
+- semantic_audit: NOT_REQUIRED
+- mandatory_evidence_ok: true
+- architecture_violations: None
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: BROWSER-2V2-MATCH-KEYBOARD
+- reviewer_agent: integration-reviewer-flash
+- reviewer_model: deepseek-v4-flash
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (1382/1382 full suite, 33/33 browser tests)
+- mandatory_evidence_ok: true
+- critic_evidence_gate_ok: true
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```

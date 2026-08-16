@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: CPU-TEAM-FORMATION
-usage_aggregates_through: CPU-TEAM-FORMATION
-model_evaluation_through: CPU-TEAM-FORMATION
+last_tracked_objective: BROWSER-2V2-MATCH-KEYBOARD
+usage_aggregates_through: BROWSER-2V2-MATCH-KEYBOARD
+model_evaluation_through: BROWSER-2V2-MATCH-KEYBOARD
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -46,7 +46,7 @@ style meter is the live context window, not session cost.
 | Sum of per-step agent time | 21h 21m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-15 ~16:44 UTC`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-16 ~12:30 UTC`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -111,6 +111,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | CPU-2V2-PASSING | accepted | ~9m | 2m | 2m | 3m | ~0.5m | ~5M est. | n/a** |
 | CPU-2V2-SCORING | accepted | ~29m | 18m | 7m | 3m | ~0.5m | ~8M est. | n/a** |
 | CPU-TEAM-FORMATION | accepted | ~11m | 4m | 2m | 4m | ~0.5m | ~11M est. | n/a** |
+| BROWSER-2V2-MATCH-KEYBOARD | accepted | ~12m | 4m | 2m | 4m | ~0.5m | ~7M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -293,6 +294,7 @@ on an H task is the interesting result.
 | CPU-2V2-PASSING | qwen3.6 | L | Low — no code changes, only test coverage for existing passing logic | 0 | A | 31 tests verify 2v2 passing behavior; existing logic already correct; critic ACCEPT first pass |
 | CPU-2V2-SCORING | qwen3.6 | H | High — new eval layer behavior (goal reset, multi-slot match runner) | 0 | A | 34 tests cover goal detection, scoring, reset, full-time, determinism; 1348 tests pass; critic ACCEPT first pass |
 | CPU-TEAM-FORMATION | qwen3.6 | H | High — new physics behavior in CPU adapter (defense mode three-way blend) | 0 | A | 16 tests cover formation positions, displacement, blend behavior, determinism; 1364 tests pass; critic ACCEPT first pass, integration ACCEPT (second pass after screenshot provided) |
+| BROWSER-2V2-MATCH-KEYBOARD | mimo-v2.5 | M | Medium — browser glue, scenario fixture, keyboard + CPU slot wiring | 0 | A | 12 fixture tests, 3 browser screenshot tests, 1382 node + 33 browser suite pass; critic ACCEPT first pass, integration ACCEPT first pass |
 
 ### Reviewer route and catches
 
@@ -316,6 +318,8 @@ on an H task is the interesting result.
 | CPU-2V2-SCORING | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1348/1348 full suite pass, no eval file regressions, headless eval layer only |
 | CPU-TEAM-FORMATION | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
 | CPU-TEAM-FORMATION | integration-reviewer-flash (deepseek-v4-flash) | first REJECT (missing screenshot); second pass ACCEPT | ACCEPT | 1364/1364 regressions, artifact at required path, known pipeline limitation |
+| BROWSER-2V2-MATCH-KEYBOARD | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
+| BROWSER-2V2-MATCH-KEYBOARD | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1382/1382 regressions, 33/33 browser tests, artifact at required path |
 
 ### Builder scoreboard
 

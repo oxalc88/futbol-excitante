@@ -37,7 +37,7 @@ const integrationRequired = trajectoryRequired;
 
 const screenshotDir = path.join(repoRoot, "docs/screenshots", objective);
 let objectiveScreenshots: string[] = [];
-try { objectiveScreenshots = (await readdir(screenshotDir)).filter((f) => /\\.(png|jpg|jpeg|webp)$/i.test(f)); } catch { /* absent */ }
+try { objectiveScreenshots = (await readdir(screenshotDir)).filter((f) => /\.(png|jpg|jpeg|webp)$/i.test(f)); } catch { /* absent */ }
 add("required screenshot exists", screenshotRequired ? (objectiveScreenshots.length ? "PASS" : "FAIL") : "NOT_APPLICABLE", "builder", screenshotRequired && !objectiveScreenshots.length ? `missing docs/screenshots/${objective}/` : undefined);
 
 const trajectory = path.join(repoRoot, "docs/evidence", objective, "trajectory.json");
