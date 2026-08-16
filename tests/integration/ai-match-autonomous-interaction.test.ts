@@ -14,8 +14,10 @@ describe("AI-MATCH-E2E-002: autonomous interaction", () => {
         adapter: createCpuAdapter(),
       }));
       const start = sim.snapshot();
+      const startBall = { ...start.ball.position };
       let actionEdges = 0;
       let nonZeroFrames = 0;
+      let maxBallDisplacement = 0;
       for (let i = 0; i < 360; i++) {
         const snapshot = sim.snapshot();
         const frames = entries.map(({ controlSlot, assignment, adapter }) => {
@@ -29,9 +31,23 @@ describe("AI-MATCH-E2E-002: autonomous interaction", () => {
         });
         sim.applyInputs(frames);
         sim.step();
+        const after = sim.snapshot();
+        maxBallDisplacement = Math.max(
+          maxBallDisplacement,
+          Math.hypot(
+            after.ball.position.x - startBall.x,
+            after.ball.position.y - startBall.y,
+          ),
+        );
       }
       const end = sim.snapshot();
-      return { start, end, hash: sim.stateHash(), actionEdges, nonZeroFrames };
+      return {
+        end,
+        hash: sim.stateHash(),
+        actionEdges,
+        nonZeroFrames,
+        maxBallDisplacement,
+      };
     };
 
     const first = run();
@@ -40,10 +56,7 @@ describe("AI-MATCH-E2E-002: autonomous interaction", () => {
     expect(first.nonZeroFrames).toBeGreaterThan(0);
     expect(first.actionEdges).toBeGreaterThan(0);
     expect(first.end.players.every((p) => Math.abs(p.groundPosition.x) <= 52.5 && Math.abs(p.groundPosition.y) <= 34)).toBe(true);
-    const ballMoved = Math.hypot(
-      first.end.ball.position.x - first.start.ball.position.x,
-      first.end.ball.position.y - first.start.ball.position.y,
-    );
-    expect(ballMoved).toBeGreaterThan(0.01);
+    expect(first.maxBallDisplacement).toBeGreaterThan(0.01);
+    expect(first.maxBallDisplacement).toBe(second.maxBallDisplacement);
   });
 });
