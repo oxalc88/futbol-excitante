@@ -71,3 +71,10 @@ Incidents are evidence, not self-modifying instructions. A failed run may sugges
 ## Correlation fields
 
 Runtime traces/incidents should prefer stable fields such as `run_id`, `horizon_id`, `objective_id`, `attempt_id`, `agent`, `model`, `event`, `verdict`, `failure_class`, duration and token counts. These can later map to OpenTelemetry GenAI semantic conventions without changing the scenario contract.
+
+
+## v0.7 deterministic audit
+
+`pnpm run gauntlet:audit -- --objective <id> --class <class> ...` is the pre-critic filesystem/state gate. It emits `PASS`, `FAIL`, or `REVIEW_REQUIRED` with an owner per check. `REVIEW_REQUIRED` is the only path to bounded cheap semantic review.
+
+`GAUNTLET_ACCEPTANCE_JSON='<json>' pnpm run gauntlet:acceptance:persist` writes a candidate acceptance record only after deterministic PASS, semantic VALID when invoked, critic ACCEPT, integration ACCEPT, and builder/critic model independence. `pnpm run gauntlet:eval:state` then checks post-bookkeeping state before final acceptance.

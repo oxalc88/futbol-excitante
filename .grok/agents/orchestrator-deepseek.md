@@ -27,36 +27,19 @@ Where technically reasonable, the horizon should lead toward at least one observ
 
 ## Objective loop
 
-Preserve exactly:
+Follow `gauntlet/principles.md` and the v0.7 pipeline in `gauntlet/PROMPT.md`.
 
-builder → required evidence → critic → fix/retry → critic → integration-reviewer → orchestrator evidence gate → accept
+For every candidate: builder → tests/artifacts → `pnpm run gauntlet:audit` → optional bounded `aux` semantic audit on `REVIEW_REQUIRED` → mandatory critic → integration reviewer → final evidence gate → `GAUNTLET_ACCEPTANCE_JSON=... pnpm run gauntlet:acceptance:persist` → bookkeeping → `pnpm run gauntlet:eval:state` → accept.
 
-Critic ACCEPT is insufficient. Integration review must independently accept, and the final mandatory-evidence gate must pass, before an objective is recorded as accepted.
+The critic is mandatory even when every deterministic check passes or Gemma/Qwen clears an ambiguity. Scripts establish mechanical facts; only the critic judges candidate quality against the applicable reference bar. Cheap semantic review follows `gauntlet/semantic-audit-contract.md` and cannot return objective ACCEPT.
 
-For a valid horizon objective, use `CURRENT.md`, `HORIZON.md`, the immediately relevant evidence, and directly applicable specs/files. Avoid repeating a whole-repository prioritization pass after every acceptance.
+Audit `FAIL` owned by the builder returns concrete fixes. Audit/state `FAIL` owned by the orchestrator is repaired locally and re-audited; do not resend valid gameplay to a builder for bookkeeping-only defects.
 
-Delegate with `spawn_subagent`; builders use `capability_mode: all`, critics/integration/aux/git-committer use `execute`, and roles come from `gauntlet/models.json`. Critic model must differ from builder model. Keep max retries and existing REJECT/revert semantics.
+Keep reviewer fallback role-based: `critic`/0731 → `critic-flash` on model-specific 0731 failure → independent Qwen/MiMo; integration uses the corresponding explicit role fallback. Never override a spawned reviewer model in place.
 
-DeepSeek reviewer fallback is role-based, not an in-place model override:
+After both reviews accept, candidate persistence must succeed before state mutation. Update `CURRENT`, `HISTORY`, `TIMING`, and the existing `HORIZON` entry/current_index, then require `gauntlet:eval:state` PASS before final acceptance/commit. Continue immediately afterward.
 
-- default critic: `critic` on `deepseek-v4-flash-0731`;
-- if 0731 fails specifically for model availability, allowance exhaustion, or model-specific capacity/rate limiting, spawn `critic-flash` on `deepseek-v4-flash`;
-- do not spawn `critic` with `model: deepseek-v4-flash`;
-- if DeepSeek still cannot review, use `critic-qwen` or `critic-mimo` while preserving independence from the builder;
-- default integration reviewer: `integration-reviewer` on 0731;
-- the same model-specific 0731 failure uses `integration-reviewer-flash` on current Flash; do not override `integration-reviewer` in place.
-
-Determine mandatory evidence from `gauntlet/evidence-contract.md` before criticism. Gameplay/presentation work and browser-visible/browser-interactive work require an existing screenshot artifact; passing tests do not substitute. Critic `ACCEPT` requires verified evidence. Integration must independently verify it and reject if the critic accepted while it was missing.
-
-After both reviews accept, perform the orchestrator's final gate by verifying both review evidence fields and every mandatory artifact path. Only then perform one acceptance transition: clear the accepted objective from `active_candidate`, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` under `gauntlet/timing-contract.md`, mark the existing horizon entry accepted in place, recompute `current_index`, and validate the complete candidate state before persisting it. TIMING refresh must include the latest per-step usage, by-model aggregates, builder grade, reviewer/orchestrator route/catches, and tracking markers from real session/review data; never invent unavailable metrics. Run `pnpm run gauntlet:eval:state` and repair tracking locally until it passes before delegating the acceptance commit. Never append a duplicate objective. If candidate bookkeeping fails validation, repair and revalidate it without another agent, global replanning, or historical rewrites. Then delegate the atomic commit/push to `git-committer` (`gemma4`).
-
-A successful acceptance commit is not a stopping point. If the horizon remains valid, immediately spawn the builder for its indexed next applicable objective in the same session. If the horizon is exhausted, immediately perform strategic reassessment and start the first applicable objective of the new horizon.
-
-Use `aux` to condense long logs/diffs/artifacts for orchestration. Do not replace authoritative builder evidence or independent reviews with summaries.
-
-You may write only `gauntlet/state/**` and `gauntlet/objectives.md`. Never implement or commit directly.
-
-SuperGrok's weekly bar does not apply to this NaN overflow session. Context auto-compaction is not a reason to stop or replan.
+Use `aux` only for bounded semantic audit/condensation. You may write only `gauntlet/state/**`, `gauntlet/objectives.md`, and transient gitignored `gauntlet/artifacts/**`. Never implement or commit directly.
 
 ## Stop conditions
 

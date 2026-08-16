@@ -1,36 +1,44 @@
 # Evidence contract
 
-Every builder, critic, and integration review uses this shape. Prose without commands, exit codes, and file paths is not evidence.
+Every builder, critic, and integration review uses this shape. Prose without commands, exit codes, and file paths is not evidence. Evidence classes are defined in `gauntlet/evidence-classes.md`; acceptance philosophy is canonical in `gauntlet/principles.md`.
 
 ## Mandatory evidence gate
 
-Required evidence is an acceptance gate, not advisory guidance. For each objective, the builder, critic, integration reviewer, and orchestrator must determine the applicable evidence from this contract and the assigned acceptance criteria.
+Required evidence is an acceptance gate, not advisory guidance.
 
-- Tests demonstrate executable behavior but never substitute for required perceptual artifacts.
-- For gameplay/presentation changes, at least one screenshot is mandatory. The artifact must exist under `docs/screenshots/<objective-id>/`; listing a nonexistent path is not evidence.
-- Any objective whose acceptance criteria require browser-visible or browser-interactive behavior is screenshot-required even when the implementation is primarily URL routing, input wiring, state selection, or other browser glue. A browser objective is not exempt merely because its code is not in the renderer.
-- If acceptance depends on motion, temporal behavior, autonomous control, passing, shooting, pursuit, transitions, or another multi-tick behavior, a structured trajectory under `docs/evidence/<objective-id>/trajectory.json` is mandatory once the repository provides the committed capture command. Unit tests and a still screenshot alone are insufficient for that integrated behavior.
-- Video is optional diagnostic evidence. When captured, use `pnpm run capture-ai-video`; keep the binary as a GitHub Actions artifact and retain `video-reference.json` with objective ID, commit SHA, workflow run ID, and artifact name. Video does not replace the structured trajectory.
-- Screenshots or dynamic captures are diagnostic evidence. They do not establish PES fidelity, a perceptual `PASS`, or a protected regression `PASS` without the required versioned oracle/review policy.
+- The orchestrator selects the strictest applicable evidence class from the objective's acceptance criteria before review.
+- `HEADLESS`: executed tests.
+- `BROWSER_VISIBLE`: executed tests plus at least one screenshot under `docs/screenshots/<objective-id>/`.
+- `MULTI_TICK`: executed tests, a relevant integration-test pass, and `docs/evidence/<objective-id>/trajectory.json`.
+- `DYNAMIC_VISUAL`: all `MULTI_TICK` evidence plus an objective screenshot.
+- `PRESENTATION`: executed tests plus an objective screenshot.
+- `BOOKKEEPING`: deterministic state/tooling audit; no screenshot is required unless the criteria are also browser-visible/presentation.
+- If acceptance explicitly depends on slot/player ownership or routing, the objective audit must include the slot-wiring invariant result.
+- Video is optional diagnostic evidence. It never replaces a required trajectory or screenshot.
+- Screenshot byte duplication is `REVIEW_REQUIRED`, not automatic `PASS` or `FAIL`; bounded semantic review follows `gauntlet/semantic-audit-contract.md`.
+- Tests and deterministic checks establish facts. They never replace the independent critic's qualitative comparison against the applicable reference bar.
 - Missing mandatory evidence prevents `ACCEPT` at every review and orchestration stage.
 
-## Builder report
+Before the critic, run `pnpm run gauntlet:audit -- --objective <id> --class <class> ...`. `FAIL` must be repaired by the owner reported by the audit. `REVIEW_REQUIRED` invokes the bounded cheap semantic audit. Only `PASS` proceeds to the critic.
 
-The builder must return this block and nothing else as its final answer:
+## Builder report
 
 ```markdown
 ## Builder report
 - objective_id:
 - builder_agent:
 - builder_model:
+- evidence_class: HEADLESS|BROWSER_VISIBLE|MULTI_TICK|DYNAMIC_VISUAL|PRESENTATION|BOOKKEEPING
 - hypothesis:
 - files_changed:
 - commands_run:
-  - cmd: 
+  - cmd:
     exit_code:
 - tests_run:
   - name:
     result:
+- integration_test_result:
+- slot_wiring_result:
 - required_evidence:
 - artifacts:
 - spec_sections:
@@ -41,11 +49,12 @@ The builder must return this block and nothing else as its final answer:
 
 Rules:
 
-- Run the tests or commands required by the assigned objective. Do not only describe them.
-- `claims_not_made` must explicitly refuse PES fidelity, `FOUNDATION_LAB_PASS`, invented reference envelopes, and regression `PASS` unless those registries exist and passed.
-- If a required command cannot run because the toolchain is not there yet, that is a failed objective unless the objective *is* creating that toolchain.
-- Do not commit, push, or rewrite specs, research, or Gauntlet agents.
-- For gameplay/presentation changes and browser-visible/browser-interactive objectives, capture at least one screenshot via `WIP_SECTION=<objective-id> pnpm run capture-wip` and list the files under `docs/screenshots/<objective-id>/` in `artifacts`.
+- Run the commands required by the assigned objective; do not only describe them.
+- `claims_not_made` must refuse PES fidelity, invented reference envelopes, and protected regression `PASS` unless the required oracle/review exists and passed.
+- If a required command cannot run because the toolchain is absent, that is a failed objective unless the objective is creating that toolchain.
+- Builders do not commit/push or edit specs/research/Gauntlet agent prompts.
+- When a screenshot is required, capture it via `WIP_SECTION=<objective-id> pnpm run capture-wip` and list the files under `docs/screenshots/<objective-id>/`.
+- When a trajectory is required, capture it with the repository-supported command and persist `docs/evidence/<objective-id>/trajectory.json`.
 
 ## Critic verdict
 
@@ -57,10 +66,13 @@ Rules:
 - builder_agent:
 - builder_model:
 - independence_ok: true|false
+- deterministic_audit: PASS|FAIL|REVIEW_REQUIRED
+- semantic_audit: NOT_REQUIRED|VALID|INVALID|INSUFFICIENT_CONTEXT
 - evidence_reviewed:
 - required_evidence:
 - evidence_presence:
 - mandatory_evidence_ok: true|false
+- reference_bar_reviewed:
 - criteria:
   - id:
     class:
@@ -73,11 +85,11 @@ Rules:
 
 Rules:
 
-- `independence_ok` must be `true`. If `critic_model` equals `builder_model`, abort and ask the orchestrator to reroute.
-- Determine required evidence from this contract before judging the implementation. Verify every mandatory artifact actually exists; never infer its existence from passing tests, implementation quality, or the builder report.
-- `mandatory_evidence_ok` must be `true` for `ACCEPT`. Missing evidence is `INVALID_RUN` plus `RETRY` when it can be produced, or `REJECT` when the evidence claim is false/dishonest or the candidate cannot satisfy the contract; it is never a pass.
-- `BLOCKED_MISSING_REFERENCE` is not a builder failure. Do not demand invented PES numbers.
-- `RETRY` means the same objective can be fixed from the listed `required_fixes`. `REJECT` means the hypothesis or implementation is wrong enough to revert.
+- `independence_ok` must be true and the critic model must differ from the builder model.
+- The critic is mandatory even after deterministic/semantic audit success.
+- Verify mandatory artifacts and inspect the candidate against the applicable reference bar; do not merely repeat script output.
+- `mandatory_evidence_ok` must be true for `ACCEPT`.
+- `BLOCKED_MISSING_REFERENCE` is not a builder failure and must not be converted into invented reference numbers.
 
 ## Integration review
 
@@ -90,6 +102,8 @@ Rules:
 - independence_ok: true|false
 - dependency_direction: PASS|FAIL
 - neighboring_regressions:
+- deterministic_audit: PASS
+- critic_verdict_verified: true|false
 - required_evidence:
 - evidence_presence:
 - mandatory_evidence_ok: true|false
@@ -100,10 +114,4 @@ Rules:
 - required_fixes:
 ```
 
-Rules:
-
-- Independently determine and verify the mandatory evidence; do not rely only on the critic's statement.
-- Verify the critic did not return `ACCEPT` while mandatory evidence was missing. If it did, set `critic_evidence_gate_ok: false` and `REJECT`.
-- Both evidence gate fields must be `true` for `ACCEPT`. Tests alone are not a substitute for required screenshots or other supported perceptual evidence.
-
-`ACCEPT` here means the candidate may proceed to the orchestrator's final mandatory-evidence gate. `REJECT` means return to a builder/reviewer with concrete `required_fixes` under the existing retry/revert policy.
+Integration must independently verify mandatory evidence and confirm that the critic actually ran and accepted. A deterministic or cheap-auditor result can never substitute for the critic.

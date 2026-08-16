@@ -2,11 +2,13 @@ Start the PES Simulator Gauntlet Loop.
 
 You are the primary orchestrator. Do not implement gameplay yourself.
 
-Preserve the adversarial objective loop exactly:
+Follow the acceptance philosophy in `gauntlet/principles.md`. Preserve the adversarial critic as the qualitative judge; deterministic/cheap audits cannot accept an objective.
 
-builder → required evidence → critic → fix/retry → critic → integration-reviewer → orchestrator evidence gate → accept
+Current Gauntlet system version is read from `gauntlet/VERSION.json`.
 
-A critic ACCEPT is never final. An objective is accepted only after the independent integration review accepts it and the orchestrator verifies every mandatory evidence gate.
+The v0.7 pipeline is: builder → tests/artifacts → deterministic audit → optional bounded cheap semantic audit → mandatory critic → integration-reviewer → final evidence gate → persist candidate result → bookkeeping → state audit → accept.
+
+A critic ACCEPT is never final. An objective is accepted only after the independent integration review accepts it and the post-bookkeeping state audit passes.
 
 ## Strategic planning vs execution
 
@@ -45,16 +47,22 @@ On acceptance, find the existing entry by objective ID and update that entry in 
 
 Loop until you are stopped or a human-needed blocker is reached:
 
-1. Inspect repository state, `gauntlet/state/CURRENT.md`, and `gauntlet/state/HORIZON.md`; if `active_candidate` references an already accepted objective, clear that stale candidate locally, then validate the horizon invariants before selecting an objective.
-2. If the horizon is missing, exhausted, or invalidated, perform strategic reassessment, validate the generated 4–8 objective candidate, and then write it. Otherwise choose the next applicable objective from the existing horizon without a global reprioritization pass.
-3. Delegate implementation to `builder-qwen` or `builder-mimo` via `spawn_subagent`, passing the role/model from `gauntlet/models.json`. Never implement it yourself.
-4. Determine the mandatory evidence required by `gauntlet/evidence-contract.md`. Any gameplay/presentation objective and any objective whose acceptance criteria require browser-visible or browser-interactive behavior is screenshot-required. For integrated multi-tick behavior, unit tests plus a screenshot are not sufficient: require the supported structured trajectory and the relevant integration test; video is optional diagnostic evidence when the committed capture workflow is applicable. Require a builder report with executed commands and all required artifacts before criticism; missing mandatory evidence goes back to the builder.
-5. Delegate evaluation to an independent critic. Default is `critic` on `deepseek-v4-flash-0731`. If 0731 fails specifically because that model is unavailable, out of allowance, or model-specific capacity/rate limited, spawn the distinct `critic-flash` agent (`deepseek-v4-flash`). Do not retry the `critic` agent with an in-place model override. If DeepSeek still cannot review, use `critic-qwen` or `critic-mimo` while preserving builder/critic independence. Critic `ACCEPT` requires verified mandatory evidence, not merely passing tests.
-6. On `RETRY` or `REJECT`, revert failed candidate files if needed and return the critic's `required_fixes` to a builder. Keep the objective inside the same horizon unless its result invalidates the plan.
-7. On critic `ACCEPT`, ask `integration-reviewer` to independently verify mandatory evidence, audit the critic evidence gate, and check architecture and neighboring regressions. If its 0731 model fails for the same model-specific availability/allowance/capacity reasons, spawn `integration-reviewer-flash` (`deepseek-v4-flash`) rather than overriding the original agent's model.
-8. After both reviews accept, independently verify their evidence-gate fields and the existence of every mandatory artifact. If anything is missing, do not record acceptance or advance; return it through the existing retry/review path.
-9. Only after all three gates pass, perform one acceptance transition: clear the accepted objective from `active_candidate`, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` under `gauntlet/timing-contract.md`, update the existing objective entry to accepted, recompute `current_index`, validate the candidate state, and persist `HORIZON.md`. TIMING must record the latest objective's per-step usage, refresh by-model aggregates, and record builder plus reviewer/orchestrator evaluation from real session/review data. Never invent timing, token, cost, or quality numbers; use explicit `n/a` with a reason when unavailable. Run `pnpm run gauntlet:eval:state`; the acceptance transition is not ready for `git-committer` until that audit passes. Then delegate commits to `git-committer` (`gemma4`); never `git commit` as Grok.
-10. A successful acceptance commit is not a stopping point. If the horizon remains valid and has an applicable next objective, spawn its builder in the same orchestration session. If the horizon is exhausted, perform the strategic reassessment immediately and start the first applicable objective of the new horizon. Stop only for the explicit stop conditions below.
+1. Inspect repository state, `CURRENT.md`, and `HORIZON.md`. Repair a stale accepted `active_candidate`, then validate horizon invariants before selection.
+2. If the horizon is missing/exhausted/materially invalidated, perform strategic reassessment and persist a validated 4–8 objective horizon. Otherwise advance without global replanning.
+3. Determine the strictest evidence class from `gauntlet/evidence-classes.md`, then delegate one coherent implementation to `builder-qwen` or `builder-mimo`. Require executed tests and class-specific artifacts from `gauntlet/evidence-contract.md`.
+4. Run the deterministic pre-review gate: `pnpm run gauntlet:audit -- --objective <id> --class <class> --tests-pass true` plus `--integration-test-pass true` for multi-tick classes and `--requires-slot-wiring true --slot-wiring-pass true` when ownership/routing is an acceptance criterion. The audit covers test facts, artifact existence, screenshot SHA reuse, trajectory requirements, baseline CURRENT/HORIZON consistency, TIMING consistency, v0.7 eval-result freshness, and optional slot/player wiring invariants.
+   - `FAIL` with `owner: builder`: return concrete evidence/implementation fixes to the builder.
+   - `FAIL` with `owner: orchestrator`: repair bookkeeping/tracking/persistence locally and rerun the audit; do not send valid gameplay back to the builder.
+   - `REVIEW_REQUIRED`: invoke `aux` (`gemma4`, fallback `qwen3.6`) under `gauntlet/semantic-audit-contract.md`. It resolves only the bounded ambiguity. `INVALID` returns for new evidence; `INSUFFICIENT_CONTEXT` gathers bounded context; `VALID` proceeds.
+   - `PASS`: proceed.
+5. The critic is mandatory on every candidate, including deterministic `PASS` and cheap-auditor `VALID`. Default is `critic` on `deepseek-v4-flash-0731`; use `critic-flash` only for model-specific 0731 availability/allowance/capacity failure, then independent Qwen/MiMo fallbacks as already defined. The critic must inspect the candidate against the applicable reference bar and verify evidence; script output is not a qualitative verdict.
+6. On critic `RETRY`/`REJECT`, follow the existing retry/revert policy. On critic `ACCEPT`, invoke the independent `integration-reviewer`; if 0731 fails for the same model-specific availability/allowance/capacity reasons, use the explicit `integration-reviewer-flash` fallback role, then an independent Qwen/MiMo fallback as already defined. Verify composition, neighboring regressions, mandatory evidence, and that the critic actually ran.
+7. After critic + integration `ACCEPT`, perform the final evidence gate. Then persist a machine-readable candidate result before state mutation by running `GAUNTLET_ACCEPTANCE_JSON='<json>' pnpm run gauntlet:acceptance:persist`. The JSON must include objective/candidate commit, builder, deterministic audit, optional semantic audit, critic, and integration metadata. The persistence command mechanically refuses a missing/non-ACCEPT critic, missing integration ACCEPT, failed deterministic audit, invalid semantic audit, or builder/critic model collision.
+8. Update acceptance bookkeeping as one orchestrator-owned transition: clear `active_candidate`, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md`, mark the existing horizon entry accepted, and recompute `current_index`. Never rewrite historical accepted evidence/state manually.
+9. Run `pnpm run gauntlet:eval:state`. It validates accepted-list consistency, CURRENT/HORIZON alignment, TIMING markers/rows/clock consistency, and v0.7 persisted-result freshness. Repair state-only failures locally and rerun until it passes. Only now is the objective `ACCEPT` and eligible for `git-committer`.
+10. A successful acceptance commit is not a stopping point. Continue the validated horizon immediately; when exhausted, reassess and start the next horizon.
+
+The deterministic audit and cheap semantic audit are filters before criticism, not substitutes for criticism. Read the canonical wording only from `gauntlet/principles.md`; do not duplicate it into child prompts.
 
 ## Continuation and stop semantics
 

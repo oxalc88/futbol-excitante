@@ -1,0 +1,27 @@
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(here, "../../..");
+const raw = process.env.GAUNTLET_ACCEPTANCE_JSON;
+if (!raw) throw new Error("GAUNTLET_ACCEPTANCE_JSON is required");
+const input = JSON.parse(raw) as Record<string, any>;
+const required = ["objective_id", "candidate_commit", "builder", "critic", "integration", "deterministic_audit"];
+for (const key of required) if (!input[key]) throw new Error(`missing acceptance field: ${key}`);
+if (input.deterministic_audit.status !== "PASS") throw new Error("deterministic audit must PASS before persistence");
+if (input.semantic_audit && input.semantic_audit.verdict !== "VALID") throw new Error("semantic audit must be VALID when invoked");
+if (input.critic.verdict !== "ACCEPT") throw new Error("critic ACCEPT is mandatory; deterministic/cheap audits cannot substitute");
+if (input.integration.verdict !== "ACCEPT") throw new Error("integration ACCEPT is mandatory");
+if (input.builder.model === input.critic.model) throw new Error("builder/critic model independence violated");
+const version = JSON.parse(await readFile(path.join(repoRoot, "gauntlet/VERSION.json"), "utf8")) as { version: string };
+const now = new Date();
+const day = now.toISOString().slice(0, 10);
+const stamp = now.toISOString().replace(/[:.]/g, "-");
+const safeObjective = String(input.objective_id).replace(/[^A-Za-z0-9_-]/g, "_");
+const dir = path.join(repoRoot, "gauntlet/evals/results", day);
+await mkdir(dir, { recursive: true });
+const record = { schema_version: 1, record_type: "candidate_acceptance", gauntlet_version: version.version, persisted_at: now.toISOString(), state_audit_required: true, ...input };
+const file = path.join(dir, `${stamp}-${safeObjective}-acceptance.json`);
+await writeFile(file, `${JSON.stringify(record, null, 2)}\n`, "utf8");
+console.log(file);

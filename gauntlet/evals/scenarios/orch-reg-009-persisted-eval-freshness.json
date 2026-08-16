@@ -1,0 +1,12 @@
+{
+  "id": "ORCH-REG-009",
+  "kind": "eval_freshness_gate",
+  "input": {
+    "v07_records_exist": true,
+    "latest_accepted_has_record": false
+  },
+  "expect": {
+    "decision": "repair_persistence",
+    "failure_class": "eval_result_stale"
+  }
+}

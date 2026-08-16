@@ -1,0 +1,17 @@
+{
+  "id": "ORCH-REG-011",
+  "kind": "composition_gate",
+  "input": {
+    "objective_id": "SYNTH-MULTI-TICK",
+    "integrated_behavior": true,
+    "unit_tests_pass": true,
+    "screenshot_exists": true,
+    "integration_test_pass": true,
+    "trajectory_exists": false,
+    "critic_verdict": "ACCEPT"
+  },
+  "expect": {
+    "decision": "reject_acceptance",
+    "failure_class": "composition_regression"
+  }
+}
