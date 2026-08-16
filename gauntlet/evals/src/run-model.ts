@@ -5,19 +5,14 @@ import { fileURLToPath } from "node:url";
 import type { GauntletScenario } from "../contracts/scenario.js";
 import { createIncident } from "../contracts/incident.js";
 import { writeIncident } from "./write-incident.js";
+import { writeEvalResult } from "./write-result.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../../..");
 const scenariosDir = path.join(repoRoot, "gauntlet/evals/scenarios");
-
 const agent = process.env.GAUNTLET_EVAL_AGENT ?? "orchestrator-deepseek";
 const model = process.env.GAUNTLET_EVAL_MODEL ?? "deepseek-v4-flash";
-const only = new Set(
-  (process.env.GAUNTLET_EVAL_SCENARIOS ?? "")
-    .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean),
-);
+const only = new Set((process.env.GAUNTLET_EVAL_SCENARIOS ?? "").split(",").map((value) => value.trim()).filter(Boolean));
 
 function matchesExpected(actual: Record<string, unknown>, expected: Record<string, unknown>): boolean {
   return Object.entries(expected).every(([key, value]) => JSON.stringify(actual[key]) === JSON.stringify(value));
@@ -33,9 +28,7 @@ function extractJson(text: string): Record<string, unknown> {
 
 async function loadScenarios(): Promise<GauntletScenario[]> {
   const names = (await readdir(scenariosDir)).filter((name) => name.endsWith(".json")).sort();
-  const scenarios = await Promise.all(
-    names.map(async (name) => JSON.parse(await readFile(path.join(scenariosDir, name), "utf8")) as GauntletScenario),
-  );
+  const scenarios = await Promise.all(names.map(async (name) => JSON.parse(await readFile(path.join(scenariosDir, name), "utf8")) as GauntletScenario));
   return only.size === 0 ? scenarios : scenarios.filter((scenario) => only.has(scenario.id));
 }
 
@@ -61,72 +54,33 @@ if (scenarios.length === 0) {
 console.log(`Gauntlet Model Eval — agent=${agent} model=${model} scenarios=${scenarios.length}`);
 let failures = 0;
 const incidentFiles: string[] = [];
+const resultRows: unknown[] = [];
 
 for (const scenario of scenarios) {
-  const result = spawnSync(
-    "grok",
-    [
-      "--no-auto-update",
-      "--agent",
-      agent,
-      "--model",
-      model,
-      "--no-plan",
-      "--no-subagents",
-      "--no-memory",
-      "--disable-web-search",
-      "--max-turns",
-      "1",
-      "--output-format",
-      "plain",
-      "-p",
-      buildPrompt(scenario),
-    ],
-    {
-      cwd: repoRoot,
-      encoding: "utf8",
-      timeout: Number(process.env.GAUNTLET_EVAL_TIMEOUT_MS ?? 120_000),
-      env: process.env,
-    },
-  );
+  const result = spawnSync("grok", ["--no-auto-update", "--agent", agent, "--model", model, "--no-plan", "--no-subagents", "--no-memory", "--disable-web-search", "--max-turns", "1", "--output-format", "plain", "-p", buildPrompt(scenario)], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    timeout: Number(process.env.GAUNTLET_EVAL_TIMEOUT_MS ?? 120_000),
+    env: process.env,
+  });
 
   const expected = scenario.expect as unknown as Record<string, unknown>;
   let observed: Record<string, unknown>;
-
   if (result.error || result.status !== 0) {
-    observed = {
-      runner_error: result.error?.message ?? null,
-      exit_status: result.status,
-      stderr: (result.stderr ?? "").trim().slice(0, 500),
-    };
+    observed = { runner_error: result.error?.message ?? null, exit_status: result.status, stderr: (result.stderr ?? "").trim().slice(0, 500) };
   } else {
     try {
       observed = extractJson(result.stdout ?? "");
     } catch (error) {
-      observed = {
-        parse_error: error instanceof Error ? error.message : String(error),
-        stdout: (result.stdout ?? "").trim().slice(0, 500),
-      };
+      observed = { parse_error: error instanceof Error ? error.message : String(error), stdout: (result.stdout ?? "").trim().slice(0, 500) };
     }
   }
 
   const pass = matchesExpected(observed, expected);
+  resultRows.push({ id: scenario.id, pass, expected, observed });
   if (!pass) {
     failures += 1;
-    incidentFiles.push(
-      await writeIncident(
-        repoRoot,
-        createIncident({
-          source: "model_eval",
-          failure_class: "state_transition",
-          scenario_id: scenario.id,
-          agent,
-          model,
-          expected,
-          observed,
-        }),
-      ),
-    );
+    incidentFiles.push(await writeIncident(repoRoot, createIncident({ source: "model_eval", failure_class: "state_transition", scenario_id: scenario.id, agent, model, expected, observed })));
   }
 
   console.log(`${pass ? "PASS" : "FAIL"} ${scenario.id}`);
@@ -135,6 +89,16 @@ for (const scenario of scenarios) {
     console.log(`  observed: ${JSON.stringify(observed)}`);
   }
 }
+
+const resultFile = await writeEvalResult(repoRoot, {
+  evaluator: "model",
+  agent,
+  model,
+  passed: scenarios.length - failures,
+  failed: failures,
+  results: resultRows,
+});
+console.log(`Result artifact: ${resultFile}`);
 
 if (failures > 0) {
   console.error(`\nGauntlet model eval failed: ${failures}/${scenarios.length}`);
