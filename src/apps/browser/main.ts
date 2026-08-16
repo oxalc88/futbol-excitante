@@ -257,6 +257,7 @@ function main(): void {
     adapter: ReturnType<typeof createCpuAdapter>;
     controlSlot: string;
     teamId: string;
+    controlledPlayerId: string;
   };
   const cpuSlots: CpuSlotEntry[] = [];
 
@@ -271,6 +272,7 @@ function main(): void {
         adapter: createCpuAdapter(),
         controlSlot: slotId,
         teamId: assignment.teamId,
+        controlledPlayerId: assignment.controlledPlayerId,
       });
     }
   } else {
@@ -342,8 +344,8 @@ function main(): void {
 
       // Add CPU frames — per-slot adapters in AI-vs-AI mode.
       if (IS_AI_MATCH) {
-        for (const { adapter: cpuAd, controlSlot, teamId: tid } of cpuSlots) {
-          const obs = buildCpuObservation(sim.snapshot(), tid);
+        for (const { adapter: cpuAd, controlSlot, teamId: tid, controlledPlayerId } of cpuSlots) {
+          const obs = buildCpuObservation(sim.snapshot(), tid, controlledPlayerId);
           const cpuFrame = cpuAd.sample(sim.tick, obs);
           // Override controlSlot to match the scenario's slot key so
           // the simulation routes the frame to the correct player.

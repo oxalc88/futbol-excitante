@@ -91,6 +91,7 @@ export interface CpuObservation {
 export function buildCpuObservation(
   world: WorldState,
   cpuTeamId?: string,
+  controlledPlayerId?: string,
 ): CpuObservation {
   // Determine pitch dimensions from scenario meta, falling back to defaults.
   let pitchLength = 105;
@@ -102,14 +103,15 @@ export function buildCpuObservation(
     if (typeof pw === "number") pitchWidth = pw;
   }
 
-  // Populate teammates from world state: same teamId, different playerId
-  // from the first CPU-controlled player.
-  const controlledPlayerId =
-    cpuTeamId && world.players.length > 0 ? world.players[0].playerId : undefined;
+  // Resolve the exact player controlled by this CPU slot. Prefer the
+  // control assignment supplied by the caller; fall back to the first player
+  // on the requested team only for legacy single-CPU callers.
+  const resolvedControlledPlayerId = controlledPlayerId ??
+    (cpuTeamId ? world.players.find((p) => p.teamId === cpuTeamId)?.playerId : world.players[0]?.playerId);
   const teammates: CpuTeammate[] = [];
   if (cpuTeamId) {
     for (const p of world.players) {
-      if (p.teamId === cpuTeamId && p.playerId !== controlledPlayerId) {
+      if (p.teamId === cpuTeamId && p.playerId !== resolvedControlledPlayerId) {
         teammates.push({
           playerId: p.playerId,
           groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
@@ -143,7 +145,7 @@ export function buildCpuObservation(
     pitchWidth,
     cpuTeamId,
     teammates: teammates.length > 0 ? teammates : undefined,
-    controlledPlayerId,
+    controlledPlayerId: resolvedControlledPlayerId,
   };
 }
 
@@ -391,8 +393,12 @@ export function createCpuAdapter(): CpuAdapter {
 
   return {
     sample(tick: number, observation: CpuObservation): InputFrame {
-      // Find the first player (CPU controlled).
-      const cpuPlayer = observation.players[0];
+      // Resolve the player owned by this CPU slot. Falling back to the
+      // first player preserves legacy one-player observations, but multi-slot
+      // callers must provide controlledPlayerId.
+      const cpuPlayer = observation.controlledPlayerId
+        ? observation.players.find((p) => p.playerId === observation.controlledPlayerId)
+        : observation.players[0];
       if (!cpuPlayer) {
         // No player available — return neutral frame.
         return {
