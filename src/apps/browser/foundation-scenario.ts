@@ -15,6 +15,7 @@ import aiVsAiScenarioJson from "@pes/eval/scenarios/ai-vs-ai-duel.v1.json";
 import scenario2v2Json from "@pes/eval/scenarios/2v2-duel.v1.json";
 import humanVsCpuJson from "@pes/eval/scenarios/human-vs-cpu.v1.json";
 import scenario2v2KeyboardJson from "@pes/eval/scenarios/2v2-with-keyboard.v1.json";
+import scenario3v3Json from "@pes/eval/scenarios/3v3-fixture.v1.json";
 
 /**
  * The foundation scenario — identical fixture used by the headless
@@ -70,3 +71,12 @@ export const FOUNDATION_SCENARIO_HUMAN_VS_CPU: ScenarioDefinition =
  */
 export const FOUNDATION_SCENARIO_2V2_KEYBOARD: ScenarioDefinition =
   scenario2v2KeyboardJson as unknown as ScenarioDefinition;
+
+/**
+ * 3v3 fixture scenario — 6 CPU-controlled players, 3 per team.
+ * Both teams have three AI_FALLBACK slots for fully autonomous CPU-vs-CPU play.
+ * Loaded from the versioned JSON at eval/scenarios/3v3-fixture.v1.json.
+ * Duration is 5400 ticks (90 seconds at 60 Hz).
+ */
+export const FOUNDATION_SCENARIO_3V3: ScenarioDefinition =
+  scenario3v3Json as unknown as ScenarioDefinition;

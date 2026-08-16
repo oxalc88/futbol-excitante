@@ -23,6 +23,7 @@ import { FOUNDATION_SCENARIO_AI_VS_AI } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_2V2 } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_HUMAN_VS_CPU } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_2V2_KEYBOARD } from "./foundation-scenario.js";
+import { FOUNDATION_SCENARIO_3V3 } from "./foundation-scenario.js";
 
 /**
  * Select a scenario from the URL search string.
@@ -39,6 +40,9 @@ export function selectBrowserScenario(search: string): ScenarioDefinition {
   if (mode === "ai-match") {
     if (scenarioParam === "2v2") {
       return FOUNDATION_SCENARIO_2V2;
+    }
+    if (scenarioParam === "3v3-fixture") {
+      return FOUNDATION_SCENARIO_3V3;
     }
     return FOUNDATION_SCENARIO_AI_VS_AI;
   }
