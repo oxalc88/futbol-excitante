@@ -1,4 +1,4 @@
-name: Temporary PR9 Conflict Resolver
+name: Temporary PR9 Post-Merge Validator
 
 on:
   push:
@@ -6,89 +6,33 @@ on:
       - temp/capture-ai-match-video
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  resolve:
+  validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           ref: test/ai-match-ownership-regression
-          fetch-depth: 0
-      - name: Merge main and resolve known conflicts
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          set +e
-          git merge --no-commit --no-ff origin/main
-          status=$?
-          set -e
-          if [ "$status" -eq 0 ]; then
-            git commit -m "merge: sync main into PR9"
-            git push origin HEAD:test/ai-match-ownership-regression
-            exit 0
-          fi
-
-          conflicts="$(git diff --name-only --diff-filter=U)"
-          expected=$'src/adapters/input-browser/cpu-adapter.ts\nsrc/apps/browser/main.ts'
-          if [ "$conflicts" != "$expected" ]; then
-            echo "Unexpected conflicts:"
-            printf '%s\n' "$conflicts"
-            exit 1
-          fi
-
-          python3 <<'PY'
-          from pathlib import Path
-
-          def resolve(path: str, choices: list[str]):
-              text = Path(path).read_text()
-              out = []
-              pos = 0
-              idx = 0
-              while True:
-                  start = text.find('<<<<<<< HEAD\n', pos)
-                  if start == -1:
-                      out.append(text[pos:])
-                      break
-                  out.append(text[pos:start])
-                  mid = text.find('=======\n', start)
-                  end = text.find('>>>>>>> origin/main\n', mid)
-                  if mid == -1 or end == -1:
-                      raise SystemExit(f'malformed conflict in {path}')
-                  ours = text[start + len('<<<<<<< HEAD\n'):mid]
-                  theirs = text[mid + len('=======\n'):end]
-                  if idx >= len(choices):
-                      raise SystemExit(f'unexpected extra conflict in {path}')
-                  choice = choices[idx]
-                  out.append(ours if choice == 'ours' else theirs)
-                  idx += 1
-                  pos = end + len('>>>>>>> origin/main\n')
-              if idx != len(choices):
-                  raise SystemExit(f'expected {len(choices)} conflicts in {path}, found {idx}')
-              Path(path).write_text(''.join(out))
-
-          # cpu-adapter conflicts:
-          # 1) keep PR team-aware controlled-player fallback
-          # 2) keep PR resolved controlledPlayerId return value
-          # 3) keep main's stricter explicit-ID-not-found neutral behavior
-          resolve('src/adapters/input-browser/cpu-adapter.ts', ['ours', 'ours', 'theirs'])
-
-          # main.ts conflict is main's mixed HUMAN/AI controlledPlayerId wiring,
-          # which complements the PR's per-slot AI-match wiring.
-          resolve('src/apps/browser/main.ts', ['theirs'])
-          PY
-
-          git add src/adapters/input-browser/cpu-adapter.ts src/apps/browser/main.ts
-          if git diff --name-only --diff-filter=U | grep -q .; then
-            echo "Unresolved conflicts remain"
-            git diff --name-only --diff-filter=U
-            exit 1
-          fi
-          if git grep -n -E '^(<<<<<<<|=======|>>>>>>>)' -- src/adapters/input-browser/cpu-adapter.ts src/apps/browser/main.ts; then
-            echo "Conflict markers remain"
-            exit 1
-          fi
-          git commit -m "merge: resolve PR9 conflicts with main"
-          git push origin HEAD:test/ai-match-ownership-regression
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+        env:
+          PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
+      - name: Typecheck
+        run: pnpm run typecheck
+      - name: CPU and ownership regressions
+        run: pnpm exec vitest run tests/unit/cpu-adapter/multi-player.test.ts tests/integration/ai-match-cpu-ownership.test.ts tests/integration/ai-match-autonomous-interaction.test.ts --project node
+      - name: Gauntlet regression evals
+        run: pnpm run gauntlet:eval
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Browser AI-match regression
+        run: pnpm exec vitest run tests/browser/ai-match-screenshot.browser.test.ts --project browser
