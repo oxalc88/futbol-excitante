@@ -1,6 +1,6 @@
 {
   "version": "gauntlet-models-v5",
-  "notes": "Role names describe responsibilities; model selection is routing. Agent frontmatter model fields must stay in sync with this file. NaN endpoints are registered in ~/.grok/config.toml (user-level); agent-to-model bindings are project-local in .grok/agents/*.md. See gauntlet/README.md.",
+  "notes": "Role names describe responsibilities; model selection is routing. Keep this file aligned with the agent model declarations used by the Gauntlet. See gauntlet/README.md.",
   "roles": {
     "orchestrator": {
       "agent": "orchestrator",
