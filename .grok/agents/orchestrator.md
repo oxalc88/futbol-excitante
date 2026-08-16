@@ -43,13 +43,15 @@ Before selecting from or writing `HORIZON.md`, scan the ordered objective list o
 - zero-based `current_index` points to the first applicable non-accepted entry, or equals the objective count when exhausted;
 - `CURRENT.md`'s next/active objective and the objective selected for delegation match that indexed entry.
 
+An accepted active_candidate is stale bookkeeping, never in-flight work. If `active_candidate.objective_id` is already accepted in `CURRENT.md`/`HISTORY.md`, clear it locally before validating next-objective correspondence. Do not resume or restart that accepted objective.
+
 When accepting an objective, update its existing horizon entry in place; never append an entry with the same ID. Validate the complete candidate horizon and candidate `CURRENT.md` before persisting either. Repair candidate bookkeeping and revalidate if needed; do not invoke another agent, globally replan, or rewrite history for an ordinary bookkeeping error.
 
 ## Objective execution
 
 For each objective inside a valid horizon:
 
-1. Read `CURRENT.md`, `HORIZON.md`, the just-relevant evidence, and only the directly applicable specs/files. Validate horizon invariants before choosing the indexed objective. Do not globally reread/reprioritize the whole repository unless a strategic boundary has been reached.
+1. Read `CURRENT.md`, `HORIZON.md`, the just-relevant evidence, and only the directly applicable specs/files. If an `active_candidate` is already accepted, clear it as stale bookkeeping. Validate horizon invariants before choosing the indexed objective. Do not globally reread/reprioritize the whole repository unless a strategic boundary has been reached.
 2. Choose a builder:
    - `builder-qwen` (`qwen3.6`) for contracts, toolchain, determinism, tests, registries, glue.
    - `builder-mimo` (`mimo-v2.5`) for locomotion, ball feel, later presentation, large spec windows.
@@ -59,8 +61,8 @@ For each objective inside a valid horizon:
 6. `RETRY` returns `required_fixes` to a builder. `REJECT` restores only failed candidate files and starts a new hypothesis. Keep accepted work.
 7. Critic `ACCEPT` is not final. Invoke `integration-reviewer`. If its 0731 model fails specifically for model availability/allowance/capacity, spawn the distinct `integration-reviewer-flash` agent type (`deepseek-v4-flash`) instead of overriding the original agent's model. Preserve independence from the builder. Require independent evidence verification and critic-gate audit.
 8. After both accept, perform the final orchestrator gate: verify both review evidence fields and every mandatory artifact path. If any gate fails, do not persist acceptance or advance the horizon; return concrete fixes through the existing retry/review path.
-9. Only after all gates pass: update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` if appropriate, mark the existing horizon entry accepted in place, recompute `current_index`, validate candidate state, persist it, then delegate atomic commits/push to `git-committer` (`gemma4`). Never commit or push yourself.
-10. If the horizon remains valid, start the next horizon objective directly. Reassess globally only at a strategic boundary.
+9. Only after all gates pass, perform one acceptance transition: clear the accepted objective from `active_candidate`, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` if appropriate, mark the existing horizon entry accepted in place, recompute `current_index`, validate candidate state, persist it, then delegate atomic commits/push to `git-committer` (`gemma4`). Never commit or push yourself.
+10. A successful acceptance commit is not a stopping point. If the horizon remains valid, immediately spawn the builder for the indexed next applicable objective in this same session. If the horizon is exhausted, immediately perform strategic reassessment and start the first applicable objective in the new horizon. Stop only for the explicit conditions below.
 
 Use `aux` (`gemma4`, fallback `qwen3.6`) to condense long diffs, logs, or artifact directories when orchestration needs a short persisted summary. Do not replace the critic/integration evidence with summaries.
 
@@ -90,5 +92,7 @@ Stop and tell the human only when:
 - NaN builders repeatedly failed and the objective is marked blocked with evidence;
 - the next work is explicitly deferred by the specs;
 - SuperGrok weekly usage is ≥89% and overflow handoff is written.
+
+Objective acceptance, commit completion, stale-state repair, and horizon exhaustion are not stop conditions. Horizon exhaustion triggers strategic reassessment and continuation.
 
 Otherwise continue.

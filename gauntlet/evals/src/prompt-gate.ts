@@ -15,29 +15,58 @@ interface GateRule {
 
 const RULES: GateRule[] = [
   {
-    name: "main prompt preserves integration and continuation",
+    name: "main prompt preserves acceptance transition and continuation",
     file: "gauntlet/PROMPT.md",
-    mustContain: ["integration-reviewer", "start it directly", "critic-flash"],
+    mustContain: [
+      "An accepted active_candidate is stale bookkeeping",
+      "clear the accepted objective from `active_candidate`",
+      "A successful acceptance commit is not a stopping point",
+      "Otherwise continue the loop.",
+    ],
   },
   {
-    name: "grok orchestrator preserves explicit stop conditions",
+    name: "grok orchestrator repairs stale accepted candidates",
     file: ".grok/agents/orchestrator.md",
-    mustContain: ["## Stop conditions", "Otherwise continue.", "integration-reviewer-flash"],
+    mustContain: [
+      "An accepted active_candidate is stale bookkeeping",
+      "clear the accepted objective from `active_candidate`",
+      "A successful acceptance commit is not a stopping point",
+      "Horizon exhaustion triggers strategic reassessment and continuation",
+    ],
   },
   {
-    name: "deepseek orchestrator preserves explicit reviewer fallback",
+    name: "deepseek pickup cannot resume an accepted candidate",
     file: ".grok/agents/orchestrator-deepseek.md",
-    mustContain: ["critic-flash", "integration-reviewer-flash", "Stop only"],
+    mustContain: [
+      "treat it as stale bookkeeping",
+      "clear the accepted objective from `active_candidate`",
+      "A successful acceptance commit is not a stopping point",
+      "Otherwise continue.",
+    ],
   },
   {
-    name: "gauntlet skill keeps final evidence gate",
+    name: "gauntlet skill keeps final evidence and continuation gates",
     file: ".grok/skills/gauntlet/SKILL.md",
-    mustContain: ["Critic ACCEPT alone is never final", "mandatory-evidence"],
+    mustContain: [
+      "Critic ACCEPT alone is never final",
+      "clear the accepted objective from `active_candidate`",
+      "A successful acceptance commit is not a stopping point",
+    ],
   },
   {
-    name: "continue skill keeps persisted horizon",
+    name: "continue skill repairs stale state and keeps running",
     file: ".grok/skills/gauntlet-continue/SKILL.md",
-    mustContain: ["Do not discard a valid persisted horizon", "orchestrator evidence gate"],
+    mustContain: [
+      "it is stale bookkeeping",
+      "clear the accepted objective from `active_candidate`",
+      "A successful acceptance commit is not a stopping point",
+      "Horizon exhaustion is a planning boundary, not a stop condition",
+    ],
+  },
+  {
+    name: "reviewer fallback remains explicit",
+    file: "gauntlet/PROMPT.md",
+    mustContain: ["critic-flash", "integration-reviewer-flash"],
   },
 ];
 

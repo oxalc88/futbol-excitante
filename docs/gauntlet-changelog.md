@@ -1,8 +1,50 @@
 # Gauntlet changelog
 
-Human-readable history of meaningful changes to the Gauntlet's **rules, prompts, role boundaries, routing, evidence requirements, and prompt-loading behavior**.
+Human-readable history of meaningful changes to the Gauntlet's **rules, prompts, role boundaries, routing, evidence requirements, prompt-loading behavior, and orchestration-eval contract**.
 
 This changelog does **not** record normal gameplay objectives or routine live-state updates produced by the running Gauntlet. Git remains the source of truth for exact file contents and diffs.
+
+## 2026-08-15 — Orchestration evals and continuation regression guard
+
+**Prompt version:** `v5-continuation-regression-evals`
+**Eval foundation commit:** `32f796606e7b891f9b64feab69360f2156198460`
+
+### Changed
+
+- Added a project-local Gauntlet evaluation surface under `gauntlet/evals/`, separate from the football/gameplay evaluator under `eval/`.
+- Adapted observability patterns from `aws-observability-instrumentation`: closed event/stop/failure taxonomies, stable naming, ownership boundaries, static enforcement, and structured agent-trace metadata without prompt/chain-of-thought capture.
+- Added deterministic regression scenarios for mandatory screenshot evidence, duplicate horizon entries, explicit DeepSeek reviewer fallback, and stale accepted `active_candidate` continuation.
+- Added `pnpm gauntlet:eval`, a static prompt contract gate, `/gauntlet-eval`, and a project-local Gauntlet observability skill.
+- Made acceptance a single transition: clear the accepted objective from `active_candidate`, persist accepted/current/horizon state, commit, then continue to the indexed next objective.
+- Defined an `active_candidate` that already appears in accepted state as stale bookkeeping. Pickup repairs it locally instead of attempting to resume an already accepted objective.
+- Declared successful acceptance commits, stale-state repair, and horizon exhaustion as non-stop conditions. Horizon exhaustion triggers immediate strategic reassessment and continuation unless an explicit stop condition applies.
+
+### Why
+
+A live run accepted `BROWSER-MATCH-PHASE-DISPLAY` and advanced `next_objective_id`/`HORIZON.current_index`, but `CURRENT.active_candidate` still pointed at the accepted objective. The newer pickup rules simultaneously said to resume an active candidate and not restart accepted work, creating a contradictory state that could end orchestration instead of launching the next objective.
+
+The regression was a prompt/state-machine problem, so the fix is guarded like code: a deterministic fixture captures the known failure, static prompt checks prevent removal of the continuation semantics, and future runtime/model evals can verify the actual model trajectory separately.
+
+### Preserved
+
+- Rolling-horizon strategic planning.
+- Independent critic and integration-review gates.
+- Mandatory evidence enforcement.
+- Explicit `0731 → current Flash → independent Qwen/MiMo` reviewer routing.
+- Generated `CURRENT/HISTORY/TIMING/HANDOFF/HORIZON` state is not manually rewritten by this change.
+
+### Prompt/rule surface
+
+- `gauntlet/PROMPT.md`
+- `.grok/agents/orchestrator.md`
+- `.grok/agents/orchestrator-deepseek.md`
+- `.grok/skills/gauntlet/SKILL.md`
+- `.grok/skills/gauntlet-continue/SKILL.md`
+- `.grok/skills/gauntlet-eval/SKILL.md`
+- `.grok/skills/gauntlet-observability/SKILL.md`
+- `gauntlet/evals/**`
+
+---
 
 ## 2026-08-15 — Explicit DeepSeek fallback agents
 
@@ -290,7 +332,8 @@ Add an entry here when a change materially alters **rules or prompts**, includin
 - retry, reject, block, or acceptance semantics;
 - evidence/artifact requirements, including visual evidence rules;
 - prompt, skill, or agent loading behavior;
-- persisted orchestration-state format when that state changes how prompts behave.
+- persisted orchestration-state format when that state changes how prompts behave;
+- orchestration-eval contract, regression scenarios, or enforcement behavior.
 
 For every new entry include the date, introducing commit(s), what changed, why it changed, and the affected prompt/rule surface when useful.
 

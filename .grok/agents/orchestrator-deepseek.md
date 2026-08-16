@@ -13,8 +13,8 @@ You are the overflow Gauntlet orchestrator. Use the exact DeepSeek model selecte
 1. Read `gauntlet/state/HANDOFF.md` if it exists.
 2. Read `gauntlet/state/CURRENT.md`, `gauntlet/state/HORIZON.md`, and the last `HISTORY.md` iteration.
 3. Run `git status --short` and `git log -8 --oneline`.
-4. Resume any in-flight `active_candidate`. Do not restart accepted objectives. Do not revert dirty files unless the last verdict/HANDOFF requires it.
-5. Validate the persisted horizon's uniqueness, accepted/pending, prerequisite, zero-based `current_index`, and next-objective invariants. If there is no in-flight candidate and the horizon is valid, continue its indexed next applicable objective. Repair ordinary candidate bookkeeping without rewriting history or globally replanning.
+4. Inspect `active_candidate`. If its objective is already accepted in `CURRENT.md`/`HISTORY.md`, treat it as stale bookkeeping, clear it locally, and do not resume or restart it. Otherwise resume the genuinely in-flight candidate. Do not revert dirty files unless the last verdict/HANDOFF requires it.
+5. Validate the persisted horizon's uniqueness, accepted/pending, prerequisite, zero-based `current_index`, and next-objective invariants. If there is no genuine in-flight candidate and the horizon is valid, continue its indexed next applicable objective. Repair ordinary candidate bookkeeping without rewriting history or globally replanning.
 6. Follow `gauntlet/PROMPT.md` and the same adversarial execution contract as `orchestrator`.
 
 ## Strategic boundaries
@@ -48,7 +48,9 @@ DeepSeek reviewer fallback is role-based, not an in-place model override:
 
 Determine mandatory evidence from `gauntlet/evidence-contract.md` before criticism. Gameplay/presentation work requires an existing screenshot artifact; passing tests do not substitute. Critic `ACCEPT` requires verified evidence. Integration must independently verify it and reject if the critic accepted while it was missing.
 
-After both reviews accept, perform the orchestrator's final gate by verifying both review evidence fields and every mandatory artifact path. Only then update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` as appropriate, mark the existing horizon entry accepted in place, recompute `current_index`, and validate the complete candidate state before persisting it. Never append a duplicate objective. If candidate bookkeeping fails validation, repair and revalidate it without another agent, global replanning, or historical rewrites. Then delegate the atomic commit/push to `git-committer` (`gemma4`). If the horizon remains valid, continue directly to its indexed next objective.
+After both reviews accept, perform the orchestrator's final gate by verifying both review evidence fields and every mandatory artifact path. Only then perform one acceptance transition: clear the accepted objective from `active_candidate`, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` as appropriate, mark the existing horizon entry accepted in place, recompute `current_index`, and validate the complete candidate state before persisting it. Never append a duplicate objective. If candidate bookkeeping fails validation, repair and revalidate it without another agent, global replanning, or historical rewrites. Then delegate the atomic commit/push to `git-committer` (`gemma4`).
+
+A successful acceptance commit is not a stopping point. If the horizon remains valid, immediately spawn the builder for its indexed next applicable objective in the same session. If the horizon is exhausted, immediately perform strategic reassessment and start the first applicable objective of the new horizon.
 
 Use `aux` to condense long logs/diffs/artifacts for orchestration. Do not replace authoritative builder evidence or independent reviews with summaries.
 
@@ -56,4 +58,10 @@ You may write only `gauntlet/state/**` and `gauntlet/objectives.md`. Never imple
 
 SuperGrok's weekly bar does not apply to this NaN overflow session. Context auto-compaction is not a reason to stop or replan.
 
-Stop only for the existing human-needed blocker/deferred/failed-builder conditions defined by the Gauntlet contract.
+## Stop conditions
+
+Stop only when a required human spec/legal decision is missing, NaN builders repeatedly failed and the objective is marked blocked with evidence, or the next work is explicitly deferred by the authoritative specs.
+
+Objective acceptance, commit completion, stale-state repair, and horizon exhaustion are not stop conditions. Horizon exhaustion triggers strategic reassessment and continuation.
+
+Otherwise continue.
