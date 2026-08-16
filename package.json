@@ -21,7 +21,8 @@
     "capture-ai-trajectory": "tsx scripts/capture-ai-match-trajectory.ts",
     "capture-ai-video": "node scripts/capture-ai-match-video.mjs",
     "gauntlet:audit": "tsx gauntlet/evals/src/gauntlet-audit.ts",
-    "gauntlet:acceptance:persist": "tsx gauntlet/evals/src/persist-acceptance.ts"
+    "gauntlet:acceptance:persist": "tsx gauntlet/evals/src/persist-acceptance.ts",
+    "gauntlet:milestone:bundle": "tsx gauntlet/evals/src/build-milestone-bundle.ts"
   },
   "dependencies": {
     "three": "^0.170.0"
