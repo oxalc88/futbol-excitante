@@ -7,30 +7,14 @@ model: grok-4.6
 argument-hint: optional focus, e.g. continue from BOOTSTRAP-07 only
 ---
 
-Start the PES Simulator Gauntlet Loop now.
+Start the PES Simulator Gauntlet Loop now. Do not implement gameplay yourself.
 
-You are the primary orchestrator. Do not implement gameplay yourself.
+Read `gauntlet/PROMPT.md`, `gauntlet/principles.md`, `gauntlet/VERSION.json`, `CURRENT.md`, and `HORIZON.md`. Follow the validated rolling horizon and existing model routing.
 
-Follow `gauntlet/PROMPT.md` and `gauntlet/README.md`. Live execution state is `gauntlet/state/CURRENT.md`; strategic rolling-plan state is `gauntlet/state/HORIZON.md`.
+For each candidate: builder → tests/artifacts → `pnpm run gauntlet:audit` → optional bounded `aux`/Gemma(Qwen fallback) semantic audit only on `REVIEW_REQUIRED` → mandatory independent critic → integration reviewer → final evidence gate → `GAUNTLET_ACCEPTANCE_JSON=... pnpm run gauntlet:acceptance:persist` → bookkeeping → `pnpm run gauntlet:eval:state` → accept.
 
-Inspect `git status --short`, recent commits, `CURRENT.md`, and `HORIZON.md` before the first delegation. If `active_candidate` points to an objective already accepted in `CURRENT.md`/`HISTORY.md`, it is stale bookkeeping: clear it locally and continue from the indexed next applicable horizon objective. Never resume an accepted candidate.
+Critic ACCEPT alone is never final, and deterministic/cheap-auditor success never bypasses the critic. Audit failures owned by state/bookkeeping are repaired by the orchestrator; implementation/evidence failures return to the builder.
 
-If `HORIZON.md` is uninitialized, exhausted, or materially invalidated, perform the strategic reassessment defined in `gauntlet/PROMPT.md`, validate the generated candidate, and persist a concise 4–8 objective horizon. Otherwise validate and continue the indexed next applicable horizon objective without globally reprioritizing the whole project. Horizon IDs must be unique; accepted objectives cannot be pending; prerequisites, zero-based `current_index`, and the selected next objective must agree.
+Persist/validate acceptance exactly as `gauntlet/PROMPT.md` specifies, then continue to the next horizon objective. A successful acceptance commit, tracking repair, or horizon exhaustion is not a stop condition. Preserve the existing SuperGrok ≥89% handoff rule.
 
-Delegate with `spawn_subagent`:
-
-- `subagent_type` is the agent name (`builder-qwen`, `builder-mimo`, `critic`, `critic-flash`, `critic-qwen`, `critic-mimo`, `integration-reviewer`, `integration-reviewer-flash`, `aux`, `git-committer`)
-- builders: `capability_mode: all`
-- critics, integration-reviewer, aux, git-committer: `capability_mode: execute`
-- pass model/role routing from `gauntlet/models.json`; do not let a child inherit `grok-4.6`
-- commits and pushes go to `git-committer` / `gemma4`
-
-Preserve the adversarial loop: builder → required evidence → critic → retry/fix as needed → critic → integration-reviewer → orchestrator evidence gate → accept. Critic ACCEPT alone is never final. Determine required evidence from `gauntlet/evidence-contract.md`; gameplay/presentation and browser-visible/browser-interactive screenshots are mandatory and tests cannot substitute for them.
-
-After both reviews accept, independently verify their mandatory-evidence fields and every required artifact. Only then perform one acceptance transition: clear the accepted objective from `active_candidate`, update `CURRENT.md` and `HISTORY.md`, refresh `TIMING.md` under `gauntlet/timing-contract.md`, mark the existing horizon entry accepted in place, recompute `current_index`, validate candidate state, and persist. TIMING tracking must include current per-step usage, by-model aggregates, builder grade, reviewer/orchestrator route/catches, and the required objective markers from real data. Never invent metrics. Run `pnpm run gauntlet:eval:state`; the acceptance commit cannot be delegated until it passes. Never append a duplicate entry. Repair bookkeeping/tracking locally; replan globally only at a strategic boundary.
-
-A successful acceptance commit is not a stopping point. If another applicable horizon objective exists, start it immediately in the same session. If the horizon is exhausted, perform strategic reassessment and start the first applicable objective of the new horizon. Stop only for the explicit stop conditions in `gauntlet/PROMPT.md`.
-
-If SuperGrok weekly usage (`/usage`) is ≥89%, write `HANDOFF.md`, preserve the horizon, and tell the human to run `/gauntlet-continue` on `orchestrator-deepseek` instead of starting another builder here.
-
-If the user passed extra focus after `/gauntlet`, apply it to strategic objective selection only. Do not skip critic or integration review.
+If the user supplies extra focus, apply it only to objective selection; never skip deterministic audit, critic, integration review, persistence, or state audit.

@@ -1,0 +1,21 @@
+{
+  "version": "0.7.0",
+  "schema_version": 1,
+  "semver": true,
+  "previous_system_version": "0.6.0",
+  "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
+  "baseline_commit": "13631a029c3c9d22096cdbfb7ad38dc8ce376b44",
+  "includes": [
+    "prompts",
+    "agents",
+    "skills",
+    "model-routing",
+    "deterministic-tooling",
+    "deterministic-evals",
+    "model-evals",
+    "evidence-contract",
+    "timing-contract",
+    "acceptance-pipeline",
+    "state-audit"
+  ]
+}

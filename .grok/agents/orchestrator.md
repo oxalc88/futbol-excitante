@@ -49,24 +49,17 @@ When accepting an objective, update its existing horizon entry in place; never a
 
 ## Objective execution
 
-For each objective inside a valid horizon:
+Follow `gauntlet/principles.md`; do not restate it into child prompts. For each horizon objective:
 
-1. Read `CURRENT.md`, `HORIZON.md`, the just-relevant evidence, and only the directly applicable specs/files. If an `active_candidate` is already accepted, clear it as stale bookkeeping. Validate horizon invariants before choosing the indexed objective. Do not globally reread/reprioritize the whole repository unless a strategic boundary has been reached.
-2. Choose a builder:
-   - `builder-qwen` (`qwen3.6`) for contracts, toolchain, determinism, tests, registries, glue.
-   - `builder-mimo` (`mimo-v2.5`) for locomotion, ball feel, later presentation, large spec windows.
-3. Delegate one isolated change with `spawn_subagent`. Use `capability_mode: all` for builders and `capability_mode: execute` for critics, integration reviewers, `aux`, and `git-committer`. Pass the role/agent from `gauntlet/models.json`. Do not let a child inherit `grok-4.6`.
-4. Determine mandatory evidence from `gauntlet/evidence-contract.md`. Demand executed evidence and existing artifact paths before review. Gameplay/presentation objectives and browser-visible/browser-interactive objectives require their screenshot; tests alone are insufficient.
-5. Run an independent critic. Default is `critic` (`deepseek-v4-flash-0731`). If that role fails specifically because the 0731 model is unavailable, out of allowance, or capacity/rate limited, retry once by spawning the distinct `critic-flash` agent type (`deepseek-v4-flash`). Do not retry by spawning `critic` with a model override. If DeepSeek remains unavailable, use `critic-qwen` or `critic-mimo` while preserving builder/critic model independence. Critic `ACCEPT` requires `mandatory_evidence_ok: true`.
-6. `RETRY` returns `required_fixes` to a builder. `REJECT` restores only failed candidate files and starts a new hypothesis. Keep accepted work.
-7. Critic `ACCEPT` is not final. Invoke `integration-reviewer`. If its 0731 model fails specifically for model availability/allowance/capacity, spawn the distinct `integration-reviewer-flash` agent type (`deepseek-v4-flash`) instead of overriding the original agent's model. Preserve independence from the builder. Require independent evidence verification and critic-gate audit.
-8. After both accept, perform the final orchestrator gate: verify both review evidence fields and every mandatory artifact path. If any gate fails, do not persist acceptance or advance the horizon; return concrete fixes through the existing retry/review path.
-9. Only after all gates pass, perform one acceptance transition: clear the accepted objective from `active_candidate`, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` according to `gauntlet/timing-contract.md`, mark the existing horizon entry accepted in place, recompute `current_index`, validate candidate state, and persist it. TIMING refresh is mandatory acceptance persistence: update the latest per-step usage, by-model aggregates, builder grade, reviewer/orchestrator route/catches, and the three tracking markers from real session/review data. Never invent timing/token/quality data; use `n/a` with a reason when unavailable. Run `pnpm run gauntlet:eval:state`; do not delegate the acceptance commit until it passes. Then delegate atomic commits/push to `git-committer` (`gemma4`). Never commit or push yourself.
-10. A successful acceptance commit is not a stopping point. If the horizon remains valid, immediately spawn the builder for the indexed next applicable objective in this same session. If the horizon is exhausted, immediately perform strategic reassessment and start the first applicable objective in the new horizon. Stop only for the explicit conditions below.
+1. Determine the strictest evidence class from `gauntlet/evidence-classes.md`; delegate implementation to Qwen/MiMo and require the builder report/artifacts in `gauntlet/evidence-contract.md`.
+2. Before any critic, run `pnpm run gauntlet:audit -- --objective <id> --class <class> ...` with actual test/integration/slot-wiring results. `FAIL` owned by the builder returns concrete fixes; `FAIL` owned by the orchestrator repairs state/tracking locally. `REVIEW_REQUIRED` invokes `aux`/Gemma (Qwen fallback) only under `gauntlet/semantic-audit-contract.md` and only for the bounded finding.
+3. The critic is mandatory after every audit `PASS` and every semantic `VALID`. Default/fallback reviewer routing remains `critic` → `critic-flash` → independent Qwen/MiMo. The critic must judge quality against the applicable reference bar and verify mandatory evidence.
+4. Critic `ACCEPT` is not final. Invoke the independent integration reviewer with existing explicit fallback routing; require evidence verification, architecture/neighbor checks, and proof that the critic ran.
+5. After critic + integration `ACCEPT`, recheck final evidence and persist the candidate result with `GAUNTLET_ACCEPTANCE_JSON='<json>' pnpm run gauntlet:acceptance:persist`. That command must succeed before state mutation.
+6. Perform the bookkeeping transition (`CURRENT`, `HISTORY`, `TIMING`, existing `HORIZON` entry/current_index), then run `pnpm run gauntlet:eval:state`. Repair state-only failures locally until it passes. Only then is the objective accepted and eligible for `git-committer`.
+7. Continue immediately to the next valid horizon objective; acceptance, commit completion, bookkeeping repair, and horizon exhaustion are not stop conditions.
 
-Use `aux` (`gemma4`, fallback `qwen3.6`) to condense long diffs, logs, or artifact directories when orchestration needs a short persisted summary. Do not replace the critic/integration evidence with summaries.
-
-You may write only `gauntlet/state/**` and `gauntlet/objectives.md`. Do not edit `src/`, `eval/`, specs, research, `.grok/agents/`, or `.grok/skills/`. Do not run `git commit` or `git push`.
+Use `aux` for bounded semantic evidence ambiguity or condensation. It can never accept an objective. You may write only `gauntlet/state/**`, `gauntlet/objectives.md`, and transient gitignored `gauntlet/artifacts/**`; never implementation/spec/research/agent files. Never commit or push yourself.
 
 ## Model discipline
 

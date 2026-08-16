@@ -4,6 +4,52 @@ Human-readable history of meaningful changes to the Gauntlet's **rules, prompts,
 
 This changelog does **not** record normal gameplay objectives or routine live-state updates produced by the running Gauntlet. Git remains the source of truth for exact file contents and diffs.
 
+## 2026-08-16 — Deterministic audit and semantic escalation
+
+**Gauntlet system version (SemVer):** `0.7.0`  
+**Previous normalized system version:** `0.6.0`  
+**Legacy predecessor prompt generation:** `v6-browser-evidence-model-tracking`
+
+### Changed
+
+- Formalized SemVer for the complete project-local Gauntlet harness via `gauntlet/VERSION.json`; version now covers prompts, agents, skills, model routing, deterministic tooling/evals, evidence/timing contracts, acceptance persistence, and state audit.
+- Added canonical `gauntlet/principles.md` so the acceptance philosophy is not duplicated token-for-token across agents. Runtime surfaces reference it and deterministic prompt gates enforce the operational consequences.
+- Added class-based evidence requirements (`HEADLESS`, `BROWSER_VISIBLE`, `MULTI_TICK`, `DYNAMIC_VISUAL`, `PRESENTATION`, `BOOKKEEPING`).
+- Added `gauntlet:audit`, a pre-critic deterministic gate for tests, evidence existence, screenshot SHA reuse, trajectory/integration requirements, CURRENT/HORIZON consistency, TIMING consistency, v0.7 result freshness, and optional slot/player wiring invariants.
+- Added bounded semantic escalation: only `REVIEW_REQUIRED` findings go to existing `aux`/Gemma (Qwen fallback), under a closed `VALID|INVALID|INSUFFICIENT_CONTEXT` contract. This role cannot accept an objective or replace reference-bar criticism.
+- Added `gauntlet:acceptance:persist`, which refuses candidate persistence unless deterministic audit passed, optional semantic review is valid, critic and integration both accepted, and builder/critic models are independent.
+- Extended live state audit to check accepted-list consistency, CURRENT/HORIZON alignment, TIMING tracking/clock consistency, and v0.7 acceptance-result freshness. Historical v0.6-and-earlier objectives are a legacy baseline until the first v0.7 acceptance record exists.
+- Added `ORCH-REG-008` through `ORCH-REG-013`, including a protected regression that deterministic/cheap audit success cannot bypass the critic.
+
+### Acceptance pipeline
+
+`builder → tests/artifacts → deterministic audit → optional bounded cheap semantic audit → mandatory critic → integration reviewer → final evidence gate → persist candidate result → bookkeeping → state audit → ACCEPT → next objective`
+
+### Preserved Gauntlet philosophy
+
+The qualitative critic remains the judge against the reference bar. Deterministic tooling removes mechanical work and can invalidate bad evidence/state; it does not convert the Gauntlet into CI or grant acceptance. The canonical wording is intentionally stored once in `gauntlet/principles.md`.
+
+### Migration/runtime notes
+
+No manual rewrite of `gauntlet/state/**` is part of this release. Existing state defects are surfaced by the new audit and must be repaired by the running orchestrator. Existing `aux = gemma4` routing is reused for bounded semantic audit, so no new user-level subagent mapping is required.
+
+### Prompt/rule/tooling surface
+
+- `gauntlet/VERSION.json`
+- `gauntlet/principles.md`
+- `gauntlet/PROMPT.md`
+- `gauntlet/README.md`
+- `gauntlet/evidence-contract.md`
+- `gauntlet/evidence-classes.md`
+- `gauntlet/semantic-audit-contract.md`
+- `.grok/agents/orchestrator*.md`
+- `.grok/skills/gauntlet*/SKILL.md`
+- `gauntlet/evals/**`
+- `gauntlet/models.json`
+- `package.json`
+
+---
+
 ## 2026-08-15 — Browser evidence and model tracking gates
 
 **Prompt version:** `v6-browser-evidence-model-tracking`  

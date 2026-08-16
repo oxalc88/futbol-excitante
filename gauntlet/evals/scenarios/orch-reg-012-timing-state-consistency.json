@@ -1,0 +1,13 @@
+{
+  "id": "ORCH-REG-012",
+  "kind": "timing_consistency_gate",
+  "input": {
+    "tracking_markers_match": true,
+    "clock_measurement_matches": false,
+    "latest_rows_present": true
+  },
+  "expect": {
+    "decision": "repair_tracking",
+    "failure_class": "timing_state_inconsistent"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "ORCH-REG-008",
+  "kind": "accepted_state_gate",
+  "input": {
+    "latest_accepted_in_list": false,
+    "current_horizon_consistent": true
+  },
+  "expect": {
+    "decision": "repair_state",
+    "failure_class": "accepted_state_inconsistent"
+  }
+}

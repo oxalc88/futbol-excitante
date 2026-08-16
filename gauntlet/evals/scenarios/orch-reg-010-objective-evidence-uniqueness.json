@@ -1,0 +1,12 @@
+{
+  "id": "ORCH-REG-010",
+  "kind": "evidence_uniqueness_gate",
+  "input": {
+    "duplicate_sha": true,
+    "criterion_claims_new_evidence": true
+  },
+  "expect": {
+    "decision": "review_required",
+    "failure_class": "evidence_reuse_review"
+  }
+}

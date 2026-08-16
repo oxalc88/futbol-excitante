@@ -18,6 +18,14 @@ An empty implementation is a valid start. `BOOTSTRAP-01` is the initial objectiv
 
 `.opencode/` and `opencode.json` are unused leftovers from the OpenCode harness. Do not launch this loop with `opencode`.
 
+## Gauntlet system version
+
+The Gauntlet is versioned as a complete harness under SemVer in `gauntlet/VERSION.json`: prompts + agents + skills + routing + deterministic tooling/evals + evidence/timing contracts + acceptance/state-audit machinery. Legacy changelog labels such as `v6-browser-evidence-model-tracking` are prompt-generation names, not SemVer releases. The normalized predecessor is `0.6.0`; this architecture is `0.7.0`.
+
+Canonical acceptance philosophy lives in `gauntlet/principles.md` and is referenced by runtime prompts rather than duplicated into every agent. v0.7 is deterministic-first and critic-always: scripts establish facts, bounded ambiguity can be sent cheaply to `aux`/Gemma (Qwen fallback), but every candidate still reaches an independent qualitative critic before integration and final acceptance.
+
+Run the pre-review audit with `pnpm run gauntlet:audit`; candidate acceptance persistence uses `pnpm run gauntlet:acceptance:persist`; post-bookkeeping consistency remains `pnpm run gauntlet:eval:state`.
+
 ## Launch
 
 From the repository root:
@@ -202,48 +210,35 @@ Confirm with `grok models`. The process must have `NAN_API_KEY` set. A missing k
 ## Loop
 
 ```text
-inspect repo + CURRENT.md
-        │
-        ▼
-select next objective
-        │
-        ▼
-choose builder (Qwen or MiMo)
-        │
-        ▼
-builder implements and produces required evidence
-        │
-        ▼
-independent critic
-   ├── RETRY ──► same or switched builder (max 3)
-   ├── REJECT ─► revert candidate files, new hypothesis
-   └── ACCEPT
-        │
-        ▼
-integration-reviewer
-   ├── REJECT ─► revert, return to builder
-   └── ACCEPT
-        │
-        ▼
-orchestrator verifies mandatory evidence
-        │
-        ▼
-record acceptance, validate/advance horizon, next objective
+OBJECTIVE
+  ↓
+BUILDER
+  ↓
+tests + class-specific artifacts
+  ↓
+gauntlet:audit (deterministic facts)
+  ├─ FAIL/builder → retry builder
+  ├─ FAIL/orchestrator → repair state and re-audit
+  └─ REVIEW_REQUIRED → bounded aux/Gemma audit → re-enter gate
+  ↓
+mandatory independent CRITIC (reference-bar quality)
+  ↓
+INTEGRATION REVIEWER
+  ↓
+FINAL EVIDENCE GATE
+  ↓
+persist candidate acceptance result
+  ↓
+update CURRENT/HISTORY/HORIZON/TIMING
+  ↓
+gauntlet:eval:state
+  ↓
+ACCEPT → next horizon objective
 ```
 
-Details:
+Deterministic and cheap semantic audits can block progression but cannot accept an objective. See `gauntlet/principles.md`, `gauntlet/evidence-classes.md`, and `gauntlet/evidence-contract.md`.
 
-1. Inspect `git status`, the tree, `gauntlet/state/CURRENT.md`, `gauntlet/state/HORIZON.md`, and directly relevant evidence/specs. Validate horizon bookkeeping before selecting from it.
-2. At a strategic boundary, create a 4–8 objective horizon from actual project state. Otherwise choose its indexed next applicable objective without global replanning. Objective IDs must be unique; accepted objectives cannot be pending; prerequisites, zero-based `current_index`, and selected objective must agree.
-3. Delegate one coherent change. Quote the spec sections and acceptance tests in the task.
-4. Require the builder report and mandatory artifacts in `gauntlet/evidence-contract.md`. Commands must have been executed. Gameplay/presentation screenshots are mandatory; tests do not replace them.
-5. Invoke `critic`. If its 0731 model has a model-specific availability/allowance/capacity failure, spawn `critic-flash`; never override `critic` in place. Both verify artifact existence before `ACCEPT`.
-6. On `RETRY`/`REJECT`, keep previously accepted work. Revert only the failed candidate files, then send `required_fixes` back.
-7. Critic `ACCEPT` is not final. Run `integration-reviewer`; on the same 0731-specific failure use `integration-reviewer-flash` as a distinct agent type. Both independently verify evidence and audit the critic gate.
-8. After both pass, the orchestrator independently verifies mandatory evidence. Only then update state, mark the existing horizon entry accepted in place, recompute/validate `current_index`, and persist acceptance.
-9. Continue the validated horizon directly. Reassess only at horizon exhaustion/material invalidation. Repair bookkeeping errors locally rather than globally replanning. Stop only for a human-needed legal/spec blocker or when a repeatedly failed objective is marked blocked with evidence.
-
-Retry budget per objective: 3, then switch NaN builder. If both still fail, Grok decomposes, reroutes to another NaN agent, or blocks the objective. Grok does not implement.
+Reviewer fallback, rolling-horizon planning, retry/revert semantics, SuperGrok handoff, and builder/critic model independence remain unchanged.
 
 ## What counts as success
 
