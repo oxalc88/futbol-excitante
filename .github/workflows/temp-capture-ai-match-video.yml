@@ -1,0 +1,101 @@
+name: Temporary AI Match Video Capture
+
+on:
+  push:
+    branches:
+      - temp/capture-ai-match-video
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Start Vite
+        run: |
+          pnpm run dev -- --host 127.0.0.1 > /tmp/vite.log 2>&1 &
+          echo $! > /tmp/vite.pid
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:5173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/vite.log
+          exit 1
+
+      - name: Capture AI-vs-AI browser match
+        run: |
+          mkdir -p capture/raw capture/out
+          cat > /tmp/capture-ai-match.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs';
+          import path from 'node:path';
+
+          const videoDir = path.resolve('capture/raw');
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({
+            viewport: { width: 1280, height: 720 },
+            recordVideo: { dir: videoDir, size: { width: 1280, height: 720 } },
+          });
+          const page = await context.newPage();
+          page.on('console', msg => console.log(`[browser:${msg.type()}] ${msg.text()}`));
+          page.on('pageerror', err => console.error(`[pageerror] ${err.message}`));
+
+          await page.goto('http://127.0.0.1:5173/?mode=ai-match', { waitUntil: 'networkidle' });
+          await page.screenshot({ path: 'capture/out/ai-match-start.png', fullPage: true });
+          await page.waitForTimeout(25000);
+          await page.screenshot({ path: 'capture/out/ai-match-end.png', fullPage: true });
+
+          const video = page.video();
+          await context.close();
+          const videoPath = video ? await video.path() : null;
+          await browser.close();
+
+          if (!videoPath || !fs.existsSync(videoPath)) {
+            throw new Error('Playwright did not produce a video file');
+          }
+          fs.copyFileSync(videoPath, 'capture/out/ai-match.webm');
+          EOF
+          node /tmp/capture-ai-match.mjs
+
+      - name: Convert to MP4
+        run: |
+          ffmpeg -y -i capture/out/ai-match.webm -c:v libx264 -pix_fmt yuv420p -movflags +faststart capture/out/ai-match.mp4
+
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-match-video
+          path: |
+            capture/out/ai-match.mp4
+            capture/out/ai-match.webm
+            capture/out/ai-match-start.png
+            capture/out/ai-match-end.png
+          if-no-files-found: error
+          retention-days: 3
