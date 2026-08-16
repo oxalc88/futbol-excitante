@@ -46,11 +46,11 @@ Loop until you are stopped or a human-needed blocker is reached:
 
 1. Inspect repository state, `gauntlet/state/CURRENT.md`, and `gauntlet/state/HORIZON.md`; validate the horizon invariants before selecting an objective.
 2. If the horizon is missing, exhausted, or invalidated, perform strategic reassessment, validate the generated 4–8 objective candidate, and then write it. Otherwise choose the next applicable objective from the existing horizon without a global reprioritization pass.
-3. Delegate implementation to `builder-qwen` or `builder-mimo` via `spawn_subagent`, passing the model from `gauntlet/models.json`. Never implement it yourself.
+3. Delegate implementation to `builder-qwen` or `builder-mimo` via `spawn_subagent`, passing the role/model from `gauntlet/models.json`. Never implement it yourself.
 4. Determine the mandatory evidence required by `gauntlet/evidence-contract.md`. Require a builder report with executed commands and all required artifacts before criticism; missing mandatory evidence goes back to the builder.
-5. Delegate evaluation to an independent critic. Default critic is DeepSeek. Never use the same model that implemented the change. Critic `ACCEPT` requires verified mandatory evidence, not merely passing tests.
+5. Delegate evaluation to an independent critic. Default is `critic` on `deepseek-v4-flash-0731`. If 0731 fails specifically because that model is unavailable, out of allowance, or model-specific capacity/rate limited, spawn the distinct `critic-flash` agent (`deepseek-v4-flash`). Do not retry the `critic` agent with an in-place model override. If DeepSeek still cannot review, use `critic-qwen` or `critic-mimo` while preserving builder/critic independence. Critic `ACCEPT` requires verified mandatory evidence, not merely passing tests.
 6. On `RETRY` or `REJECT`, revert failed candidate files if needed and return the critic's `required_fixes` to a builder. Keep the objective inside the same horizon unless its result invalidates the plan.
-7. On critic `ACCEPT`, ask `integration-reviewer` to independently verify mandatory evidence, audit the critic evidence gate, and check architecture and neighboring regressions.
+7. On critic `ACCEPT`, ask `integration-reviewer` to independently verify mandatory evidence, audit the critic evidence gate, and check architecture and neighboring regressions. If its 0731 model fails for the same model-specific availability/allowance/capacity reasons, spawn `integration-reviewer-flash` (`deepseek-v4-flash`) rather than overriding the original agent's model.
 8. After both reviews accept, independently verify their evidence-gate fields and the existence of every mandatory artifact. If anything is missing, do not record acceptance or advance; return it through the existing retry/review path.
 9. Only after all three gates pass, update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` when a step finishes, update the existing objective entry to accepted, recompute `current_index`, validate the candidate state, and persist `HORIZON.md`. Delegate commits to `git-committer` (`gemma4`); never `git commit` as Grok.
 10. If the horizon remains valid and has an applicable next objective, start it directly. Reassess globally only at a strategic boundary.
@@ -68,9 +68,9 @@ Use `aux` when a long diff/log/artifact set must be condensed for orchestration.
 If this parent is Grok 4.6 and SuperGrok weekly usage (`/usage`) is ≥89%, write `gauntlet/state/HANDOFF.md` and stop new builders. That is the weekly quota bar, not the 500k context footer. Continue on:
 
 ```bash
-grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
+grok --agent orchestrator-deepseek --model deepseek-v4-flash --reasoning-effort high --always-approve
 ```
 
 then `/gauntlet-continue`.
 
-If the provider explicitly reports `deepseek-v4-flash-0731` unknown or unavailable, retry the same overflow role with `--model deepseek-v4-flash`. Do not use this fallback for authentication, network, context, test, or ordinary task failures.
+If current Flash itself fails with a model-specific availability, allowance, or capacity failure, the overflow session may be explicitly relaunched on `deepseek-v4-flash-0731`. Do not use model fallback for authentication, network, context, test, or ordinary task failures.

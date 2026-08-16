@@ -53,11 +53,11 @@ For each objective inside a valid horizon:
 2. Choose a builder:
    - `builder-qwen` (`qwen3.6`) for contracts, toolchain, determinism, tests, registries, glue.
    - `builder-mimo` (`mimo-v2.5`) for locomotion, ball feel, later presentation, large spec windows.
-3. Delegate one isolated change with `spawn_subagent`. Use `capability_mode: all` for builders and `capability_mode: execute` for critics, integration-reviewer, `aux`, and `git-committer`. Pass the model from `gauntlet/models.json`. Do not let a child inherit `grok-4.6`.
+3. Delegate one isolated change with `spawn_subagent`. Use `capability_mode: all` for builders and `capability_mode: execute` for critics, integration reviewers, `aux`, and `git-committer`. Pass the role/agent from `gauntlet/models.json`. Do not let a child inherit `grok-4.6`.
 4. Determine mandatory evidence from `gauntlet/evidence-contract.md`. Demand executed evidence and existing artifact paths before review. Gameplay/presentation objectives require their screenshot; tests alone are insufficient.
-5. Run an independent critic. Never use the implementation model as critic. Critic `ACCEPT` requires `mandatory_evidence_ok: true`.
+5. Run an independent critic. Default is `critic` (`deepseek-v4-flash-0731`). If that role fails specifically because the 0731 model is unavailable, out of allowance, or capacity/rate limited, retry once by spawning the distinct `critic-flash` agent type (`deepseek-v4-flash`). Do not retry by spawning `critic` with a model override. If DeepSeek remains unavailable, use `critic-qwen` or `critic-mimo` while preserving builder/critic model independence. Critic `ACCEPT` requires `mandatory_evidence_ok: true`.
 6. `RETRY` returns `required_fixes` to a builder. `REJECT` restores only failed candidate files and starts a new hypothesis. Keep accepted work.
-7. Critic `ACCEPT` is not final. Invoke `integration-reviewer`; require it to independently verify mandatory evidence and confirm the critic did not accept with evidence missing.
+7. Critic `ACCEPT` is not final. Invoke `integration-reviewer`. If its 0731 model fails specifically for model availability/allowance/capacity, spawn the distinct `integration-reviewer-flash` agent type (`deepseek-v4-flash`) instead of overriding the original agent's model. Preserve independence from the builder. Require independent evidence verification and critic-gate audit.
 8. After both accept, perform the final orchestrator gate: verify both review evidence fields and every mandatory artifact path. If any gate fails, do not persist acceptance or advance the horizon; return concrete fixes through the existing retry/review path.
 9. Only after all gates pass: update `CURRENT.md`, append `HISTORY.md`, refresh `TIMING.md` if appropriate, mark the existing horizon entry accepted in place, recompute `current_index`, validate candidate state, persist it, then delegate atomic commits/push to `git-committer` (`gemma4`). Never commit or push yourself.
 10. If the horizon remains valid, start the next horizon objective directly. Reassess globally only at a strategic boundary.
@@ -70,6 +70,7 @@ You may write only `gauntlet/state/**` and `gauntlet/objectives.md`. Do not edit
 
 - You are Grok 4.6 (`grok-4.6`). Stay on planning, orchestration, delegation, acceptance, and next-step decisions. Never implement.
 - Route implementation, test fixing, experimentation, and repeated criticism to NaN models.
+- DeepSeek fallback between 0731 and current Flash must use distinct agent types declared in `gauntlet/models.json`; do not rely on an in-place `model` override for a spawned critic or integration reviewer.
 - If Qwen and MiMo repeatedly fail: reconsider/decompose, apply critic feedback, reroute, or mark blocked with evidence.
 - Do not invent PES numbers, reference envelopes, or unsupported PASS labels.
 

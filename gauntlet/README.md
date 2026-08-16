@@ -58,19 +58,21 @@ Optional extra focus after `/gauntlet`:
 | Agent | Kind | Default model | Writes | Job |
 |---|---|---|---|---|
 | `orchestrator` | primary | `grok-4.6` | `gauntlet/state/**`, `gauntlet/objectives.md` | Inspect, prioritize, delegate, accept/revert, choose the next objective. Hands off at 89% SuperGrok weekly usage (`/usage`). |
-| `orchestrator-deepseek` | primary (overflow) | `deepseek-v4-flash-0731`, fallback `deepseek-v4-flash` | `gauntlet/state/**`, `gauntlet/objectives.md` | Same loop. Picks up from `HANDOFF.md` + `CURRENT.md` after Grok hits the ceiling. |
+| `orchestrator-deepseek` | primary (overflow) | `deepseek-v4-flash` | `gauntlet/state/**`, `gauntlet/objectives.md` | Same loop on current Flash. Picks up from `HANDOFF.md` + `CURRENT.md` after Grok hits the ceiling. |
 | `builder-qwen` | subagent | `qwen3.6` | implementation files | Structured TypeScript, toolchain, contracts, tests, registries |
 | `builder-mimo` | subagent | `mimo-v2.5` | implementation files | Large-context gameplay/presentation work |
-| `critic` | subagent | `deepseek-v4-flash-0731` | none | Independent evaluation of builder evidence |
+| `critic` | subagent | `deepseek-v4-flash-0731` | none | Preferred independent evaluation of builder evidence |
+| `critic-flash` | fallback subagent | `deepseek-v4-flash` | none | Explicit current-Flash critic fallback when 0731 is unavailable/out of allowance |
 | `critic-qwen` | fallback subagent | `qwen3.6` | none | Fallback critic when DeepSeek is unavailable and Qwen did not implement |
 | `critic-mimo` | fallback subagent | `mimo-v2.5` | none | Fallback critic when DeepSeek is unavailable and MiMo did not implement |
-| `integration-reviewer` | subagent | `deepseek-v4-flash-0731` | none | Architecture and neighboring-regression review after critic accept |
+| `integration-reviewer` | subagent | `deepseek-v4-flash-0731` | none | Preferred architecture and neighboring-regression review after critic accept |
+| `integration-reviewer-flash` | fallback subagent | `deepseek-v4-flash` | none | Explicit current-Flash integration fallback when 0731 is unavailable/out of allowance |
 | `aux` | subagent | `gemma4` | none | Cheap summaries, file lists, artifact condensation |
 | `git-committer` | subagent | `gemma4` | git only | Atomic conventional commits (and push when asked). Not Grok. |
 
 Exact IDs are in `gauntlet/models.json` and must match `.grok/agents/<name>.md` frontmatter `model` plus the `[model.*]` blocks in `~/.grok/config.toml`.
 
-The orchestrator delegates with `spawn_subagent`. `subagent_type` is the agent name. Builders use `capability_mode: all`. Critics, the integration reviewer, `aux`, and `git-committer` use `capability_mode: execute`. Pass `model` from `gauntlet/models.json`. If the provider explicitly reports the 0731 snapshot unavailable, retry the same DeepSeek role once with `deepseek-v4-flash`. Do not change models for authentication, network, context, test, or ordinary task failures. A child that inherits `grok-4.6` is a routing bug. Commits go to `git-committer` / `gemma4`, never to the orchestrator.
+The orchestrator delegates with `spawn_subagent`. `subagent_type` is the agent name. Builders use `capability_mode: all`. Critics, integration reviewers, `aux`, and `git-committer` use `capability_mode: execute`. Route DeepSeek reviewer fallback by agent type: if the 0731 role fails specifically for model availability, allowance exhaustion, or model-specific capacity/rate limiting, spawn `critic-flash` or `integration-reviewer-flash`. Do **not** retry `critic` or `integration-reviewer` with an in-place `model: deepseek-v4-flash` override. Do not change models for authentication, network, context, test, or ordinary task failures. A child that inherits `grok-4.6` is a routing bug. Commits go to `git-committer` / `gemma4`, never to the orchestrator.
 
 Direct CLI launches of a NaN agent must also set `--model`, because `--agent` alone keeps the session default:
 
@@ -103,30 +105,29 @@ The usual isolatable pair is `BOOTSTRAP-07` and `BOOTSTRAP-08` once input exists
 | Role | Exact model | Fallback |
 |---|---|---|
 | Orchestrator | `grok-4.6` | `orchestrator-deepseek` at ≥89% SuperGrok weekly usage (`/usage`). Do not fall back to Grok 4, 4.5, or 4.20. |
-| Overflow orchestrator | `deepseek-v4-flash-0731` | `deepseek-v4-flash` only when the provider explicitly reports 0731 unavailable |
+| Overflow orchestrator | `deepseek-v4-flash` (high reasoning) | explicit relaunch on `deepseek-v4-flash-0731` only for model-specific availability/allowance/capacity failure |
 | Primary builders | `qwen3.6` and `mimo-v2.5` | the other builder |
-| Primary critic | `deepseek-v4-flash-0731` | `deepseek-v4-flash`, then `critic-mimo` if the builder was Qwen or `critic-qwen` if the builder was MiMo |
-| Integration reviewer | `deepseek-v4-flash-0731` | `deepseek-v4-flash`, then a NaN model that is not the builder under review |
+| Primary critic | `critic` / `deepseek-v4-flash-0731` | `critic-flash` / `deepseek-v4-flash`, then `critic-mimo` if the builder was Qwen or `critic-qwen` if the builder was MiMo |
+| Integration reviewer | `integration-reviewer` / `deepseek-v4-flash-0731` | `integration-reviewer-flash` / `deepseek-v4-flash`, then a NaN model that is not the builder under review |
 | Cheap auxiliary | `gemma4` | `qwen3.6` |
 | Git committer | `gemma4` | `qwen3.6` |
 
 Hard rule: the critic model must differ from the implementation model for that candidate.
 
-Use NaN models for high-token implementation, test fixing, experimentation, and repeated criticism. Use `gemma4` for summaries and git commits. Use Grok 4.6 for orchestration until **SuperGrok weekly usage** (`/usage`, not the `217K / 500K` context footer) hits **89%**. Then continue on `orchestrator-deepseek` (`deepseek-v4-flash-0731`) from `gauntlet/state/HANDOFF.md`. Auto-compact is still 65% of the 500k **context** window (`~/.grok/config.toml` `[session] auto_compact_threshold_percent = 65`). That setting lives in the user config, not project `.grok/config.toml`.
+Use NaN models for high-token implementation, test fixing, experimentation, and repeated criticism. Use `gemma4` for summaries and git commits. Use Grok 4.6 for orchestration until **SuperGrok weekly usage** (`/usage`, not the context footer) hits **89%**. Then continue on `orchestrator-deepseek` using current `deepseek-v4-flash` from `gauntlet/state/HANDOFF.md`. Auto-compact is still 65% of the 500k **context** window (`~/.grok/config.toml` `[session] auto_compact_threshold_percent = 65`). That setting lives in the user config, not project `.grok/config.toml`.
 
 Overflow launch (always pass `--model`):
 
 ```bash
-grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
+grok --agent orchestrator-deepseek --model deepseek-v4-flash --reasoning-effort high --always-approve
 ```
 
 Then `/gauntlet-continue`.
 
-If and only if the provider reports the 0731 model unknown or unavailable,
-launch the same role with the current model and run `/gauntlet-continue`:
+If current Flash itself fails with a model-specific availability, allowance, or capacity failure, explicitly relaunch the same overflow role once with the 0731 snapshot:
 
 ```bash
-grok --agent orchestrator-deepseek --model deepseek-v4-flash --always-approve
+grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
 ```
 
 ## NaN models
@@ -183,12 +184,14 @@ Also add this per-type map in the same user file so spawned agents do not inheri
 builder-qwen = "qwen3.6"
 builder-mimo = "mimo-v2.5"
 critic = "deepseek-v4-flash-0731"
+critic-flash = "deepseek-v4-flash"
 critic-qwen = "qwen3.6"
 critic-mimo = "mimo-v2.5"
 integration-reviewer = "deepseek-v4-flash-0731"
+integration-reviewer-flash = "deepseek-v4-flash"
 aux = "gemma4"
 git-committer = "gemma4"
-orchestrator-deepseek = "deepseek-v4-flash-0731"
+orchestrator-deepseek = "deepseek-v4-flash"
 
 [session]
 auto_compact_threshold_percent = 65
@@ -234,9 +237,9 @@ Details:
 2. At a strategic boundary, create a 4–8 objective horizon from actual project state. Otherwise choose its indexed next applicable objective without global replanning. Objective IDs must be unique; accepted objectives cannot be pending; prerequisites, zero-based `current_index`, and selected objective must agree.
 3. Delegate one coherent change. Quote the spec sections and acceptance tests in the task.
 4. Require the builder report and mandatory artifacts in `gauntlet/evidence-contract.md`. Commands must have been executed. Gameplay/presentation screenshots are mandatory; tests do not replace them.
-5. Invoke `critic` with the report, diff, required tests, and evidence requirements. Default model is DeepSeek. It verifies artifact existence before `ACCEPT`.
+5. Invoke `critic`. If its 0731 model has a model-specific availability/allowance/capacity failure, spawn `critic-flash`; never override `critic` in place. Both verify artifact existence before `ACCEPT`.
 6. On `RETRY`/`REJECT`, keep previously accepted work. Revert only the failed candidate files, then send `required_fixes` back.
-7. Critic `ACCEPT` is not final. Run `integration-reviewer`, which independently verifies evidence and audits the critic gate.
+7. Critic `ACCEPT` is not final. Run `integration-reviewer`; on the same 0731-specific failure use `integration-reviewer-flash` as a distinct agent type. Both independently verify evidence and audit the critic gate.
 8. After both pass, the orchestrator independently verifies mandatory evidence. Only then update state, mark the existing horizon entry accepted in place, recompute/validate `current_index`, and persist acceptance.
 9. Continue the validated horizon directly. Reassess only at horizon exhaustion/material invalidation. Repair bookkeeping errors locally rather than globally replanning. Stop only for a human-needed legal/spec blocker or when a repeatedly failed objective is marked blocked with evidence.
 
@@ -287,9 +290,9 @@ Do not add these agents under `~/.grok/agents/`. That would make them appear in 
 1. Edit `gauntlet/models.json`.
 2. Copy the same Grok slugs into `.grok/agents/<name>.md` frontmatter `model`.
 3. If a NaN API id or endpoint changes, update the matching `[model.*]` block and `[subagents.models]` map in `~/.grok/config.toml`.
-4. Keep the default orchestrator on `grok-4.6`. Overflow is `orchestrator-deepseek`, preferring `deepseek-v4-flash-0731` and falling back to `deepseek-v4-flash` only when the snapshot is explicitly unavailable. Do not point the Grok orchestrator at Grok 4, 4.5, 4.20, or another non-4.6 ID.
+4. Keep the default orchestrator on `grok-4.6`. Overflow `orchestrator-deepseek` defaults to current `deepseek-v4-flash`; the 0731 snapshot is only its explicit model-specific fallback. Critic/integration fallback between 0731 and current Flash uses distinct agent types, never an in-place model override.
 5. Confirm with `grok models` that the IDs exist.
-6. Record the change in `gauntlet/state/HISTORY.md`.
+6. Record semantic routing changes in `docs/gauntlet-changelog.md`; do not write routing-rule changes into generated live state solely for documentation.
 
 Do not put builder work on Grok by editing only the builder frontmatter. If a NaN model ID changes, update both builders and the matching fallback critics so independence rules still resolve.
 

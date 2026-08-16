@@ -35,7 +35,16 @@ Critic ACCEPT is insufficient. Integration review must independently accept, and
 
 For a valid horizon objective, use `CURRENT.md`, `HORIZON.md`, the immediately relevant evidence, and directly applicable specs/files. Avoid repeating a whole-repository prioritization pass after every acceptance.
 
-Delegate with `spawn_subagent`; builders use `capability_mode: all`, critics/integration/aux/git-committer use `execute`, and models come from `gauntlet/models.json`. Critic model must differ from builder model. Keep max retries and existing REJECT/revert semantics.
+Delegate with `spawn_subagent`; builders use `capability_mode: all`, critics/integration/aux/git-committer use `execute`, and roles come from `gauntlet/models.json`. Critic model must differ from builder model. Keep max retries and existing REJECT/revert semantics.
+
+DeepSeek reviewer fallback is role-based, not an in-place model override:
+
+- default critic: `critic` on `deepseek-v4-flash-0731`;
+- if 0731 fails specifically for model availability, allowance exhaustion, or model-specific capacity/rate limiting, spawn `critic-flash` on `deepseek-v4-flash`;
+- do not spawn `critic` with `model: deepseek-v4-flash`;
+- if DeepSeek still cannot review, use `critic-qwen` or `critic-mimo` while preserving independence from the builder;
+- default integration reviewer: `integration-reviewer` on 0731;
+- the same model-specific 0731 failure uses `integration-reviewer-flash` on current Flash; do not override `integration-reviewer` in place.
 
 Determine mandatory evidence from `gauntlet/evidence-contract.md` before criticism. Gameplay/presentation work requires an existing screenshot artifact; passing tests do not substitute. Critic `ACCEPT` requires verified evidence. Integration must independently verify it and reject if the critic accepted while it was missing.
 
