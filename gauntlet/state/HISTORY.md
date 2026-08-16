@@ -206,6 +206,16 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - commits: 63904f1 candidate(CPU-TEAM-DECISION-PROFILE)
 - notes: Pure team decision state machine (ATTACK/DEFEND/BALANCED) in adapter layer. TeamDecision field in CpuObservation shared per team per tick. Formation modulation: ATTACK ×0.3, DEFEND ×1.5. 176/176 CPU adapter, 27/27 arch, 195/195 integration tests pass. 601-hash trajectory. Deterministic audit PASS. Slot-wiring invariant verified. No PES claim. No FOUNDATION_LAB_PASS claim.
 
+## Iteration 39 — 2026-08-16
+
+- objective_id: SCENARIO-3V3-FIXTURE
+- builder: builder-structured / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: 55feb7b candidate(SCENARIO-3V3-FIXTURE)
+- notes: 3v3 fixture scenario with 6 CPU players (3 per team), 1-2 formation, 6 AI_FALLBACK slots. Versioned JSON fixture, scenario selector route. 32 unit tests, 9 integration tests. 1438/1438 node, 40/40 browser, 204/204 integration all pass. 61-hash trajectory. Deterministic audit PASS. Slot-wiring invariant verified. No PES claim.
+
 ## Iteration 37 — 2026-08-15
 
 - objective_id: CAPABILITY-SWERVE

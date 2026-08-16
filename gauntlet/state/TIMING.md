@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: CPU-TEAM-DECISION-PROFILE
-usage_aggregates_through: CPU-TEAM-DECISION-PROFILE
-model_evaluation_through: CPU-TEAM-DECISION-PROFILE
+last_tracked_objective: SCENARIO-3V3-FIXTURE
+usage_aggregates_through: SCENARIO-3V3-FIXTURE
+model_evaluation_through: SCENARIO-3V3-FIXTURE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -114,6 +114,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | BROWSER-2V2-MATCH-KEYBOARD | accepted | ~12m | 4m | 2m | 4m | ~0.5m | ~7M est. | n/a** |
 | BROWSER-2V2-PLAYABLE | accepted | ~28m | 6m | 3m | 5m | ~0.5m | ~6M est. | n/a** |
 | CPU-TEAM-DECISION-PROFILE | accepted | ~27m | 27m | 3.5m | 9m | 0.5m | ~8M est. | n/a** |
+| SCENARIO-3V3-FIXTURE | accepted | ~15m | 14.5m | 0.3m | 12m | 0.5m | ~3M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -299,6 +300,7 @@ on an H task is the interesting result.
 | BROWSER-2V2-MATCH-KEYBOARD | mimo-v2.5 | M | Medium — browser glue, scenario fixture, keyboard + CPU slot wiring | 0 | A |
 | BROWSER-2V2-PLAYABLE | mimo-v2.5 | M | Medium — browser glue, URL routing, deterministic multi-tick test, screenshot evidence | 2 | C | 12 fixture tests, 3 browser screenshot tests, 1382 node + 33 browser suite pass; critic ACCEPT first pass, integration ACCEPT first pass |
 | CPU-TEAM-DECISION-PROFILE | mimo-v2.5 | M | Medium — team coordination state machine in adapter layer | 0 | A | ATTACK/DEFEND/BALANCED state machine, formation modulation, slot-wiring verified, 176/176 tests pass, critic ACCEPT first pass |
+| SCENARIO-3V3-FIXTURE | qwen3.6 | M | Medium — new scenario fixture, existing pattern | 0 | A | 32 unit tests, 9 integration tests, 1438/1438 pass, critic ACCEPT first pass |
 
 ### Reviewer route and catches
 
@@ -328,6 +330,8 @@ on an H task is the interesting result.
 | BROWSER-2V2-PLAYABLE | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1382/1382 node, 40/40 browser, trajectory with CPU-driven movement |
 | CPU-TEAM-DECISION-PROFILE | critic-flash (deepseek-v4-flash) | 0731 allowance exhausted | ACCEPT | 0 retries — first pass clean |
 | CPU-TEAM-DECISION-PROFILE | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 176/176 CPU adapter, 27/27 arch, 195/195 integration, slot-wiring verified |
+| SCENARIO-3V3-FIXTURE | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
+| SCENARIO-3V3-FIXTURE | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 32/32 unit, 9/9 integration, 204/204 integration suite, slot-wiring verified |
 
 ### Builder scoreboard
 
@@ -335,7 +339,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 35 | 19 | 8 | 3 | 3 | 2 | 54% | ~0.89 | ~41m |
+| qwen3.6 | 36 | 20 | 8 | 3 | 3 | 2 | 56% | ~0.86 | ~40m |
 | mimo-v2.5 | 10 | 5 | 4 | 1 | 0 | 0 | 50% | ~0.70 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
@@ -343,7 +347,7 @@ Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 | Builder | Objectives | Weighted grade / difficulty | Read as |
 |---|---:|---:|---|
 | mimo-v2.5 | 10, mixed M–H | 3.0 / 3.0 | First-pass locomotion and ball; misses were local (mapping, restore, pair order). CPU-TEAM-DECISION-PROFILE (M) first-pass A. BROWSER-2V2-PLAYABLE needed 2 critic retries for evidence quality. |
-| qwen3.6 | 35, mixed M–VH | 3.3 / 2.8 | Reliable on contracts, profiles, and adapter wiring; expensive on honest-eval / CLI / browser evidence |
+| qwen3.6 | 36, mixed M–VH | 3.3 / 2.8 | Reliable on contracts, profiles, and adapter wiring; expensive on honest-eval / CLI / browser evidence. SCENARIO-3V3-FIXTURE first-pass A (new scenario fixture). |
 
 ### What that means for routing
 

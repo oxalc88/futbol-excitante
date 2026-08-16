@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.8.1",
+  "persisted_at": "2026-08-16T20:14:15.107Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SCENARIO-3V3-FIXTURE",
+  "candidate_commit": "55feb7b",
+  "evidence_class": "MULTI_TICK",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS",
+    "checks": 19,
+    "all_pass": true
+  },
+  "semantic_audit": null,
+  "critic": {
+    "agent": "critic-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "agent": "integration-reviewer-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  },
+  "metrics": [],
+  "accepted_at": "2026-08-16T20:13:45.000Z"
+}
