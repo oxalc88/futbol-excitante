@@ -1,5 +1,5 @@
 {
-  "version": "gauntlet-models-v2",
+  "version": "gauntlet-models-v3",
   "notes": "Grok agent frontmatter model fields and ~/.grok/config.toml [subagents.models] must stay in sync with this file. NaN endpoints are registered in ~/.grok/config.toml (user-level). Quote dotted keys as [model.\"qwen3.6\"]. See gauntlet/README.md.",
   "roles": {
     "orchestrator": {
@@ -44,8 +44,17 @@
       "provider": "nan",
       "model": "deepseek-v4-flash-0731",
       "api_model": "deepseek-v4-flash-0731",
-      "fallback": ["deepseek-v4-flash", "critic-qwen", "critic-mimo"],
-      "constraint": "Never use the same model that implemented the candidate under review."
+      "fallback": ["critic-flash", "critic-qwen", "critic-mimo"],
+      "constraint": "Never use the same model that implemented the candidate under review. If 0731 is unavailable or out of allowance, spawn critic-flash as a distinct agent type; do not override critic's model in place."
+    },
+    "critic_flash": {
+      "agent": "critic-flash",
+      "mode": "subagent",
+      "provider": "nan",
+      "hidden": true,
+      "model": "deepseek-v4-flash",
+      "api_model": "deepseek-v4-flash",
+      "constraint": "DeepSeek fallback critic. Same review contract as critic. Never use if the builder model is DeepSeek/current Flash."
     },
     "critic_qwen": {
       "agent": "critic-qwen",
@@ -69,8 +78,17 @@
       "provider": "nan",
       "model": "deepseek-v4-flash-0731",
       "api_model": "deepseek-v4-flash-0731",
-      "fallback": ["deepseek-v4-flash", "qwen3.6", "mimo-v2.5"],
-      "constraint": "Prefer DeepSeek. If unavailable, use a NaN model different from the builder under review."
+      "fallback": ["integration-reviewer-flash", "qwen3.6", "mimo-v2.5"],
+      "constraint": "Prefer DeepSeek. If 0731 is unavailable or out of allowance, spawn integration-reviewer-flash as a distinct agent type. Otherwise use a NaN model different from the builder under review."
+    },
+    "integration_reviewer_flash": {
+      "agent": "integration-reviewer-flash",
+      "mode": "subagent",
+      "provider": "nan",
+      "hidden": true,
+      "model": "deepseek-v4-flash",
+      "api_model": "deepseek-v4-flash",
+      "constraint": "DeepSeek fallback integration reviewer. Same integration contract as integration-reviewer. Must differ from the builder under review."
     },
     "aux": {
       "agent": "aux",
