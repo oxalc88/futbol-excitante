@@ -19,4 +19,4 @@ For every candidate preserve the full 0.8 pipeline from `gauntlet/PROMPT.md`: bu
 
 Never describe an objective as fully accepted/committed before the durable acceptance record, manifest, state transition, candidate commit, and final acceptance commit exist. Preserve old evidence rather than replacing it. Dynamic visual objectives require 3–5 semantic frames.
 
-Continue after acceptance/commit or horizon exhaustion; horizon exhaustion triggers strategic reassessment. Stop only for explicit blockers in `gauntlet/PROMPT.md`.
+Continue after acceptance/commit or horizon exhaustion; horizon exhaustion triggers strategic reassessment. After a valid replanned horizon is persisted, immediately delegate its executable next objective without asking the human for confirmation. Stop only for explicit blockers in `gauntlet/PROMPT.md`.

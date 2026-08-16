@@ -102,6 +102,7 @@ function evaluateAcceptanceClaim(s: AcceptanceClaimGateScenario): EvaluationResu
 function evaluatePostAcceptanceContinuation(s: PostAcceptanceContinuationGateScenario): EvaluationResult {
   if (s.input.stop_reason && isAllowedStopReason(s.input.stop_reason)) return { scenario_id: s.id, decision: "stop" };
   if (!s.input.acceptance_finalized) return { scenario_id: s.id, decision: "finish_acceptance" };
+  if (s.input.replan_completed && s.input.next_objective) return { scenario_id: s.id, decision: "delegate_and_continue", next_objective: s.input.next_objective };
   if (s.input.horizon_exhausted) return { scenario_id: s.id, decision: "replan_and_continue" };
   if (s.input.next_objective) return { scenario_id: s.id, decision: "continue", next_objective: s.input.next_objective };
   return { scenario_id: s.id, decision: "replan_and_continue" };
