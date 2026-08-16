@@ -35,7 +35,7 @@ jobs:
       - name: Capture structured trajectory
         run: pnpm run capture-ai-trajectory
         env:
-          WIP_SECTION: PR9-VALIDATION
+          WIP_SECTION: PR9-FINAL
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
       - name: Browser AI-match regression
@@ -52,13 +52,12 @@ jobs:
       - name: Capture optional video evidence
         run: pnpm run capture-ai-video
         env:
-          WIP_SECTION: PR9-VALIDATION
+          WIP_SECTION: PR9-FINAL
           WIP_VIDEO_MS: 3000
-          WIP_ARTIFACT_NAME: pr9-validation
+          WIP_ARTIFACT_NAME: pr9-final
       - uses: actions/upload-artifact@v4
         with:
-          name: pr9-validation-evidence
-          path: docs/evidence/PR9-VALIDATION/
+          name: pr9-final-evidence
+          path: docs/evidence/PR9-FINAL/
           if-no-files-found: error
           retention-days: 3
-# rerun after deterministic kickoff fixture fix
