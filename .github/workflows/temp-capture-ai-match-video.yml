@@ -1,4 +1,4 @@
-name: Temporary AI Match Video Capture
+name: Temporary PR9 Plan Applier
 
 on:
   push:
@@ -6,101 +6,370 @@ on:
       - temp/capture-ai-match-video
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  capture:
+  apply:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
-      - name: Checkout current main
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: test/ai-match-ownership-regression
+          fetch-depth: 0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.10.0
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: Install dependencies
-        env:
-          PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
-        run: pnpm install --frozen-lockfile
-
-      - name: Install Chromium
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
-      - name: Start Vite
+      - name: Configure git
         run: |
-          pnpm exec vite --host 127.0.0.1 > /tmp/vite.log 2>&1 &
-          echo $! > /tmp/vite.pid
-          for i in {1..60}; do
-            if curl -fsS http://127.0.0.1:5173/src/apps/browser/index.html >/dev/null; then
-              exit 0
-            fi
-            sleep 1
-          done
-          cat /tmp/vite.log
-          exit 1
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Capture AI-vs-AI browser match
+      - name: Commit 2 - fix CPU ownership
+        shell: bash
         run: |
-          mkdir -p capture/raw capture/out
-          cat > capture/capture-ai-match.mjs <<'EOF'
-          import { chromium } from 'playwright';
-          import fs from 'node:fs';
-          import path from 'node:path';
+          python3 <<'PY'
+          from pathlib import Path
 
-          const videoDir = path.resolve('capture/raw');
-          const browser = await chromium.launch({ headless: true });
-          const context = await browser.newContext({
-            viewport: { width: 1280, height: 720 },
-            recordVideo: { dir: videoDir, size: { width: 1280, height: 720 } },
+          p = Path('src/adapters/input-browser/cpu-adapter.ts')
+          s = p.read_text()
+          s = s.replace(
+          '''export function buildCpuObservation(\n  world: WorldState,\n  cpuTeamId?: string,\n): CpuObservation {''',
+          '''export function buildCpuObservation(\n  world: WorldState,\n  cpuTeamId?: string,\n  controlledPlayerId?: string,\n): CpuObservation {''')
+          s = s.replace(
+          '''  // Populate teammates from world state: same teamId, different playerId\n  // from the first CPU-controlled player.\n  const controlledPlayerId =\n    cpuTeamId && world.players.length > 0 ? world.players[0].playerId : undefined;''',
+          '''  // Resolve the exact player controlled by this CPU slot. Prefer the\n  // control assignment supplied by the caller; fall back to the first player\n  // on the requested team only for legacy single-CPU callers.\n  const resolvedControlledPlayerId = controlledPlayerId ??\n    (cpuTeamId ? world.players.find((p) => p.teamId === cpuTeamId)?.playerId : world.players[0]?.playerId);''')
+          s = s.replace('p.playerId !== controlledPlayerId)', 'p.playerId !== resolvedControlledPlayerId)')
+          s = s.replace('    controlledPlayerId,\n  };', '    controlledPlayerId: resolvedControlledPlayerId,\n  };')
+          s = s.replace(
+          '''      // Find the first player (CPU controlled).\n      const cpuPlayer = observation.players[0];''',
+          '''      // Resolve the player owned by this CPU slot. Falling back to the\n      // first player preserves legacy one-player observations, but multi-slot\n      // callers must provide controlledPlayerId.\n      const cpuPlayer = observation.controlledPlayerId\n        ? observation.players.find((p) => p.playerId === observation.controlledPlayerId)\n        : observation.players[0];''')
+          p.write_text(s)
+
+          p = Path('src/apps/browser/main.ts')
+          s = p.read_text()
+          s = s.replace(
+          '''    controlSlot: string;\n    teamId: string;\n  };''',
+          '''    controlSlot: string;\n    teamId: string;\n    controlledPlayerId: string;\n  };''')
+          s = s.replace(
+          '''        controlSlot: slotId,\n        teamId: assignment.teamId,\n      });''',
+          '''        controlSlot: slotId,\n        teamId: assignment.teamId,\n        controlledPlayerId: assignment.controlledPlayerId,\n      });''')
+          s = s.replace(
+          '''        for (const { adapter: cpuAd, controlSlot, teamId: tid } of cpuSlots) {\n          const obs = buildCpuObservation(sim.snapshot(), tid);''',
+          '''        for (const { adapter: cpuAd, controlSlot, teamId: tid, controlledPlayerId } of cpuSlots) {\n          const obs = buildCpuObservation(sim.snapshot(), tid, controlledPlayerId);''')
+          p.write_text(s)
+          PY
+          git add src/adapters/input-browser/cpu-adapter.ts src/apps/browser/main.ts
+          git commit -m "fix: bind CPU decisions to controlled player"
+          git push origin HEAD:test/ai-match-ownership-regression
+
+      - name: Commit 3 - real AI bridge and autonomous interaction regression
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          p = Path('src/apps/browser/test-bridge.ts')
+          s = p.read_text()
+          s = s.replace(
+          '''import type { PresentationSnapshot } from "../../contracts/presentation.js";''',
+          '''import type { PresentationSnapshot } from "../../contracts/presentation.js";\nimport { buildCpuObservation, createCpuAdapter } from "../../adapters/input-browser/cpu-adapter.js";''')
+          s = s.replace(
+          '''  step(ticks: number): string[];\n\n  /**\n   * Inject normalized InputFrames''',
+          '''  step(ticks: number): string[];\n\n  /** Advance with the same per-slot CPU wiring used by the AI-match browser. */\n  stepWithCpuControllers(ticks: number): string[];\n\n  /**\n   * Inject normalized InputFrames''')
+          s = s.replace(
+          '''  // Initialize on creation.\n  initSimulation();\n\n  const bridge: TestBridge = {''',
+          '''  // Initialize on creation.\n  initSimulation();\n\n  const cpuEntries = Object.entries((scenario ?? FOUNDATION_SCENARIO).controlAssignments)\n    .filter(([, assignment]) => assignment.mode !== "HUMAN")\n    .map(([controlSlot, assignment]) => ({\n      controlSlot,\n      teamId: assignment.teamId,\n      controlledPlayerId: assignment.controlledPlayerId,\n      adapter: createCpuAdapter(),\n    }));\n\n  const bridge: TestBridge = {''')
+          s = s.replace(
+          '''    step(ticks: number): string[] {\n      const hashes: string[] = [];\n\n      for (let i = 0; i < ticks; i++) {\n        const result = sim.step();\n        hashes.push(result.stateHash);\n      }\n\n      return hashes;\n    },\n\n    injectInputs''',
+          '''    step(ticks: number): string[] {\n      const hashes: string[] = [];\n\n      for (let i = 0; i < ticks; i++) {\n        const result = sim.step();\n        hashes.push(result.stateHash);\n      }\n\n      return hashes;\n    },\n\n    stepWithCpuControllers(ticks: number): string[] {\n      const hashes: string[] = [];\n      for (let i = 0; i < ticks; i++) {\n        const snapshot = sim.snapshot();\n        const frames = cpuEntries.map((entry) => {\n          const observation = buildCpuObservation(\n            snapshot,\n            entry.teamId,\n            entry.controlledPlayerId,\n          );\n          const frame = entry.adapter.sample(sim.tick, observation);\n          frame.controlSlot = entry.controlSlot;\n          return frame;\n        });\n        sim.applyInputs(frames);\n        hashes.push(sim.step().stateHash);\n      }\n      return hashes;\n    },\n\n    injectInputs''')
+          p.write_text(s)
+
+          p = Path('tests/browser/ai-match-screenshot.browser.test.ts')
+          s = p.read_text().replace('bridge.step(120);', 'bridge.stepWithCpuControllers(120);')
+          p.write_text(s)
+          PY
+          cat > tests/integration/ai-match-autonomous-interaction.test.ts <<'EOF'
+          import { describe, expect, it } from "vitest";
+          import { createWorld } from "../../src/simulation/world/create.js";
+          import { createSimulation } from "../../src/simulation/loop/simulation.js";
+          import { buildCpuObservation, createCpuAdapter } from "../../src/adapters/input-browser/cpu-adapter.js";
+          import { FOUNDATION_SCENARIO_AI_VS_AI } from "../../src/apps/browser/foundation-scenario.js";
+
+          describe("AI-MATCH-E2E-002: autonomous interaction", () => {
+            it("uses distinct owned players and produces bounded deterministic interaction", () => {
+              const run = () => {
+                const sim = createSimulation(createWorld({ scenario: FOUNDATION_SCENARIO_AI_VS_AI }));
+                const entries = Object.entries(FOUNDATION_SCENARIO_AI_VS_AI.controlAssignments).map(([controlSlot, assignment]) => ({
+                  controlSlot,
+                  assignment,
+                  adapter: createCpuAdapter(),
+                }));
+                const start = sim.snapshot();
+                let actionEdges = 0;
+                let nonZeroFrames = 0;
+                for (let i = 0; i < 360; i++) {
+                  const snapshot = sim.snapshot();
+                  const frames = entries.map(({ controlSlot, assignment, adapter }) => {
+                    const obs = buildCpuObservation(snapshot, assignment.teamId, assignment.controlledPlayerId);
+                    expect(obs.controlledPlayerId).toBe(assignment.controlledPlayerId);
+                    const frame = adapter.sample(sim.tick, obs);
+                    frame.controlSlot = controlSlot;
+                    if (Math.hypot(frame.moveX, frame.moveY) > 0.01) nonZeroFrames++;
+                    if (frame.pressedButtons !== 0) actionEdges++;
+                    return frame;
+                  });
+                  sim.applyInputs(frames);
+                  sim.step();
+                }
+                const end = sim.snapshot();
+                return { start, end, hash: sim.stateHash(), actionEdges, nonZeroFrames };
+              };
+
+              const first = run();
+              const second = run();
+              expect(first.hash).toBe(second.hash);
+              expect(first.nonZeroFrames).toBeGreaterThan(0);
+              expect(first.actionEdges).toBeGreaterThan(0);
+              expect(first.end.players.every((p) => Math.abs(p.groundPosition.x) <= 52.5 && Math.abs(p.groundPosition.y) <= 34)).toBe(true);
+              const ballMoved = Math.hypot(
+                first.end.ball.position.x - first.start.ball.position.x,
+                first.end.ball.position.y - first.start.ball.position.y,
+              );
+              expect(ballMoved).toBeGreaterThan(0.01);
+            });
           });
+          EOF
+          git add src/apps/browser/test-bridge.ts tests/browser/ai-match-screenshot.browser.test.ts tests/integration/ai-match-autonomous-interaction.test.ts
+          git commit -m "test: exercise real autonomous AI-match wiring"
+          git push origin HEAD:test/ai-match-ownership-regression
+
+      - name: Commit 4 - trajectory evidence
+        shell: bash
+        run: |
+          mkdir -p scripts
+          cat > scripts/capture-ai-match-trajectory.ts <<'EOF'
+          import { mkdir, writeFile } from "node:fs/promises";
+          import path from "node:path";
+          import { createWorld } from "../src/simulation/world/create.js";
+          import { createSimulation } from "../src/simulation/loop/simulation.js";
+          import { buildCpuObservation, createCpuAdapter } from "../src/adapters/input-browser/cpu-adapter.js";
+          import { FOUNDATION_SCENARIO_AI_VS_AI } from "../src/apps/browser/foundation-scenario.js";
+
+          const objectiveId = process.env.WIP_SECTION ?? "ai-match";
+          const ticks = Number(process.env.WIP_TICKS ?? 360);
+          const sim = createSimulation(createWorld({ scenario: FOUNDATION_SCENARIO_AI_VS_AI }));
+          const entries = Object.entries(FOUNDATION_SCENARIO_AI_VS_AI.controlAssignments).map(([controlSlot, assignment]) => ({
+            controlSlot,
+            assignment,
+            adapter: createCpuAdapter(),
+          }));
+          const samples: unknown[] = [];
+          let actionEdges = 0;
+          for (let i = 0; i < ticks; i++) {
+            const before = sim.snapshot();
+            const frames = entries.map(({ controlSlot, assignment, adapter }) => {
+              const obs = buildCpuObservation(before, assignment.teamId, assignment.controlledPlayerId);
+              const frame = adapter.sample(sim.tick, obs);
+              frame.controlSlot = controlSlot;
+              if (frame.pressedButtons !== 0) actionEdges++;
+              return frame;
+            });
+            sim.applyInputs(frames);
+            sim.step();
+            if (i === 0 || (i + 1) % 60 === 0 || i === ticks - 1) {
+              const state = sim.snapshot();
+              samples.push({
+                tick: sim.tick,
+                players: state.players.map((p) => ({ playerId: p.playerId, x: p.groundPosition.x, y: p.groundPosition.y })),
+                ball: { x: state.ball.position.x, y: state.ball.position.y, z: state.ball.position.z },
+                stateHash: sim.stateHash(),
+              });
+            }
+          }
+          const outDir = path.join("docs", "evidence", objectiveId);
+          await mkdir(outDir, { recursive: true });
+          const outFile = path.join(outDir, "trajectory.json");
+          await writeFile(outFile, JSON.stringify({ schemaVersion: 1, objectiveId, scenarioId: FOUNDATION_SCENARIO_AI_VS_AI.id, ticks, actionEdges, samples }, null, 2) + "\n");
+          console.log(outFile);
+          EOF
+          python3 <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('package.json'); d=json.loads(p.read_text()); d['scripts']['capture-ai-trajectory']='tsx scripts/capture-ai-match-trajectory.ts'; p.write_text(json.dumps(d, indent=2)+'\n')
+          PY
+          git add scripts/capture-ai-match-trajectory.ts package.json
+          git commit -m "feat: add durable AI-match trajectory evidence"
+          git push origin HEAD:test/ai-match-ownership-regression
+
+      - name: Commit 5 - optional video artifact capture and reference metadata
+        shell: bash
+        run: |
+          cat > scripts/capture-ai-match-video.mjs <<'EOF'
+          import { chromium } from "playwright";
+          import fs from "node:fs";
+          import path from "node:path";
+
+          const objectiveId = process.env.WIP_SECTION ?? "ai-match";
+          const baseUrl = process.env.WIP_BASE_URL ?? "http://127.0.0.1:5173/src/apps/browser/index.html?mode=ai-match";
+          const durationMs = Number(process.env.WIP_VIDEO_MS ?? 15000);
+          const outDir = path.join("docs", "evidence", objectiveId);
+          const rawDir = path.join(outDir, "raw");
+          fs.mkdirSync(rawDir, { recursive: true });
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, recordVideo: { dir: rawDir, size: { width: 1280, height: 720 } } });
           const page = await context.newPage();
-          page.on('console', msg => console.log(`[browser:${msg.type()}] ${msg.text()}`));
-          page.on('pageerror', err => console.error(`[pageerror] ${err.message}`));
-
-          await page.goto('http://127.0.0.1:5173/src/apps/browser/index.html?mode=ai-match', { waitUntil: 'networkidle' });
-          await page.screenshot({ path: 'capture/out/ai-match-start.png', fullPage: true });
-          await page.waitForTimeout(25000);
-          await page.screenshot({ path: 'capture/out/ai-match-end.png', fullPage: true });
-
+          await page.goto(baseUrl, { waitUntil: "networkidle" });
+          await page.waitForTimeout(durationMs);
           const video = page.video();
           await context.close();
-          const videoPath = video ? await video.path() : null;
+          const rawPath = video ? await video.path() : null;
           await browser.close();
-
-          if (!videoPath || !fs.existsSync(videoPath)) {
-            throw new Error('Playwright did not produce a video file');
-          }
-          fs.copyFileSync(videoPath, 'capture/out/ai-match.webm');
+          if (!rawPath) throw new Error("video capture failed");
+          const webm = path.join(outDir, "ai-match.webm");
+          fs.copyFileSync(rawPath, webm);
+          fs.writeFileSync(path.join(outDir, "video-reference.json"), JSON.stringify({
+            schemaVersion: 1,
+            objectiveId,
+            commitSha: process.env.GITHUB_SHA ?? "local",
+            workflowRunId: process.env.GITHUB_RUN_ID ?? null,
+            artifactName: process.env.WIP_ARTIFACT_NAME ?? `video-${objectiveId}`,
+            source: "playwright-recordVideo",
+            videoFile: "ai-match.webm"
+          }, null, 2) + "\n");
+          console.log(webm);
           EOF
-          node capture/capture-ai-match.mjs
+          mkdir -p .github/workflows
+          cat > .github/workflows/ai-match-evidence.yml <<'EOF'
+          name: AI Match Dynamic Evidence
+          on:
+            workflow_dispatch:
+              inputs:
+                objective_id:
+                  description: Objective/evidence ID
+                  required: true
+                  default: ai-match
+          permissions:
+            contents: read
+          jobs:
+            capture:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: pnpm/action-setup@v4
+                  with:
+                    version: 11.10.0
+                - uses: actions/setup-node@v4
+                  with:
+                    node-version: 22
+                    cache: pnpm
+                - run: pnpm install --frozen-lockfile
+                  env:
+                    PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
+                - run: pnpm exec playwright install --with-deps chromium
+                - name: Capture trajectory
+                  run: pnpm run capture-ai-trajectory
+                  env:
+                    WIP_SECTION: ${{ inputs.objective_id }}
+                - name: Start Vite
+                  run: |
+                    pnpm exec vite --host 127.0.0.1 > /tmp/vite.log 2>&1 &
+                    for i in {1..60}; do curl -fsS http://127.0.0.1:5173/src/apps/browser/index.html >/dev/null && exit 0; sleep 1; done
+                    cat /tmp/vite.log; exit 1
+                - name: Capture optional video
+                  run: pnpm run capture-ai-video
+                  env:
+                    WIP_SECTION: ${{ inputs.objective_id }}
+                    WIP_ARTIFACT_NAME: dynamic-evidence-${{ inputs.objective_id }}
+                - uses: actions/upload-artifact@v4
+                  with:
+                    name: dynamic-evidence-${{ inputs.objective_id }}
+                    path: docs/evidence/${{ inputs.objective_id }}/
+                    retention-days: 14
+          EOF
+          python3 <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('package.json'); d=json.loads(p.read_text()); d['scripts']['capture-ai-video']='node scripts/capture-ai-match-video.mjs'; p.write_text(json.dumps(d, indent=2)+'\n')
+          PY
+          git add scripts/capture-ai-match-video.mjs .github/workflows/ai-match-evidence.yml package.json
+          git commit -m "feat: add optional video artifact evidence"
+          git push origin HEAD:test/ai-match-ownership-regression
 
-      - name: Convert to MP4
+      - name: Commit 6 - Gauntlet dynamic evidence contract
+        shell: bash
         run: |
-          ffmpeg -y -i capture/out/ai-match.webm -c:v libx264 -pix_fmt yuv420p -movflags +faststart capture/out/ai-match.mp4
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('gauntlet/evidence-contract.md'); s=p.read_text()
+          s=s.replace(
+          '- If a required behavior cannot reasonably be demonstrated by a still image, require supported dynamic evidence only when the repository already contains a committed capture command and rule for it. Do not invent video tooling or a video requirement.\n',
+          '- If acceptance depends on motion, temporal behavior, autonomous control, passing, shooting, pursuit, transitions, or another multi-tick behavior, a structured trajectory under `docs/evidence/<objective-id>/trajectory.json` is mandatory once the repository provides the committed capture command. Unit tests and a still screenshot alone are insufficient for that integrated behavior.\n- Video is optional diagnostic evidence. When captured, use `pnpm run capture-ai-video`; keep the binary as a GitHub Actions artifact and retain `video-reference.json` with objective ID, commit SHA, workflow run ID, and artifact name. Video does not replace the structured trajectory.\n')
+          p.write_text(s)
+          PY
+          git add gauntlet/evidence-contract.md
+          git commit -m "docs: require trajectories for dynamic gameplay evidence"
+          git push origin HEAD:test/ai-match-ownership-regression
 
-      - name: Upload video artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ai-match-video
-          path: |
-            capture/out/ai-match.mp4
-            capture/out/ai-match.webm
-            capture/out/ai-match-start.png
-            capture/out/ai-match-end.png
-          if-no-files-found: error
-          retention-days: 3
+      - name: Commit 7 - Gauntlet composition regression gate
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('gauntlet/evals/contracts/failures.ts'); s=p.read_text().replace('  "mandatory_evidence_missing",', '  "mandatory_evidence_missing",\n  "composition_regression",'); p.write_text(s)
+          p=Path('gauntlet/evals/contracts/scenario.ts'); s=p.read_text()
+          s=s.replace('  | "tracking_gate";', '  | "tracking_gate"\n  | "composition_gate";')
+          insert='''\nexport interface CompositionGateScenario {\n  id: string;\n  kind: "composition_gate";\n  input: {\n    objective_id: string;\n    integrated_behavior: boolean;\n    unit_tests_pass: boolean;\n    screenshot_exists: boolean;\n    integration_test_pass: boolean;\n    trajectory_exists: boolean;\n    critic_verdict: "ACCEPT" | "RETRY" | "REJECT";\n  };\n  expect: ScenarioExpectation;\n}\n'''
+          s=s.replace('\nexport type GauntletScenario =', insert+'\nexport type GauntletScenario =')
+          s=s.replace('  | TrackingGateScenario;', '  | TrackingGateScenario\n  | CompositionGateScenario;')
+          p.write_text(s)
+
+          p=Path('gauntlet/evals/src/evaluate-state.ts'); s=p.read_text()
+          s=s.replace('  TrackingGateScenario,', '  TrackingGateScenario,\n  CompositionGateScenario,')
+          fn='''\nfunction evaluateComposition(scenario: CompositionGateScenario): EvaluationResult {\n  const complete = !scenario.input.integrated_behavior ||\n    (scenario.input.integration_test_pass && scenario.input.trajectory_exists);\n  if (!complete && scenario.input.critic_verdict === "ACCEPT") {\n    return {\n      scenario_id: scenario.id,\n      decision: "reject_acceptance",\n      failure_class: "composition_regression",\n    };\n  }\n  return { scenario_id: scenario.id, decision: "allow_review_result" };\n}\n\n'''
+          s=s.replace('export function evaluateScenario', fn+'export function evaluateScenario')
+          s=s.replace('    case "tracking_gate":\n      return evaluateTracking(scenario);', '    case "tracking_gate":\n      return evaluateTracking(scenario);\n    case "composition_gate":\n      return evaluateComposition(scenario);')
+          p.write_text(s)
+          PY
+          cat > gauntlet/evals/scenarios/orch-reg-007-composition-regression.json <<'EOF'
+          {
+            "id": "ORCH-REG-007",
+            "kind": "composition_gate",
+            "input": {
+              "objective_id": "CPU-BALL-PURSUIT",
+              "integrated_behavior": true,
+              "unit_tests_pass": true,
+              "screenshot_exists": true,
+              "integration_test_pass": false,
+              "trajectory_exists": false,
+              "critic_verdict": "ACCEPT"
+            },
+            "expect": {
+              "decision": "reject_acceptance",
+              "failure_class": "composition_regression"
+            }
+          }
+          EOF
+          git add gauntlet/evals/contracts/failures.ts gauntlet/evals/contracts/scenario.ts gauntlet/evals/src/evaluate-state.ts gauntlet/evals/scenarios/orch-reg-007-composition-regression.json
+          git commit -m "eval: reject unproven integrated behavior"
+          git push origin HEAD:test/ai-match-ownership-regression
+
+      - name: Commit 8 - document Gauntlet integration evidence gate
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('gauntlet/PROMPT.md'); s=p.read_text()
+          old='''4. Determine the mandatory evidence required by `gauntlet/evidence-contract.md`. Any gameplay/presentation objective and any objective whose acceptance criteria require browser-visible or browser-interactive behavior is screenshot-required. Require a builder report with executed commands and all required artifacts before criticism; missing mandatory evidence goes back to the builder.'''
+          new='''4. Determine the mandatory evidence required by `gauntlet/evidence-contract.md`. Any gameplay/presentation objective and any objective whose acceptance criteria require browser-visible or browser-interactive behavior is screenshot-required. For integrated multi-tick behavior, unit tests plus a screenshot are not sufficient: require the supported structured trajectory and the relevant integration test; video is optional diagnostic evidence when the committed capture workflow is applicable. Require a builder report with executed commands and all required artifacts before criticism; missing mandatory evidence goes back to the builder.'''
+          if old not in s: raise SystemExit('PROMPT anchor not found')
+          p.write_text(s.replace(old,new))
+          PY
+          git add gauntlet/PROMPT.md
+          git commit -m "docs: gate integrated capabilities on end-to-end evidence"
+          git push origin HEAD:test/ai-match-ownership-regression
+
+      - name: Validate
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run typecheck
+          pnpm run test
+          pnpm run test-browser
+          pnpm run gauntlet:eval
