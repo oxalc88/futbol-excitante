@@ -1,8 +1,96 @@
 # Gauntlet changelog
 
-Human-readable history of meaningful changes to the Gauntlet's **rules, prompts, role boundaries, routing, evidence requirements, and prompt-loading behavior**.
+Human-readable history of meaningful changes to the Gauntlet's **rules, prompts, role boundaries, routing, evidence requirements, prompt-loading behavior, and orchestration-eval contract**.
 
 This changelog does **not** record normal gameplay objectives or routine live-state updates produced by the running Gauntlet. Git remains the source of truth for exact file contents and diffs.
+
+## 2026-08-15 — Browser evidence and model tracking gates
+
+**Prompt version:** `v6-browser-evidence-model-tracking`  
+**Core eval/tracking commit:** `1a1113f5e0e076226a637d629bfd24ee0fa2c142`  
+**PR:** `#7`
+
+### Changed
+
+- Extended mandatory screenshot evidence beyond the generic gameplay/presentation flag: any objective whose acceptance criteria require browser-visible or browser-interactive behavior is now explicitly screenshot-required.
+- Added `ORCH-REG-005` so a browser objective cannot be accepted without the required screenshot even when the scenario is not otherwise classified as gameplay/presentation.
+- Added `gauntlet/timing-contract.md`, making `TIMING.md` refresh part of acceptance persistence rather than optional bookkeeping.
+- Added machine-readable tracking markers (`last_tracked_objective`, `usage_aggregates_through`, `model_evaluation_through`) that must match the latest accepted objective.
+- Required each accepted objective to refresh its per-step timing/token usage, by-model usage aggregates, builder performance grade, and a reviewer/orchestrator route-and-catches row. Missing metrics must be `n/a` with a reason; timing, token, cost, or quality numbers may not be invented.
+- Added `ORCH-REG-006` for incomplete TIMING/model tracking.
+- Added `pnpm run gauntlet:eval:state`, a live persisted-state audit that compares `CURRENT.md` with TIMING tracking markers and required usage/evaluation rows.
+- Kept `gauntlet:eval` deterministic and independent of mutable live state; the live state audit is instead a mandatory acceptance-time gate before `git-committer` receives the acceptance commit.
+- Updated Grok and DeepSeek orchestrators plus `/gauntlet` and `/gauntlet-continue` so tracking repair is local bookkeeping and is not a reason to stop or send an accepted implementation back to a builder.
+
+### Why
+
+The existing screenshot regression covered gameplay/presentation work, but did not independently encode the stronger rule that a browser-visible/browser-interactive objective needs browser evidence. That left browser routing/input/state objectives dependent on correct informal classification.
+
+`TIMING.md` already tracks per-step wall time/tokens, by-model usage, and model performance, but the orchestration evals did not verify that it was refreshed. The committed state demonstrates the gap: `CURRENT.md` records `CPU-BALL-PURSUIT` as the latest accepted objective while the existing TIMING snapshot predates that objective and does not evaluate it. This change deliberately does not rewrite generated state; `gauntlet:eval:state` should expose the stale tracking until the running orchestrator refreshes TIMING from real session/review data.
+
+### Prompt/rule surface
+
+- `gauntlet/PROMPT.md`
+- `gauntlet/evidence-contract.md`
+- `gauntlet/timing-contract.md` (new)
+- `.grok/agents/orchestrator.md`
+- `.grok/agents/orchestrator-deepseek.md`
+- `.grok/skills/gauntlet/SKILL.md`
+- `.grok/skills/gauntlet-continue/SKILL.md`
+- `.grok/skills/gauntlet-eval/SKILL.md`
+- `gauntlet/evals/**`
+- `package.json`
+
+---
+
+## 2026-08-15 — Orchestration evals and continuation regression guard
+
+**Prompt version:** `v5-continuation-regression-evals`  
+**Eval foundation commit:** `32f796606e7b891f9b64feab69360f2156198460`  
+**Continuation fix commit:** `8e0dd8b805294a40ce5185eaaa56ac288e332bf6`  
+**Runtime/model eval commit:** `695838277d4b997ce542f6a60cc0f4bdd76f022b`
+
+### Changed
+
+- Added a project-local Gauntlet evaluation surface under `gauntlet/evals/`, separate from the football/gameplay evaluator under `eval/`.
+- Adapted observability patterns from `aws-observability-instrumentation`: closed event/stop/failure taxonomies, stable naming, ownership boundaries, static enforcement, and structured agent-trace metadata without prompt/chain-of-thought capture.
+- Added deterministic regression scenarios for mandatory screenshot evidence, duplicate horizon entries, explicit DeepSeek reviewer fallback, and stale accepted `active_candidate` continuation.
+- Added `pnpm gauntlet:eval`, a static prompt contract gate, `/gauntlet-eval`, and a project-local Gauntlet observability skill.
+- Added optional `pnpm gauntlet:eval:model` / `/gauntlet-eval-model` so the real configured orchestrator/model can be exercised against synthetic read-only scenarios. The returned structured decision is checked deterministically against scenario expectations.
+- Added compact gitignored incident artifacts for deterministic, prompt-gate, and model-eval failures. They retain bounded metadata and expected/observed results, not complete prompts, transcripts, credentials, or chain-of-thought.
+- Wired the zero-cost deterministic Gauntlet suite into `test-all`; model-backed evals remain opt-in because they consume model allowance/tokens.
+- Made acceptance a single transition: clear the accepted objective from `active_candidate`, persist accepted/current/horizon state, commit, then continue to the indexed next objective.
+- Defined an `active_candidate` that already appears in accepted state as stale bookkeeping. Pickup repairs it locally instead of attempting to resume an already accepted objective.
+- Declared successful acceptance commits, stale-state repair, and horizon exhaustion as non-stop conditions. Horizon exhaustion triggers immediate strategic reassessment and continuation unless an explicit stop condition applies.
+- Deliberately did not add a session-end hook in v1: Grok Build documents lifecycle hooks/`PreToolUse`, but this implementation does not depend on an unverified session-end blocking event contract.
+
+### Why
+
+A live run accepted `BROWSER-MATCH-PHASE-DISPLAY` and advanced `next_objective_id`/`HORIZON.current_index`, but `CURRENT.active_candidate` still pointed at the accepted objective. The newer pickup rules simultaneously said to resume an active candidate and not restart accepted work, creating a contradictory state that could end orchestration instead of launching the next objective.
+
+The regression was a prompt/state-machine problem, so the fix is guarded like code: a deterministic fixture captures the known failure, static prompt checks prevent removal of the continuation semantics, and the optional model-backed runner can verify how the actual configured orchestrator/model interprets the same synthetic scenarios.
+
+### Preserved
+
+- Rolling-horizon strategic planning.
+- Independent critic and integration-review gates.
+- Mandatory evidence enforcement.
+- Explicit `0731 → current Flash → independent Qwen/MiMo` reviewer routing.
+- Generated `CURRENT/HISTORY/TIMING/HANDOFF/HORIZON` state is not manually rewritten by this change.
+
+### Prompt/rule surface
+
+- `gauntlet/PROMPT.md`
+- `.grok/agents/orchestrator.md`
+- `.grok/agents/orchestrator-deepseek.md`
+- `.grok/skills/gauntlet/SKILL.md`
+- `.grok/skills/gauntlet-continue/SKILL.md`
+- `.grok/skills/gauntlet-eval/SKILL.md`
+- `.grok/skills/gauntlet-eval-model/SKILL.md`
+- `.grok/skills/gauntlet-observability/SKILL.md`
+- `gauntlet/evals/**`
+
+---
 
 ## 2026-08-15 — Explicit DeepSeek fallback agents
 
@@ -290,7 +378,8 @@ Add an entry here when a change materially alters **rules or prompts**, includin
 - retry, reject, block, or acceptance semantics;
 - evidence/artifact requirements, including visual evidence rules;
 - prompt, skill, or agent loading behavior;
-- persisted orchestration-state format when that state changes how prompts behave.
+- persisted orchestration-state format when that state changes how prompts behave;
+- orchestration-eval contract, regression scenarios, or enforcement behavior.
 
 For every new entry include the date, introducing commit(s), what changed, why it changed, and the affected prompt/rule surface when useful.
 

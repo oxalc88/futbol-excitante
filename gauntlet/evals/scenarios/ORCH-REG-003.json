@@ -1,0 +1,14 @@
+{
+  "id": "ORCH-REG-003",
+  "kind": "routing_fallback",
+  "input": {
+    "role": "critic",
+    "failed_model": "deepseek-v4-flash-0731",
+    "failure_class": "quota_exhausted",
+    "builder_model": "mimo-v2.5"
+  },
+  "expect": {
+    "decision": "fallback",
+    "next_agent": "critic-flash"
+  }
+}

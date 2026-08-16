@@ -1,0 +1,16 @@
+{
+  "id": "ORCH-REG-005",
+  "kind": "evidence_gate",
+  "input": {
+    "objective_id": "BROWSER-MATCH-START-URL",
+    "gameplay_or_presentation": false,
+    "browser_behavior": true,
+    "screenshot_required": false,
+    "screenshot_exists": false,
+    "critic_verdict": "ACCEPT"
+  },
+  "expect": {
+    "decision": "reject_acceptance",
+    "failure_class": "mandatory_evidence_missing"
+  }
+}
