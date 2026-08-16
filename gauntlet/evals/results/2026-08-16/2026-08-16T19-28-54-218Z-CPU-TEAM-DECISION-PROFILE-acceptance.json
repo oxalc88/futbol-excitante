@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.8.1",
+  "persisted_at": "2026-08-16T19:28:54.218Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "CPU-TEAM-DECISION-PROFILE",
+  "candidate_commit": "63904f1",
+  "evidence_class": "MULTI_TICK",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS",
+    "checks": 19,
+    "all_pass": true
+  },
+  "semantic_audit": null,
+  "critic": {
+    "agent": "critic-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "agent": "integration-reviewer-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  },
+  "metrics": [],
+  "accepted_at": "2026-08-16T19:27:50.000Z"
+}

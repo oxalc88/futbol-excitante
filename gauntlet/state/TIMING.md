@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-2V2-PLAYABLE
-usage_aggregates_through: BROWSER-2V2-PLAYABLE
-model_evaluation_through: BROWSER-2V2-PLAYABLE
+last_tracked_objective: CPU-TEAM-DECISION-PROFILE
+usage_aggregates_through: CPU-TEAM-DECISION-PROFILE
+model_evaluation_through: CPU-TEAM-DECISION-PROFILE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -113,6 +113,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | CPU-TEAM-FORMATION | accepted | ~11m | 4m | 2m | 4m | ~0.5m | ~11M est. | n/a** |
 | BROWSER-2V2-MATCH-KEYBOARD | accepted | ~12m | 4m | 2m | 4m | ~0.5m | ~7M est. | n/a** |
 | BROWSER-2V2-PLAYABLE | accepted | ~28m | 6m | 3m | 5m | ~0.5m | ~6M est. | n/a** |
+| CPU-TEAM-DECISION-PROFILE | accepted | ~27m | 27m | 3.5m | 9m | 0.5m | ~8M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -297,6 +298,7 @@ on an H task is the interesting result.
 | CPU-TEAM-FORMATION | qwen3.6 | H | High — new physics behavior in CPU adapter (defense mode three-way blend) | 0 | A | 16 tests cover formation positions, displacement, blend behavior, determinism; 1364 tests pass; critic ACCEPT first pass, integration ACCEPT (second pass after screenshot provided) |
 | BROWSER-2V2-MATCH-KEYBOARD | mimo-v2.5 | M | Medium — browser glue, scenario fixture, keyboard + CPU slot wiring | 0 | A |
 | BROWSER-2V2-PLAYABLE | mimo-v2.5 | M | Medium — browser glue, URL routing, deterministic multi-tick test, screenshot evidence | 2 | C | 12 fixture tests, 3 browser screenshot tests, 1382 node + 33 browser suite pass; critic ACCEPT first pass, integration ACCEPT first pass |
+| CPU-TEAM-DECISION-PROFILE | mimo-v2.5 | M | Medium — team coordination state machine in adapter layer | 0 | A | ATTACK/DEFEND/BALANCED state machine, formation modulation, slot-wiring verified, 176/176 tests pass, critic ACCEPT first pass |
 
 ### Reviewer route and catches
 
@@ -324,6 +326,8 @@ on an H task is the interesting result.
 | BROWSER-2V2-MATCH-KEYBOARD | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1382/1382 regressions, 33/33 browser tests, artifact at required path |
 | BROWSER-2V2-PLAYABLE | critic-flash (deepseek-v4-flash) | 0731 allowance exhausted | ACCEPT (3rd attempt) | 2 retries: screenshot quality (1st), ball-static trajectory (2nd) |
 | BROWSER-2V2-PLAYABLE | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1382/1382 node, 40/40 browser, trajectory with CPU-driven movement |
+| CPU-TEAM-DECISION-PROFILE | critic-flash (deepseek-v4-flash) | 0731 allowance exhausted | ACCEPT | 0 retries — first pass clean |
+| CPU-TEAM-DECISION-PROFILE | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 176/176 CPU adapter, 27/27 arch, 195/195 integration, slot-wiring verified |
 
 ### Builder scoreboard
 
@@ -332,14 +336,14 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 35 | 19 | 8 | 3 | 3 | 2 | 54% | ~0.89 | ~41m |
-| mimo-v2.5 | 9 | 4 | 4 | 1 | 0 | 0 | 44% | 0.78 | ~34m |
+| mimo-v2.5 | 10 | 5 | 4 | 1 | 0 | 0 | 50% | ~0.70 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 
 | Builder | Objectives | Weighted grade / difficulty | Read as |
 |---|---:|---:|---|
-| mimo-v2.5 | 9, all H | 2.9 / 3.0 | First-pass locomotion and ball; misses were local (mapping, restore, pair order). BROWSER-2V2-PLAYABLE needed 2 critic retries for evidence quality. |
-| qwen3.6 | 34, mixed M–VH | 3.3 / 2.8 | Reliable on contracts, profiles, and adapter wiring; expensive on honest-eval / CLI / browser evidence |
+| mimo-v2.5 | 10, mixed M–H | 3.0 / 3.0 | First-pass locomotion and ball; misses were local (mapping, restore, pair order). CPU-TEAM-DECISION-PROFILE (M) first-pass A. BROWSER-2V2-PLAYABLE needed 2 critic retries for evidence quality. |
+| qwen3.6 | 35, mixed M–VH | 3.3 / 2.8 | Reliable on contracts, profiles, and adapter wiring; expensive on honest-eval / CLI / browser evidence |
 
 ### What that means for routing
 

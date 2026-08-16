@@ -7,16 +7,20 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: ""
+
+next_objective_id: SCENARIO-3V3-FIXTURE
+
 best_known:
-  commit: 514847f
-  note: "BROWSER-2V2-PLAYABLE accepted — full playable 2v2 AI match with ?mode=2v2-ai URL mode. 4 CPU-controlled players, hash parity verified, 21KB canvas screenshot. Horizon 2v2-playable fully accepted. Next horizon requires strategic reassessment."
+  commit: 63904f1
+  note: "CPU-TEAM-DECISION-PROFILE accepted. Next: scenario fixture for 3v3 (6 players, 3 per team)."
+
 active_candidate: null
 builder_in_use: null
 critic_in_use: null
 retry_count: 0
 max_retries_per_objective: 3
 nan_builder_failures: 0
+
 accepted:
   - BOOTSTRAP-01 through BOOTSTRAP-12
   - FOUNDATION-REGISTRIES through FOUNDATION-PROMOTION
@@ -50,16 +54,19 @@ accepted:
   - CPU-TEAM-FORMATION
   - BROWSER-2V2-MATCH-KEYBOARD
   - BROWSER-2V2-PLAYABLE
+  - CPU-TEAM-DECISION-PROFILE
+
 blocked: []
-selection_note: "Horizon 2v2-playable exhausted (all 5 objectives accepted). Next horizon requires strategic reassessment."
+
+selection_note: "Horizon small-sided-match: 6 objectives toward 3v3 play. CPU-TEAM-DECISION-PROFILE accepted. Next: SCENARIO-3V3-FIXTURE."
 ```
 
 ## Last accepted objective
 
-BROWSER-2V2-PLAYABLE — Full playable 2v2 match in browser. `?mode=2v2-ai` URL creates autonomous AI-vs-AI 2v2 match with 4 CPU players (2 per team). HUD, scoreboard, match timer, phase transitions all work. 7 browser tests, 6 scenario selector tests. 1382 node tests, 40 browser tests. 600-tick CPU-driven trajectory. 21KB canvas screenshot.
+CPU-TEAM-DECISION-PROFILE — Team-level decision profile that coordinates CPU players per team with ATTACK/DEFEND/BALANCED strategy signal. Pure state machine in adapter layer, shared via CpuObservation.teamDecision. Formation modulation: ATTACK reduces pull, DEFEND strengthens it. 176/176 CPU adapter tests, 27/27 arch tests, 195/195 integration tests. 601-hash trajectory. Deterministic audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (3rd attempt, 2 retries)
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 7/7 browser tests, 40/40 browser suite, 1382/1382 node suite, trajectory with ball velocity contact, canvas screenshot
-- Commit: 514847f
+- Evidence: 176/176 unit, 27/27 arch, 195/195 integration, MULTI_TICK trajectory, slot-wiring verified
+- Commit: 63904f1

@@ -196,6 +196,16 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - required_fixes: none
 ```
 
+## Iteration 38 — 2026-08-16
+
+- objective_id: CPU-TEAM-DECISION-PROFILE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0731 allowance exhausted)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: 63904f1 candidate(CPU-TEAM-DECISION-PROFILE)
+- notes: Pure team decision state machine (ATTACK/DEFEND/BALANCED) in adapter layer. TeamDecision field in CpuObservation shared per team per tick. Formation modulation: ATTACK ×0.3, DEFEND ×1.5. 176/176 CPU adapter, 27/27 arch, 195/195 integration tests pass. 601-hash trajectory. Deterministic audit PASS. Slot-wiring invariant verified. No PES claim. No FOUNDATION_LAB_PASS claim.
+
 ## Iteration 37 — 2026-08-15
 
 - objective_id: CAPABILITY-SWERVE
