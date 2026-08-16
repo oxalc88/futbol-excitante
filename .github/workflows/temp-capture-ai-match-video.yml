@@ -40,7 +40,7 @@ jobs:
 
       - name: Start Vite
         run: |
-          pnpm run dev -- --host 127.0.0.1 > /tmp/vite.log 2>&1 &
+          pnpm exec vite --host 127.0.0.1 > /tmp/vite.log 2>&1 &
           echo $! > /tmp/vite.pid
           for i in {1..60}; do
             if curl -fsS http://127.0.0.1:5173/ >/dev/null; then
