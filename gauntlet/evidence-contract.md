@@ -1,6 +1,6 @@
 # Evidence contract
 
-Every builder, critic, and integration review uses this shape. Prose without commands, exit codes, and file paths is not evidence. Evidence classes are defined in `gauntlet/evidence-classes.md`; acceptance philosophy is canonical in `gauntlet/principles.md`.
+Every builder, critic, and integration review uses this shape. Prose without commands, exit codes, and file paths is not evidence. Evidence classes are defined in `gauntlet/evidence-classes.md`; acceptance philosophy is canonical in `gauntlet/principles.md`; durable provenance is defined in `gauntlet/evidence-manifest-contract.md`.
 
 ## Mandatory evidence gate
 
@@ -10,16 +10,39 @@ Required evidence is an acceptance gate, not advisory guidance.
 - `HEADLESS`: executed tests.
 - `BROWSER_VISIBLE`: executed tests plus at least one screenshot under `docs/screenshots/<objective-id>/`.
 - `MULTI_TICK`: executed tests, a relevant integration-test pass, and `docs/evidence/<objective-id>/trajectory.json`.
-- `DYNAMIC_VISUAL`: all `MULTI_TICK` evidence plus an objective screenshot.
-- `PRESENTATION`: executed tests plus an objective screenshot.
+- `DYNAMIC_VISUAL`: all `MULTI_TICK` evidence plus **3–5 semantic frames** and `docs/screenshots/<objective-id>/sequence.json` describing `before → event → transition → result` (or another objective-appropriate semantic order).
+- `PRESENTATION`: executed tests plus an objective screenshot. Static presentation does not require a semantic sequence.
 - `BOOKKEEPING`: deterministic state/tooling audit; no screenshot is required unless the criteria are also browser-visible/presentation.
 - If acceptance explicitly depends on slot/player ownership or routing, the objective audit must include the slot-wiring invariant result.
-- Video is optional diagnostic evidence. It never replaces a required trajectory or screenshot.
+- Video is optional diagnostic evidence. It never replaces a required trajectory or semantic frame sequence.
+- When video exists, `docs/evidence/<objective-id>/video-reference.json` must preserve objective, provider artifact ID/name, creation/expiration dates, and candidate commit.
 - Screenshot byte duplication is `REVIEW_REQUIRED`, not automatic `PASS` or `FAIL`; bounded semantic review follows `gauntlet/semantic-audit-contract.md`.
 - Tests and deterministic checks establish facts. They never replace the independent critic's qualitative comparison against the applicable reference bar.
 - Missing mandatory evidence prevents `ACCEPT` at every review and orchestration stage.
 
-Before the critic, run `pnpm run gauntlet:audit -- --objective <id> --class <class> ...`. `FAIL` must be repaired by the owner reported by the audit. `REVIEW_REQUIRED` invokes the bounded cheap semantic audit. Only `PASS` proceeds to the critic.
+Before the critic, run `pnpm run gauntlet:audit -- --objective <id> --class <class> ...`. The audit persists its latest structured result at `docs/evidence/<objective-id>/audit.json`. `FAIL` must be repaired by the owner reported by the audit. `REVIEW_REQUIRED` invokes the bounded cheap semantic audit. Only `PASS` proceeds to the critic.
+
+## Durable acceptance evidence (0.8+)
+
+Every newly accepted objective must produce `docs/evidence/<objective-id>/manifest.json` during `gauntlet:acceptance:persist`.
+
+The manifest records:
+
+- objective and Gauntlet version;
+- exact candidate commit;
+- evidence class;
+- screenshots with SHA-256;
+- semantic sequence metadata when present;
+- trajectory SHA-256 when present;
+- optional video metadata/reference SHA;
+- final deterministic audit;
+- semantic audit when invoked;
+- critic and integration verdict metadata;
+- acceptance result path and acceptance timestamp.
+
+The manifest is immutable. Do not retroactively overwrite old evidence or backfill pre-0.8 objectives merely to make history look cleaner. Historical imperfect evidence remains useful as a before-state.
+
+For major playable milestones, `pnpm run gauntlet:milestone:bundle -- --milestone <id> --objectives OBJ1,OBJ2` can create a derived evidence bundle without mutating source objective evidence.
 
 ## Builder report
 
@@ -53,7 +76,8 @@ Rules:
 - `claims_not_made` must refuse PES fidelity, invented reference envelopes, and protected regression `PASS` unless the required oracle/review exists and passed.
 - If a required command cannot run because the toolchain is absent, that is a failed objective unless the objective is creating that toolchain.
 - Builders do not commit/push or edit specs/research/Gauntlet agent prompts.
-- When a screenshot is required, capture it via `WIP_SECTION=<objective-id> pnpm run capture-wip` and list the files under `docs/screenshots/<objective-id>/`.
+- When a static screenshot is required, capture it via `WIP_SECTION=<objective-id> pnpm run capture-wip` and list the files under `docs/screenshots/<objective-id>/`.
+- For `DYNAMIC_VISUAL`, capture 3–5 semantic frames, e.g. `WIP_SECTION=<objective-id> WIP_FRAMES=4 WIP_FRAME_LABELS=before,event,transition,result pnpm run capture-wip`.
 - When a trajectory is required, capture it with the repository-supported command and persist `docs/evidence/<objective-id>/trajectory.json`.
 
 ## Critic verdict

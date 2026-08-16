@@ -1,10 +1,10 @@
 {
-  "version": "0.7.0",
+  "version": "0.8.0",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.6.0",
+  "previous_system_version": "0.7.0",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
-  "baseline_commit": "13631a029c3c9d22096cdbfb7ad38dc8ce376b44",
+  "baseline_commit": "ec3a177e91e4dbeab780579928a4433bf1e9a068",
   "includes": [
     "prompts",
     "agents",
@@ -14,6 +14,9 @@
     "deterministic-evals",
     "model-evals",
     "evidence-contract",
+    "evidence-provenance",
+    "objective-manifests",
+    "milestone-bundles",
     "timing-contract",
     "acceptance-pipeline",
     "state-audit"

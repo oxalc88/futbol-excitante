@@ -1,45 +1,28 @@
 /**
- * @module tests/browser/capture-wip.browser.test
+ * Browser-mode evidence capture.
  *
- * Browser Mode screenshot capture for WIP evidence.
- *
- * Runs in Vitest Browser Mode (Playwright + Chromium with GPU).
- * Captures the app's render output via WebGL readPixels (same pipeline
- * as the test-bridge) and writes PNGs to docs/screenshots/<section>/.
- *
- * Usage:
- *   WIP_SECTION=<objective-id> pnpm run capture-wip
- *
- * The test captures via test-bridge and writes PNGs for the builder
- * to include as evidence. No acceptance claims — diagnostic evidence only.
- *
- * No Math.random, Date, DOM, or Node I/O in the simulation core.
- * Node I/O (writeFileSync) is allowed in the eval layer.
- * In browser mode, node:fs writeFileSync works but other fs functions
- * may not be available. We handle this gracefully.
- *
- * For reliable disk writing, see capture-wip.node.test.ts which runs
- * the test via Playwright in node mode.
+ * Static objectives normally use one frame. Dynamic visual objectives use
+ * WIP_FRAMES=3..5 and receive an ordered sequence.json with semantic labels.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
 import type { TestBridge } from "../../src/apps/browser/test-bridge.js";
 
-// ---------------------------------------------------------------------------
-// Section config
-// ---------------------------------------------------------------------------
-
-/**
- * Configuration for this capture run.
- * Builder scripts override these to target a specific section.
- */
 const SECTION = process.env.WIP_SECTION || "capture";
-const FRAME_COUNT = parseInt(process.env.WIP_FRAMES || "1", 10) || 1;
+const FRAME_COUNT = Math.max(1, Math.min(5, parseInt(process.env.WIP_FRAMES || "1", 10) || 1));
+const FRAME_STRIDE = Math.max(1, parseInt(process.env.WIP_FRAME_STRIDE || "30", 10) || 30);
 
-// ---------------------------------------------------------------------------
-// Fixture
-// ---------------------------------------------------------------------------
+function defaultLabels(count: number): string[] {
+  if (count === 1) return ["state"];
+  if (count === 2) return ["before", "result"];
+  if (count === 3) return ["before", "event", "result"];
+  if (count === 4) return ["before", "event", "transition", "result"];
+  return ["before", "event", "transition", "result", "after"];
+}
+
+const configuredLabels = (process.env.WIP_FRAME_LABELS || "").split(",").map((s) => s.trim()).filter(Boolean);
+const FRAME_LABELS = configuredLabels.length === FRAME_COUNT ? configuredLabels : defaultLabels(FRAME_COUNT);
 
 let container: HTMLDivElement;
 let bridge: TestBridge;
@@ -53,68 +36,60 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  try {
-    bridge.getPresentationSession().dispose();
-  } catch {
-    /* already disposed */
-  }
-  if (container.parentElement) {
-    container.parentElement.removeChild(container);
-  }
+  try { bridge.getPresentationSession().dispose(); } catch { /* already disposed */ }
+  if (container.parentElement) container.parentElement.removeChild(container);
 });
 
-// ---------------------------------------------------------------------------
-// Capture WIP evidence
-// ---------------------------------------------------------------------------
-
 describe(`WIP capture: ${SECTION}`, () => {
-  it("captures render output and writes to disk", async () => {
-    // Ensure we have a DOM for the test bridge in browser mode.
-    if (typeof document === "undefined") {
-      throw new Error("capture-wip.browser.test.ts requires a DOM environment (browser mode)");
-    }
-
-    // Reset the bridge (loads scenario, creates renderer).
+  it("captures static or semantic frame evidence", async () => {
+    if (typeof document === "undefined") throw new Error("capture-wip.browser.test.ts requires browser mode");
     await bridge.reset();
 
-    // Advance simulation slightly for visual activity.
-    bridge.step(30);
-    bridge.renderFrame();
+    const sequence: Array<{ label: string; path: string; tick: number }> = [];
+    let cumulativeTick = 0;
 
-    // Capture via WebGL readPixels → base64 PNG.
-    const capture = await bridge.capture();
+    for (let index = 0; index < FRAME_COUNT; index += 1) {
+      bridge.step(FRAME_STRIDE);
+      cumulativeTick += FRAME_STRIDE;
+      bridge.renderFrame();
+      const capture = await bridge.capture();
+      expect(capture.screenshot).toMatch(/^data:image\/png;base64,/);
+      const base64Data = capture.screenshot.split(",")[1] ?? "";
+      expect(base64Data.length).toBeGreaterThan(100);
+      expect(capture.sceneObjectCount).toBeGreaterThanOrEqual(5);
+      expect(capture.cameraPosition.z).toBeGreaterThan(0);
 
-    // Assertions: screenshot has content.
-    expect(capture.screenshot).toMatch(/^data:image\/png;base64,/);
-    const base64Data = capture.screenshot.split(",")[1] ?? "";
-    expect(base64Data.length).toBeGreaterThan(100);
-
-    // Scene diagnostics.
-    expect(capture.sceneObjectCount).toBeGreaterThanOrEqual(5);
-    expect(capture.cameraPosition.z).toBeGreaterThan(0);
-
-    // Write to disk.  node:fs writeFileSync works in vitest browser mode.
-    // In environments where writeFileSync is available but Buffer is not,
-    // we decode manually via atob (browser global).
-    try {
-      const { writeFileSync } = await import("node:fs");
-      // Try Buffer.from first.
+      const fileName = `frame-${String(index).padStart(3, "0")}.png`;
       try {
-        // @ts-expect-error — Buffer may or may not be defined in browser mode.
-        writeFileSync(`docs/screenshots/${SECTION}/frame-000.png`, Buffer.from(base64Data, "base64"));
-      } catch {
-        // Fallback: atob + Uint8Array.
-        const binary = atob(base64Data);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-          bytes[i] = binary.charCodeAt(i);
+        const { mkdirSync, writeFileSync } = await import("node:fs");
+        mkdirSync(`docs/screenshots/${SECTION}`, { recursive: true });
+        try {
+          // @ts-expect-error Buffer may not exist in browser mode.
+          writeFileSync(`docs/screenshots/${SECTION}/${fileName}`, Buffer.from(base64Data, "base64"));
+        } catch {
+          const binary = atob(base64Data);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+          writeFileSync(`docs/screenshots/${SECTION}/${fileName}`, bytes);
         }
-        writeFileSync(`docs/screenshots/${SECTION}/frame-000.png`, bytes);
+      } catch {
+        console.log(`[capture-wip:${fileName}:base64]${base64Data}`);
       }
-    } catch {
-      // node:fs unavailable — output base64 to stdout for node-side extraction.
-      // The node-side test (capture-wip.node.test.ts) captures this.
-      console.log(`[capture-wip:base64]${base64Data}`);
+      sequence.push({ label: FRAME_LABELS[index] ?? `frame-${index}`, path: fileName, tick: cumulativeTick });
+    }
+
+    if (FRAME_COUNT > 1) {
+      try {
+        const { mkdirSync, writeFileSync } = await import("node:fs");
+        mkdirSync(`docs/screenshots/${SECTION}`, { recursive: true });
+        writeFileSync(
+          `docs/screenshots/${SECTION}/sequence.json`,
+          `${JSON.stringify({ schema_version: 1, objective_id: SECTION, frames: sequence }, null, 2)}\n`,
+          "utf8",
+        );
+      } catch {
+        console.log(`[capture-wip:sequence]${JSON.stringify(sequence)}`);
+      }
     }
   });
 });

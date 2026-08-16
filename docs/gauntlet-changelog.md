@@ -4,6 +4,72 @@ Human-readable history of meaningful changes to the Gauntlet's **rules, prompts,
 
 This changelog does **not** record normal gameplay objectives or routine live-state updates produced by the running Gauntlet. Git remains the source of truth for exact file contents and diffs.
 
+## 2026-08-16 — Durable evidence provenance and acceptance continuation
+
+**Gauntlet system version (SemVer):** `0.8.0`  
+**Previous system version:** `0.7.0`
+
+### Changed
+
+- Added one immutable `docs/evidence/<objective-id>/manifest.json` for every objective newly accepted under 0.8. The manifest indexes the objective, evidence class, candidate commit, acceptance date, screenshots, semantic sequence, trajectory, metrics, optional video reference, deterministic audit, semantic audit when used, critic, integration review, and acceptance record.
+- Added artifact ↔ commit provenance. Screenshots, trajectories, deterministic-audit artifacts, and sequence metadata are SHA-256 hashed and must be byte-identical to the artifacts stored in the candidate commit. The manifest also records the corresponding Git blob.
+- Split committing into a reviewed **candidate snapshot commit** and a later acceptance/bookkeeping commit. The candidate snapshot exists only to bind reviewed code and evidence to an exact SHA; it is not itself final acceptance.
+- Added semantic visual sequences for `DYNAMIC_VISUAL` objectives. Dynamic behavior now requires 3–5 labeled frames plus `sequence.json`; static browser/presentation objectives may still use one screenshot.
+- `gauntlet:audit` now persists its structured result beside objective evidence as `audit.json`.
+- Added durable optional video metadata through `video-reference.json` and `gauntlet:video:reference`, recording objective, provider artifact ID/name, creation/expiration metadata, and candidate commit while allowing the binary video itself to remain external/ephemeral.
+- Added `gauntlet:milestone:bundle` to build derived evidence packages for important milestones such as playable 2v2, 5v5, and 11v11 without mutating source objective evidence.
+- Added `ORCH-REG-014` to reject verbal "fully accepted/committed" claims that are not backed by durable acceptance record, objective manifest, accepted state, and candidate commit.
+- Added `ORCH-REG-015` so a finalized objective cannot terminate the loop: a remaining objective continues immediately and an exhausted horizon triggers strategic reassessment and continuation.
+- Added `ORCH-REG-016` for mandatory 0.8 objective manifests and provenance, and `ORCH-REG-017` for required semantic sequences on dynamic visual behavior.
+- Extended the live state audit so, once 0.8 acceptance records exist, the latest accepted objective must also have an acceptance-complete objective manifest.
+- Preserved all pre-0.8 evidence as historical evidence. No migration rewrites, replaces, or cleans old screenshots/manifests retroactively; imperfect "before" evidence remains part of the project history.
+- Centralized shared role behavior: `gauntlet/PROMPT.md` is the canonical orchestrator contract, while critic and integration-reviewer behavior moved to `gauntlet/roles/`. `.grok/agents/` now keeps thin runtime/model wrappers instead of duplicated review prompts.
+- Replaced model-named builders with responsibility-named roles: `builder-structured` for tooling/contracts/deterministic/evaluator/test work and `builder-gameplay` for gameplay/ball/control/team-behavior/presentation-facing integration. Model assignment remains routing data in `gauntlet/models.json`.
+- Added only two deterministic guards for the role refactor: wrappers must reference an existing canonical role contract, and wrapper frontmatter models must match `gauntlet/models.json`. No extra scenario/eval matrix was added.
+- Added a post-merge release workflow that only publishes the immutable `gauntlet-v<version>` tag when `gauntlet/VERSION.json` changes on `main`. The workflow does not decide SemVer and does not rerun Gauntlet evaluation.
+
+### Why
+
+A live overflow run received critic fallback `ACCEPT` and then stated that `BROWSER-2V2-PLAYABLE` was "fully accepted and committed" before stopping. A subsequent Git check showed local `main` and `origin/main` still at `ec3a177`, whose persisted state only accepted `BROWSER-2V2-MATCH-KEYBOARD`; the next objective remained pending. 0.8 therefore makes acceptance claims depend on durable facts rather than conversational conclusions and separately protects post-acceptance continuation.
+
+The richer provenance is also intended to make project history reconstructable without reading all of `HISTORY.md` and to provide stable material for progress posts: exact code version, exact evidence, how it was audited, and what changed before/after.
+
+The role refactor keeps the same runtime responsibilities while removing prompt drift between model fallbacks. Builder specialization is intentionally limited to the two responsibilities already demonstrated by the existing Qwen/MiMo prompts; additional builder roles are deferred until a concrete recurring need appears.
+
+### Acceptance pipeline
+
+`builder → tests/artifacts → deterministic audit → optional bounded cheap semantic audit → mandatory critic → integration reviewer → final evidence gate → candidate snapshot commit → persist acceptance + objective manifest → bookkeeping → state audit → final acceptance commit → ACCEPT → next objective/replan`
+
+### Preserved Gauntlet philosophy
+
+The canonical 0.7 principle remains unchanged: deterministic tooling may invalidate evidence/state but never substitutes for the qualitative critic against the reference bar. 0.8 changes durability, provenance, and prompt/routing organization, not who judges gameplay quality.
+
+### Migration/runtime notes
+
+- Applies prospectively to objectives accepted under 0.8; pre-0.8 evidence is not backfilled automatically.
+- No manual `gauntlet/state/**` rewrite is part of this release.
+- Existing video binaries may remain external or ephemeral; when a future objective uses video, durable metadata records how to find/download it before provider expiration.
+- No `[subagents.models]` migration is part of the 0.8 repository update.
+- `gauntlet/VERSION.json` represents the checkout; the published release is the immutable `gauntlet-vX.Y.Z` tag created after merge to `main`.
+
+### Prompt/rule/tooling surface
+
+- `gauntlet/VERSION.json`
+- `gauntlet/PROMPT.md`
+- `gauntlet/README.md`
+- `gauntlet/roles/**`
+- `gauntlet/models.json`
+- `gauntlet/evidence-contract.md`
+- `gauntlet/evidence-manifest-contract.md`
+- `.grok/agents/**`
+- `.grok/skills/gauntlet*/SKILL.md`
+- `gauntlet/evals/**`
+- `.github/workflows/publish-gauntlet-tag.yml`
+- `tests/browser/capture-wip.browser.test.ts`
+- `package.json`
+
+---
+
 ## 2026-08-16 — Deterministic audit and semantic escalation
 
 **Gauntlet system version (SemVer):** `0.7.0`  
@@ -234,7 +300,7 @@ The instruction-regression audit found that `eba48b211fc0661beda289f04d722876427
 - Added `gauntlet/state/HORIZON.md` as concise planning state.
 - Strategic reassessment now happens at startup, handoff, horizon exhaustion, or material invalidation rather than after every acceptance.
 - Added explicit early-replan conditions.
-- Added a rule that horizons should, where technically reasonable, lead toward observable playable/browser-facing progress; infrastructure-only horizons require justification.
+- Added a rule that horizons should, where technically reasonable, lead to observable playable/browser-facing progress; infrastructure-only horizons require justification.
 - Added context-discipline rules so routine orchestration uses concise persisted state and directly relevant evidence/specs rather than repeatedly rebuilding global context.
 - Preserved the adversarial acceptance loop: `builder → critic → fix/retry → critic → integration-reviewer → accept`.
 

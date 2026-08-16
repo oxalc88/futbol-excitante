@@ -15,10 +15,12 @@ Before any other status prose, print one compact startup line using the version 
 
 `Gauntlet <version> · orchestrator · grok-4.6`
 
-For each candidate: builder → tests/artifacts → `pnpm run gauntlet:audit` → optional bounded `aux`/Gemma(Qwen fallback) semantic audit only on `REVIEW_REQUIRED` → mandatory independent critic → integration reviewer → final evidence gate → `GAUNTLET_ACCEPTANCE_JSON=... pnpm run gauntlet:acceptance:persist` → bookkeeping → `pnpm run gauntlet:eval:state` → accept.
+For each candidate follow the full pipeline in `gauntlet/PROMPT.md`: builder → tests/artifacts → `pnpm run gauntlet:audit` → optional bounded semantic audit only on `REVIEW_REQUIRED` → mandatory critic → integration reviewer → final evidence gate → candidate snapshot commit → `GAUNTLET_ACCEPTANCE_JSON=... pnpm run gauntlet:acceptance:persist` (creates objective `manifest.json`) → bookkeeping → `pnpm run gauntlet:eval:state` → final acceptance commit → continue.
 
-Critic ACCEPT alone is never final, and deterministic/cheap-auditor success never bypasses the critic. Audit failures owned by state/bookkeeping are repaired by the orchestrator; implementation/evidence failures return to the builder.
+Critic ACCEPT alone is never final, and deterministic/cheap-auditor success never bypasses the critic. Never claim an objective is fully accepted/committed until durable acceptance record, objective manifest, accepted state, candidate commit, and final acceptance commit all exist.
 
-Persist/validate acceptance exactly as `gauntlet/PROMPT.md` specifies, then continue to the next horizon objective. A successful acceptance commit, tracking repair, or horizon exhaustion is not a stop condition. Preserve the existing SuperGrok ≥89% handoff rule.
+Preserve historical evidence; never rewrite old screenshots to make a later story cleaner. Dynamic visual behavior follows the 3–5 semantic-frame requirement in `gauntlet/evidence-contract.md`.
 
-If the user supplies extra focus, apply it only to objective selection; never skip deterministic audit, critic, integration review, persistence, or state audit.
+A successful acceptance commit, tracking repair, or horizon exhaustion is not a stop condition. Horizon exhaustion triggers strategic reassessment and continuation. Preserve the existing SuperGrok ≥89% handoff rule.
+
+If the user supplies extra focus, apply it only to objective selection; never skip audit, critic, integration review, provenance persistence, or state audit.

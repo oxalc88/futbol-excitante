@@ -12,7 +12,7 @@ Use these in this order. Do not invent a competing architecture.
 4. `BOOTSTRAP_PLAN.md` as bootstrap guidance, not a forced backlog
 5. `VISION.md` and `research/` as background. If research documents conflict, `research/RESEARCH_AUDIT.md` governs.
 
-The Gauntlet loop lives in `gauntlet/`. Launch and model routing are documented in `gauntlet/README.md`. Project agents are in `.grok/agents/`.
+The Gauntlet loop lives in `gauntlet/`. Launch and model routing are documented in `gauntlet/README.md`. Project agents are in `.grok/agents/`; canonical reusable role contracts are in `gauntlet/roles/`.
 
 ## Hard boundaries
 
@@ -50,11 +50,12 @@ Do not skip the architecture boundaries to jump to 11v11, tactics, polished art,
 
 ## Gauntlet roles
 
-- `orchestrator` (Grok 4.6) plans/replans the rolling horizon at strategic boundaries, then decides and delegates inside it. It does not implement. At ≥89% SuperGrok weekly usage (`/usage`) it writes `gauntlet/state/HANDOFF.md` and hands off to `orchestrator-deepseek`.
-- `orchestrator-deepseek` uses the configured DeepSeek overflow model. Same loop. It picks up from `HANDOFF.md` + `CURRENT.md` + `HORIZON.md`. It does not implement.
-- `builder-qwen` / `builder-mimo` implement one isolated objective and produce evidence.
-- `critic` (DeepSeek by default) judges evidence independently and cannot accept until mandatory evidence exists. Never review with the same model that implemented the change.
-- `integration-reviewer` independently verifies mandatory evidence, audits the critic evidence gate, and checks architecture and neighboring regressions. Critic ACCEPT alone is never final.
-- The orchestrator records acceptance only after critic ACCEPT, integration ACCEPT, and its own verification of every mandatory artifact. Tests do not replace required perceptual evidence.
-- `aux` does cheap summaries and inspection only.
-- `git-committer` (`gemma4`) makes atomic commits. Grok must not `git commit`.
+- `orchestrator` (Grok 4.6) follows the canonical orchestration contract in `gauntlet/PROMPT.md`; its wrapper only adds the ≥89% SuperGrok weekly handoff to `orchestrator-deepseek`.
+- `orchestrator-deepseek` follows the same canonical contract; its wrapper only adds overflow pickup/resume semantics.
+- `builder-structured` implements structured/tooling/contracts/deterministic/evaluator/test objectives. Current route: Qwen.
+- `builder-gameplay` implements gameplay/ball/control/team-behavior/presentation-facing gameplay objectives. Current route: MiMo.
+- `critic` and its model fallbacks share `gauntlet/roles/critic.md`. Never review with the same model that implemented the candidate.
+- `integration-reviewer` and its current-Flash fallback share `gauntlet/roles/integration-reviewer.md`.
+- The orchestrator records acceptance only after critic ACCEPT, integration ACCEPT, durable provenance/persistence, and the state audit required by the current Gauntlet contract.
+- `aux` does cheap summaries/bounded semantic audit only.
+- `git-committer` (`gemma4`) makes atomic commits. Orchestrators/builders do not commit.
