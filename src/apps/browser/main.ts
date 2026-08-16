@@ -28,6 +28,7 @@ import type { ScenarioDefinition } from "../../contracts/scenario.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { Simulation } from "../../simulation/loop/simulation.js";
 import { createCpuAdapter, buildCpuObservation } from "../../adapters/input-browser/cpu-adapter.js";
+import { computeTeamDecision } from "../../adapters/input-browser/team-decision-profile.js";
 
 // ---------------------------------------------------------------------------
 // Scenario loading
@@ -389,8 +390,19 @@ function main(): void {
 
       // Add CPU frames — per-slot adapters in AI-vs-AI, human-vs-CPU, or 2v2 modes.
       if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2) {
+        // Compute one team decision per team from any observation on that team.
+        const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
+        const snapshot = sim.snapshot();
+        for (const { teamId: tid, controlledPlayerId } of cpuSlots) {
+          if (!teamDecisions.has(tid)) {
+            const teamObs = buildCpuObservation(snapshot, tid, controlledPlayerId);
+            teamDecisions.set(tid, computeTeamDecision(teamObs, tid));
+          }
+        }
+
         for (const { adapter: cpuAd, controlSlot, teamId: tid, controlledPlayerId } of cpuSlots) {
-          const obs = buildCpuObservation(sim.snapshot(), tid, controlledPlayerId);
+          const obs = buildCpuObservation(snapshot, tid, controlledPlayerId);
+          obs.teamDecision = teamDecisions.get(tid);
           const cpuFrame = cpuAd.sample(sim.tick, obs);
           // Override controlSlot to match the scenario's slot key so
           // the simulation routes the frame to the correct player.

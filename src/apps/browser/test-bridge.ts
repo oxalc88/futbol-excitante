@@ -33,6 +33,7 @@ import type { InputFrame } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
 import type { PresentationSnapshot } from "../../contracts/presentation.js";
 import { buildCpuObservation, createCpuAdapter } from "../../adapters/input-browser/cpu-adapter.js";
+import { computeTeamDecision } from "../../adapters/input-browser/team-decision-profile.js";
 
 // ---------------------------------------------------------------------------
 // Test bridge interface
@@ -205,12 +206,27 @@ export function createTestBridge(
       const hashes: string[] = [];
       for (let i = 0; i < ticks; i++) {
         const snapshot = sim.snapshot();
+
+        // Compute one team decision per team from any observation on that team.
+        const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
+        for (const entry of cpuEntries) {
+          if (!teamDecisions.has(entry.teamId)) {
+            const teamObs = buildCpuObservation(
+              snapshot,
+              entry.teamId,
+              entry.controlledPlayerId,
+            );
+            teamDecisions.set(entry.teamId, computeTeamDecision(teamObs, entry.teamId));
+          }
+        }
+
         const frames = cpuEntries.map((entry) => {
           const observation = buildCpuObservation(
             snapshot,
             entry.teamId,
             entry.controlledPlayerId,
           );
+          observation.teamDecision = teamDecisions.get(entry.teamId);
           const frame = entry.adapter.sample(sim.tick, observation);
           frame.controlSlot = entry.controlSlot;
           return frame;

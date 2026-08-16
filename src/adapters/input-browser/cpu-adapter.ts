@@ -33,6 +33,9 @@
 import type { InputFrame } from "../../contracts/input.js";
 import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
+import type { TeamDecision } from "./team-decision-profile.js";
+export type { TeamDecision } from "./team-decision-profile.js";
+export { computeTeamDecision, getBallZone, teamHasPossession } from "./team-decision-profile.js";
 
 // ---------------------------------------------------------------------------
 // CpuObservation — minimal read-only subset of world state
@@ -86,6 +89,14 @@ export interface CpuObservation {
    * have formation closer to own goal).
    */
   formationPosition?: { x: number; y: number };
+  /**
+   * Optional team-level decision signal.
+   * When present, the CPU adapter uses this shared strategy to
+   * coordinate with teammates on the same team. The signal is
+   * computed once per tick per team and injected into all CPU
+   * adapters on that team.
+   */
+  teamDecision?: TeamDecision;
 }
 
 // ---------------------------------------------------------------------------
@@ -672,6 +683,13 @@ export function createCpuAdapter(): CpuAdapter {
           moveY = (dy / distToBall) * distUnit;
         }
 
+        // --- Team-decision modulation ---
+        // When the team decision is ATTACK, non-ball-carrying players
+        // push forward (reduced formation pull).  When DEFEND, players
+        // drop back harder (increased formation pull).  BALANCED is the
+        // default existing behavior.
+        const teamStrategy = observation.teamDecision?.strategy;
+
         // --- Optional formation blend (only when formationPosition is set) ---
         const formPos = observation.formationPosition;
         if (formPos) {
@@ -685,6 +703,10 @@ export function createCpuAdapter(): CpuAdapter {
           const isBehind = cpuTeamId === "team-b"
             ? ball.position.x > playerX  // team-b own goal at +x; ball > player = behind
             : ball.position.x < playerX; // team-a own goal at -x; ball < player = behind
+
+          // Is this player the nearest to the ball on the team?
+          const isNearestToBall = observation.teamDecision?.nearestToBallPlayerId
+            === observation.controlledPlayerId;
 
           if (isBehind) {
             // --- Formation recovery: track displacement ---
@@ -702,17 +724,28 @@ export function createCpuAdapter(): CpuAdapter {
               //  Within CHASE_FORMATION_THRESHOLD → chase fully
               //  Beyond 2× threshold → formation fully
               const blendRange = CHASE_FORMATION_THRESHOLD;
-              const formationWeight = Math.min(
+              let formationWeight = Math.min(
                 Math.max((distToBall - CHASE_FORMATION_THRESHOLD) / blendRange, 0),
                 1,
               );
 
               // Formation recovery weight grows with displacement time
               // and normalized distance from formation position.
-              const recoveryWeight = computeFormationRecoveryWeight(
+              let recoveryWeight = computeFormationRecoveryWeight(
                 state.formationDisplacementTicks,
                 fDist,
               );
+
+              // Apply team-decision modulation:
+              //  ATTACK mode: reduce formation pull (players push forward).
+              //  DEFEND mode: increase formation pull (players hold shape).
+              if (teamStrategy === "ATTACK" && !isNearestToBall) {
+                formationWeight *= 0.3;
+                recoveryWeight *= 0.3;
+              } else if (teamStrategy === "DEFEND") {
+                formationWeight = Math.min(formationWeight * 1.5, 1);
+                recoveryWeight = Math.min(recoveryWeight * 1.5, 0.95);
+              }
 
               // Blend chase with formation direction.
               // Then blend that result with formation recovery:
