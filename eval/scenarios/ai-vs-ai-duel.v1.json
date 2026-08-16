@@ -21,7 +21,7 @@
     {
       "playerId": "player-a",
       "teamId": "team-a",
-      "groundPosition": { "x": -5, "y": 0 },
+      "groundPosition": { "x": -0.5, "y": 0 },
       "linearVelocity": { "x": 0, "y": 0 },
       "desiredVelocity": { "x": 0, "y": 0 },
       "bodyHeading": 0,
