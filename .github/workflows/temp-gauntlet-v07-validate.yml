@@ -1,5 +1,6 @@
 name: Temporary Gauntlet 0.7.0 Validate
 
+# rerun after prompt fallback fix
 on:
   push:
     branches:
