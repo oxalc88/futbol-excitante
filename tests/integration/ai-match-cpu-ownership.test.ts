@@ -66,8 +66,9 @@ describe("AI-MATCH-E2E-001: CPU slot ownership and pursuit", () => {
   });
 
   it("real slot-routed CPU execution reduces both players' distance to the ball", () => {
-    const world = createWorld({ scenario: FOUNDATION_SCENARIO_AI_VS_AI });
-    const sim = createSimulation(world);
+    const sim = createSimulation(
+      createWorld({ scenario: FOUNDATION_SCENARIO_AI_VS_AI }),
+    );
     const cpuA = createCpuAdapter();
     const cpuB = createCpuAdapter();
 
@@ -104,8 +105,8 @@ describe("AI-MATCH-E2E-001: CPU slot ownership and pursuit", () => {
           assignments["slot-2"].controlledPlayerId,
         ),
       );
-      frameA.controlSlot = "slot-1";
-      frameB.controlSlot = "slot-2";
+      frameA.controlSlot = assignments["slot-1"].controlSlot;
+      frameB.controlSlot = assignments["slot-2"].controlSlot;
       sim.applyInputs([frameA, frameB]);
       sim.step();
     }
