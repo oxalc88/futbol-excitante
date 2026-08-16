@@ -1,0 +1,85 @@
+name: Temporary Gauntlet routing docs correction
+
+on:
+  push:
+    branches:
+      - chore/fix-gauntlet-routing-docs
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/gauntlet-0.8.0-evidence-provenance
+          fetch-depth: 0
+
+      - name: Correct routing documentation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          readme_path = Path('gauntlet/README.md')
+          readme = readme_path.read_text()
+          replacements = {
+              'Exact IDs are in `gauntlet/models.json` and must match `.grok/agents/<name>.md` frontmatter `model` plus the `[subagents.models]` map in `~/.grok/config.toml`.':
+              'Exact IDs are in `gauntlet/models.json` and must match `.grok/agents/<name>.md` frontmatter `model`. The user-level `~/.grok/config.toml` only needs to register the custom model endpoints themselves.',
+              'Direct CLI launches of a NaN agent must also set `--model`, because `--agent` alone keeps the session default:\n\n```bash\ngrok --agent aux --model gemma4 --always-approve\n```':
+              'Project-local agent frontmatter owns the agent → model binding. For example, `grok --agent aux --always-approve` resolves the `model: gemma4` declared in `.grok/agents/aux.md`; an explicit `--model` override is only for intentional runtime override/debugging.',
+              'Grok loads custom models only from user `~/.grok/config.toml`, not from project `.grok/config.toml`. Existing model blocks for `qwen3.6`, `mimo-v2.5`, `deepseek-v4-flash`, `deepseek-v4-flash-0731`, and `gemma4` remain unchanged.\n\nUpdate the per-type map so spawned agents do not inherit `grok-4.6`:\n\n```toml\n[subagents.models]\nbuilder-structured = "qwen3.6"\nbuilder-gameplay = "mimo-v2.5"\ncritic = "deepseek-v4-flash-0731"\ncritic-flash = "deepseek-v4-flash"\ncritic-qwen = "qwen3.6"\ncritic-mimo = "mimo-v2.5"\nintegration-reviewer = "deepseek-v4-flash-0731"\nintegration-reviewer-flash = "deepseek-v4-flash"\naux = "gemma4"\ngit-committer = "gemma4"\norchestrator-deepseek = "deepseek-v4-flash"\n\n[session]\nauto_compact_threshold_percent = 65\n```\n\nThe only builder migration is the key rename from `builder-qwen` / `builder-mimo` to `builder-structured` / `builder-gameplay`. Model endpoint definitions themselves do not change.':
+              'Grok loads custom model endpoint definitions from user `~/.grok/config.toml`; those global entries only make models such as `qwen3.6`, `mimo-v2.5`, `deepseek-v4-flash`, `deepseek-v4-flash-0731`, and `gemma4` available. Agent → model selection is project-local in each `.grok/agents/*.md` frontmatter and mirrored by `gauntlet/models.json` for Gauntlet routing/auditability. No user-level `[subagents.models]` migration is required for 0.8.',
+              '3. If a NaN API id or endpoint changes, update the matching user-level `[model.*]` block and `[subagents.models]` map.':
+              '3. If a NaN API id or endpoint changes, update the matching user-level `[model.*]` block; agent → model routing remains project-local in the corresponding wrapper frontmatter and `gauntlet/models.json`.'
+          }
+          for old, new in replacements.items():
+              if old not in readme:
+                  raise SystemExit(f'README expected text not found: {old[:80]!r}')
+              readme = readme.replace(old, new)
+          readme_path.write_text(readme)
+
+          models_path = Path('gauntlet/models.json')
+          models = json.loads(models_path.read_text())
+          models['notes'] = ('Role names describe responsibilities; model selection is routing. '
+                             'Agent frontmatter model fields must stay in sync with this file. '
+                             'NaN endpoints are registered in ~/.grok/config.toml (user-level); '
+                             'agent-to-model bindings are project-local in .grok/agents/*.md. '
+                             'See gauntlet/README.md.')
+          models_path.write_text(json.dumps(models, indent=2) + '\n')
+
+          changelog_path = Path('docs/gauntlet-changelog.md')
+          changelog = changelog_path.read_text()
+          old = '- User-level `~/.grok/config.toml` must rename the builder mappings from `builder-qwen` / `builder-mimo` to `builder-structured = "qwen3.6"` and `builder-gameplay = "mimo-v2.5"`. Model endpoint definitions themselves do not change.'
+          new = '- No user-level agent-routing migration is required. `~/.grok/config.toml` continues to register the available NaN model endpoints only; project-local `.grok/agents/*.md` frontmatter selects each agent model, with `gauntlet/models.json` kept in sync for routing/auditability.'
+          if old not in changelog:
+              raise SystemExit('Changelog migration note not found')
+          changelog_path.write_text(changelog.replace(old, new))
+          PY
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+        env:
+          PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
+      - name: Validate Gauntlet routing guards
+        run: pnpm run gauntlet:eval
+
+      - name: Commit correction atomically
+        shell: bash
+        run: |
+          git config user.name "Rolando Quispe Juarez"
+          git config user.email "qj.oxalc@gmail.com"
+          git add gauntlet/README.md gauntlet/models.json docs/gauntlet-changelog.md
+          git diff --cached --check
+          git commit -m "docs(gauntlet): correct project-local model routing"
+          git push origin HEAD:feat/gauntlet-0.8.0-evidence-provenance
