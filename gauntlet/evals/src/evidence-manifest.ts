@@ -9,9 +9,10 @@ const execFileAsync = promisify(execFile);
 export interface ArtifactRecord {
   path: string;
   sha256: string;
-  git_blob: string;
+  git_blob: string | null;
   candidate_commit: string;
   bytes: number;
+  committed_with_candidate: boolean;
 }
 
 export interface EvidenceManifestInput {
@@ -29,26 +30,29 @@ async function exists(file: string): Promise<boolean> {
   try { return (await stat(file)).isFile(); } catch { return false; }
 }
 
-async function artifact(repoRoot: string, absolutePath: string, candidateCommit: string): Promise<ArtifactRecord> {
+async function artifact(repoRoot: string, absolutePath: string, candidateCommit: string, requireCommitted = true): Promise<ArtifactRecord> {
   const bytes = await readFile(absolutePath);
   const relative = path.relative(repoRoot, absolutePath).replaceAll(path.sep, "/");
-  let committedBlob: string;
-  let localBlob: string;
-  try {
-    ({ stdout: committedBlob } = await execFileAsync("git", ["-C", repoRoot, "rev-parse", `${candidateCommit}:${relative}`], { encoding: "utf8" }));
-    ({ stdout: localBlob } = await execFileAsync("git", ["-C", repoRoot, "hash-object", absolutePath], { encoding: "utf8" }));
-  } catch {
-    throw new Error(`artifact is not present in candidate commit ${candidateCommit}: ${relative}`);
+  let committedBlob: string | null = null;
+  if (requireCommitted) {
+    let localBlob: string;
+    try {
+      ({ stdout: committedBlob } = await execFileAsync("git", ["-C", repoRoot, "rev-parse", `${candidateCommit}:${relative}`], { encoding: "utf8" }));
+      ({ stdout: localBlob } = await execFileAsync("git", ["-C", repoRoot, "hash-object", absolutePath], { encoding: "utf8" }));
+    } catch {
+      throw new Error(`artifact is not present in candidate commit ${candidateCommit}: ${relative}`);
+    }
+    committedBlob = committedBlob.trim();
+    localBlob = localBlob.trim();
+    if (committedBlob !== localBlob) throw new Error(`artifact differs from candidate commit ${candidateCommit}: ${relative}`);
   }
-  committedBlob = committedBlob.trim();
-  localBlob = localBlob.trim();
-  if (committedBlob !== localBlob) throw new Error(`artifact differs from candidate commit ${candidateCommit}: ${relative}`);
   return {
     path: relative,
     sha256: createHash("sha256").update(bytes).digest("hex"),
     git_blob: committedBlob,
     candidate_commit: candidateCommit,
     bytes: bytes.byteLength,
+    committed_with_candidate: requireCommitted,
   };
 }
 
@@ -85,7 +89,7 @@ export async function buildEvidenceManifest(
   const auditArtifact = await exists(auditPath) ? await artifact(repoRoot, auditPath, candidateCommit) : null;
   const sequenceArtifact = await exists(sequencePath) ? await artifact(repoRoot, sequencePath, candidateCommit) : null;
   const sequence = await readJsonIfPresent(sequencePath);
-  const videoReferenceArtifact = await exists(videoPath) ? await artifact(repoRoot, videoPath, candidateCommit) : null;
+  const videoReferenceArtifact = await exists(videoPath) ? await artifact(repoRoot, videoPath, candidateCommit, false) : null;
   const video = await readJsonIfPresent(videoPath);
 
   if (video) {
