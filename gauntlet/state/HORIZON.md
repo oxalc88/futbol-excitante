@@ -2,12 +2,12 @@
 
 ```yaml
 horizon_version: 5
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "small-sided-match"
 created_from_commit: 514847f
 created_at: 2026-08-16
 reason: "Horizon 2v2-playable exhausted (5/5 accepted). All 2v2 browser match infrastructure exists: CPU passing, scoring, formation, keyboard control, and autonomous AI match. Next horizon targets small-sided match evolution: 3v3 scenarios, team decision coordination, improved formation/positioning, match restarts (kickoff/goal kick), and a playable 3v3 browser match. These build toward the SMALL-SIDED milestone."
-current_index: 5
+current_index: 6
 objectives:
   - id: CPU-TEAM-DECISION-PROFILE
     status: accepted
@@ -40,10 +40,11 @@ objectives:
     prerequisite: CPU-3V3-TEAMPLAY
     commit: def23dd
   - id: BROWSER-3V3-MATCH
-    status: pending
+    status: accepted
     reason: "Add ?mode=ai-match-3v3 URL mode for a playable 3v3 browser match with 6 CPU players (3 per team). Browser shows HUD, scoreboard, match timer, phase transitions. Browser test verifies hash parity and deterministic multi-tick 3v3 play. Screenshot evidence."
-    builder: builder-mimo
+    builder: builder-gameplay / mimo-v2.5
     prerequisite: CPU-3V3-TEAMPLAY
+    commit: eaefdf1
 replan_if:
   - objective_blocked
   - architectural_invalidation

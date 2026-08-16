@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-3V3-MATCH
+next_objective_id: STRATEGIC-REASSESSMENT
 
 best_known:
-  commit: def23dd
-  note: "MATCH-SET-PIECE accepted. Next: BROWSER-3V3-MATCH — playable 3v3 browser match."
+  commit: eaefdf1
+  note: "BROWSER-3V3-MATCH accepted. Horizon small-sided-match exhausted (6/6 accepted). Strategic reassessment needed."
 
 active_candidate: null
 builder_in_use: null
@@ -59,18 +59,19 @@ accepted:
   - CPU-3V3-FORMATION
   - CPU-3V3-TEAMPLAY
   - MATCH-SET-PIECE
+  - BROWSER-3V3-MATCH
 
 blocked: []
 
-selection_note: "Horizon small-sided-match: 6 objectives toward 3v3 play. MATCH-SET-PIECE accepted. Next: BROWSER-3V3-MATCH."
+selection_note: "Horizon small-sided-match exhausted (6/6 accepted). All 3v3 browser match infrastructure complete. Strategic reassessment needed for next horizon."
 ```
 
 ## Last accepted objective
 
-MATCH-SET-PIECE — Match restart infrastructure. MatchPhase type (playing/goal/halftime/fulltime/kickoff) in WorldState and PresentationSnapshot. Tick-based goal countdown: goal event → "goal" phase → countdown → position/velocity reset → "playing". Ball resets to center with zero velocity. Players reset to formation positions. 21 unit tests, 11 integration tests. 1530/1530 node, 40/40 browser. 80-tick trajectory with 7 goal cycles. Deterministic audit PASS.
+BROWSER-3V3-MATCH — Playable 3v3 browser match. `?mode=ai-match-3v3` URL creates autonomous AI-vs-AI 3v3 match with 6 CPU players (3 per team) with team decision, role-aware formation, and match restart. HUD, scoreboard, match timer, phase transitions all work. 4 semantic screenshots (before/kickoff/play/later). 1541/1541 node tests. 60-tick trajectory. 21KB semantic screenshots. DYNAMIC_VISUAL audit PASS.
 
-- builder: builder-structured / qwen3.6
+- builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 21/21 unit, 11/11 integration, 1530/1530 node, 40/40 browser, 80-tick trajectory
-- Commit: def23dd
+- Evidence: 1541/1541 node tests, 4 semantic frames, 60-tick trajectory, slot-wiring verified
+- Commit: eaefdf1

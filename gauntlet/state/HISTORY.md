@@ -246,6 +246,20 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - commits: def23dd candidate(MATCH-SET-PIECE)
 - notes: Match restart infrastructure. MatchPhase type (playing/goal/halftime/fulltime/kickoff) in WorldState + PresentationSnapshot. Tick-based goal countdown: goal event → "goal" → countdown → position/velocity reset → "playing". Ball resets to center. Players to formation positions. 21 unit tests, 11 integration tests. 1530/1530 node, 40/40 browser. 80-tick trajectory. No PES claim.
 
+## Iteration 43 — 2026-08-16
+
+- objective_id: BROWSER-3V3-MATCH
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: eaefdf1 candidate(BROWSER-3V3-MATCH)
+- notes: Playable 3v3 browser match. ?mode=ai-match-3v3 URL creates autonomous AI-vs-AI 3v3 match with 6 CPU players (3 per team), team decision, role-aware formation, match restart. HUD, scoreboard, match timer, phase transitions work. 4 semantic screenshots. 1541/1541 node tests. 60-tick trajectory. No PES claim.
+
+## Horizon small-sided-match exhausted (6/6 accepted)
+
+All 6 objectives of the small-sided-match horizon are accepted. Strategic reassessment needed for next horizon.
+
 ## Iteration 37 — 2026-08-15
 
 - objective_id: CAPABILITY-SWERVE
