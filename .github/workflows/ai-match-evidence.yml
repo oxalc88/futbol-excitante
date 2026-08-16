@@ -1,0 +1,54 @@
+name: AI Match Dynamic Evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      objective_id:
+        description: Objective/evidence ID
+        required: true
+        default: ai-match
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+        env:
+          PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Capture trajectory
+        run: pnpm run capture-ai-trajectory
+        env:
+          WIP_SECTION: ${{ inputs.objective_id }}
+      - name: Start Vite
+        run: |
+          pnpm exec vite --host 127.0.0.1 > /tmp/vite.log 2>&1 &
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:5173/src/apps/browser/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/vite.log
+          exit 1
+      - name: Capture optional video
+        run: pnpm run capture-ai-video
+        env:
+          WIP_SECTION: ${{ inputs.objective_id }}
+          WIP_ARTIFACT_NAME: dynamic-evidence-${{ inputs.objective_id }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dynamic-evidence-${{ inputs.objective_id }}
+          path: docs/evidence/${{ inputs.objective_id }}/
+          if-no-files-found: error
+          retention-days: 14
