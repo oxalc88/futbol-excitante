@@ -216,6 +216,16 @@ Prior critic passes on this objective: RETRY (missing screenshot smoke, vite-res
 - commits: 55feb7b candidate(SCENARIO-3V3-FIXTURE)
 - notes: 3v3 fixture scenario with 6 CPU players (3 per team), 1-2 formation, 6 AI_FALLBACK slots. Versioned JSON fixture, scenario selector route. 32 unit tests, 9 integration tests. 1438/1438 node, 40/40 browser, 204/204 integration all pass. 61-hash trajectory. Deterministic audit PASS. Slot-wiring invariant verified. No PES claim.
 
+## Iteration 40 — 2026-08-16
+
+- objective_id: CPU-3V3-FORMATION
+- builder: builder-structured / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: 7398773 candidate(CPU-3V3-FORMATION)
+- notes: Role-aware formation for 3v3. Defender 40% pull, midfielder 20%, attacker 5%. formationRole field in 3v3 fixture. Backward compatible: no role → default 20%. 23 new tests, 483 total all pass. 60-tick trajectory. No PES claim.
+
 ## Iteration 37 — 2026-08-15
 
 - objective_id: CAPABILITY-SWERVE

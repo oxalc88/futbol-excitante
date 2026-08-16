@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: CPU-3V3-FORMATION
+next_objective_id: CPU-3V3-TEAMPLAY
 
 best_known:
-  commit: 55feb7b
-  note: "SCENARIO-3V3-FIXTURE accepted. Next: CPU-3V3-FORMATION — extend formation system for 3v3 player counts."
+  commit: 7398773
+  note: "CPU-3V3-FORMATION accepted. Next: CPU-3V3-TEAMPLAY — ensure CPU adapters work correctly in 3v3 context."
 
 active_candidate: null
 builder_in_use: null
@@ -56,18 +56,19 @@ accepted:
   - BROWSER-2V2-PLAYABLE
   - CPU-TEAM-DECISION-PROFILE
   - SCENARIO-3V3-FIXTURE
+  - CPU-3V3-FORMATION
 
 blocked: []
 
-selection_note: "Horizon small-sided-match: 6 objectives toward 3v3 play. SCENARIO-3V3-FIXTURE accepted. Next: CPU-3V3-FORMATION — extend formation system for 3v3 player counts."
+selection_note: "Horizon small-sided-match: 6 objectives toward 3v3 play. CPU-3V3-FORMATION accepted. Next: CPU-3V3-TEAMPLAY."
 ```
 
 ## Last accepted objective
 
-SCENARIO-3V3-FIXTURE — 3v3 scenario fixture with 6 CPU-controlled players (3 per team) in a 1-2 formation. Versioned JSON fixture, scenario selector route, 6 AI_FALLBACK slots. 32 unit tests, 9 integration tests. 1438/1438 node tests, 40/40 browser tests, 204/204 integration tests. 61-hash trajectory. Deterministic audit PASS.
+CPU-3V3-FORMATION — Role-aware formation positions for 3v3. Defender 40% pull toward own goal, midfielder 20%, attacker 5%. formationRole field in 3v3 fixture. Backward compatible: no role → default 20%. 23 new tests, 483 total all pass. 60-tick trajectory. Deterministic audit PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 32/32 unit, 9/9 integration, 204/204 integration suite, 61-hash trajectory, slot-wiring verified
-- Commit: 55feb7b
+- Evidence: 221/221 cpu-adapter, 204/204 integration, 58/58 browser, 60-tick trajectory
+- Commit: 7398773

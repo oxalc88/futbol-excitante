@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.8.1",
+  "persisted_at": "2026-08-16T20:58:00.879Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "CPU-3V3-FORMATION",
+  "candidate_commit": "7398773",
+  "evidence_class": "MULTI_TICK",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS",
+    "checks": 19,
+    "all_pass": true
+  },
+  "semantic_audit": null,
+  "critic": {
+    "agent": "critic-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "agent": "integration-reviewer-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  },
+  "metrics": [],
+  "accepted_at": "2026-08-16T20:57:30.000Z"
+}
