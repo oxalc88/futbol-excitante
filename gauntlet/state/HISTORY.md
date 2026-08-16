@@ -1598,6 +1598,16 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - notes: Test-verification objective — CPU pursuit mode already existed in cpu-adapter.ts. Builder added 33 tests to verify and protect existing behavior (direction, continuity, first-touch, pursuit-to-attack transition, moving ball, sprint, team direction, determinism, edge cases). Also fixed pre-existing type compatibility issues: telemetry.ts payload field, ball-system.ts import path + goal config, mutant event shapes. 60 files, 1181 tests all PASS (33 new tests). No behavioral changes to simulation core.
 
+## Iteration 48 — 2026-08-16
+
+- objective_id: BROWSER-MATCH-START-URL
+- builder: builder-mimo / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash
+- verdict: ACCEPT (first pass, 0 retries)
+- integration: ACCEPT (integration-reviewer / deepseek-v4-flash, flash)
+- result: accepted
+- notes: CPU-vs-CPU match viewer via ?mode=ai-match. Added IS_AI_MATCH URL param detection, per-slot CPU adapter creation (one createCpuAdapter per slot, frame routing with controlSlot), scenario selector, and AI-vs-AI scenario fixture (ai-vs-ai-duel.v1.json, 5400 ticks, seed 42). Screenshot: frame-000.png shows pitch with scoreboard, clock, and "AI-vs-AI Match" hint. Typecheck 0 errors. No core changes.
+
 ## Iteration 46 — 2026-08-16
 
 - objective_id: BROWSER-GOAL-EFFECT

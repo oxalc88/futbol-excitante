@@ -7,10 +7,10 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: CPU-BALL-PURSUIT
+next_objective_id: CPU-PASSING-EVALUATION
 best_known:
   commit: (pending acceptance)
-  note: "CPU-BALL-PURSUIT accepted. Advancing to next horizon objective: CPU-BALL-PURSUIT was test-verification (pursuit mode already existed). Next: CPU-BALL-PURSUIT is done, next pending index 3 = CPU-BALL-PURSUIT... wait. current_index is 2 which is CPU-BALL-PURSUIT. After acceptance, advance to 3 = BROWSER-MATCH-START-URL."
+  note: "BROWSER-MATCH-START-URL accepted. Advancing to next horizon objective: CPU-PASSING-EVALUATION — evaluator tests verifying CPU produces pass inputs under range/direction conditions."
 active_candidate: null
 builder_in_use: builder-qwen
 critic_in_use: critic-flash
@@ -38,19 +38,20 @@ accepted:
   - BROWSER-MATCH-PHASE-DISPLAY
   - BROWSER-GOAL-EFFECT
   - CPU-BALL-PURSUIT
+  - BROWSER-MATCH-START-URL
 blocked: []
-selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal effects, CPU ball pursuit (done), match-start URL, CPU passing evaluation."
+selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal effects, CPU ball pursuit (done), match-start URL (done), CPU passing evaluation."
 ```
 
 ## Last accepted objective
 
-CPU-BALL-PURSUIT — pursuit mode test-verification (CPU already pursued ball). 33 new tests protect existing behavior. Bug fixes: telemetry, ball-system import, mutant event shapes.
+BROWSER-MATCH-START-URL — CPU-vs-CPU match viewer via ?mode=ai-match. Per-slot CPU adapters, scenario fixture, screenshot evidence.
 
-- builder: builder-qwen / qwen3.6
+- builder: builder-mimo / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
 - integration: integration-reviewer / deepseek-v4-flash (flash) — ACCEPT
-- Evidence: 33 pursuit tests in tests/unit/cpu-adapter/pursuit.test.ts (33/33 PASS, no regressions)
+- Evidence: docs/screenshots/BROWSER-MATCH-START-URL/frame-000.png
 
 ## Next action
 
-Advance to next horizon objective: BROWSER-MATCH-START-URL — Support launching a running CPU-vs-CPU match from browser URL (?mode=ai-match).
+Delegate CPU-PASSING-EVALUATION to builder-qwen. Prerequisite: CPU-BALL-PURSUIT.

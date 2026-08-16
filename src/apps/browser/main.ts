@@ -44,6 +44,15 @@ const SCENARIO_DATA: ScenarioDefinition = selectBrowserScenario(
   window.location.search,
 );
 
+/**
+ * Detect AI-vs-AI match mode from URL: ?mode=ai-match
+ *
+ * When enabled, all control slots use CPU adapters (no keyboard input).
+ * The match runs fully autonomously as a standalone viewer.
+ */
+const IS_AI_MATCH =
+  new URLSearchParams(window.location.search).get("mode") === "ai-match";
+
 // ---------------------------------------------------------------------------
 // Real-time loop
 // ---------------------------------------------------------------------------
@@ -239,32 +248,57 @@ function main(): void {
   // 2. Create simulation (synchronous, DOM-free core).
   const sim: Simulation = createSimulation(world);
 
-  // 3. Create keyboard adapters based on scenario assignments.
+  // Track keyboard adapters (empty in AI-vs-AI mode).
   type AdapterEntry = { adapter: KeyboardAdapter; config: { controlSlot: string } };
-  const adapters: AdapterEntry[] = [
-    { adapter: createKeyboardAdapter(DEFAULT_KEYBOARD_CONFIG), config: DEFAULT_KEYBOARD_CONFIG },
-  ];
+  const adapters: AdapterEntry[] = [];
 
-  if (hasTwoSlots) {
-    const slot2Adapter = createKeyboardAdapter(DEFAULT_SLOT2_KEYBOARD_CONFIG);
-    adapters.push({ adapter: slot2Adapter, config: DEFAULT_SLOT2_KEYBOARD_CONFIG });
-  }
+  // Track per-slot CPU adapters for AI-vs-AI mode.
+  type CpuSlotEntry = {
+    adapter: ReturnType<typeof createCpuAdapter>;
+    controlSlot: string;
+    teamId: string;
+  };
+  const cpuSlots: CpuSlotEntry[] = [];
 
-  // 3.5 Create CPU adapter for any non-HUMAN control slots.
+  // Legacy single-CPU adapter for mixed HUMAN/AI scenarios.
   let cpuAdapter: ReturnType<typeof createCpuAdapter> | undefined;
   let cpuTeamId: string | undefined;
-  for (const _slot of Object.keys(SCENARIO_DATA.controlAssignments)) {
-    const assignment = SCENARIO_DATA.controlAssignments[_slot];
-    if (assignment && assignment.mode !== "HUMAN") {
-      cpuAdapter = createCpuAdapter();
-      cpuTeamId = assignment.teamId;
-      break;
-    }
-  }
 
-  // 4. Connect all keyboard adapters to window for physical input.
-  for (const { adapter } of adapters) {
-    adapter.connect(window);
+  if (IS_AI_MATCH) {
+    // AI-vs-AI mode: create a CPU adapter for every control slot.
+    for (const [slotId, assignment] of Object.entries(SCENARIO_DATA.controlAssignments)) {
+      cpuSlots.push({
+        adapter: createCpuAdapter(),
+        controlSlot: slotId,
+        teamId: assignment.teamId,
+      });
+    }
+  } else {
+    // Human mode: create keyboard adapters for HUMAN slots.
+    adapters.push({
+      adapter: createKeyboardAdapter(DEFAULT_KEYBOARD_CONFIG),
+      config: DEFAULT_KEYBOARD_CONFIG,
+    });
+
+    if (hasTwoSlots) {
+      const slot2Adapter = createKeyboardAdapter(DEFAULT_SLOT2_KEYBOARD_CONFIG);
+      adapters.push({ adapter: slot2Adapter, config: DEFAULT_SLOT2_KEYBOARD_CONFIG });
+    }
+
+    // Create CPU adapter for any non-HUMAN control slots.
+    for (const _slot of Object.keys(SCENARIO_DATA.controlAssignments)) {
+      const assignment = SCENARIO_DATA.controlAssignments[_slot];
+      if (assignment && assignment.mode !== "HUMAN") {
+        cpuAdapter = createCpuAdapter();
+        cpuTeamId = assignment.teamId;
+        break;
+      }
+    }
+
+    // 4. Connect all keyboard adapters to window for physical input.
+    for (const { adapter } of adapters) {
+      adapter.connect(window);
+    }
   }
 
   // 5. Create presentation session (Three.js renderer).
@@ -306,8 +340,18 @@ function main(): void {
         ({ adapter, config }) => adapter.sample(sim.tick),
       );
 
-      // Add CPU frame if a CPU adapter is present for AI_FALLBACK slots.
-      if (cpuAdapter) {
+      // Add CPU frames — per-slot adapters in AI-vs-AI mode.
+      if (IS_AI_MATCH) {
+        for (const { adapter: cpuAd, controlSlot, teamId: tid } of cpuSlots) {
+          const obs = buildCpuObservation(sim.snapshot(), tid);
+          const cpuFrame = cpuAd.sample(sim.tick, obs);
+          // Override controlSlot to match the scenario's slot key so
+          // the simulation routes the frame to the correct player.
+          cpuFrame.controlSlot = controlSlot;
+          allFrames.push(cpuFrame);
+        }
+      } else if (cpuAdapter) {
+        // Legacy single-CPU adapter for mixed HUMAN/AI scenarios.
         const obs = buildCpuObservation(sim.snapshot(), cpuTeamId);
         const cpuFrame = cpuAdapter.sample(sim.tick, obs);
         allFrames.push(cpuFrame);
@@ -389,6 +433,14 @@ function main(): void {
 
   // Start the loop.
   requestAnimationFrame(gameLoop);
+
+  // Update controls hint for AI-vs-AI mode.
+  if (IS_AI_MATCH) {
+    const hint = document.getElementById("controls-hint");
+    if (hint) {
+      hint.textContent = "AI-vs-AI Match — fully autonomous";
+    }
+  }
 }
 
 // Initialize when DOM is ready.

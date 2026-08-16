@@ -11,6 +11,7 @@
 import type { ScenarioDefinition } from "../../contracts/scenario.js";
 import foundationScenarioJson from "@pes/eval/scenarios/foundation-move-and-roll.v1.json";
 import twoPlayerScenarioJson from "@pes/eval/scenarios/two-player-duel.v1.json";
+import aiVsAiScenarioJson from "@pes/eval/scenarios/ai-vs-ai-duel.v1.json";
 
 /**
  * The foundation scenario — identical fixture used by the headless
@@ -28,3 +29,12 @@ export const FOUNDATION_SCENARIO: ScenarioDefinition =
  */
 export const FOUNDATION_SCENARIO_TWO_PLAYER: ScenarioDefinition =
   twoPlayerScenarioJson as unknown as ScenarioDefinition;
+
+/**
+ * AI-vs-AI match scenario — two CPU-controlled players on opposite teams.
+ * Both slots use AI_FALLBACK mode for fully autonomous CPU-vs-CPU play.
+ * Loaded from the versioned JSON at eval/scenarios/ai-vs-ai-duel.v1.json.
+ * Duration is 5400 ticks (90 seconds at 60 Hz) to allow meaningful match play.
+ */
+export const FOUNDATION_SCENARIO_AI_VS_AI: ScenarioDefinition =
+  aiVsAiScenarioJson as unknown as ScenarioDefinition;
