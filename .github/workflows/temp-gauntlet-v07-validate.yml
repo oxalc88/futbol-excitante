@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: CI=1 pnpm install --frozen-lockfile
       - name: Typecheck
         run: pnpm run typecheck
       - name: Deterministic Gauntlet regressions
