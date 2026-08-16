@@ -1660,3 +1660,41 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - integration: n/a
 - result: fixed
 - notes: Removed 3 duplicate pending entries from horizon (BROWSER-SCOREBOARD, MATCH-LIFECYCLE, AI-GOAL-IMPROVEMENT at indices 4-6) that were already accepted at indices 1-3. Updated current_index from 4 to 5 after MATCH-ORACLE acceptance.
+
+## Iteration 44 — 2026-08-16
+
+- objective_id: SCENARIO-2V2-FIXTURE
+- builder: builder-qwen / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (after prior REJECT for scope violation; fixed by removing extra capture-extract.js file)
+- result: accepted
+- notes: ?mode=ai-match&scenario=2v2 selector routing (scenario-selector.ts now checks scenario param inside ai-match branch). 14 CPU adapter independence tests (2v2-cpu-independence.test.ts): 4 adapters per slot, non-zero frames, independent movement vectors, per-slot routing correctness, 60-tick simulation loop, determinism hash. 3 new selector tests (BROWSER-SCENARIO-SELECTOR-005). Screenshot artifact at docs/screenshots/SCENARIO-2V2-FIXTURE/frame-000.png (diagnostic — blank white, known pipeline limitation). 1282/1282 full suite pass. No core changes — only browser glue layer.
+
+### Critic verdict (ACCEPT — first pass)
+
+```markdown
+## Critic verdict
+- objective_id: SCENARIO-2V2-FIXTURE
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-qwen
+- builder_model: qwen3.6
+- independence_ok: true
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: SCENARIO-2V2-FIXTURE
+- reviewer_agent: integration-reviewer-flash
+- reviewer_model: deepseek-v4-flash
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (1282/1282 full suite, 3/3 architecture contracts)
+- verdict: ACCEPT
+- required_fixes: none
+```

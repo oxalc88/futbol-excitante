@@ -7,11 +7,11 @@ orchestrator_in_use: orchestrator-deepseek
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: SCENARIO-2V2-FIXTURE
+next_objective_id: CPU-BASIC-FORMATION
 best_known:
   commit: (pending acceptance)
-  note: "CPU-MULTI-PLAYER accepted. CPU adapter now supports multiple controlled players per team via controlledPlayerId. Advancing to SCENARIO-2V2-FIXTURE: create 2v2 AI-vs-AI scenario fixture."
-active_candidate: SCENARIO-2V2-FIXTURE
+  note: "SCENARIO-2V2-FIXTURE accepted. Selector handles ?mode=ai-match&scenario=2v2, 14 CPU adapter independence tests, 11 selector tests, screenshot artifact. Advancing to CPU-BASIC-FORMATION: CPU players maintain basic formation shape."
+active_candidate: null
 builder_in_use: builder-qwen
 critic_in_use: critic-flash
 retry_count: 0
@@ -48,9 +48,9 @@ selection_note: "Horizon playable-browser-v2: browser match-phase overlays, goal
 
 ## Last accepted objective
 
-CPU-MULTI-PLAYER — CPU adapter now uses controlledPlayerId to find its controlled player instead of blindly using players[0]. Per-slot CPU adapters in browser mode pass controlledPlayerId through buildCpuObservation. Fallback to players[0] for backward compatibility. 12 new tests (CPU-MULTIPLAYER-001 through 004), 92/92 CPU adapter tests, 1224/1224 full suite.
+SCENARIO-2V2-FIXTURE — ?mode=ai-match&scenario=2v2 selector routing (scenario-selector.ts checks scenario param inside ai-match branch). 14 CPU adapter independence tests (per-slot routing, non-zero frames, independent movement, determinism). 11 selector tests (BROWSER-SCENARIO-SELECTOR-005). 1282/1282 full suite pass.
 
 - builder: builder-qwen / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 12/12 multi-player tests, 92/92 CPU adapter tests, 1224/1224 full suite
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (scope violation removed)
+- Evidence: 14/14 CPU independence tests, 11/11 selector tests, 10/10 fixture structure tests

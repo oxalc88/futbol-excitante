@@ -102,3 +102,34 @@ describe("BROWSER-SCENARIO-SELECTOR-004: unknown query falls back", () => {
     expect(world.players.length).toBe(1);
   });
 });
+
+// ---------------------------------------------------------------------------
+// 5. ?mode=ai-match&scenario=2v2 → 2v2 AI match scenario
+// ---------------------------------------------------------------------------
+
+describe("BROWSER-SCENARIO-SELECTOR-005: ?mode=ai-match&scenario=2v2", () => {
+  it("returns 2v2 scenario for ?mode=ai-match&scenario=2v2", async () => {
+    const { FOUNDATION_SCENARIO_2V2 } =
+      await import("../../src/apps/browser/foundation-scenario.js");
+    const scenario = selectBrowserScenario("?mode=ai-match&scenario=2v2");
+    expect(scenario).toBe(FOUNDATION_SCENARIO_2V2);
+    const world = createWorld({ scenario });
+    expect(world.players.length).toBe(4);
+    // 4 control slots → 4 CPU adapters.
+    expect(Object.keys(scenario.controlAssignments)).toHaveLength(4);
+  });
+
+  it("mode=ai-match alone returns 1v1 AI-vs-AI (not 2v2)", async () => {
+    const { FOUNDATION_SCENARIO_AI_VS_AI } =
+      await import("../../src/apps/browser/foundation-scenario.js");
+    const scenario = selectBrowserScenario("?mode=ai-match");
+    expect(scenario).toBe(FOUNDATION_SCENARIO_AI_VS_AI);
+  });
+
+  it("scenario=2v2 without mode=ai-match returns 2v2", async () => {
+    const { FOUNDATION_SCENARIO_2V2 } =
+      await import("../../src/apps/browser/foundation-scenario.js");
+    const scenario = selectBrowserScenario("?scenario=2v2");
+    expect(scenario).toBe(FOUNDATION_SCENARIO_2V2);
+  });
+});

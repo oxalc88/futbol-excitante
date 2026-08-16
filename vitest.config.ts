@@ -3,6 +3,11 @@ import viteConfig from "./vite.config";
 
 export default defineConfig({
   ...viteConfig,
+  define: {
+    // Inject process.env.WIP_SECTION and WIP_FRAMES for browser mode.
+    "process.env.WIP_SECTION": JSON.stringify(process.env.WIP_SECTION || "capture"),
+    "process.env.WIP_FRAMES": JSON.stringify(process.env.WIP_FRAMES || "1"),
+  },
   test: {
     projects: [
       {
@@ -20,6 +25,7 @@ export default defineConfig({
         name: "browser",
         test: {
           name: "browser",
+          environment: "jsdom",
           browser: {
             enabled: true,
             provider: "playwright",
@@ -27,6 +33,9 @@ export default defineConfig({
           },
           include: ["tests/browser/**/*.test.ts"],
           exclude: [],
+          define: {
+            process: "globalThis.process",
+          },
         },
       },
     ],
