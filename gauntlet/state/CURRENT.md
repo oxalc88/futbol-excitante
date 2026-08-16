@@ -9,7 +9,7 @@ handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 next_objective_id: CPU-BALL-PURSUIT
 best_known:
-  commit: (pending acceptance)
+  commit: 0528b7d
   note: "BROWSER-GOAL-EFFECT accepted. Advancing to next horizon objective: CPU-BALL-PURSUIT — CPU adapter actively moves toward ball when out of possession."
 active_candidate: null
 builder_in_use: builder-qwen
