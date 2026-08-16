@@ -43,7 +43,7 @@ jobs:
           pnpm exec vite --host 127.0.0.1 > /tmp/vite.log 2>&1 &
           echo $! > /tmp/vite.pid
           for i in {1..60}; do
-            if curl -fsS http://127.0.0.1:5173/ >/dev/null; then
+            if curl -fsS http://127.0.0.1:5173/src/apps/browser/index.html >/dev/null; then
               exit 0
             fi
             sleep 1
@@ -69,7 +69,7 @@ jobs:
           page.on('console', msg => console.log(`[browser:${msg.type()}] ${msg.text()}`));
           page.on('pageerror', err => console.error(`[pageerror] ${err.message}`));
 
-          await page.goto('http://127.0.0.1:5173/?mode=ai-match', { waitUntil: 'networkidle' });
+          await page.goto('http://127.0.0.1:5173/src/apps/browser/index.html?mode=ai-match', { waitUntil: 'networkidle' });
           await page.screenshot({ path: 'capture/out/ai-match-start.png', fullPage: true });
           await page.waitForTimeout(25000);
           await page.screenshot({ path: 'capture/out/ai-match-end.png', fullPage: true });
