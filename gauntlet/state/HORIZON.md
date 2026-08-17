@@ -7,7 +7,7 @@ horizon_id: "five-vs-five"
 created_from_commit: eaefdf1
 created_at: 2026-08-16
 reason: "Horizon small-sided-match exhausted (6/6 accepted). SMALL-SIDED milestone complete with 3v3 browser play, team decision, role-aware formation, and match restart. Next horizon targets 5v5 progression: auto match timer, defensive AI improvements, pass variety (ground/lofted/power), human-vs-CPU 3v3, and the 5v5 fixture and browser play. These build toward the next cardinality milestone after SMALL-SIDED."
-current_index: 3
+current_index: 4
 objectives:
   - id: MATCH-TIMER-ENFORCEMENT
     status: accepted
@@ -28,10 +28,11 @@ objectives:
     prerequisite: CPU-3V3-TEAMPLAY
     commit: 127720b
   - id: BROWSER-3V3-HUMAN-VS-CPU
-    status: pending
+    status: accepted
     reason: "Add ?mode=human-vs-ai-3v3 URL mode where a human controls one player via keyboard and has 2 CPU teammates against 3 CPU opponents. Follows the existing BROWSER-HUMAN-VS-CPU pattern but scaled to 3v3."
     builder: builder-gameplay
     prerequisite: BROWSER-3V3-MATCH
+    commit: 490d773
   - id: SCENARIO-5V5-FIXTURE
     status: pending
     reason: "Add a 5v5 fixture scenario (10 players, 5 per team) with appropriate formation positions (e.g., 2-2-1 or 2-1-2). Follows the existing 2v2 and 3v3 scenario patterns. 10 control slots, all AI_FALLBACK, with team/player assignments."

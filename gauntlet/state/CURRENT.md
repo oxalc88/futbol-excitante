@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-3V3-HUMAN-VS-CPU
+next_objective_id: SCENARIO-5V5-FIXTURE
 
 best_known:
-  commit: 127720b
-  note: "CPU-PASS-VARIETY accepted. Horizon five-vs-five 3/6. Next: BROWSER-3V3-HUMAN-VS-CPU."
+  commit: 490d773
+  note: "BROWSER-3V3-HUMAN-VS-CPU accepted. Horizon five-vs-five 4/6. Next: SCENARIO-5V5-FIXTURE."
 
 active_candidate: null
 builder_in_use: null
@@ -63,18 +63,19 @@ accepted:
   - MATCH-TIMER-ENFORCEMENT
   - CPU-DEFENSIVE-IMPROVEMENT
   - CPU-PASS-VARIETY
+  - BROWSER-3V3-HUMAN-VS-CPU
 
 blocked: []
 
-selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 3/6 accepted. Next: BROWSER-3V3-HUMAN-VS-CPU."
+selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 4/6 accepted. Next: SCENARIO-5V5-FIXTURE."
 ```
 
 ## Last accepted objective
 
-CPU-PASS-VARIETY — CPU adapter pass variety: ground vs lofted choice (LOFT_PASS_DISTANCE_THRESHOLD=15m, urgency-scaled to 7.5m–30m), defender-aware target selection (PASS_DEFENDER_MARKING_RADIUS=5m), urgency-scaled pass power via pass-type choice. All constants provisional. 273/273 cpu-adapter unit tests, 1612/1612 total. 8-frame trajectory. MULTI_TICK audit PASS.
+BROWSER-3V3-HUMAN-VS-CPU — 3v3 human-vs-CPU browser mode. `?mode=human-vs-ai-3v3` loads 6 players (3 per team), 1 HUMAN keyboard slot + 2 CPU teammates vs 3 CPU opponents. 1-2 formation with defender/midfielder/attacker roles. 6 CPU slots verified independent. All constants provisional. 90/90 node files, 12/12 browser files. BROWSER_VISIBLE audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 273/273 unit, 1612/1612 total, 8-frame trajectory, deterministic audit PASS
-- Commit: 127720b
+- Evidence: 1612 node tests, 56 browser tests, deterministic audit PASS, screenshot frame-000.png
+- Commit: 490d773

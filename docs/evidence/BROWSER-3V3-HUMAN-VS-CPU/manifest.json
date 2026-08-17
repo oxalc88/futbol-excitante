@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.1",
+  "objective_id": "BROWSER-3V3-HUMAN-VS-CPU",
+  "accepted_at": "2026-08-17T15:42:46.827Z",
+  "candidate_commit": "490d773c4fbd394b5fe78d453c3f93770689e038",
+  "evidence_class": "BROWSER_VISIBLE",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/BROWSER-3V3-HUMAN-VS-CPU/frame-000.png",
+        "sha256": "10fd338a7be69c71b6f046723ea5c6acd83439d52f1b352caadbaf619b9a93c5",
+        "git_blob": "f411771ae84aeb56497490c6b77e3eaf08012287",
+        "candidate_commit": "490d773c4fbd394b5fe78d453c3f93770689e038",
+        "bytes": 36434,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/BROWSER-3V3-HUMAN-VS-CPU/audit.json",
+      "sha256": "d0a2afc47255c82b4fa69f8d29ffbb08e08ec404b3b47b1b0acef6658ce31e4c",
+      "git_blob": "352e9d780d3e01293a1b87cfa2554db972163f49",
+      "candidate_commit": "490d773c4fbd394b5fe78d453c3f93770689e038",
+      "bytes": 2536,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "checks": 24,
+      "all_pass": true
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "agent": "integration-reviewer-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-17/2026-08-17T15-42-46-827Z-BROWSER-3V3-HUMAN-VS-CPU-acceptance.json"
+}

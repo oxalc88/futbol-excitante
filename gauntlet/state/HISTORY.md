@@ -2251,3 +2251,60 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 55 — 2026-08-17
+
+- objective_id: BROWSER-3V3-HUMAN-VS-CPU
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: 490d773 candidate(BROWSER-3V3-HUMAN-VS-CPU)
+- notes: 3v3 human-vs-CPU browser mode. `?mode=human-vs-ai-3v3` URL route loads 6 players (3 per team), 1 HUMAN keyboard slot (slot-1, player-1, team-a) + 2 CPU teammates (slots 2–3, team-a) vs 3 CPU opponents (slots 4–6, team-b). 1-2 formation (defender/midfielder/attacker roles). Browser screenshot evidence at frame-000.png (36KB). 12 browser test files (56 tests), 90 node files (1612 tests) all PASS. Deterministic audit PASS. No PES claim.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: BROWSER-3V3-HUMAN-VS-CPU
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-gameplay
+- builder_model: mimo-v2.5
+- independence_ok: true
+- deterministic_audit: PASS
+- semantic_audit: NOT_REQUIRED
+- mandatory_evidence_ok: true
+- criteria:
+  - mode loads 6 players: PASS
+  - human keyboard slot: PASS
+  - CPU teammates: PASS
+  - CPU opponents: PASS
+  - no regressions: PASS
+  - deterministic: PASS
+  - screenshot evidence: PASS
+  - no PES claims: PASS
+- architecture_violations: none
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: BROWSER-3V3-HUMAN-VS-CPU
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (90 files, 1612 node tests; 12 files, 56 browser tests)
+- deterministic_audit: PASS
+- critic_verdict_verified: true
+- mandatory_evidence_ok: true
+- presentation_authority: PASS
+- evaluator_integrity: NOT_APPLICABLE
+- verdict: ACCEPT
+- required_fixes: none
+```
