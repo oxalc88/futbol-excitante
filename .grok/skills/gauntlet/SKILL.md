@@ -9,15 +9,19 @@ argument-hint: optional focus, e.g. continue from BOOTSTRAP-07 only
 
 Start the PES Simulator Gauntlet Loop now. Do not implement gameplay yourself.
 
-Read `gauntlet/PROMPT.md`, `gauntlet/principles.md`, `gauntlet/VERSION.json`, `gauntlet/observability-contract.md`, `CURRENT.md`, and `HORIZON.md`. Follow the validated rolling horizon and existing model routing.
+Read `gauntlet/PROMPT.md`, `gauntlet/principles.md`, `gauntlet/VERSION.json`, `gauntlet/observability-contract.md`, `gauntlet/regression-inbox-contract.md`, `CURRENT.md`, and `HORIZON.md`. Follow the validated rolling horizon and existing model routing.
 
 Before any other status prose, print one compact startup line using the version read from `gauntlet/VERSION.json`:
 
 `Gauntlet <version> · orchestrator · grok-4.6`
 
+Before ordinary objective selection, fetch `origin/gauntlet-regressions` and inspect OPEN regression records as required by `gauntlet/regression-inbox-contract.md`. CI is the detector/classifier; reproduce the named deterministic check before prioritizing a repair. Never edit or resolve the inbox yourself.
+
 For each candidate follow the full pipeline in `gauntlet/PROMPT.md`: builder → tests/artifacts → `pnpm run gauntlet:audit` → optional bounded semantic audit only on `REVIEW_REQUIRED` → mandatory critic → integration reviewer → final evidence gate → candidate snapshot commit → `GAUNTLET_ACCEPTANCE_JSON=... pnpm run gauntlet:acceptance:persist` → bookkeeping → `pnpm run gauntlet:eval:state` → final acceptance commit → acceptance publication + remote containment verification → continue.
 
 Critic ACCEPT alone is never final, and deterministic/cheap-auditor success never bypasses the critic. Never claim an objective is fully accepted/committed until durable acceptance record, objective manifest, accepted state, candidate commit, final acceptance commit, and required remote publication all exist.
+
+After every acceptance publication and before strategic replan, inspect the regression inbox again. An OPEN regression that still reproduces may reprioritize repair, but it does not bypass the normal builder/critic/integration/acceptance pipeline. Inbox resolution is owned by the next successful deterministic `main` CI run.
 
 Preserve historical evidence; never rewrite old screenshots to make a later story cleaner. Dynamic visual behavior follows the strict evidence-class and event-centered rules in `gauntlet/evidence-contract.md`.
 
@@ -25,4 +29,4 @@ Normative milestone progress follows `gauntlet/milestone-playtest-contract.md` a
 
 A successful acceptance commit, tracking repair, or horizon exhaustion is not a stop condition. Horizon exhaustion triggers strategic reassessment and continuation only after remote durability is verified. Preserve the existing SuperGrok ≥89% handoff rule.
 
-If the user supplies extra focus, apply it only to objective selection; never skip audit, critic, integration review, provenance persistence, state audit, remote publication, or an applicable milestone gate.
+If the user supplies extra focus, apply it only to objective selection; never skip audit, critic, integration review, provenance persistence, state audit, remote publication, regression-inbox pickup, or an applicable milestone gate.

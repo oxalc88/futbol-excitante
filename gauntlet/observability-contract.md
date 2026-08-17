@@ -17,6 +17,7 @@ There is no parallel hidden progress database and no observer-owned state that c
 7. `docs/evidence/<objective-id>/manifest.json` — objective-level accepted evidence provenance.
 8. `docs/evidence/milestones/<milestone-id>/manifest.json` — derived milestone bundle.
 9. `gauntlet/gameplay-situations.json` and `gauntlet/playtests/*.json` — stable product/playtest expectations, not generated live state.
+10. `origin/gauntlet-regressions:gauntlet/regressions/inbox/*.json` — CI-produced deterministic regression notifications. These report repository health only and have no acceptance authority.
 
 Consumers MUST NOT infer a stronger status than these sources support.
 
@@ -27,6 +28,14 @@ A finalized objective may exist locally before it is published. Repository obser
 The orchestration loop therefore publishes and verifies every finalized acceptance before delegating the next objective or replanning an exhausted horizon.
 
 Remote durability is an orchestration/observability invariant, not a gameplay quality criterion.
+
+## Deterministic regression observability
+
+The `gauntlet-regressions` branch is a repository-hosted side channel for CI health records. It is intentionally separate from `main`: CI bookkeeping must not advance, rewrite, or dirty the accepted gameplay branch.
+
+The branch is produced only by deterministic CI according to `gauntlet/regression-inbox-contract.md`. The live Gauntlet and all observer/dashboard/blog consumers are read-only consumers of this branch. Repeated identical failures are deduplicated by stable signature; a later passing check resolves the corresponding record.
+
+A regression record cannot accept/reject gameplay quality, replace critic/integration review, or alter milestone status.
 
 ## Standard observable levels
 
@@ -59,6 +68,7 @@ The live Gauntlet owns writes to generated state/evidence. Observer/dashboard/bl
 - edit `gauntlet/state/**`;
 - rewrite objective manifests or historical screenshots;
 - upgrade `NOT_EVALUATED`, `NEEDS_PERCEPTUAL_REVIEW`, or missing evidence into PASS;
+- edit or resolve CI regression inbox records;
 - create a second canonical milestone status outside the repository.
 
 ## Design rule

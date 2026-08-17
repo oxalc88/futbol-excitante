@@ -3,21 +3,34 @@ name: PR Validation
 on:
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: pr-validation-${{ github.event.pull_request.number || github.ref }}
+  group: pr-validation-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [base, head]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout CI runner from PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: source
+
+      - name: Checkout validation target
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.target == 'base' && github.event.pull_request.base.sha || github.event.pull_request.head.sha }}
+          path: target
 
       - uses: pnpm/action-setup@v4
         with:
@@ -27,29 +40,59 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: target/pnpm-lock.yaml
 
       - name: Install dependencies
+        working-directory: target
         run: pnpm install --frozen-lockfile
         env:
           PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
 
       - name: Install Chromium
+        working-directory: target
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Gauntlet regression evals
-        run: pnpm run gauntlet:eval
+      - name: Run deterministic validation
+        id: validation
+        continue-on-error: true
+        working-directory: target
+        run: node ../source/scripts/ci/run-validation.mjs
+        env:
+          CI_TARGET_SHA: ${{ matrix.target == 'base' && github.event.pull_request.base.sha || github.event.pull_request.head.sha }}
+          CI_REPORT_PATH: ../artifacts/ci/${{ matrix.target }}.json
 
-      - name: Typecheck
-        run: pnpm run typecheck
+      - name: Upload validation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-validation-${{ matrix.target }}
+          path: artifacts/ci/${{ matrix.target }}.json
+          if-no-files-found: error
 
-      - name: Unit and integration tests
-        run: pnpm run test
+  classify:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Browser tests
-        run: pnpm run test-browser
+      - uses: actions/download-artifact@v4
+        with:
+          name: ci-validation-base
+          path: artifacts/ci/base
 
-      - name: Simulation smoke test
-        run: pnpm run sim-smoke
+      - uses: actions/download-artifact@v4
+        with:
+          name: ci-validation-head
+          path: artifacts/ci/head
 
-      - name: Production build
-        run: pnpm run build
+      - name: Classify base vs PR failures
+        run: node scripts/ci/classify-pr-validation.mjs artifacts/ci/base/base.json artifacts/ci/head/head.json artifacts/ci/pr-classification.json
+
+      - name: Upload classification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-ci-classification
+          path: artifacts/ci/pr-classification.json
+          if-no-files-found: error

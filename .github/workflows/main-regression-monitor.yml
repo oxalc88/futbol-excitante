@@ -1,0 +1,96 @@
+name: Main Regression Monitor
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: main-regression-monitor
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run deterministic validation
+        id: validation
+        continue-on-error: true
+        run: node scripts/ci/run-validation.mjs
+        env:
+          CI_TARGET_SHA: ${{ github.sha }}
+          CI_REPORT_PATH: artifacts/ci/main.json
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-ci-validation
+          path: artifacts/ci/main.json
+          if-no-files-found: error
+
+      - name: Mark validation result
+        if: steps.validation.outcome == 'failure'
+        run: exit 1
+
+  publish-regression-inbox:
+    if: always()
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: source
+
+      - name: Checkout regression inbox branch
+        uses: actions/checkout@v4
+        with:
+          ref: gauntlet-regressions
+          path: regression-repo
+
+      - name: Download validation report
+        uses: actions/download-artifact@v4
+        with:
+          name: main-ci-validation
+          path: source/artifacts/ci
+
+      - name: Update deterministic regression inbox
+        run: node source/scripts/ci/update-regression-inbox.mjs source/artifacts/ci/main.json regression-repo
+
+      - name: Commit inbox changes when semantic status changed
+        working-directory: regression-repo
+        run: |
+          if git diff --quiet -- gauntlet/regressions/inbox; then
+            echo "No regression inbox change"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gauntlet/regressions/inbox
+          git commit -m "ci(gauntlet): update regression inbox"
+          git push origin HEAD:gauntlet-regressions
