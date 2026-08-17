@@ -481,6 +481,12 @@ export function createPresentationSession(
     // --- Players ---
     const activePlayerIds = new Set<string>();
 
+    // Reset controlled-player marker visibility each frame so it
+    // hides automatically when no human-controlled player exists.
+    if (markerMesh) {
+      markerMesh.visible = false;
+    }
+
     for (const pp of snapshot.players) {
       activePlayerIds.add(pp.playerId);
 
@@ -505,7 +511,8 @@ export function createPresentationSession(
       mesh.position.set(px, 0, pz);
       mesh.rotation.y = -pp.bodyHeading; // rotate to face heading direction
 
-      // Controlled-player marker
+      // Controlled-player marker — yellow ring above the human-controlled
+      // player.  Only HUMAN-slot players have isControlled === true.
       if (pp.isControlled && markerMesh) {
         markerMesh.visible = true;
         markerMesh.position.set(px, config.playerHeight + 0.5, pz);
