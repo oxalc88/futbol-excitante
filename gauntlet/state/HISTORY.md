@@ -2421,3 +2421,60 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 58 — 2026-08-17
+
+- objective_id: BROWSER-PLAYER-SWITCH
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (retry 1: fixed live-state read)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: b1cc042 candidate(BROWSER-PLAYER-SWITCH)
+- notes: Tab-key player switching for human-controlled slot. SWITCH_PLAYER_BIT (1<<3) in input contract, Tab mapped in keyboard adapter, setControlledPlayer on Simulation API. fix: nextEligiblePlayer reads from live snapshot, not static scenario. 71/71 browser tests, 1654/1654 node tests. SHA collision resolved by semantic audit (VALID). No PES claim.
+
+### Critic verdict (ACCEPT — retry 1)
+
+```markdown
+## Critic verdict
+- objective_id: BROWSER-PLAYER-SWITCH
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-gameplay
+- builder_model: mimo-v2.5
+- independence_ok: true
+- deterministic_audit: REVIEW_REQUIRED (semantic audit VALID)
+- semantic_audit: VALID
+- mandatory_evidence_ok: true
+- criteria:
+  - Tab switches to next teammate: PASS
+  - cycle wraps: PASS (retry fix)
+  - CPU slots unaffected: PASS
+  - Tab inert in AI mode: PASS
+  - deterministic: PASS
+  - screenshot: PASS
+  - no regressions: PASS
+  - no PES claims: PASS
+- architecture_violations: none
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: BROWSER-PLAYER-SWITCH
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (15 browser files, 71 tests; 91 node files, 1654 tests)
+- deterministic_audit: REVIEW_REQUIRED (semantic audit VALID)
+- critic_verdict_verified: true
+- mandatory_evidence_ok: true
+- presentation_authority: PASS
+- evaluator_integrity: NOT_APPLICABLE
+- verdict: ACCEPT
+- required_fixes: none
+```

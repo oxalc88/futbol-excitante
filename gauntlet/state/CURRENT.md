@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-5V5-MATCH
+next_objective_id: BROWSER-CONTROLLED-PLAYER-INDICATOR
 
 best_known:
-  commit: 15317d2
-  note: "BROWSER-5V5-MATCH accepted. Horizon five-vs-five complete (6/6). Next: strategic reassessment needed."
+  commit: b1cc042
+  note: "BROWSER-PLAYER-SWITCH accepted. Horizon human-vs-cpu 1/5. Next: BROWSER-CONTROLLED-PLAYER-INDICATOR."
 
 active_candidate: null
 builder_in_use: null
@@ -66,23 +66,19 @@ accepted:
   - BROWSER-3V3-HUMAN-VS-CPU
   - SCENARIO-5V5-FIXTURE
   - BROWSER-5V5-MATCH
+  - BROWSER-PLAYER-SWITCH
 
 blocked: []
 
-selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 6/6 accepted. Horizon complete."
+selection_note: "Horizon human-vs-cpu: 5 objectives toward playable human-vs-CPU with player switching, visual indicator, 5v3 mode, improved CPU attack, and directional passing. 1/5 accepted. Next: BROWSER-CONTROLLED-PLAYER-INDICATOR."
 ```
 
 ## Last accepted objective
 
-BROWSER-5V5-MATCH — Playable 5v5 browser AI match. `?mode=ai-match-5v5` loads 10 CPU players (5 per team) with autonomous CpuAdapter behavior. Hash parity verified against headless: 60-tick and 120-tick deterministic play. HUD, scoreboard, match timer, phase transitions inherited. Screenshot evidence at frame-000.png (7.1KB). 64/64 browser tests, 1654/1654 node tests. BROWSER_VISIBLE audit PASS.
+BROWSER-PLAYER-SWITCH — Tab-key player switching for human-controlled slot in human-vs-CPU browser modes. SWITCH_PLAYER_BIT (1<<3) added to InputFrame contract. Keyboard Tab mapped to switch. setControlledPlayer on Simulation API cycles controlledPlayerId through eligible teammates. Fix: nextEligiblePlayer reads from live simulation snapshot, not static scenario data. 71/71 browser tests, 1654/1654 node tests. BROWSER_VISIBLE audit PASS (semantic audit VALID for SHA collision).
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 1654 node tests, 64 browser tests, 10-player autonomous CPU, hash parity, screenshot frame-000.png
-- Commit: 15317d2
-
----
-## Horizon five-vs-five complete (6/6 accepted)
-
-All 6 objectives of the five-vs-five horizon are accepted. Strategic reassessment needed for next horizon.
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (retry 1: fixed live-state read)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (evidence independently verified)
+- Evidence: 71 browser tests, 1654 node tests, screenshot, semantic audit VALID
+- Commit: b1cc042

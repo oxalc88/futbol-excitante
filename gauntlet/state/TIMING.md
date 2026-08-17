@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-5V5-MATCH
-usage_aggregates_through: BROWSER-5V5-MATCH
-model_evaluation_through: BROWSER-5V5-MATCH
+last_tracked_objective: BROWSER-PLAYER-SWITCH
+usage_aggregates_through: BROWSER-PLAYER-SWITCH
+model_evaluation_through: BROWSER-PLAYER-SWITCH
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -125,6 +125,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | BROWSER-3V3-HUMAN-VS-CPU | accepted | ~22m | 15m | 19m | 5m | 0.5m | ~2M est. | n/a** |
 | SCENARIO-5V5-FIXTURE | accepted | ~18m | 15m | 12m | 5m | 0.5m | ~4M est. | n/a** |
 | BROWSER-5V5-MATCH | accepted | ~25m | 16m | 3m | 3m | 0.5m | ~1M est. | n/a** |
+| BROWSER-PLAYER-SWITCH | accepted | ~30m | 19m | 10m | 5m | 0.5m | ~6M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -323,6 +324,7 @@ on an H task is the interesting result.
 | BROWSER-3V3-HUMAN-VS-CPU | mimo-v2.5 | M | Medium — URL routing, scenario fixture, browser glue | 0 | A | 56 browser tests, 1612 node tests, screenshot frame-000.png |
 | SCENARIO-5V5-FIXTURE | qwen3.6 | M | Medium — new fixture, existing scenario pattern | 0 | A | 42 new tests, 1654/1654 total, 5 scenario files |
 | BROWSER-5V5-MATCH | mimo-v2.5 | H | High — browser wiring, 10-slot CPU autonomy, hash parity | 0 | A | 8 new browser tests, 64/64 browser total, hash parity verified |
+| BROWSER-PLAYER-SWITCH | mimo-v2.5 | M | Medium — player switching, Tab mapping, Simulation API | 1 | B | 7 new browser tests, 71/71 browser total, 1654/1654 node |
 
 ### Reviewer route and catches
 
@@ -374,6 +376,8 @@ on an H task is the interesting result.
 | SCENARIO-5V5-FIXTURE | integration-reviewer-flash (deepseek-v4-flash) | 0731 allowance exhausted, flash fallback | ACCEPT | 5 scenario files, 125 tests, 1654 total, dependency clean |
 | BROWSER-5V5-MATCH | critic-flash (deepseek-v4-flash) | 0731 allowance exhausted, flash fallback | ACCEPT | 0 retries — first pass clean; all 8 criteria PASS |
 | BROWSER-5V5-MATCH | integration-reviewer-flash (deepseek-v4-flash) | 0731 allowance exhausted, flash fallback | ACCEPT | 13 browser files/64 tests, 91 node files/1654 tests, dependency clean |
+| BROWSER-PLAYER-SWITCH | critic-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 1 retry — fixed nextEligiblePlayer to read live state |
+| BROWSER-PLAYER-SWITCH | integration-reviewer-flash (deepseek-v4-flash) | — | ACCEPT | 15 browser files/71 tests, 91 node files/1654 tests, evidence verified |
 
 ### Builder scoreboard
 
@@ -382,7 +386,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 40 | 24 | 8 | 3 | 3 | 2 | 60% | ~0.78 | ~38m |
-| mimo-v2.5 | 14 | 9 | 4 | 1 | 0 | 0 | 64% | ~0.50 | ~30m |
+| mimo-v2.5 | 15 | 9 | 5 | 1 | 0 | 0 | 60% | ~0.53 | ~30m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

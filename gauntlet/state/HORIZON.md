@@ -1,50 +1,40 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 6
-status: EXHAUSTED
-horizon_id: "five-vs-five"
-created_from_commit: eaefdf1
-created_at: 2026-08-16
-reason: "Horizon small-sided-match exhausted (6/6 accepted). SMALL-SIDED milestone complete with 3v3 browser play, team decision, role-aware formation, and match restart. Next horizon targets 5v5 progression: auto match timer, defensive AI improvements, pass variety (ground/lofted/power), human-vs-CPU 3v3, and the 5v5 fixture and browser play. These build toward the next cardinality milestone after SMALL-SIDED."
-current_index: 6
+horizon_version: 7
+status: ACTIVE
+horizon_id: "human-vs-cpu"
+created_from_commit: fbb68f8
+created_at: 2026-08-17
+reason: "Horizon five-vs-five exhausted (6/6 accepted). 5v5 AI match and browser play established. Next horizon focuses on human-vs-CPU quality: player switching, 5v5 human-vs-CPU with mixed control, improved CPU teammate behavior, and basic visual indicators so the human can identify their controlled player."
+current_index: 1
 objectives:
-  - id: MATCH-TIMER-ENFORCEMENT
+  - id: BROWSER-PLAYER-SWITCH
     status: accepted
-    reason: "Add tick-based match timer that auto-transitions phases: playing → halftime → playing → fulltime. The timer display exists in the HUD but doesn't drive phase changes yet. Integrates with the existing matchPhase state machine and PresentationSnapshot. Reuses MATCH-SET-PIECE reset logic for halftime."
-    builder: builder-structured
-    prerequisite: MATCH-SET-PIECE
-    commit: d1795b0
-  - id: CPU-DEFENSIVE-IMPROVEMENT
-    status: accepted
-    reason: "Improve CPU defender behavior: tracking opposing attackers, marking space, pressing the ball carrier more intelligently. Extends the team decision profile with defensive sub-modes and the role-aware formation with marking distances. First step toward coordinated team defense."
+    reason: "Add player switching for the human-controlled slot in human-vs-CPU modes. When the human presses a key (e.g., Tab or Q), the controlled player switches to the nearest teammate (or the next in a fixed order). This is purely a control-layer change: slot-1 remains HUMAN, but its controlledPlayerId cycles through eligible teammates. Integrates with the existing keyboard adapter and test-bridge. Makes the human-vs-CPU experience significantly more playable."
     builder: builder-gameplay
-    prerequisite: CPU-3V3-TEAMPLAY
-    commit: b499017
-  - id: CPU-PASS-VARIETY
-    status: accepted
-    reason: "Add ground pass vs lofted pass choice to CPU adapter. Pass power influenced by distance to target and urgency (score state, time remaining). Better target selection under pressure (consider defender proximity). Extends the existing getBestTeammateTarget logic."
+    prerequisite: BROWSER-3V3-HUMAN-VS-CPU
+    commit: b1cc042
+  - id: BROWSER-CONTROLLED-PLAYER-INDICATOR
+    status: pending
+    reason: "Add a visual indicator (e.g., arrow, ring, or highlight) above the human-controlled player in browser modes. The Three.js renderer already renders player models; this adds a simple colored indicator (a small cone/ring above the controlled player's head) so the human can see which player they control. Updates PresentationSnapshot or renderer-only state."
     builder: builder-gameplay
-    prerequisite: CPU-3V3-TEAMPLAY
-    commit: 127720b
-  - id: BROWSER-3V3-HUMAN-VS-CPU
-    status: accepted
-    reason: "Add ?mode=human-vs-ai-3v3 URL mode where a human controls one player via keyboard and has 2 CPU teammates against 3 CPU opponents. Follows the existing BROWSER-HUMAN-VS-CPU pattern but scaled to 3v3."
+    prerequisite: BROWSER-PLAYER-SWITCH
+  - id: BROWSER-5V3-HUMAN-VS-CPU
+    status: pending
+    reason: "Add ?mode=human-vs-ai-5v3 URL mode where a human controls 1 player via keyboard with 4 CPU teammates against 5 CPU opponents. Uses the 5v5 fixture with slot-1 set to HUMAN. Combined with player switching, the human can control any of the 5 players on their team. Follows the existing human-vs-CPU pattern."
     builder: builder-gameplay
-    prerequisite: BROWSER-3V3-MATCH
-    commit: 490d773
-  - id: SCENARIO-5V5-FIXTURE
-    status: accepted
-    reason: "Add a 5v5 fixture scenario (10 players, 5 per team) with appropriate formation positions (e.g., 2-2-1 or 2-1-2). Follows the existing 2v2 and 3v3 scenario patterns. 10 control slots, all AI_FALLBACK, with team/player assignments."
-    builder: builder-structured
-    prerequisite: SCENARIO-3V3-FIXTURE
-    commit: e29b116
-  - id: BROWSER-5V5-MATCH
-    status: accepted
-    reason: "Add ?mode=ai-match-5v5 URL mode for a playable 5v5 browser match with 10 CPU players (5 per team). Browser shows HUD, scoreboard, match timer, phase transitions. Browser test verifies hash parity and deterministic multi-tick 5v5 play. Screenshot evidence."
+    prerequisite: BROWSER-PLAYER-SWITCH
+  - id: CPU-ATTACKING-IMPROVEMENT
+    status: pending
+    reason: "Improve CPU attacking patterns: smarter forward runs when teammates have possession, better off-ball positioning toward opponent goal, and periodic forward movement from midfielders/attackers during balanced/attack phases. Extends the CpuAdapter with role-aware off-ball movement."
     builder: builder-gameplay
-    prerequisite: BROWSER-3V3-MATCH
-    commit: 15317d2
+    prerequisite: CPU-TEAM-DECISION-PROFILE
+  - id: HUMAN-PASS-DIRECTION-CONTROL
+    status: pending
+    reason: "Allow the human to influence pass direction beyond body heading. When pressing PASS_BIT, the pass direction could be influenced by the current movement direction (moveX/moveY) rather than only bodyHeading. This makes human passing feel more responsive. Add a modifier: SHIFT+PASS for a lofted pass. This is a contact/wiring change."
+    builder: builder-gameplay
+    prerequisite: BROWSER-PLAYER-SWITCH
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -53,7 +43,7 @@ replan_if:
   - unsafe_due_to_new_defect
   - materially_higher_value_evidence
   - human_needed_spec_or_legal_blocker
-observable_progress_target: "Browser shows a playable 5v5 AI match with team defense, pass variety, and auto phase transitions"
+observable_progress_target: "Browser shows a human-vs-CPU 5v5 match where the human can switch controlled players, see which player they control, and pass with directional control"
 infrastructure_only_justification: null
 last_invalidation_reason: null
 ```

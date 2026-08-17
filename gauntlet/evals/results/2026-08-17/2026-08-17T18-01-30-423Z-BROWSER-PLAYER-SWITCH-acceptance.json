@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.1",
+  "persisted_at": "2026-08-17T18:01:30.423Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "BROWSER-PLAYER-SWITCH",
+  "candidate_commit": "b1cc042",
+  "evidence_class": "BROWSER_VISIBLE",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS",
+    "checks": 20,
+    "all_pass": true
+  },
+  "semantic_audit": {
+    "verdict": "VALID",
+    "agent": "aux",
+    "model": "gemma4"
+  },
+  "critic": {
+    "agent": "critic-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "agent": "integration-reviewer-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  }
+}
