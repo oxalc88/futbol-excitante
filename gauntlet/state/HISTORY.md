@@ -2488,3 +2488,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: ebefccb candidate(BROWSER-CONTROLLED-PLAYER-INDICATOR); f2cb8da acceptance(BROWSER-CONTROLLED-PLAYER-INDICATOR)
 - notes: Yellow ring indicator (RingGeometry, 0xffcc00) above the human-controlled player in browser modes. Renderer-only change: markerMesh follows isControlled flag on PresentationSnapshot, resets each frame, follows Tab switching. 77/77 browser tests, 1654/1654 node tests. BROWSER_VISIBLE audit PASS. No simulation core changes. No PES claim.
+
+## Iteration 60 — 2026-08-17
+
+- objective_id: BROWSER-5V3-HUMAN-VS-CPU
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: ff527e2 candidate(BROWSER-5V3-HUMAN-VS-CPU)
+- notes: `?mode=human-vs-ai-5v3` URL mode with human controlling 1 player via keyboard, 4 CPU teammates, 5 CPU opponents. Uses 5v5 fixture with slot-1 HUMAN. Player switching (Tab) cycles through 5 teammates. 86/86 browser tests, 1654/1654 node tests. HEADLESS audit PASS. No simulation core changes. No PES claim.

@@ -7,7 +7,7 @@ horizon_id: "human-vs-cpu"
 created_from_commit: fbb68f8
 created_at: 2026-08-17
 reason: "Horizon five-vs-five exhausted (6/6 accepted). 5v5 AI match and browser play established. Next horizon focuses on human-vs-CPU quality: player switching, 5v5 human-vs-CPU with mixed control, improved CPU teammate behavior, and basic visual indicators so the human can identify their controlled player."
-current_index: 2
+current_index: 3
 objectives:
   - id: BROWSER-PLAYER-SWITCH
     status: accepted
@@ -22,10 +22,11 @@ objectives:
     prerequisite: BROWSER-PLAYER-SWITCH
     commit: ebefccb
   - id: BROWSER-5V3-HUMAN-VS-CPU
-    status: pending
+    status: accepted
     reason: "Add ?mode=human-vs-ai-5v3 URL mode where a human controls 1 player via keyboard with 4 CPU teammates against 5 CPU opponents. Uses the 5v5 fixture with slot-1 set to HUMAN. Combined with player switching, the human can control any of the 5 players on their team. Follows the existing human-vs-CPU pattern."
     builder: builder-gameplay
     prerequisite: BROWSER-PLAYER-SWITCH
+    commit: ff527e2
   - id: CPU-ATTACKING-IMPROVEMENT
     status: pending
     reason: "Improve CPU attacking patterns: smarter forward runs when teammates have possession, better off-ball positioning toward opponent goal, and periodic forward movement from midfielders/attackers during balanced/attack phases. Extends the CpuAdapter with role-aware off-ball movement."

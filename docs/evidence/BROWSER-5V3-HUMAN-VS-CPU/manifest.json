@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.1",
+  "objective_id": "BROWSER-5V3-HUMAN-VS-CPU",
+  "accepted_at": "2026-08-17T22:20:59.369Z",
+  "candidate_commit": "ff527e2",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": null,
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/BROWSER-5V3-HUMAN-VS-CPU/audit.json",
+      "sha256": "6114f71b59a2597eb5a1217485ba76990c2691a8a145eb8e43517042afb8bef6",
+      "git_blob": "b59e67c0b2008be7d002f8ecd668bafcc6311ce3",
+      "candidate_commit": "ff527e2",
+      "bytes": 2554,
+      "committed_with_candidate": false
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "checks": 19,
+      "all_pass": true
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "retries": 0
+    },
+    "integration": {
+      "agent": "integration-reviewer-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": null
+}

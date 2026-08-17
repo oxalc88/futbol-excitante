@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-5V3-HUMAN-VS-CPU
+next_objective_id: CPU-ATTACKING-IMPROVEMENT
 
 best_known:
-  commit: ebefccb
-  note: "BROWSER-CONTROLLED-PLAYER-INDICATOR accepted. Horizon human-vs-cpu 2/5. Next: BROWSER-5V3-HUMAN-VS-CPU."
+  commit: ff527e2
+  note: "BROWSER-5V3-HUMAN-VS-CPU accepted. Horizon human-vs-cpu 3/5. Next: CPU-ATTACKING-IMPROVEMENT."
 
 active_candidate: null
 builder_in_use: null
@@ -68,18 +68,18 @@ accepted:
   - BROWSER-5V5-MATCH
   - BROWSER-PLAYER-SWITCH
   - BROWSER-CONTROLLED-PLAYER-INDICATOR
+  - BROWSER-5V3-HUMAN-VS-CPU
 
 blocked: []
 
-selection_note: "Horizon human-vs-cpu: 5 objectives toward playable human-vs-CPU with player switching, visual indicator, 5v3 mode, improved CPU attack, and directional passing. 2/5 accepted. Next: BROWSER-5V3-HUMAN-VS-CPU."
+selection_note: "Horizon human-vs-cpu: 5 objectives toward playable human-vs-CPU with player switching, visual indicator, 5v3 mode, improved CPU attack, and directional passing. 3/5 accepted. Next: CPU-ATTACKING-IMPROVEMENT."
 ```
-
 ## Last accepted objective
 
-BROWSER-CONTROLLED-PLAYER-INDICATOR — Yellow ring indicator above the human-controlled player in browser modes. Renderer-only change: markerMesh (RingGeometry, yellow 0xffcc00) visible above players where isControlled === true. Marker follows the controlled player on Tab switching. No simulation core changes — PresentationSnapshot drives the visual. 77/77 browser tests, 1654/1654 node tests. BROWSER_VISIBLE audit PASS.
+BROWSER-5V3-HUMAN-VS-CPU — `?mode=human-vs-ai-5v3` URL mode with human controlling 1 player via keyboard with 4 CPU teammates against 5 CPU opponents. Uses the 5v5 fixture with slot-1 set to HUMAN. Player switching (Tab) cycles through 5 teammates via live simulation state. No simulation core changes. 86/86 browser tests, 1654/1654 node tests. HEADLESS audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (retry 1: audit flag, test env)
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 77 browser tests, 1654 node tests, screenshot frame-000.png
-- Commit: ebefccb
+- Evidence: 86 browser tests, 1654 node tests
+- Commit: ff527e2
