@@ -8,6 +8,7 @@
  *  - `?mode=2v2-ai`                → returns the 2v2 AI match scenario (shorthand)
  *  - `?mode=ai-match&scenario=2v2` → returns the 2v2 AI match scenario
  *  - `?mode=ai-match`              → returns the AI-vs-AI match scenario (all CPU)
+ *  - `?mode=ai-match-5v5`          → returns the 5v5 AI match scenario
  *  - `?mode=human-vs-ai`           → returns the human-vs-CPU scenario (slot-1 keyboard, rest CPU)
  *  - `?mode=human-vs-ai-3v3`       → returns the 3v3 human-vs-CPU scenario (slot-1 keyboard, slots 2-6 CPU)
  *  - `?mode=2v2`                   → returns the 2v2 keyboard scenario (slot-1 keyboard, slots 2-4 CPU)
@@ -25,6 +26,7 @@ import { FOUNDATION_SCENARIO_2V2 } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_HUMAN_VS_CPU } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_2V2_KEYBOARD } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_3V3 } from "./foundation-scenario.js";
+import { FOUNDATION_SCENARIO_5V5 } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_HUMAN_VS_CPU_3V3 } from "./foundation-scenario.js";
 
 /**
@@ -46,6 +48,9 @@ export function selectBrowserScenario(search: string): ScenarioDefinition {
     if (scenarioParam === "3v3-fixture") {
       return FOUNDATION_SCENARIO_3V3;
     }
+    if (scenarioParam === "5v5-fixture") {
+      return FOUNDATION_SCENARIO_5V5;
+    }
     return FOUNDATION_SCENARIO_AI_VS_AI;
   }
 
@@ -63,6 +68,10 @@ export function selectBrowserScenario(search: string): ScenarioDefinition {
 
   if (mode === "ai-match-3v3") {
     return FOUNDATION_SCENARIO_3V3;
+  }
+
+  if (mode === "ai-match-5v5") {
+    return FOUNDATION_SCENARIO_5V5;
   }
 
   if (mode === "2v2") {

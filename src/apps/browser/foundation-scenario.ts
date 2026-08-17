@@ -16,6 +16,7 @@ import scenario2v2Json from "@pes/eval/scenarios/2v2-duel.v1.json";
 import humanVsCpuJson from "@pes/eval/scenarios/human-vs-cpu.v1.json";
 import scenario2v2KeyboardJson from "@pes/eval/scenarios/2v2-with-keyboard.v1.json";
 import scenario3v3Json from "@pes/eval/scenarios/3v3-fixture.v1.json";
+import scenario5v5Json from "@pes/eval/scenarios/5v5-fixture-v1.json";
 import humanVsCpu3v3Json from "@pes/eval/scenarios/human-vs-cpu-3v3.v1.json";
 
 /**
@@ -81,6 +82,15 @@ export const FOUNDATION_SCENARIO_2V2_KEYBOARD: ScenarioDefinition =
  */
 export const FOUNDATION_SCENARIO_3V3: ScenarioDefinition =
   scenario3v3Json as unknown as ScenarioDefinition;
+
+/**
+ * 5v5 fixture scenario — 10 CPU-controlled players, 5 per team.
+ * Both teams have five AI_FALLBACK slots for fully autonomous CPU-vs-CPU play.
+ * Loaded from the versioned JSON at eval/scenarios/5v5-fixture-v1.json.
+ * Duration is 5400 ticks (90 seconds at 60 Hz).
+ */
+export const FOUNDATION_SCENARIO_5V5: ScenarioDefinition =
+  scenario5v5Json as unknown as ScenarioDefinition;
 
 /**
  * Human-vs-CPU 3v3 scenario — 6 players (3 per team), slot-1 is keyboard-controlled
