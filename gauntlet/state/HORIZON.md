@@ -7,7 +7,7 @@ horizon_id: "five-vs-five"
 created_from_commit: eaefdf1
 created_at: 2026-08-16
 reason: "Horizon small-sided-match exhausted (6/6 accepted). SMALL-SIDED milestone complete with 3v3 browser play, team decision, role-aware formation, and match restart. Next horizon targets 5v5 progression: auto match timer, defensive AI improvements, pass variety (ground/lofted/power), human-vs-CPU 3v3, and the 5v5 fixture and browser play. These build toward the next cardinality milestone after SMALL-SIDED."
-current_index: 2
+current_index: 3
 objectives:
   - id: MATCH-TIMER-ENFORCEMENT
     status: accepted
@@ -22,10 +22,11 @@ objectives:
     prerequisite: CPU-3V3-TEAMPLAY
     commit: b499017
   - id: CPU-PASS-VARIETY
-    status: pending
+    status: accepted
     reason: "Add ground pass vs lofted pass choice to CPU adapter. Pass power influenced by distance to target and urgency (score state, time remaining). Better target selection under pressure (consider defender proximity). Extends the existing getBestTeammateTarget logic."
     builder: builder-gameplay
     prerequisite: CPU-3V3-TEAMPLAY
+    commit: 127720b
   - id: BROWSER-3V3-HUMAN-VS-CPU
     status: pending
     reason: "Add ?mode=human-vs-ai-3v3 URL mode where a human controls one player via keyboard and has 2 CPU teammates against 3 CPU opponents. Follows the existing BROWSER-HUMAN-VS-CPU pattern but scaled to 3v3."

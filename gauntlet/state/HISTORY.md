@@ -2195,3 +2195,59 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 54 — 2026-08-17
+
+- objective_id: CPU-PASS-VARIETY
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass; 0731 allowance exhausted at session start)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: 127720b candidate(CPU-PASS-VARIETY)
+- notes: CPU adapter pass variety. choosePassType: ground (PASS_BIT) vs lofted (SHOT_BIT aimed at teammate) with LOFT_PASS_DISTANCE_THRESHOLD=15m scaled by urgency (behind → 7.5m, ahead → 30m). isLoftedPass state flag skips shot cooldown for lofted passes. getBestTeammateTarget now defender-aware: PASS_DEFENDER_MARKING_RADIUS=5m, unmarked targets scored 2000 vs marked 1000 minus distance penalty. All constants provisional. 13 new tests, 273/273 cpu-adapter, 1612/1612 total. 8-frame trajectory. MULTI_TICK audit PASS. No PES claim.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: CPU-PASS-VARIETY
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-gameplay
+- builder_model: mimo-v2.5
+- independence_ok: true
+- deterministic_audit: PASS
+- semantic_audit: NOT_REQUIRED
+- mandatory_evidence_ok: true
+- criteria:
+  - short-distance ground pass: PASS
+  - long-distance lofted pass: PASS
+  - urgency-responsive pass type: PASS
+  - defender-aware target selection: PASS
+  - no regressions: PASS
+  - determinism: PASS
+  - no PES/LAB claims: PASS
+- architecture_violations: none
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CPU-PASS-VARIETY
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (90 files, 1612 tests; cpu-adapter 273/273)
+- deterministic_audit: PASS
+- critic_verdict_verified: true
+- mandatory_evidence_ok: true
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: NOT_APPLICABLE
+- verdict: ACCEPT
+- required_fixes: none
+```

@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: CPU-PASS-VARIETY
+next_objective_id: BROWSER-3V3-HUMAN-VS-CPU
 
 best_known:
-  commit: b499017
-  note: "CPU-DEFENSIVE-IMPROVEMENT accepted. Horizon five-vs-five 2/6. Next: CPU-PASS-VARIETY."
+  commit: 127720b
+  note: "CPU-PASS-VARIETY accepted. Horizon five-vs-five 3/6. Next: BROWSER-3V3-HUMAN-VS-CPU."
 
 active_candidate: null
 builder_in_use: null
@@ -62,18 +62,19 @@ accepted:
   - BROWSER-3V3-MATCH
   - MATCH-TIMER-ENFORCEMENT
   - CPU-DEFENSIVE-IMPROVEMENT
+  - CPU-PASS-VARIETY
 
 blocked: []
 
-selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 2/6 accepted. Next: CPU-PASS-VARIETY."
+selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 3/6 accepted. Next: BROWSER-3V3-HUMAN-VS-CPU."
 ```
 
 ## Last accepted objective
 
-CPU-DEFENSIVE-IMPROVEMENT — CPU defender behavior with tracking, pressing, marking distance, and defensive sub-modes. Added DefensiveSubMode (NONE/PRESSING/MARKING/RECOVERING), findMostThreateningOpponent, findBallCarrierPlayer, computeMarkOffsetPosition. Configurable PRESS_RADIUS=12m, MARKING_DISTANCE=5m, PRESS_STRENGTH=1.3×. Formation pull reduced for marking defenders. All constants provisional. 238/238 cpu-adapter unit tests, 239/239 integration tests. 100-tick trajectory. MULTI_TICK audit PASS.
+CPU-PASS-VARIETY — CPU adapter pass variety: ground vs lofted choice (LOFT_PASS_DISTANCE_THRESHOLD=15m, urgency-scaled to 7.5m–30m), defender-aware target selection (PASS_DEFENDER_MARKING_RADIUS=5m), urgency-scaled pass power via pass-type choice. All constants provisional. 273/273 cpu-adapter unit tests, 1612/1612 total. 8-frame trajectory. MULTI_TICK audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 238/238 unit, 239/239 integration, 100-tick trajectory, deterministic audit PASS
-- Commit: b499017
+- Evidence: 273/273 unit, 1612/1612 total, 8-frame trajectory, deterministic audit PASS
+- Commit: 127720b
