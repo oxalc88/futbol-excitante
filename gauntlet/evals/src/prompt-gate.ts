@@ -7,11 +7,12 @@ interface GateRule { name: string; file: string; mustContain: string[] }
 const RULES: GateRule[] = [
   { name: "canonical principles exist", file: "gauntlet/principles.md", mustContain: ["Deterministic audits may invalidate evidence or state", "Scripts establish facts. Cheap auditors resolve bounded ambiguity. Critics judge quality against the bar."] },
   { name: "main prompt uses deterministic-first critic-always pipeline", file: "gauntlet/PROMPT.md", mustContain: ["gauntlet/principles.md", "pnpm run gauntlet:audit", "REVIEW_REQUIRED", "The critic is mandatory", "GAUNTLET_ACCEPTANCE_JSON", "pnpm run gauntlet:eval:state"] },
-  { name: "0.8 acceptance is durable before claim", file: "gauntlet/PROMPT.md", mustContain: ["manifest.json", "fully accepted", "candidate commit", "Horizon exhaustion triggers strategic reassessment"] },
+  { name: "acceptance is durable before claim", file: "gauntlet/PROMPT.md", mustContain: ["manifest.json", "fully accepted", "candidate commit", "Horizon exhaustion triggers strategic reassessment"] },
+  { name: "accepted objectives are remotely durable before continuation", file: "gauntlet/PROMPT.md", mustContain: ["acceptance publication mode", "verify the exact final acceptance commit is contained in the remote branch", "Do not delegate or replan past an accepted objective until remote durability is verified"] },
   { name: "replanned horizon delegates without confirmation", file: "gauntlet/PROMPT.md", mustContain: ["delegate it immediately without asking the human for confirmation", "proceed to delegation without asking whether to continue"] },
   { name: "role-based builder routing is canonical", file: "gauntlet/PROMPT.md", mustContain: ["builder-structured", "builder-gameplay", "Choose the implementation role by responsibility, not by provider/model"] },
   { name: "main skill cannot bypass critic", file: ".grok/skills/gauntlet/SKILL.md", mustContain: ["gauntlet/principles.md", "pnpm run gauntlet:audit", "REVIEW_REQUIRED", "Critic ACCEPT alone is never final", "GAUNTLET_ACCEPTANCE_JSON"] },
-  { name: "continue skill cannot bypass critic", file: ".grok/skills/gauntlet-continue/SKILL.md", mustContain: ["gauntlet/principles.md", "pnpm run gauntlet:audit", "critic remains mandatory", "immediately delegate its executable next objective", "GAUNTLET_ACCEPTANCE_JSON"] },
+  { name: "continue skill cannot bypass critic", file: ".grok/skills/gauntlet-continue/SKILL.md", mustContain: ["gauntlet/principles.md", "pnpm run gauntlet:audit", "critic remains mandatory", "remote containment verification", "immediately delegate its executable next objective", "GAUNTLET_ACCEPTANCE_JSON"] },
   { name: "class-based evidence contract cannot regress", file: "gauntlet/evidence-contract.md", mustContain: ["`HEADLESS`", "`BROWSER_VISIBLE`", "`MULTI_TICK`", "`DYNAMIC_VISUAL`", "3–5 semantic frames", "`PRESENTATION`", "`BOOKKEEPING`", "manifest.json", "The critic is mandatory"] },
   { name: "evidence manifest contract exists", file: "gauntlet/evidence-manifest-contract.md", mustContain: ["candidate_commit", "sha256", "sequence.json", "video-reference.json", "milestones", "never silently overwritten"] },
   { name: "semantic audit is bounded and cannot accept", file: "gauntlet/semantic-audit-contract.md", mustContain: ["VALID|INVALID|INSUFFICIENT_CONTEXT", "can never produce objective `ACCEPT`"] },
@@ -86,7 +87,7 @@ export async function runPromptGate(repoRoot: string): Promise<PromptGateResult[
     results.push({ name: rule.name, pass: missing.length === 0, detail: missing.length ? `missing: ${missing.join(", ")}` : undefined });
   }
 
-  // Only two new deterministic guards for the role refactor:
+  // Only two deterministic guards for the role refactor:
   // 1) wrappers must resolve to their canonical role contract;
   // 2) frontmatter model routing must match models.json.
   results.push(await roleWrapperCheck(repoRoot));

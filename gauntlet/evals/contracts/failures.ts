@@ -14,6 +14,7 @@ export const GAUNTLET_FAILURE_CLASSES = [
   "acceptance_claim_unproven",
   "manifest_missing",
   "dynamic_sequence_missing",
+  "remote_durability_missing",
   "state_transition",
   "tracking_missing",
   "prompt_contract",

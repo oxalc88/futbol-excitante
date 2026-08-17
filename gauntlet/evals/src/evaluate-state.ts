@@ -15,6 +15,7 @@ import type {
   AcceptancePipelineGateScenario,
   AcceptanceClaimGateScenario,
   PostAcceptanceContinuationGateScenario,
+  RemoteDurabilityGateScenario,
   ManifestGateScenario,
   DynamicSequenceGateScenario,
 } from "../contracts/scenario.js";
@@ -108,6 +109,20 @@ function evaluatePostAcceptanceContinuation(s: PostAcceptanceContinuationGateSce
   return { scenario_id: s.id, decision: "replan_and_continue" };
 }
 
+function evaluateRemoteDurability(s: RemoteDurabilityGateScenario): EvaluationResult {
+  if (!s.input.acceptance_finalized) return { scenario_id: s.id, decision: "finish_acceptance" };
+  if (!s.input.remote_contains_acceptance) {
+    return {
+      scenario_id: s.id,
+      decision: s.input.horizon_exhausted ? "publish_before_replan" : "publish_before_continue",
+      failure_class: "remote_durability_missing",
+    };
+  }
+  if (s.input.horizon_exhausted) return { scenario_id: s.id, decision: "replan_and_continue" };
+  if (s.input.next_objective) return { scenario_id: s.id, decision: "continue", next_objective: s.input.next_objective };
+  return { scenario_id: s.id, decision: "replan_and_continue" };
+}
+
 function evaluateManifest(s: ManifestGateScenario): EvaluationResult {
   const applies = s.input.objective_accepted && /^0\.(?:[89]|[1-9]\d+)\./.test(s.input.gauntlet_version);
   if (applies && (!s.input.manifest_exists || !s.input.artifact_commit_bound || !s.input.reviews_persisted)) return { scenario_id: s.id, decision: "reject_acceptance", failure_class: "manifest_missing" };
@@ -135,6 +150,7 @@ export function evaluateScenario(s: GauntletScenario): EvaluationResult {
     case "acceptance_pipeline_gate": return evaluateAcceptancePipeline(s);
     case "acceptance_claim_gate": return evaluateAcceptanceClaim(s);
     case "post_acceptance_continuation_gate": return evaluatePostAcceptanceContinuation(s);
+    case "remote_durability_gate": return evaluateRemoteDurability(s);
     case "manifest_gate": return evaluateManifest(s);
     case "dynamic_sequence_gate": return evaluateDynamicSequence(s);
   }
