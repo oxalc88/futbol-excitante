@@ -22,6 +22,12 @@ export type ActionBits = number;
  * radius of the ball. The contact system resolves the actual shot;
  * pressing this bit does not guarantee a shot occurs (range, timing,
  * and priority govern).
+ *
+ * Bit 3: SWITCH_PLAYER — request switching controlled player to the
+ * next eligible teammate. Edge-triggered.
+ *
+ * Bit 4: LOFTED_PASS — directed lofted/chip pass. Higher vertical
+ * component for lofted trajectory. Provisional.
  */
 export const FIRST_TOUCH_BIT = 1 << 0;
 
@@ -46,6 +52,17 @@ export const SHOT_BIT = 1 << 2;
  * Processed at the adapter layer; does not affect simulation internals.
  */
 export const SWITCH_PLAYER_BIT = 1 << 3;
+
+/**
+ * LOFTED_PASS_BIT: directed lofted/chip pass action. The controlled
+ * player applies a pass impulse with a higher vertical component,
+ * producing a lofted trajectory. Pressed while within contact radius
+ * of the ball. The contact system resolves the actual lofted pass;
+ * pressing this bit does not guarantee a pass occurs.
+ *
+ * Provisional — not a PES 2017 calibration claim.
+ */
+export const LOFTED_PASS_BIT = 1 << 4;
 
 /**
  * A tick-indexed input frame from any source (keyboard, gamepad, replay, AI, test).

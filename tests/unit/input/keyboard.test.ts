@@ -603,3 +603,143 @@ describe("KEYBOARD-CONFIG-001: default configuration", () => {
     expect(shotBtn!.actionBit).toBe(2);
   });
 });
+
+// ===========================================================================
+// 11. Button modifier: E+J → LOFTED_PASS_BIT
+// ===========================================================================
+
+describe("KEYBOARD-MODIFIER-001: E+J produces LOFTED_PASS_BIT", () => {
+  let adapter: KeyboardAdapter;
+  let target: ReturnType<typeof createMockEventTarget>;
+
+  beforeEach(() => {
+    adapter = createKeyboardAdapter();
+    target = createMockEventTarget();
+    adapter.connect(target);
+  });
+
+  it("E held + J pressed → LOFTED_PASS_BIT (bit 4) in pressedButtons", () => {
+    target.press("KeyE");
+    adapter.sample(0); // consume E as held
+    target.press("KeyJ"); // J press — E is held → modified to LOFTED_PASS_BIT
+    const frame = adapter.sample(1);
+
+    // LOFTED_PASS_BIT (bit 4) should be set.
+    expect(frame.pressedButtons & (1 << 4)).not.toBe(0);
+    // PASS_BIT (bit 1) should NOT be set.
+    expect(frame.pressedButtons & (1 << 1)).toBe(0);
+  });
+
+  it("J pressed without E → PASS_BIT (bit 1) as normal", () => {
+    target.press("KeyJ");
+    const frame = adapter.sample(0);
+
+    // PASS_BIT (bit 1) should be set.
+    expect(frame.pressedButtons & (1 << 1)).not.toBe(0);
+    // LOFTED_PASS_BIT (bit 4) should NOT be set.
+    expect(frame.pressedButtons & (1 << 4)).toBe(0);
+  });
+
+  it("E+J held state shows PASS_BIT (modifier only affects pressed edge)", () => {
+    target.press("KeyE");
+    adapter.sample(0); // consume E as held
+    target.press("KeyJ");
+    adapter.sample(1); // consume J press with modifier
+
+    const frame2 = adapter.sample(2); // J is now held, not pressed
+    // heldButtons should show PASS_BIT (bit 1), not LOFTED_PASS_BIT.
+    expect(frame2.heldButtons & (1 << 1)).not.toBe(0);
+    expect(frame2.heldButtons & (1 << 4)).toBe(0);
+    // pressedButtons should be clear (one-shot).
+    expect(frame2.pressedButtons & (1 << 1)).toBe(0);
+    expect(frame2.pressedButtons & (1 << 4)).toBe(0);
+  });
+
+  it("E held + K pressed → FIRST_TOUCH (bit 0) unchanged (modifier only affects J)", () => {
+    target.press("KeyE");
+    adapter.sample(0); // consume E as held
+    target.press("KeyK"); // K press — E doesn't modify K
+    const frame = adapter.sample(1);
+
+    expect(frame.pressedButtons & (1 << 0)).not.toBe(0);
+    expect(frame.pressedButtons & (1 << 4)).toBe(0);
+  });
+
+  it("E pressed simultaneously with J in same tick → modifier IS applied (E is in heldKeys at sample time)", () => {
+    target.press("KeyE");
+    target.press("KeyJ"); // both pressed before sample
+    const frame = adapter.sample(0);
+
+    // E is in heldKeys when sample() runs, so modifier applies.
+    expect(frame.pressedButtons & (1 << 4)).not.toBe(0);
+    expect(frame.pressedButtons & (1 << 1)).toBe(0);
+  });
+
+  it("E held across multiple ticks, J pressed on tick 2 → LOFTED_PASS_BIT", () => {
+    target.press("KeyE");
+    adapter.sample(0); // E is now held
+    adapter.sample(1); // still held
+
+    target.press("KeyJ");
+    const frame = adapter.sample(2);
+
+    expect(frame.pressedButtons & (1 << 4)).not.toBe(0);
+    expect(frame.pressedButtons & (1 << 1)).toBe(0);
+  });
+
+  it("E released, then J pressed → PASS_BIT (modifier no longer active)", () => {
+    target.press("KeyE");
+    adapter.sample(0); // E held
+    target.release("KeyE");
+    adapter.sample(1); // E released
+
+    target.press("KeyJ");
+    const frame = adapter.sample(2);
+
+    expect(frame.pressedButtons & (1 << 1)).not.toBe(0);
+    expect(frame.pressedButtons & (1 << 4)).toBe(0);
+  });
+});
+
+// ===========================================================================
+// 12. Custom button modifier config
+// ===========================================================================
+
+describe("KEYBOARD-MODIFIER-002: custom modifier config", () => {
+  it("custom modifier maps KeyX + KeyK to bit 5", () => {
+    const custom = createKeyboardAdapter({
+      ...DEFAULT_KEYBOARD_CONFIG,
+      buttonModifiers: [
+        { modifierKey: "KeyX", targetActionBit: 0, modifiedActionBit: 5 },
+      ],
+    });
+    const target = createMockEventTarget();
+    custom.connect(target);
+
+    target.press("KeyX");
+    custom.sample(0); // X held
+    target.press("KeyK"); // K press with X held → bit 5
+    const frame = custom.sample(1);
+
+    expect(frame.pressedButtons & (1 << 5)).not.toBe(0);
+    expect(frame.pressedButtons & (1 << 0)).toBe(0);
+  });
+
+  it("no buttonModifiers → normal behavior", () => {
+    const custom = createKeyboardAdapter({
+      ...DEFAULT_KEYBOARD_CONFIG,
+      buttonModifiers: [],
+    });
+    const target = createMockEventTarget();
+    custom.connect(target);
+
+    target.press("KeyE");
+    custom.sample(0);
+    target.press("KeyJ");
+    const frame = custom.sample(1);
+
+    // Without modifiers, J produces PASS_BIT normally.
+    expect(frame.pressedButtons & (1 << 1)).not.toBe(0);
+    expect(frame.pressedButtons & (1 << 4)).toBe(0);
+  });
+});

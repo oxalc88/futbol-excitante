@@ -24,6 +24,7 @@
  */
 
 import type { InputFrame, ActionBits } from "../../contracts/input.js";
+import { LOFTED_PASS_BIT } from "../../contracts/input.js";
 
 // ---------------------------------------------------------------------------
 // Key mapping configuration
@@ -65,6 +66,24 @@ export interface KeyboardAdapterConfig {
   sprintButton: KeyboardButtonMapping;
   /** Action button mappings. */
   buttons: KeyboardButtonMapping[];
+  /** Button modifier mappings: when modifierKey is held and a button with targetActionBit is pressed, emit modifiedActionBit instead. */
+  buttonModifiers?: KeyboardButtonModifier[];
+}
+
+/**
+ * Button modifier mapping.
+ *
+ * When the modifier key is held and a button with the target action bit
+ * is pressed, the modified action bit is emitted instead of the target bit.
+ * The target bit is still emitted if the modifier is not held.
+ */
+export interface KeyboardButtonModifier {
+  /** Key code of the modifier key (e.g. "KeyE"). */
+  modifierKey: string;
+  /** The action bit that the modifier applies to (e.g. 1 for PASS_BIT). */
+  targetActionBit: number;
+  /** The action bit to emit when modifier is held (e.g. 4 for LOFTED_PASS_BIT). */
+  modifiedActionBit: number;
 }
 
 /**
@@ -73,6 +92,7 @@ export interface KeyboardAdapterConfig {
  * Uses WASD for movement and Shift for sprint.
  * Action bits: bit 0 = first-touch, bit 1 = pass, bit 2 = shot, bit 3 = switch player.
  * Tab is edge-triggered for player switching (press, not hold).
+ * E+J produces LOFTED_PASS_BIT (bit 4) instead of PASS_BIT (bit 1).
  */
 export const DEFAULT_KEYBOARD_CONFIG: KeyboardAdapterConfig = {
   controlSlot: "slot-1",
@@ -84,6 +104,9 @@ export const DEFAULT_KEYBOARD_CONFIG: KeyboardAdapterConfig = {
     { key: "KeyJ", actionBit: 1 }, // pass
     { key: "KeyL", actionBit: 2 }, // shot
     { key: "Tab", actionBit: 3 }, // switch player (edge-triggered)
+  ],
+  buttonModifiers: [
+    { modifierKey: "KeyE", targetActionBit: 1, modifiedActionBit: 4 }, // E+J → lofted pass
   ],
 };
 
@@ -272,6 +295,10 @@ export function createKeyboardAdapter(
    * heldButtons: keys currently held that map to action bits.
    * pressedButtons: keys pressed this tick that map to action bits.
    * releasedButtons: keys released this tick that map to action bits.
+   *
+   * Button modifiers: when a modifier key is held and a target button
+   * is pressed, the modified bit replaces the target bit in pressedButtons.
+   * The target bit remains in heldButtons (the modifier doesn't affect held state).
    */
   function deriveButtons(): {
     heldButtons: ActionBits;
@@ -282,10 +309,30 @@ export function createKeyboardAdapter(
     let pressed = 0;
     let released = 0;
 
+    // Build a set of modified action bits for this tick.
+    const modifiedPressed = new Map<number, number>(); // targetBit → modifiedBit
+    if (config.buttonModifiers) {
+      for (const mod of config.buttonModifiers) {
+        if (state.heldKeys.has(mod.modifierKey)) {
+          modifiedPressed.set(mod.targetActionBit, mod.modifiedActionBit);
+        }
+      }
+    }
+
     for (const btn of config.buttons) {
       const bit = 1 << btn.actionBit;
       if (state.heldKeys.has(btn.key)) held |= bit;
-      if (state.pressedKeys.has(btn.key)) pressed |= bit;
+
+      // Check if this button's press should be modified.
+      const modifiedBit = modifiedPressed.get(btn.actionBit);
+      if (state.pressedKeys.has(btn.key)) {
+        if (modifiedBit !== undefined) {
+          pressed |= 1 << modifiedBit;
+        } else {
+          pressed |= bit;
+        }
+      }
+
       if (state.releasedKeys.has(btn.key)) released |= bit;
     }
 

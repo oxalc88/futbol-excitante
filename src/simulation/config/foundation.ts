@@ -163,6 +163,29 @@ export const FOUNDATION_PASS_V1 = {
   verticalComponent: { value: 0.05, note: "provisional upward velocity fraction" },
 } as const;
 
+// -- Lofted pass coefficients (provisional) -----------------------------------
+
+/**
+ * Provisional lofted/chip pass coefficients.
+ *
+ * Every value is provisional — hand-tuned for laboratory testing only.
+ * No PES 2017 calibration claim is made.
+ *
+ * A lofted pass applies a pass impulse with a higher vertical component
+ * for a chip/through-ball trajectory. The ball remains an independent
+ * 3D entity; position is never teleported.
+ */
+export const FOUNDATION_LOFTED_PASS_V1 = {
+  id: "foundation-lofted-pass-v1",
+  label: "provisional",
+  /** Proximity radius (metres) at which a lofted pass is geometrically possible. */
+  passRadius: { value: 1.2, unit: "m", note: "provisional lofted pass proximity radius" },
+  /** Exit speed (m/s) applied to the ball along the pass direction. */
+  exitSpeed: { value: 7.5, unit: "m/s", note: "provisional lofted pass exit speed" },
+  /** Vertical launch component: fraction of exitSpeed projected upward. Higher than standard pass. */
+  verticalComponent: { value: 0.25, note: "provisional upward velocity fraction for lofted trajectory" },
+} as const;
+
 // -- Shot coefficients (provisional) -----------------------------------------
 
 /**
@@ -283,6 +306,7 @@ export const FOUNDATION_CONFIG = {
   ball: FOUNDATION_BALL_V1,
   contact: FOUNDATION_CONTACT_V1,
   pass: FOUNDATION_PASS_V1,
+  loftedPass: FOUNDATION_LOFTED_PASS_V1,
   shot: FOUNDATION_SHOT_V1,
   closeControl: FOUNDATION_CLOSE_CONTROL_V1,
   playerContact: FOUNDATION_PLAYER_CONTACT_V1,

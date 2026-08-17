@@ -19,8 +19,8 @@
 import type { BallState, PlayerState } from "../../contracts/state.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { SimulationEvent } from "../../contracts/scenario.js";
-import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT } from "../../contracts/input.js";
-import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1, FOUNDATION_SHOT_V1, FOUNDATION_CLOSE_CONTROL_V1 } from "../config/foundation.js";
+import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT, LOFTED_PASS_BIT } from "../../contracts/input.js";
+import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1, FOUNDATION_SHOT_V1, FOUNDATION_CLOSE_CONTROL_V1, FOUNDATION_LOFTED_PASS_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -145,18 +145,46 @@ function computeOutgoingVelocity(
 }
 
 /**
- * Compute outgoing velocity for a directed pass along body heading.
+ * Compute outgoing velocity for a directed pass along the given direction.
  *
- * The pass applies the configured exit speed in the player's body
- * heading direction with a small vertical component for loft.
+ * The pass applies the configured exit speed in the specified direction
+ * with a small vertical component for loft.
  * Ball position is never modified — only velocity.
+ *
+ * @param dirX - Normalized horizontal direction component.
+ * @param dirY - Normalized vertical direction component.
+ * @param config - Pass config (default: FOUNDATION_PASS_V1).
  */
 function computePassVelocity(
-  player: PlayerState,
-  config: PassConfig,
+  dirX: number,
+  dirY: number,
+  config: PassConfig = FOUNDATION_PASS_V1,
 ): { vx: number; vy: number; vz: number } {
-  const dirX = Math.cos(player.bodyHeading);
-  const dirY = Math.sin(player.bodyHeading);
+  const speed = config.exitSpeed.value;
+
+  return {
+    vx: dirX * speed,
+    vy: dirY * speed,
+    vz: speed * config.verticalComponent.value,
+  };
+}
+
+/**
+ * Compute outgoing velocity for a lofted/chip pass along the given direction.
+ *
+ * The lofted pass applies the configured exit speed with a higher vertical
+ * component for a chip/through-ball trajectory.
+ * Ball position is never modified — only velocity.
+ *
+ * @param dirX - Normalized horizontal direction component.
+ * @param dirY - Normalized vertical direction component.
+ * @param config - Lofted pass config (default: FOUNDATION_LOFTED_PASS_V1).
+ */
+function computeLoftedPassVelocity(
+  dirX: number,
+  dirY: number,
+  config: PassConfig = FOUNDATION_LOFTED_PASS_V1,
+): { vx: number; vy: number; vz: number } {
   const speed = config.exitSpeed.value;
 
   return {
@@ -315,11 +343,11 @@ export function stepContacts(
     }
   }
 
-  // Find eligible players — within radius + SHOT_BIT, PASS_BIT, or FIRST_TOUCH_BIT set.
-  // Priority: shot > pass > first-touch (on pressedButtons) > dribble-touch (on heldButtons).
+  // Find eligible players — within radius + SHOT_BIT, PASS_BIT, LOFTED_PASS_BIT, or FIRST_TOUCH_BIT set.
+  // Priority: shot > pass > lofted-pass > first-touch (on pressedButtons) > dribble-touch (on heldButtons).
   // Dribble-touch fires on heldButtons & FIRST_TOUCH_BIT but NOT pressedButtons & FIRST_TOUCH_BIT
   // to avoid double-firing with the one-shot first-touch edge on the same tick.
-  const candidates: Array<{ player: PlayerState; action: "shot" | "pass" | "first-touch" | "dribble-touch" }> = [];
+  const candidates: Array<{ player: PlayerState; action: "shot" | "pass" | "lofted-pass" | "first-touch" | "dribble-touch" }> = [];
 
   for (const player of players) {
     const frame = frameByPlayerId.get(player.playerId);
@@ -329,13 +357,15 @@ export function stepContacts(
     const hasShotBit = (frame.pressedButtons & SHOT_BIT) !== 0;
     // Check PASS_BIT next.
     const hasPassBit = (frame.pressedButtons & PASS_BIT) !== 0;
+    // Check LOFTED_PASS_BIT next.
+    const hasLoftedPassBit = (frame.pressedButtons & LOFTED_PASS_BIT) !== 0;
     // Check FIRST_TOUCH_BIT for one-shot edge.
     const hasFirstTouchBit = (frame.pressedButtons & FIRST_TOUCH_BIT) !== 0;
     // Check FIRST_TOUCH_BIT held (for dribble-touch) — only if not also pressed this tick.
     const hasFirstTouchHeld = (frame.heldButtons & FIRST_TOUCH_BIT) !== 0 &&
       (frame.pressedButtons & FIRST_TOUCH_BIT) === 0;
 
-    if (!hasShotBit && !hasPassBit && !hasFirstTouchBit && !hasFirstTouchHeld) continue;
+    if (!hasShotBit && !hasPassBit && !hasLoftedPassBit && !hasFirstTouchBit && !hasFirstTouchHeld) continue;
 
     const dist = planarDistance(
       player.groundPosition.x,
@@ -344,16 +374,19 @@ export function stepContacts(
       ball.position.y,
     );
 
-    // Use shotRadius for shot, passRadius for pass, contactRadius for first-touch,
+    // Use shotRadius for shot, passRadius for pass/lofted-pass, contactRadius for first-touch,
     // dribbleRadius for dribble-touch.
     let effectiveRadius: number;
-    let action: "shot" | "pass" | "first-touch" | "dribble-touch";
+    let action: "shot" | "pass" | "lofted-pass" | "first-touch" | "dribble-touch";
     if (hasShotBit) {
       effectiveRadius = shotConfig.shotRadius.value;
       action = "shot";
     } else if (hasPassBit) {
       effectiveRadius = passConfig.passRadius.value;
       action = "pass";
+    } else if (hasLoftedPassBit) {
+      effectiveRadius = passConfig.passRadius.value;
+      action = "lofted-pass";
     } else if (hasFirstTouchBit) {
       effectiveRadius = radius;
       action = "first-touch";
@@ -431,7 +464,7 @@ export function stepContacts(
 
   // Compute and apply outgoing velocity based on action type.
   let out: { vx: number; vy: number; vz: number };
-  let eventKind: "shot" | "pass" | "player-ball-contact";
+  let eventKind: "shot" | "pass" | "lofted-pass" | "player-ball-contact";
   let contactType: string;
   let eventLabel: string;
 
@@ -440,11 +473,34 @@ export function stepContacts(
     eventKind = "shot";
     contactType = "shot";
     eventLabel = `Player ${contactPlayer.playerId} directed shot`;
-  } else if (action === "pass") {
-    out = computePassVelocity(contactPlayer, passConfig);
-    eventKind = "pass";
-    contactType = "pass";
-    eventLabel = `Player ${contactPlayer.playerId} directed pass`;
+  } else if (action === "pass" || action === "lofted-pass") {
+    // Derive pass direction from input moveX/moveY when non-zero,
+    // falling back to bodyHeading when the player isn't providing
+    // directional input.
+    const passFrame = frameByPlayerId.get(contactPlayer.playerId);
+    let dirX: number;
+    let dirY: number;
+
+    if (passFrame && (passFrame.moveX !== 0 || passFrame.moveY !== 0)) {
+      const inputMag = Math.sqrt(passFrame.moveX * passFrame.moveX + passFrame.moveY * passFrame.moveY);
+      dirX = passFrame.moveX / inputMag;
+      dirY = passFrame.moveY / inputMag;
+    } else {
+      dirX = Math.cos(contactPlayer.bodyHeading);
+      dirY = Math.sin(contactPlayer.bodyHeading);
+    }
+
+    if (action === "lofted-pass") {
+      out = computeLoftedPassVelocity(dirX, dirY);
+      eventKind = "lofted-pass";
+      contactType = "lofted-pass";
+      eventLabel = `Player ${contactPlayer.playerId} lofted pass`;
+    } else {
+      out = computePassVelocity(dirX, dirY);
+      eventKind = "pass";
+      contactType = "pass";
+      eventLabel = `Player ${contactPlayer.playerId} directed pass`;
+    }
   } else if (action === "dribble-touch") {
     out = computeCloseControlVelocity(contactPlayer, closeControlConfig);
     eventKind = "player-ball-contact";
@@ -493,7 +549,7 @@ export function stepContacts(
 
   // Emit ordered event.
   eventCounter.value++;
-  const eventId = `${eventKind === "pass" ? "pass" : eventKind === "shot" ? "shot" : "player-ball-contact"}-${tick}-${eventCounter.value}`;
+  const eventId = `${eventKind === "pass" ? "pass" : eventKind === "lofted-pass" ? "lofted-pass" : eventKind === "shot" ? "shot" : "player-ball-contact"}-${tick}-${eventCounter.value}`;
 
   const event: SimulationEvent = {
     id: eventId,

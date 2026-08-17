@@ -34,6 +34,7 @@ export interface SimulationEvent {
     | "player-ball-contact"
     | "player-player-contact"
     | "pass"
+    | "lofted-pass"
     | "shot"
     | "rule"
     | "input-rejection"
