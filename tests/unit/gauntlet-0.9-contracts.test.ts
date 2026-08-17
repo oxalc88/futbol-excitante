@@ -27,12 +27,22 @@ describe("Gauntlet 0.9 milestone contracts", () => {
     expect(SMALL_SIDED_SHAPE_PROFILE.exit_prerequisites).toEqual(["MUTANT_TEAM_PASS", "TEAM_SHAPE_SUITE_PASS"]);
   });
 
-  it("materializes the team suite from documented team/transition cases", () => {
-    expect(TEAM_SUITE.prerequisite_capabilities).toEqual(["TEAM_TACTICS", "TRANSITION_PHASES", "SMALL_SIDED_CARDINALITY"]);
+  it("materializes the normative team suite exactly", () => {
+    expect(TEAM_SUITE.prerequisite_capabilities).toEqual(["TEAM_TACTICS", "TRANSITION_PHASES"]);
+    expect(TEAM_SUITE.seed_matrix_id).toBe("seeds-team-v1");
+    expect(TEAM_SUITE.browser_case_ids).toEqual([]);
+    expect(TEAM_SUITE.resource_policy_id).toBe("resources-team-v1");
     expect(TEAM_SUITE.direct_test_ids).toEqual(expect.arrayContaining([
       "OFF-SUP-001",
       "DEF-SHAPE-001",
       "PRESS-001",
+      "TACT-COMP-001",
+      "TACT-DLINE-001",
+      "TACT-SUP-001",
+      "TACT-TIKI-001",
+      "TACT-MARK-001",
+      "AI-ADAPT-001",
+      "AI-ADAPT-002",
       "TRANS-AD-001",
       "TRANS-DA-001",
     ]));

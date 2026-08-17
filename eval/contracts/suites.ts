@@ -172,8 +172,8 @@ export const DUELS_SUITE: SuiteDefinition = {
 /**
  * Team suite for the normative SMALL_SIDED_SHAPE profile.
  *
- * The IDs come directly from GAMEPLAY_EVALUATION_SPEC.md §7.5. Registering
- * the suite does not fabricate missing bindings or PASS results.
+ * This record mirrors GAMEPLAY_EVALUATION_SPEC.md §8. Registering the suite
+ * does not fabricate missing bindings or PASS results.
  */
 export const TEAM_SUITE: SuiteDefinition = {
   suite_id: "team",
@@ -186,6 +186,13 @@ export const TEAM_SUITE: SuiteDefinition = {
     "PRESS-001",
     "PRESS-GG-001",
     "PRESS-REC-001",
+    "TACT-COMP-001",
+    "TACT-DLINE-001",
+    "TACT-SUP-001",
+    "TACT-TIKI-001",
+    "TACT-MARK-001",
+    "AI-ADAPT-001",
+    "AI-ADAPT-002",
     "TRANS-AD-001",
     "TRANS-DA-001",
   ],
@@ -196,16 +203,12 @@ export const TEAM_SUITE: SuiteDefinition = {
     "COMMON-BOUNDS",
   ],
   impact_closure: "NONE",
-  prerequisite_capabilities: [
-    "TEAM_TACTICS",
-    "TRANSITION_PHASES",
-    "SMALL_SIDED_CARDINALITY",
-  ],
-  seed_matrix_id: "seeds-family-v1",
+  prerequisite_capabilities: ["TEAM_TACTICS", "TRANSITION_PHASES"],
+  seed_matrix_id: "seeds-team-v1",
   config_matrix_id: "config-team-v1",
   held_out_policy_id: null,
-  browser_case_ids: ["BROWSER-SMALL-SIDED-001"],
-  resource_policy_id: "resources-family-v1",
+  browser_case_ids: [],
+  resource_policy_id: "resources-team-v1",
   outcome_reduction_profile_id: "profile-selected-v1",
   expected_expansion_manifest_id: "expansion-team-v1",
 };
