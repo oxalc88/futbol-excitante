@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-3V3-MATCH
-usage_aggregates_through: BROWSER-3V3-MATCH
-model_evaluation_through: BROWSER-3V3-MATCH
+last_tracked_objective: MATCH-TIMER-ENFORCEMENT
+usage_aggregates_through: MATCH-TIMER-ENFORCEMENT
+model_evaluation_through: MATCH-TIMER-ENFORCEMENT
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -119,6 +119,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | CPU-3V3-TEAMPLAY | accepted | ~21m | 20m | 13m | 6m | 0.5m | ~6M est. | n/a** |
 | MATCH-SET-PIECE | accepted | ~23m | 22m | 1m | 8m | 0.5m | ~9M est. | n/a** |
 | BROWSER-3V3-MATCH | accepted | ~21m | 21m | 1m | 11m | 0.5m | ~6M est. | n/a** |
+| MATCH-TIMER-ENFORCEMENT | accepted | ~27m | ~0m*** | 13m | 12.7m | 11s | ~0.5M*** | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -132,6 +133,8 @@ role); `Prompt` is the summed final totals (MUTANT-1V1: builder 1.95M +
 critic 0.89M + integrator 0.52M; PHYSICAL-CONTACT: 7.66M + 1.21M + 0.73M;
 SHOOTING-POWER: 8.59M + 1.45M + 0.57M; BODY-CONTROL: builder 10.68M + critic
 1.43M + integrator 1.08M, retry rounds share the builder/critic sessions;
+MATCH-TIMER-ENFORCEMENT: builder work was done in a prior session; tokens
+not measured in this session.
 LATERAL-DRIFT: builder 1.17M + critic 0.19M + integrator 0.32M; SWERVE: estimated ~0.5M total).
 
 ## By phase
@@ -309,6 +312,7 @@ on an H task is the interesting result.
 | CPU-3V3-TEAMPLAY | qwen3.6 | L | Low — test-only, no source changes needed | 0 | A | 23 unit tests, 14 integration tests, existing adapter handles 3v3 correctly |
 | MATCH-SET-PIECE | qwen3.6 | M | Medium — match restart logic, contracts + simulation loop | 0 | A | 21 unit tests, 11 integration tests, 1530/1530 total pass, countdown → reset cycle |
 | BROWSER-3V3-MATCH | mimo-v2.5 | M | Medium — browser URL routing, CPU slot wiring, screenshot evidence | 0 | A | ?mode=ai-match-3v3, 4 semantic screenshots, 1541/1541 node tests |
+| MATCH-TIMER-ENFORCEMENT | qwen3.6 | M | Medium — match timer state machine, contracts + simulation loop | 0 | A | 19 unit tests, 6 integration tests, 1579/1579 total pass, playing→halftime→playing→fulltime, 120-tick trajectory |
 
 ### Reviewer route and catches
 
@@ -348,6 +352,8 @@ on an H task is the interesting result.
 | MATCH-SET-PIECE | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 32/32 new tests, 1530/1530 node, 40/40 browser, presentation_authority PASS |
 | BROWSER-3V3-MATCH | critic-flash (deepseek-v4-flash) | direct | ACCEPT | 0 retries — first pass clean |
 | BROWSER-3V3-MATCH | integration-reviewer-flash (deepseek-v4-flash) | direct | ACCEPT | 1541/1541 node, 4 semantic frames, 60-tick trajectory, presentation_authority PASS |
+| MATCH-TIMER-ENFORCEMENT | critic-flash (deepseek-v4-flash) | direct 0731 exhausted, flash used | ACCEPT | 0 retries — first pass clean; trajectory hash re-computed and matching |
+| MATCH-TIMER-ENFORCEMENT | integration-reviewer-flash (deepseek-v4-flash) | direct 0731 exhausted, flash used | ACCEPT | 1579/1579 node, 120-tick trajectory byte-identical, neighboring suites pass, presentation_authority PASS |
 
 ### Builder scoreboard
 

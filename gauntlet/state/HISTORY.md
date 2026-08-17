@@ -2090,3 +2090,53 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 52 — 2026-08-17
+
+- objective_id: MATCH-TIMER-ENFORCEMENT
+- builder: builder-structured / qwen3.6
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: d1795b0 candidate(MATCH-TIMER-ENFORCEMENT)
+- notes: Tick-based match timer auto-transitions phases: playing → halftime → playing → fulltime. WorldState gains matchTimer/currentHalf, PresentationSnapshot exposes matchTimer, ScenarioDefinition gains optional matchDurationTicks (default 5400). Halftime uses 60-tick countdown with position reset; timer frozen during "goal" phase. 1579/1579 node tests. 120-tick trajectory. Pre-existing typecheck fix: formationRole declared on PlayerState (was written/read via casts since CPU-3V3-FORMATION but never typed). No PES claim.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: MATCH-TIMER-ENFORCEMENT
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-structured
+- builder_model: qwen3.6
+- independence_ok: true
+- deterministic_audit: PASS
+- semantic_audit: NOT_REQUIRED
+- mandatory_evidence_ok: true
+- criteria:
+  - MATCH-TIMER-ENFORCEMENT: PASS
+- architecture_violations: none
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: MATCH-TIMER-ENFORCEMENT
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash
+- builder_model: qwen3.6
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (87 files / 1579 tests, all neighboring suites pass)
+- deterministic_audit: PASS
+- critic_verdict_verified: true
+- mandatory_evidence_ok: true
+- presentation_authority: PASS
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```

@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: STRATEGIC-REASSESSMENT
+next_objective_id: CPU-DEFENSIVE-IMPROVEMENT
 
 best_known:
-  commit: eaefdf1
-  note: "BROWSER-3V3-MATCH accepted. Horizon small-sided-match exhausted (6/6 accepted). Strategic reassessment needed."
+  commit: d1795b0
+  note: "MATCH-TIMER-ENFORCEMENT accepted. Horizon five-vs-five 1/6. Next: CPU-DEFENSIVE-IMPROVEMENT."
 
 active_candidate: null
 builder_in_use: null
@@ -60,18 +60,19 @@ accepted:
   - CPU-3V3-TEAMPLAY
   - MATCH-SET-PIECE
   - BROWSER-3V3-MATCH
+  - MATCH-TIMER-ENFORCEMENT
 
 blocked: []
 
-selection_note: "Horizon small-sided-match exhausted (6/6 accepted). All 3v3 browser match infrastructure complete. Strategic reassessment needed for next horizon."
+selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 1/6 accepted. Next: CPU-DEFENSIVE-IMPROVEMENT."
 ```
 
 ## Last accepted objective
 
-BROWSER-3V3-MATCH — Playable 3v3 browser match. `?mode=ai-match-3v3` URL creates autonomous AI-vs-AI 3v3 match with 6 CPU players (3 per team) with team decision, role-aware formation, and match restart. HUD, scoreboard, match timer, phase transitions all work. 4 semantic screenshots (before/kickoff/play/later). 1541/1541 node tests. 60-tick trajectory. 21KB semantic screenshots. DYNAMIC_VISUAL audit PASS.
+MATCH-TIMER-ENFORCEMENT — Tick-based match timer auto-transitions phases: playing → halftime → playing → fulltime. WorldState gains matchTimer/currentHalf, PresentationSnapshot exposes matchTimer, ScenarioDefinition gains optional matchDurationTicks (default 5400). Halftime uses 60-tick countdown with position reset; timer frozen during "goal" phase. 1579/1579 node tests. 120-tick trajectory. MULTI_TICK audit PASS.
 
-- builder: builder-gameplay / mimo-v2.5
+- builder: builder-structured / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 1541/1541 node tests, 4 semantic frames, 60-tick trajectory, slot-wiring verified
-- Commit: eaefdf1
+- Evidence: 1579/1579 node tests, 120-tick trajectory, deterministic audit PASS
+- Commit: d1795b0
