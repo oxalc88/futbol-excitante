@@ -16,6 +16,8 @@
  *  - sourceId is "cpu" — pure provenance, never affects gameplay.
  *  - Formation recovery: displaced players return toward formation
  *    position over time, blended with chase direction.
+ *  - Off-ball attacking: non-possessing players push forward during
+ *    team possession (role-aware forward runs, cycling pattern).
  *
  * Deterministic: same (tick, observation) → same InputFrame.
  * No Math.random, Date, DOM, or Node I/O.
@@ -28,12 +30,16 @@
  *  - SHOT_COOLDOWN_TICKS
  *  - CHASE_FORMATION_THRESHOLD
  *  - FORMATION_RECOVERY_RATE
+ *  - OFFBALL_FORWARD_PUSH_ATTACKER, OFFBALL_FORWARD_PUSH_MIDFIELDER
+ *  - OFFBALL_FORWARD_PUSH_BASE, ATTACK_PHASE_FORWARD_MULTIPLIER_*
+ *  - CYCLING_HALF_PERIOD, CYCLING_AMPLITUDE
  *  - PRESS_RADIUS, MARKING_DISTANCE, PRESS_STRENGTH
  */
 
 import type { InputFrame } from "../../contracts/input.js";
 import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
+import { teamHasPossession } from "./team-decision-profile.js";
 import type { TeamDecision } from "./team-decision-profile.js";
 export type { TeamDecision, DefensiveSubMode } from "./team-decision-profile.js";
 export { computeTeamDecision, getBallZone, teamHasPossession } from "./team-decision-profile.js";
@@ -242,6 +248,9 @@ interface CpuInternalState {
   /** Consecutive ticks the CPU player has been displaced from formation.
    * Reset when the player is near their formation position. */
   formationDisplacementTicks: number;
+  /** Consecutive ticks the team has had possession while this player
+   * does NOT have the ball.  Used for cycling off-ball movement. */
+  possessionDuration: number;
 }
 
 /**
@@ -425,6 +434,69 @@ const CHASE_FORMATION_THRESHOLD = 20;
  * Provisional placeholder — not a measured PES value.
  */
 const FORMATION_RECOVERY_RATE = 0.02;
+
+// ---------------------------------------------------------------------------
+// Off-ball attacking movement constants (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Target distance (metres) from opponent goal for off-ball attackers
+ * during team possession.  Attackers push ahead of the ball toward
+ * the goal to create passing options.
+ *
+ * Provisional placeholder — not a measured PES value.
+ */
+const OFFBALL_FORWARD_PUSH_ATTACKER = 15;
+
+/**
+ * Target distance (metres) from opponent goal for off-ball midfielders
+ * during team possession.  Midfielders position between defenders
+ * and attackers to create passing lanes.
+ *
+ * Provisional placeholder — not a measured PES value.
+ */
+const OFFBALL_FORWARD_PUSH_MIDFIELDER = 25;
+
+/**
+ * Default target distance (metres) from opponent goal for off-ball
+ * players with no recognised formation role.
+ *
+ * Provisional placeholder — not a measured PES value.
+ */
+const OFFBALL_FORWARD_PUSH_BASE = 20;
+
+/**
+ * Multiplier applied to off-ball forward push when team strategy is
+ * ATTACK.  Attackers push 20% further forward.
+ *
+ * Provisional placeholder — not a measured PES value.
+ */
+const ATTACK_PHASE_FORWARD_MULTIPLIER_ATTACKER = 1.2;
+
+/**
+ * Multiplier applied to off-ball forward push when team strategy is
+ * ATTACK.  Midfielders push 15% further forward.
+ *
+ * Provisional placeholder — not a measured PES value.
+ */
+const ATTACK_PHASE_FORWARD_MULTIPLIER_MIDFIELDER = 1.15;
+
+/**
+ * Tick period for the midfield cycling pattern.  During sustained
+ * possession, midfielders alternate pushing forward and dropping
+ * back every CYCLING_HALF_PERIOD ticks.
+ *
+ * Provisional placeholder — not a measured PES value.
+ */
+const CYCLING_HALF_PERIOD = 30;
+
+/**
+ * Cycling amplitude (metres) added or subtracted from the midfielder
+ * base target to create alternating forward/drop movement.
+ *
+ * Provisional placeholder — not a measured PES value.
+ */
+const CYCLING_AMPLITUDE = 5;
 
 // ---------------------------------------------------------------------------
 // Defensive behavior constants (provisional)
@@ -783,6 +855,7 @@ export function createCpuAdapter(): CpuAdapter {
     shotCooldownRemaining: 0,
     isLoftedPass: false,
     formationDisplacementTicks: 0,
+    possessionDuration: 0,
   };
 
   return {
@@ -1073,6 +1146,75 @@ export function createCpuAdapter(): CpuAdapter {
           }
         }
 
+        // Track possession duration for off-ball cycling.
+        if (state.hasPossession) {
+          state.possessionDuration = 0;
+        } else if (cpuTeamId && teamHasPossession(observation, cpuTeamId)) {
+          state.possessionDuration++;
+        } else {
+          state.possessionDuration = 0;
+        }
+
+        // --- Off-ball forward run: teammates with possession ---
+        // When the team has possession but this CPU player does NOT
+        // have the ball, non-defenders push forward to create passing
+        // options.  Role-aware targets place attackers deep, midfielders
+        // in the middle, and defenders hold position.
+        if (cpuTeamId && teamHasPossession(observation, cpuTeamId) && !state.hasPossession && !isNearestToBall && distToBall > FIRST_TOUCH_RANGE) {
+          const opponentGoalX = getOpponentGoalX(cpuTeamId);
+          const ballX = observation.ball.position.x;
+
+          // Attack direction: +1 for team-a, -1 for team-b.
+          const attackingX = cpuTeamId === "team-b" ? -1 : 1;
+
+          const role = cpuPlayer.formationRole;
+
+          // Base target distance from opponent goal by role.
+          let targetDistFromGoal = OFFBALL_FORWARD_PUSH_BASE;
+          let forwardMultiplier = 1;
+
+          if (role === "attacker") {
+            targetDistFromGoal = OFFBALL_FORWARD_PUSH_ATTACKER;
+            forwardMultiplier = ATTACK_PHASE_FORWARD_MULTIPLIER_ATTACKER;
+          } else if (role === "midfielder") {
+            targetDistFromGoal = OFFBALL_FORWARD_PUSH_MIDFIELDER;
+            forwardMultiplier = ATTACK_PHASE_FORWARD_MULTIPLIER_MIDFIELDER;
+          }
+          // Defenders: no forward push — fall through to chase-ball below.
+
+          if (role !== "defender" && teamStrategy === "ATTACK") {
+            targetDistFromGoal /= forwardMultiplier;
+          }
+
+          if (role !== "defender" && targetDistFromGoal > 0) {
+            // Position the target ahead of the ball toward opponent goal,
+            // at most targetDistFromGoal metres from the opponent goal,
+            // but never closer to the goal than the ball itself.
+            const ballDistToGoal = (opponentGoalX - ballX) * attackingX;
+            const cappedDist = Math.min(targetDistFromGoal, Math.max(ballDistToGoal, 0));
+            const targetX = opponentGoalX + cappedDist * (-attackingX);
+
+            // Midfield cycling: alternate pushing forward / dropping back
+            // during sustained possession (> 60 ticks without the ball).
+            let adjustedTargetX = targetX;
+            if (role === "midfielder" && state.possessionDuration > 60) {
+              const cycleTick = state.possessionDuration - 60;
+              const cycleSign = ((Math.floor(cycleTick / CYCLING_HALF_PERIOD) % 2) === 0)
+                ? 1 : -1;
+              adjustedTargetX += cycleSign * CYCLING_AMPLITUDE * attackingX;
+            }
+
+            const runDx = adjustedTargetX - playerX;
+            const runDist = Math.abs(runDx);
+
+            if (runDist > 0.5) {
+              const distUnit = Math.min(runDist, 1);
+              moveX = (runDx / runDist) * distUnit;
+              moveY = 0;
+            }
+          }
+        }
+
         // --- Optional formation blend (only when formationPosition is set) ---
         const formPos = observation.formationPosition;
         if (formPos) {
@@ -1197,6 +1339,7 @@ export function createCpuAdapter(): CpuAdapter {
       state.shotCooldownRemaining = 0;
       state.isLoftedPass = false;
       state.formationDisplacementTicks = 0;
+      state.possessionDuration = 0;
     },
   };
 }
