@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-CONTROLLED-PLAYER-INDICATOR
+next_objective_id: BROWSER-5V3-HUMAN-VS-CPU
 
 best_known:
-  commit: b1cc042
-  note: "BROWSER-PLAYER-SWITCH accepted. Horizon human-vs-cpu 1/5. Next: BROWSER-CONTROLLED-PLAYER-INDICATOR."
+  commit: ebefccb
+  note: "BROWSER-CONTROLLED-PLAYER-INDICATOR accepted. Horizon human-vs-cpu 2/5. Next: BROWSER-5V3-HUMAN-VS-CPU."
 
 active_candidate: null
 builder_in_use: null
@@ -67,18 +67,19 @@ accepted:
   - SCENARIO-5V5-FIXTURE
   - BROWSER-5V5-MATCH
   - BROWSER-PLAYER-SWITCH
+  - BROWSER-CONTROLLED-PLAYER-INDICATOR
 
 blocked: []
 
-selection_note: "Horizon human-vs-cpu: 5 objectives toward playable human-vs-CPU with player switching, visual indicator, 5v3 mode, improved CPU attack, and directional passing. 1/5 accepted. Next: BROWSER-CONTROLLED-PLAYER-INDICATOR."
+selection_note: "Horizon human-vs-cpu: 5 objectives toward playable human-vs-CPU with player switching, visual indicator, 5v3 mode, improved CPU attack, and directional passing. 2/5 accepted. Next: BROWSER-5V3-HUMAN-VS-CPU."
 ```
 
 ## Last accepted objective
 
-BROWSER-PLAYER-SWITCH — Tab-key player switching for human-controlled slot in human-vs-CPU browser modes. SWITCH_PLAYER_BIT (1<<3) added to InputFrame contract. Keyboard Tab mapped to switch. setControlledPlayer on Simulation API cycles controlledPlayerId through eligible teammates. Fix: nextEligiblePlayer reads from live simulation snapshot, not static scenario data. 71/71 browser tests, 1654/1654 node tests. BROWSER_VISIBLE audit PASS (semantic audit VALID for SHA collision).
+BROWSER-CONTROLLED-PLAYER-INDICATOR — Yellow ring indicator above the human-controlled player in browser modes. Renderer-only change: markerMesh (RingGeometry, yellow 0xffcc00) visible above players where isControlled === true. Marker follows the controlled player on Tab switching. No simulation core changes — PresentationSnapshot drives the visual. 77/77 browser tests, 1654/1654 node tests. BROWSER_VISIBLE audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (retry 1: fixed live-state read)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (evidence independently verified)
-- Evidence: 71 browser tests, 1654 node tests, screenshot, semantic audit VALID
-- Commit: b1cc042
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (retry 1: audit flag, test env)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- Evidence: 77 browser tests, 1654 node tests, screenshot frame-000.png
+- Commit: ebefccb

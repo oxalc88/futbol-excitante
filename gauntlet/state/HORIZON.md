@@ -7,7 +7,7 @@ horizon_id: "human-vs-cpu"
 created_from_commit: fbb68f8
 created_at: 2026-08-17
 reason: "Horizon five-vs-five exhausted (6/6 accepted). 5v5 AI match and browser play established. Next horizon focuses on human-vs-CPU quality: player switching, 5v5 human-vs-CPU with mixed control, improved CPU teammate behavior, and basic visual indicators so the human can identify their controlled player."
-current_index: 1
+current_index: 2
 objectives:
   - id: BROWSER-PLAYER-SWITCH
     status: accepted
@@ -16,10 +16,11 @@ objectives:
     prerequisite: BROWSER-3V3-HUMAN-VS-CPU
     commit: b1cc042
   - id: BROWSER-CONTROLLED-PLAYER-INDICATOR
-    status: pending
+    status: accepted
     reason: "Add a visual indicator (e.g., arrow, ring, or highlight) above the human-controlled player in browser modes. The Three.js renderer already renders player models; this adds a simple colored indicator (a small cone/ring above the controlled player's head) so the human can see which player they control. Updates PresentationSnapshot or renderer-only state."
     builder: builder-gameplay
     prerequisite: BROWSER-PLAYER-SWITCH
+    commit: ebefccb
   - id: BROWSER-5V3-HUMAN-VS-CPU
     status: pending
     reason: "Add ?mode=human-vs-ai-5v3 URL mode where a human controls 1 player via keyboard with 4 CPU teammates against 5 CPU opponents. Uses the 5v5 fixture with slot-1 set to HUMAN. Combined with player switching, the human can control any of the 5 players on their team. Follows the existing human-vs-CPU pattern."
