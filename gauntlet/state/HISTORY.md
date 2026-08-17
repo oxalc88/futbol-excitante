@@ -2478,3 +2478,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 59 — 2026-08-17
+
+- objective_id: BROWSER-CONTROLLED-PLAYER-INDICATOR
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (retry 1: audit flag, test env)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: ebefccb candidate(BROWSER-CONTROLLED-PLAYER-INDICATOR); f2cb8da acceptance(BROWSER-CONTROLLED-PLAYER-INDICATOR)
+- notes: Yellow ring indicator (RingGeometry, 0xffcc00) above the human-controlled player in browser modes. Renderer-only change: markerMesh follows isControlled flag on PresentationSnapshot, resets each frame, follows Tab switching. 77/77 browser tests, 1654/1654 node tests. BROWSER_VISIBLE audit PASS. No simulation core changes. No PES claim.
