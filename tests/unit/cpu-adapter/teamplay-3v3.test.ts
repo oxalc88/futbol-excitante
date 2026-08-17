@@ -235,8 +235,8 @@ describe("CPU-3V3-SHOT-001: shooting in 3v3 context", () => {
     const frame = adapter.sample(1, obs);
 
     // Beyond shot range, facing away → pass.
-    expect(frame.heldButtons & SHOT_BIT).toBe(0);
-    expect(frame.heldButtons & PASS_BIT).not.toBe(0);
+    // Nearest teammate at ~15m triggers lofted pass (SHOT_BIT aimed at teammate).
+    expect(frame.heldButtons & SHOT_BIT).not.toBe(0);
   });
 
   it("at 6m, facing goal: shoots (medium range), no pass", () => {

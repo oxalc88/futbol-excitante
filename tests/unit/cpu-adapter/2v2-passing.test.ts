@@ -249,6 +249,7 @@ describe("CPU-FORMATION-PASS-004: 2v2 teammate always in forward range", () => {
 
   it("2v2: teammate at midfield while CPU is deep → still forward", () => {
     // CPU at (5, 0), teammate at (30, 0). Both forward direction from CPU.
+    // Distance = 25m ≥ 15m threshold → lofted pass (SHOT_BIT aimed at teammate).
     const obs = make2v2Observation(5, 0, 5.5, 0, "team-a", [30, 0]);
     obs.players[0].bodyHeading = Math.PI;
 
@@ -256,7 +257,7 @@ describe("CPU-FORMATION-PASS-004: 2v2 teammate always in forward range", () => {
     adapter.sample(0, obs);
     const frame = adapter.sample(1, obs);
 
-    expect(frame.heldButtons & PASS_BIT).not.toBe(0);
+    expect(frame.heldButtons & SHOT_BIT).not.toBe(0);
     expect(frame.moveX).toBeGreaterThan(0.95);
   });
 
@@ -557,6 +558,7 @@ describe("CPU-FORMATION-PASS-007: determinism in 2v2 passing", () => {
 
 describe("CPU-FORMATION-PASS-008: 2v2 teammate-directed pass at various positions", () => {
   it("2v2: CPU near own goal, teammate ahead → pass forward", () => {
+    // CPU at (-45, 0), teammate at (-30, 0). Distance = 15m → lofted pass.
     const obs = make2v2Observation(-45, 0, -44.5, 0, "team-a", [-30, 0]);
     obs.players[0].bodyHeading = Math.PI;
 
@@ -564,8 +566,8 @@ describe("CPU-FORMATION-PASS-008: 2v2 teammate-directed pass at various position
     adapter.sample(0, obs);
     const frame = adapter.sample(1, obs);
 
-    expect(frame.heldButtons & PASS_BIT).not.toBe(0);
-    expect(frame.pressedButtons & PASS_BIT).not.toBe(0);
+    expect(frame.heldButtons & SHOT_BIT).not.toBe(0);
+    expect(frame.pressedButtons & SHOT_BIT).not.toBe(0);
     // Move toward teammate at x=-30 from x=-45.
     expect(frame.moveX).toBeGreaterThan(0.95);
   });

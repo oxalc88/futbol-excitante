@@ -1,0 +1,87 @@
+{
+  "objective": "CPU-PASS-VARIETY",
+  "evidence_class": "MULTI_TICK",
+  "captured_at": "2026-08-17T00:00:00Z",
+  "tests_executed": [
+    "CPU-PASS-VARIETY-001: short distance → ground pass (PASS_BIT)",
+    "CPU-PASS-VARIETY-002: long distance → lofted pass (SHOT_BIT at teammate)",
+    "CPU-PASS-VARIETY-003: defender near primary target → selects safer teammate",
+    "CPU-PASS-VARIETY-004: urgency (behind) → favors lofted passes",
+    "CPU-PASS-VARIETY-005: caution (ahead) → favors ground passes",
+    "CPU-PASS-VARIETY-006: all defenders near all teammates → still passes",
+    "CPU-PASS-VARIETY-007: determinism across fresh adapters"
+  ],
+  "tests_total": 13,
+  "tests_passed": 13,
+  "tests_failed": 0,
+  "regression_suite": "cpu-adapter-all",
+  "regression_total": 273,
+  "regression_passed": 273,
+  "regression_failed": 0,
+  "typecheck": "PASS",
+  "trajectory_frames": [
+    {
+      "tick": 0,
+      "event": "tick_0_setup",
+      "description": "CPU adapter gains possession (ballInRange → ballWasInRange)",
+      "buttons": {}
+    },
+    {
+      "tick": 1,
+      "event": "short_distance_ground_pass",
+      "description": "Teammate at 8m → PASS_BIT ground pass toward teammate",
+      "buttons": { "PASS_BIT": true, "SHOT_BIT": false },
+      "moveX_direction": "toward teammate",
+      "pass_type": "ground"
+    },
+    {
+      "tick": 1,
+      "event": "long_distance_lofted_pass",
+      "description": "Teammate at 20m → SHOT_BIT lofted pass aimed at teammate",
+      "buttons": { "PASS_BIT": false, "SHOT_BIT": true },
+      "moveX_direction": "toward teammate",
+      "pass_type": "lofted"
+    },
+    {
+      "tick": 1,
+      "event": "defender_aware_target_selection",
+      "description": "Primary target marked by opponent → CPU selects farther unmarked teammate",
+      "buttons": { "PASS_BIT": true },
+      "moveX_direction": "toward unmarked teammate",
+      "pass_type": "ground",
+      "defender_proximity": "primary target 1m from opponent"
+    },
+    {
+      "tick": 1,
+      "event": "urgency_lofted_pass",
+      "description": "CPU behind by 3 goals (urgency=2) → threshold lowered to 7.5m → lofted pass at 10m",
+      "buttons": { "PASS_BIT": false, "SHOT_BIT": true },
+      "pass_type": "lofted",
+      "score_differential": -3,
+      "urgency": 2
+    },
+    {
+      "tick": 1,
+      "event": "caution_ground_pass",
+      "description": "CPU ahead by 3 goals (urgency=0.5) → threshold raised to 30m → ground pass at 18m",
+      "buttons": { "PASS_BIT": true, "SHOT_BIT": false },
+      "pass_type": "ground",
+      "score_differential": 3,
+      "urgency": 0.5
+    },
+    {
+      "tick": 1,
+      "event": "all_marked_still_passes",
+      "description": "All forward teammates marked → still passes to least-marked teammate",
+      "buttons": { "PASS_BIT": true },
+      "pass_type": "ground",
+      "all_teammates_marked": true
+    },
+    {
+      "tick": "0-19",
+      "event": "determinism_verification",
+      "description": "Two fresh adapters with same observation produce identical outputs over 20 ticks",
+      "deterministic": true
+    }
+  ]
+}

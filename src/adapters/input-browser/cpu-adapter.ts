@@ -237,6 +237,8 @@ interface CpuInternalState {
   passWasPressed: boolean;
   /** Remaining cooldown ticks after a shot (prevents immediate re-possession). */
   shotCooldownRemaining: number;
+  /** Whether the current tick's SHOT_BIT is a lofted pass (no cooldown). */
+  isLoftedPass: boolean;
   /** Consecutive ticks the CPU player has been displaced from formation.
    * Reset when the player is near their formation position. */
   formationDisplacementTicks: number;
@@ -246,8 +248,12 @@ interface CpuInternalState {
  * Find the best teammate to pass to.
  *
  * Filters to teammates in a forward direction (toward opponent goal)
- * and returns the nearest one.  Falls back to undefined when no
+ * and returns the best target.  Falls back to undefined when no
  * forward teammate exists.
+ *
+ * When `opponents` is provided, target selection considers defender
+ * proximity: unmarked teammates are preferred over marked ones, and
+ * among equally marked teammates the closest to the passer wins.
  *
  * Direction is forward when the dot product of
  * (teammatePos - playerPos) with the attack direction is positive.
@@ -257,9 +263,16 @@ function getBestTeammateTarget(
   teammates: CpuTeammate[],
   playerPos: { x: number; y: number },
   cpuTeamId: string,
+  opponents?: Array<{ x: number; y: number }>,
 ): { x: number; y: number } | undefined {
   const attackingX = cpuTeamId === "team-b" ? -1 : 1;
-  let best: { x: number; y: number; dist: number } | undefined;
+
+  // Collect forward teammates with distance-to-passer.
+  const forward: Array<{
+    x: number;
+    y: number;
+    distToPlayer: number;
+  }> = [];
 
   for (const tm of teammates) {
     const dx = tm.groundPosition.x - playerPos.x;
@@ -270,13 +283,52 @@ function getBestTeammateTarget(
       continue;
     }
 
-    const distSq = dx * dx + dy * dy;
-    if (!best || distSq < best.dist) {
-      best = { x: tm.groundPosition.x, y: tm.groundPosition.y, dist: distSq };
+    forward.push({
+      x: tm.groundPosition.x,
+      y: tm.groundPosition.y,
+      distToPlayer: Math.sqrt(dx * dx + dy * dy),
+    });
+  }
+
+  if (forward.length === 0) return undefined;
+
+  // When no opponent data, pick nearest forward (legacy behavior).
+  if (!opponents || opponents.length === 0) {
+    let best = forward[0];
+    for (const tm of forward) {
+      if (tm.distToPlayer < best.distToPlayer) {
+        best = tm;
+      }
+    }
+    return { x: best.x, y: best.y };
+  }
+
+  // Defender-aware selection: prefer unmarked teammates, then closer ones.
+  let best = forward[0];
+  let bestScore = -Infinity;
+
+  for (const tm of forward) {
+    // Minimum distance from this teammate to any opponent.
+    let minOppDist = Infinity;
+    for (const opp of opponents) {
+      const odx = opp.x - tm.x;
+      const ody = opp.y - tm.y;
+      const oppDist = Math.sqrt(odx * odx + ody * ody);
+      if (oppDist < minOppDist) minOppDist = oppDist;
+    }
+
+    const isMarked = minOppDist < PASS_DEFENDER_MARKING_RADIUS;
+    // Unmarked (2000) vs marked (1000) priority, minus distance penalty.
+    const priority = isMarked ? 1000 : 2000;
+    const score = priority - tm.distToPlayer;
+
+    if (score > bestScore) {
+      bestScore = score;
+      best = tm;
     }
   }
 
-  return best ? { x: best.x, y: best.y } : undefined;
+  return { x: best.x, y: best.y };
 }
 
 /**
@@ -402,6 +454,26 @@ const MARKING_DISTANCE = 5;
 const PRESS_STRENGTH = 1.3;
 
 // ---------------------------------------------------------------------------
+// Pass variety constants (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Distance (metres) at which the CPU switches from ground pass (PASS_BIT)
+ * to lofted/chip pass (SHOT_BIT aimed at teammate). Adjusted by urgency:
+ * higher urgency lowers the threshold (lofted passes sooner).
+ * Provisional placeholder — not a measured PES value.
+ */
+const LOFT_PASS_DISTANCE_THRESHOLD = 15;
+
+/**
+ * Radius (metres) within which an opposing player is considered to be
+ * "marking" a teammate. Teammates inside this radius from any opponent
+ * are treated as less safe pass targets.
+ * Provisional placeholder — not a measured PES value.
+ */
+const PASS_DEFENDER_MARKING_RADIUS = 5;
+
+// ---------------------------------------------------------------------------
 // Role-aware formation pull (provisional PES 2017 values)
 // ---------------------------------------------------------------------------
 
@@ -429,6 +501,44 @@ function getFormationPull(role?: "defender" | "midfielder" | "attacker"): number
   if (role === "midfielder") return MIDFIELDER_FORMATION_PULL;
   if (role === "attacker") return ATTACKER_FORMATION_PULL;
   return MIDFIELDER_FORMATION_PULL; // default fallback (20%)
+}
+
+// ---------------------------------------------------------------------------
+// Pass variety helpers (provisional)
+// ---------------------------------------------------------------------------
+
+/** Ground or lofted pass type. */
+type PassType = "ground" | "lofted";
+
+/**
+ * Choose between ground pass and lofted pass based on distance and urgency.
+ *
+ * Longer distances and higher urgency (behind in score) favor lofted
+ * passes (SHOT_BIT, higher exit speed + vertical component).  Short
+ * distances and low urgency (ahead) favor ground passes (PASS_BIT).
+ *
+ * Provisional: unmeasured PES 2017 values.
+ */
+function choosePassType(
+  distanceToTarget: number,
+  urgency: number,
+): PassType {
+  const adjustedThreshold = LOFT_PASS_DISTANCE_THRESHOLD / urgency;
+  return distanceToTarget >= adjustedThreshold ? "lofted" : "ground";
+}
+
+/**
+ * Extract opponent positions from the observation for defender proximity
+ * checks during target selection.
+ */
+function getOpponentPositions(
+  observation: CpuObservation,
+  cpuTeamId: string,
+): Array<{ x: number; y: number }> {
+  const opponentTeamId = cpuTeamId === "team-a" ? "team-b" : "team-a";
+  return observation.players
+    .filter((p) => p.teamId === opponentTeamId)
+    .map((p) => ({ x: p.groundPosition.x, y: p.groundPosition.y }));
 }
 
 /**
@@ -671,6 +781,7 @@ export function createCpuAdapter(): CpuAdapter {
     hasPossession: false,
     passWasPressed: false,
     shotCooldownRemaining: 0,
+    isLoftedPass: false,
     formationDisplacementTicks: 0,
   };
 
@@ -761,6 +872,8 @@ export function createCpuAdapter(): CpuAdapter {
       if (state.shotCooldownRemaining > 0) {
         state.shotCooldownRemaining--;
       }
+      // Reset per-tick lofted-pass flag.
+      state.isLoftedPass = false;
 
       const cpuTeamId = observation.cpuTeamId;
       const scoreDiff = observation.scoreDifferential;
@@ -817,28 +930,22 @@ export function createCpuAdapter(): CpuAdapter {
           pressedButtons |= SHOT_BIT;
         }
 
-        // Pass decision: if not shooting, press PASS_BIT when
-        // beyond shot range or not facing well enough (edge detected).
+        // Pass decision: if not shooting, press PASS_BIT or SHOT_BIT
+        // (lofted) when beyond shot range or not facing well enough.
         const shotNotPressed = (pressedButtons & SHOT_BIT) === 0;
         if (shotNotPressed) {
           const shouldPressPass =
             distToGoal > SHOT_RANGE_WIDE || !isFacingGoal;
-          // Edge detection: press only when entering the pass state.
-          if (shouldPressPass && !state.passWasPressed) {
-            pressedButtons |= PASS_BIT;
-          }
-          // Hold while condition persists.
-          if (shouldPressPass) {
-            heldButtons |= PASS_BIT;
-          }
 
-          // Aim the pass toward the nearest forward teammate when available.
+          // Aim the pass toward the best forward teammate when available.
           if (shouldPressPass && observation.teammates &&
               observation.teammates.length > 0 && cpuTeamId) {
+            const opponents = getOpponentPositions(observation, cpuTeamId);
             const target = getBestTeammateTarget(
               observation.teammates,
               { x: playerX, y: playerY },
               cpuTeamId,
+              opponents,
             );
             if (target) {
               const aimDx = target.x - playerX;
@@ -846,6 +953,46 @@ export function createCpuAdapter(): CpuAdapter {
               const normalized = normalizeVec2(aimDx, aimDy);
               moveX = normalized.dx;
               moveY = normalized.dy;
+
+              // Choose ground vs lofted based on distance and urgency.
+              const distToTarget = Math.sqrt(aimDx * aimDx + aimDy * aimDy);
+              const passType = choosePassType(distToTarget, urgency);
+
+              if (passType === "lofted") {
+                // Lofted pass: SHOT_BIT aimed at teammate (higher exit
+                // speed + vertical component).  No shot cooldown.
+                if (shouldPressPass && !state.passWasPressed) {
+                  pressedButtons |= SHOT_BIT;
+                }
+                if (shouldPressPass) {
+                  heldButtons |= SHOT_BIT;
+                }
+                state.isLoftedPass = true;
+              } else {
+                // Ground pass: PASS_BIT (standard low trajectory).
+                if (shouldPressPass && !state.passWasPressed) {
+                  pressedButtons |= PASS_BIT;
+                }
+                if (shouldPressPass) {
+                  heldButtons |= PASS_BIT;
+                }
+              }
+            } else {
+              // No forward teammate: fallback to PASS_BIT toward goal.
+              if (shouldPressPass && !state.passWasPressed) {
+                pressedButtons |= PASS_BIT;
+              }
+              if (shouldPressPass) {
+                heldButtons |= PASS_BIT;
+              }
+            }
+          } else {
+            // No teammates: existing PASS_BIT toward goal direction.
+            if (shouldPressPass && !state.passWasPressed) {
+              pressedButtons |= PASS_BIT;
+            }
+            if (shouldPressPass) {
+              heldButtons |= PASS_BIT;
             }
           }
         }
@@ -1015,10 +1162,13 @@ export function createCpuAdapter(): CpuAdapter {
 
       // Update ballWasInRange for next tick.
       // After a shot, clear it to prevent immediate re-possession.
+      // Lofted passes (isLoftedPass) still lose possession but skip cooldown.
       if (shotJustPressed) {
         state.hasPossession = false;
         state.ballWasInRange = false;
-        state.shotCooldownRemaining = SHOT_COOLDOWN_TICKS;
+        if (!state.isLoftedPass) {
+          state.shotCooldownRemaining = SHOT_COOLDOWN_TICKS;
+        }
       } else if (anyButtonPressed && state.hasPossession) {
         // Some other action was pressed while in possession (not a shot).
         // We still maintain possession.
@@ -1045,6 +1195,7 @@ export function createCpuAdapter(): CpuAdapter {
       state.hasPossession = false;
       state.passWasPressed = false;
       state.shotCooldownRemaining = 0;
+      state.isLoftedPass = false;
       state.formationDisplacementTicks = 0;
     },
   };
