@@ -2140,3 +2140,58 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 53 — 2026-08-17
+
+- objective_id: CPU-DEFENSIVE-IMPROVEMENT
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: b499017 candidate(CPU-DEFENSIVE-IMPROVEMENT)
+- notes: CPU defender behavior with tracking, pressing, marking distance, defensive sub-modes. Added DefensiveSubMode (NONE/PRESSING/MARKING/RECOVERING) to team-decision-profile.ts; findMostThreateningOpponent, findBallCarrierPlayer, computeMarkOffsetPosition helpers in cpu-adapter.ts. Configurable PRESS_RADIUS=12m, MARKING_DISTANCE=5m, PRESS_STRENGTH=1.3×. Formation pull reduced for marking defenders. All constants provisional. 238/238 cpu-adapter unit tests, 239/239 integration tests. 100-tick trajectory. No PES claim.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: CPU-DEFENSIVE-IMPROVEMENT
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-gameplay
+- builder_model: mimo-v2.5
+- independence_ok: true
+- deterministic_audit: PASS
+- semantic_audit: NOT_REQUIRED
+- mandatory_evidence_ok: true
+- criteria:
+  - sub-mode computation: PASS
+  - mark tracking: PASS
+  - pressing: PASS
+  - determinism: PASS
+  - ball isolation: PASS
+  - architecture boundary: PASS
+- architecture_violations: none
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: CPU-DEFENSIVE-IMPROVEMENT
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (238/238 unit, 239/239 integration)
+- deterministic_audit: PASS
+- critic_verdict_verified: true
+- mandatory_evidence_ok: true
+- presentation_authority: NOT_APPLICABLE
+- evaluator_integrity: PASS
+- verdict: ACCEPT
+- required_fixes: none
+```

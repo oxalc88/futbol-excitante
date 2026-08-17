@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: CPU-DEFENSIVE-IMPROVEMENT
+next_objective_id: CPU-PASS-VARIETY
 
 best_known:
-  commit: d1795b0
-  note: "MATCH-TIMER-ENFORCEMENT accepted. Horizon five-vs-five 1/6. Next: CPU-DEFENSIVE-IMPROVEMENT."
+  commit: b499017
+  note: "CPU-DEFENSIVE-IMPROVEMENT accepted. Horizon five-vs-five 2/6. Next: CPU-PASS-VARIETY."
 
 active_candidate: null
 builder_in_use: null
@@ -61,18 +61,19 @@ accepted:
   - MATCH-SET-PIECE
   - BROWSER-3V3-MATCH
   - MATCH-TIMER-ENFORCEMENT
+  - CPU-DEFENSIVE-IMPROVEMENT
 
 blocked: []
 
-selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 1/6 accepted. Next: CPU-DEFENSIVE-IMPROVEMENT."
+selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 2/6 accepted. Next: CPU-PASS-VARIETY."
 ```
 
 ## Last accepted objective
 
-MATCH-TIMER-ENFORCEMENT — Tick-based match timer auto-transitions phases: playing → halftime → playing → fulltime. WorldState gains matchTimer/currentHalf, PresentationSnapshot exposes matchTimer, ScenarioDefinition gains optional matchDurationTicks (default 5400). Halftime uses 60-tick countdown with position reset; timer frozen during "goal" phase. 1579/1579 node tests. 120-tick trajectory. MULTI_TICK audit PASS.
+CPU-DEFENSIVE-IMPROVEMENT — CPU defender behavior with tracking, pressing, marking distance, and defensive sub-modes. Added DefensiveSubMode (NONE/PRESSING/MARKING/RECOVERING), findMostThreateningOpponent, findBallCarrierPlayer, computeMarkOffsetPosition. Configurable PRESS_RADIUS=12m, MARKING_DISTANCE=5m, PRESS_STRENGTH=1.3×. Formation pull reduced for marking defenders. All constants provisional. 238/238 cpu-adapter unit tests, 239/239 integration tests. 100-tick trajectory. MULTI_TICK audit PASS.
 
-- builder: builder-structured / qwen3.6
+- builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 1579/1579 node tests, 120-tick trajectory, deterministic audit PASS
-- Commit: d1795b0
+- Evidence: 238/238 unit, 239/239 integration, 100-tick trajectory, deterministic audit PASS
+- Commit: b499017
