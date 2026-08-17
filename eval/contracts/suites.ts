@@ -170,10 +170,12 @@ export const DUELS_SUITE: SuiteDefinition = {
 };
 
 /**
- * Team suite for the normative SMALL_SIDED_SHAPE profile.
+ * Normative declaration of the team suite required by SMALL_SIDED_SHAPE.
  *
- * This record mirrors GAMEPLAY_EVALUATION_SPEC.md §8. Registering the suite
- * does not fabricate missing bindings or PASS results.
+ * This record mirrors GAMEPLAY_EVALUATION_SPEC.md §8, but it is deliberately
+ * not registered in SUITES until every direct test has an executable binding.
+ * Registering an unresolved suite would invalidate the executable registry and
+ * falsely imply that team evaluation can already run.
  */
 export const TEAM_SUITE: SuiteDefinition = {
   suite_id: "team",
@@ -213,14 +215,13 @@ export const TEAM_SUITE: SuiteDefinition = {
   expected_expansion_manifest_id: "expansion-team-v1",
 };
 
-/** All registered suites keyed by suite_id. */
+/** Executable suites only; unresolved normative declarations stay out. */
 export const SUITES: Record<string, SuiteDefinition> = {
   [FAST_SUITE.suite_id]: FAST_SUITE,
   [LOCOMOTION_SUITE.suite_id]: LOCOMOTION_SUITE,
   [BALL_SUITE.suite_id]: BALL_SUITE,
   [TOUCH_AND_ACTIONS_SUITE.suite_id]: TOUCH_AND_ACTIONS_SUITE,
   [DUELS_SUITE.suite_id]: DUELS_SUITE,
-  [TEAM_SUITE.suite_id]: TEAM_SUITE,
 };
 
 /**
