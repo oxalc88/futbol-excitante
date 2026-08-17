@@ -28,11 +28,24 @@ function normalizeLine(line) {
     .trim();
 }
 
+function isFailureLine(line) {
+  return (
+    /error TS\d+/i.test(line) ||
+    /^FAIL(?:\s|$)/i.test(line) ||
+    /^×\s/.test(line) ||
+    /^❯\s/.test(line) ||
+    /^AssertionError\b/i.test(line) ||
+    /^Error:\s/i.test(line) ||
+    /Test timed out/i.test(line) ||
+    /ELIFECYCLE/i.test(line) ||
+    /Process completed with exit code/i.test(line) ||
+    /Replay divergence/i.test(line)
+  );
+}
+
 function relevantLines(output) {
   const lines = stripAnsi(output).split(/\r?\n/).map(normalizeLine).filter(Boolean);
-  const selected = lines.filter((line) =>
-    /error TS\d+|\bFAIL\b|AssertionError|\bError:|ELIFECYCLE|Process completed with exit code|×|failed:/i.test(line),
-  );
+  const selected = lines.filter(isFailureLine);
   return (selected.length > 0 ? selected : lines.slice(-20)).slice(0, 40);
 }
 
