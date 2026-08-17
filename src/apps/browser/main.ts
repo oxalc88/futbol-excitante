@@ -85,6 +85,16 @@ const IS_2V2 =
 const IS_AI_MATCH_3V3 =
   URL_MODE === "ai-match-3v3";
 
+/**
+ * Detect 5v5 AI match mode from URL: ?mode=ai-match-5v5
+ *
+ * When enabled, all 10 control slots use CPU adapters (no keyboard input).
+ * The match runs fully autonomously as a 5v5 viewer with team decision
+ * profile coordination.
+ */
+const IS_AI_MATCH_5V5 =
+  URL_MODE === "ai-match-5v5";
+
 // ---------------------------------------------------------------------------
 // Real-time loop
 // ---------------------------------------------------------------------------
@@ -298,8 +308,8 @@ function main(): void {
   let cpuTeamId: string | undefined;
   let cpuControlledPlayerId: string | undefined;
 
-  if (IS_AI_MATCH || IS_AI_MATCH_3V3) {
-    // AI-vs-AI mode (1v1 or 3v3): create a CPU adapter for every control slot.
+  if (IS_AI_MATCH || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5) {
+    // AI-vs-AI mode (1v1, 3v3, or 5v5): create a CPU adapter for every control slot.
     for (const [slotId, assignment] of Object.entries(SCENARIO_DATA.controlAssignments)) {
       cpuSlots.push({
         adapter: createCpuAdapter(),
@@ -399,7 +409,7 @@ function main(): void {
       );
 
       // Add CPU frames — per-slot adapters in AI-vs-AI, human-vs-CPU, 2v2, or 3v3 modes.
-      if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3) {
+      if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5) {
         // Compute one team decision per team from any observation on that team.
         const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
         const snapshot = sim.snapshot();
@@ -540,6 +550,14 @@ function main(): void {
     const hint = document.getElementById("controls-hint");
     if (hint) {
       hint.textContent = "3v3 AI Match — fully autonomous";
+    }
+  }
+
+  // Update controls hint for 5v5 AI mode.
+  if (IS_AI_MATCH_5V5) {
+    const hint = document.getElementById("controls-hint");
+    if (hint) {
+      hint.textContent = "5v5 AI Match — fully autonomous";
     }
   }
 }
