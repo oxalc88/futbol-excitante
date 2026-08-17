@@ -7,7 +7,7 @@ horizon_id: "human-vs-cpu"
 created_from_commit: fbb68f8
 created_at: 2026-08-17
 reason: "Horizon five-vs-five exhausted (6/6 accepted). 5v5 AI match and browser play established. Next horizon focuses on human-vs-CPU quality: player switching, 5v5 human-vs-CPU with mixed control, improved CPU teammate behavior, and basic visual indicators so the human can identify their controlled player."
-current_index: 3
+current_index: 4
 objectives:
   - id: BROWSER-PLAYER-SWITCH
     status: accepted
@@ -28,10 +28,11 @@ objectives:
     prerequisite: BROWSER-PLAYER-SWITCH
     commit: ff527e2
   - id: CPU-ATTACKING-IMPROVEMENT
-    status: pending
+    status: accepted
     reason: "Improve CPU attacking patterns: smarter forward runs when teammates have possession, better off-ball positioning toward opponent goal, and periodic forward movement from midfielders/attackers during balanced/attack phases. Extends the CpuAdapter with role-aware off-ball movement."
     builder: builder-gameplay
     prerequisite: CPU-TEAM-DECISION-PROFILE
+    commit: 7f26779
   - id: HUMAN-PASS-DIRECTION-CONTROL
     status: pending
     reason: "Allow the human to influence pass direction beyond body heading. When pressing PASS_BIT, the pass direction could be influenced by the current movement direction (moveX/moveY) rather than only bodyHeading. This makes human passing feel more responsive. Add a modifier: SHIFT+PASS for a lofted pass. This is a contact/wiring change."

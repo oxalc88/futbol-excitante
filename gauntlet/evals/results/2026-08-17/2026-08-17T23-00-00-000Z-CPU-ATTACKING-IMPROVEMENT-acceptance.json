@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.1",
+  "persisted_at": "2026-08-17T23:00:00.000Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "CPU-ATTACKING-IMPROVEMENT",
+  "candidate_commit": "7f26779",
+  "evidence_class": "HEADLESS",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS",
+    "checks": 19,
+    "all_pass": true
+  },
+  "critic": {
+    "agent": "critic-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "retries": 0
+  },
+  "integration": {
+    "agent": "integration-reviewer-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  }
+}

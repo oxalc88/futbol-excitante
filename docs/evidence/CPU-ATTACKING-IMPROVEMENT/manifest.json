@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.1",
+  "objective_id": "CPU-ATTACKING-IMPROVEMENT",
+  "accepted_at": "2026-08-17T23:00:00.000Z",
+  "candidate_commit": "7f26779",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": null,
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/CPU-ATTACKING-IMPROVEMENT/audit.json",
+      "sha256": "0abf47e6dfa3bb94e1ce22805f36e060747f4d36296c032469da405817864e7f",
+      "git_blob": "ccdd678040e5b5fc52d2b17f1e891e5a698ef587",
+      "candidate_commit": "7f26779",
+      "bytes": 2555,
+      "committed_with_candidate": false
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "checks": 19,
+      "all_pass": true
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "retries": 0
+    },
+    "integration": {
+      "agent": "integration-reviewer-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": null
+}

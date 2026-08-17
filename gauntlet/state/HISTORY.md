@@ -2498,3 +2498,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: ff527e2 candidate(BROWSER-5V3-HUMAN-VS-CPU)
 - notes: `?mode=human-vs-ai-5v3` URL mode with human controlling 1 player via keyboard, 4 CPU teammates, 5 CPU opponents. Uses 5v5 fixture with slot-1 HUMAN. Player switching (Tab) cycles through 5 teammates. 86/86 browser tests, 1654/1654 node tests. HEADLESS audit PASS. No simulation core changes. No PES claim.
+
+## Iteration 61 — 2026-08-17
+
+- objective_id: CPU-ATTACKING-IMPROVEMENT
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 7f26779 candidate(CPU-ATTACKING-IMPROVEMENT)
+- notes: Role-aware off-ball forward runs for CPU attackers and midfielders. Attackers push to 15m from opponent goal, midfielders to 25m, defenders hold position. Attack phase amplifies forward push (1.2× attackers, 1.15× midfielders). Midfielders cycle forward/back during sustained possession >60 ticks. All constants provisional. 1668/1668 node tests. HEADLESS audit PASS. No simulation core changes. No PES claim.

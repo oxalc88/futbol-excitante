@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-5V3-HUMAN-VS-CPU
-usage_aggregates_through: BROWSER-5V3-HUMAN-VS-CPU
-model_evaluation_through: BROWSER-5V3-HUMAN-VS-CPU
+last_tracked_objective: CPU-ATTACKING-IMPROVEMENT
+usage_aggregates_through: CPU-ATTACKING-IMPROVEMENT
+model_evaluation_through: CPU-ATTACKING-IMPROVEMENT
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -128,6 +128,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | BROWSER-PLAYER-SWITCH | accepted | ~30m | 19m | 10m | 5m | 0.5m | ~6M est. | n/a** |
 | BROWSER-CONTROLLED-PLAYER-INDICATOR | accepted | ~30m | 19m | 10m | 5m | 0.5m | ~6M est. | n/a** |
 | BROWSER-5V3-HUMAN-VS-CPU | accepted | ~30m | 19m | 10m | 5m | 0.5m | ~6M est. | n/a** |
+| CPU-ATTACKING-IMPROVEMENT | accepted | ~35m | 20m | 7m | 36m | 0.5m | ~6M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -329,6 +330,7 @@ on an H task is the interesting result.
 | BROWSER-PLAYER-SWITCH | mimo-v2.5 | M | Medium — player switching, Tab mapping, Simulation API | 1 | B | 7 new browser tests, 71/71 browser total, 1654/1654 node |
 | BROWSER-CONTROLLED-PLAYER-INDICATOR | mimo-v2.5 | M | Medium — yellow ring indicator, renderer-only change | 1 | B | 1 retry: audit flag, test env |
 | BROWSER-5V3-HUMAN-VS-CPU | mimo-v2.5 | M | Medium — URL mode, fixture, browser glue | 0 | A | 9 tests, 86 browser tests, 1654 node tests, first-pass clean |
+| CPU-ATTACKING-IMPROVEMENT | mimo-v2.5 | M | Medium — off-ball forward runs, role-aware positioning | 0 | A | 14 tests, 1668 node, first-pass clean |
 
 ### Reviewer route and catches
 
@@ -386,6 +388,8 @@ on an H task is the interesting result.
 | BROWSER-CONTROLLED-PLAYER-INDICATOR | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 77 browser tests, 1654 node tests, evidence verified |
 | BROWSER-5V3-HUMAN-VS-CPU | critic-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 0 retries — first pass clean |
 | BROWSER-5V3-HUMAN-VS-CPU | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 86 browser tests, 1654 node tests, dependency clean |
+| CPU-ATTACKING-IMPROVEMENT | critic-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 0 retries — first pass clean, 13/13 criteria |
+| CPU-ATTACKING-IMPROVEMENT | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 1668 node tests, dependency clean |
 
 ### Builder scoreboard
 
@@ -394,7 +398,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 40 | 24 | 8 | 3 | 3 | 2 | 60% | ~0.78 | ~38m |
-| mimo-v2.5 | 17 | 10 | 6 | 1 | 0 | 0 | 59% | ~0.53 | ~30m |
+| mimo-v2.5 | 18 | 11 | 6 | 1 | 0 | 0 | 61% | ~0.50 | ~30m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 
