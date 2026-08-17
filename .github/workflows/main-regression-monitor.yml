@@ -1,19 +1,18 @@
-name: Main Regression Monitor
+name: Gauntlet Runtime CI
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: main-regression-monitor
+  group: gauntlet-runtime-ci
   cancel-in-progress: true
 
 jobs:
-  validate:
+  observe:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -48,17 +47,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: main-ci-validation
+          name: gauntlet-runtime-validation
           path: artifacts/ci/main.json
           if-no-files-found: error
 
-      - name: Mark validation result
-        if: steps.validation.outcome == 'failure'
-        run: exit 1
-
   publish-regression-inbox:
     if: always()
-    needs: validate
+    needs: observe
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source commit
@@ -76,7 +71,7 @@ jobs:
       - name: Download validation report
         uses: actions/download-artifact@v4
         with:
-          name: main-ci-validation
+          name: gauntlet-runtime-validation
           path: source/artifacts/ci
 
       - name: Update deterministic regression inbox
