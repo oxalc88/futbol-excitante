@@ -58,7 +58,7 @@ Loop until you are stopped or a human-needed blocker is reached:
 
 1. Inspect repository state, `CURRENT.md`, and `HORIZON.md`. Repair a stale accepted `active_candidate`, then validate horizon invariants before selection.
 2. If the horizon is missing/exhausted/materially invalidated, perform strategic reassessment and persist a validated 4–8 objective horizon. Otherwise advance without global replanning. After persisting a valid replanned horizon, if its indexed next objective is executable and no allowed stop reason applies, delegate it immediately without asking the human for confirmation.
-3. Determine the strictest evidence class from `gauntlet/evidence-classes.md`, choose `builder-structured` or `builder-gameplay` by the responsibility rules above, and delegate one coherent implementation. Require executed tests and class-specific artifacts from `gauntlet/evidence-contract.md`. `DYNAMIC_VISUAL` requires 3–5 semantic frames plus `sequence.json`; static browser/presentation objectives may use one screenshot.
+3. Determine the strictest evidence class from `gauntlet/evidence-classes.md`, choose `builder-structured` or `builder-gameplay` by the responsibility rules above, and delegate one coherent implementation. Require executed tests and class-specific artifacts from `gauntlet/evidence-contract.md`. A temporal browser-visible claim requires `DYNAMIC_VISUAL`; event-driven claims require event-centered semantic evidence.
 4. Run the deterministic pre-review gate: `pnpm run gauntlet:audit -- --objective <id> --class <class> --tests-pass true` plus `--integration-test-pass true` for multi-tick classes and `--requires-slot-wiring true --slot-wiring-pass true` when ownership/routing is an acceptance criterion. The audit persists `docs/evidence/<id>/audit.json` and covers test facts, artifact existence, semantic-sequence requirements, screenshot SHA reuse, trajectory requirements, CURRENT/HORIZON consistency, TIMING consistency, eval-result freshness, and optional slot/player wiring invariants.
    - `FAIL` with `owner: builder`: return concrete evidence/implementation fixes to the builder.
    - `FAIL` with `owner: orchestrator`: repair bookkeeping/tracking/persistence locally and rerun the audit; do not send valid gameplay back to the builder.
@@ -72,13 +72,31 @@ Loop until you are stopped or a human-needed blocker is reached:
 10. Run `pnpm run gauntlet:eval:state`. Repair state-only failures locally and rerun until it passes. Then invoke `git-committer` for the separate acceptance/bookkeeping commit containing the manifest/result/state changes. Only after the acceptance record, objective `manifest.json`, state, and commits exist may you say the objective is **fully accepted and committed**.
 11. Immediately invoke `git-committer` in **acceptance publication mode** for the final acceptance commit. Push the accepted chain once, fetch the configured upstream, and verify the exact final acceptance commit is contained in the remote branch. A local final commit is not sufficient remote durability. If push or verification fails, repair publication before continuing. Do not delegate or replan past an accepted objective until remote durability is verified.
 12. Continue immediately only after step 11 succeeds. If another horizon objective exists, delegate it. If the horizon is exhausted, first ensure the exhausted horizon's last acceptance is remotely durable, then perform strategic reassessment and start the next horizon. Horizon exhaustion triggers strategic reassessment; it is never a stop condition by itself.
-13. For important playable milestones (2v2, 5v5, 11v11, etc.), generate a derived evidence bundle when the milestone is reached: `pnpm run gauntlet:milestone:bundle -- --milestone <id> --objectives <accepted-objectives>`. Bundles never mutate source evidence.
+13. At a strategic boundary where a normative milestone has enough implemented material to evaluate, apply the milestone playtest flow below. This evaluation reports milestone truth; it does not retroactively change objective acceptance.
+
+## Milestone-aware playtesting and observability
+
+Repository observability follows `gauntlet/observability-contract.md`. Produce standardized repository artifacts once and let observers/dashboards/blog tooling consume them read-only; do not create a second canonical progress database.
+
+A completed horizon, accepted browser objective, or larger player cardinality is implementation progress, **not a milestone verdict**. Normative milestone applicability comes from `eval/contracts/profiles.ts` and `specs/GAMEPLAY_EVALUATION_SPEC.md`.
+
+When a normative milestone is ready to evaluate:
+
+1. Read `gauntlet/milestone-playtest-contract.md`, `gauntlet/gameplay-situations.json`, and `gauntlet/playtests/<milestone>.json`.
+2. Execute/collect the required capability suites and gameplay situations. Missing required situation evidence remains `NOT_EVALUATED`; do not infer PASS from neighboring objectives.
+3. For temporal browser-visible situations use `DYNAMIC_VISUAL`; for event/transition claims capture evidence around the actual event and consequence.
+4. Invoke the existing independent critic against the milestone playtest plan, applicable gameplay/reference bar, facts, and visual/readability evidence. Do not create a new critic role merely for milestones.
+5. Persist the structured verdict with `pnpm run gauntlet:milestone:evaluate -- --milestone <id> --input <json>`. Deterministic reduction may only produce PASS when prerequisites and every required situation are PASS and the critic verdict is ACCEPT.
+6. Generate the derived observable bundle with `pnpm run gauntlet:milestone:bundle -- --milestone <id> --objectives <accepted-objectives>`. Bundles preserve immutable source evidence and include applicable situations/playtest history.
+7. Report unresolved prerequisites/situations honestly. A milestone that is `NOT_EVALUATED` or `NEEDS_PERCEPTUAL_REVIEW` does not prevent implementation of later non-prohibited capabilities unless an authoritative spec explicitly makes that milestone a promotion prerequisite for the selected work.
+
+Do not materialize a regulation/full-match profile until the authoritative goalkeeper and deterministic-rules publication barrier in `GAMEPLAY_EVALUATION_SPEC.md` is satisfied.
 
 The deterministic audit and cheap semantic audit are filters before criticism, not substitutes for criticism. Read the canonical wording only from `gauntlet/principles.md`; do not duplicate it into child prompts.
 
 ## Continuation and stop semantics
 
-Completion of an objective, critic/integration ACCEPT, a candidate snapshot commit, a final acceptance commit, acceptance publication, stale-state repair, tracking repair, horizon exhaustion, or completion of a strategic replan is never by itself a reason to return control to the human. Once a valid horizon has an executable next objective and the prior accepted objective is remotely durable, proceed to delegation without asking whether to continue.
+Completion of an objective, critic/integration ACCEPT, a candidate snapshot commit, a final acceptance commit, acceptance publication, stale-state repair, tracking repair, horizon exhaustion, completion of a strategic replan, or a non-PASS milestone observation is never by itself a reason to return control to the human. Once a valid horizon has an executable next objective and the prior accepted objective is remotely durable, proceed to delegation without asking whether to continue.
 
 Remote durability is a continuation invariant, not a gameplay acceptance criterion: the candidate/acceptance pipeline decides whether the objective is accepted; publication decides whether the accepted state is safe to advance past. Never claim remote durability from a local commit alone.
 

@@ -1,4 +1,4 @@
-import { access, copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, copyFile, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -42,9 +42,18 @@ const playtestPlanPath = path.join(repoRoot, "gauntlet/playtests", `${safeMilest
 let playtestPlan: Record<string, unknown> | null = null;
 try { playtestPlan = JSON.parse(await readFile(playtestPlanPath, "utf8")) as Record<string, unknown>; } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
 
-const playtestResultPath = path.join(outDir, "playtest-result.json");
-let playtestResult: Record<string, unknown> | null = null;
-try { playtestResult = JSON.parse(await readFile(playtestResultPath, "utf8")) as Record<string, unknown>; } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+const playtestDir = path.join(outDir, "playtests");
+let playtestResults: Array<{ path: string; result: Record<string, unknown> }> = [];
+try {
+  const names = (await readdir(playtestDir)).filter((name) => name.endsWith(".json")).sort();
+  playtestResults = await Promise.all(names.map(async (name) => ({
+    path: path.posix.join("docs/evidence/milestones", safeMilestone, "playtests", name),
+    result: JSON.parse(await readFile(path.join(playtestDir, name), "utf8")) as Record<string, unknown>,
+  })));
+} catch (error) {
+  if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+}
+const latestPlaytest = playtestResults.at(-1) ?? null;
 
 const sources: Array<Record<string, unknown>> = [];
 for (const objective of objectiveList) {
@@ -92,9 +101,10 @@ const bundle = {
   gameplay_situation_registry_version: situationsRegistry.registry_version ?? null,
   applicable_gameplay_situations: applicableSituations,
   playtest_plan: playtestPlan,
-  playtest_result: playtestResult,
+  playtest_runs: playtestResults.map(({ path: resultPath, result }) => ({ path: resultPath, generated_at: result.generated_at ?? null, milestone_verdict: result.milestone_verdict ?? null })),
+  latest_playtest_result: latestPlaytest,
   source_objectives: sources,
-  preservation_policy: "source objective evidence is immutable; bundle files are derived copies and this bundle is write-once",
+  preservation_policy: "source objective evidence and playtest runs are immutable; bundle files are derived copies and this bundle is write-once",
 };
 await writeFile(manifestOut, `${JSON.stringify(bundle, null, 2)}\n`, { encoding: "utf8", flag: "wx" });
 console.log(manifestOut);

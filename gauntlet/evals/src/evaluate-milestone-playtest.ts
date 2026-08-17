@@ -23,7 +23,8 @@ if (!milestone || !inputPath) {
   process.exit(2);
 }
 
-const planPath = path.join(repoRoot, "gauntlet/playtests", `${milestone}.json`);
+const safeMilestone = milestone.replace(/[^A-Za-z0-9_-]/g, "_");
+const planPath = path.join(repoRoot, "gauntlet/playtests", `${safeMilestone}.json`);
 const plan = JSON.parse(await readFile(planPath, "utf8")) as { required_situations?: string[]; playtest_plan_version?: string };
 const input = JSON.parse(await readFile(path.resolve(repoRoot, inputPath), "utf8")) as {
   entry_prerequisites_pass?: boolean;
@@ -48,15 +49,17 @@ const scenario: MilestonePlaytestGateScenario = {
 };
 
 const result = evaluateMilestonePlaytest(scenario);
-const outDir = path.join(repoRoot, "docs/evidence/milestones", milestone);
+const generatedAt = new Date().toISOString();
+const runId = generatedAt.replace(/[:.]/g, "-");
+const outDir = path.join(repoRoot, "docs/evidence/milestones", safeMilestone, "playtests");
 await mkdir(outDir, { recursive: true });
-const outPath = path.join(outDir, "playtest-result.json");
+const outPath = path.join(outDir, `${runId}.json`);
 const output = {
   schema_version: 1,
   record_type: "milestone_playtest_result",
   milestone_id: milestone,
   playtest_plan_version: plan.playtest_plan_version ?? null,
-  generated_at: new Date().toISOString(),
+  generated_at: generatedAt,
   required_situations: scenario.input.required_situations,
   situation_outcomes: scenario.input.situation_outcomes,
   entry_prerequisites_pass: scenario.input.entry_prerequisites_pass,
