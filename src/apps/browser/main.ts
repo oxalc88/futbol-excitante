@@ -26,6 +26,7 @@ import {
 import { selectBrowserScenario } from "./scenario-selector.js";
 import type { ScenarioDefinition } from "../../contracts/scenario.js";
 import type { InputFrame } from "../../contracts/input.js";
+import { SWITCH_PLAYER_BIT } from "../../contracts/input.js";
 import type { Simulation } from "../../simulation/loop/simulation.js";
 import { createCpuAdapter, buildCpuObservation } from "../../adapters/input-browser/cpu-adapter.js";
 import { computeTeamDecision } from "../../adapters/input-browser/team-decision-profile.js";
@@ -290,6 +291,34 @@ function main(): void {
   // 2. Create simulation (synchronous, DOM-free core).
   const sim: Simulation = createSimulation(world);
 
+  // -------------------------------------------------------------------
+  // Player switching helpers
+  // -------------------------------------------------------------------
+
+  /**
+   * Compute the next eligible player for a given control slot.
+   *
+   * Eligible players are all teammates on the same team (sorted by
+   * playerId for deterministic cycling). Returns the next playerId
+   * in the cycle, or null if no switch is possible.
+   */
+  function nextEligiblePlayer(controlSlot: string): string | null {
+    const liveState = sim.snapshot();
+    const assignment = liveState.controlAssignments[controlSlot];
+    if (!assignment) return null;
+    const teamId = assignment.teamId;
+    const currentId = assignment.controlledPlayerId;
+    // All players on the same team, sorted by playerId.
+    const teammates = SCENARIO_DATA.players
+      .filter((p) => p.teamId === teamId)
+      .map((p) => p.playerId)
+      .sort();
+    if (teammates.length <= 1) return null;
+    const idx = teammates.indexOf(currentId);
+    if (idx < 0) return null;
+    return teammates[(idx + 1) % teammates.length];
+  }
+
   // Track keyboard adapters (empty in AI-vs-AI mode).
   type AdapterEntry = { adapter: KeyboardAdapter; config: { controlSlot: string } };
   const adapters: AdapterEntry[] = [];
@@ -408,6 +437,19 @@ function main(): void {
         ({ adapter, config }) => adapter.sample(sim.tick),
       );
 
+      // Player switching: detect edge-triggered SWITCH_PLAYER_BIT
+      // from the first human keyboard adapter. Each press cycles to
+      // the next eligible teammate on the same team.
+      if (adapters.length > 0) {
+        const humanFrame = allFrames[0];
+        if (humanFrame && (humanFrame.pressedButtons & SWITCH_PLAYER_BIT) !== 0) {
+          const nextId = nextEligiblePlayer(humanFrame.controlSlot);
+          if (nextId) {
+            sim.setControlledPlayer(humanFrame.controlSlot, nextId);
+          }
+        }
+      }
+
       // Add CPU frames — per-slot adapters in AI-vs-AI, human-vs-CPU, 2v2, or 3v3 modes.
       if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5) {
         // Compute one team decision per team from any observation on that team.
@@ -525,7 +567,7 @@ function main(): void {
   if (IS_HUMAN_VS_CPU) {
     const hint = document.getElementById("controls-hint");
     if (hint) {
-      hint.textContent = "Human vs CPU — Arrow keys + Space to sprint";
+      hint.textContent = "Human vs CPU — WASD + Shift to sprint, Tab to switch player";
     }
   }
 

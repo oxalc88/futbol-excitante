@@ -200,6 +200,19 @@ export interface Simulation {
    * Uses canonical JSON encoding + FNV-1a 64-bit.
    */
   stateHash(): string;
+
+  /**
+   * Switch the controlled player for a given control slot.
+   *
+   * Updates the slot's `controlledPlayerId` in the authoritative
+   * controlAssignments. This is a control-layer concern — the
+   * simulation core does not decide which player is controlled;
+   * adapters (browser, AI, replay) call this to reassign.
+   *
+   * @param controlSlot - the slot to reassign (e.g. "slot-1").
+   * @param nextPlayerId - the new player to control.
+   */
+  setControlledPlayer(controlSlot: string, nextPlayerId: string): void;
 }
 
 // ---------------------------------------------------------------------------
@@ -1060,6 +1073,19 @@ export function createSimulation(
       return hashFnv1a64(
         encodeCanonical(freezeWorldState(state) as unknown as Record<string, unknown>),
       );
+    },
+
+    /**
+     * Switch the controlled player for a given control slot.
+     *
+     * Updates `controlAssignments[slot].controlledPlayerId` on the
+     * authoritative world state. The mutation is immediate and affects
+     * the next tick's input resolution.
+     */
+    setControlledPlayer(controlSlot: string, nextPlayerId: string): void {
+      const assignment = state.controlAssignments[controlSlot];
+      if (!assignment) return;
+      assignment.controlledPlayerId = nextPlayerId;
     },
   });
 }

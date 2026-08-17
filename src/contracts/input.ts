@@ -40,6 +40,14 @@ export const PASS_BIT = 1 << 1;
 export const SHOT_BIT = 1 << 2;
 
 /**
+ * SWITCH_PLAYER_BIT: request switching controlled player to the next
+ * eligible teammate. Edge-triggered — each press advances to the next
+ * teammate on the same team (excluding goalkeeper, if any).
+ * Processed at the adapter layer; does not affect simulation internals.
+ */
+export const SWITCH_PLAYER_BIT = 1 << 3;
+
+/**
  * A tick-indexed input frame from any source (keyboard, gamepad, replay, AI, test).
  *
  * sourceId is provenance only — it must never affect gameplay outcomes,
