@@ -1,10 +1,10 @@
 {
-  "version": "0.9.0",
+  "version": "0.9.1",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.8.1",
+  "previous_system_version": "0.9.0",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
-  "baseline_commit": "1c9449989a4e630cc1992aa412a8b76f24c0e92b",
+  "baseline_commit": "729fbd316220ca84217da1604035064b11f6cf23",
   "includes": [
     "prompts",
     "agents",
@@ -23,6 +23,7 @@
     "milestone-bundles",
     "timing-contract",
     "acceptance-pipeline",
-    "state-audit"
+    "state-audit",
+    "provider-failure-resilience"
   ]
 }
