@@ -5,7 +5,9 @@ export interface PromptGateResult { name: string; pass: boolean; detail?: string
 interface GateRule { name: string; file: string; mustContain: string[] }
 
 const RULES: GateRule[] = [
-  { name: "canonical principles exist", file: "gauntlet/principles.md", mustContain: ["Deterministic audits may invalidate evidence or state", "Scripts establish facts. Cheap auditors resolve bounded ambiguity. Critics judge quality against the bar."] },
+  { name: "canonical principles exist", file: "gauntlet/principles.md", mustContain: ["Deterministic audits may invalidate evidence or state", "Scripts establish facts. Cheap auditors resolve bounded ambiguity. Critics judge quality against the bar.", "Provider, transport, quota, authentication, and harness failures are non-progress events", "gauntlet/provider-failure-contract.md"] },
+  { name: "provider failures cannot masquerade as completed inference", file: "gauntlet/provider-failure-contract.md", mustContain: ["A completed CLI turn is not sufficient evidence of a successful inference", "HTTP 403: System error, please try again later.", "TRANSIENT_PROVIDER_FAILURE", "bounded exponential backoff with jitter", "maximum attempts: 5", "no state advancement", "same objective resumes"] },
+  { name: "provider failure retry policy stays bounded", file: "gauntlet/provider-failure-contract.md", mustContain: ["base delays: 2s, 5s, 10s, 20s, 40s", "jitter: +/- 20%", "Never spin indefinitely", "Do not classify every 403 as transient"] },
   { name: "main prompt uses deterministic-first critic-always pipeline", file: "gauntlet/PROMPT.md", mustContain: ["gauntlet/principles.md", "pnpm run gauntlet:audit", "REVIEW_REQUIRED", "The critic is mandatory", "GAUNTLET_ACCEPTANCE_JSON", "pnpm run gauntlet:eval:state"] },
   { name: "acceptance is durable before claim", file: "gauntlet/PROMPT.md", mustContain: ["manifest.json", "fully accepted", "candidate commit", "Horizon exhaustion triggers strategic reassessment"] },
   { name: "accepted objectives are remotely durable before continuation", file: "gauntlet/PROMPT.md", mustContain: ["acceptance publication mode", "verify the exact final acceptance commit is contained in the remote branch", "Do not delegate or replan past an accepted objective until remote durability is verified"] },
@@ -20,7 +22,7 @@ const RULES: GateRule[] = [
   { name: "class-based evidence contract cannot regress", file: "gauntlet/evidence-contract.md", mustContain: ["`HEADLESS`", "`BROWSER_VISIBLE`", "`MULTI_TICK`", "`DYNAMIC_VISUAL`", "3–5 semantic frames", "temporal and browser-visible", "centered on that event", "`PRESENTATION`", "`BOOKKEEPING`", "manifest.json", "The critic is mandatory"] },
   { name: "evidence manifest contract exists", file: "gauntlet/evidence-manifest-contract.md", mustContain: ["candidate_commit", "sha256", "sequence.json", "video-reference.json", "milestones", "never silently overwritten"] },
   { name: "semantic audit is bounded and cannot accept", file: "gauntlet/semantic-audit-contract.md", mustContain: ["VALID|INVALID|INSUFFICIENT_CONTEXT", "can never produce objective `ACCEPT`"] },
-  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.9.0\"", "\"semver\": true"] },
+  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.9.1\"", "\"previous_system_version\": \"0.9.0\"", "\"semver\": true", "provider-failure-resilience"] },
   { name: "reviewer fallback remains explicit", file: "gauntlet/PROMPT.md", mustContain: ["critic-flash", "integration-reviewer-flash"] },
 ];
 
