@@ -28,13 +28,14 @@
  *  - SHOT_COOLDOWN_TICKS
  *  - CHASE_FORMATION_THRESHOLD
  *  - FORMATION_RECOVERY_RATE
+ *  - PRESS_RADIUS, MARKING_DISTANCE, PRESS_STRENGTH
  */
 
 import type { InputFrame } from "../../contracts/input.js";
 import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
 import type { TeamDecision } from "./team-decision-profile.js";
-export type { TeamDecision } from "./team-decision-profile.js";
+export type { TeamDecision, DefensiveSubMode } from "./team-decision-profile.js";
 export { computeTeamDecision, getBallZone, teamHasPossession } from "./team-decision-profile.js";
 
 // ---------------------------------------------------------------------------
@@ -374,6 +375,33 @@ const CHASE_FORMATION_THRESHOLD = 20;
 const FORMATION_RECOVERY_RATE = 0.02;
 
 // ---------------------------------------------------------------------------
+// Defensive behavior constants (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Radius (metres) within which the nearest defender presses the ball
+ * carrier directly instead of marking space.
+ * Provisional placeholder — not a measured PES value.
+ */
+const PRESS_RADIUS = 12;
+
+/**
+ * Default offset (metres) between a marking defender and their target,
+ * measured toward own goal. At this distance the defender is positioned
+ * between the marked attacker and the own goal.
+ * Provisional placeholder — not a measured PES value.
+ */
+const MARKING_DISTANCE = 5;
+
+/**
+ * Strength multiplier applied to the press direction vector when the
+ * nearest defender presses the ball carrier.  Values > 1 produce a
+ * more aggressive press; < 1 a more cautious approach.
+ * Provisional placeholder.
+ */
+const PRESS_STRENGTH = 1.3;
+
+// ---------------------------------------------------------------------------
 // Role-aware formation pull (provisional PES 2017 values)
 // ---------------------------------------------------------------------------
 
@@ -493,6 +521,122 @@ function normalizeAngle(angle: number): number {
   while (a > Math.PI) a -= 2 * Math.PI;
   while (a < -Math.PI) a += 2 * Math.PI;
   return a;
+}
+
+// ---------------------------------------------------------------------------
+// Defensive behavior helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the opposing player closest to the ball (the "ball carrier").
+ *
+ * Only considers players on the opposite team.  Returns undefined
+ * when no opposing player is present.
+ *
+ * Deterministic: same observation → same result.
+ */
+function findBallCarrierPlayer(
+  observation: CpuObservation,
+  cpuTeamId: string,
+): { playerId: string; position: { x: number; y: number } } | undefined {
+  const opponentTeamId = cpuTeamId === "team-a" ? "team-b" : "team-a";
+  let best: { playerId: string; position: { x: number; y: number }; dist: number } | undefined;
+
+  for (const p of observation.players) {
+    if (p.teamId !== opponentTeamId) continue;
+    const dx = observation.ball.position.x - p.groundPosition.x;
+    const dy = observation.ball.position.y - p.groundPosition.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (!best || dist < best.dist) {
+      best = {
+        playerId: p.playerId,
+        position: { x: p.groundPosition.x, y: p.groundPosition.y },
+        dist,
+      };
+    }
+  }
+
+  return best ? { playerId: best.playerId, position: best.position } : undefined;
+}
+
+/**
+ * Find the most threatening opposing player from the perspective of
+ * the defending team.
+ *
+ * Threat is measured by proximity to own goal (the opposing player
+ * closest to the defending team's goal).  When two opposing players
+ * are equidistant, the one closer to the ball wins (tie-break).
+ *
+ * Deterministic: same observation → same result.
+ */
+function findMostThreateningOpponent(
+  observation: CpuObservation,
+  cpuTeamId: string,
+): { playerId: string; position: { x: number; y: number } } | undefined {
+  const opponentTeamId = cpuTeamId === "team-a" ? "team-b" : "team-a";
+  const ownGoalX = cpuTeamId === "team-b"
+    ? observation.pitchLength / 2
+    : -observation.pitchLength / 2;
+
+  let best:
+    { playerId: string; position: { x: number; y: number }; goalDist: number; ballDist: number }
+    | undefined;
+
+  for (const p of observation.players) {
+    if (p.teamId !== opponentTeamId) continue;
+    const goalDist = Math.abs(p.groundPosition.x - ownGoalX);
+    const bdx = observation.ball.position.x - p.groundPosition.x;
+    const bdy = observation.ball.position.y - p.groundPosition.y;
+    const ballDist = Math.sqrt(bdx * bdx + bdy * bdy);
+
+    if (
+      !best ||
+      goalDist < best.goalDist ||
+      (goalDist === best.goalDist && ballDist < best.ballDist)
+    ) {
+      best = {
+        playerId: p.playerId,
+        position: { x: p.groundPosition.x, y: p.groundPosition.y },
+        goalDist,
+        ballDist,
+      };
+    }
+  }
+
+  return best
+    ? { playerId: best.playerId, position: best.position }
+    : undefined;
+}
+
+/**
+ * Compute the offset position for a marking defender.
+ *
+ * Returns a position along the line from the mark target toward own
+ * goal, offset by `markingDistance` metres.  When the mark target is
+ * closer to own goal than `markingDistance`, the defender sits at the
+ * mark target's position (no overshoot).
+ *
+ * Deterministic: same inputs → same result.
+ */
+function computeMarkOffsetPosition(
+  targetPos: { x: number; y: number },
+  ownGoalX: number,
+  markingDistance: number,
+): { x: number; y: number } {
+  const toGoalX = ownGoalX - targetPos.x;
+  const toGoalLen = Math.abs(toGoalX);
+
+  if (toGoalLen < 0.001) {
+    // Target is on the goal line — hold at target position.
+    return { x: targetPos.x, y: targetPos.y };
+  }
+
+  // Offset fraction: clamp so we never overshoot the own goal.
+  const fraction = Math.min(markingDistance / toGoalLen, 1);
+  return {
+    x: targetPos.x + toGoalX * fraction,
+    y: targetPos.y,
+  };
 }
 
 /**
@@ -711,24 +855,76 @@ export function createCpuAdapter(): CpuAdapter {
           (distToGoal > SHOT_RANGE_WIDE || !isFacingGoal);
       } else {
         // ----------------------------------------------------------------
-        // DEFENSE MODE — chase ball with formation blend
+        // DEFENSE MODE — chase ball / mark opponents / press carrier
         // ----------------------------------------------------------------
 
-        // --- Default chase direction (always applied) ---
-        if (distToBall > 0.001) {
-          // Clamp magnitude to distToBall when ball is within 1m so the CPU
-          // doesn't overshoot the ball during FIRST_TOUCH acquisition.
-          const distUnit = Math.min(distToBall, 1);
-          moveX = (dx / distToBall) * distUnit;
-          moveY = (dy / distToBall) * distUnit;
+        const teamStrategy = observation.teamDecision?.strategy;
+        const defensiveSubMode = observation.teamDecision?.defensiveSubMode;
+        const cpuTeamId = observation.cpuTeamId;
+        const isNearestToBall = observation.teamDecision?.nearestToBallPlayerId
+          === observation.controlledPlayerId;
+
+        // Determine if defensive coordination is active: team is
+        // defending, pressing, or marking.
+        const isDefensiveMode = teamStrategy === "DEFEND" ||
+          defensiveSubMode === "MARKING" || defensiveSubMode === "PRESSING";
+
+        // --- Marking: non-nearest-to-ball defenders track mark targets ---
+        // When defensive coordination is active and this player is a
+        // defender who is NOT the nearest to the ball, track the most
+        // threatening opponent at a configurable offset distance toward
+        // own goal instead of chasing the ball.
+        let chaseTargetX = ball.position.x;
+        let chaseTargetY = ball.position.y;
+        let effectiveDistToTarget = distToBall;
+
+        if (isDefensiveMode && cpuTeamId &&
+            cpuPlayer.formationRole === "defender" && !isNearestToBall) {
+          const markTarget = findMostThreateningOpponent(observation, cpuTeamId);
+          if (markTarget) {
+            const ownGoalX = cpuTeamId === "team-b"
+              ? observation.pitchLength / 2
+              : -observation.pitchLength / 2;
+            const offsetPos = computeMarkOffsetPosition(
+              markTarget.position, ownGoalX, MARKING_DISTANCE,
+            );
+            chaseTargetX = offsetPos.x;
+            chaseTargetY = offsetPos.y;
+            const mdx = offsetPos.x - playerX;
+            const mdy = offsetPos.y - playerY;
+            effectiveDistToTarget = Math.sqrt(mdx * mdx + mdy * mdy);
+          }
         }
 
-        // --- Team-decision modulation ---
-        // When the team decision is ATTACK, non-ball-carrying players
-        // push forward (reduced formation pull).  When DEFEND, players
-        // drop back harder (increased formation pull).  BALANCED is the
-        // default existing behavior.
-        const teamStrategy = observation.teamDecision?.strategy;
+        // --- Default chase direction toward target ---
+        if (effectiveDistToTarget > 0.001) {
+          const distUnit = Math.min(effectiveDistToTarget, 1);
+          moveX = ((chaseTargetX - playerX) / effectiveDistToTarget) * distUnit;
+          moveY = ((chaseTargetY - playerY) / effectiveDistToTarget) * distUnit;
+        }
+
+        // --- Pressing: nearest-to-ball defender presses carrier ---
+        // When defensive mode is active and this player is the nearest
+        // to the ball, press the ball carrier more aggressively when
+        // within PRESS_RADIUS.
+        if (isDefensiveMode && isNearestToBall && cpuTeamId) {
+          const ballCarrier = findBallCarrierPlayer(observation, cpuTeamId);
+          if (ballCarrier) {
+            const bcdx = ballCarrier.position.x - playerX;
+            const bcdy = ballCarrier.position.y - playerY;
+            const bcDist = Math.sqrt(bcdx * bcdx + bcdy * bcdy);
+            if (bcDist < PRESS_RADIUS && bcDist > 0.001) {
+              const distUnit = Math.min(bcDist, 1);
+              let pressX = (bcdx / bcDist) * distUnit * PRESS_STRENGTH;
+              let pressY = (bcdy / bcDist) * distUnit * PRESS_STRENGTH;
+              // Clamp to valid input range.
+              pressX = Math.max(-1, Math.min(1, pressX));
+              pressY = Math.max(-1, Math.min(1, pressY));
+              moveX = pressX;
+              moveY = pressY;
+            }
+          }
+        }
 
         // --- Optional formation blend (only when formationPosition is set) ---
         const formPos = observation.formationPosition;
@@ -739,20 +935,12 @@ export function createCpuAdapter(): CpuAdapter {
 
           // Only blend when the ball is BEHIND the player (toward own goal).
           // When the ball is ahead, the CPU chases fully regardless.
-          const cpuTeamId = observation.cpuTeamId;
           const isBehind = cpuTeamId === "team-b"
             ? ball.position.x > playerX  // team-b own goal at +x; ball > player = behind
             : ball.position.x < playerX; // team-a own goal at -x; ball < player = behind
 
-          // Is this player the nearest to the ball on the team?
-          const isNearestToBall = observation.teamDecision?.nearestToBallPlayerId
-            === observation.controlledPlayerId;
-
           if (isBehind) {
             // --- Formation recovery: track displacement ---
-            // Reset counter when near formation (within 0.5m), otherwise
-            // increment. This ensures the recovery weight grows naturally
-            // when the player is displaced by gameplay.
             if (fDist < 0.5) {
               state.formationDisplacementTicks = 0;
             } else {
@@ -761,16 +949,12 @@ export function createCpuAdapter(): CpuAdapter {
 
             if (fDist > 0.001) {
               // Blend: 0 = chase, 1 = hold formation.
-              //  Within CHASE_FORMATION_THRESHOLD → chase fully
-              //  Beyond 2× threshold → formation fully
               const blendRange = CHASE_FORMATION_THRESHOLD;
               let formationWeight = Math.min(
                 Math.max((distToBall - CHASE_FORMATION_THRESHOLD) / blendRange, 0),
                 1,
               );
 
-              // Formation recovery weight grows with displacement time
-              // and normalized distance from formation position.
               let recoveryWeight = computeFormationRecoveryWeight(
                 state.formationDisplacementTicks,
                 fDist,
@@ -779,6 +963,8 @@ export function createCpuAdapter(): CpuAdapter {
               // Apply team-decision modulation:
               //  ATTACK mode: reduce formation pull (players push forward).
               //  DEFEND mode: increase formation pull (players hold shape).
+              //  Marking mode: reduce formation pull for marking defenders
+              //    (they track opponents, not formation position).
               if (teamStrategy === "ATTACK" && !isNearestToBall) {
                 formationWeight *= 0.3;
                 recoveryWeight *= 0.3;
@@ -787,10 +973,14 @@ export function createCpuAdapter(): CpuAdapter {
                 recoveryWeight = Math.min(recoveryWeight * 1.5, 0.95);
               }
 
+              // Marking defenders blend less with formation (they track
+              // opponents); the mark target already accounts for position.
+              if (isDefensiveMode && cpuPlayer.formationRole === "defender" && !isNearestToBall) {
+                formationWeight *= 0.5;
+                recoveryWeight *= 0.5;
+              }
+
               // Blend chase with formation direction.
-              // Then blend that result with formation recovery:
-              //  1. chase ←→ formation (distance-based)
-              //  2. intermediate ←→ formation recovery (time-based)
               const combinedX = moveX * (1 - formationWeight) + (fdx / fDist) * formationWeight;
               const combinedY = moveY * (1 - formationWeight) + (fdy / fDist) * formationWeight;
               moveX = combinedX * (1 - recoveryWeight) + (fdx / fDist) * recoveryWeight;

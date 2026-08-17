@@ -31,9 +31,34 @@ import type { CpuObservation } from "./cpu-adapter.js";
  */
 export type TeamStrategy = "ATTACK" | "DEFEND" | "BALANCED";
 
+/**
+ * Defensive sub-mode coordinating how defenders behave within
+ * the DEFEND / BALANCED strategies.
+ *
+ *  - NONE:     no active defensive coordination (typically attacking).
+ *  - PRESSING: opponents have the ball and the nearest defender is
+ *              close enough to press the ball carrier directly.
+ *  - MARKING:  opponents have the ball but the nearest defender is
+ *              too far to press; defenders should mark space / players.
+ *  - RECOVERING: ball transitioning from own third to center;
+ *              defenders recovering defensive shape.
+ *
+ * Provisional — not a measured PES 2017 concept.
+ */
+export type DefensiveSubMode = "NONE" | "PRESSING" | "MARKING" | "RECOVERING";
+
+/**
+ * Distance (metres) within which a defender is considered close
+ * enough to press the ball carrier rather than marking space.
+ * Provisional placeholder.
+ */
+const PRESS_DISTANCE_THRESHOLD = 12;
+
 export interface TeamDecision {
   /** The active team strategy for this tick. */
   strategy: TeamStrategy;
+  /** Defensive sub-mode for coordinated defender behavior. */
+  defensiveSubMode: DefensiveSubMode;
   /** Index of the teammate closest to the ball (within observation.players). */
   nearestToBallPlayerId: string | undefined;
   /** Distance from the nearest teammate to the ball (metres). */
@@ -206,8 +231,28 @@ export function computeTeamDecision(
     }
   }
 
+  // ------------------------------------------------------------------
+  // Compute defensive sub-mode from strategy + ball state.
+  // ------------------------------------------------------------------
+  let defensiveSubMode: DefensiveSubMode = "NONE";
+
+  if (strategy === "DEFEND") {
+    if (nearest.distance <= PRESS_DISTANCE_THRESHOLD) {
+      defensiveSubMode = "PRESSING";
+    } else {
+      defensiveSubMode = "MARKING";
+    }
+  } else if (strategy === "BALANCED" && opponentHasPossession) {
+    // Opponent has possession in center/third — cautious marking.
+    // RECOVERING when the ball is in the center zone (transitioning
+    // from a previous own-third possession by the opponent).
+    defensiveSubMode = ballZone === "own" ? "MARKING" : "RECOVERING";
+  }
+  // ATTACK → NONE (default).
+
   return {
     strategy,
+    defensiveSubMode,
     nearestToBallPlayerId: nearest.playerId,
     nearestToBallDistance: nearest.distance,
     hasPossession,
