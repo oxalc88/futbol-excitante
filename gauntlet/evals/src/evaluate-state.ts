@@ -120,10 +120,7 @@ function evaluateRemoteDurability(s: RemoteDurabilityGateScenario): EvaluationRe
 
 export function evaluateMilestonePlaytest(s: MilestonePlaytestGateScenario): EvaluationResult {
   const missingSituation = s.input.required_situations.find((id) => !(id in s.input.situation_outcomes));
-  if (!s.input.entry_prerequisites_pass || !s.input.exit_prerequisites_pass || missingSituation) {
-    return { scenario_id: s.id, decision: "milestone_not_evaluated", milestone_verdict: "NOT_EVALUATED", failure_class: "milestone_playtest_incomplete" };
-  }
-
+  if (!s.input.entry_prerequisites_pass || !s.input.exit_prerequisites_pass || missingSituation) return { scenario_id: s.id, decision: "milestone_not_evaluated", milestone_verdict: "NOT_EVALUATED", failure_class: "milestone_playtest_incomplete" };
   const outcomes = s.input.required_situations.map((id) => s.input.situation_outcomes[id]);
   if (outcomes.includes("FAIL")) return { scenario_id: s.id, decision: "milestone_failed", milestone_verdict: "FAIL", failure_class: "milestone_playtest_failed" };
   if (outcomes.includes("NOT_EVALUATED")) return { scenario_id: s.id, decision: "milestone_not_evaluated", milestone_verdict: "NOT_EVALUATED", failure_class: "milestone_playtest_incomplete" };
@@ -140,9 +137,12 @@ function evaluateManifest(s: ManifestGateScenario): EvaluationResult {
 }
 
 function evaluateDynamicSequence(s: DynamicSequenceGateScenario): EvaluationResult {
+  if (s.input.temporal_and_visual === true && s.input.evidence_class !== "DYNAMIC_VISUAL") return { scenario_id: s.id, decision: "reject_evidence_class", failure_class: "evidence_class_too_weak" };
   if (s.input.evidence_class !== "DYNAMIC_VISUAL") return { scenario_id: s.id, decision: "sequence_not_required" };
   const valid = s.input.frame_count >= 3 && s.input.frame_count <= 5 && s.input.sequence_manifest_exists && s.input.labels_complete;
-  return valid ? { scenario_id: s.id, decision: "sequence_valid" } : { scenario_id: s.id, decision: "reject_acceptance", failure_class: "dynamic_sequence_missing" };
+  if (!valid) return { scenario_id: s.id, decision: "reject_acceptance", failure_class: "dynamic_sequence_missing" };
+  if (s.input.event_centered_required === true && s.input.event_centered !== true) return { scenario_id: s.id, decision: "reject_acceptance", failure_class: "event_evidence_not_centered" };
+  return { scenario_id: s.id, decision: "sequence_valid" };
 }
 
 export function evaluateScenario(s: GauntletScenario): EvaluationResult {

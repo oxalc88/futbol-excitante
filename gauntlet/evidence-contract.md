@@ -11,6 +11,8 @@ Required evidence is an acceptance gate, not advisory guidance.
 - `BROWSER_VISIBLE`: executed tests plus at least one screenshot under `docs/screenshots/<objective-id>/`.
 - `MULTI_TICK`: executed tests, a relevant integration-test pass, and `docs/evidence/<objective-id>/trajectory.json`.
 - `DYNAMIC_VISUAL`: all `MULTI_TICK` evidence plus **3–5 semantic frames** and `docs/screenshots/<objective-id>/sequence.json` describing `before → event → transition → result` (or another objective-appropriate semantic order).
+- A criterion that is both temporal and browser-visible MUST use `DYNAMIC_VISUAL`; it cannot be downgraded to `MULTI_TICK` merely because a trajectory exists.
+- When the named claim is an event or transition, the semantic frames MUST be centered on that event and consequence. Arbitrary evenly spaced ticks do not satisfy the event claim by themselves.
 - `PRESENTATION`: executed tests plus an objective screenshot. Static presentation does not require a semantic sequence.
 - `BOOKKEEPING`: deterministic state/tooling audit; no screenshot is required unless the criteria are also browser-visible/presentation.
 - If acceptance explicitly depends on slot/player ownership or routing, the objective audit must include the slot-wiring invariant result.
@@ -77,7 +79,7 @@ Rules:
 - If a required command cannot run because the toolchain is absent, that is a failed objective unless the objective is creating that toolchain.
 - Builders do not commit/push or edit specs/research/Gauntlet agent prompts.
 - When a static screenshot is required, capture it via `WIP_SECTION=<objective-id> pnpm run capture-wip` and list the files under `docs/screenshots/<objective-id>/`.
-- For `DYNAMIC_VISUAL`, capture 3–5 semantic frames, e.g. `WIP_SECTION=<objective-id> WIP_FRAMES=4 WIP_FRAME_LABELS=before,event,transition,result pnpm run capture-wip`.
+- For `DYNAMIC_VISUAL`, capture 3–5 semantic frames selected to demonstrate the criterion. For event-driven claims, capture around the named event/consequence rather than selecting frames only by elapsed ticks.
 - When a trajectory is required, capture it with the repository-supported command and persist `docs/evidence/<objective-id>/trajectory.json`.
 
 ## Critic verdict

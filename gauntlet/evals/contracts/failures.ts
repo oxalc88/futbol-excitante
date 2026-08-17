@@ -14,6 +14,8 @@ export const GAUNTLET_FAILURE_CLASSES = [
   "acceptance_claim_unproven",
   "manifest_missing",
   "dynamic_sequence_missing",
+  "evidence_class_too_weak",
+  "event_evidence_not_centered",
   "remote_durability_missing",
   "milestone_playtest_incomplete",
   "milestone_playtest_failed",
