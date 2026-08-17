@@ -1,0 +1,13 @@
+{
+  "id": "ORCH-REG-028",
+  "kind": "regression_inbox_gate",
+  "input": {
+    "check_status": "FAIL",
+    "current_status": "OPEN",
+    "current_signature": "old-signature",
+    "observed_signature": "new-signature"
+  },
+  "expect": {
+    "decision": "update_inbox"
+  }
+}

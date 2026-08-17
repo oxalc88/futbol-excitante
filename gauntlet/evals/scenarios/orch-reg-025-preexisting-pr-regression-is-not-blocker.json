@@ -1,0 +1,13 @@
+{
+  "id": "ORCH-REG-025",
+  "kind": "pr_regression_classification_gate",
+  "input": {
+    "base_status": "FAIL",
+    "head_status": "FAIL",
+    "base_signature": "same-signature",
+    "head_signature": "same-signature"
+  },
+  "expect": {
+    "decision": "allow_preexisting_regression"
+  }
+}

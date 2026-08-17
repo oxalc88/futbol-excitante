@@ -20,6 +20,8 @@ export const GAUNTLET_FAILURE_CLASSES = [
   "milestone_playtest_incomplete",
   "milestone_playtest_failed",
   "milestone_perceptual_review_required",
+  "pr_regression",
+  "regression_inbox_invariant",
   "state_transition",
   "tracking_missing",
   "prompt_contract",

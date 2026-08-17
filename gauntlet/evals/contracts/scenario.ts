@@ -3,6 +3,8 @@ import type { GauntletStopReason } from "./stop-reasons.js";
 
 export type MilestoneSituationOutcome = "PASS" | "FAIL" | "NOT_EVALUATED" | "NEEDS_PERCEPTUAL_REVIEW";
 export type MilestoneVerdict = "PASS" | "FAIL" | "NOT_EVALUATED" | "NEEDS_PERCEPTUAL_REVIEW";
+export type ValidationStatus = "PASS" | "FAIL";
+export type RegressionInboxStatus = "OPEN" | "RESOLVED" | "MISSING";
 
 export type ScenarioKind =
   | "evidence_gate"
@@ -21,7 +23,10 @@ export type ScenarioKind =
   | "remote_durability_gate"
   | "milestone_playtest_gate"
   | "manifest_gate"
-  | "dynamic_sequence_gate";
+  | "dynamic_sequence_gate"
+  | "pr_regression_classification_gate"
+  | "regression_inbox_gate"
+  | "regression_monitor_trigger_gate";
 
 export interface ScenarioExpectation {
   decision: string;
@@ -49,6 +54,9 @@ export interface RemoteDurabilityGateScenario { id: string; kind: "remote_durabi
 export interface MilestonePlaytestGateScenario { id: string; kind: "milestone_playtest_gate"; input: { milestone_id: string; entry_prerequisites_pass: boolean; exit_prerequisites_pass: boolean; required_situations: string[]; situation_outcomes: Record<string, MilestoneSituationOutcome>; critic_verdict: "ACCEPT" | "RETRY" | "REJECT" | "MISSING" }; expect: ScenarioExpectation }
 export interface ManifestGateScenario { id: string; kind: "manifest_gate"; input: { gauntlet_version: string; objective_accepted: boolean; manifest_exists: boolean; artifact_commit_bound: boolean; reviews_persisted: boolean }; expect: ScenarioExpectation }
 export interface DynamicSequenceGateScenario { id: string; kind: "dynamic_sequence_gate"; input: { evidence_class: string; temporal_and_visual?: boolean; frame_count: number; sequence_manifest_exists: boolean; labels_complete: boolean; event_centered_required?: boolean; event_centered?: boolean }; expect: ScenarioExpectation }
+export interface PrRegressionClassificationGateScenario { id: string; kind: "pr_regression_classification_gate"; input: { base_status: ValidationStatus; head_status: ValidationStatus; base_signature: string | null; head_signature: string | null }; expect: ScenarioExpectation }
+export interface RegressionInboxGateScenario { id: string; kind: "regression_inbox_gate"; input: { check_status: ValidationStatus; current_status: RegressionInboxStatus; current_signature: string | null; observed_signature: string | null }; expect: ScenarioExpectation }
+export interface RegressionMonitorTriggerGateScenario { id: string; kind: "regression_monitor_trigger_gate"; input: { pushed_branch: string }; expect: ScenarioExpectation }
 
-export type GauntletScenario = EvidenceGateScenario | HorizonValidationScenario | RoutingFallbackScenario | ContinuationScenario | TrackingGateScenario | CompositionGateScenario | AcceptedStateGateScenario | EvalFreshnessGateScenario | EvidenceUniquenessGateScenario | TimingConsistencyGateScenario | AcceptancePipelineGateScenario | AcceptanceClaimGateScenario | PostAcceptanceContinuationGateScenario | RemoteDurabilityGateScenario | MilestonePlaytestGateScenario | ManifestGateScenario | DynamicSequenceGateScenario;
+export type GauntletScenario = EvidenceGateScenario | HorizonValidationScenario | RoutingFallbackScenario | ContinuationScenario | TrackingGateScenario | CompositionGateScenario | AcceptedStateGateScenario | EvalFreshnessGateScenario | EvidenceUniquenessGateScenario | TimingConsistencyGateScenario | AcceptancePipelineGateScenario | AcceptanceClaimGateScenario | PostAcceptanceContinuationGateScenario | RemoteDurabilityGateScenario | MilestonePlaytestGateScenario | ManifestGateScenario | DynamicSequenceGateScenario | PrRegressionClassificationGateScenario | RegressionInboxGateScenario | RegressionMonitorTriggerGateScenario;
 export interface EvaluationResult extends ScenarioExpectation { scenario_id: string }

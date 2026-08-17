@@ -19,6 +19,9 @@ import type {
   MilestonePlaytestGateScenario,
   ManifestGateScenario,
   DynamicSequenceGateScenario,
+  PrRegressionClassificationGateScenario,
+  RegressionInboxGateScenario,
+  RegressionMonitorTriggerGateScenario,
 } from "../contracts/scenario.js";
 
 function evaluateEvidence(s: EvidenceGateScenario): EvaluationResult {
@@ -145,6 +148,26 @@ function evaluateDynamicSequence(s: DynamicSequenceGateScenario): EvaluationResu
   return { scenario_id: s.id, decision: "sequence_valid" };
 }
 
+function evaluatePrRegressionClassification(s: PrRegressionClassificationGateScenario): EvaluationResult {
+  if (s.input.head_status === "PASS") return { scenario_id: s.id, decision: s.input.base_status === "FAIL" ? "pr_improves_baseline" : "pr_validation_pass" };
+  if (s.input.base_status === "FAIL" && s.input.base_signature !== null && s.input.base_signature === s.input.head_signature) return { scenario_id: s.id, decision: "allow_preexisting_regression" };
+  return { scenario_id: s.id, decision: "block_pr_regression", failure_class: "pr_regression" };
+}
+
+function evaluateRegressionInbox(s: RegressionInboxGateScenario): EvaluationResult {
+  if (s.input.check_status === "FAIL") {
+    if (s.input.current_status === "OPEN" && s.input.current_signature === s.input.observed_signature) return { scenario_id: s.id, decision: "inbox_unchanged" };
+    if (!s.input.observed_signature) return { scenario_id: s.id, decision: "reject_inbox_update", failure_class: "regression_inbox_invariant" };
+    return { scenario_id: s.id, decision: "update_inbox" };
+  }
+  if (s.input.current_status === "OPEN") return { scenario_id: s.id, decision: "resolve_inbox" };
+  return { scenario_id: s.id, decision: "inbox_unchanged" };
+}
+
+function evaluateRegressionMonitorTrigger(s: RegressionMonitorTriggerGateScenario): EvaluationResult {
+  return { scenario_id: s.id, decision: s.input.pushed_branch === "main" ? "run_main_monitor" : "ignore_non_main_push" };
+}
+
 export function evaluateScenario(s: GauntletScenario): EvaluationResult {
   switch (s.kind) {
     case "evidence_gate": return evaluateEvidence(s);
@@ -164,5 +187,8 @@ export function evaluateScenario(s: GauntletScenario): EvaluationResult {
     case "milestone_playtest_gate": return evaluateMilestonePlaytest(s);
     case "manifest_gate": return evaluateManifest(s);
     case "dynamic_sequence_gate": return evaluateDynamicSequence(s);
+    case "pr_regression_classification_gate": return evaluatePrRegressionClassification(s);
+    case "regression_inbox_gate": return evaluateRegressionInbox(s);
+    case "regression_monitor_trigger_gate": return evaluateRegressionMonitorTrigger(s);
   }
 }
