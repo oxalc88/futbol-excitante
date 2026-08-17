@@ -96,6 +96,16 @@ const IS_AI_MATCH_3V3 =
 const IS_AI_MATCH_5V5 =
   URL_MODE === "ai-match-5v5";
 
+/**
+ * Detect human-vs-CPU 5v3 match mode from URL: ?mode=human-vs-ai-5v3
+ *
+ * When enabled, slot-1 gets a keyboard adapter (HUMAN) and all other
+ * slots get CPU adapters.  Provides a 5v3 match with one human player
+ * and 4 CPU teammates + 5 CPU opponents.
+ */
+const IS_HUMAN_VS_CPU_5V3 =
+  URL_MODE === "human-vs-ai-5v3";
+
 // ---------------------------------------------------------------------------
 // Real-time loop
 // ---------------------------------------------------------------------------
@@ -347,7 +357,7 @@ function main(): void {
         controlledPlayerId: assignment.controlledPlayerId ?? "",
       });
     }
-  } else if (IS_HUMAN_VS_CPU || IS_2V2) {
+  } else if (IS_HUMAN_VS_CPU || IS_2V2 || IS_HUMAN_VS_CPU_5V3) {
     // Human-vs-CPU / 2v2 mode: keyboard adapter for HUMAN slots, CPU adapters for AI_FALLBACK.
     for (const [slotId, assignment] of Object.entries(SCENARIO_DATA.controlAssignments)) {
       if (assignment.mode === "HUMAN") {
@@ -451,7 +461,7 @@ function main(): void {
       }
 
       // Add CPU frames — per-slot adapters in AI-vs-AI, human-vs-CPU, 2v2, or 3v3 modes.
-      if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5) {
+      if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5 || IS_HUMAN_VS_CPU_5V3) {
         // Compute one team decision per team from any observation on that team.
         const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
         const snapshot = sim.snapshot();
@@ -600,6 +610,14 @@ function main(): void {
     const hint = document.getElementById("controls-hint");
     if (hint) {
       hint.textContent = "5v5 AI Match — fully autonomous";
+    }
+  }
+
+  // Update controls hint for human-vs-CPU 5v3 mode.
+  if (IS_HUMAN_VS_CPU_5V3) {
+    const hint = document.getElementById("controls-hint");
+    if (hint) {
+      hint.textContent = "5v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player";
     }
   }
 }
