@@ -180,6 +180,9 @@ export function createWorld(opts: CreateOptions): WorldState {
     controlAssignments: scenario.controlAssignments,
     matchPhase: "playing",
     goalResetCountdown: 0,
+    // --- match timer (MATCH-TIMER-ENFORCEMENT) ---
+    matchTimer: scenario.matchDurationTicks ?? 5400,
+    currentHalf: 1,
     meta: {
       scenarioId: scenario.id,
       scenarioVersion: scenario.version,

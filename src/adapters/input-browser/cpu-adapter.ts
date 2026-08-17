@@ -159,11 +159,7 @@ export function buildCpuObservation(
       groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
       linearVelocity: { x: p.linearVelocity.x, y: p.linearVelocity.y },
       bodyHeading: p.bodyHeading,
-      formationRole: (p as Record<string, unknown>).formationRole as
-        | "defender"
-        | "midfielder"
-        | "attacker"
-        | undefined,
+      formationRole: p.formationRole,
     })),
     ball: {
       position: {
@@ -195,11 +191,7 @@ export function buildCpuObservation(
     );
     const resolvedX = controlledPlayer?.groundPosition.x ?? world.players[0]?.groundPosition.x ?? 0;
     const resolvedY = controlledPlayer?.groundPosition.y ?? world.players[0]?.groundPosition.y ?? 0;
-    const formationRole = (controlledPlayer as Record<string, unknown>)?.formationRole as
-      | "defender"
-      | "midfielder"
-      | "attacker"
-      | undefined;
+    const formationRole = controlledPlayer?.formationRole;
     const pull = getFormationPull(formationRole);
     result.formationPosition = {
       x: resolvedX + (ownGoalX - resolvedX) * pull,

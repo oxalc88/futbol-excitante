@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "family": "ai-match",
   "durationTicks": 5400,
+  "matchDurationTicks": 5400,
   "seed": 42,
   "prngAlgorithmId": "mulberry32-v1",
   "schemaVersion": "state-v1",

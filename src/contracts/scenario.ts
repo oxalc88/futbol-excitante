@@ -158,6 +158,12 @@ export interface ScenarioDefinition {
   maxConsecutiveMissing: number;
   /** Tick-indexed input program (sparse: only non-neutral ticks need entries). */
   inputProgram: Record<number, InputFrame[]>;
+  /**
+   * Duration of each half in ticks (default: 5400 = 90 min at 60 Hz).
+   * The simulation auto-enforces phase transitions based on this value.
+   * Omitted or undefined means no auto-enforcement (legacy behavior).
+   */
+  matchDurationTicks?: number;
   /** Scheduled scenario events (tick-indexed). */
   scheduledEvents: Record<number, SimulationEvent[]>;
   /** Observation windows for telemetry. */

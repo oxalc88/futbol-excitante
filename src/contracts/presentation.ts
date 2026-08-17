@@ -29,6 +29,8 @@ export interface PresentationSnapshot {
   };
   /** Current match lifecycle phase (set-aware for restarts). */
   matchPhase: MatchPhase;
+  /** Remaining ticks in the current half (for HUD display). */
+  matchTimer: number;
 }
 
 /**

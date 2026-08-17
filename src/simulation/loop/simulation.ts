@@ -275,6 +275,9 @@ export function createSimulation(
   const initialBallAngularVelocity = { ...state.ball.angularVelocity };
   const initialBallRegime = state.ball.regime;
 
+  // Capture the per-half duration for halftime → second-half restart.
+  const initialHalfDurationTicks = state.matchTimer;
+
   /**
    * Reset all players and the ball to their initial positions.
    * Called when goalResetCountdown reaches zero.
@@ -302,6 +305,28 @@ export function createSimulation(
     if (state.matchPhase !== "playing") return;
     state.matchPhase = "goal";
     state.goalResetCountdown = goalResetConfig?.goalResetTicks ?? defaultGoalResetTicks;
+  }
+
+  /** Default halftime delay ticks (≈1 second at 60 FPS). */
+  const defaultHalftimeCountdown = 60;
+
+  /**
+   * Reset all players and the ball to their initial positions.
+   * Called when halftime countdown reaches zero (start of second half).
+   */
+  function applyHalftimeReset(): void {
+    state.ball.position = { ...initialBallPosition };
+    state.ball.linearVelocity = { ...initialBallVelocity };
+    state.ball.angularVelocity = { ...initialBallAngularVelocity };
+    state.ball.regime = initialBallRegime;
+    for (const player of state.players) {
+      const pos = initialPositions[player.playerId];
+      if (pos) {
+        player.groundPosition = { x: pos.x, y: pos.y };
+        player.linearVelocity = { x: 0, y: 0 };
+        player.desiredVelocity = { x: 0, y: 0 };
+      }
+    }
   }
 
   // ------------------------------------------------------------------
@@ -649,6 +674,7 @@ export function createSimulation(
       events: [],
       controlAssignments: { bySlot: {} }, // stub: full resolution TBD
       matchPhase: state.matchPhase,
+      matchTimer: state.matchTimer,
     };
   }
 
@@ -911,6 +937,34 @@ export function createSimulation(
           onGoalEvent();
           break; // Only start countdown on the first goal event of the tick.
         }
+      }
+
+      // 6c. Match timer auto-enforcement (MATCH-TIMER-ENFORCEMENT).
+      //  Decrement the timer when in "playing" phase. On zero, transition
+      //  to "halftime" (half 1) or "fulltime" (half 2). During "halftime"
+      //  the timer counts down the delay before auto-restart.
+      {
+        if (state.matchPhase === "playing") {
+          state.matchTimer--;
+          if (state.matchTimer <= 0) {
+            if (state.currentHalf === 1) {
+              state.matchPhase = "halftime";
+              state.matchTimer = defaultHalftimeCountdown;
+            } else {
+              state.matchPhase = "fulltime";
+            }
+          }
+        } else if (state.matchPhase === "halftime") {
+          state.matchTimer--;
+          if (state.matchTimer <= 0) {
+            applyHalftimeReset();
+            state.matchPhase = "playing";
+            state.currentHalf = 2;
+            state.matchTimer = initialHalfDurationTicks;
+          }
+        }
+        // fulltime: timer stays at zero, no further transitions.
+        // goal: timer frozen (not playing or halftime).
       }
 
       const obsData = buildObservation(newTick, allStepEvents, currentFrames);

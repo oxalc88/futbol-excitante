@@ -33,6 +33,8 @@ export interface PlayerState {
   archetypeId?: string;
   /** Transient acceleration override from the archetype (0 = baseline). */
   archetypeTransientAccel?: number;
+  /** Formation role (e.g. "defender") when assigned by a team formation scenario. */
+  formationRole?: "defender" | "midfielder" | "attacker";
   // -----------------------------------------------------------------
   // Fields present from bootstrap but not yet implemented:
   // - actionState
@@ -166,14 +168,16 @@ export interface WorldState {
   /**
    * Match lifecycle phase.
    *
-   * - "playing": normal gameplay.
+   * - "playing": normal gameplay (first half or second half).
    * - "goal": a goal was scored; players are resetting.
-   * - "halftime": first half ended.
+   * - "halftime": first half ended; countdown then auto-restart.
    * - "fulltime": match ended.
    *
-   * Only "playing" allows regular tick progression. During "goal",
-   * the `goalResetCountdown` field drives the automatic restart.
-   * When countdown reaches zero, the phase transitions back to "playing".
+   * Only "playing" allows regular tick progression with countdown.
+   * During "goal", the `goalResetCountdown` field drives the automatic
+   * restart. During "halftime", `matchTimer` counts down, then
+   * `currentHalf` increments and phase resets to "playing".
+   * When countdown reaches zero in "fulltime", the match ends.
    */
   matchPhase: MatchPhase;
   /**
@@ -187,6 +191,26 @@ export interface WorldState {
    * Default: 0 (no active countdown).
    */
   goalResetCountdown: number;
+
+  /**
+   * Remaining ticks in the current half.
+   *
+   * Starts at `matchDurationTicks` (from scenario config), decrements
+   * each tick during "playing" phase. Hits 0 at half-time.
+   *
+   * Default: 0 (no active countdown).
+   */
+  matchTimer: number;
+
+  /**
+   * Current half number (1 or 2).
+   *
+   * Starts at 1, increments to 2 after the first half ends (halftime
+   * countdown completes and phase returns to "playing").
+   *
+   * Default: 1.
+   */
+  currentHalf: number;
 }
 
 // ---------------------------------------------------------------------------
