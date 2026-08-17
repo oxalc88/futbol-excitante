@@ -16,6 +16,7 @@ import type {
   AcceptanceClaimGateScenario,
   PostAcceptanceContinuationGateScenario,
   RemoteDurabilityGateScenario,
+  MilestonePlaytestGateScenario,
   ManifestGateScenario,
   DynamicSequenceGateScenario,
 } from "../contracts/scenario.js";
@@ -111,16 +112,25 @@ function evaluatePostAcceptanceContinuation(s: PostAcceptanceContinuationGateSce
 
 function evaluateRemoteDurability(s: RemoteDurabilityGateScenario): EvaluationResult {
   if (!s.input.acceptance_finalized) return { scenario_id: s.id, decision: "finish_acceptance" };
-  if (!s.input.remote_contains_acceptance) {
-    return {
-      scenario_id: s.id,
-      decision: s.input.horizon_exhausted ? "publish_before_replan" : "publish_before_continue",
-      failure_class: "remote_durability_missing",
-    };
-  }
+  if (!s.input.remote_contains_acceptance) return { scenario_id: s.id, decision: s.input.horizon_exhausted ? "publish_before_replan" : "publish_before_continue", failure_class: "remote_durability_missing" };
   if (s.input.horizon_exhausted) return { scenario_id: s.id, decision: "replan_and_continue" };
   if (s.input.next_objective) return { scenario_id: s.id, decision: "continue", next_objective: s.input.next_objective };
   return { scenario_id: s.id, decision: "replan_and_continue" };
+}
+
+export function evaluateMilestonePlaytest(s: MilestonePlaytestGateScenario): EvaluationResult {
+  const missingSituation = s.input.required_situations.find((id) => !(id in s.input.situation_outcomes));
+  if (!s.input.entry_prerequisites_pass || !s.input.exit_prerequisites_pass || missingSituation) {
+    return { scenario_id: s.id, decision: "milestone_not_evaluated", milestone_verdict: "NOT_EVALUATED", failure_class: "milestone_playtest_incomplete" };
+  }
+
+  const outcomes = s.input.required_situations.map((id) => s.input.situation_outcomes[id]);
+  if (outcomes.includes("FAIL")) return { scenario_id: s.id, decision: "milestone_failed", milestone_verdict: "FAIL", failure_class: "milestone_playtest_failed" };
+  if (outcomes.includes("NOT_EVALUATED")) return { scenario_id: s.id, decision: "milestone_not_evaluated", milestone_verdict: "NOT_EVALUATED", failure_class: "milestone_playtest_incomplete" };
+  if (outcomes.includes("NEEDS_PERCEPTUAL_REVIEW")) return { scenario_id: s.id, decision: "milestone_needs_perceptual_review", milestone_verdict: "NEEDS_PERCEPTUAL_REVIEW", failure_class: "milestone_perceptual_review_required" };
+  if (s.input.critic_verdict === "MISSING") return { scenario_id: s.id, decision: "reject_milestone_verdict", milestone_verdict: "NEEDS_PERCEPTUAL_REVIEW", failure_class: "critic_bypassed" };
+  if (s.input.critic_verdict !== "ACCEPT") return { scenario_id: s.id, decision: "milestone_failed", milestone_verdict: "FAIL", failure_class: "milestone_playtest_failed" };
+  return { scenario_id: s.id, decision: "milestone_verdict_ready", milestone_verdict: "PASS" };
 }
 
 function evaluateManifest(s: ManifestGateScenario): EvaluationResult {
@@ -151,6 +161,7 @@ export function evaluateScenario(s: GauntletScenario): EvaluationResult {
     case "acceptance_claim_gate": return evaluateAcceptanceClaim(s);
     case "post_acceptance_continuation_gate": return evaluatePostAcceptanceContinuation(s);
     case "remote_durability_gate": return evaluateRemoteDurability(s);
+    case "milestone_playtest_gate": return evaluateMilestonePlaytest(s);
     case "manifest_gate": return evaluateManifest(s);
     case "dynamic_sequence_gate": return evaluateDynamicSequence(s);
   }

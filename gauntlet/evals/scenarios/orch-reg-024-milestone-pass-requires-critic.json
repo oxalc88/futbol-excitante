@@ -1,0 +1,20 @@
+{
+  "id": "ORCH-REG-024",
+  "kind": "milestone_playtest_gate",
+  "input": {
+    "milestone_id": "SMALL_SIDED_SHAPE",
+    "entry_prerequisites_pass": true,
+    "exit_prerequisites_pass": true,
+    "required_situations": ["PASS_RECEPTION", "ATTACK_TO_DEFENCE_TRANSITION"],
+    "situation_outcomes": {
+      "PASS_RECEPTION": "PASS",
+      "ATTACK_TO_DEFENCE_TRANSITION": "PASS"
+    },
+    "critic_verdict": "MISSING"
+  },
+  "expect": {
+    "decision": "reject_milestone_verdict",
+    "milestone_verdict": "NEEDS_PERCEPTUAL_REVIEW",
+    "failure_class": "critic_bypassed"
+  }
+}
