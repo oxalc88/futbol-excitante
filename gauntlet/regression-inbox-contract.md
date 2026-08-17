@@ -37,7 +37,7 @@ At startup/resume, after acceptance publication, and before strategic replan:
 3. Reproduce the named deterministic check against current local `main` before acting.
 4. If it still fails with the recorded signature, treat repair as higher priority than ordinary horizon work when the failure makes continued development unsafe or invalidates required checks.
 5. Repair through the normal builder -> tests/evidence -> critic -> integration -> acceptance pipeline. Do not bypass ordinary acceptance because CI found the defect.
-6. Do not edit, commit, or mark inbox records RESOLVED. The next successful `main` CI run owns resolution.
+6. Never edit, commit, or mark inbox records RESOLVED. The next successful `main` CI run owns resolution.
 
 If the latest `main` push has not yet been processed by CI, the absence of a new inbox record is not evidence of PASS. The Gauntlet may continue under its existing local acceptance checks and will inspect the inbox again at the next required pickup point.
 

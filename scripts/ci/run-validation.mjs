@@ -19,8 +19,11 @@ function stripAnsi(value) {
 function normalizeLine(line) {
   return stripAnsi(line)
     .replaceAll(process.cwd(), "<repo>")
+    .replaceAll("/home/ubuntu/projects/oxDeveloop/pes-simulator", "<repo>")
     .replace(/\((\d+),(\d+)\)/g, "(*,*)")
     .replace(/:(\d+):(\d+)/g, ":*:*")
+    .replace(/\b\d+(?:\.\d+)?ms\b/g, "<duration>")
+    .replace(/\bpid:\s*\d+/g, "pid:<pid>")
     .replace(/\b20\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z\b/g, "<timestamp>")
     .trim();
 }
