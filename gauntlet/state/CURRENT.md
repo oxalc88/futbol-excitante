@@ -11,8 +11,8 @@ handoff_metric: super_grok_weekly_usage
 next_objective_id: BROWSER-5V5-MATCH
 
 best_known:
-  commit: e29b116
-  note: "SCENARIO-5V5-FIXTURE accepted. Horizon five-vs-five 5/6. Next: BROWSER-5V5-MATCH."
+  commit: 15317d2
+  note: "BROWSER-5V5-MATCH accepted. Horizon five-vs-five complete (6/6). Next: strategic reassessment needed."
 
 active_candidate: null
 builder_in_use: null
@@ -65,18 +65,24 @@ accepted:
   - CPU-PASS-VARIETY
   - BROWSER-3V3-HUMAN-VS-CPU
   - SCENARIO-5V5-FIXTURE
+  - BROWSER-5V5-MATCH
 
 blocked: []
 
-selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 5/6 accepted. Next: BROWSER-5V5-MATCH."
+selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 6/6 accepted. Horizon complete."
 ```
 
 ## Last accepted objective
 
-SCENARIO-5V5-FIXTURE — 10-player 5v5 fixture scenario (5 per team) with 2-2-1 formation (2 defenders + 2 midfielders + 1 attacker). 10 control slots, all AI_FALLBACK. Versioned JSON with seed 42, mulberry32-v1, 5400 ticks. Follows existing 2v2/3v3 fixture patterns. Route: `?mode=ai-match-5v5` or `?mode=ai-match&scenario=5v5-fixture`. 42 new tests, 1654/1654 total. HEADLESS audit PASS.
+BROWSER-5V5-MATCH — Playable 5v5 browser AI match. `?mode=ai-match-5v5` loads 10 CPU players (5 per team) with autonomous CpuAdapter behavior. Hash parity verified against headless: 60-tick and 120-tick deterministic play. HUD, scoreboard, match timer, phase transitions inherited. Screenshot evidence at frame-000.png (7.1KB). 64/64 browser tests, 1654/1654 node tests. BROWSER_VISIBLE audit PASS.
 
-- builder: builder-structured / qwen3.6
+- builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 42 new tests, 1654/1654 total, deterministic audit PASS
-- Commit: e29b116
+- Evidence: 1654 node tests, 64 browser tests, 10-player autonomous CPU, hash parity, screenshot frame-000.png
+- Commit: 15317d2
+
+---
+## Horizon five-vs-five complete (6/6 accepted)
+
+All 6 objectives of the five-vs-five horizon are accepted. Strategic reassessment needed for next horizon.

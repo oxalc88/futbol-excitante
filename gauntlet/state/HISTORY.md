@@ -2364,3 +2364,60 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - verdict: ACCEPT
 - required_fixes: none
 ```
+
+## Iteration 57 — 2026-08-17
+
+- objective_id: BROWSER-5V5-MATCH
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: 15317d2 candidate(BROWSER-5V5-MATCH)
+- notes: Playable 5v5 browser AI match. ?mode=ai-match-5v5 loads 10 CPU players (5 per team) with CpuAdapter autonomy. Hash parity 60-tick and 120-tick verified against headless. HUD, scoreboard, match timer, phase transitions inherited. 64/64 browser tests, 1654/1654 node tests. Screenshot frame-000.png (7.1KB). No PES claim.
+
+### Critic verdict (ACCEPT)
+
+```markdown
+## Critic verdict
+- objective_id: BROWSER-5V5-MATCH
+- critic_agent: critic
+- critic_model: deepseek-v4-flash
+- builder_agent: builder-gameplay
+- builder_model: mimo-v2.5
+- independence_ok: true
+- deterministic_audit: PASS
+- semantic_audit: NOT_REQUIRED
+- mandatory_evidence_ok: true
+- criteria:
+  - loads 10 players: PASS
+  - HUD/scoreboard/timer/phase: PASS
+  - 10 CPU autonomous: PASS
+  - hash parity: PASS
+  - deterministic: PASS
+  - screenshot: PASS
+  - no regressions: PASS
+  - no PES claims: PASS
+- architecture_violations: none
+- verdict: ACCEPT
+- required_fixes: none
+```
+
+### Integration review (ACCEPT)
+
+```markdown
+## Integration review
+- objective_id: BROWSER-5V5-MATCH
+- reviewer_agent: integration-reviewer
+- reviewer_model: deepseek-v4-flash
+- builder_model: mimo-v2.5
+- independence_ok: true
+- dependency_direction: PASS
+- neighboring_regressions: PASS (13 browser files, 64 tests; 91 node files, 1654 tests)
+- deterministic_audit: PASS
+- critic_verdict_verified: true
+- mandatory_evidence_ok: true
+- presentation_authority: PASS
+- evaluator_integrity: NOT_APPLICABLE
+- verdict: ACCEPT
+- required_fixes: none
+```

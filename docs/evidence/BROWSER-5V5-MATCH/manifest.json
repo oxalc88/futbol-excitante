@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.1",
+  "objective_id": "BROWSER-5V5-MATCH",
+  "accepted_at": "2026-08-17T16:49:19.299Z",
+  "candidate_commit": "15317d2",
+  "evidence_class": "BROWSER_VISIBLE",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/BROWSER-5V5-MATCH/frame-000.png",
+        "sha256": "518881dd7c409fd1751120a02caa58b92b0d8ed6d9197e0a7b38228d922ba18f",
+        "git_blob": "4cfc9fedcf4245eb77df78eabe5c3523a40937d0",
+        "candidate_commit": "15317d2",
+        "bytes": 3969,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/BROWSER-5V5-MATCH/audit.json",
+      "sha256": "5f648b42b044527afd7a591ca7dcb4062e047921ac3d366bb69c2afcb167ab02",
+      "git_blob": "d41e9c2bccca7c5d1db5b2e1644bcc753e08dae7",
+      "candidate_commit": "15317d2",
+      "bytes": 2529,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "checks": 18,
+      "all_pass": true
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "agent": "integration-reviewer-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-17/2026-08-17T16-49-19-299Z-BROWSER-5V5-MATCH-acceptance.json"
+}

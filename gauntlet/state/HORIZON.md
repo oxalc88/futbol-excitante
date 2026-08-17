@@ -2,12 +2,12 @@
 
 ```yaml
 horizon_version: 6
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "five-vs-five"
 created_from_commit: eaefdf1
 created_at: 2026-08-16
 reason: "Horizon small-sided-match exhausted (6/6 accepted). SMALL-SIDED milestone complete with 3v3 browser play, team decision, role-aware formation, and match restart. Next horizon targets 5v5 progression: auto match timer, defensive AI improvements, pass variety (ground/lofted/power), human-vs-CPU 3v3, and the 5v5 fixture and browser play. These build toward the next cardinality milestone after SMALL-SIDED."
-current_index: 5
+current_index: 6
 objectives:
   - id: MATCH-TIMER-ENFORCEMENT
     status: accepted
@@ -40,10 +40,11 @@ objectives:
     prerequisite: SCENARIO-3V3-FIXTURE
     commit: e29b116
   - id: BROWSER-5V5-MATCH
-    status: pending
+    status: accepted
     reason: "Add ?mode=ai-match-5v5 URL mode for a playable 5v5 browser match with 10 CPU players (5 per team). Browser shows HUD, scoreboard, match timer, phase transitions. Browser test verifies hash parity and deterministic multi-tick 5v5 play. Screenshot evidence."
     builder: builder-gameplay
     prerequisite: BROWSER-3V3-MATCH
+    commit: 15317d2
 replan_if:
   - objective_blocked
   - architectural_invalidation
