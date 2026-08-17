@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-3V3-HUMAN-VS-CPU
-usage_aggregates_through: BROWSER-3V3-HUMAN-VS-CPU
-model_evaluation_through: BROWSER-3V3-HUMAN-VS-CPU
+last_tracked_objective: SCENARIO-5V5-FIXTURE
+usage_aggregates_through: SCENARIO-5V5-FIXTURE
+model_evaluation_through: SCENARIO-5V5-FIXTURE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -123,6 +123,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | CPU-DEFENSIVE-IMPROVEMENT | accepted | ~74m | 43m | 31m | 3m | 22s | ~6M est. | n/a** |
 | CPU-PASS-VARIETY | accepted | ~30m | 25m | 6m | 6m | 0.5m | ~8M est. | n/a** |
 | BROWSER-3V3-HUMAN-VS-CPU | accepted | ~22m | 15m | 19m | 5m | 0.5m | ~2M est. | n/a** |
+| SCENARIO-5V5-FIXTURE | accepted | ~18m | 15m | 12m | 5m | 0.5m | ~4M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -319,6 +320,7 @@ on an H task is the interesting result.
 | CPU-DEFENSIVE-IMPROVEMENT | mimo-v2.5 | M | Medium — CPU defender marking/pressing/sub-modes in adapter layer | 0 | A | 16 unit tests, 4 integration tests, 238/238 unit, 239/239 integration, 100-tick trajectory |
 | CPU-PASS-VARIETY | mimo-v2.5 | M | Medium — pass variety, defender-aware targeting, urgency-scaled choice | 0 | A | 13 new tests, 273/273 cpu-adapter, 1612/1612 total, 8-frame trajectory |
 | BROWSER-3V3-HUMAN-VS-CPU | mimo-v2.5 | M | Medium — URL routing, scenario fixture, browser glue | 0 | A | 56 browser tests, 1612 node tests, screenshot frame-000.png |
+| SCENARIO-5V5-FIXTURE | qwen3.6 | M | Medium — new fixture, existing scenario pattern | 0 | A | 42 new tests, 1654/1654 total, 5 scenario files |
 
 ### Reviewer route and catches
 
@@ -366,6 +368,8 @@ on an H task is the interesting result.
 | CPU-PASS-VARIETY | integration-reviewer-flash (deepseek-v4-flash) | 0731 allowance exhausted, flash fallback | ACCEPT | 90/90 files, 1612/1612 tests, dependency direction clean |
 | BROWSER-3V3-HUMAN-VS-CPU | critic-flash (deepseek-v4-flash) | 0731 allowance exhausted, flash fallback | ACCEPT | 0 retries — first pass clean; all 8 criteria PASS |
 | BROWSER-3V3-HUMAN-VS-CPU | integration-reviewer-flash (deepseek-v4-flash) | 0731 allowance exhausted, flash fallback | ACCEPT | 90/90 files, 1612/1612 node, 12/12 files, 56/56 browser, dependency clean |
+| SCENARIO-5V5-FIXTURE | critic-flash (deepseek-v4-flash) | 0731 allowance exhausted, flash fallback | ACCEPT | 0 retries — first pass clean; all 7 criteria PASS |
+| SCENARIO-5V5-FIXTURE | integration-reviewer-flash (deepseek-v4-flash) | 0731 allowance exhausted, flash fallback | ACCEPT | 5 scenario files, 125 tests, 1654 total, dependency clean |
 
 ### Builder scoreboard
 
@@ -373,7 +377,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 39 | 23 | 8 | 3 | 3 | 2 | 59% | ~0.80 | ~38m |
+| qwen3.6 | 40 | 24 | 8 | 3 | 3 | 2 | 60% | ~0.78 | ~38m |
 | mimo-v2.5 | 13 | 8 | 4 | 1 | 0 | 0 | 62% | ~0.54 | ~30m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

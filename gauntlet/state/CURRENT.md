@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SCENARIO-5V5-FIXTURE
+next_objective_id: BROWSER-5V5-MATCH
 
 best_known:
-  commit: 490d773
-  note: "BROWSER-3V3-HUMAN-VS-CPU accepted. Horizon five-vs-five 4/6. Next: SCENARIO-5V5-FIXTURE."
+  commit: e29b116
+  note: "SCENARIO-5V5-FIXTURE accepted. Horizon five-vs-five 5/6. Next: BROWSER-5V5-MATCH."
 
 active_candidate: null
 builder_in_use: null
@@ -64,18 +64,19 @@ accepted:
   - CPU-DEFENSIVE-IMPROVEMENT
   - CPU-PASS-VARIETY
   - BROWSER-3V3-HUMAN-VS-CPU
+  - SCENARIO-5V5-FIXTURE
 
 blocked: []
 
-selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 4/6 accepted. Next: SCENARIO-5V5-FIXTURE."
+selection_note: "Horizon five-vs-five: 6 objectives toward 5v5 browser play, defensive AI, pass variety, auto phase transitions. 5/6 accepted. Next: BROWSER-5V5-MATCH."
 ```
 
 ## Last accepted objective
 
-BROWSER-3V3-HUMAN-VS-CPU — 3v3 human-vs-CPU browser mode. `?mode=human-vs-ai-3v3` loads 6 players (3 per team), 1 HUMAN keyboard slot + 2 CPU teammates vs 3 CPU opponents. 1-2 formation with defender/midfielder/attacker roles. 6 CPU slots verified independent. All constants provisional. 90/90 node files, 12/12 browser files. BROWSER_VISIBLE audit PASS.
+SCENARIO-5V5-FIXTURE — 10-player 5v5 fixture scenario (5 per team) with 2-2-1 formation (2 defenders + 2 midfielders + 1 attacker). 10 control slots, all AI_FALLBACK. Versioned JSON with seed 42, mulberry32-v1, 5400 ticks. Follows existing 2v2/3v3 fixture patterns. Route: `?mode=ai-match-5v5` or `?mode=ai-match&scenario=5v5-fixture`. 42 new tests, 1654/1654 total. HEADLESS audit PASS.
 
-- builder: builder-gameplay / mimo-v2.5
+- builder: builder-structured / qwen3.6
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (first pass)
-- Evidence: 1612 node tests, 56 browser tests, deterministic audit PASS, screenshot frame-000.png
-- Commit: 490d773
+- Evidence: 42 new tests, 1654/1654 total, deterministic audit PASS
+- Commit: e29b116
