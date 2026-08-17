@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "registry_version": "gameplay-situations-v1",
+  "authority": [
+    "VISION.md",
+    "specs/GAMEPLAY_EVALUATION_SPEC.md",
+    "research/04-autonomous-evaluation.md",
+    "specs/VISUAL_SPEC.md"
+  ],
+  "status_policy": "This registry defines applicability and evidence expectations only. Current implementation status is derived from executable registries/evidence and is not stored here.",
+  "situations": [
+    {
+      "situation_id": "LOC_MOMENTUM_CHANGE",
+      "label": "Acceleration, braking and direction change",
+      "required_capabilities": ["LOCOMOTION"],
+      "first_testable_milestone": "FOUNDATION_LAB",
+      "integrated_playtest_milestone": "PLAYABLE_1V1",
+      "final_match_required": true,
+      "evidence": ["state_trajectory", "heading_speed_timeline", "event_centered_frames_if_visual"],
+      "source_refs": ["LOC-ACC-001", "LOC-DEC-001", "LOC-T45-001", "LOC-T90-001", "LOC-REV-001"]
+    },
+    {
+      "situation_id": "BALL_FREE_MOTION",
+      "label": "Independent ball roll, bounce and spin",
+      "required_capabilities": ["INDEPENDENT_BALL"],
+      "first_testable_milestone": "FOUNDATION_LAB",
+      "integrated_playtest_milestone": "PLAYABLE_1V1",
+      "final_match_required": true,
+      "evidence": ["ball_trajectory", "contact_history", "event_centered_frames_if_visual"],
+      "source_refs": ["BALL-IND-001", "BALL-GND-001", "BALL-BNC-001", "BALL-SPN-001"]
+    },
+    {
+      "situation_id": "FIRST_TOUCH_CONTINUATION",
+      "label": "Incoming ball, first touch and continued control",
+      "required_capabilities": ["FIRST_TOUCH", "INDEPENDENT_BALL", "LOCOMOTION"],
+      "first_testable_milestone": "PLAYABLE_1V1",
+      "integrated_playtest_milestone": "PLAYABLE_1V1",
+      "final_match_required": true,
+      "evidence": ["incoming_contact_outgoing_state", "event_centered_sequence"],
+      "source_refs": ["TOUCH-SLOW-001", "TOUCH-FAST-001", "TOUCH-BACK-001", "TOUCH-90-001"]
+    },
+    {
+      "situation_id": "PASS_RECEPTION",
+      "label": "Pass to teammate and reception",
+      "required_capabilities": ["BASIC_ACTIONS", "FIRST_TOUCH", "INDEPENDENT_BALL"],
+      "first_testable_milestone": "PLAYABLE_1V1",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": ["pass_contact", "free_ball_trajectory", "receiver_contact", "event_centered_sequence"],
+      "source_refs": ["PASS-LOW-001", "PASS-RUN-001", "TOUCH-SLOW-001"]
+    },
+    {
+      "situation_id": "SHOT_TO_RESULT",
+      "label": "Shot, ball trajectory and result",
+      "required_capabilities": ["BASIC_ACTIONS", "INDEPENDENT_BALL"],
+      "first_testable_milestone": "PLAYABLE_1V1",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": ["shot_contact", "ball_trajectory", "goal_or_non_goal_event", "event_centered_sequence"],
+      "source_refs": ["SHOT-PWR-001", "SHOT-IND-001", "SHOT-SWV-001"]
+    },
+    {
+      "situation_id": "PHYSICAL_DUEL",
+      "label": "Player contact, displacement and recovery",
+      "required_capabilities": ["PLAYER_DUELS", "LOCOMOTION", "INDEPENDENT_BALL"],
+      "first_testable_milestone": "PLAYABLE_1V1",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": ["approach_contact_recovery_state", "event_centered_sequence"],
+      "source_refs": ["PHY-SHLD-001", "PHY-STR-001", "PHY-BC-001", "PHY-PC-001"]
+    },
+    {
+      "situation_id": "SUPPORT_AND_PASSING_LANES",
+      "label": "Teammate support without abandoning team structure",
+      "required_capabilities": ["TEAM_TACTICS", "SMALL_SIDED_CARDINALITY"],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": ["team_positions_over_time", "passing_lane_graph", "support_event_sequence"],
+      "source_refs": ["OFF-SUP-001", "OFF-RUN-001"]
+    },
+    {
+      "situation_id": "SETTLED_ATTACK_VS_DEFENCE",
+      "label": "Attacking progression against preserved defensive shape",
+      "required_capabilities": ["TEAM_TACTICS", "SMALL_SIDED_CARDINALITY"],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": ["world_space_team_geometry", "role_assignments", "semantic_frame_strip"],
+      "source_refs": ["DEF-SHAPE-001", "DEF-SHIFT-001", "OFF-SUP-001"]
+    },
+    {
+      "situation_id": "ATTACK_TO_DEFENCE_TRANSITION",
+      "label": "Possession loss to defensive transition and recovered shape",
+      "required_capabilities": ["TEAM_TACTICS", "TRANSITION_PHASES", "SMALL_SIDED_CARDINALITY"],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": ["possession_loss_event", "phase_events", "team_geometry_trajectory", "event_centered_sequence"],
+      "source_refs": ["TRANS-AD-001", "DEF-SHAPE-001"]
+    },
+    {
+      "situation_id": "DEFENCE_TO_ATTACK_TRANSITION",
+      "label": "Recovery to differentiated attacking/support roles",
+      "required_capabilities": ["TEAM_TACTICS", "TRANSITION_PHASES", "SMALL_SIDED_CARDINALITY"],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": ["recovery_event", "phase_events", "role_changes", "event_centered_sequence"],
+      "source_refs": ["TRANS-DA-001", "OFF-RUN-001", "OFF-SUP-001"]
+    },
+    {
+      "situation_id": "COORDINATED_PRESS",
+      "label": "Pressure with press and cover responsibilities",
+      "required_capabilities": ["TEAM_TACTICS", "TRANSITION_PHASES", "SMALL_SIDED_CARDINALITY"],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": ["press_cover_assignments", "team_geometry_trajectory", "event_centered_sequence"],
+      "source_refs": ["PRESS-001", "PRESS-REC-001", "TRANS-AD-001"]
+    },
+    {
+      "situation_id": "AERIAL_ATTACK",
+      "label": "Cross or lofted ball into header/aerial contest",
+      "required_capabilities": ["BASIC_ACTIONS", "PLAYER_DUELS", "AERIAL_PLAY"],
+      "first_testable_milestone": null,
+      "integrated_playtest_milestone": null,
+      "final_match_required": true,
+      "evidence": ["3d_ball_trajectory", "aerial_contact_events", "event_centered_sequence"],
+      "source_refs": ["CROSS-HI-001", "HEAD-FREE-001", "HEAD-DUEL-001"],
+      "deferred_reason": "Required by the final vision but no later regulation/full-match milestone may be published yet."
+    },
+    {
+      "situation_id": "GOALKEEPER_SAVE_SEQUENCE",
+      "label": "Shot response, save/catch/parry and recovery",
+      "required_capabilities": ["GOALKEEPERS"],
+      "first_testable_milestone": null,
+      "integrated_playtest_milestone": null,
+      "final_match_required": true,
+      "evidence": ["shot_event", "keeper_response_state", "contact_result", "recovery_sequence"],
+      "source_refs": ["GK-REA-001", "GK-LEG-001", "GK-PARRY-001", "GK-REC-001"],
+      "deferred_reason": "Goalkeeper subsystem is required before a regulation/full-match milestone can be published."
+    },
+    {
+      "situation_id": "REGULATION_RESTARTS",
+      "label": "Out/foul/goal event to correct restart and ball-in-play",
+      "required_capabilities": ["REGULATION_MATCH_RULES"],
+      "first_testable_milestone": null,
+      "integrated_playtest_milestone": null,
+      "final_match_required": true,
+      "evidence": ["rule_event", "restart_award", "placement_state", "ball_in_play_event"],
+      "source_refs": ["VISION: throw-ins/corners/goal-kicks/fouls", "GAMEPLAY_EVALUATION_SPEC: regulation prerequisite"],
+      "deferred_reason": "Dedicated deterministic rules specification/suites are required before publication of a regulation/full-match profile."
+    },
+    {
+      "situation_id": "FULL_MATCH_CONTINUITY",
+      "label": "Kickoff through fulltime with continuous regulation football",
+      "required_capabilities": ["COMPLETE_REGULATION_MATCH", "GOALKEEPERS", "TEAM_TACTICS", "REGULATION_MATCH_RULES"],
+      "first_testable_milestone": null,
+      "integrated_playtest_milestone": null,
+      "final_match_required": true,
+      "evidence": ["complete_replay", "event_log", "targeted_situation_extracts", "video_when_perceptually_useful"],
+      "source_refs": ["VISION.md", "GAMEPLAY_EVALUATION_SPEC: full-match publication barrier"],
+      "deferred_reason": "The authoritative spec deliberately prevents publication of this milestone until goalkeeper and deterministic regulation coverage exists."
+    }
+  ]
+}

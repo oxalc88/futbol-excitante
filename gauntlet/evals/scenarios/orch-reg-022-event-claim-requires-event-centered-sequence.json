@@ -1,0 +1,17 @@
+{
+  "id": "ORCH-REG-022",
+  "kind": "dynamic_sequence_gate",
+  "input": {
+    "evidence_class": "DYNAMIC_VISUAL",
+    "temporal_and_visual": true,
+    "frame_count": 4,
+    "sequence_manifest_exists": true,
+    "labels_complete": true,
+    "event_centered_required": true,
+    "event_centered": false
+  },
+  "expect": {
+    "decision": "reject_acceptance",
+    "failure_class": "event_evidence_not_centered"
+  }
+}

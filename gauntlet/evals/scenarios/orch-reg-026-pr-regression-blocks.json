@@ -1,0 +1,14 @@
+{
+  "id": "ORCH-REG-026",
+  "kind": "pr_regression_classification_gate",
+  "input": {
+    "base_status": "PASS",
+    "head_status": "FAIL",
+    "base_signature": null,
+    "head_signature": "new-signature"
+  },
+  "expect": {
+    "decision": "block_pr_regression",
+    "failure_class": "pr_regression"
+  }
+}

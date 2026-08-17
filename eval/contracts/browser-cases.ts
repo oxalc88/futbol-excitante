@@ -121,6 +121,30 @@ export const BROWSER_CASE_ARCH_DIFF_001: BrowserCaseDefinition = {
 };
 
 // ---------------------------------------------------------------------------
+// Case definitions (SMALL_SIDED_SHAPE)
+// ---------------------------------------------------------------------------
+
+/**
+ * Existing 3v3 execution is the first concrete browser source for this case.
+ * Passing this execution case does not itself establish the team/transition
+ * or qualitative gameplay requirements of the milestone.
+ */
+export const BROWSER_CASE_SMALL_SIDED_001: BrowserCaseDefinition = {
+  case_id: "BROWSER-SMALL-SIDED-001",
+  case_version: "browser-case-small-sided-v1",
+  description:
+    "A deterministic browser small-sided match renders multiple players per " +
+    "team and preserves browser/headless state correspondence while exposing " +
+    "team behavior for milestone playtest review.",
+  test_source: "tests/browser/3v3-match.browser.test.ts",
+  acceptance_criteria:
+    "A real browser run must exercise the small-sided scenario deterministically. " +
+    "Passing this execution case does not by itself prove TEAM_TACTICS, " +
+    "TRANSITION_PHASES, or qualitative football behavior; those remain " +
+    "milestone-suite/playtest responsibilities.",
+};
+
+// ---------------------------------------------------------------------------
 // Registry
 // ---------------------------------------------------------------------------
 
@@ -130,6 +154,7 @@ export const BROWSER_CASES: Record<string, BrowserCaseDefinition> = {
   [BROWSER_CASE_CORE_STEP_001.case_id]: BROWSER_CASE_CORE_STEP_001,
   [BROWSER_CASE_1V1_CONTROL_001.case_id]: BROWSER_CASE_1V1_CONTROL_001,
   [BROWSER_CASE_ARCH_DIFF_001.case_id]: BROWSER_CASE_ARCH_DIFF_001,
+  [BROWSER_CASE_SMALL_SIDED_001.case_id]: BROWSER_CASE_SMALL_SIDED_001,
 };
 
 /**
@@ -148,6 +173,7 @@ export const ALL_BROWSER_CASE_IDS: string[] = [
   BROWSER_CASE_CORE_STEP_001.case_id,
   BROWSER_CASE_1V1_CONTROL_001.case_id,
   BROWSER_CASE_ARCH_DIFF_001.case_id,
+  BROWSER_CASE_SMALL_SIDED_001.case_id,
 ];
 
 /**

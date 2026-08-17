@@ -1,0 +1,98 @@
+name: Gauntlet Maintenance PR CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gauntlet-maintenance-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [base, head]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout CI runner from PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: source
+
+      - name: Checkout validation target
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.target == 'base' && github.event.pull_request.base.sha || github.event.pull_request.head.sha }}
+          path: target
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: target/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: target
+        run: pnpm install --frozen-lockfile
+        env:
+          PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
+
+      - name: Install Chromium
+        working-directory: target
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run deterministic validation
+        id: validation
+        continue-on-error: true
+        working-directory: target
+        run: node ../source/scripts/ci/run-validation.mjs
+        env:
+          CI_TARGET_SHA: ${{ matrix.target == 'base' && github.event.pull_request.base.sha || github.event.pull_request.head.sha }}
+          CI_REPORT_PATH: ../artifacts/ci/${{ matrix.target }}.json
+
+      - name: Upload validation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-validation-${{ matrix.target }}
+          path: artifacts/ci/${{ matrix.target }}.json
+          if-no-files-found: error
+
+  classify:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ci-validation-base
+          path: artifacts/ci/base
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ci-validation-head
+          path: artifacts/ci/head
+
+      - name: Classify base vs PR failures
+        run: node scripts/ci/classify-pr-validation.mjs artifacts/ci/base/base.json artifacts/ci/head/head.json artifacts/ci/pr-classification.json
+
+      - name: Upload classification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-ci-classification
+          path: artifacts/ci/pr-classification.json
+          if-no-files-found: error

@@ -1,10 +1,8 @@
 /**
  * @module @pes/eval/contracts/suites
  *
- * SuiteDefinition records for the three foundation-lab suites:
- * fast, locomotion, and ball.
- *
- * Materialized from GAMEPLAY_EVALUATION_SPEC.md §8.
+ * Versioned SuiteDefinition records materialized from
+ * GAMEPLAY_EVALUATION_SPEC.md.
  * impact_closure is NONE so expansion = direct set + common criteria,
  * not a graph walk.
  *
@@ -171,7 +169,53 @@ export const DUELS_SUITE: SuiteDefinition = {
   expected_expansion_manifest_id: "expansion-duels-v1",
 };
 
-/** All registered suites keyed by suite_id. */
+/**
+ * Normative declaration of the team suite required by SMALL_SIDED_SHAPE.
+ *
+ * This record mirrors GAMEPLAY_EVALUATION_SPEC.md §8, but it is deliberately
+ * not registered in SUITES until every direct test has an executable binding.
+ * Registering an unresolved suite would invalidate the executable registry and
+ * falsely imply that team evaluation can already run.
+ */
+export const TEAM_SUITE: SuiteDefinition = {
+  suite_id: "team",
+  suite_version: "suite-team-v1",
+  direct_test_ids: [
+    "OFF-RUN-001",
+    "OFF-SUP-001",
+    "DEF-SHAPE-001",
+    "DEF-SHIFT-001",
+    "PRESS-001",
+    "PRESS-GG-001",
+    "PRESS-REC-001",
+    "TACT-COMP-001",
+    "TACT-DLINE-001",
+    "TACT-SUP-001",
+    "TACT-TIKI-001",
+    "TACT-MARK-001",
+    "AI-ADAPT-001",
+    "AI-ADAPT-002",
+    "TRANS-AD-001",
+    "TRANS-DA-001",
+  ],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+    "COMMON-BOUNDS",
+  ],
+  impact_closure: "NONE",
+  prerequisite_capabilities: ["TEAM_TACTICS", "TRANSITION_PHASES"],
+  seed_matrix_id: "seeds-team-v1",
+  config_matrix_id: "config-team-v1",
+  held_out_policy_id: null,
+  browser_case_ids: [],
+  resource_policy_id: "resources-team-v1",
+  outcome_reduction_profile_id: "profile-selected-v1",
+  expected_expansion_manifest_id: "expansion-team-v1",
+};
+
+/** Executable suites only; unresolved normative declarations stay out. */
 export const SUITES: Record<string, SuiteDefinition> = {
   [FAST_SUITE.suite_id]: FAST_SUITE,
   [LOCOMOTION_SUITE.suite_id]: LOCOMOTION_SUITE,

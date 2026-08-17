@@ -1,0 +1,15 @@
+{
+  "id": "ORCH-REG-021",
+  "kind": "dynamic_sequence_gate",
+  "input": {
+    "evidence_class": "MULTI_TICK",
+    "temporal_and_visual": true,
+    "frame_count": 0,
+    "sequence_manifest_exists": false,
+    "labels_complete": false
+  },
+  "expect": {
+    "decision": "reject_evidence_class",
+    "failure_class": "evidence_class_too_weak"
+  }
+}

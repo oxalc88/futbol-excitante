@@ -15,8 +15,13 @@ import type {
   AcceptancePipelineGateScenario,
   AcceptanceClaimGateScenario,
   PostAcceptanceContinuationGateScenario,
+  RemoteDurabilityGateScenario,
+  MilestonePlaytestGateScenario,
   ManifestGateScenario,
   DynamicSequenceGateScenario,
+  PrRegressionClassificationGateScenario,
+  RegressionInboxGateScenario,
+  RegressionMonitorTriggerGateScenario,
 } from "../contracts/scenario.js";
 
 function evaluateEvidence(s: EvidenceGateScenario): EvaluationResult {
@@ -108,6 +113,26 @@ function evaluatePostAcceptanceContinuation(s: PostAcceptanceContinuationGateSce
   return { scenario_id: s.id, decision: "replan_and_continue" };
 }
 
+function evaluateRemoteDurability(s: RemoteDurabilityGateScenario): EvaluationResult {
+  if (!s.input.acceptance_finalized) return { scenario_id: s.id, decision: "finish_acceptance" };
+  if (!s.input.remote_contains_acceptance) return { scenario_id: s.id, decision: s.input.horizon_exhausted ? "publish_before_replan" : "publish_before_continue", failure_class: "remote_durability_missing" };
+  if (s.input.horizon_exhausted) return { scenario_id: s.id, decision: "replan_and_continue" };
+  if (s.input.next_objective) return { scenario_id: s.id, decision: "continue", next_objective: s.input.next_objective };
+  return { scenario_id: s.id, decision: "replan_and_continue" };
+}
+
+export function evaluateMilestonePlaytest(s: MilestonePlaytestGateScenario): EvaluationResult {
+  const missingSituation = s.input.required_situations.find((id) => !(id in s.input.situation_outcomes));
+  if (!s.input.entry_prerequisites_pass || !s.input.exit_prerequisites_pass || missingSituation) return { scenario_id: s.id, decision: "milestone_not_evaluated", milestone_verdict: "NOT_EVALUATED", failure_class: "milestone_playtest_incomplete" };
+  const outcomes = s.input.required_situations.map((id) => s.input.situation_outcomes[id]);
+  if (outcomes.includes("FAIL")) return { scenario_id: s.id, decision: "milestone_failed", milestone_verdict: "FAIL", failure_class: "milestone_playtest_failed" };
+  if (outcomes.includes("NOT_EVALUATED")) return { scenario_id: s.id, decision: "milestone_not_evaluated", milestone_verdict: "NOT_EVALUATED", failure_class: "milestone_playtest_incomplete" };
+  if (outcomes.includes("NEEDS_PERCEPTUAL_REVIEW")) return { scenario_id: s.id, decision: "milestone_needs_perceptual_review", milestone_verdict: "NEEDS_PERCEPTUAL_REVIEW", failure_class: "milestone_perceptual_review_required" };
+  if (s.input.critic_verdict === "MISSING") return { scenario_id: s.id, decision: "reject_milestone_verdict", milestone_verdict: "NEEDS_PERCEPTUAL_REVIEW", failure_class: "critic_bypassed" };
+  if (s.input.critic_verdict !== "ACCEPT") return { scenario_id: s.id, decision: "milestone_failed", milestone_verdict: "FAIL", failure_class: "milestone_playtest_failed" };
+  return { scenario_id: s.id, decision: "milestone_verdict_ready", milestone_verdict: "PASS" };
+}
+
 function evaluateManifest(s: ManifestGateScenario): EvaluationResult {
   const applies = s.input.objective_accepted && /^0\.(?:[89]|[1-9]\d+)\./.test(s.input.gauntlet_version);
   if (applies && (!s.input.manifest_exists || !s.input.artifact_commit_bound || !s.input.reviews_persisted)) return { scenario_id: s.id, decision: "reject_acceptance", failure_class: "manifest_missing" };
@@ -115,9 +140,32 @@ function evaluateManifest(s: ManifestGateScenario): EvaluationResult {
 }
 
 function evaluateDynamicSequence(s: DynamicSequenceGateScenario): EvaluationResult {
+  if (s.input.temporal_and_visual === true && s.input.evidence_class !== "DYNAMIC_VISUAL") return { scenario_id: s.id, decision: "reject_evidence_class", failure_class: "evidence_class_too_weak" };
   if (s.input.evidence_class !== "DYNAMIC_VISUAL") return { scenario_id: s.id, decision: "sequence_not_required" };
   const valid = s.input.frame_count >= 3 && s.input.frame_count <= 5 && s.input.sequence_manifest_exists && s.input.labels_complete;
-  return valid ? { scenario_id: s.id, decision: "sequence_valid" } : { scenario_id: s.id, decision: "reject_acceptance", failure_class: "dynamic_sequence_missing" };
+  if (!valid) return { scenario_id: s.id, decision: "reject_acceptance", failure_class: "dynamic_sequence_missing" };
+  if (s.input.event_centered_required === true && s.input.event_centered !== true) return { scenario_id: s.id, decision: "reject_acceptance", failure_class: "event_evidence_not_centered" };
+  return { scenario_id: s.id, decision: "sequence_valid" };
+}
+
+function evaluatePrRegressionClassification(s: PrRegressionClassificationGateScenario): EvaluationResult {
+  if (s.input.head_status === "PASS") return { scenario_id: s.id, decision: s.input.base_status === "FAIL" ? "pr_improves_baseline" : "pr_validation_pass" };
+  if (s.input.base_status === "FAIL" && s.input.base_signature !== null && s.input.base_signature === s.input.head_signature) return { scenario_id: s.id, decision: "allow_preexisting_regression" };
+  return { scenario_id: s.id, decision: "block_pr_regression", failure_class: "pr_regression" };
+}
+
+function evaluateRegressionInbox(s: RegressionInboxGateScenario): EvaluationResult {
+  if (s.input.check_status === "FAIL") {
+    if (s.input.current_status === "OPEN" && s.input.current_signature === s.input.observed_signature) return { scenario_id: s.id, decision: "inbox_unchanged" };
+    if (!s.input.observed_signature) return { scenario_id: s.id, decision: "reject_inbox_update", failure_class: "regression_inbox_invariant" };
+    return { scenario_id: s.id, decision: "update_inbox" };
+  }
+  if (s.input.current_status === "OPEN") return { scenario_id: s.id, decision: "resolve_inbox" };
+  return { scenario_id: s.id, decision: "inbox_unchanged" };
+}
+
+function evaluateRegressionMonitorTrigger(s: RegressionMonitorTriggerGateScenario): EvaluationResult {
+  return { scenario_id: s.id, decision: s.input.pushed_branch === "main" ? "run_main_monitor" : "ignore_non_main_push" };
 }
 
 export function evaluateScenario(s: GauntletScenario): EvaluationResult {
@@ -135,7 +183,12 @@ export function evaluateScenario(s: GauntletScenario): EvaluationResult {
     case "acceptance_pipeline_gate": return evaluateAcceptancePipeline(s);
     case "acceptance_claim_gate": return evaluateAcceptanceClaim(s);
     case "post_acceptance_continuation_gate": return evaluatePostAcceptanceContinuation(s);
+    case "remote_durability_gate": return evaluateRemoteDurability(s);
+    case "milestone_playtest_gate": return evaluateMilestonePlaytest(s);
     case "manifest_gate": return evaluateManifest(s);
     case "dynamic_sequence_gate": return evaluateDynamicSequence(s);
+    case "pr_regression_classification_gate": return evaluatePrRegressionClassification(s);
+    case "regression_inbox_gate": return evaluateRegressionInbox(s);
+    case "regression_monitor_trigger_gate": return evaluateRegressionMonitorTrigger(s);
   }
 }
