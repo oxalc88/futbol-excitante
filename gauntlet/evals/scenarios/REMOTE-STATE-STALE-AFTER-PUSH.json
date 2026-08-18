@@ -1,0 +1,16 @@
+{
+  "id": "REMOTE-STATE-STALE-AFTER-PUSH",
+  "kind": "acceptance_state_durability_gate",
+  "input": {
+    "acceptance_finalized": true,
+    "changed_bookkeeping_committed": true,
+    "committed_state_valid": true,
+    "remote_contains_acceptance": true,
+    "remote_state_valid": false,
+    "next_objective": "NEXT-OBJECTIVE"
+  },
+  "expect": {
+    "decision": "repair_remote_bookkeeping",
+    "failure_class": "remote_state_stale"
+  }
+}
