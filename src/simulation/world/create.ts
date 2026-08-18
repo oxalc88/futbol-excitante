@@ -183,6 +183,12 @@ export function createWorld(opts: CreateOptions): WorldState {
     // --- match timer (MATCH-TIMER-ENFORCEMENT) ---
     matchTimer: scenario.matchDurationTicks ?? 5400,
     currentHalf: 1,
+    // --- corner kick state (MATCH-CORNER-KICK) ---
+    cornerKickPosition: null,
+    cornerKickAttackingTeam: null,
+    cornerKickTakerId: null,
+    cornerKickCountdown: 0,
+    cornerKickGoalIndex: null,
     meta: {
       scenarioId: scenario.id,
       scenarioVersion: scenario.version,

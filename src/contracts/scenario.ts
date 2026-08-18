@@ -31,6 +31,8 @@ export interface SimulationEvent {
     | "goal-post-contact"
     | "crossbar-contact"
     | "goal"
+    | "ball-out-of-play"
+    | "corner-kick-executed"
     | "player-ball-contact"
     | "player-player-contact"
     | "pass"

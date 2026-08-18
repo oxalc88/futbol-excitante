@@ -211,6 +211,44 @@ export interface WorldState {
    * Default: 1.
    */
   currentHalf: number;
+
+  // -----------------------------------------------------------------
+  // Corner kick state (MATCH-CORNER-KICK)
+  // -----------------------------------------------------------------
+
+  /**
+   * Corner flag position where the ball will be placed.
+   * Set when matchPhase transitions to "corner-kick".
+   */
+  cornerKickPosition: { x: number; y: number } | null;
+
+  /**
+   * Team that takes the corner kick (the attacking team).
+   * Set when matchPhase transitions to "corner-kick".
+   */
+  cornerKickAttackingTeam: string | null;
+
+  /**
+   * Player ID of the kick taker at the corner flag.
+   * Set when matchPhase transitions to "corner-kick".
+   */
+  cornerKickTakerId: string | null;
+
+  /**
+   * Countdown ticks before the corner kick is auto-executed.
+   * Set when matchPhase transitions to "corner-kick".
+   * Decremented each tick while matchPhase === "corner-kick".
+   * When zero, the cross is executed and phase returns to "playing".
+   *
+   * Default: 0 (no active countdown).
+   */
+  cornerKickCountdown: number;
+
+  /**
+   * Goal line index (0 = right goal line at +x, 1 = left goal line at -x)
+   * where the corner kick occurred. Used for corner flag positioning.
+   */
+  cornerKickGoalIndex: 0 | 1 | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -228,4 +266,4 @@ export interface WorldState {
  * kick. Match lifecycle phases (first-half, etc.) are tracked by the
  * match runner; the simulation core only needs "playing" vs "goal".
  */
-export type MatchPhase = "playing" | "goal" | "halftime" | "fulltime" | "kickoff";
+export type MatchPhase = "playing" | "goal" | "halftime" | "fulltime" | "kickoff" | "corner-kick";

@@ -565,6 +565,28 @@ export function stepBall(
                   } as BallStateSnapshot,
                 },
               });
+            } else if (goalZ > 0) {
+              // Ball crossed the goal line outside the posts (or above crossbar) — out of play.
+              // This triggers corner kick or goal kick depending on last touch team.
+              eventCounter.value++;
+              events.push({
+                id: `ball-out-of-play-${tick}-${eventCounter.value}`,
+                tick,
+                sequence: eventCounter.value,
+                kind: "ball-out-of-play",
+                label: "Ball out of play over goal line",
+                payload: {
+                  goalIndex: gi as 0 | 1,
+                  ballPosition: { x: goalX, y: goalY, z: goalZ },
+                  lastTouchRef: ball.lastTouchRef,
+                  ballState: {
+                    position: { x: posA.x, y: posA.y, z: posA.z },
+                    linearVelocity: { x: ball.linearVelocity.x, y: ball.linearVelocity.y, z: ball.linearVelocity.z },
+                    angularVelocity: { x: ball.angularVelocity.x, y: ball.angularVelocity.y, z: ball.angularVelocity.z },
+                    regime: ball.regime,
+                  } as BallStateSnapshot,
+                },
+              });
             }
           }
         }

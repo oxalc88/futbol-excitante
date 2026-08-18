@@ -343,6 +343,219 @@ export function createSimulation(
   }
 
   // ------------------------------------------------------------------
+  // Corner kick helpers (MATCH-CORNER-KICK)
+  // ------------------------------------------------------------------
+
+  /** Default corner kick countdown ticks (≈1 second at 60 FPS). */
+  const defaultCornerKickCountdown = 60;
+
+  /** Pitch half-width for corner flag positioning (provisional 68m pitch). */
+  const PITCH_HALF_WIDTH = 34;
+
+  /** Goal line x position (matches ball-system constant). */
+  const GOAL_LINE_X = 52.5;
+
+  /**
+   * Resolve the team that last touched the ball from the lastTouchRef.
+   *
+   * Searches state.events for the matching event and extracts the teamId
+   * from the payload. Returns null if the event is not found or has no
+   * team information.
+   */
+  function resolveLastTouchTeam(lastTouchRef: string | null): string | null {
+    if (!lastTouchRef) return null;
+    for (const ev of state.events) {
+      if (ev.id === lastTouchRef) {
+        const payload = ev.payload as { teamId?: string } | undefined;
+        return payload?.teamId ?? null;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Compute the nearest corner flag position given the goal line and
+   * the ball's y-position when it went out.
+   *
+   * Corner flags are at (goalX, ±pitchHalfWidth).
+   * The nearest flag is determined by the sign of ballY.
+   */
+  function computeCornerFlagPosition(
+    goalIndex: 0 | 1,
+    ballY: number,
+  ): { x: number; y: number } {
+    const goalX = goalIndex === 0 ? GOAL_LINE_X : -GOAL_LINE_X;
+    const cornerY = ballY >= 0 ? PITCH_HALF_WIDTH : -PITCH_HALF_WIDTH;
+    return { x: goalX, y: cornerY };
+  }
+
+  /**
+   * Set matchPhase to "corner-kick" and start the countdown.
+   * Called when a ball-out-of-play event is detected and the last touch
+   * was by the defending team (corner kick condition).
+   */
+  function onCornerKickEvent(
+    attackingTeam: string,
+    cornerPos: { x: number; y: number },
+    goalIndex: 0 | 1,
+  ): void {
+    if (state.matchPhase !== "playing") return;
+    state.matchPhase = "corner-kick";
+    state.cornerKickCountdown = defaultCornerKickCountdown;
+    state.cornerKickPosition = { ...cornerPos };
+    state.cornerKickAttackingTeam = attackingTeam;
+    state.cornerKickGoalIndex = goalIndex;
+
+    // Select kick taker: closest attacking player to the corner flag.
+    let bestPlayer: string | null = null;
+    let bestDist = Infinity;
+    for (const p of state.players) {
+      if (p.teamId !== attackingTeam) continue;
+      const dx = p.groundPosition.x - cornerPos.x;
+      const dy = p.groundPosition.y - cornerPos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestPlayer = p.playerId;
+      }
+    }
+    state.cornerKickTakerId = bestPlayer;
+
+    // Position the kick taker near the corner flag.
+    if (bestPlayer) {
+      const player = state.players.find((p) => p.playerId === bestPlayer);
+      if (player) {
+        player.groundPosition = { x: cornerPos.x, y: cornerPos.y };
+        player.linearVelocity = { x: 0, y: 0 };
+        player.desiredVelocity = { x: 0, y: 0 };
+        // Face toward the goal (direction from corner to goal center).
+        const goalCenterX = goalIndex === 0 ? GOAL_LINE_X : -GOAL_LINE_X;
+        const dirX = goalCenterX - cornerPos.x;
+        const dirY = 0 - cornerPos.y;
+        const dirMag = Math.sqrt(dirX * dirX + dirY * dirY);
+        if (dirMag > 0.001) {
+          player.bodyHeading = Math.atan2(dirY / dirMag, dirX / dirMag);
+          player.desiredHeading = player.bodyHeading;
+        }
+      }
+    }
+
+    // Position attacking teammates in the penalty area.
+    const attackAreaCenterX = goalIndex === 0 ? GOAL_LINE_X - 10 : -GOAL_LINE_X + 10;
+    let attackIdx = 0;
+    for (const p of state.players) {
+      if (p.teamId !== attackingTeam) continue;
+      if (p.playerId === bestPlayer) continue;
+      // Spread attackers across the penalty area.
+      const offsetX = (attackIdx % 3) * 5 - 5;
+      const offsetY = Math.floor(attackIdx / 3) * 6 - 3;
+      p.groundPosition = { x: attackAreaCenterX + offsetX, y: offsetY };
+      p.linearVelocity = { x: 0, y: 0 };
+      p.desiredVelocity = { x: 0, y: 0 };
+      // Face toward the goal.
+      const faceX = goalIndex === 0 ? 1 : -1;
+      p.bodyHeading = Math.atan2(0, faceX);
+      p.desiredHeading = p.bodyHeading;
+      attackIdx++;
+    }
+
+    // Position defensive team: mark attackers and place goalkeeper.
+    const defendingTeam = attackingTeam === "team-a" ? "team-b" : "team-a";
+    const defendingPlayers = state.players.filter((p) => p.teamId === defendingTeam);
+
+    // Find goalkeeper (or last defender) and position near far post.
+    const goalkeeper = defendingPlayers[defendingPlayers.length - 1];
+    if (goalkeeper) {
+      const farPostY = cornerPos.y > 0 ? -3.66 : 3.66;
+      goalkeeper.groundPosition = { x: goalIndex === 0 ? GOAL_LINE_X - 1 : -GOAL_LINE_X + 1, y: farPostY };
+      goalkeeper.linearVelocity = { x: 0, y: 0 };
+      goalkeeper.desiredVelocity = { x: 0, y: 0 };
+      goalkeeper.bodyHeading = goalIndex === 0 ? Math.PI : 0;
+      goalkeeper.desiredHeading = goalkeeper.bodyHeading;
+    }
+
+    // Position remaining defenders to mark attackers.
+    const attackers = state.players.filter(
+      (p) => p.teamId === attackingTeam && p.playerId !== bestPlayer,
+    );
+    const remainingDefenders = defendingPlayers.filter((p) => p !== goalkeeper);
+    for (let i = 0; i < remainingDefenders.length; i++) {
+      const def = remainingDefenders[i];
+      const target = attackers[i % attackers.length];
+      if (target) {
+        // Position slightly between attacker and goal.
+        const markX = (target.groundPosition.x + (goalIndex === 0 ? GOAL_LINE_X : -GOAL_LINE_X)) / 2;
+        const markY = target.groundPosition.y;
+        def.groundPosition = { x: markX, y: markY };
+        def.linearVelocity = { x: 0, y: 0 };
+        def.desiredVelocity = { x: 0, y: 0 };
+        def.bodyHeading = goalIndex === 0 ? Math.PI : 0;
+        def.desiredHeading = def.bodyHeading;
+      }
+    }
+  }
+
+  /**
+   * Execute the corner kick: perform a lofted cross from the corner flag
+   * toward the center of the penalty area.
+   *
+   * Called when cornerKickCountdown reaches zero.
+   */
+  function applyCornerKick(): void {
+    if (!state.cornerKickPosition || !state.cornerKickAttackingTeam) return;
+
+    const cornerPos = state.cornerKickPosition;
+    const goalIndex = state.cornerKickGoalIndex ?? 0;
+    const goalLineX = goalIndex === 0 ? GOAL_LINE_X : -GOAL_LINE_X;
+
+    // Target: center of the penalty area (about 8-10m from goal line, center of pitch).
+    const targetX = goalLineX + (goalIndex === 0 ? -8 : 8);
+    const targetY = 0;
+
+    // Compute cross direction from corner flag to target.
+    const dx = targetX - cornerPos.x;
+    const dy = targetY - cornerPos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 0.001) return;
+
+    const dirX = dx / dist;
+    const dirY = dy / dist;
+
+    // Place ball at corner flag.
+    state.ball.position.x = cornerPos.x;
+    state.ball.position.y = cornerPos.y;
+    state.ball.position.z = 0.11; // ball radius
+    state.ball.regime = "airborne";
+
+    // Apply cross velocity (lofted pass).
+    const crossSpeed = 14; // provisional: lofted cross speed (m/s)
+    const verticalComponent = 0.35; // provisional: loft for cross trajectory
+    state.ball.linearVelocity.x = dirX * crossSpeed;
+    state.ball.linearVelocity.y = dirY * crossSpeed;
+    state.ball.linearVelocity.z = crossSpeed * verticalComponent;
+    state.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.lastTouchRef = null;
+
+    // Emit corner-kick-executed event.
+    eventCounter++;
+    const kickEvent: SimulationEvent = {
+      id: `corner-kick-executed-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "corner-kick-executed",
+      label: `Corner kick executed by ${state.cornerKickTakerId}`,
+      payload: {
+        teamId: state.cornerKickAttackingTeam,
+        kickTakerId: state.cornerKickTakerId,
+        cornerPosition: { ...cornerPos },
+        targetPosition: { x: targetX, y: targetY },
+        crossDirection: { x: dirX, y: dirY },
+      },
+    };
+    state.events = [...state.events, kickEvent];
+  }
+
+  // ------------------------------------------------------------------
   // Internal: drain all buffers into a single flat array (ordered by tick, then insertion).
   // ------------------------------------------------------------------
 
@@ -949,6 +1162,52 @@ export function createSimulation(
         if (ev.kind === "goal" && state.matchPhase === "playing") {
           onGoalEvent();
           break; // Only start countdown on the first goal event of the tick.
+        }
+      }
+
+      // 6b-2. Process corner kick countdown (MATCH-CORNER-KICK).
+      if (state.matchPhase === "corner-kick") {
+        state.cornerKickCountdown--;
+        if (state.cornerKickCountdown <= 0) {
+          // Execute the corner kick: place ball, position players, kick.
+          applyCornerKick();
+          state.matchPhase = "playing";
+          state.cornerKickCountdown = 0;
+          state.cornerKickPosition = null;
+          state.cornerKickAttackingTeam = null;
+          state.cornerKickTakerId = null;
+          state.cornerKickGoalIndex = null;
+        }
+      }
+
+      // 6b-3. Detect ball-out-of-play events and trigger corner kick phase.
+      if (state.matchPhase === "playing") {
+        for (const ev of allStepEvents) {
+          if (ev.kind === "ball-out-of-play") {
+            const payload = ev.payload as {
+              goalIndex?: number;
+              ballPosition?: { x: number; y: number; z: number };
+              lastTouchRef?: string | null;
+            };
+            if (payload.goalIndex === undefined || payload.ballPosition === undefined) continue;
+
+            // Determine which team last touched the ball.
+            const lastTouchTeam = resolveLastTouchTeam(payload.lastTouchRef ?? null);
+            if (lastTouchTeam === null) continue;
+
+            // Goal index: 0 = right goal line (team-b defends), 1 = left goal line (team-a defends).
+            const goalIndex = payload.goalIndex as 0 | 1;
+            const defendingTeam = goalIndex === 0 ? "team-b" : "team-a";
+
+            // Corner kick: last touch by the defending team.
+            if (lastTouchTeam === defendingTeam) {
+              const attackingTeam = goalIndex === 0 ? "team-a" : "team-b";
+              const cornerPos = computeCornerFlagPosition(goalIndex, payload.ballPosition.y);
+
+              onCornerKickEvent(attackingTeam, cornerPos, goalIndex as 0 | 1);
+              break;
+            }
+          }
         }
       }
 
