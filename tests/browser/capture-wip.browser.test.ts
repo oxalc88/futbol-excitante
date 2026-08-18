@@ -1,8 +1,8 @@
 /**
  * Browser-mode evidence capture.
  *
- * Static objectives normally use one frame. Dynamic visual objectives use
- * WIP_FRAMES=3..5 and receive an ordered sequence.json with semantic labels.
+ * Normal browser regression runs write only to test-results/gauntlet-capture.
+ * Durable objective evidence requires GAUNTLET_EVIDENCE_CAPTURE=1.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -12,6 +12,8 @@ import type { TestBridge } from "../../src/apps/browser/test-bridge.js";
 const SECTION = process.env.WIP_SECTION || "capture";
 const FRAME_COUNT = Math.max(1, Math.min(5, parseInt(process.env.WIP_FRAMES || "1", 10) || 1));
 const FRAME_STRIDE = Math.max(1, parseInt(process.env.WIP_FRAME_STRIDE || "30", 10) || 30);
+const DURABLE_EVIDENCE = process.env.GAUNTLET_EVIDENCE_CAPTURE === "1";
+const OUTPUT_ROOT = DURABLE_EVIDENCE ? "docs/screenshots" : "test-results/gauntlet-capture";
 
 function defaultLabels(count: number): string[] {
   if (count === 1) return ["state"];
@@ -45,6 +47,17 @@ describe(`WIP capture: ${SECTION}`, () => {
     if (typeof document === "undefined") throw new Error("capture-wip.browser.test.ts requires browser mode");
     await bridge.reset();
 
+    if (DURABLE_EVIDENCE) {
+      try {
+        const { existsSync } = await import("node:fs");
+        if (existsSync(`docs/evidence/${SECTION}/manifest.json`)) {
+          throw new Error(`Accepted evidence is immutable: ${SECTION} already has a manifest`);
+        }
+      } catch (error) {
+        if (error instanceof Error && error.message.startsWith("Accepted evidence is immutable:")) throw error;
+      }
+    }
+
     const sequence: Array<{ label: string; path: string; tick: number }> = [];
     let cumulativeTick = 0;
 
@@ -62,15 +75,15 @@ describe(`WIP capture: ${SECTION}`, () => {
       const fileName = `frame-${String(index).padStart(3, "0")}.png`;
       try {
         const { mkdirSync, writeFileSync } = await import("node:fs");
-        mkdirSync(`docs/screenshots/${SECTION}`, { recursive: true });
+        mkdirSync(`${OUTPUT_ROOT}/${SECTION}`, { recursive: true });
         try {
           // @ts-expect-error Buffer may not exist in browser mode.
-          writeFileSync(`docs/screenshots/${SECTION}/${fileName}`, Buffer.from(base64Data, "base64"));
+          writeFileSync(`${OUTPUT_ROOT}/${SECTION}/${fileName}`, Buffer.from(base64Data, "base64"));
         } catch {
           const binary = atob(base64Data);
           const bytes = new Uint8Array(binary.length);
           for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-          writeFileSync(`docs/screenshots/${SECTION}/${fileName}`, bytes);
+          writeFileSync(`${OUTPUT_ROOT}/${SECTION}/${fileName}`, bytes);
         }
       } catch {
         console.log(`[capture-wip:${fileName}:base64]${base64Data}`);
@@ -81,9 +94,9 @@ describe(`WIP capture: ${SECTION}`, () => {
     if (FRAME_COUNT > 1) {
       try {
         const { mkdirSync, writeFileSync } = await import("node:fs");
-        mkdirSync(`docs/screenshots/${SECTION}`, { recursive: true });
+        mkdirSync(`${OUTPUT_ROOT}/${SECTION}`, { recursive: true });
         writeFileSync(
-          `docs/screenshots/${SECTION}/sequence.json`,
+          `${OUTPUT_ROOT}/${SECTION}/sequence.json`,
           `${JSON.stringify({ schema_version: 1, objective_id: SECTION, frames: sequence }, null, 2)}\n`,
           "utf8",
         );
