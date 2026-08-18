@@ -38,6 +38,160 @@ html, body {
   height: 100%;
 }
 
+/* ==========================================================================
+   Setup menu
+   ========================================================================== */
+
+#setup-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #16213e 0%, #0f0f23 100%);
+}
+
+#setup-menu.hidden {
+  display: none;
+}
+
+#setup-menu-card {
+  background: rgba(22, 33, 62, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 40px 48px;
+  min-width: 400px;
+  max-width: 480px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+#setup-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 6px;
+  margin-bottom: 4px;
+}
+
+#setup-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.setup-field {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.setup-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.setup-field select,
+.setup-field input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.setup-field select:focus,
+.setup-field input:focus {
+  border-color: rgba(76, 175, 80, 0.6);
+}
+
+.setup-field select option {
+  background: #1a1a2e;
+  color: #ffffff;
+}
+
+.setup-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.setup-half {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+#start-button {
+  width: 100%;
+  padding: 14px 0;
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 3px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #2e7d32, #388e3c);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+#start-button:hover {
+  background: linear-gradient(135deg, #388e3c, #43a047);
+}
+
+#start-button:active {
+  transform: scale(0.98);
+}
+
+/* ==========================================================================
+   Back-to-menu button
+   ========================================================================== */
+
+#back-to-menu {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 100;
+  transition: background 0.2s, color 0.2s;
+}
+
+#back-to-menu:hover {
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+}
+
+#back-to-menu.hidden {
+  display: none;
+}
+
+/* ==========================================================================
+   Scoreboard
+   ========================================================================== */
+
 #scoreboard {
   position: absolute;
   top: 12px;
@@ -53,6 +207,10 @@ html, body {
   z-index: 20;
   font-family: "Courier New", Courier, monospace;
   user-select: none;
+}
+
+#scoreboard.hidden {
+  display: none;
 }
 
 #scoreboard-team-a,
@@ -104,6 +262,10 @@ html, body {
   font-variant-numeric: tabular-nums;
 }
 
+/* ==========================================================================
+   HUD
+   ========================================================================== */
+
 #hud {
   position: absolute;
   top: 10px;
@@ -115,6 +277,10 @@ html, body {
   border-radius: 4px;
   pointer-events: none;
   z-index: 10;
+}
+
+#hud.hidden {
+  display: none;
 }
 
 #controls-hint {
@@ -130,6 +296,10 @@ html, body {
   pointer-events: none;
   z-index: 10;
   text-align: center;
+}
+
+#controls-hint.hidden {
+  display: none;
 }
 
 /* Scoreboard goal flash animation */
