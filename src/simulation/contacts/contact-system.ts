@@ -195,18 +195,21 @@ function computeLoftedPassVelocity(
 }
 
 /**
- * Compute outgoing velocity for a directed shot along body heading.
+ * Compute outgoing velocity for a directed shot along the given direction.
  *
- * The shot applies a stronger exit speed in the player's body
- * heading direction with a larger vertical component for loft.
+ * The shot applies a stronger exit speed in the specified direction
+ * with a larger vertical component for loft.
  * Ball position is never modified — only velocity.
+ *
+ * @param dirX - Normalized horizontal direction component.
+ * @param dirY - Normalized vertical direction component.
+ * @param config - Shot config (default: FOUNDATION_SHOT_V1).
  */
 function computeShotVelocity(
-  player: PlayerState,
-  config: ShotConfig,
+  dirX: number,
+  dirY: number,
+  config: ShotConfig = FOUNDATION_SHOT_V1,
 ): { vx: number; vy: number; vz: number } {
-  const dirX = Math.cos(player.bodyHeading);
-  const dirY = Math.sin(player.bodyHeading);
   const speed = config.exitSpeed.value;
 
   return {
@@ -469,7 +472,23 @@ export function stepContacts(
   let eventLabel: string;
 
   if (action === "shot") {
-    out = computeShotVelocity(contactPlayer, shotConfig);
+    // Derive shot direction from input moveX/moveY when non-zero,
+    // falling back to bodyHeading when the player isn't providing
+    // directional input.
+    const shotFrame = frameByPlayerId.get(contactPlayer.playerId);
+    let dirX: number;
+    let dirY: number;
+
+    if (shotFrame && (shotFrame.moveX !== 0 || shotFrame.moveY !== 0)) {
+      const inputMag = Math.sqrt(shotFrame.moveX * shotFrame.moveX + shotFrame.moveY * shotFrame.moveY);
+      dirX = shotFrame.moveX / inputMag;
+      dirY = shotFrame.moveY / inputMag;
+    } else {
+      dirX = Math.cos(contactPlayer.bodyHeading);
+      dirY = Math.sin(contactPlayer.bodyHeading);
+    }
+
+    out = computeShotVelocity(dirX, dirY, shotConfig);
     eventKind = "shot";
     contactType = "shot";
     eventLabel = `Player ${contactPlayer.playerId} directed shot`;
