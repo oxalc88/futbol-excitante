@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: HUMAN-THROUGH-BALL
+next_objective_id: CPU-INTERCEPTION-AWARENESS
 
 best_known:
-  commit: f24833f
-  note: "Horizon match-play-depth: HUMAN-SHOT-DIRECTION-CONTROL accepted. 1/5 done. Next: HUMAN-THROUGH-BALL."
+  commit: 0481e46
+  note: "Horizon match-play-depth: HUMAN-SHOT-DIRECTION-CONTROL and HUMAN-THROUGH-BALL accepted. 2/5 done. Next: CPU-INTERCEPTION-AWARENESS."
 
 active_candidate: null
 builder_in_use: null
@@ -72,17 +72,18 @@ accepted:
   - CPU-ATTACKING-IMPROVEMENT
   - HUMAN-PASS-DIRECTION-CONTROL
   - HUMAN-SHOT-DIRECTION-CONTROL
+  - HUMAN-THROUGH-BALL
 
 blocked: []
 
-selection_note: "Horizon match-play-depth: 5 objectives toward deeper human controls (shot direction, through ball), CPU interception awareness, and browser match setup + live stats. 1/5 accepted. Next: HUMAN-THROUGH-BALL."
+selection_note: "Horizon match-play-depth: 5 objectives toward deeper human controls (shot direction, through ball), CPU interception awareness, and browser match setup + live stats. 2/5 accepted. Next: CPU-INTERCEPTION-AWARENESS."
 ```
 ## Last accepted objective
 
-HUMAN-SHOT-DIRECTION-CONTROL — Shot direction uses moveX/moveY from input when the human presses SHOT_BIT with non-zero moveX/moveY, falling back to bodyHeading when idle. Follows the accepted HUMAN-PASS-DIRECTION-CONTROL pattern. computeShotVelocity now takes explicit dirX/dirY params. All constants provisional. No PES claims. 1722/1722 node tests, 86/86 browser tests. HEADLESS audit PASS.
+HUMAN-THROUGH-BALL — Q+J modifier produces THROUGH_BALL_BIT (bit 5) that plays the ball into space ahead of the best forward teammate (highest y) rather than directly to their feet. Directional input (moveX/moveY) overrides automatic targeting. Falls back to bodyHeading when no forward teammate exists. All constants provisional. No PES claims. 1722/1722 node tests, 86/86 browser tests. HEADLESS audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
 - Evidence: 1722 node tests (97 files), 86 browser tests (18 files)
-- Commit: f24833f
+- Commit: 0481e46

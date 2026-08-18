@@ -1,13 +1,13 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 9
+horizon_version: 10
 status: ACTIVE
 horizon_id: "match-play-depth"
 created_from_commit: 6153949
 created_at: 2026-08-18
-reason: "Horizon match-play-depth: HUMAN-SHOT-DIRECTION-CONTROL accepted. 1/5 done. Browser now shows human-vs-CPU 5v3 where the human can aim passes and shots. Next: HUMAN-THROUGH-BALL."
-current_index: 1
+reason: "Horizon match-play-depth: HUMAN-SHOT-DIRECTION-CONTROL and HUMAN-THROUGH-BALL accepted. 2/5 done. Browser now shows human-vs-CPU 5v3 where the human can aim passes, shots, and through balls. Next: CPU-INTERCEPTION-AWARENESS."
+current_index: 2
 objectives:
   - id: HUMAN-SHOT-DIRECTION-CONTROL
     status: accepted
@@ -15,8 +15,8 @@ objectives:
     builder: builder-gameplay
     prerequisite: HUMAN-PASS-DIRECTION-CONTROL
   - id: HUMAN-THROUGH-BALL
-    status: pending
-    reason: "Add a through-ball action for the human: a modifier key combination (e.g., Q+PASS or E+PASS) that plays the ball into space ahead of the best forward teammate rather than directly to their feet, so the teammate can run onto it. Builds on CPU-ATTACKING-IMPROVEMENT off-ball runs. Contact + input contract change."
+    status: accepted
+    reason: "Add a through-ball action for the human: a modifier key combination (Q+PASS) that plays the ball into space ahead of the best forward teammate rather than directly to their feet, so the teammate can run onto it. Builds on CPU-ATTACKING-IMPROVEMENT off-ball runs. Contact + input contract change."
     builder: builder-gameplay
     prerequisite: HUMAN-PASS-DIRECTION-CONTROL
   - id: CPU-INTERCEPTION-AWARENESS

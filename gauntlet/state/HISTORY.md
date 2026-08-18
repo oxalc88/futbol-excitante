@@ -2528,3 +2528,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: f24833f candidate(HUMAN-SHOT-DIRECTION-CONTROL)
 - notes: Shot direction uses moveX/moveY from input when SHOT_BIT pressed with non-zero movement, bodyHeading fallback when idle. computeShotVelocity now takes explicit dirX/dirY params. Follows HUMAN-PASS-DIRECTION-CONTROL pattern. All constants provisional. 1722/1722 node tests, 86/86 browser tests. HEADLESS audit PASS. No PES claim.
+
+## Iteration 64 — 2026-08-18
+
+- objective_id: HUMAN-THROUGH-BALL
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 0481e46 candidate(HUMAN-THROUGH-BALL)
+- notes: Q+J modifier produces THROUGH_BALL_BIT (bit 5) that plays the ball into space 7 units ahead of the best forward teammate (highest y). Directional input (moveX/moveY) overrides automatic targeting. Falls back to bodyHeading when no forward teammate exists. All constants provisional. 1722/1722 node tests, 86/86 browser tests. 21 through-ball tests. HEADLESS audit PASS. No PES claim.
