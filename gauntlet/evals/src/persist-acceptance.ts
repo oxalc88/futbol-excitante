@@ -4,6 +4,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { buildEvidenceManifest, writeEvidenceManifest } from "./evidence-manifest.js";
+import { assertScreenshotSanity } from "./screenshot-sanity.js";
 
 const execFileAsync = promisify(execFile);
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -58,6 +59,10 @@ const manifest = await buildEvidenceManifest(repoRoot, version.version, accepted
   integration: input.integration,
   metrics: Array.isArray(input.metrics) ? input.metrics.map(String) : [],
 });
+
+for (const screenshot of manifest.evidence.screenshots) {
+  await assertScreenshotSanity(path.join(repoRoot, screenshot.path));
+}
 
 let manifestFile: string | null = null;
 try {
