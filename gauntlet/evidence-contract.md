@@ -24,6 +24,18 @@ Required evidence is an acceptance gate, not advisory guidance.
 
 Before the critic, run `pnpm run gauntlet:audit -- --objective <id> --class <class> ...`. The audit persists its latest structured result at `docs/evidence/<objective-id>/audit.json`. `FAIL` must be repaired by the owner reported by the audit. `REVIEW_REQUIRED` invokes the bounded cheap semantic audit. Only `PASS` proceeds to the critic.
 
+## Capture and evidence hygiene (0.9.2+)
+
+Normal node/browser regression suites may render and capture, but their filesystem output is ephemeral and belongs under ignored `test-results/gauntlet-capture/**`. They must not write to `docs/screenshots/**`.
+
+Durable screenshot capture is an explicit evidence operation through `WIP_SECTION=<objective-id> pnpm run capture-wip`. The command enters durable evidence mode mechanically; setting a section name during an ordinary test run is not sufficient to write durable evidence.
+
+Accepted evidence is immutable. Once `docs/evidence/<objective-id>/manifest.json` exists, later regression suites or capture commands may read that objective's evidence but must not overwrite it. Full-suite CI compares accepted manifest SHA-256 values and the pre/post worktree and fails hygiene if the suite mutates historical evidence or leaves new tracked/untracked durable artifacts.
+
+Before acceptance persistence, durable PNG screenshots pass a deterministic examinability check for valid dimensions and non-uniform luminance/color variation. White, black, fully transparent, or near-uniform frames fail. This is only a sanity gate; it does not decide whether the screenshot proves gameplay quality and never replaces the critic.
+
+Routine `gauntlet:eval`, model eval, and `gauntlet:eval:state` outputs are ephemeral by default under ignored `test-results/gauntlet-evals/**`. Durable acceptance records continue to be written explicitly by `gauntlet:acceptance:persist` under `gauntlet/evals/results/**`; ordinary state-audit runs must not accumulate timestamped durable files.
+
 ## Durable acceptance evidence (0.8+)
 
 Every newly accepted objective must produce `docs/evidence/<objective-id>/manifest.json` during `gauntlet:acceptance:persist`.
