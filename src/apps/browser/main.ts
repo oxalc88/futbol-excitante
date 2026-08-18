@@ -188,6 +188,7 @@ const scoreboardScoreB = document.getElementById("scoreboard-score-b");
 const scoreboardNameA = document.getElementById("scoreboard-name-a");
 const scoreboardNameB = document.getElementById("scoreboard-name-b");
 const scoreboardEl = document.getElementById("scoreboard");
+const scoreboardHalf = document.getElementById("scoreboard-half");
 const hudEl = document.getElementById("hud");
 const controlsHintEl = document.getElementById("controls-hint");
 const gameContainerEl = document.getElementById("game-container");
@@ -585,6 +586,15 @@ function startMatch(
           else if (goalIndex === 1) scoreB++;
           const teamLabel = goalIndex === 0 ? teamALabel : teamBLabel;
           showGoalOverlay(teamLabel);
+
+          // Score bump animation on the scoring team's number
+          const scoreEl = goalIndex === 0 ? scoreboardScoreA : scoreboardScoreB;
+          if (scoreEl) {
+            scoreEl.classList.remove("bump");
+            void scoreEl.offsetHeight;
+            scoreEl.classList.add("bump");
+            setTimeout(() => { scoreEl.classList.remove("bump"); }, 400);
+          }
         }
       }
 
@@ -620,6 +630,9 @@ function startMatch(
       const seconds = totalSeconds % 60;
       scoreboardClock.textContent =
         `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+    if (scoreboardHalf) {
+      scoreboardHalf.textContent = sim.tick < HALF_DURATION_TICKS ? "1ST" : "2ND";
     }
     if (scoreboardScoreA) scoreboardScoreA.textContent = String(scoreA);
     if (scoreboardScoreB) scoreboardScoreB.textContent = String(scoreB);
