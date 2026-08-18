@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.2",
+  "persisted_at": "2026-08-18T08:44:40.571Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "MATCH-CORNER-KICK",
+  "candidate_commit": "43f8726",
+  "evidence_class": "HEADLESS",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS",
+    "checks": [
+      {
+        "name": "tests result",
+        "status": "PASS",
+        "owner": "builder"
+      },
+      {
+        "name": "required screenshot exists",
+        "status": "NOT_APPLICABLE",
+        "owner": "builder"
+      },
+      {
+        "name": "semantic visual sequence",
+        "status": "NOT_APPLICABLE",
+        "owner": "builder"
+      },
+      {
+        "name": "required trajectory exists",
+        "status": "NOT_APPLICABLE",
+        "owner": "builder"
+      },
+      {
+        "name": "integration test result",
+        "status": "PASS",
+        "owner": "builder"
+      },
+      {
+        "name": "slot/player wiring invariants",
+        "status": "NOT_APPLICABLE",
+        "owner": "builder"
+      },
+      {
+        "name": "screenshot SHA uniqueness",
+        "status": "NOT_APPLICABLE",
+        "owner": "builder"
+      },
+      {
+        "name": "CURRENT accepted list contains latest accepted",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "HORIZON current_index matches first pending",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "latest accepted horizon entry is not pending",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "CURRENT next objective matches HORIZON index",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "last_tracked_objective matches latest accepted",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "usage_aggregates_through matches latest accepted",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "model_evaluation_through matches latest accepted",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "TIMING latest per-step row exists",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "TIMING latest builder grade exists",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "TIMING latest reviewer route exists",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "TIMING clock measurement date matches measured_at",
+        "status": "PASS",
+        "owner": "orchestrator"
+      },
+      {
+        "name": "acceptance result freshness",
+        "status": "PASS",
+        "owner": "orchestrator"
+      }
+    ],
+    "all_pass": true
+  },
+  "semantic_audit": null,
+  "critic": {
+    "agent": "critic-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "retries": 0
+  },
+  "integration": {
+    "agent": "integration-reviewer-flash",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT"
+  },
+  "metrics": []
+}
