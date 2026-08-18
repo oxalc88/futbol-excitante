@@ -1,0 +1,15 @@
+{
+  "id": "STOP-HORIZON-EXHAUSTION",
+  "kind": "post_acceptance_continuation_gate",
+  "input": {
+    "acceptance_finalized": true,
+    "horizon_exhausted": true,
+    "replan_completed": false,
+    "next_objective": null,
+    "stop_reason": "horizon_exhausted",
+    "required_next_action": "strategic_reassessment"
+  },
+  "expect": {
+    "decision": "replan_and_continue"
+  }
+}

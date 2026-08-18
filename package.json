@@ -16,7 +16,7 @@
     "gauntlet:eval:model": "tsx gauntlet/evals/src/run-model.ts",
     "test": "vitest run --project node",
     "test-browser": "vitest run --project browser",
-    "capture-wip": "WIP_SECTION=${WIP_SECTION:-capture} WIP_FRAMES=${WIP_FRAMES:-1} vitest run tests/browser/capture-wip.browser.test.ts --project browser",
+    "capture-wip": "GAUNTLET_EVIDENCE_CAPTURE=1 WIP_SECTION=__EVIDENCE__:${WIP_SECTION:-capture} WIP_FRAMES=${WIP_FRAMES:-1} vitest run tests/browser/capture-wip.browser.test.ts --project browser",
     "test-all": "CI=1 pnpm install --frozen-lockfile && CI=1 pnpm run gauntlet:eval && CI=1 pnpm run typecheck && CI=1 pnpm run test && CI=1 pnpm run test-browser && CI=1 pnpm run sim-smoke && pnpm run build",
     "capture-ai-trajectory": "tsx scripts/capture-ai-match-trajectory.ts",
     "capture-ai-video": "node scripts/capture-ai-match-video.mjs",
@@ -24,7 +24,8 @@
     "gauntlet:acceptance:persist": "tsx gauntlet/evals/src/persist-acceptance.ts",
     "gauntlet:video:reference": "tsx gauntlet/evals/src/write-video-reference.ts",
     "gauntlet:milestone:bundle": "tsx gauntlet/evals/src/build-milestone-bundle.ts",
-    "gauntlet:milestone:evaluate": "tsx gauntlet/evals/src/evaluate-milestone-playtest.ts"
+    "gauntlet:milestone:evaluate": "tsx gauntlet/evals/src/evaluate-milestone-playtest.ts",
+    "gauntlet:candidate-scope": "node scripts/ci/verify-candidate-scope.mjs"
   },
   "dependencies": {
     "three": "^0.170.0"

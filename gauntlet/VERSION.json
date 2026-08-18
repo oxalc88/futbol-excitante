@@ -1,10 +1,10 @@
 {
-  "version": "0.9.1",
+  "version": "0.9.2",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.9.0",
+  "previous_system_version": "0.9.1",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
-  "baseline_commit": "729fbd316220ca84217da1604035064b11f6cf23",
+  "baseline_commit": "c719fb838b18baa9f672d5e5eb19338bea4e34ae",
   "includes": [
     "prompts",
     "agents",
@@ -24,6 +24,11 @@
     "timing-contract",
     "acceptance-pipeline",
     "state-audit",
-    "provider-failure-resilience"
+    "provider-failure-resilience",
+    "orchestration-continuity",
+    "evidence-immutability",
+    "worktree-hygiene",
+    "candidate-scope-isolation",
+    "ephemeral-eval-lifecycle"
   ]
 }

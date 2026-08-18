@@ -22,6 +22,8 @@ Gauntlet may explicitly ask for a **candidate snapshot commit** after critic + i
 
 - commit only the candidate implementation/tests and the exact evidence artifacts that produced the reviewed result;
 - do not include `gauntlet/state/**`, acceptance result files, or the objective `manifest.json`;
+- before committing, stage only the parent-declared expected candidate paths, then run `pnpm run gauntlet:candidate-scope -- --allow <file> ... --allow-prefix <dir> ...`; the gate must PASS and every staged path must be inside the explicit expected candidate scope;
+- never stage historical screenshots from another objective, old state-audit outputs, `docs/screenshots/capture/**`, incident docs, or residual artifacts merely to make the tree clean;
 - report the candidate commit SHA to the orchestrator;
 - do not call the objective fully accepted: this is a provenance snapshot, not final acceptance;
 - do not push the candidate snapshot by itself.
@@ -56,9 +58,10 @@ Good: three separate Bash calls (`status`, `add`, `commit`).
 2. `git -C <repo> diff` and `git -C <repo> diff --cached`
 3. `git -C <repo> log -8 --oneline` so the message matches this repo
 4. Split unrelated concerns into separate commits (feature / test / docs / chore).
-5. Stage only the files for one concern, then commit.
-6. Repeat until the assigned files are committed.
-7. Report each hash, subject, and leftover dirty files.
+5. Stage only the files for one concern. In candidate snapshot mode, run the candidate-scope gate against the explicit expected path list before commit.
+6. Commit.
+7. Repeat until the assigned files are committed.
+8. Report each hash, subject, and leftover dirty files.
 
 ## Commit format
 

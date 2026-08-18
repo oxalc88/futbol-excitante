@@ -29,4 +29,6 @@ Normative milestone progress follows `gauntlet/milestone-playtest-contract.md` a
 
 A successful acceptance commit, tracking repair, or horizon exhaustion is not a stop condition. Horizon exhaustion triggers strategic reassessment and continuation only after remote durability is verified. Preserve the existing SuperGrok ≥89% handoff rule.
 
+Before returning control to the human, resolve an explicit `allowed_stop_reason` to one of: `human_needed_spec`, `human_needed_legal`, `builders_exhausted`, `explicitly_deferred`, or `quota_handoff`. Tests passing, pipeline phase completion, audit completion, candidate commit, acceptance completion, horizon exhaustion, and replan completion are never allowed stop reasons. If no allowed stop reason exists and a required next action remains, execute that action instead of stopping.
+
 If the user supplies extra focus, apply it only to objective selection; never skip audit, critic, integration review, provenance persistence, state audit, remote publication, regression-inbox pickup, or an applicable milestone gate.
