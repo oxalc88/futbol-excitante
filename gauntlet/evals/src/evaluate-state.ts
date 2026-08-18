@@ -16,6 +16,8 @@ import type {
   AcceptanceClaimGateScenario,
   PostAcceptanceContinuationGateScenario,
   RemoteDurabilityGateScenario,
+  AcceptanceStateDurabilityGateScenario,
+  CleanupClassificationGateScenario,
   MilestonePlaytestGateScenario,
   ManifestGateScenario,
   DynamicSequenceGateScenario,
@@ -121,6 +123,22 @@ function evaluateRemoteDurability(s: RemoteDurabilityGateScenario): EvaluationRe
   return { scenario_id: s.id, decision: "replan_and_continue" };
 }
 
+function evaluateAcceptanceStateDurability(s: AcceptanceStateDurabilityGateScenario): EvaluationResult {
+  if (!s.input.acceptance_finalized) return { scenario_id: s.id, decision: "finish_acceptance" };
+  if (!s.input.changed_bookkeeping_committed || !s.input.committed_state_valid) return { scenario_id: s.id, decision: "repair_acceptance_bookkeeping", failure_class: "missing_acceptance_bookkeeping" };
+  if (!s.input.remote_contains_acceptance) return { scenario_id: s.id, decision: "publish_before_continue", failure_class: "remote_durability_missing" };
+  if (!s.input.remote_state_valid) return { scenario_id: s.id, decision: "repair_remote_bookkeeping", failure_class: "remote_state_stale" };
+  if (s.input.next_objective) return { scenario_id: s.id, decision: "continue", next_objective: s.input.next_objective };
+  return { scenario_id: s.id, decision: "replan_and_continue" };
+}
+
+function evaluateCleanupClassification(s: CleanupClassificationGateScenario): EvaluationResult {
+  if (s.input.path_class === "canonical_state" && s.input.newer_than_remote) return { scenario_id: s.id, decision: "preserve_for_bookkeeping_repair" };
+  if (s.input.path_class === "accepted_evidence") return { scenario_id: s.id, decision: "restore_historical_evidence" };
+  if (s.input.path_class === "ephemeral_artifact") return { scenario_id: s.id, decision: "discard_ephemeral_artifact" };
+  return { scenario_id: s.id, decision: "preserve" };
+}
+
 export function evaluateMilestonePlaytest(s: MilestonePlaytestGateScenario): EvaluationResult {
   const missingSituation = s.input.required_situations.find((id) => !(id in s.input.situation_outcomes));
   if (!s.input.entry_prerequisites_pass || !s.input.exit_prerequisites_pass || missingSituation) return { scenario_id: s.id, decision: "milestone_not_evaluated", milestone_verdict: "NOT_EVALUATED", failure_class: "milestone_playtest_incomplete" };
@@ -184,6 +202,8 @@ export function evaluateScenario(s: GauntletScenario): EvaluationResult {
     case "acceptance_claim_gate": return evaluateAcceptanceClaim(s);
     case "post_acceptance_continuation_gate": return evaluatePostAcceptanceContinuation(s);
     case "remote_durability_gate": return evaluateRemoteDurability(s);
+    case "acceptance_state_durability_gate": return evaluateAcceptanceStateDurability(s);
+    case "cleanup_classification_gate": return evaluateCleanupClassification(s);
     case "milestone_playtest_gate": return evaluateMilestonePlaytest(s);
     case "manifest_gate": return evaluateManifest(s);
     case "dynamic_sequence_gate": return evaluateDynamicSequence(s);
