@@ -1,0 +1,11 @@
+{
+  "analysis_cutoff": "2026-08-18T04:52:46.000Z",
+  "analysis_start": "2026-08-14T01:19:17.000Z",
+  "context_breakdown_rows": 19038,
+  "errors_observed": 1013,
+  "generated_at": "2026-08-18T05:24:39.229Z",
+  "model_requests_analyzed": 15731,
+  "objectives_attributed": 78,
+  "sessions_analyzed": 552,
+  "source_session_ids_sha256": "0c63e8900403b3b69d357e1878f13fa87e4d4a4014e517c497169c1bf0ceb354"
+}

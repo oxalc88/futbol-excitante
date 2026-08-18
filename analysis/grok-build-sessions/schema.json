@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PES Simulator Grok Build forensic datasets",
+  "dataset_version": "1.0.0",
+  "null_policy": "Absent or unreconstructable values are null in JSONL and empty in CSV; no values are invented.",
+  "files": {
+    "requests.csv": "One flattened row per model-visible generation loop.",
+    "requests.jsonl": "Canonical request rows with native null, boolean, array and number types.",
+    "sessions.csv": "One row per parent/child session and role.",
+    "objectives.csv": "One row per attributed Gauntlet objective.",
+    "context-breakdown.csv": "One row per request/category for reconstructable parent contexts.",
+    "errors.csv": "One row per provider/retry/subagent/tool failure observation."
+  },
+  "$defs": {
+    "request": {
+      "type": "object",
+      "required": ["request_key", "timestamp_start", "session_id", "request_sequence", "agent", "role", "model"],
+      "properties": {
+        "request_key": {"type": "string", "description": "Stable session_id:zero-padded-sequence key."},
+        "timestamp_start": {"type": "string", "format": "date-time"},
+        "timestamp_first_token": {"type": ["string", "null"], "format": "date-time"},
+        "timestamp_end": {"type": ["string", "null"], "format": "date-time"},
+        "duration_ms": {"type": ["integer", "null"], "minimum": 0},
+        "session_id": {"type": "string"},
+        "parent_session_id": {"type": ["string", "null"]},
+        "request_id": {"type": ["string", "null"], "description": "Grok promptId where persisted."},
+        "provider_request_id": {"type": ["string", "null"], "description": "Null: not persisted by Grok Build."},
+        "request_sequence": {"type": "integer", "minimum": 0},
+        "turn_sequence": {"type": ["integer", "null"], "minimum": 0},
+        "loop_index": {"type": ["integer", "null"]},
+        "agent": {"type": "string"},
+        "role": {"enum": ["parent/orchestrator", "builder", "critic", "integration reviewer", "auxiliary", "bookkeeping/committer"]},
+        "model": {"type": "string", "description": "Exact persisted route ID."},
+        "provider": {"type": ["string", "null"]},
+        "api_backend": {"type": ["string", "null"]},
+        "gauntlet_objective_id": {"type": ["string", "null"]},
+        "objective_attribution_confidence": {"enum": ["high", "medium", "unknown"]},
+        "prompt_input_tokens": {"type": ["integer", "null"], "description": "First Grok totalTokens meter at generation start."},
+        "completion_output_tokens": {"type": ["integer", "null"], "description": "Estimated within-generation token-meter growth."},
+        "total_tokens": {"type": ["integer", "null"]},
+        "token_measurement": {"type": "string"},
+        "context_window_tokens_before": {"type": ["integer", "null"]},
+        "context_window_tokens_after": {"type": ["integer", "null"]},
+        "record_count": {"type": ["integer", "null"]},
+        "tool_calls_in_context": {"type": ["integer", "null"]},
+        "tool_calls_emitted": {"type": "integer"},
+        "tool_names_emitted": {"type": "array", "items": {"type": "string"}},
+        "context_content_characters": {"type": ["integer", "null"]},
+        "context_content_bytes": {"type": ["integer", "null"]},
+        "context_serialized_characters": {"type": ["integer", "null"]},
+        "context_serialized_bytes": {"type": ["integer", "null"]},
+        "tool_argument_characters_in_context": {"type": ["integer", "null"]},
+        "reasoning_summary_characters_in_context": {"type": ["integer", "null"]},
+        "context_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "reasoning_effort": {"type": ["string", "null"]},
+        "cache_hit": {"type": ["boolean", "null"]},
+        "cached_read_tokens": {"type": ["integer", "null"], "description": "Null per request; only turn aggregates persist."},
+        "cache_creation_tokens": {"type": ["integer", "null"], "description": "Null per request; only turn aggregates persist."},
+        "compaction_happened": {"type": "boolean"},
+        "compaction_size_before_tokens": {"type": ["integer", "null"]},
+        "compaction_size_after_tokens": {"type": ["integer", "null"]},
+        "retry_number": {"type": "integer", "minimum": 0},
+        "http_provider_status": {"type": ["integer", "null"]},
+        "error_type": {"type": ["string", "null"]},
+        "success": {"type": ["boolean", "null"]},
+        "immediately_after_child_finished": {"type": "boolean"},
+        "activity_class": {"type": "string"},
+        "new_decision_high_confidence": {"type": ["boolean", "null"]},
+        "repeated_context_tokens_estimate": {"type": ["integer", "null"]},
+        "repeated_context_percentage_estimate": {"type": ["number", "null"]},
+        "context_reconstruction": {"enum": ["exact_current_chat_prefix", "unavailable_after_compaction", "unavailable/in_flight"]}
+      }
+    },
+    "session_columns": {
+      "description": "Identity/parent/agent/role/model/objective/time/status; request/token/tool/error/compaction/context aggregates; exact turn_usage_* including cache and modelCalls; sanitized source reference."
+    },
+    "objective_columns": {
+      "description": "Objective start/end/span; request and prompt totals by role; completion/total; HISTORY critic/integration retries, result and first-pass; failures, compactions, routes and attribution note."
+    },
+    "context_columns": {
+      "description": "Request identity plus category, content/structural characters, bytes, chars/4 token estimate, category share, adjacent size-bounded repetition and non-content-derived hash."
+    },
+    "error_columns": {
+      "description": "Sanitized error identity/time/session/request/role/model/objective/layer/status/type/message/retry/harness outcome/source reference."
+    }
+  }
+}
