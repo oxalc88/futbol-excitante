@@ -259,11 +259,23 @@ function buildPitch(config: RendererConfig, scene: THREE.Object3D): void {
   scene.add(spot);
 }
 
+// --- Kick animation duration (ticks) ---
+const KICK_ANIMATION_DURATION = 8;
+
+// --- Player animation state ---
+const playerLegAnimState = new Map<string, { leftZ: number; rightZ: number }>();
+
 /**
- * Create a primitive player — a box body with a direction indicator.
+ * Create a primitive player — a multi-part body with head, legs, and
+ * direction indicator.  Built from simple Three.js primitives (boxes,
+ * cylinders, sphere, cone).  No external animation assets needed.
  *
- * The player is oriented by bodyHeading.  The box faces +X by default;
- * the direction indicator is a small cone pointing forward.
+ * Parts (local coordinates, player faces +X):
+ *   body  — BoxGeometry torso at (0, 0.9, 0)
+ *   head  — SphereGeometry at (0, 1.6, 0)
+ *   leftLeg  — CylinderGeometry at (0, 0.35, -0.12)
+ *   rightLeg — CylinderGeometry at (0, 0.35,  0.12)
+ *   direction — ConeGeometry at (+X edge, +Y, 0) pointing forward
  */
 function createPrimitivePlayer(
   playerId: string,
@@ -273,13 +285,14 @@ function createPrimitivePlayer(
   const group = new THREE.Group();
   group.name = `player-${playerId}`;
 
-  // Body — a box
   const bodyColor =
     teamId === "team-a" ? config.playerColorA : config.playerColorB;
+
+  // Body — torso
   const bodyGeometry = new THREE.BoxGeometry(
     config.playerWidth,
-    config.playerHeight,
-    config.playerDepth,
+    config.playerHeight * 0.55,
+    config.playerDepth * 0.8,
   );
   const bodyMaterial = new THREE.MeshStandardMaterial({
     color: bodyColor,
@@ -287,23 +300,128 @@ function createPrimitivePlayer(
     metalness: 0.1,
   });
   const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-  body.position.y = config.playerHeight / 2;
+  body.position.y = config.playerHeight * 0.48;
   body.name = "body";
   group.add(body);
 
-  // Direction indicator — a small cone pointing forward (+X)
-  const coneGeometry = new THREE.ConeGeometry(0.1, 0.3, 8);
+  // Head — sphere
+  const headGeometry = new THREE.SphereGeometry(config.playerWidth * 0.38, 12, 8);
+  const headMaterial = new THREE.MeshStandardMaterial({
+    color: bodyColor,
+    roughness: 0.5,
+  });
+  const head = new THREE.Mesh(headGeometry, headMaterial);
+  head.position.y = config.playerHeight * 0.85;
+  head.name = "head";
+  group.add(head);
+
+  // Legs — cylinders
+  const legGeometry = new THREE.CylinderGeometry(0.06, 0.07, config.playerHeight * 0.36, 8);
+  const legMaterial = new THREE.MeshStandardMaterial({
+    color: bodyColor,
+    roughness: 0.6,
+  });
+
+  const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+  leftLeg.position.set(0, config.playerHeight * 0.18, -config.playerDepth * 0.2);
+  leftLeg.name = "left-leg";
+  group.add(leftLeg);
+
+  const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+  rightLeg.position.set(0, config.playerHeight * 0.18, config.playerDepth * 0.2);
+  rightLeg.name = "right-leg";
+  group.add(rightLeg);
+
+  // Direction indicator — cone pointing forward (+X)
+  const coneGeometry = new THREE.ConeGeometry(0.08, 0.25, 8);
   const coneMaterial = new THREE.MeshStandardMaterial({
     color: bodyColor,
     roughness: 0.5,
   });
   const cone = new THREE.Mesh(coneGeometry, coneMaterial);
   cone.rotation.z = -Math.PI / 2;
-  cone.position.set(config.playerWidth / 2 + 0.15, config.playerHeight * 0.7, 0);
+  cone.position.set(config.playerWidth / 2 + 0.12, config.playerHeight * 0.7, 0);
   cone.name = "direction";
   group.add(cone);
 
   return group;
+}
+
+/**
+ * Animate a player's limbs based on locomotion phase, speed, and
+ * contact state.  Mutates only the Three.js scene objects; never
+ * touches simulation state.
+ *
+ * Idle: legs straight down (neutral stance).
+ * Running / sprinting / turning: alternating leg swing with vertical bob.
+ * Kicking (contactState non-null): left leg extended forward.
+ * Braking: leaning slightly forward, short leg swing.
+ */
+function animatePlayer(
+  group: THREE.Group,
+  locomotionPhase: string,
+  speed: number,
+  contactState: string | null,
+  tick: number,
+  config: RendererConfig,
+): void {
+  const leftLeg = group.getObjectByName("left-leg") as THREE.Mesh | undefined;
+  const rightLeg = group.getObjectByName("right-leg") as THREE.Mesh | undefined;
+  const bodyMesh = group.getObjectByName("body") as THREE.Mesh | undefined;
+
+  if (!leftLeg || !rightLeg) return;
+
+  const id = group.name;
+  if (!playerLegAnimState.has(id)) {
+    playerLegAnimState.set(id, { leftZ: 0, rightZ: 0 });
+  }
+  const state = playerLegAnimState.get(id)!;
+
+  let leftTargetZ = 0;
+  let rightTargetZ = 0;
+  let bodyOffsetY = 0;
+
+  const isKicking = contactState != null && contactState.length > 0;
+
+  if (isKicking) {
+    // Kicking pose — left leg extended forward
+    leftTargetZ = -0.25;
+    rightTargetZ = 0.08;
+    bodyOffsetY = 0.02;
+  } else if (locomotionPhase === "idle" || speed < 0.3) {
+    // Idle — neutral standing stance
+    leftTargetZ = 0;
+    rightTargetZ = 0;
+    bodyOffsetY = 0;
+  } else if (locomotionPhase === "braking") {
+    // Braking — slight lean, small leg movement
+    const t = tick * 0.3;
+    leftTargetZ = Math.sin(t) * 0.06;
+    rightTargetZ = Math.sin(t + Math.PI) * 0.06;
+    bodyOffsetY = 0;
+  } else {
+    // Running / sprinting / turning — alternating leg swing
+    const frequency = locomotionPhase === "sprinting" ? 3.5 : 2.5;
+    const amplitude = locomotionPhase === "sprinting" ? 0.2 : 0.14;
+    const t = tick * frequency;
+    leftTargetZ = Math.sin(t) * amplitude;
+    rightTargetZ = Math.sin(t + Math.PI) * amplitude;
+    bodyOffsetY = Math.abs(Math.sin(t * 2)) * 0.02;
+  }
+
+  // Smooth interpolation toward targets
+  const lerpFactor = 0.35;
+  state.leftZ += (leftTargetZ - state.leftZ) * lerpFactor;
+  state.rightZ += (rightTargetZ - state.rightZ) * lerpFactor;
+
+  leftLeg.position.z = -config.playerDepth * 0.2 + state.leftZ;
+  rightLeg.position.z = config.playerDepth * 0.2 + state.rightZ;
+  leftLeg.position.y = config.playerHeight * 0.18 + Math.abs(state.leftZ) * 0.06;
+  rightLeg.position.y = config.playerHeight * 0.18 + Math.abs(state.rightZ) * 0.06;
+
+  if (bodyMesh) {
+    bodyMesh.position.y = config.playerHeight * 0.48 + bodyOffsetY;
+  }
 }
 
 /**
@@ -511,6 +629,16 @@ export function createPresentationSession(
       mesh.position.set(px, 0, pz);
       mesh.rotation.y = -pp.bodyHeading; // rotate to face heading direction
 
+      // Animate limbs based on locomotion phase, speed, and contact state.
+      animatePlayer(
+        mesh,
+        pp.locomotionPhase,
+        pp.speed,
+        pp.contactState,
+        snapshot.tick,
+        config,
+      );
+
       // Controlled-player marker — yellow ring above the human-controlled
       // player.  Only HUMAN-slot players have isControlled === true.
       if (pp.isControlled && markerMesh) {
@@ -524,6 +652,7 @@ export function createPresentationSession(
       if (!activePlayerIds.has(id)) {
         scene.remove(mesh);
         playerMeshes.delete(id);
+        playerLegAnimState.delete(`player-${id}`);
       }
     }
 
@@ -568,6 +697,7 @@ export function createPresentationSession(
 
       // Clear all mesh references.
       playerMeshes.clear();
+      playerLegAnimState.clear();
       markerMesh = null;
       ballMesh = null;
       ballShadowMesh = null;
