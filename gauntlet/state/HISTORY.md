@@ -2558,3 +2558,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 41e4c86 candidate(BROWSER-MATCH-SETUP-MENU)
 - notes: In-browser match setup menu overlay with mode selection (6 modes), team name inputs, start/restart buttons. Refactored main.ts into lifecycle-based architecture (startMatch/stopMatch/showSetupMenu). URL-parameter auto-start preserved. No simulation core changes. PRESENTATION audit PASS. No PES claim.
+
+## Iteration 67 — 2026-08-18
+
+- objective_id: BROWSER-MATCH-STATS
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: ae00e1f candidate(BROWSER-MATCH-STATS)
+- notes: Live match stats in browser HUD: possession %, shots, passes for each team. Derived from simulation event stream. Browser UI layer only (main.ts). No simulation core changes. PRESENTATION audit PASS. Horizon match-play-depth EXHAUSTED (5/5).

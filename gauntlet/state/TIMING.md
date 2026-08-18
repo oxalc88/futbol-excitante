@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-MATCH-SETUP-MENU
-usage_aggregates_through: BROWSER-MATCH-SETUP-MENU
-model_evaluation_through: BROWSER-MATCH-SETUP-MENU
+last_tracked_objective: BROWSER-MATCH-STATS
+usage_aggregates_through: BROWSER-MATCH-STATS
+model_evaluation_through: BROWSER-MATCH-STATS
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -133,6 +133,8 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | HUMAN-SHOT-DIRECTION-CONTROL | accepted | ~30m | 15m | 8m | 12m | 0.5m | ~6M est. | n/a** |
 | HUMAN-THROUGH-BALL | accepted | ~25m | 14m | 6m | 9m | 0.5m | ~6M est. | n/a** |
 | CPU-INTERCEPTION-AWARENESS | accepted | ~35m | 17m | 14m | 21m | 0.5m | ~6M est. | n/a** |
+| BROWSER-MATCH-SETUP-MENU | accepted | ~30m | 15m | 10m | 12m | 0.5m | ~6M est. | n/a** |
+| BROWSER-MATCH-STATS | accepted | ~25m | 12m | 8m | 10m | 0.5m | ~6M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -339,6 +341,8 @@ on an H task is the interesting result.
 | HUMAN-SHOT-DIRECTION-CONTROL | mimo-v2.5 | M | Medium — shot direction via moveX/moveY, bodyHeading fallback | 0 | A | 17 tests, 1722 node, first-pass clean |
 | HUMAN-THROUGH-BALL | mimo-v2.5 | M | Medium — Q+J through-ball, teammate targeting, auto fallback | 0 | A | 21 tests, 1722 node, first-pass clean |
 | CPU-INTERCEPTION-AWARENESS | mimo-v2.5 | M | Medium — pass-trajectory interception, defender coordination | 0 | A | 15 tests, 1722 node, first-pass clean |
+| BROWSER-MATCH-SETUP-MENU | mimo-v2.5 | M | Medium — setup menu, match lifecycle refactor | 0 | A | 86 browser, 1722 node, first-pass clean |
+| BROWSER-MATCH-STATS | mimo-v2.5 | L | Small — live stats display, event derivation | 0 | A | 86 browser, typecheck, first-pass clean |
 
 ### Reviewer route and catches
 
@@ -406,6 +410,10 @@ on an H task is the interesting result.
 | HUMAN-THROUGH-BALL | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 1722 node tests, 86 browser tests, dependency clean |
 | CPU-INTERCEPTION-AWARENESS | critic-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 7/7 criteria, first-pass clean |
 | CPU-INTERCEPTION-AWARENESS | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 287/287 CPU adapter, 130 unit, 239 integration tests, no core changes |
+| BROWSER-MATCH-SETUP-MENU | critic-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 8/8 criteria, screenshot present, first-pass clean |
+| BROWSER-MATCH-SETUP-MENU | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 86 browser tests, 1722 node tests, no core changes |
+| BROWSER-MATCH-STATS | critic-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 4/4 criteria, first-pass clean |
+| BROWSER-MATCH-STATS | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 86 browser tests, typecheck, no core changes |
 
 ### Builder scoreboard
 

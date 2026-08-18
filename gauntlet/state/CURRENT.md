@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-MATCH-STATS
+next_objective_id: ""
 
 best_known:
-  commit: 41e4c86
-  note: "Horizon match-play-depth: 4/5 accepted (shot direction, through ball, interception, setup menu). 1 remaining: BROWSER-MATCH-STATS."
+  commit: ae00e1f
+  note: "Horizon match-play-depth EXHAUSTED (5/5 accepted). Strategic reassessment needed for next horizon."
 
 active_candidate: null
 builder_in_use: null
@@ -75,14 +75,21 @@ accepted:
   - HUMAN-THROUGH-BALL
   - CPU-INTERCEPTION-AWARENESS
   - BROWSER-MATCH-SETUP-MENU
+  - BROWSER-MATCH-STATS
 
 blocked: []
 
-selection_note: "Horizon match-play-depth: 5 objectives toward deeper human controls (shot direction, through ball), CPU interception awareness, and browser match setup + live stats. 4/5 accepted. Next: BROWSER-MATCH-STATS."
+selection_note: "Horizon match-play-depth EXHAUSTED (5/5 accepted). Strategic reassessment needed for next horizon."
 ```
 ## Last accepted objective
 
-BROWSER-MATCH-SETUP-MENU — In-browser match setup menu overlay with mode selection (AI vs AI 5v5, Human vs CPU 5v3, AI vs AI 3v3, Human vs CPU 2v2, AI vs AI 2v2, AI vs AI 1v1), team name inputs, and START/BACK-TO-MENU buttons. Refactored main.ts into lifecycle-based architecture (startMatch/stopMatch/showSetupMenu). URL-parameter auto-start preserved as fallback. No simulation core changes. All constants provisional. 1722/1722 node tests, 86/86 browser tests. PRESENTATION audit PASS.
+BROWSER-MATCH-STATS — Live match stats display in browser HUD: possession percentage, shots, and passes completed for each team, derived from authoritative simulation events (goal/pass/possession telemetry). Pure derivation from the event stream — no simulation core changes. Browser UI layer change in main.ts only. All constants provisional. 86/86 browser tests, typecheck passes. PRESENTATION audit PASS.
+
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- Evidence: 86 browser tests (18 files), typecheck pass
+- Commit: ae00e1f
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)

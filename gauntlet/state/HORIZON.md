@@ -2,12 +2,12 @@
 
 ```yaml
 horizon_version: 12
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "match-play-depth"
 created_from_commit: 6153949
 created_at: 2026-08-18
-reason: "Horizon match-play-depth: 4/5 accepted (shot direction, through ball, interception, setup menu). 1 remaining: BROWSER-MATCH-STATS (live possession/shot/pass stats)."
-current_index: 4
+reason: "Horizon match-play-depth EXHAUSTED (5/5 accepted). Browser now shows human-vs-CPU 5v3 match with directional passing, shooting, through balls, CPU interception awareness, match setup menu, and live stats. Next horizon pending strategic reassessment."
+current_index: 5
 objectives:
   - id: HUMAN-SHOT-DIRECTION-CONTROL
     status: accepted
@@ -29,13 +29,8 @@ objectives:
     reason: "Add an in-browser match setup menu: select match mode (AI-vs-AI, Human-vs-CPU 5v3, etc.), select team/formation, and start/restart the match from the UI instead of URL parameters only. Browser UI layer change (index.html + main.ts + styles). Makes the browser match experience observable and self-contained."
     builder: builder-gameplay
     prerequisite: BROWSER-5V3-HUMAN-VS-CPU
-  - id: BROWSER-MATCH-SETUP-MENU
-    status: pending
-    reason: "Add an in-browser match setup menu: select match mode (AI-vs-AI, Human-vs-CPU 5v3, etc.), select team/formation, and start/restart the match from the UI instead of URL parameters only. Browser UI layer change (index.html + main.ts + styles). Makes the browser match experience observable and self-contained."
-    builder: builder-gameplay
-    prerequisite: BROWSER-5V3-HUMAN-VS-CPU
   - id: BROWSER-MATCH-STATS
-    status: pending
+    status: accepted
     reason: "Show live match stats in the browser HUD: possession percentage, shots, and passes completed for each team, derived from authoritative simulation events (goal/pass/possession telemetry). Pure derivation from the event stream — no simulation core changes. Browser UI layer."
     builder: builder-gameplay
     prerequisite: BROWSER-SCOREBOARD
