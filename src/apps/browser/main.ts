@@ -100,6 +100,83 @@ const startButton = document.getElementById("start-button");
 const backToMenuButton = document.getElementById("back-to-menu");
 
 // ---------------------------------------------------------------------------
+// Match stats accumulator
+// ---------------------------------------------------------------------------
+
+interface MatchStats {
+  /** Possession ticks per team (indexed by teamId). */
+  possessionTicks: Record<string, number>;
+  /** Completed passes per team. */
+  passes: Record<string, number>;
+  /** Shots per team. */
+  shots: Record<string, number>;
+  /** Goals per team. */
+  goals: Record<string, number>;
+  /** Last team that touched the ball (for possession tracking). */
+  lastPossessionTeamId: string | null;
+  /** Total ticks with a known possession holder (for % calculation). */
+  totalPossessionTicks: number;
+}
+
+function createEmptyStats(): MatchStats {
+  return {
+    possessionTicks: {},
+    passes: {},
+    shots: {},
+    goals: {},
+    lastPossessionTeamId: null,
+    totalPossessionTicks: 0,
+  };
+}
+
+/** Event kinds that indicate ball possession by a team. */
+const POSSESSION_EVENTS = new Set([
+  "player-ball-contact",
+  "pass",
+  "lofted-pass",
+  "through-ball",
+  "shot",
+]);
+
+/** Event kinds that count as passes completed. */
+const PASS_EVENTS = new Set(["pass", "lofted-pass", "through-ball"]);
+
+function processStatsEvent(stats: MatchStats, evt: import("../../contracts/scenario.js").SimulationEvent): void {
+  const payload = evt.payload as Record<string, unknown>;
+  const teamId = payload.teamId as string | undefined;
+
+  // Track possession from ball-touching events.
+  if (POSSESSION_EVENTS.has(evt.kind) && teamId) {
+    stats.lastPossessionTeamId = teamId;
+  }
+
+  // Count passes.
+  if (PASS_EVENTS.has(evt.kind) && teamId) {
+    stats.passes[teamId] = (stats.passes[teamId] ?? 0) + 1;
+  }
+
+  // Count shots.
+  if (evt.kind === "shot" && teamId) {
+    stats.shots[teamId] = (stats.shots[teamId] ?? 0) + 1;
+  }
+
+  // Count goals — goalIndex 0 = team-a, 1 = team-b.
+  if (evt.kind === "goal") {
+    const goalIndex = (payload.goalIndex as number) ?? -1;
+    const goalTeam = goalIndex === 0 ? "team-a" : "team-b";
+    stats.goals[goalTeam] = (stats.goals[goalTeam] ?? 0) + 1;
+  }
+}
+
+function tickPossession(stats: MatchStats): void {
+  if (stats.lastPossessionTeamId) {
+    const tid = stats.lastPossessionTeamId;
+    stats.possessionTicks[tid] = (stats.possessionTicks[tid] ?? 0) + 1;
+    stats.totalPossessionTicks++;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // DOM elements — HUD / scoreboard (always exist in HTML)
 // ---------------------------------------------------------------------------
 
@@ -114,6 +191,66 @@ const scoreboardEl = document.getElementById("scoreboard");
 const hudEl = document.getElementById("hud");
 const controlsHintEl = document.getElementById("controls-hint");
 const gameContainerEl = document.getElementById("game-container");
+
+// ---------------------------------------------------------------------------
+// Match stats display (created once, reused across matches)
+// ---------------------------------------------------------------------------
+
+const statsPanel = document.createElement("div");
+statsPanel.id = "match-stats-panel";
+Object.assign(statsPanel.style, {
+  position: "fixed",
+  bottom: "14px",
+  left: "14px",
+  background: "rgba(0, 0, 0, 0.75)",
+  borderRadius: "8px",
+  padding: "12px 16px",
+  fontFamily: '"Courier New", Courier, monospace',
+  fontSize: "12px",
+  color: "#ffffff",
+  zIndex: "100",
+  pointerEvents: "none",
+  userSelect: "none",
+  lineHeight: "1.6",
+  minWidth: "200px",
+});
+statsPanel.innerHTML = `
+  <div style="font-size:11px;letter-spacing:1.5px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:4px;">Match Stats</div>
+  <table style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr style="color:rgba(255,255,255,0.5);font-size:10px;letter-spacing:1px;">
+        <th style="text-align:left;padding:2px 8px 2px 0;"></th>
+        <th style="text-align:center;padding:2px 4px;">HOME</th>
+        <th style="text-align:center;padding:2px 4px;">AWAY</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:2px 8px 2px 0;color:rgba(255,255,255,0.6);">Possession</td>
+        <td id="stats-poss-a" style="text-align:center;padding:2px 4px;color:#4fc3f7;">0%</td>
+        <td id="stats-poss-b" style="text-align:center;padding:2px 4px;color:#ef5350;">0%</td>
+      </tr>
+      <tr>
+        <td style="padding:2px 8px 2px 0;color:rgba(255,255,255,0.6);">Shots</td>
+        <td id="stats-shots-a" style="text-align:center;padding:2px 4px;color:#4fc3f7;">0</td>
+        <td id="stats-shots-b" style="text-align:center;padding:2px 4px;color:#ef5350;">0</td>
+      </tr>
+      <tr>
+        <td style="padding:2px 8px 2px 0;color:rgba(255,255,255,0.6);">Passes</td>
+        <td id="stats-passes-a" style="text-align:center;padding:2px 4px;color:#4fc3f7;">0</td>
+        <td id="stats-passes-b" style="text-align:center;padding:2px 4px;color:#ef5350;">0</td>
+      </tr>
+    </tbody>
+  </table>
+`;
+document.body.appendChild(statsPanel);
+
+const statsPossA = document.getElementById("stats-poss-a");
+const statsPossB = document.getElementById("stats-poss-b");
+const statsShotsA = document.getElementById("stats-shots-a");
+const statsShotsB = document.getElementById("stats-shots-b");
+const statsPassesA = document.getElementById("stats-passes-a");
+const statsPassesB = document.getElementById("stats-passes-b");
 
 // ---------------------------------------------------------------------------
 // Match phase overlay (created once, reused across matches)
@@ -215,6 +352,7 @@ function showSetupMenu(): void {
   if (hudEl) hudEl.classList.add("hidden");
   if (controlsHintEl) controlsHintEl.classList.add("hidden");
   if (backToMenuButton) backToMenuButton.classList.add("hidden");
+  statsPanel.style.display = "none";
 }
 
 function hideSetupMenu(): void {
@@ -224,6 +362,7 @@ function hideSetupMenu(): void {
   if (hudEl) hudEl.classList.remove("hidden");
   if (controlsHintEl) controlsHintEl.classList.remove("hidden");
   if (backToMenuButton) backToMenuButton.classList.remove("hidden");
+  statsPanel.style.display = "";
 }
 
 // ---------------------------------------------------------------------------
@@ -382,6 +521,7 @@ function startMatch(
   let scoreB = 0;
   let overlayShownForPhase = false;
   matchRunning = true;
+  const matchStats = createEmptyStats();
 
   function gameLoop(now: number): void {
     if (!matchRunning) return;
@@ -434,8 +574,11 @@ function startMatch(
       accumulator -= FIXED_DT;
       stepsThisFrame++;
 
-      // Process goal events
+      // Process events
       for (const evt of stepResult.events) {
+        // Stats accumulation (pure derivation from event stream)
+        processStatsEvent(matchStats, evt);
+
         if (evt.kind === "goal") {
           const goalIndex = (evt.payload.goalIndex as number) ?? -1;
           if (goalIndex === 0) scoreA++;
@@ -444,6 +587,9 @@ function startMatch(
           showGoalOverlay(teamLabel);
         }
       }
+
+      // Possession tick — each step counts as one tick for the last-touching team.
+      tickPossession(matchStats);
 
       // Match-phase transitions
       {
@@ -477,6 +623,19 @@ function startMatch(
     }
     if (scoreboardScoreA) scoreboardScoreA.textContent = String(scoreA);
     if (scoreboardScoreB) scoreboardScoreB.textContent = String(scoreB);
+
+    // Match stats display
+    {
+      const totalP = matchStats.totalPossessionTicks || 1;
+      const pctA = Math.round(((matchStats.possessionTicks["team-a"] ?? 0) / totalP) * 100);
+      const pctB = 100 - pctA;
+      if (statsPossA) statsPossA.textContent = `${pctA}%`;
+      if (statsPossB) statsPossB.textContent = `${pctB}%`;
+      if (statsShotsA) statsShotsA.textContent = String(matchStats.shots["team-a"] ?? 0);
+      if (statsShotsB) statsShotsB.textContent = String(matchStats.shots["team-b"] ?? 0);
+      if (statsPassesA) statsPassesA.textContent = String(matchStats.passes["team-a"] ?? 0);
+      if (statsPassesB) statsPassesB.textContent = String(matchStats.passes["team-b"] ?? 0);
+    }
 
     activeFrameId = requestAnimationFrame(gameLoop);
   }
