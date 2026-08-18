@@ -10,7 +10,8 @@
  * 4. Capture the canvas via WebGL readPixels (through test-bridge)
  * 5. Write the PNG to disk
  *
- * Usage: WIP_SECTION=SCENARIO-2V2-FIXTURE npx vitest run tests/browser/capture-wip.node.test.ts --project node
+ * Normal test runs write only to test-results/gauntlet-capture. Durable evidence
+ * requires GAUNTLET_EVIDENCE_CAPTURE=1 and refuses to overwrite accepted evidence.
  */
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
@@ -55,7 +56,6 @@ function startVite(): Promise<void> {
     vite.stderr?.on("data", handler);
     vite.on("error", (e) => { viteStarted = false; reject(e); });
 
-    // Timeout after 60s.
     setTimeout(() => {
       if (!ready) {
         vite?.kill("SIGTERM");
@@ -87,9 +87,16 @@ describe("WIP capture: node mode", () => {
     "captures 2v2 scenario screenshot and writes to disk",
     async () => {
     const section = process.env.WIP_SECTION || "capture";
-    const outDir = join("docs", "screenshots", section);
+    const durableEvidence = process.env.GAUNTLET_EVIDENCE_CAPTURE === "1";
+    const outDir = durableEvidence
+      ? join("docs", "screenshots", section)
+      : join("test-results", "gauntlet-capture", section);
 
-    console.log(`[node] port=${port} section=${section}`);
+    if (durableEvidence && existsSync(join("docs", "evidence", section, "manifest.json"))) {
+      throw new Error(`Accepted evidence is immutable: ${section} already has a manifest`);
+    }
+
+    console.log(`[node] port=${port} section=${section} durable=${durableEvidence}`);
 
     if (!existsSync(outDir)) {
       mkdirSync(outDir, { recursive: true });
@@ -97,28 +104,23 @@ describe("WIP capture: node mode", () => {
 
     const page = await browser!.newPage();
 
-    // Navigate to the app's dev server.
     await page.goto(`http://localhost:${port}/`);
     await page.waitForTimeout(3000);
 
-    // Try to capture via test-bridge (injected by test-bridge into window).
     try {
       const dataUrl = await page.evaluate(async () => {
-        // The test-bridge is available after the app loads.
-        // It exposes capture() on the instance.
         const bridge = (globalThis as any).__testBridge || (window as any).__testBridge;
         if (bridge && bridge.capture) {
           if (bridge.step) bridge.step(30);
           bridge.renderFrame();
           const cap = await bridge.capture();
-          return cap.screenshot; // base64 PNG data URL
+          return cap.screenshot;
         }
         return null;
       });
 
       if (dataUrl && dataUrl.startsWith("data:image/png;base64,")) {
         const base64 = dataUrl.split(",")[1]!;
-        // Decode using atob (browser global).
         const binary = atob(base64);
         const bytes = new Uint8Array(binary.length);
         for (let i = 0; i < binary.length; i++) {
@@ -134,7 +136,6 @@ describe("WIP capture: node mode", () => {
       // test-bridge not available.
     }
 
-    // Fallback: Playwright page screenshot.
     console.log("[node] fallback: Playwright screenshot.");
     await page.waitForTimeout(2000);
     const screenshot = await page.screenshot({ type: "png", fullPage: false });
