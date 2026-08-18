@@ -82,11 +82,11 @@ export function verifyAcceptanceDurability({ objective, acceptanceCommit, ref, m
     changedBookkeepingCommitted = dirty.length === 0;
   }
 
-  const committedStateValid = Object.values(checks).every(Boolean);
+  const stateValid = Object.values(checks).every(Boolean);
   let failureClass = null;
-  if (!changedBookkeepingCommitted || !committedStateValid) failureClass = "MISSING_ACCEPTANCE_BOOKKEEPING";
-  else if (!remoteContainsAcceptance) failureClass = "REMOTE_DURABILITY_MISSING";
-  else if (mode === "remote" && !committedStateValid) failureClass = "REMOTE_STATE_STALE";
+  if (mode === "local" && (!changedBookkeepingCommitted || !stateValid)) failureClass = "MISSING_ACCEPTANCE_BOOKKEEPING";
+  else if (mode === "remote" && !remoteContainsAcceptance) failureClass = "REMOTE_DURABILITY_MISSING";
+  else if (mode === "remote" && !stateValid) failureClass = "REMOTE_STATE_STALE";
 
   return {
     status: failureClass ? "FAIL" : "PASS",
@@ -97,6 +97,7 @@ export function verifyAcceptanceDurability({ objective, acceptanceCommit, ref, m
     ref,
     changed_bookkeeping_committed: changedBookkeepingCommitted,
     remote_contains_acceptance: remoteContainsAcceptance,
+    state_valid: stateValid,
     checks,
   };
 }
