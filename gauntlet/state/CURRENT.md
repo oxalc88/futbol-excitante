@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: null
+next_objective_id: HUMAN-SHOT-DIRECTION-CONTROL
 
 best_known:
   commit: bb77b3b
-  note: "HUMAN-PASS-DIRECTION-CONTROL accepted. Horizon human-vs-cpu 5/5 EXHAUSTED. Strategic reassessment needed for next horizon."
+  note: "Horizon human-vs-cpu 5/5 EXHAUSTED. New horizon match-play-depth active. Next: HUMAN-SHOT-DIRECTION-CONTROL."
 
 active_candidate: null
 builder_in_use: null
@@ -74,7 +74,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon human-vs-cpu 5/5 EXHAUSTED. All 5 objectives accepted. Strategic reassessment required for next horizon."
+selection_note: "Horizon match-play-depth: 5 objectives toward deeper human controls (shot direction, through ball), CPU interception awareness, and browser match setup + live stats. 0/5 accepted. Next: HUMAN-SHOT-DIRECTION-CONTROL."
 ```
 ## Last accepted objective
 
