@@ -2508,3 +2508,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 7f26779 candidate(CPU-ATTACKING-IMPROVEMENT)
 - notes: Role-aware off-ball forward runs for CPU attackers and midfielders. Attackers push to 15m from opponent goal, midfielders to 25m, defenders hold position. Attack phase amplifies forward push (1.2× attackers, 1.15× midfielders). Midfielders cycle forward/back during sustained possession >60 ticks. All constants provisional. 1668/1668 node tests. HEADLESS audit PASS. No simulation core changes. No PES claim.
+
+## Iteration 62 — 2026-08-17
+
+- objective_id: HUMAN-PASS-DIRECTION-CONTROL
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: bb77b3b candidate(HUMAN-PASS-DIRECTION-CONTROL)
+- notes: Pass direction uses non-zero moveX/moveY from input with bodyHeading fallback. E+PASS modifier produces LOFTED_PASS_BIT for higher-trajectory chip pass. Contact system updated with directional pass velocity and lofted pass velocity with vertical component. All constants provisional. 1698/1698 node tests, 86/86 browser tests. HEADLESS audit PASS. No PES claim.

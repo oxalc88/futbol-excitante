@@ -2,12 +2,12 @@
 
 ```yaml
 horizon_version: 7
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "human-vs-cpu"
 created_from_commit: fbb68f8
 created_at: 2026-08-17
 reason: "Horizon five-vs-five exhausted (6/6 accepted). 5v5 AI match and browser play established. Next horizon focuses on human-vs-CPU quality: player switching, 5v5 human-vs-CPU with mixed control, improved CPU teammate behavior, and basic visual indicators so the human can identify their controlled player."
-current_index: 4
+current_index: 5
 objectives:
   - id: BROWSER-PLAYER-SWITCH
     status: accepted
@@ -34,10 +34,11 @@ objectives:
     prerequisite: CPU-TEAM-DECISION-PROFILE
     commit: 7f26779
   - id: HUMAN-PASS-DIRECTION-CONTROL
-    status: pending
+    status: accepted
     reason: "Allow the human to influence pass direction beyond body heading. When pressing PASS_BIT, the pass direction could be influenced by the current movement direction (moveX/moveY) rather than only bodyHeading. This makes human passing feel more responsive. Add a modifier: SHIFT+PASS for a lofted pass. This is a contact/wiring change."
     builder: builder-gameplay
     prerequisite: BROWSER-PLAYER-SWITCH
+    commit: bb77b3b
 replan_if:
   - objective_blocked
   - architectural_invalidation

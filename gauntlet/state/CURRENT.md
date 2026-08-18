@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: HUMAN-PASS-DIRECTION-CONTROL
+next_objective_id: null
 
 best_known:
-  commit: 7f26779
-  note: "CPU-ATTACKING-IMPROVEMENT accepted. Horizon human-vs-cpu 4/5. Next: HUMAN-PASS-DIRECTION-CONTROL."
+  commit: bb77b3b
+  note: "HUMAN-PASS-DIRECTION-CONTROL accepted. Horizon human-vs-cpu 5/5 EXHAUSTED. Strategic reassessment needed for next horizon."
 
 active_candidate: null
 builder_in_use: null
@@ -70,17 +70,18 @@ accepted:
   - BROWSER-CONTROLLED-PLAYER-INDICATOR
   - BROWSER-5V3-HUMAN-VS-CPU
   - CPU-ATTACKING-IMPROVEMENT
+  - HUMAN-PASS-DIRECTION-CONTROL
 
 blocked: []
 
-selection_note: "Horizon human-vs-cpu: 5 objectives toward playable human-vs-CPU with player switching, visual indicator, 5v3 mode, improved CPU attack, and directional passing. 4/5 accepted. Next: HUMAN-PASS-DIRECTION-CONTROL."
+selection_note: "Horizon human-vs-cpu 5/5 EXHAUSTED. All 5 objectives accepted. Strategic reassessment required for next horizon."
 ```
 ## Last accepted objective
 
-CPU-ATTACKING-IMPROVEMENT — Role-aware off-ball forward movement for CPU attackers and midfielders. When a CPU teammate has possession, non-possessing attackers push to 15m from opponent goal, midfielders to 25m, defenders hold position. Attack phase (ATTACK strategy) amplifies forward push (1.2× attackers, 1.15× midfielders). Midfielders cycle forward/back during sustained possession >60 ticks. All constants are provisional. No simulation core changes. 1668/1668 node tests. HEADLESS audit PASS.
+HUMAN-PASS-DIRECTION-CONTROL — Pass direction uses non-zero moveX/moveY from input when the human presses PASS_BIT, falling back to bodyHeading when no movement. Add E+PASS modifier (LOFTED_PASS_BIT) for higher-trajectory chip pass through ball. Contact system updated with directional pass velocity and lofted pass velocity with vertical component. All constants provisional. No PES claims. 1698/1698 node tests, 86/86 browser tests. HEADLESS audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 1668 node tests (92 files)
-- Commit: 7f26779
+- Evidence: 1698 node tests (93 files), 86 browser tests (18 files)
+- Commit: bb77b3b
