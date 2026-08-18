@@ -34,7 +34,10 @@ export async function writeEvalResult(
   const stamp = safeTimestamp(now);
   const runId = `${stamp}-${input.evaluator}`;
   const day = now.toISOString().slice(0, 10);
-  const dir = path.join(repoRoot, "gauntlet/evals/results", day);
+  const durable = process.env.GAUNTLET_EVAL_DURABLE === "1";
+  const dir = durable
+    ? path.join(repoRoot, "gauntlet/evals/results", day)
+    : path.join(repoRoot, "test-results/gauntlet-evals", day);
   await mkdir(dir, { recursive: true });
   const file = path.join(dir, `${runId}.json`);
   const record: EvalResultRecord = {
