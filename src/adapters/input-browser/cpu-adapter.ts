@@ -62,6 +62,28 @@ export interface CpuTeammate {
   groundPosition: { x: number; y: number };
 }
 
+/**
+ * Summary of a pass event relevant to CPU interception awareness.
+ *
+ * Extracted from SimulationEvent pass / lofted-pass / through-ball
+ * events.  Contains only the fields the CPU adapter needs to compute
+ * interception positioning.
+ *
+ * Provisional — not a measured PES 2017 concept.
+ */
+export interface PassEventInfo {
+  /** Tick at which the pass was executed. */
+  tick: number;
+  /** Player ID of the passer (the player who touched the ball). */
+  passerPlayerId: string;
+  /** Team ID of the passer. */
+  passerTeamId: string;
+  /** Planar position of the passer at the moment of the pass. */
+  passerPosition: { x: number; y: number };
+  /** Planar velocity vector of the ball after the pass. */
+  ballVelocity: { x: number; y: number };
+}
+
 export interface CpuObservation {
   /** All players on the pitch. */
   players: Array<{
@@ -111,6 +133,14 @@ export interface CpuObservation {
    * adapters on that team.
    */
   teamDecision?: TeamDecision;
+  /**
+   * Optional recent pass events from the world state.
+   * Used by interception-aware defense to detect opponent passes
+   * and position toward the pass trajectory.
+   *
+   * Provisional — not a measured PES 2017 concept.
+   */
+  recentPassEvents?: PassEventInfo[];
 }
 
 // ---------------------------------------------------------------------------
@@ -206,6 +236,33 @@ export function buildCpuObservation(
     };
   }
 
+  // Extract recent pass events for interception awareness.
+  // Only include pass / lofted-pass / through-ball events from the
+  // last 10 ticks (provisional window at 60 Hz ≈ 0.17 s).
+  const PASS_EVENT_WINDOW = 10;
+  const passEvents: PassEventInfo[] = [];
+  if (world.events.length > 0) {
+    for (let i = world.events.length - 1; i >= 0; i--) {
+      const evt = world.events[i];
+      if (evt.kind !== "pass" && evt.kind !== "lofted-pass" && evt.kind !== "through-ball") {
+        continue;
+      }
+      if (world.tick - evt.tick > PASS_EVENT_WINDOW) break;
+      const p = evt.payload;
+      const passInfo: PassEventInfo = {
+        tick: evt.tick,
+        passerPlayerId: p.playerId as string,
+        passerTeamId: p.teamId as string,
+        passerPosition: { x: (p.incoming as any).position.x, y: (p.incoming as any).position.y },
+        ballVelocity: { x: (p.outgoing as any).vx, y: (p.outgoing as any).vy },
+      };
+      passEvents.push(passInfo);
+    }
+  }
+  if (passEvents.length > 0) {
+    result.recentPassEvents = passEvents;
+  }
+
   return result;
 }
 
@@ -251,6 +308,16 @@ interface CpuInternalState {
   /** Consecutive ticks the team has had possession while this player
    * does NOT have the ball.  Used for cycling off-ball movement. */
   possessionDuration: number;
+
+  // --- Interception awareness (provisional) ---
+  /** Tick at which the current active pass was detected. */
+  activePassTick: number;
+  /** Passer position at the moment of the active pass. */
+  activePasserPosition: { x: number; y: number };
+  /** Planar ball velocity after the pass (direction vector of pass trajectory). */
+  activePassBallVelocity: { x: number; y: number };
+  /** Player ID of the passer. */
+  activePasserId: string;
 }
 
 /**
@@ -526,6 +593,29 @@ const MARKING_DISTANCE = 5;
 const PRESS_STRENGTH = 1.3;
 
 // ---------------------------------------------------------------------------
+// Interception awareness constants (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Maximum tick age (ticks) for a pass event to be considered active
+ * for interception.  After this window, the pass is considered
+ * completed or stale and the defender reverts to normal chase.
+ *
+ * At 60 Hz, 60 ticks ≈ 1 second.
+ * Provisional placeholder — not a measured PES 2017 value.
+ */
+const PASS_ACTIVE_TICKS = 60;
+
+/**
+ * Maximum distance (metres) at which a CPU defender will consider
+ * intercepting a pass.  If the defender is farther from the pass
+ * trajectory than this, it falls back to normal chase/marking.
+ *
+ * Provisional placeholder — not a measured PES 2017 value.
+ */
+const INTERCEPTION_RANGE = 25;
+
+// ---------------------------------------------------------------------------
 // Pass variety constants (provisional)
 // ---------------------------------------------------------------------------
 
@@ -706,6 +796,200 @@ function normalizeAngle(angle: number): number {
 }
 
 // ---------------------------------------------------------------------------
+// Interception awareness helpers (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the closest point on a line segment (A→B) to a given point P.
+ *
+ * The line segment is defined by a start point (passer position) and
+ * an infinite ray in the direction of the pass velocity. The segment
+ * is clamped between start and the projection of the ball's expected
+ * arrival (start + velocity × 3 seconds at 60 Hz). This prevents
+ * the defender from targeting a point beyond the receiver.
+ *
+ * Deterministic: same inputs → same result.
+ *
+ * @param px - Point X coordinate (defender position).
+ * @param py - Point Y coordinate (defender position).
+ * @param ax - Segment start X (passer position).
+ * @param ay - Segment start Y (passer position).
+ * @param dirX - Normalized pass direction X.
+ * @param dirY - Normalized pass direction Y.
+ * @param segLen - Maximum segment length in the pass direction.
+ * @returns Closest point on the segment to (px, py).
+ */
+function closestPointOnPassLine(
+  px: number,
+  py: number,
+  ax: number,
+  ay: number,
+  dirX: number,
+  dirY: number,
+  segLen: number,
+): { x: number; y: number } {
+  const toPx = px - ax;
+  const toPy = py - ay;
+  // Project onto the direction vector.
+  let t = toPx * dirX + toPy * dirY;
+  // Clamp to segment bounds [0, segLen].
+  t = Math.max(0, Math.min(t, segLen));
+  return {
+    x: ax + dirX * t,
+    y: ay + dirY * t,
+  };
+}
+
+/**
+ * Compute the distance from a point to a line segment (closest-point approach).
+ *
+ * Deterministic: same inputs → same result.
+ */
+function distToPassLine(
+  px: number,
+  py: number,
+  ax: number,
+  ay: number,
+  dirX: number,
+  dirY: number,
+  segLen: number,
+): number {
+  const cp = closestPointOnPassLine(px, py, ax, ay, dirX, dirY, segLen);
+  const dx = px - cp.x;
+  const dy = py - cp.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+/**
+ * Detect the most relevant active pass event from the observation's
+ * recent pass events, and update the adapter's internal interception state.
+ *
+ * A pass is "active" when:
+ *  1. The pass event is from an opponent (passerTeamId ≠ cpuTeamId).
+ *  2. The pass event is within PASS_ACTIVE_TICKS of the current tick.
+ *  3. The ball is moving in a direction consistent with the pass
+ *     (ball velocity has a significant component along the pass trajectory).
+ *
+ * If an active pass is found, the internal state is updated.
+ * If no active pass is found, the interception state is cleared.
+ *
+ * Returns true if an active pass was found.
+ *
+ * Deterministic: same inputs → same result.
+ */
+function detectActiveOpponentPass(
+  observation: CpuObservation,
+  cpuTeamId: string,
+  currentTick: number,
+  state: CpuInternalState,
+): boolean {
+  const passEvents = observation.recentPassEvents;
+  if (!passEvents || passEvents.length === 0) return false;
+
+  // Find the most recent opponent pass within the active window.
+  let bestEvent: PassEventInfo | undefined;
+  for (const evt of passEvents) {
+    if (evt.passerTeamId === cpuTeamId) continue; // skip own-team passes
+    if (currentTick - evt.tick > PASS_ACTIVE_TICKS) continue;
+    if (!bestEvent || evt.tick > bestEvent.tick) {
+      bestEvent = evt;
+    }
+  }
+
+  if (!bestEvent) return false;
+
+  // Verify the ball is moving in a direction consistent with the pass.
+  // The ball's horizontal velocity should have a positive dot product
+  // with the pass direction, indicating the ball is still traveling
+  // along (or near) the pass trajectory.
+  const passDirX = bestEvent.ballVelocity.x;
+  const passDirY = bestEvent.ballVelocity.y;
+  const passDirLen = Math.sqrt(passDirX * passDirX + passDirY * passDirY);
+  if (passDirLen < 0.01) return false;
+
+  const ballVx = observation.ball.linearVelocity.x;
+  const ballVy = observation.ball.linearVelocity.y;
+  const dot = (ballVx * passDirX + ballVy * passDirY) / passDirLen;
+
+  // Ball should be moving in roughly the pass direction (dot > 0 means
+  // ball is still heading toward the receiver). If the ball has been
+  // received or deflected (dot ≤ 0), the pass is no longer active.
+  if (dot <= 0) return false;
+
+  // Update internal state with the active pass.
+  state.activePassTick = bestEvent.tick;
+  state.activePasserPosition = { ...bestEvent.passerPosition };
+  state.activePassBallVelocity = { ...bestEvent.ballVelocity };
+  state.activePasserId = bestEvent.passerPlayerId;
+
+  return true;
+}
+
+/**
+ * Compute the interception point on the pass trajectory for a given
+ * defender.  The interception point is the closest point on the pass
+ * line to the defender, projected slightly ahead along the ball's
+ * travel direction so the defender arrives before (or at the same
+ * time as) the ball.
+ *
+ * The "slight ahead" offset is computed as a fraction of the distance
+ * from the passer to the interception point, proportional to the
+ * defender's distance from the trajectory. This gives faster-closing
+ * defenders a more aggressive interception angle.
+ *
+ * Deterministic: same inputs → same result.
+ *
+ * @param defenderX - Defender's current X position.
+ * @param defenderY - Defender's current Y position.
+ * @param passerX - Passer's position X.
+ * @param passerY - Passer's position Y.
+ * @param ballVx - Ball velocity X after the pass.
+ * @param ballVy - Ball velocity Y after the pass.
+ * @returns The interception point {x, y} on the pass trajectory.
+ */
+function computeInterceptionPoint(
+  defenderX: number,
+  defenderY: number,
+  passerX: number,
+  passerY: number,
+  ballVx: number,
+  ballVy: number,
+): { x: number; y: number } {
+  const ballSpeed = Math.sqrt(ballVx * ballVx + ballVy * ballVy);
+  if (ballSpeed < 0.01) {
+    // Ball nearly stationary — intercept at passer position.
+    return { x: passerX, y: passerY };
+  }
+
+  const dirX = ballVx / ballSpeed;
+  const dirY = ballVy / ballSpeed;
+
+  // Segment length: ball speed × active window gives a reasonable
+  // maximum pass distance (ball won't go further than speed × time).
+  const segLen = ballSpeed * PASS_ACTIVE_TICKS;
+
+  // Find the closest point on the pass line to the defender.
+  const cp = closestPointOnPassLine(
+    defenderX, defenderY,
+    passerX, passerY,
+    dirX, dirY, segLen,
+  );
+
+  // Project slightly ahead along the pass direction to give the
+  // defender time to arrive before the ball.
+  // The ahead offset is proportional to the ball's speed and the
+  // distance from passer to interception point (gives faster-closing
+  // defenders a more aggressive angle).
+  const distFromPasser = (cp.x - passerX) * dirX + (cp.y - passerY) * dirY;
+  const aheadOffset = Math.min(ballSpeed * 0.3, distFromPasser * 0.15);
+
+  return {
+    x: cp.x + dirX * aheadOffset,
+    y: cp.y + dirY * aheadOffset,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Defensive behavior helpers
 // ---------------------------------------------------------------------------
 
@@ -856,6 +1140,10 @@ export function createCpuAdapter(): CpuAdapter {
     isLoftedPass: false,
     formationDisplacementTicks: 0,
     possessionDuration: 0,
+    activePassTick: -1,
+    activePasserPosition: { x: 0, y: 0 },
+    activePassBallVelocity: { x: 0, y: 0 },
+    activePasserId: "",
   };
 
   return {
@@ -1116,6 +1404,38 @@ export function createCpuAdapter(): CpuAdapter {
           }
         }
 
+        // --- Interception awareness: position toward pass trajectory ---
+        // When an opponent pass is active, the nearest CPU defender to
+        // the pass trajectory should move toward an interception point
+        // on the pass line, rather than chasing the ball carrier.
+        // This overrides the chase target but NOT the ball-carrier
+        // press (which happens later for the nearest-to-ball player).
+        if (cpuTeamId && cpuPlayer.formationRole === "defender" &&
+            !isNearestToBall) {
+          const passActive = detectActiveOpponentPass(
+            observation, cpuTeamId, tick, state,
+          );
+          if (passActive) {
+            const intPoint = computeInterceptionPoint(
+              playerX, playerY,
+              state.activePasserPosition.x,
+              state.activePasserPosition.y,
+              state.activePassBallVelocity.x,
+              state.activePassBallVelocity.y,
+            );
+            const intDx = intPoint.x - playerX;
+            const intDy = intPoint.y - playerY;
+            const intDist = Math.sqrt(intDx * intDx + intDy * intDy);
+
+            // Only intercept if the defender is within range.
+            if (intDist < INTERCEPTION_RANGE) {
+              chaseTargetX = intPoint.x;
+              chaseTargetY = intPoint.y;
+              effectiveDistToTarget = intDist;
+            }
+          }
+        }
+
         // --- Default chase direction toward target ---
         if (effectiveDistToTarget > 0.001) {
           const distUnit = Math.min(effectiveDistToTarget, 1);
@@ -1340,6 +1660,10 @@ export function createCpuAdapter(): CpuAdapter {
       state.isLoftedPass = false;
       state.formationDisplacementTicks = 0;
       state.possessionDuration = 0;
+      state.activePassTick = -1;
+      state.activePasserPosition = { x: 0, y: 0 };
+      state.activePassBallVelocity = { x: 0, y: 0 };
+      state.activePasserId = "";
     },
   };
 }
