@@ -1,13 +1,13 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 10
+horizon_version: 11
 status: ACTIVE
 horizon_id: "match-play-depth"
 created_from_commit: 6153949
 created_at: 2026-08-18
-reason: "Horizon match-play-depth: HUMAN-SHOT-DIRECTION-CONTROL and HUMAN-THROUGH-BALL accepted. 2/5 done. Browser now shows human-vs-CPU 5v3 where the human can aim passes, shots, and through balls. Next: CPU-INTERCEPTION-AWARENESS."
-current_index: 2
+reason: "Horizon match-play-depth: 3/5 accepted (shot direction, through ball, interception awareness). 2 remaining: BROWSER-MATCH-SETUP-MENU, BROWSER-MATCH-STATS."
+current_index: 3
 objectives:
   - id: HUMAN-SHOT-DIRECTION-CONTROL
     status: accepted
@@ -20,7 +20,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: HUMAN-PASS-DIRECTION-CONTROL
   - id: CPU-INTERCEPTION-AWARENESS
-    status: pending
+    status: accepted
     reason: "When the opposing team is passing, the nearest CPU defender positions toward the pass trajectory to intercept (shift toward the ball's projected path between passer and receiver) rather than only chasing the ball carrier. Extends the CpuAdapter defense block with pass-trajectory awareness. Improves CPU defensive realism in small-sided matches."
     builder: builder-gameplay
     prerequisite: CPU-DEFENSIVE-IMPROVEMENT
