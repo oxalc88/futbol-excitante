@@ -2518,3 +2518,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: bb77b3b candidate(HUMAN-PASS-DIRECTION-CONTROL)
 - notes: Pass direction uses non-zero moveX/moveY from input with bodyHeading fallback. E+PASS modifier produces LOFTED_PASS_BIT for higher-trajectory chip pass. Contact system updated with directional pass velocity and lofted pass velocity with vertical component. All constants provisional. 1698/1698 node tests, 86/86 browser tests. HEADLESS audit PASS. No PES claim.
+
+## Iteration 63 — 2026-08-18
+
+- objective_id: HUMAN-SHOT-DIRECTION-CONTROL
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: f24833f candidate(HUMAN-SHOT-DIRECTION-CONTROL)
+- notes: Shot direction uses moveX/moveY from input when SHOT_BIT pressed with non-zero movement, bodyHeading fallback when idle. computeShotVelocity now takes explicit dirX/dirY params. Follows HUMAN-PASS-DIRECTION-CONTROL pattern. All constants provisional. 1722/1722 node tests, 86/86 browser tests. HEADLESS audit PASS. No PES claim.

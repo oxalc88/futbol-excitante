@@ -1,16 +1,16 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 8
+horizon_version: 9
 status: ACTIVE
 horizon_id: "match-play-depth"
 created_from_commit: 6153949
 created_at: 2026-08-18
-reason: "Horizon human-vs-cpu exhausted (5/5 accepted). The browser now shows a human-vs-CPU 5v3 match with player switching, a controlled-player indicator, and directional passing. Next horizon deepens the match experience: human shot-aim control and through balls, CPU interception awareness, and browser match setup + live stats. Goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs and suites exist."
-current_index: 0
+reason: "Horizon match-play-depth: HUMAN-SHOT-DIRECTION-CONTROL accepted. 1/5 done. Browser now shows human-vs-CPU 5v3 where the human can aim passes and shots. Next: HUMAN-THROUGH-BALL."
+current_index: 1
 objectives:
   - id: HUMAN-SHOT-DIRECTION-CONTROL
-    status: pending
+    status: accepted
     reason: "Extend directional input control from passes to shots: when the human presses SHOT_BIT with non-zero moveX/moveY, the shot direction uses the movement direction instead of only bodyHeading (with bodyHeading fallback when not moving). Follows the accepted HUMAN-PASS-DIRECTION-CONTROL pattern. This is a contact/wiring change in the shot impulse path."
     builder: builder-gameplay
     prerequisite: HUMAN-PASS-DIRECTION-CONTROL
