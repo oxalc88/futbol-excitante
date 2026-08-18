@@ -2,17 +2,19 @@
  * Browser-mode evidence capture.
  *
  * Normal browser regression runs write only to test-results/gauntlet-capture.
- * Durable objective evidence requires GAUNTLET_EVIDENCE_CAPTURE=1.
+ * Durable objective evidence is entered only through the explicit capture-wip
+ * command, which prefixes WIP_SECTION with __EVIDENCE__.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
 import type { TestBridge } from "../../src/apps/browser/test-bridge.js";
 
-const SECTION = process.env.WIP_SECTION || "capture";
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION.startsWith("__EVIDENCE__:");
+const SECTION = DURABLE_EVIDENCE ? RAW_SECTION.slice("__EVIDENCE__:".length) || "capture" : RAW_SECTION;
 const FRAME_COUNT = Math.max(1, Math.min(5, parseInt(process.env.WIP_FRAMES || "1", 10) || 1));
 const FRAME_STRIDE = Math.max(1, parseInt(process.env.WIP_FRAME_STRIDE || "30", 10) || 30);
-const DURABLE_EVIDENCE = process.env.GAUNTLET_EVIDENCE_CAPTURE === "1";
 const OUTPUT_ROOT = DURABLE_EVIDENCE ? "docs/screenshots" : "test-results/gauntlet-capture";
 
 function defaultLabels(count: number): string[] {
