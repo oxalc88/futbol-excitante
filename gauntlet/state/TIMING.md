@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-MATCH-STATS
-usage_aggregates_through: BROWSER-MATCH-STATS
-model_evaluation_through: BROWSER-MATCH-STATS
+last_tracked_objective: CPU-ATTACKING-ORGANIZATION
+usage_aggregates_through: CPU-ATTACKING-ORGANIZATION
+model_evaluation_through: CPU-ATTACKING-ORGANIZATION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
@@ -135,6 +135,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | CPU-INTERCEPTION-AWARENESS | accepted | ~35m | 17m | 14m | 21m | 0.5m | ~6M est. | n/a** |
 | BROWSER-MATCH-SETUP-MENU | accepted | ~30m | 15m | 10m | 12m | 0.5m | ~6M est. | n/a** |
 | BROWSER-MATCH-STATS | accepted | ~25m | 12m | 8m | 10m | 0.5m | ~6M est. | n/a** |
+| CPU-ATTACKING-ORGANIZATION | accepted | ~20m | 10m | 7m | 8m | 0.5m | ~6M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -343,6 +344,7 @@ on an H task is the interesting result.
 | CPU-INTERCEPTION-AWARENESS | mimo-v2.5 | M | Medium — pass-trajectory interception, defender coordination | 0 | A | 15 tests, 1722 node, first-pass clean |
 | BROWSER-MATCH-SETUP-MENU | mimo-v2.5 | M | Medium — setup menu, match lifecycle refactor | 0 | A | 86 browser, 1722 node, first-pass clean |
 | BROWSER-MATCH-STATS | mimo-v2.5 | L | Small — live stats display, event derivation | 0 | A | 86 browser, typecheck, first-pass clean |
+| CPU-ATTACKING-ORGANIZATION | mimo-v2.5 | M | Medium — overlapping runs, spacing, delayed runs, cross/through-ball | 0 | A | 11 tests, 86 browser, first-pass clean |
 
 ### Reviewer route and catches
 
@@ -414,6 +416,8 @@ on an H task is the interesting result.
 | BROWSER-MATCH-SETUP-MENU | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 86 browser tests, 1722 node tests, no core changes |
 | BROWSER-MATCH-STATS | critic-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 4/4 criteria, first-pass clean |
 | BROWSER-MATCH-STATS | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 86 browser tests, typecheck, no core changes |
+| CPU-ATTACKING-ORGANIZATION | critic-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 5/5 criteria, 11 tests, first-pass clean |
+| CPU-ATTACKING-ORGANIZATION | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 11 tests, 86 browser, no core changes |
 
 ### Builder scoreboard
 

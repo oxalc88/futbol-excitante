@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: CPU-DEFENSIVE-ORGANIZATION
 
 best_known:
-  commit: ae00e1f
-  note: "Horizon match-play-depth EXHAUSTED (5/5 accepted). Strategic reassessment needed for next horizon."
+  commit: 86c3278
+  note: "Horizon small-sided-shape: CPU-ATTACKING-ORGANIZATION accepted. 1/5 done. Next: CPU-DEFENSIVE-ORGANIZATION."
 
 active_candidate: null
 builder_in_use: null
@@ -76,14 +76,21 @@ accepted:
   - CPU-INTERCEPTION-AWARENESS
   - BROWSER-MATCH-SETUP-MENU
   - BROWSER-MATCH-STATS
+  - CPU-ATTACKING-ORGANIZATION
 
 blocked: []
 
-selection_note: "Horizon match-play-depth EXHAUSTED (5/5 accepted). Strategic reassessment needed for next horizon."
+selection_note: "Horizon small-sided-shape: 5 objectives toward SMALL_SIDED_SHAPE milestone (CPU attacking/d defense organization, corner kicks, player animations, UI polish). 1/5 accepted. Next: CPU-DEFENSIVE-ORGANIZATION."
 ```
 ## Last accepted objective
 
-BROWSER-MATCH-STATS — Live match stats display in browser HUD: possession percentage, shots, and passes completed for each team, derived from authoritative simulation events (goal/pass/possession telemetry). Pure derivation from the event stream — no simulation core changes. Browser UI layer change in main.ts only. All constants provisional. 86/86 browser tests, typecheck passes. PRESENTATION audit PASS.
+CPU-ATTACKING-ORGANIZATION — Structured CPU attacking patterns: overlapping runs (wide carriers trigger lateral overlap), spacing maintenance (10-15m between attackers), delayed forward runs (20-tick delay for onside simulation), and cross/through-ball decision logic (wide → cross, central → through-ball). CPU adapter only. All constants provisional. No PES claims. 11/11 attacking organization tests, 86/86 browser tests. HEADLESS audit PASS.
+
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- Evidence: 11 attacking organization tests, 86 browser tests (18 files)
+- Commit: 86c3278
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)

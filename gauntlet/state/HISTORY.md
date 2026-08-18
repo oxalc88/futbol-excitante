@@ -2568,3 +2568,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: ae00e1f candidate(BROWSER-MATCH-STATS)
 - notes: Live match stats in browser HUD: possession %, shots, passes for each team. Derived from simulation event stream. Browser UI layer only (main.ts). No simulation core changes. PRESENTATION audit PASS. Horizon match-play-depth EXHAUSTED (5/5).
+
+## Iteration 68 — 2026-08-18
+
+- objective_id: CPU-ATTACKING-ORGANIZATION
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 86c3278 candidate(CPU-ATTACKING-ORGANIZATION)
+- notes: Structured CPU attacking patterns: overlapping runs, spacing maintenance, delayed forward runs, cross/through-ball decisions. CPU adapter only. 11 new tests. HEADLESS audit PASS. No PES claim. Horizon small-sided-shape 1/5.
