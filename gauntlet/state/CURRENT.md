@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: CPU-DEFENSIVE-ORGANIZATION
+next_objective_id: MATCH-THROW-IN
 
 best_known:
-  commit: 86c3278
-  note: "Horizon small-sided-shape: CPU-ATTACKING-ORGANIZATION accepted. 1/5 done. Next: CPU-DEFENSIVE-ORGANIZATION."
+  commit: a7620fe
+  note: "Horizon small-sided-shape exhausted (5/5 accepted). All 5 objectives toward SMALL_SIDED_SHAPE milestone completed."
 
 active_candidate: null
 builder_in_use: null
@@ -77,10 +77,14 @@ accepted:
   - BROWSER-MATCH-SETUP-MENU
   - BROWSER-MATCH-STATS
   - CPU-ATTACKING-ORGANIZATION
+  - CPU-DEFENSIVE-ORGANIZATION
+  - MATCH-CORNER-KICK
+  - BROWSER-PLAYER-ANIMATION
+  - BROWSER-UI-POLISH
 
 blocked: []
 
-selection_note: "Horizon small-sided-shape: 5 objectives toward SMALL_SIDED_SHAPE milestone (CPU attacking/d defense organization, corner kicks, player animations, UI polish). 1/5 accepted. Next: CPU-DEFENSIVE-ORGANIZATION."
+selection_note: "Horizon small-sided-shape exhausted (5/5 accepted). Horizon was fully completed by a prior session; this session repaired stale bookkeeping. Next: strategic reassessment."
 ```
 ## Last accepted objective
 

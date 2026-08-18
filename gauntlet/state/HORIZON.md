@@ -1,39 +1,39 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 1
+horizon_version: 2
 status: ACTIVE
-horizon_id: "small-sided-shape"
-created_from_commit: a3869eb
+horizon_id: "transition-completion"
+created_from_commit: a7620fe
 created_at: 2026-08-18
-reason: "Horizon match-play-depth exhausted (5/5 accepted). Next horizon targets the SMALL_SIDED_SHAPE milestone: deepening CPU team tactics with structured attacking patterns, defensive organization, and press triggers; completing transition-phase set pieces (corner kicks, throw-ins); and polishing the browser presentation baseline with player animations and UI refinement. Goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs and suites exist."
-current_index: 1
+reason: "Horizon small-sided-shape exhausted (5/5 accepted). Next horizon completes remaining transition set pieces (throw-ins, goal kicks), deepens CPU tactical awareness for game-state adaptation, adds browser match-difficulty setup, and materializes the team evaluator suite to enable SMALL_SIDED_SHAPE milestone evaluation. Goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs and suites exist."
+current_index: 0
 objectives:
-  - id: CPU-ATTACKING-ORGANIZATION
-    status: accepted
-    reason: "Structured CPU attacking patterns: overlapping runs, spacing maintenance, delayed forward runs to stay onside, and cross/through-ball decision logic. Extends CPU-ATTACKING-IMPROVEMENT off-ball runs with tactical awareness. CPU adapter changes only."
-    builder: builder-gameplay
-    prerequisite: CPU-ATTACKING-IMPROVEMENT
-  - id: CPU-DEFENSIVE-ORGANIZATION
+  - id: MATCH-THROW-IN
     status: pending
-    reason: "Structured CPU defensive organization: zonal marking, press triggers (when ball enters a zone), cover-shadow positioning, and defensive line coordination. Extends CPU-DEFENSIVE-IMPROVEMENT and CPU-INTERCEPTION-AWARENESS. CPU adapter changes only."
-    builder: builder-gameplay
-    prerequisite: CPU-INTERCEPTION-AWARENESS
-  - id: MATCH-CORNER-KICK
-    status: pending
-    reason: "Corner kick set piece: ball placement at corner flag, attacker/receiver positioning, kick taker selection, and defensive setup. Extends MATCH-SET-PIECE transition infrastructure. No simulation core changes."
+    reason: "Throw-in set piece: ball out-of-play detection for sideline exits, throw-in positioning, receiver/taker logic, and defensive setup. Extends MATCH-SET-PIECE transition infrastructure. No simulation core changes."
     builder: builder-gameplay
     prerequisite: MATCH-SET-PIECE
-  - id: BROWSER-PLAYER-ANIMATION
+  - id: MATCH-GOAL-KICK
     status: pending
-    reason: "Player animation system in the browser renderer: idle stance, running cycle, kicking animation, and direction-based body orientation. Three.js renderer layer only. No simulation core changes."
+    reason: "Goal kick set piece: ball placement at goal area, kick taker selection, team positioning, and defensive setup. Extends MATCH-SET-PIECE transition infrastructure. No simulation core changes."
     builder: builder-gameplay
-    prerequisite: BROWSER-5V5-MATCH
-  - id: BROWSER-UI-POLISH
+    prerequisite: MATCH-SET-PIECE
+  - id: CPU-TACTICAL-AWARENESS
     status: pending
-    reason: "Browser UI polish: match clock display, goal animation refinement, scoreboard styling, and responsive layout for different screen sizes. Browser UI layer only. No simulation core changes."
+    reason: "CPU tactical awareness: game-state adaptation (more attacking when losing, more defensive when winning), fatigue awareness, and match-phase-specific behavior. Extends CPU-TEAM-DECISION-PROFILE. CPU adapter changes only."
     builder: builder-gameplay
-    prerequisite: BROWSER-MATCH-STATS
+    prerequisite: CPU-TEAM-DECISION-PROFILE
+  - id: BROWSER-DIFFICULTY-SETTING
+    status: pending
+    reason: "Difficulty setting in browser match setup and HUD: configurable CPU strength level (Easy/Medium/Hard) affecting CPU decision quality and reaction speed. Browser and CPU adapter changes."
+    builder: builder-gameplay
+    prerequisite: BROWSER-MATCH-SETUP-MENU
+  - id: TEAM-EVALUATOR-SUITE
+    status: pending
+    reason: "Materialize the team evaluator suite with MUTANT_TEAM_PASS and TEAM_SHAPE_SUITE_PASS reducers. Enables SMALL_SIDED_SHAPE milestone evaluation. Structured evaluator work."
+    builder: builder-structured
+    prerequisite: CPU-TEAM-DECISION-PROFILE
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -42,7 +42,7 @@ replan_if:
   - unsafe_due_to_new_defect
   - materially_higher_value_evidence
   - human_needed_spec_or_legal_blocker
-observable_progress_target: "Browser shows a polished small-sided match with structured CPU team tactics, all transition set pieces, player animations, and refined UI. Milestone: SMALL_SIDED_SHAPE."
-infrastructure_only_justification: null
+observable_progress_target: "Browser shows throw-in and goal-kick transitions, difficulty setting in match setup, CPU responds to game score in tactical approach, and SMALL_SIDED_SHAPE milestone evaluator suite exists."
+infrastructure_only_justification: "TEAM-EVALUATOR-SUITE is the only non-observable objective. It is required to formally enable SMALL_SIDED_SHAPE milestone evaluation, which the horizon's observable targets (throw-ins, goal kicks, difficulty settings, tactical awareness) feed into."
 last_invalidation_reason: null
 ```
