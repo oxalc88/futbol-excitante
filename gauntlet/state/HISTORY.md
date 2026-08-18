@@ -2548,3 +2548,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 8e83767 candidate(CPU-INTERCEPTION-AWARENESS)
 - notes: CPU defenders position toward pass trajectory to intercept when opponent passes. Nearest-to-ball defender continues chase. Uses closest-point-on-line-segment for interception. Behavior reverts after pass received. Adapter-only change (no simulation core). All constants provisional. 15 interception tests. HEADLESS audit PASS. No PES claim.
+
+## Iteration 66 — 2026-08-18
+
+- objective_id: BROWSER-MATCH-SETUP-MENU
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 41e4c86 candidate(BROWSER-MATCH-SETUP-MENU)
+- notes: In-browser match setup menu overlay with mode selection (6 modes), team name inputs, start/restart buttons. Refactored main.ts into lifecycle-based architecture (startMatch/stopMatch/showSetupMenu). URL-parameter auto-start preserved. No simulation core changes. PRESENTATION audit PASS. No PES claim.

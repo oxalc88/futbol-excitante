@@ -1,13 +1,13 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 11
+horizon_version: 12
 status: ACTIVE
 horizon_id: "match-play-depth"
 created_from_commit: 6153949
 created_at: 2026-08-18
-reason: "Horizon match-play-depth: 3/5 accepted (shot direction, through ball, interception awareness). 2 remaining: BROWSER-MATCH-SETUP-MENU, BROWSER-MATCH-STATS."
-current_index: 3
+reason: "Horizon match-play-depth: 4/5 accepted (shot direction, through ball, interception, setup menu). 1 remaining: BROWSER-MATCH-STATS (live possession/shot/pass stats)."
+current_index: 4
 objectives:
   - id: HUMAN-SHOT-DIRECTION-CONTROL
     status: accepted
@@ -24,6 +24,11 @@ objectives:
     reason: "When the opposing team is passing, the nearest CPU defender positions toward the pass trajectory to intercept (shift toward the ball's projected path between passer and receiver) rather than only chasing the ball carrier. Extends the CpuAdapter defense block with pass-trajectory awareness. Improves CPU defensive realism in small-sided matches."
     builder: builder-gameplay
     prerequisite: CPU-DEFENSIVE-IMPROVEMENT
+  - id: BROWSER-MATCH-SETUP-MENU
+    status: accepted
+    reason: "Add an in-browser match setup menu: select match mode (AI-vs-AI, Human-vs-CPU 5v3, etc.), select team/formation, and start/restart the match from the UI instead of URL parameters only. Browser UI layer change (index.html + main.ts + styles). Makes the browser match experience observable and self-contained."
+    builder: builder-gameplay
+    prerequisite: BROWSER-5V3-HUMAN-VS-CPU
   - id: BROWSER-MATCH-SETUP-MENU
     status: pending
     reason: "Add an in-browser match setup menu: select match mode (AI-vs-AI, Human-vs-CPU 5v3, etc.), select team/formation, and start/restart the match from the UI instead of URL parameters only. Browser UI layer change (index.html + main.ts + styles). Makes the browser match experience observable and self-contained."

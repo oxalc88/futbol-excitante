@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-MATCH-SETUP-MENU
+next_objective_id: BROWSER-MATCH-STATS
 
 best_known:
-  commit: 8e83767
-  note: "Horizon match-play-depth: HUMAN-SHOT-DIRECTION-CONTROL, HUMAN-THROUGH-BALL, CPU-INTERCEPTION-AWARENESS accepted. 3/5 done. Next: BROWSER-MATCH-SETUP-MENU."
+  commit: 41e4c86
+  note: "Horizon match-play-depth: 4/5 accepted (shot direction, through ball, interception, setup menu). 1 remaining: BROWSER-MATCH-STATS."
 
 active_candidate: null
 builder_in_use: null
@@ -74,14 +74,21 @@ accepted:
   - HUMAN-SHOT-DIRECTION-CONTROL
   - HUMAN-THROUGH-BALL
   - CPU-INTERCEPTION-AWARENESS
+  - BROWSER-MATCH-SETUP-MENU
 
 blocked: []
 
-selection_note: "Horizon match-play-depth: 5 objectives toward deeper human controls (shot direction, through ball), CPU interception awareness, and browser match setup + live stats. 3/5 accepted. Next: BROWSER-MATCH-SETUP-MENU."
+selection_note: "Horizon match-play-depth: 5 objectives toward deeper human controls (shot direction, through ball), CPU interception awareness, and browser match setup + live stats. 4/5 accepted. Next: BROWSER-MATCH-STATS."
 ```
 ## Last accepted objective
 
-CPU-INTERCEPTION-AWARENESS — Nearest CPU defender positions toward pass trajectory to intercept when the opposing team is passing, rather than only chasing the ball carrier. Closest-to-ball defender continues chase. Uses closest-point-on-line-segment computation for interception positioning. No simulation core changes. All constants provisional. No PES claims. 1722/1722 node tests, 86/86 browser tests. HEADLESS audit PASS.
+BROWSER-MATCH-SETUP-MENU — In-browser match setup menu overlay with mode selection (AI vs AI 5v5, Human vs CPU 5v3, AI vs AI 3v3, Human vs CPU 2v2, AI vs AI 2v2, AI vs AI 1v1), team name inputs, and START/BACK-TO-MENU buttons. Refactored main.ts into lifecycle-based architecture (startMatch/stopMatch/showSetupMenu). URL-parameter auto-start preserved as fallback. No simulation core changes. All constants provisional. 1722/1722 node tests, 86/86 browser tests. PRESENTATION audit PASS.
+
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- Evidence: 1722 node tests (97 files), 86 browser tests (18 files)
+- Commit: 41e4c86
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)

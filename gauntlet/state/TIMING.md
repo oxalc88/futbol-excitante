@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: CPU-INTERCEPTION-AWARENESS
-usage_aggregates_through: CPU-INTERCEPTION-AWARENESS
-model_evaluation_through: CPU-INTERCEPTION-AWARENESS
+last_tracked_objective: BROWSER-MATCH-SETUP-MENU
+usage_aggregates_through: BROWSER-MATCH-SETUP-MENU
+model_evaluation_through: BROWSER-MATCH-SETUP-MENU
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
