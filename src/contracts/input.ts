@@ -65,6 +65,18 @@ export const SWITCH_PLAYER_BIT = 1 << 3;
 export const LOFTED_PASS_BIT = 1 << 4;
 
 /**
+ * THROUGH_BALL_BIT: through-ball action. The controlled player plays
+ * the ball into open space ahead of the best forward teammate rather
+ * than directly to their feet, allowing the teammate to run onto it.
+ * Pressed while within contact radius of the ball. The contact system
+ * resolves the actual through-ball; pressing this bit does not guarantee
+ * a through-ball occurs (range, timing, and priority govern).
+ *
+ * Provisional — not a PES 2017 calibration claim.
+ */
+export const THROUGH_BALL_BIT = 1 << 5;
+
+/**
  * A tick-indexed input frame from any source (keyboard, gamepad, replay, AI, test).
  *
  * sourceId is provenance only — it must never affect gameplay outcomes,

@@ -19,7 +19,7 @@
 import type { BallState, PlayerState } from "../../contracts/state.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { SimulationEvent } from "../../contracts/scenario.js";
-import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT, LOFTED_PASS_BIT } from "../../contracts/input.js";
+import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT, LOFTED_PASS_BIT, THROUGH_BALL_BIT } from "../../contracts/input.js";
 import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1, FOUNDATION_SHOT_V1, FOUNDATION_CLOSE_CONTROL_V1, FOUNDATION_LOFTED_PASS_V1 } from "../config/foundation.js";
 
 // ---------------------------------------------------------------------------
@@ -350,7 +350,7 @@ export function stepContacts(
   // Priority: shot > pass > lofted-pass > first-touch (on pressedButtons) > dribble-touch (on heldButtons).
   // Dribble-touch fires on heldButtons & FIRST_TOUCH_BIT but NOT pressedButtons & FIRST_TOUCH_BIT
   // to avoid double-firing with the one-shot first-touch edge on the same tick.
-  const candidates: Array<{ player: PlayerState; action: "shot" | "pass" | "lofted-pass" | "first-touch" | "dribble-touch" }> = [];
+  const candidates: Array<{ player: PlayerState; action: "shot" | "pass" | "lofted-pass" | "through-ball" | "first-touch" | "dribble-touch" }> = [];
 
   for (const player of players) {
     const frame = frameByPlayerId.get(player.playerId);
@@ -362,13 +362,15 @@ export function stepContacts(
     const hasPassBit = (frame.pressedButtons & PASS_BIT) !== 0;
     // Check LOFTED_PASS_BIT next.
     const hasLoftedPassBit = (frame.pressedButtons & LOFTED_PASS_BIT) !== 0;
+    // Check THROUGH_BALL_BIT next.
+    const hasThroughBallBit = (frame.pressedButtons & THROUGH_BALL_BIT) !== 0;
     // Check FIRST_TOUCH_BIT for one-shot edge.
     const hasFirstTouchBit = (frame.pressedButtons & FIRST_TOUCH_BIT) !== 0;
     // Check FIRST_TOUCH_BIT held (for dribble-touch) — only if not also pressed this tick.
     const hasFirstTouchHeld = (frame.heldButtons & FIRST_TOUCH_BIT) !== 0 &&
       (frame.pressedButtons & FIRST_TOUCH_BIT) === 0;
 
-    if (!hasShotBit && !hasPassBit && !hasLoftedPassBit && !hasFirstTouchBit && !hasFirstTouchHeld) continue;
+    if (!hasShotBit && !hasPassBit && !hasLoftedPassBit && !hasThroughBallBit && !hasFirstTouchBit && !hasFirstTouchHeld) continue;
 
     const dist = planarDistance(
       player.groundPosition.x,
@@ -377,16 +379,19 @@ export function stepContacts(
       ball.position.y,
     );
 
-    // Use shotRadius for shot, passRadius for pass/lofted-pass, contactRadius for first-touch,
-    // dribbleRadius for dribble-touch.
+    // Use shotRadius for shot, passRadius for pass/lofted-pass/through-ball,
+    // contactRadius for first-touch, dribbleRadius for dribble-touch.
     let effectiveRadius: number;
-    let action: "shot" | "pass" | "lofted-pass" | "first-touch" | "dribble-touch";
+    let action: "shot" | "pass" | "lofted-pass" | "through-ball" | "first-touch" | "dribble-touch";
     if (hasShotBit) {
       effectiveRadius = shotConfig.shotRadius.value;
       action = "shot";
     } else if (hasPassBit) {
       effectiveRadius = passConfig.passRadius.value;
       action = "pass";
+    } else if (hasThroughBallBit) {
+      effectiveRadius = passConfig.passRadius.value;
+      action = "through-ball";
     } else if (hasLoftedPassBit) {
       effectiveRadius = passConfig.passRadius.value;
       action = "lofted-pass";
@@ -467,7 +472,7 @@ export function stepContacts(
 
   // Compute and apply outgoing velocity based on action type.
   let out: { vx: number; vy: number; vz: number };
-  let eventKind: "shot" | "pass" | "lofted-pass" | "player-ball-contact";
+  let eventKind: "shot" | "pass" | "lofted-pass" | "through-ball" | "player-ball-contact";
   let contactType: string;
   let eventLabel: string;
 
@@ -520,6 +525,74 @@ export function stepContacts(
       contactType = "pass";
       eventLabel = `Player ${contactPlayer.playerId} directed pass`;
     }
+  } else if (action === "through-ball") {
+    // Through-ball: play the ball into space ahead of the best forward teammate.
+    // If the human provides directional input, use that direction instead.
+
+    const tbFrame = frameByPlayerId.get(contactPlayer.playerId);
+
+    // Find best forward teammate: highest y value on the same team, excluding
+    // the contacting player.
+    let bestForward: PlayerState | null = null;
+    for (const p of players) {
+      if (p.teamId !== contactPlayer.teamId) continue;
+      if (p.playerId === contactPlayer.playerId) continue;
+      if (bestForward === null || p.groundPosition.y > bestForward.groundPosition.y) {
+        bestForward = p;
+      }
+    }
+
+    let dirX: number;
+    let dirY: number;
+
+    if (tbFrame && (tbFrame.moveX !== 0 || tbFrame.moveY !== 0)) {
+      // Human directional input overrides automatic teammate targeting.
+      const inputMag = Math.sqrt(tbFrame.moveX * tbFrame.moveX + tbFrame.moveY * tbFrame.moveY);
+      dirX = tbFrame.moveX / inputMag;
+      dirY = tbFrame.moveY / inputMag;
+    } else if (bestForward !== null) {
+      // Compute direction from ball to a point 6-8 units ahead of the best
+      // forward teammate in their movement direction (or body heading fallback).
+      const aheadDist = 7.0; // provisional: midpoint of 6-8 range
+      let moveDirX: number;
+      let moveDirY: number;
+      const mvSpeed = Math.sqrt(
+        bestForward.desiredVelocity.x * bestForward.desiredVelocity.x +
+          bestForward.desiredVelocity.y * bestForward.desiredVelocity.y,
+      );
+      if (mvSpeed >= 0.1) {
+        moveDirX = bestForward.desiredVelocity.x / mvSpeed;
+        moveDirY = bestForward.desiredVelocity.y / mvSpeed;
+      } else {
+        moveDirX = Math.cos(bestForward.bodyHeading);
+        moveDirY = Math.sin(bestForward.bodyHeading);
+      }
+      const targetX = bestForward.groundPosition.x + moveDirX * aheadDist;
+      const targetY = bestForward.groundPosition.y + moveDirY * aheadDist;
+
+      const dx = targetX - ball.position.x;
+      const dy = targetY - ball.position.y;
+      const dMag = Math.sqrt(dx * dx + dy * dy);
+      if (dMag > 0.001) {
+        dirX = dx / dMag;
+        dirY = dy / dMag;
+      } else {
+        // Ball is at the target — use forward's movement direction as pass dir.
+        dirX = moveDirX;
+        dirY = moveDirY;
+      }
+    } else {
+      // No forward teammate found — fall back to body heading.
+      dirX = Math.cos(contactPlayer.bodyHeading);
+      dirY = Math.sin(contactPlayer.bodyHeading);
+    }
+
+    out = computePassVelocity(dirX, dirY);
+    eventKind = "through-ball";
+    contactType = "through-ball";
+    eventLabel = bestForward !== null
+      ? `Player ${contactPlayer.playerId} through-ball to ${bestForward.playerId}`
+      : `Player ${contactPlayer.playerId} through-ball (no forward found)`;
   } else if (action === "dribble-touch") {
     out = computeCloseControlVelocity(contactPlayer, closeControlConfig);
     eventKind = "player-ball-contact";
@@ -568,7 +641,7 @@ export function stepContacts(
 
   // Emit ordered event.
   eventCounter.value++;
-  const eventId = `${eventKind === "pass" ? "pass" : eventKind === "lofted-pass" ? "lofted-pass" : eventKind === "shot" ? "shot" : "player-ball-contact"}-${tick}-${eventCounter.value}`;
+  const eventId = `${eventKind === "pass" ? "pass" : eventKind === "lofted-pass" ? "lofted-pass" : eventKind === "through-ball" ? "through-ball" : eventKind === "shot" ? "shot" : "player-ball-contact"}-${tick}-${eventCounter.value}`;
 
   const event: SimulationEvent = {
     id: eventId,

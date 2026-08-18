@@ -107,6 +107,7 @@ export const DEFAULT_KEYBOARD_CONFIG: KeyboardAdapterConfig = {
   ],
   buttonModifiers: [
     { modifierKey: "KeyE", targetActionBit: 1, modifiedActionBit: 4 }, // E+J → lofted pass
+    { modifierKey: "KeyQ", targetActionBit: 1, modifiedActionBit: 5 }, // Q+J → through ball
   ],
 };
 
