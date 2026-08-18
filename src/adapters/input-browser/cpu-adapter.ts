@@ -318,6 +318,9 @@ interface CpuInternalState {
   activePassBallVelocity: { x: number; y: number };
   /** Player ID of the passer. */
   activePasserId: string;
+
+  /** Whether this player is currently making an overlapping run. */
+  isOverlapping: boolean;
 }
 
 /**
@@ -564,6 +567,153 @@ const CYCLING_HALF_PERIOD = 30;
  * Provisional placeholder — not a measured PES value.
  */
 const CYCLING_AMPLITUDE = 5;
+
+// ---------------------------------------------------------------------------
+// Attacking organization constants (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Lateral offset (metres) applied to a teammate making an overlapping
+ * run when the ball carrier is in a wide zone.  The overlap curves
+ * around the outside of the carrier, creating a numerical advantage.
+ *
+ * Provisional placeholder — not a measured PES 2017 value.
+ */
+const OVERLAP_LATERAL_OFFSET = 10;
+
+/**
+ * Minimum distance (metres) between attacking teammates during team
+ * possession.  Attacking players adjust laterally to maintain this
+ * spacing and avoid clustering near the ball.
+ *
+ * Provisional placeholder — not a measured PES 2017 value.
+ */
+const ATTACKING_SPACING_MIN = 10;
+
+/**
+ * Maximum distance (metres) between attacking teammates.  If two
+ * attackers are farther apart than this, the closer one moves
+ * toward the farther one to tighten the attacking shape.
+ *
+ * Provisional placeholder — not a measured PES 2017 value.
+ */
+const ATTACKING_SPACING_MAX = 15;
+
+/**
+ * Number of ticks after gaining possession during which a forward
+ * delays their run to simulate staying onside.  At 60 Hz,
+ * 20 ticks ≈ 0.33 s.
+ *
+ * Provisional placeholder — not a measured PES 2017 value.
+ */
+const DELAYED_RUN_TICKS = 20;
+
+/**
+ * Lateral boundary (metres from centre) at which the ball carrier
+ * is considered to be in a "wide" zone.  Used for the cross vs
+ * through-ball decision: wide → prefer crossing, central → prefer
+ * through-ball.
+ *
+ * Provisional placeholder — not a measured PES 2017 value.
+ */
+const WIDE_ZONE_THRESHOLD = 15;
+
+// ---------------------------------------------------------------------------
+// Attacking organization helpers (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Check if the ball carrier is in a wide zone (near the touchline).
+ *
+ * Wide zones are defined by lateral distance from pitch centre
+ * exceeding WIDE_ZONE_THRESHOLD.
+ */
+function isWideZone(
+  carrierY: number,
+  pitchWidth: number,
+): boolean {
+  const centreY = 0;
+  return Math.abs(carrierY - centreY) > WIDE_ZONE_THRESHOLD;
+}
+
+/**
+ * Find the closest teammate to the given position, excluding the
+ * specified player ID.
+ */
+function findClosestTeammate(
+  teammates: CpuTeammate[],
+  pos: { x: number; y: number },
+  excludeId: string,
+): CpuTeammate | undefined {
+  let best: CpuTeammate | undefined;
+  let bestDist = Infinity;
+  for (const tm of teammates) {
+    if (tm.playerId === excludeId) continue;
+    const dx = tm.groundPosition.x - pos.x;
+    const dy = tm.groundPosition.y - pos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = tm;
+    }
+  }
+  return best;
+}
+
+/**
+ * Find the teammate closest to a given position among players with
+ * a specific formation role.  Returns undefined when no matching
+ * teammate exists.
+ */
+function findClosestTeammateByRole(
+  players: CpuObservation["players"],
+  cpuTeamId: string,
+  pos: { x: number; y: number },
+  excludeId: string,
+  role: "defender" | "midfielder" | "attacker",
+): CpuObservation["players"][0] | undefined {
+  let best: CpuObservation["players"][0] | undefined;
+  let bestDist = Infinity;
+  for (const p of players) {
+    if (p.teamId !== cpuTeamId) continue;
+    if (p.playerId === excludeId) continue;
+    if (p.formationRole !== role) continue;
+    const dx = p.groundPosition.x - pos.x;
+    const dy = p.groundPosition.y - pos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = p;
+    }
+  }
+  return best;
+}
+
+/**
+ * Find the teammate with a specific formation role who is farthest
+ * forward (highest X in attack direction).
+ */
+function findFurthestForwardTeammateByRole(
+  players: CpuObservation["players"],
+  cpuTeamId: string,
+  excludeId: string,
+  attackingX: number,
+  role: "defender" | "midfielder" | "attacker",
+): CpuObservation["players"][0] | undefined {
+  let best: CpuObservation["players"][0] | undefined;
+  let bestForward = -Infinity;
+  for (const p of players) {
+    if (p.teamId !== cpuTeamId) continue;
+    if (p.playerId === excludeId) continue;
+    if (p.formationRole !== role) continue;
+    const forward = p.groundPosition.x * attackingX;
+    if (forward > bestForward) {
+      bestForward = forward;
+      best = p;
+    }
+  }
+  return best;
+}
 
 // ---------------------------------------------------------------------------
 // Defensive behavior constants (provisional)
@@ -1144,6 +1294,7 @@ export function createCpuAdapter(): CpuAdapter {
     activePasserPosition: { x: 0, y: 0 },
     activePassBallVelocity: { x: 0, y: 0 },
     activePasserId: "",
+    isOverlapping: false,
   };
 
   return {
@@ -1261,6 +1412,130 @@ export function createCpuAdapter(): CpuAdapter {
           const distUnit = Math.min(distAim, 1);
           moveX = (aimDx / distAim) * distUnit;
           moveY = (aimDy / distAim) * distUnit;
+        }
+
+        // ============================================================
+        // ATTACKING ORGANIZATION: overlap, spacing, delayed runs,
+        // cross/through-ball decision.
+        // ============================================================
+        {
+          const attackingX = cpuTeamId === "team-b" ? -1 : 1;
+          const carrierWide = isWideZone(playerY, observation.pitchWidth);
+
+          // --- Overlapping run: nearby teammate curves around carrier ---
+          if (carrierWide && observation.teammates &&
+              observation.teammates.length > 0) {
+            const closestTm = findClosestTeammate(
+              observation.teammates,
+              { x: playerX, y: playerY },
+              observation.controlledPlayerId ?? "",
+            );
+            if (closestTm) {
+              const dxTm = closestTm.groundPosition.x - playerX;
+              const dyTm = closestTm.groundPosition.y - playerY;
+              const distTm = Math.sqrt(dxTm * dxTm + dyTm * dyTm);
+              if (distTm < OVERLAP_LATERAL_OFFSET * 2 && distTm > 1) {
+                // Curving run: move forward (attack direction) and laterally
+                // around the carrier's outside.  The lateral direction is
+                // away from the carrier (opposite of dyTm sign).
+                const lateralDir = -Math.sign(dyTm);
+                const overlapMoveX = attackingX;
+                const overlapMoveY = lateralDir;
+                const olLen = Math.sqrt(
+                  overlapMoveX * overlapMoveX + overlapMoveY * overlapMoveY,
+                );
+                moveX = (overlapMoveX / olLen);
+                moveY = (overlapMoveY / olLen);
+                state.isOverlapping = true;
+              } else {
+                state.isOverlapping = false;
+              }
+            } else {
+              state.isOverlapping = false;
+            }
+          } else {
+            state.isOverlapping = false;
+          }
+
+          // --- Spacing enforcement: avoid clustering ---
+          if (!state.isOverlapping && observation.teammates &&
+              observation.teammates.length > 0) {
+            for (const tm of observation.teammates) {
+              const dxTm = tm.groundPosition.x - playerX;
+              const dyTm = tm.groundPosition.y - playerY;
+              const distTm = Math.sqrt(dxTm * dxTm + dyTm * dyTm);
+
+              if (distTm < ATTACKING_SPACING_MIN && distTm > 0.1) {
+                // Too close — push laterally away from the teammate.
+                const awayX = -dxTm / distTm;
+                const awayY = -dyTm / distTm;
+                moveX += awayX * 0.3;
+                moveY += awayY * 0.3;
+                // Clamp to [-1, 1].
+                moveX = Math.max(-1, Math.min(1, moveX));
+                moveY = Math.max(-1, Math.min(1, moveY));
+                break;
+              }
+            }
+          }
+
+          // --- Delayed runs: forwards stay behind last defender ---
+          if (observation.teammates && observation.teammates.length > 0) {
+            const role = cpuPlayer.formationRole;
+            if (role === "attacker" &&
+                state.possessionDuration < DELAYED_RUN_TICKS) {
+              // During the delay phase, reduce forward push.
+              // Blend toward zero movement (holding position).
+              const progress = state.possessionDuration / DELAYED_RUN_TICKS;
+              moveX *= progress;
+              moveY *= progress;
+            }
+          }
+
+          // --- Cross / through-ball decision ---
+          if (observation.teammates && observation.teammates.length > 0) {
+            if (carrierWide) {
+              // Wide zone → prefer cross: target forward teammate ahead of ball.
+              const forwardTm = findFurthestForwardTeammateByRole(
+                observation.players, cpuTeamId,
+                observation.controlledPlayerId ?? "",
+                attackingX, "attacker",
+              );
+              if (forwardTm) {
+                const fwdDx =
+                  forwardTm.groundPosition.x - playerX;
+                const fwdDy =
+                  forwardTm.groundPosition.y - playerY;
+                const fwdDist =
+                  Math.sqrt(fwdDx * fwdDx + fwdDy * fwdDy);
+                if (fwdDist > 1) {
+                  moveX = (fwdDx / fwdDist);
+                  moveY = (fwdDy / fwdDist);
+                }
+              }
+            } else {
+              // Central zone → prefer through-ball: target a forward
+              // making a run behind the defensive line.
+              const throughTarget = findClosestTeammateByRole(
+                observation.players, cpuTeamId,
+                { x: playerX + attackingX * 15, y: playerY },
+                observation.controlledPlayerId ?? "",
+                "attacker",
+              );
+              if (throughTarget) {
+                const tbDx =
+                  throughTarget.groundPosition.x - playerX;
+                const tbDy =
+                  throughTarget.groundPosition.y - playerY;
+                const tbDist =
+                  Math.sqrt(tbDx * tbDx + tbDy * tbDy);
+                if (tbDist > 1) {
+                  moveX = (tbDx / tbDist);
+                  moveY = (tbDy / tbDist);
+                }
+              }
+            }
+          }
         }
 
         // Distance-based shooting decision.
@@ -1664,6 +1939,7 @@ export function createCpuAdapter(): CpuAdapter {
       state.activePasserPosition = { x: 0, y: 0 };
       state.activePassBallVelocity = { x: 0, y: 0 };
       state.activePasserId = "";
+      state.isOverlapping = false;
     },
   };
 }
