@@ -60,7 +60,8 @@ const manifest = await buildEvidenceManifest(repoRoot, version.version, accepted
   metrics: Array.isArray(input.metrics) ? input.metrics.map(String) : [],
 });
 
-for (const screenshot of manifest.evidence.screenshots) {
+const manifestEvidence = manifest.evidence as { screenshots?: Array<{ path: string }> } | undefined;
+for (const screenshot of manifestEvidence?.screenshots ?? []) {
   await assertScreenshotSanity(path.join(repoRoot, screenshot.path));
 }
 
