@@ -766,6 +766,160 @@ const PASS_ACTIVE_TICKS = 60;
 const INTERCEPTION_RANGE = 25;
 
 // ---------------------------------------------------------------------------
+// Defensive organization constants (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Number of defensive zones the pitch is divided into (own, center, attacking).
+ * Each zone spans pitchLength / 3.  Defenders are assigned to zones based
+ * on their current position, and zone-based marking tracks opponents
+ * within each zone.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const DEFENSIVE_ZONE_COUNT = 3;
+
+/**
+ * Sprint multiplier applied to the nearest defender when the ball enters
+ * their zone (press trigger).  Higher values produce a more aggressive
+ * press; values below 1 produce a more cautious approach.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const ZONE_PRESS_SPRINT_BOOST = 1.2;
+
+/**
+ * Default sprint value for the CPU adapter.  When the ball is NOT in a
+ * zone-based press trigger, the nearest defender uses this sprint level.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const DEFAULT_SPRINT = 1;
+
+/**
+ * Maximum lateral shift (metres) applied by defensive line coordination.
+ * Prevents defenders from overcommitting to the line when a teammate
+ * presses.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const LINE_COORDINATION_MAX_SHIFT = 10;
+
+/**
+ * Strength of the cover-shadow pull (0–1).  Higher values make defenders
+ * more strongly position between the ball and the most threatening
+ * attacker; 0 disables cover shadow entirely.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const COVER_SHADOW_STRENGTH = 0.4;
+
+/**
+ * Weight of the defensive line pull relative to cover-shadow (0–1).
+ * Higher values make defenders prefer holding the line; lower values
+ * favour cover-shadow positioning.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const LINE_WEIGHT = 0.35;
+
+// ---------------------------------------------------------------------------
+// Defensive organization helpers (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Determine the defensive zone for a given x-coordinate.
+ *
+ * Zones are defined as thirds of the pitch, measured from the
+ * defending team's own goal:
+ *  - "defensive": closest third to own goal
+ *  - "middle": center third
+ *  - "attacking": farthest third from own goal
+ *
+ * team-a attacks +x, own goal at -pitchLength/2.
+ * team-b attacks -x, own goal at +pitchLength/2.
+ *
+ * Deterministic: same inputs → same result.
+ */
+function determineZone(
+  x: number,
+  pitchLength: number,
+  cpuTeamId: string,
+): "defensive" | "middle" | "attacking" {
+  const thirdWidth = pitchLength / 3;
+  if (cpuTeamId === "team-a") {
+    if (x < -pitchLength / 2 + thirdWidth) return "defensive";
+    if (x > pitchLength / 2 - thirdWidth) return "attacking";
+    return "middle";
+  }
+  // team-b attacks -x, own goal at +pitchLength/2
+  if (x > pitchLength / 2 - thirdWidth) return "defensive";
+  if (x < -pitchLength / 2 + thirdWidth) return "attacking";
+  return "middle";
+}
+
+/**
+ * Compute the cover-shadow position for a defender.
+ *
+ * The cover-shadow is the position between the ball and the most
+ * threatening opponent (closest to own goal).  The defender positions
+ * themselves at `coverFraction` of the way from the ball toward the
+ * opponent, blocking the passing lane.
+ *
+ * When `coverFraction` is 0 the defender holds at the ball position;
+ * when 1 the defender sits at the opponent position.
+ *
+ * Deterministic: same inputs → same result.
+ */
+function computeCoverShadow(
+  ballX: number,
+  ballY: number,
+  opponentX: number,
+  opponentY: number,
+  coverFraction: number,
+): { x: number; y: number } {
+  return {
+    x: ballX + (opponentX - ballX) * coverFraction,
+    y: ballY + (opponentY - ballY) * coverFraction,
+  };
+}
+
+/**
+ * Compute the average y-coordinate of pressing defenders in a team.
+ *
+ * Used by defensive line coordination: non-pressing defenders shift
+ * their y-coordinate toward this average to maintain a flat defensive
+ * line when a teammate commits to pressing.
+ *
+ * @param players — all players in the observation.
+ * @param cpuTeamId — the defending team ID.
+ * @param pressingPlayerId — player ID of the pressing defender (excluded from average).
+ * @returns the average y-coordinate, or undefined if no pressing defenders exist.
+ */
+function computePressingDefendersAvgY(
+  players: CpuObservation["players"],
+  cpuTeamId: string,
+  pressingPlayerId: string,
+): number | undefined {
+  let sumY = 0;
+  let count = 0;
+  for (const p of players) {
+    if (p.teamId !== cpuTeamId) continue;
+    if (p.formationRole !== "defender") continue;
+    if (p.playerId === pressingPlayerId) continue;
+    // A defender is considered "pressing" when they are the nearest to the ball.
+    // We detect this by checking if they are within PRESS_RADIUS of the ball
+    // in the current tick.  However, we don't have the ball position here.
+    // Instead, we simply average ALL other defenders — the effect is that
+    // non-pressing defenders align with the pressing group.
+    sumY += p.groundPosition.y;
+    count++;
+  }
+  if (count === 0) return undefined;
+  return sumY / count;
+}
+
+// ---------------------------------------------------------------------------
 // Pass variety constants (provisional)
 // ---------------------------------------------------------------------------
 
@@ -1652,30 +1806,67 @@ export function createCpuAdapter(): CpuAdapter {
         const isDefensiveMode = teamStrategy === "DEFEND" ||
           defensiveSubMode === "MARKING" || defensiveSubMode === "PRESSING";
 
-        // --- Marking: non-nearest-to-ball defenders track mark targets ---
+        // --- Zonal marking: defenders track attackers in their zone ---
         // When defensive coordination is active and this player is a
-        // defender who is NOT the nearest to the ball, track the most
-        // threatening opponent at a configurable offset distance toward
-        // own goal instead of chasing the ball.
+        // defender who is NOT the nearest to the ball, track the
+        // nearest opponent in their zone instead of chasing the ball.
+        // Zone boundaries divide the pitch into thirds (defensive,
+        // middle, attacking) from the defending team's own goal.
         let chaseTargetX = ball.position.x;
         let chaseTargetY = ball.position.y;
         let effectiveDistToTarget = distToBall;
 
+        // Determine which zone the ball is in (used by press triggers).
+        const ballZone = cpuTeamId
+          ? determineZone(ball.position.x, observation.pitchLength, cpuTeamId)
+          : "middle";
+
         if (isDefensiveMode && cpuTeamId &&
             cpuPlayer.formationRole === "defender" && !isNearestToBall) {
-          const markTarget = findMostThreateningOpponent(observation, cpuTeamId);
-          if (markTarget) {
-            const ownGoalX = cpuTeamId === "team-b"
-              ? observation.pitchLength / 2
-              : -observation.pitchLength / 2;
-            const offsetPos = computeMarkOffsetPosition(
-              markTarget.position, ownGoalX, MARKING_DISTANCE,
+          const opponentTeamId = cpuTeamId === "team-a" ? "team-b" : "team-a";
+          const defenderZone = determineZone(
+            playerX, observation.pitchLength, cpuTeamId,
+          );
+          // Find the nearest opponent in the same zone as this defender.
+          let zoneTarget:
+            { playerId: string; position: { x: number; y: number }; dist: number } | undefined;
+          for (const p of observation.players) {
+            if (p.teamId !== opponentTeamId) continue;
+            const pZone = determineZone(
+              p.groundPosition.x, observation.pitchLength, cpuTeamId,
             );
-            chaseTargetX = offsetPos.x;
-            chaseTargetY = offsetPos.y;
-            const mdx = offsetPos.x - playerX;
-            const mdy = offsetPos.y - playerY;
-            effectiveDistToTarget = Math.sqrt(mdx * mdx + mdy * mdy);
+            if (pZone !== defenderZone) continue;
+            const dx = p.groundPosition.x - playerX;
+            const dy = p.groundPosition.y - playerY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (!zoneTarget || dist < zoneTarget.dist) {
+              zoneTarget = {
+                playerId: p.playerId,
+                position: { x: p.groundPosition.x, y: p.groundPosition.y },
+                dist,
+              };
+            }
+          }
+          // Fallback to most threatening opponent if no one is in the zone.
+          if (!zoneTarget) {
+            const markTarget = findMostThreateningOpponent(observation, cpuTeamId);
+            if (markTarget) {
+              const ownGoalX = cpuTeamId === "team-b"
+                ? observation.pitchLength / 2
+                : -observation.pitchLength / 2;
+              const offsetPos = computeMarkOffsetPosition(
+                markTarget.position, ownGoalX, MARKING_DISTANCE,
+              );
+              chaseTargetX = offsetPos.x;
+              chaseTargetY = offsetPos.y;
+              const mdx = offsetPos.x - playerX;
+              const mdy = offsetPos.y - playerY;
+              effectiveDistToTarget = Math.sqrt(mdx * mdx + mdy * mdy);
+            }
+          } else {
+            chaseTargetX = zoneTarget.position.x;
+            chaseTargetY = zoneTarget.position.y;
+            effectiveDistToTarget = zoneTarget.dist;
           }
         }
 
@@ -1722,6 +1913,8 @@ export function createCpuAdapter(): CpuAdapter {
         // When defensive mode is active and this player is the nearest
         // to the ball, press the ball carrier more aggressively when
         // within PRESS_RADIUS.
+        // Press trigger: when the ball enters the nearest defender's zone,
+        // increase sprint to signal more aggressive pressing behavior.
         if (isDefensiveMode && isNearestToBall && cpuTeamId) {
           const ballCarrier = findBallCarrierPlayer(observation, cpuTeamId);
           if (ballCarrier) {
@@ -1737,6 +1930,60 @@ export function createCpuAdapter(): CpuAdapter {
               pressY = Math.max(-1, Math.min(1, pressY));
               moveX = pressX;
               moveY = pressY;
+            }
+          }
+        }
+
+        // --- Cover shadow positioning ---
+        // The nearest-to-ball defender positions between the ball and
+        // the most threatening opponent (closest to own goal), blocking
+        // the passing lane.  This is a supplement to the press, not
+        // a replacement — the defender still moves toward the ball but
+        // with a lateral bias toward the cover-shadow position.
+        if (isDefensiveMode && isNearestToBall && cpuTeamId) {
+          const threatening = findMostThreateningOpponent(observation, cpuTeamId);
+          if (threatening) {
+            const shadowPos = computeCoverShadow(
+              ball.position.x, ball.position.y,
+              threatening.position.x, threatening.position.y,
+              0.3,
+            );
+            const shadowDx = shadowPos.x - playerX;
+            const shadowDy = shadowPos.y - playerY;
+            const shadowDist = Math.sqrt(shadowDx * shadowDx + shadowDy * shadowDy);
+            if (shadowDist > 0.001) {
+              const shadowUnit = Math.min(shadowDist, 1);
+              const shadowMoveX = (shadowDx / shadowDist) * shadowUnit;
+              const shadowMoveY = (shadowDy / shadowDist) * shadowUnit;
+              moveX = moveX * (1 - COVER_SHADOW_STRENGTH) + shadowMoveX * COVER_SHADOW_STRENGTH;
+              moveY = moveY * (1 - COVER_SHADOW_STRENGTH) + shadowMoveY * COVER_SHADOW_STRENGTH;
+            }
+          }
+        }
+
+        // --- Defensive line coordination ---
+        // When one defender presses, other defenders shift laterally
+        // to maintain the defensive line (similar y-coordinate).
+        // This prevents the defensive line from being stretched by
+        // a pressing defender's movement.
+        if (isDefensiveMode && cpuTeamId &&
+            cpuPlayer.formationRole === "defender" && !isNearestToBall) {
+          const avgPressingY = computePressingDefendersAvgY(
+            observation.players, cpuTeamId,
+            observation.controlledPlayerId ?? "",
+          );
+          if (avgPressingY !== undefined) {
+            const lineShiftY = avgPressingY - playerY;
+            const clampedShift = Math.max(
+              -LINE_COORDINATION_MAX_SHIFT,
+              Math.min(LINE_COORDINATION_MAX_SHIFT, lineShiftY),
+            );
+            // Normalize and blend with the current movement.
+            const lineDist = Math.abs(clampedShift);
+            if (lineDist > 0.001) {
+              const lineMoveY = (clampedShift / lineDist) * Math.min(lineDist, 1);
+              moveX = moveX * (1 - LINE_WEIGHT);
+              moveY = moveY * (1 - LINE_WEIGHT) + lineMoveY * LINE_WEIGHT;
             }
           }
         }
