@@ -556,6 +556,181 @@ export function createSimulation(
   }
 
   // ------------------------------------------------------------------
+  // Throw-in helpers (MATCH-THROW-IN)
+  // ------------------------------------------------------------------
+
+  /** Default throw-in countdown ticks (≈1 second at 60 FPS). */
+  const defaultThrowInCountdown = 60;
+
+  /**
+   * Set matchPhase to "throw-in" and start the countdown.
+   * Called when a ball-touchline-out-of-play event is detected and the
+   * last touch was by the opposite team (throw-in condition).
+   *
+   * Throw-in awarding rule: awarded to the team OPPOSITE whoever last
+   * touched the ball (standard football rule).
+   */
+  function onThrowInEvent(
+    awardingTeam: string,
+    throwInPos: { x: number; y: number },
+    touchlineIndex: 0 | 1,
+  ): void {
+    if (state.matchPhase !== "playing") return;
+    state.matchPhase = "throw-in";
+    state.throwInCountdown = defaultThrowInCountdown;
+    state.throwInPosition = { ...throwInPos };
+    state.throwInAwardingTeam = awardingTeam;
+    state.throwInTouchlineIndex = touchlineIndex;
+
+    // Select throw-in taker: closest awarding-team player to the exit point.
+    let bestPlayer: string | null = null;
+    let bestDist = Infinity;
+    for (const p of state.players) {
+      if (p.teamId !== awardingTeam) continue;
+      const dx = p.groundPosition.x - throwInPos.x;
+      const dy = p.groundPosition.y - throwInPos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestPlayer = p.playerId;
+      }
+    }
+    state.throwInTakerId = bestPlayer;
+
+    // Position the throw-in taker at the sideline exit point.
+    if (bestPlayer) {
+      const player = state.players.find((p) => p.playerId === bestPlayer);
+      if (player) {
+        player.groundPosition = { x: throwInPos.x, y: throwInPos.y };
+        player.linearVelocity = { x: 0, y: 0 };
+        player.desiredVelocity = { x: 0, y: 0 };
+        // Face toward the field (perpendicular to touchline).
+        const faceY = touchlineIndex === 0 ? -1 : 1;
+        player.bodyHeading = Math.atan2(faceY, 0);
+        player.desiredHeading = player.bodyHeading;
+      }
+    }
+
+    // Position awarding-team receivers in play (spread along the sideline).
+    const defendingTeam = awardingTeam === "team-a" ? "team-b" : "team-a";
+    const sidelineDir = touchlineIndex === 0 ? -1 : 1; // direction into play
+    let receiverIdx = 0;
+    for (const p of state.players) {
+      if (p.teamId !== awardingTeam) continue;
+      if (p.playerId === bestPlayer) continue;
+      // Position receivers slightly inside the field from the touchline.
+      const offsetY = (receiverIdx % 3) * 8 - 8;
+      const offsetX = sidelineDir * (5 + receiverIdx * 3);
+      p.groundPosition = { x: throwInPos.x + offsetX, y: throwInPos.y + offsetY };
+      // Clamp inside the pitch bounds.
+      p.groundPosition.y = Math.max(-PITCH_HALF_WIDTH + 2, Math.min(PITCH_HALF_WIDTH - 2, p.groundPosition.y));
+      p.groundPosition.x = Math.max(-GOAL_LINE_X + 2, Math.min(GOAL_LINE_X - 2, p.groundPosition.x));
+      p.linearVelocity = { x: 0, y: 0 };
+      p.desiredVelocity = { x: 0, y: 0 };
+      // Face toward the touchline (ready to receive).
+      p.bodyHeading = Math.atan2(-sidelineDir, 0);
+      p.desiredHeading = p.bodyHeading;
+      receiverIdx++;
+    }
+
+    // Position defensive team to mark receivers.
+    const defenders = state.players.filter((p) => p.teamId === defendingTeam);
+    const receivers = state.players.filter(
+      (p) => p.teamId === awardingTeam && p.playerId !== bestPlayer,
+    );
+    for (let i = 0; i < defenders.length; i++) {
+      const def = defenders[i];
+      const target = receivers[i % receivers.length];
+      if (target) {
+        // Position between receiver and own goal.
+        const goalX = defendingTeam === "team-a" ? -GOAL_LINE_X : GOAL_LINE_X;
+        const markX = (target.groundPosition.x + goalX) / 2;
+        const markY = target.groundPosition.y;
+        def.groundPosition = { x: markX, y: markY };
+        def.linearVelocity = { x: 0, y: 0 };
+        def.desiredVelocity = { x: 0, y: 0 };
+        def.bodyHeading = defendingTeam === "team-a" ? Math.PI : 0;
+        def.desiredHeading = def.bodyHeading;
+      }
+    }
+  }
+
+  /**
+   * Execute the throw-in: place the ball at the sideline position and
+   * throw it back into play toward the nearest receiver.
+   *
+   * Called when throwInCountdown reaches zero.
+   */
+  function applyThrowIn(): void {
+    if (!state.throwInPosition || !state.throwInAwardingTeam) return;
+
+    const throwPos = state.throwInPosition;
+    const touchlineIndex = state.throwInTouchlineIndex ?? 0;
+    const sidelineDir = touchlineIndex === 0 ? -1 : 1; // direction into play
+
+    // Find the nearest awarding-team receiver (not the taker) to throw to.
+    let bestReceiver: { x: number; y: number } | null = null;
+    let bestDist = Infinity;
+    for (const p of state.players) {
+      if (p.teamId !== state.throwInAwardingTeam) continue;
+      if (p.playerId === state.throwInTakerId) continue;
+      const dx = p.groundPosition.x - throwPos.x;
+      const dy = p.groundPosition.y - throwPos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < bestDist && dist > 0.5) {
+        bestDist = dist;
+        bestReceiver = { x: p.groundPosition.x, y: p.groundPosition.y };
+      }
+    }
+
+    // Default target: into play from the exit point if no receiver found.
+    const targetX = bestReceiver ? bestReceiver.x : throwPos.x + sidelineDir * 10;
+    const targetY = bestReceiver ? bestReceiver.y : throwPos.y;
+
+    // Compute throw direction from exit point to target.
+    const dx = targetX - throwPos.x;
+    const dy = targetY - throwPos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 0.001) return;
+
+    const dirX = dx / dist;
+    const dirY = dy / dist;
+
+    // Place ball at the sideline exit point at chest height (provisional).
+    state.ball.position.x = throwPos.x;
+    state.ball.position.y = throwPos.y;
+    state.ball.position.z = 1.5; // provisional: chest height for throw-in (m)
+    state.ball.regime = "airborne";
+
+    // Apply throw velocity (provisional: moderate overarm throw speed).
+    const throwSpeed = 12; // provisional: throw-in speed (m/s)
+    const verticalComponent = 0.15; // provisional: slight upward arc
+    state.ball.linearVelocity.x = dirX * throwSpeed;
+    state.ball.linearVelocity.y = dirY * throwSpeed;
+    state.ball.linearVelocity.z = throwSpeed * verticalComponent;
+    state.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.lastTouchRef = null;
+
+    // Emit throw-in-executed event.
+    eventCounter++;
+    const throwEvent: SimulationEvent = {
+      id: `throw-in-executed-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "throw-in-executed",
+      label: `Throw-in executed by ${state.throwInTakerId}`,
+      payload: {
+        teamId: state.throwInAwardingTeam,
+        throwTakerId: state.throwInTakerId,
+        throwPosition: { ...throwPos },
+        targetPosition: { x: targetX, y: targetY },
+        throwDirection: { x: dirX, y: dirY },
+      },
+    };
+    state.events = [...state.events, throwEvent];
+  }
+
+  // ------------------------------------------------------------------
   // Internal: drain all buffers into a single flat array (ordered by tick, then insertion).
   // ------------------------------------------------------------------
 
@@ -1180,6 +1355,21 @@ export function createSimulation(
         }
       }
 
+      // 6b-2b. Process throw-in countdown (MATCH-THROW-IN).
+      if (state.matchPhase === "throw-in") {
+        state.throwInCountdown--;
+        if (state.throwInCountdown <= 0) {
+          // Execute the throw-in: place ball, throw into play.
+          applyThrowIn();
+          state.matchPhase = "playing";
+          state.throwInCountdown = 0;
+          state.throwInPosition = null;
+          state.throwInAwardingTeam = null;
+          state.throwInTakerId = null;
+          state.throwInTouchlineIndex = null;
+        }
+      }
+
       // 6b-3. Detect ball-out-of-play events and trigger corner kick phase.
       if (state.matchPhase === "playing") {
         for (const ev of allStepEvents) {
@@ -1207,6 +1397,28 @@ export function createSimulation(
               onCornerKickEvent(attackingTeam, cornerPos, goalIndex as 0 | 1);
               break;
             }
+          }
+        }
+
+        // 6b-3b. Detect ball-touchline-out-of-play events and trigger throw-in phase.
+        for (const ev of allStepEvents) {
+          if (ev.kind === "ball-touchline-out-of-play") {
+            const payload = ev.payload as {
+              touchlineIndex?: number;
+              ballPosition?: { x: number; y: number; z: number };
+              lastTouchRef?: string | null;
+            };
+            if (payload.touchlineIndex === undefined || payload.ballPosition === undefined) continue;
+
+            // Throw-in awarded to the team OPPOSITE whoever last touched the ball.
+            const lastTouchTeam = resolveLastTouchTeam(payload.lastTouchRef ?? null);
+            if (lastTouchTeam === null) continue;
+
+            const touchlineIndex = payload.touchlineIndex as 0 | 1;
+            const awardingTeam = lastTouchTeam === "team-a" ? "team-b" : "team-a";
+
+            onThrowInEvent(awardingTeam, payload.ballPosition, touchlineIndex);
+            break;
           }
         }
       }

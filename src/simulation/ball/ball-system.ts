@@ -90,6 +90,9 @@ const GOAL_LINE_X = 52.5;
 /** Goal half-width: posts at y = ±3.66 m (7.32 m standard goal width). */
 const GOAL_HALF_WIDTH = 3.66;
 
+/** Pitch half-width: touchline at y = ±34 m (provisional 68 m pitch). */
+const PITCH_HALF_WIDTH = 34;
+
 /**
  * Compute horizontal speed from 3D linear velocity.
  */
@@ -578,6 +581,50 @@ export function stepBall(
                 payload: {
                   goalIndex: gi as 0 | 1,
                   ballPosition: { x: goalX, y: goalY, z: goalZ },
+                  lastTouchRef: ball.lastTouchRef,
+                  ballState: {
+                    position: { x: posA.x, y: posA.y, z: posA.z },
+                    linearVelocity: { x: ball.linearVelocity.x, y: ball.linearVelocity.y, z: ball.linearVelocity.z },
+                    angularVelocity: { x: ball.angularVelocity.x, y: ball.angularVelocity.y, z: ball.angularVelocity.z },
+                    regime: ball.regime,
+                  } as BallStateSnapshot,
+                },
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // -- Touchline (sideline) detection -----------------------------------------
+  // Detect the ball crossing a touchline (|y| > PITCH_HALF_WIDTH) while
+  // within the goal-line span (|x| < GOAL_LINE_X).  Uses the same swept
+  // line-segment test as goal-line detection.
+  if (!goalPostHit) {
+    for (let ti = 0; ti < 2; ti++) {
+      const touchlineY = ti === 0 ? PITCH_HALF_WIDTH : -PITCH_HALF_WIDTH;
+      const crossedTop = (posA.y < touchlineY && posB.y >= touchlineY) || (posA.y > touchlineY && posB.y <= touchlineY);
+      if (crossedTop) {
+        const dySeg = posB.y - posA.y;
+        if (Math.abs(dySeg) > 1e-12) {
+          const tTouch = (touchlineY - posA.y) / dySeg;
+          if (tTouch >= 0 && tTouch <= 1) {
+            const touchX = posA.x + tTouch * (posB.x - posA.x);
+            const touchZ = posA.z + tTouch * (posB.z - posA.z);
+
+            // Only trigger if within the goal-line span and above ground.
+            if (Math.abs(touchX) < GOAL_LINE_X && touchZ > 0) {
+              eventCounter.value++;
+              events.push({
+                id: `ball-touchline-out-${tick}-${eventCounter.value}`,
+                tick,
+                sequence: eventCounter.value,
+                kind: "ball-touchline-out-of-play",
+                label: "Ball out of play over touchline",
+                payload: {
+                  touchlineIndex: ti as 0 | 1,
+                  ballPosition: { x: touchX, y: touchlineY, z: touchZ },
                   lastTouchRef: ball.lastTouchRef,
                   ballState: {
                     position: { x: posA.x, y: posA.y, z: posA.z },
