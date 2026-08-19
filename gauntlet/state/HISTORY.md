@@ -2618,3 +2618,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 08096f7 candidate(BROWSER-UI-POLISH), a7620fe gauntlet(BROWSER-UI-POLISH): accept
 - notes: Browser UI polish. Backfilled from durable acceptance record 2026-08-18T09:54:35Z and manifest (HEADLESS). Not previously recorded in HISTORY/TIMING. Horizon small-sided-shape EXHAUSTED (5/5).
+
+## Iteration 73 — 2026-08-19
+
+- objective_id: MATCH-THROW-IN
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass; durable audit artifact was overwritten to FAIL by a bare gauntlet:audit re-run, corrected by regenerating with --tests-pass true, critic re-verified)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (second pass after audit artifact fix)
+- result: accepted
+- commits: 5f3fb3a candidate(MATCH-THROW-IN)
+- notes: Throw-in set piece: sideline out-of-play detection in ball-system (swept line-segment, |y|>34 while |x|<52.5, `ball-touchline-out-of-play` event), new `throw-in` MatchPhase with parallel state fields, award to team opposite last touch (null last touch → no throw-in), taker = closest awarding-team player, receiver/defensive positioning, 60-tick countdown auto-execute that places the ball at the sideline exit and throws it into play (`throw-in-executed`), state reset. Extends MATCH-SET-PIECE / MATCH-CORNER-KICK infrastructure. 19 unit + 9 integration tests, full node suite 1835/1835, browser 86/86. HEADLESS audit PASS. All coefficients provisional; no PES claim. Horizon transition-completion 1/5.

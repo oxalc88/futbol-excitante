@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.3",
+  "objective_id": "MATCH-THROW-IN",
+  "accepted_at": "2026-08-19T13:13:38.734Z",
+  "candidate_commit": "5f3fb3a7752a16053178486755a4335ebbebe574",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/MATCH-THROW-IN/audit.json",
+      "sha256": "74fd3651d8607862e58eeedf90e3524377d73f5d0f4a55f0b08eb28e440cb592",
+      "git_blob": "e7961ea1ca354ae95973ce4be0ccb9c58023d76e",
+      "candidate_commit": "5f3fb3a7752a16053178486755a4335ebbebe574",
+      "bytes": 2539,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "tests result",
+          "status": "PASS",
+          "owner": "builder"
+        },
+        {
+          "name": "required screenshot exists",
+          "status": "NOT_APPLICABLE",
+          "owner": "builder"
+        },
+        {
+          "name": "semantic visual sequence",
+          "status": "NOT_APPLICABLE",
+          "owner": "builder"
+        },
+        {
+          "name": "required trajectory exists",
+          "status": "NOT_APPLICABLE",
+          "owner": "builder"
+        },
+        {
+          "name": "integration test result",
+          "status": "NOT_APPLICABLE",
+          "owner": "builder"
+        },
+        {
+          "name": "slot/player wiring invariants",
+          "status": "NOT_APPLICABLE",
+          "owner": "builder"
+        },
+        {
+          "name": "screenshot SHA uniqueness",
+          "status": "NOT_APPLICABLE",
+          "owner": "builder"
+        },
+        {
+          "name": "CURRENT accepted list contains latest accepted",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "HORIZON current_index matches first pending",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "latest accepted horizon entry is not pending",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "CURRENT next objective matches HORIZON index",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "last_tracked_objective matches latest accepted",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "usage_aggregates_through matches latest accepted",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "model_evaluation_through matches latest accepted",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "TIMING latest per-step row exists",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "TIMING latest builder grade exists",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "TIMING latest reviewer route exists",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "TIMING clock measurement date matches measured_at",
+          "status": "PASS",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "acceptance result freshness",
+          "status": "PASS",
+          "owner": "orchestrator"
+        }
+      ]
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "retries": 0
+    },
+    "integration": {
+      "agent": "integration-reviewer-flash",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-19/2026-08-19T13-13-38-734Z-MATCH-THROW-IN-acceptance.json"
+}

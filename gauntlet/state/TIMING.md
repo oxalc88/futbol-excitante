@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-UI-POLISH
-usage_aggregates_through: BROWSER-UI-POLISH
-model_evaluation_through: BROWSER-UI-POLISH
+last_tracked_objective: MATCH-THROW-IN
+usage_aggregates_through: MATCH-THROW-IN
+model_evaluation_through: MATCH-THROW-IN
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -141,6 +141,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | MATCH-CORNER-KICK | accepted | ~35m* | ~15m* | ~7m* | ~12m* | ~0.5m* | n/a** | n/a** |
 | BROWSER-PLAYER-ANIMATION | accepted | ~20m* | ~9m* | ~6m* | ~5m* | ~0.5m* | n/a** | n/a** |
 | BROWSER-UI-POLISH | accepted | ~45m* | ~20m* | ~8m* | ~16m* | ~0.5m* | n/a** | n/a** |
+| MATCH-THROW-IN | accepted | ~64m | 40m | 11m | 9m | 1m | ~8M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -358,6 +359,7 @@ on an H task is the interesting result.
 | MATCH-CORNER-KICK | mimo-v2.5 | M | Medium — corner-kick set piece over MATCH-SET-PIECE infra | 0 | A | backfilled from durable record; critic first pass |
 | BROWSER-PLAYER-ANIMATION | mimo-v2.5 | M | Medium — body orientation and running animation | 0 | A | backfilled from durable record; critic first pass |
 | BROWSER-UI-POLISH | mimo-v2.5 | M | Medium — browser UI polish | 0 | A | backfilled from durable record; critic first pass |
+| MATCH-THROW-IN | mimo-v2.5 | M | Medium — throw-in set piece over MATCH-SET-PIECE infra | 0 | A | 28 tests, 1835 node, 86 browser, first-pass clean |
 
 ### Reviewer route and catches
 
@@ -439,6 +441,8 @@ on an H task is the interesting result.
 | BROWSER-PLAYER-ANIMATION | integration-reviewer-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | presentation_authority PASS |
 | BROWSER-UI-POLISH | critic-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | first pass clean |
 | BROWSER-UI-POLISH | integration-reviewer-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | no core changes |
+| MATCH-THROW-IN | critic-flash (deepseek-v4-flash) | 0731 unavailable, flash fallback | ACCEPT | critique re-verified after audit-artifact correction |
+| MATCH-THROW-IN | integration-reviewer-flash (deepseek-v4-flash) | 0731 unavailable, flash fallback; second pass | ACCEPT | full node 1835, 84 targeted, no core changes |
 
 ### Builder scoreboard
 
@@ -447,7 +451,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 40 | 24 | 8 | 3 | 3 | 2 | 60% | ~0.78 | ~38m |
-| mimo-v2.5 | 23 | 16 | 6 | 1 | 0 | 0 | 70% | ~0.39 | ~30m |
+| mimo-v2.5 | 24 | 17 | 6 | 1 | 0 | 0 | 71% | ~0.38 | ~30m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

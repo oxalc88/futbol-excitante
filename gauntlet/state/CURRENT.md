@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: MATCH-THROW-IN
+next_objective_id: MATCH-GOAL-KICK
 
 best_known:
-  commit: a7620fe
-  note: "Horizon small-sided-shape exhausted (5/5 accepted). All 5 objectives toward SMALL_SIDED_SHAPE milestone completed."
+  commit: 5f3fb3a
+  note: "MATCH-THROW-IN accepted (HEADLESS). Candidate commit 5f3fb3a; acceptance bookkeeping and publication follow in this session."
 
 active_candidate: null
 builder_in_use: null
@@ -81,18 +81,18 @@ accepted:
   - MATCH-CORNER-KICK
   - BROWSER-PLAYER-ANIMATION
   - BROWSER-UI-POLISH
+  - MATCH-THROW-IN
 
 blocked: []
 
-selection_note: "Horizon small-sided-shape exhausted (5/5 accepted). Horizon was fully completed by a prior session; this session repaired stale bookkeeping. Next: strategic reassessment."
+selection_note: "Horizon transition-completion 1/5: MATCH-THROW-IN accepted 2026-08-19. Next: MATCH-GOAL-KICK."
 ```
 ## Last accepted objective
 
-BROWSER-UI-POLISH — Browser UI polish. Prior session left the "Last accepted" section and TIMING behind at CPU-ATTACKING-ORGANIZATION; backfilled on 2026-08-19 from durable acceptance records and manifests (CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH all have candidate + acceptance commits on main). HEADLESS audit PASS.
+MATCH-THROW-IN — Throw-in set piece: sideline out-of-play detection (ball-system swept line-segment test, `ball-touchline-out-of-play` event), throw-in phase with countdown (60 ticks provisional), award to the team opposite last touch, taker selection (closest), receiver/defensive positioning, auto-execute throw into play with `throw-in-executed` event, state reset. Extends the MATCH-SET-PIECE / MATCH-CORNER-KICK infrastructure. All coefficients provisional. No PES claims. 28 new tests, full node suite 1835/1835, browser 86/86. HEADLESS audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-18T09:54:35Z)
-- Candidate: 08096f7
-- Acceptance commit: a7620fe
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass; re-verified against corrected audit artifact)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (second pass after audit artifact fix)
+- Evidence: durable acceptance manifest + record (2026-08-19T13:13:38Z)
+- Candidate: 5f3fb3a
