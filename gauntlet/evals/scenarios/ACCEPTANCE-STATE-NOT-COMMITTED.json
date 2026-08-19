@@ -1,0 +1,16 @@
+{
+  "id": "ACCEPTANCE-STATE-NOT-COMMITTED",
+  "kind": "acceptance_state_durability_gate",
+  "input": {
+    "acceptance_finalized": true,
+    "changed_bookkeeping_committed": false,
+    "committed_state_valid": false,
+    "remote_contains_acceptance": false,
+    "remote_state_valid": false,
+    "next_objective": "NEXT-OBJECTIVE"
+  },
+  "expect": {
+    "decision": "repair_acceptance_bookkeeping",
+    "failure_class": "missing_acceptance_bookkeeping"
+  }
+}

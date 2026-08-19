@@ -21,6 +21,8 @@ export type ScenarioKind =
   | "acceptance_claim_gate"
   | "post_acceptance_continuation_gate"
   | "remote_durability_gate"
+  | "acceptance_state_durability_gate"
+  | "cleanup_classification_gate"
   | "milestone_playtest_gate"
   | "manifest_gate"
   | "dynamic_sequence_gate"
@@ -51,6 +53,8 @@ export interface AcceptancePipelineGateScenario { id: string; kind: "acceptance_
 export interface AcceptanceClaimGateScenario { id: string; kind: "acceptance_claim_gate"; input: { claims_fully_accepted: boolean; acceptance_record_exists: boolean; objective_manifest_exists: boolean; state_marks_accepted: boolean; candidate_commit_exists: boolean }; expect: ScenarioExpectation }
 export interface PostAcceptanceContinuationGateScenario { id: string; kind: "post_acceptance_continuation_gate"; input: { acceptance_finalized: boolean; horizon_exhausted: boolean; replan_completed?: boolean; next_objective?: string | null; stop_reason?: GauntletStopReason | null }; expect: ScenarioExpectation }
 export interface RemoteDurabilityGateScenario { id: string; kind: "remote_durability_gate"; input: { acceptance_finalized: boolean; remote_contains_acceptance: boolean; horizon_exhausted: boolean; next_objective?: string | null }; expect: ScenarioExpectation }
+export interface AcceptanceStateDurabilityGateScenario { id: string; kind: "acceptance_state_durability_gate"; input: { acceptance_finalized: boolean; changed_bookkeeping_committed: boolean; committed_state_valid: boolean; remote_contains_acceptance: boolean; remote_state_valid: boolean; next_objective?: string | null }; expect: ScenarioExpectation }
+export interface CleanupClassificationGateScenario { id: string; kind: "cleanup_classification_gate"; input: { path_class: "accepted_evidence" | "ephemeral_artifact" | "canonical_state"; newer_than_remote: boolean }; expect: ScenarioExpectation }
 export interface MilestonePlaytestGateScenario { id: string; kind: "milestone_playtest_gate"; input: { milestone_id: string; entry_prerequisites_pass: boolean; exit_prerequisites_pass: boolean; required_situations: string[]; situation_outcomes: Record<string, MilestoneSituationOutcome>; critic_verdict: "ACCEPT" | "RETRY" | "REJECT" | "MISSING" }; expect: ScenarioExpectation }
 export interface ManifestGateScenario { id: string; kind: "manifest_gate"; input: { gauntlet_version: string; objective_accepted: boolean; manifest_exists: boolean; artifact_commit_bound: boolean; reviews_persisted: boolean }; expect: ScenarioExpectation }
 export interface DynamicSequenceGateScenario { id: string; kind: "dynamic_sequence_gate"; input: { evidence_class: string; temporal_and_visual?: boolean; frame_count: number; sequence_manifest_exists: boolean; labels_complete: boolean; event_centered_required?: boolean; event_centered?: boolean }; expect: ScenarioExpectation }
@@ -58,5 +62,5 @@ export interface PrRegressionClassificationGateScenario { id: string; kind: "pr_
 export interface RegressionInboxGateScenario { id: string; kind: "regression_inbox_gate"; input: { check_status: ValidationStatus; current_status: RegressionInboxStatus; current_signature: string | null; observed_signature: string | null }; expect: ScenarioExpectation }
 export interface RegressionMonitorTriggerGateScenario { id: string; kind: "regression_monitor_trigger_gate"; input: { pushed_branch: string }; expect: ScenarioExpectation }
 
-export type GauntletScenario = EvidenceGateScenario | HorizonValidationScenario | RoutingFallbackScenario | ContinuationScenario | TrackingGateScenario | CompositionGateScenario | AcceptedStateGateScenario | EvalFreshnessGateScenario | EvidenceUniquenessGateScenario | TimingConsistencyGateScenario | AcceptancePipelineGateScenario | AcceptanceClaimGateScenario | PostAcceptanceContinuationGateScenario | RemoteDurabilityGateScenario | MilestonePlaytestGateScenario | ManifestGateScenario | DynamicSequenceGateScenario | PrRegressionClassificationGateScenario | RegressionInboxGateScenario | RegressionMonitorTriggerGateScenario;
+export type GauntletScenario = EvidenceGateScenario | HorizonValidationScenario | RoutingFallbackScenario | ContinuationScenario | TrackingGateScenario | CompositionGateScenario | AcceptedStateGateScenario | EvalFreshnessGateScenario | EvidenceUniquenessGateScenario | TimingConsistencyGateScenario | AcceptancePipelineGateScenario | AcceptanceClaimGateScenario | PostAcceptanceContinuationGateScenario | RemoteDurabilityGateScenario | AcceptanceStateDurabilityGateScenario | CleanupClassificationGateScenario | MilestonePlaytestGateScenario | ManifestGateScenario | DynamicSequenceGateScenario | PrRegressionClassificationGateScenario | RegressionInboxGateScenario | RegressionMonitorTriggerGateScenario;
 export interface EvaluationResult extends ScenarioExpectation { scenario_id: string }

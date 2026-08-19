@@ -15,7 +15,7 @@ const RULES: GateRule[] = [
   { name: "acceptance persistence rejects blank screenshots", file: "gauntlet/evals/src/persist-acceptance.ts", mustContain: ["assertScreenshotSanity", "manifest.evidence.screenshots"] },
   { name: "candidate snapshot has mechanical scope gate", file: ".grok/agents/git-committer.md", mustContain: ["gauntlet:candidate-scope", "expected candidate scope", "docs/screenshots/capture"] },
   { name: "full suite checks worktree and accepted evidence hygiene", file: "scripts/ci/run-validation.mjs", mustContain: ["FULL-SUITE-WORKTREE-HYGIENE", "ACCEPTED-EVIDENCE-IMMUTABLE", "preexisting dirty content/status changed during suite"] },
-  { name: "main prompt uses deterministic-first critic-always pipeline", file: "gauntlet/PROMPT.md", mustContain: ["gauntlet/principles.md", "pnpm run gauntlet:audit", "REVIEW_REQUIRED", "The critic is mandatory", "GAUNTLET_ACCEPTANCE_JSON", "pnpm run gauntlet:eval:state"] },
+  { name: "main gauntlet entrypoint uses deterministic-first critic-always pipeline", file: "gauntlet/PROMPT.md", mustContain: ["gauntlet/principles.md", "pnpm run gauntlet:audit", "REVIEW_REQUIRED", "The critic is mandatory", "GAUNTLET_ACCEPTANCE_JSON", "pnpm run gauntlet:eval:state"] },
   { name: "acceptance is durable before claim", file: "gauntlet/PROMPT.md", mustContain: ["manifest.json", "fully accepted", "candidate commit", "Horizon exhaustion triggers strategic reassessment"] },
   { name: "accepted objectives are remotely durable before continuation", file: "gauntlet/PROMPT.md", mustContain: ["acceptance publication mode", "verify the exact final acceptance commit is contained in the remote branch", "Do not delegate or replan past an accepted objective until remote durability is verified"] },
   { name: "replanned horizon delegates without confirmation", file: "gauntlet/PROMPT.md", mustContain: ["delegate it immediately without asking the human for confirmation", "proceed to delegation without asking whether to continue"] },
@@ -29,7 +29,7 @@ const RULES: GateRule[] = [
   { name: "class-based evidence contract cannot regress", file: "gauntlet/evidence-contract.md", mustContain: ["`HEADLESS`", "`BROWSER_VISIBLE`", "`MULTI_TICK`", "`DYNAMIC_VISUAL`", "3–5 semantic frames", "temporal and browser-visible", "centered on that event", "`PRESENTATION`", "`BOOKKEEPING`", "manifest.json", "The critic is mandatory"] },
   { name: "evidence manifest contract exists", file: "gauntlet/evidence-manifest-contract.md", mustContain: ["candidate_commit", "sha256", "sequence.json", "video-reference.json", "milestones", "never silently overwritten"] },
   { name: "semantic audit is bounded and cannot accept", file: "gauntlet/semantic-audit-contract.md", mustContain: ["VALID|INVALID|INSUFFICIENT_CONTEXT", "can never produce objective `ACCEPT`"] },
-  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.9.2\"", "\"previous_system_version\": \"0.9.1\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene"] },
+  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.9.3\"", "\"previous_system_version\": \"0.9.2\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene"] },
   { name: "reviewer fallback remains explicit", file: "gauntlet/PROMPT.md", mustContain: ["critic-flash", "integration-reviewer-flash"] },
 ];
 
