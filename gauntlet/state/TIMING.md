@@ -7,11 +7,12 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: CPU-ATTACKING-ORGANIZATION
-usage_aggregates_through: CPU-ATTACKING-ORGANIZATION
-model_evaluation_through: CPU-ATTACKING-ORGANIZATION
+last_tracked_objective: BROWSER-UI-POLISH
+usage_aggregates_through: BROWSER-UI-POLISH
+model_evaluation_through: BROWSER-UI-POLISH
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
+backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
 overflow: orchestrator-deepseek (deepseek-v4-flash-0731) continued the session 2026-08-15T05:46Z; MUTANT-1V1, the three capability-axis rows, the lateral-drift row, the swerve row, and the CPU-opponent row are measured from this overflow session's meta.json. No sub-step in this session used the base deployment without the 0731 suffix.
 ```
 
@@ -136,13 +137,21 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | BROWSER-MATCH-SETUP-MENU | accepted | ~30m | 15m | 10m | 12m | 0.5m | ~6M est. | n/a** |
 | BROWSER-MATCH-STATS | accepted | ~25m | 12m | 8m | 10m | 0.5m | ~6M est. | n/a** |
 | CPU-ATTACKING-ORGANIZATION | accepted | ~20m | 10m | 7m | 8m | 0.5m | ~6M est. | n/a** |
+| CPU-DEFENSIVE-ORGANIZATION | accepted | ~20m* | ~10m* | ~7m* | ~8m* | ~0.5m* | n/a** | n/a** |
+| MATCH-CORNER-KICK | accepted | ~35m* | ~15m* | ~7m* | ~12m* | ~0.5m* | n/a** | n/a** |
+| BROWSER-PLAYER-ANIMATION | accepted | ~20m* | ~9m* | ~6m* | ~5m* | ~0.5m* | n/a** | n/a** |
+| BROWSER-UI-POLISH | accepted | ~45m* | ~20m* | ~8m* | ~16m* | ~0.5m* | n/a** | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
 not first-pass implementation.
 
 \* DUELS-SUITE prompt/completion tokens were not re-aggregated from the prior
-session; durations are from that session's subagent meta.json.
+session; durations are from that session's subagent meta.json. The four rows
+marked with a single `*` per cell (CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK,
+BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH) were backfilled 2026-08-19 from
+durable acceptance records/manifests and commit timestamps; their per-cell
+durations are estimates, not subagent meta.json values.
 \*\* MUTANT-1V1 and the later overflow-session steps are not separately split
 for completion (updates.jsonl records a final `totalTokens` snapshot per
 role); `Prompt` is the summed final totals (MUTANT-1V1: builder 1.95M +
@@ -345,6 +354,10 @@ on an H task is the interesting result.
 | BROWSER-MATCH-SETUP-MENU | mimo-v2.5 | M | Medium — setup menu, match lifecycle refactor | 0 | A | 86 browser, 1722 node, first-pass clean |
 | BROWSER-MATCH-STATS | mimo-v2.5 | L | Small — live stats display, event derivation | 0 | A | 86 browser, typecheck, first-pass clean |
 | CPU-ATTACKING-ORGANIZATION | mimo-v2.5 | M | Medium — overlapping runs, spacing, delayed runs, cross/through-ball | 0 | A | 11 tests, 86 browser, first-pass clean |
+| CPU-DEFENSIVE-ORGANIZATION | mimo-v2.5 | M | Medium — structured defensive organization | 0 | A | backfilled from durable record; critic first pass |
+| MATCH-CORNER-KICK | mimo-v2.5 | M | Medium — corner-kick set piece over MATCH-SET-PIECE infra | 0 | A | backfilled from durable record; critic first pass |
+| BROWSER-PLAYER-ANIMATION | mimo-v2.5 | M | Medium — body orientation and running animation | 0 | A | backfilled from durable record; critic first pass |
+| BROWSER-UI-POLISH | mimo-v2.5 | M | Medium — browser UI polish | 0 | A | backfilled from durable record; critic first pass |
 
 ### Reviewer route and catches
 
@@ -418,6 +431,14 @@ on an H task is the interesting result.
 | BROWSER-MATCH-STATS | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 86 browser tests, typecheck, no core changes |
 | CPU-ATTACKING-ORGANIZATION | critic-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 5/5 criteria, 11 tests, first-pass clean |
 | CPU-ATTACKING-ORGANIZATION | integration-reviewer-flash (deepseek-v4-flash) | 0731 exhausted, flash fallback | ACCEPT | 11 tests, 86 browser, no core changes |
+| CPU-DEFENSIVE-ORGANIZATION | critic-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | first pass clean |
+| CPU-DEFENSIVE-ORGANIZATION | integration-reviewer-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | no core changes |
+| MATCH-CORNER-KICK | critic-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | first pass clean |
+| MATCH-CORNER-KICK | integration-reviewer-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | no core changes |
+| BROWSER-PLAYER-ANIMATION | critic-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | first pass clean |
+| BROWSER-PLAYER-ANIMATION | integration-reviewer-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | presentation_authority PASS |
+| BROWSER-UI-POLISH | critic-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | first pass clean |
+| BROWSER-UI-POLISH | integration-reviewer-flash (deepseek-v4-flash) | backfilled from durable record | ACCEPT | no core changes |
 
 ### Builder scoreboard
 
@@ -426,7 +447,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 40 | 24 | 8 | 3 | 3 | 2 | 60% | ~0.78 | ~38m |
-| mimo-v2.5 | 19 | 12 | 6 | 1 | 0 | 0 | 63% | ~0.47 | ~30m |
+| mimo-v2.5 | 23 | 16 | 6 | 1 | 0 | 0 | 70% | ~0.39 | ~30m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

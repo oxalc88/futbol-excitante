@@ -88,28 +88,11 @@ selection_note: "Horizon small-sided-shape exhausted (5/5 accepted). Horizon was
 ```
 ## Last accepted objective
 
-CPU-ATTACKING-ORGANIZATION — Structured CPU attacking patterns: overlapping runs (wide carriers trigger lateral overlap), spacing maintenance (10-15m between attackers), delayed forward runs (20-tick delay for onside simulation), and cross/through-ball decision logic (wide → cross, central → through-ball). CPU adapter only. All constants provisional. No PES claims. 11/11 attacking organization tests, 86/86 browser tests. HEADLESS audit PASS.
+BROWSER-UI-POLISH — Browser UI polish. Prior session left the "Last accepted" section and TIMING behind at CPU-ATTACKING-ORGANIZATION; backfilled on 2026-08-19 from durable acceptance records and manifests (CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH all have candidate + acceptance commits on main). HEADLESS audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 11 attacking organization tests, 86 browser tests (18 files)
-- Commit: 86c3278
-
-- builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 86 browser tests (18 files), typecheck pass
-- Commit: ae00e1f
-
-- builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 1722 node tests (97 files), 86 browser tests (18 files)
-- Commit: 41e4c86
-
-- builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: 1722 node tests (97 files), 86 browser tests (18 files)
-- Commit: 8e83767
+- Evidence: durable acceptance manifest + record (2026-08-18T09:54:35Z)
+- Candidate: 08096f7
+- Acceptance commit: a7620fe

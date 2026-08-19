@@ -2578,3 +2578,43 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 86c3278 candidate(CPU-ATTACKING-ORGANIZATION)
 - notes: Structured CPU attacking patterns: overlapping runs, spacing maintenance, delayed forward runs, cross/through-ball decisions. CPU adapter only. 11 new tests. HEADLESS audit PASS. No PES claim. Horizon small-sided-shape 1/5.
+
+## Iteration 69 — 2026-08-18 (backfilled 2026-08-19 from durable records)
+
+- objective_id: CPU-DEFENSIVE-ORGANIZATION
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: ce61af0 candidate(CPU-DEFENSIVE-ORGANIZATION), a98d3e0 gauntlet(CPU-DEFENSIVE-ORGANIZATION): accept
+- notes: Structured CPU defensive organization. Backfilled from durable acceptance record 2026-08-18T08:05:39Z and manifest (HEADLESS). Not previously recorded in HISTORY/TIMING.
+
+## Iteration 70 — 2026-08-18 (backfilled 2026-08-19 from durable records)
+
+- objective_id: MATCH-CORNER-KICK
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 43f8726 candidate(MATCH-CORNER-KICK), 2cc66d1 gauntlet(MATCH-CORNER-KICK): accept
+- notes: Corner kick set piece: out-of-play detection over goal line, corner flag positioning, kick taker selection, penalty-area setup, countdown auto-execute cross. Extends MATCH-SET-PIECE infrastructure. Backfilled from durable acceptance record 2026-08-18T08:44:40Z and manifest (HEADLESS). Not previously recorded in HISTORY/TIMING.
+
+## Iteration 71 — 2026-08-18 (backfilled 2026-08-19 from durable records)
+
+- objective_id: BROWSER-PLAYER-ANIMATION
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: f96820f candidate(BROWSER-PLAYER-ANIMATION), 4ffd752 gauntlet(BROWSER-PLAYER-ANIMATION): accept
+- notes: Player body orientation and running animation. Backfilled from durable acceptance record 2026-08-18T09:05:57Z and manifest (PRESENTATION, screenshot PASS). Not previously recorded in HISTORY/TIMING.
+
+## Iteration 72 — 2026-08-18 (backfilled 2026-08-19 from durable records)
+
+- objective_id: BROWSER-UI-POLISH
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 08096f7 candidate(BROWSER-UI-POLISH), a7620fe gauntlet(BROWSER-UI-POLISH): accept
+- notes: Browser UI polish. Backfilled from durable acceptance record 2026-08-18T09:54:35Z and manifest (HEADLESS). Not previously recorded in HISTORY/TIMING. Horizon small-sided-shape EXHAUSTED (5/5).
