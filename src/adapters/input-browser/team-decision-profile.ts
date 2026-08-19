@@ -14,6 +14,13 @@
  *    player chases, others cover space.
  *  - BALANCED: default — independent per-player behavior.
  *
+ * Tactical awareness (CPU-TACTICAL-AWARENESS):
+ *  - Score gradient: continuous bias from scoreDifferential replaces
+ *    hard ±2 threshold. Larger deficit → more attacking bias.
+ *  - Match phase: non-playing phases → hold; kickoff → calm.
+ *  - Fatigue effects (press radius/strength reduction) are applied
+ *    per-player inside the CPU adapter, not at the team-decision level.
+ *
  * Deterministic: same (observation, teamId) → same TeamDecision.
  * No Math.random, Date, DOM, or Node I/O.
  *
@@ -175,15 +182,27 @@ function findNearestToBall(
  * Compute the team-level decision for one team on one tick.
  *
  * Rules (deterministic, pure):
- *  1. If this team has possession → ATTACK.
- *  2. If opponent has possession AND ball is in own third → DEFEND.
- *  3. Otherwise → BALANCED.
+ *  1. If match phase is non-playing ("goal", "halftime", "fulltime",
+ *     "corner-kick", "throw-in", "goal-kick") → BALANCED with HOLD
+ *     sub-mode (players hold position, no chasing).
+ *  2. If match phase is "kickoff" → BALANCED (structured/calm).
+ *  3. If this team has possession → ATTACK.
+ *  4. If opponent has possession AND ball is in own third → DEFEND.
+ *  5. Otherwise → BALANCED with score-gradient adjustment.
  *
- * Score awareness (provisional):
- *  - When ahead by ≥ 2 goals, DEFEND is preferred: BALANCED in center
- *    third counts as DEFEND.
- *  - When behind by ≥ 2 goals, ATTACK is preferred: BALANCED in center
- *    third counts as ATTACK.
+ * Score gradient (provisional):
+ *  - Continuous bias from scoreDifferential: the larger the deficit,
+ *    the more attacking (and vice versa for leads).
+ *  - Mapping: bias = clamp(-scoreDifferential / 3, -1, 1).
+ *    Positive bias → toward ATTACK; negative → toward DEFEND.
+ *  - In center third (BALANCED default):
+ *    - bias > 0.33 → ATTACK
+ *    - bias < -0.33 → DEFEND
+ *    - Otherwise → BALANCED
+ *
+ * Fatigue effects (per-player, in the adapter, not here):
+ *  - Press radius and press strength shrink with fatigue.
+ *  - Sprint is always 1 (accepted invariant).
  *
  * @param observation — read-only world observation.
  * @param teamId — the team this decision applies to.
@@ -206,25 +225,41 @@ export function computeTeamDecision(
   const hasPossession = teamHasPossession(observation, teamId);
   const opponentHasPossession = teamHasPossession(observation, opponentTeamId);
 
+  // --- Phase-aware behavior (provisional) ---
+  // Non-playing phases: hold position, no chasing.
+  const phase = observation.matchPhase;
+  const isNonPlayingPhase = phase === "goal" || phase === "halftime" ||
+    phase === "fulltime" || phase === "corner-kick" ||
+    phase === "throw-in" || phase === "goal-kick";
+  const isKickoff = phase === "kickoff";
+
   let strategy: TeamStrategy;
 
-  if (hasPossession) {
-    // Rule 1: we have the ball → ATTACK
+  if (isNonPlayingPhase) {
+    // During set pieces and stoppages, hold position — no chasing.
+    strategy = "BALANCED";
+  } else if (isKickoff) {
+    // Right after kickoff: structured/calm behavior.
+    strategy = "BALANCED";
+  } else if (hasPossession) {
+    // Rule 3: we have the ball → ATTACK
     strategy = "ATTACK";
   } else if (opponentHasPossession && ballZone === "own") {
-    // Rule 2: opponent has ball in our third → DEFEND
+    // Rule 4: opponent has ball in our third → DEFEND
     strategy = "DEFEND";
   } else {
-    // Rule 3: default → BALANCED, with score-based adjustment
-    const scoreDiff = observation.scoreDifferential;
-    const isAhead = typeof scoreDiff === "number" && scoreDiff >= 2;
-    const isBehind = typeof scoreDiff === "number" && scoreDiff <= -2;
+    // Rule 5: default → BALANCED, with continuous score-gradient adjustment.
+    const scoreDiff = observation.scoreDifferential ?? 0;
+    // Provisional continuous bias: positive = more attacking, negative = more defensive.
+    // Clamp to [-1, 1]. At scoreDiff = -3 → bias ≈ 1 (very attacking).
+    // At scoreDiff = +3 → bias ≈ -1 (very defensive).
+    const scoreBias = Math.max(-1, Math.min(1, -scoreDiff / 3));
 
-    if (isBehind && ballZone === "center") {
-      // Behind by 2+: push forward even in center third
+    if (scoreBias > 0.33 && ballZone === "center") {
+      // Behind in score → push forward in center third.
       strategy = "ATTACK";
-    } else if (isAhead && ballZone === "center") {
-      // Ahead by 2+: drop back even in center third
+    } else if (scoreBias < -0.33 && ballZone === "center") {
+      // Ahead in score → drop back in center third.
       strategy = "DEFEND";
     } else {
       strategy = "BALANCED";
@@ -236,7 +271,10 @@ export function computeTeamDecision(
   // ------------------------------------------------------------------
   let defensiveSubMode: DefensiveSubMode = "NONE";
 
-  if (strategy === "DEFEND") {
+  if (isNonPlayingPhase) {
+    // During non-playing phases, all players hold — no pressing or marking.
+    defensiveSubMode = "NONE";
+  } else if (strategy === "DEFEND") {
     if (nearest.distance <= PRESS_DISTANCE_THRESHOLD) {
       defensiveSubMode = "PRESSING";
     } else {

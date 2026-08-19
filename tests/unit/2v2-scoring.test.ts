@@ -330,6 +330,7 @@ describe("GOAL-2V2-006: multiple goals", () => {
     expect(result.matchPhase).not.toBe("kickoff");
   });
 
+  // long 1000-tick free-play fixture; needs >5s budget (can reach ~11s under load)
   it("multiple goals accumulate in score", () => {
     // Use a longer match to allow multiple goal scenarios.
     const scenario = buildForcedGoal2v2Scenario(0, 1000);
@@ -341,7 +342,7 @@ describe("GOAL-2V2-006: multiple goals", () => {
     // At least some goals should be scored by team-a in this setup.
     // (Ball starts near +x and is shot toward +52.5)
     expect(teamAGoals + teamBGoals).toBeGreaterThanOrEqual(1);
-  });
+  }, 15_000);
 
   it("no goals before first goal event is processed", () => {
     const scenario = buildForcedGoal2v2Scenario(0);
@@ -372,6 +373,7 @@ describe("GOAL-2V2-006: multiple goals", () => {
 // ---------------------------------------------------------------------------
 
 describe("GOAL-2V2-007: full-time detection", () => {
+  // long 1000-tick free-play fixture; needs >5s budget
   it("long match reaches fulltime", () => {
     // Run a match that's long enough to test full-time detection
     // (uses 1000 ticks instead of 5400 for performance).
@@ -380,7 +382,7 @@ describe("GOAL-2V2-007: full-time detection", () => {
 
     expect(result.matchPhase).toBe("fulltime");
     expect(result.elapsedTicks).toBe(1000);
-  });
+  }, 10_000);
 
   it("fulltime fires regardless of goals scored", () => {
     const scenario = buildForcedGoal2v2Scenario(0, 500);
@@ -389,6 +391,7 @@ describe("GOAL-2V2-007: full-time detection", () => {
     expect(result.matchPhase).toBe("fulltime");
   });
 
+  // long 1000-tick free-play fixture; needs >5s budget
   it("phase history includes halftime and fulltime for long match", () => {
     const scenario = buildForcedGoal2v2Scenario(0, 1000);
     const result = runHeadlessMatch({ scenario, maxTicks: 1000 });
@@ -399,7 +402,7 @@ describe("GOAL-2V2-007: full-time detection", () => {
     expect(phases).toContain("second-half");
     // The final phase should be fulltime (or kickoff if a goal fired on last tick).
     expect(phases.includes("fulltime") || phases[phases.length - 1] === "fulltime").toBe(true);
-  });
+  }, 10_000);
 
   it("goal-triggered kickoff phase does not prevent fulltime", () => {
     const scenario = buildForcedGoal2v2Scenario(0, 200);

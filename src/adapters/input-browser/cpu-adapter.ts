@@ -141,6 +141,40 @@ export interface CpuObservation {
    * Provisional — not a measured PES 2017 concept.
    */
   recentPassEvents?: PassEventInfo[];
+
+  // -----------------------------------------------------------------
+  // Tactical awareness signals (CPU-TACTICAL-AWARENESS)
+  // All optional for backward compatibility.
+  // -----------------------------------------------------------------
+
+  /**
+   * Current match lifecycle phase.
+   * When present, the CPU adapter adjusts behavior:
+   * - "playing": normal tactical decisions.
+   * - "kickoff": structured/calm (first few ticks after restart).
+   * - "goal"/"halftime"/"fulltime": hold position (no chasing).
+   * - "corner-kick"/"throw-in"/"goal-kick": hold during set pieces.
+   * Provisional — not a measured PES 2017 concept.
+   */
+  matchPhase?: "playing" | "goal" | "halftime" | "fulltime" | "kickoff" | "corner-kick" | "throw-in" | "goal-kick";
+
+  /**
+   * Current half number (1 or 2).
+   * Used by the adapter to reset fatigue on half transitions.
+   * Provisional — not a measured PES 2017 concept.
+   */
+  currentHalf?: number;
+
+  /**
+   * Provisional fatigue signal in [0, 1].
+   * 0 = fresh (start of half), 1 = fully fatigued.
+   * Derived deterministically by the CPU adapter's per-instance
+   * tick accumulator: incremented each tick while matchPhase === "playing",
+   * capped at FATIGUE_MAX_TICKS, reset on half transitions.
+   * When absent, the adapter assumes fresh (no fatigue effects).
+   * Provisional — not a measured PES 2017 concept.
+   */
+  fatigue?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -263,6 +297,10 @@ export function buildCpuObservation(
     result.recentPassEvents = passEvents;
   }
 
+  // Populate tactical awareness signals from deterministic world state.
+  result.matchPhase = world.matchPhase;
+  result.currentHalf = world.currentHalf;
+
   return result;
 }
 
@@ -321,6 +359,12 @@ interface CpuInternalState {
 
   /** Whether this player is currently making an overlapping run. */
   isOverlapping: boolean;
+
+  // --- Fatigue accumulator (CPU-TACTICAL-AWARENESS) ---
+  /** Accumulated ticks while matchPhase === "playing". Capped at FATIGUE_MAX_TICKS. */
+  fatigueTicks: number;
+  /** The last observed currentHalf, used to detect half transitions for reset. */
+  lastCurrentHalf: number;
 }
 
 /**
@@ -1046,18 +1090,21 @@ function getShotAimOffsetY(tick: number): number {
 }
 
 /**
- * Compute score-state urgency multiplier.
+ * Compute score-state urgency multiplier (provisional continuous gradient).
  *
- * - scoreDiff >= 2: CPU is ahead → caution mode (reduced urgency).
- * - scoreDiff <= -2: CPU is behind → aggressive mode.
- * - otherwise: neutral.
+ * Replaces the hard ±2 threshold with a continuous mapping:
+ * - scoreDiff = 0 → urgency = 1 (neutral)
+ * - scoreDiff = -3 → urgency = 2 (very aggressive, behind)
+ * - scoreDiff = +3 → urgency = 0.5 (very cautious, ahead)
+ *
+ * Mapping: urgency = 1 - scoreDiff / 3, clamped to [0.5, 2].
+ * This is monotonic and deterministic.
  *
  * Returns a factor in [0.5, 2] that scales shooting/wide-angle thresholds.
  */
 function getScoreUrgency(scoreDiff?: number): number {
-  if (typeof scoreDiff === "number" && scoreDiff >= 2) return 0.5;
-  if (typeof scoreDiff === "number" && scoreDiff <= -2) return 2;
-  return 1;
+  if (typeof scoreDiff !== "number") return 1;
+  return Math.max(0.5, Math.min(2, 1 - scoreDiff / 3));
 }
 
 /**
@@ -1435,6 +1482,44 @@ function computeMarkOffsetPosition(
  *
  * @returns A CpuAdapter instance.
  */
+
+// ---------------------------------------------------------------------------
+// Fatigue accumulator constants (CPU-TACTICAL-AWARENESS, provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Maximum tick count for the fatigue accumulator per half.
+ * At 60 Hz, 3600 ticks ≈ 60 simulated minutes — roughly one half of
+ * a 90-minute match.  When fatigueTicks reaches this value, fatigue
+ * saturates at 1.0 (fully fatigued).
+ *
+ * The accumulator increments by 1 each tick while matchPhase === "playing"
+ * and resets to 0 when currentHalf changes (half-time break).
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const FATIGUE_MAX_TICKS = 3600;
+
+/**
+ * Apply fatigue accumulation and half-transition reset.
+ * Called only when observation.matchPhase is present (real runtime).
+ * Deterministic: same inputs → same state mutation.
+ */
+function applyFatigueAndPhase(
+  state: CpuInternalState,
+  observation: CpuObservation,
+  _tick: number,
+): void {
+  const currentHalf = observation.currentHalf ?? 1;
+  if (currentHalf !== state.lastCurrentHalf) {
+    state.fatigueTicks = 0;
+    state.lastCurrentHalf = currentHalf;
+  }
+  if (observation.matchPhase === "playing") {
+    state.fatigueTicks = Math.min(state.fatigueTicks + 1, FATIGUE_MAX_TICKS);
+  }
+}
+
 export function createCpuAdapter(): CpuAdapter {
   const state: CpuInternalState = {
     ballWasInRange: false,
@@ -1449,6 +1534,8 @@ export function createCpuAdapter(): CpuAdapter {
     activePassBallVelocity: { x: 0, y: 0 },
     activePasserId: "",
     isOverlapping: false,
+    fatigueTicks: 0,
+    lastCurrentHalf: 1,
   };
 
   return {
@@ -1498,6 +1585,27 @@ export function createCpuAdapter(): CpuAdapter {
       const ball = observation.ball;
       const playerX = cpuPlayer.groundPosition.x;
       const playerY = cpuPlayer.groundPosition.y;
+
+      // --- Fatigue accumulator + phase hold (CPU-TACTICAL-AWARENESS) ---
+      // Guarded: only runs when observation carries matchPhase (real runtime).
+      // In the headless runner (buildTeamCpuObservation), matchPhase is absent
+      // so this entire block is skipped with zero overhead.
+      if (observation.matchPhase != null) {
+        applyFatigueAndPhase(state, observation, tick);
+        if (observation.matchPhase !== "playing" && observation.matchPhase !== "kickoff") {
+          return {
+            tick,
+            sourceId: "cpu",
+            controlSlot: "slot-cpu",
+            moveX: 0,
+            moveY: 0,
+            sprint: 0,
+            heldButtons: 0,
+            pressedButtons: 0,
+            releasedButtons: 0,
+          };
+        }
+      }
 
       // Compute vector from CPU player to ball.
       const dx = ball.position.x - playerX;
@@ -1915,16 +2023,26 @@ export function createCpuAdapter(): CpuAdapter {
         // within PRESS_RADIUS.
         // Press trigger: when the ball enters the nearest defender's zone,
         // increase sprint to signal more aggressive pressing behavior.
+        // Fatigue modulates: press strength and radius shrink when tired.
         if (isDefensiveMode && isNearestToBall && cpuTeamId) {
+          const playerFatigue = state.fatigueTicks > 0
+            ? Math.min(state.fatigueTicks / FATIGUE_MAX_TICKS, 1)
+            : 0;
+          const effectivePressRadius = playerFatigue > 0
+            ? PRESS_RADIUS * (1 - playerFatigue * 0.4)
+            : PRESS_RADIUS;
+          const effectivePressStrength = playerFatigue > 0
+            ? PRESS_STRENGTH * (1 - playerFatigue * 0.3)
+            : PRESS_STRENGTH;
           const ballCarrier = findBallCarrierPlayer(observation, cpuTeamId);
           if (ballCarrier) {
             const bcdx = ballCarrier.position.x - playerX;
             const bcdy = ballCarrier.position.y - playerY;
             const bcDist = Math.sqrt(bcdx * bcdx + bcdy * bcdy);
-            if (bcDist < PRESS_RADIUS && bcDist > 0.001) {
+            if (bcDist < effectivePressRadius && bcDist > 0.001) {
               const distUnit = Math.min(bcDist, 1);
-              let pressX = (bcdx / bcDist) * distUnit * PRESS_STRENGTH;
-              let pressY = (bcdy / bcDist) * distUnit * PRESS_STRENGTH;
+              let pressX = (bcdx / bcDist) * distUnit * effectivePressStrength;
+              let pressY = (bcdy / bcDist) * distUnit * effectivePressStrength;
               // Clamp to valid input range.
               pressX = Math.max(-1, Math.min(1, pressX));
               pressY = Math.max(-1, Math.min(1, pressY));
@@ -2187,6 +2305,8 @@ export function createCpuAdapter(): CpuAdapter {
       state.activePassBallVelocity = { x: 0, y: 0 };
       state.activePasserId = "";
       state.isOverlapping = false;
+      state.fatigueTicks = 0;
+      state.lastCurrentHalf = 1;
     },
   };
 }
