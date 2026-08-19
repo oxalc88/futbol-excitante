@@ -1,13 +1,13 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 4
+horizon_version: 5
 status: ACTIVE
 horizon_id: "transition-completion"
 created_from_commit: a7620fe
 created_at: 2026-08-18
 reason: "Horizon small-sided-shape exhausted (5/5 accepted). Next horizon completes remaining transition set pieces (throw-ins, goal kicks), deepens CPU tactical awareness for game-state adaptation, adds browser match-difficulty setup, and materializes the team evaluator suite to enable SMALL_SIDED_SHAPE milestone evaluation. Goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs and suites exist."
-current_index: 2
+current_index: 3
 objectives:
   - id: MATCH-THROW-IN
     status: accepted
@@ -20,7 +20,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: MATCH-SET-PIECE
   - id: CPU-TACTICAL-AWARENESS
-    status: pending
+    status: accepted
     reason: "CPU tactical awareness: game-state adaptation (more attacking when losing, more defensive when winning), fatigue awareness, and match-phase-specific behavior. Extends CPU-TEAM-DECISION-PROFILE. CPU adapter changes only."
     builder: builder-gameplay
     prerequisite: CPU-TEAM-DECISION-PROFILE

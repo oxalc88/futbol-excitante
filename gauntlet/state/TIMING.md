@@ -7,9 +7,9 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: MATCH-GOAL-KICK
-usage_aggregates_through: MATCH-GOAL-KICK
-model_evaluation_through: MATCH-GOAL-KICK
+last_tracked_objective: CPU-TACTICAL-AWARENESS
+usage_aggregates_through: CPU-TACTICAL-AWARENESS
+model_evaluation_through: CPU-TACTICAL-AWARENESS
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -143,6 +143,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | BROWSER-UI-POLISH | accepted | ~45m* | ~20m* | ~8m* | ~16m* | ~0.5m* | n/a** | n/a** |
 | MATCH-THROW-IN | accepted | ~64m | 40m | 11m | 9m | 1m | ~8M est. | n/a** |
 | MATCH-GOAL-KICK | accepted | ~78m | 44m | 8m | 13m | 1m | ~8M est. | n/a** |
+| CPU-TACTICAL-AWARENESS | accepted | ~160m | 100m | 20m | 9m | 1m | ~20M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -362,6 +363,7 @@ on an H task is the interesting result.
 | BROWSER-UI-POLISH | mimo-v2.5 | M | Medium — browser UI polish | 0 | A | backfilled from durable record; critic first pass |
 | MATCH-THROW-IN | mimo-v2.5 | M | Medium — throw-in set piece over MATCH-SET-PIECE infra | 0 | A | 28 tests, 1835 node, 86 browser, first-pass clean |
 | MATCH-GOAL-KICK | mimo-v2.5 | M | Medium — goal-kick set piece over MATCH-SET-PIECE infra | 0 | A | 33 tests, 1868 node, 86 browser, first-pass clean |
+| CPU-TACTICAL-AWARENESS | mimo-v2.5 | M | Medium — continuous score gradient, fatigue accumulator, phase hold | 0 | A | 46 tests, 1914 node, 86 browser (2 orchestrator-verified fix rounds before critic) |
 
 ### Reviewer route and catches
 
@@ -447,6 +449,8 @@ on an H task is the interesting result.
 | MATCH-THROW-IN | integration-reviewer-flash (deepseek-v4-flash) | 0731 unavailable, flash fallback; second pass | ACCEPT | full node 1835, 84 targeted, no core changes |
 | MATCH-GOAL-KICK | critic-flash (deepseek-v4-flash) | 0731 unavailable, flash fallback | ACCEPT | 33 goal-kick, 1868 node, 86 browser, first-pass clean |
 | MATCH-GOAL-KICK | integration-reviewer-flash (deepseek-v4-flash) | 0731 unavailable, flash fallback | ACCEPT | 1868 node, 84 neighboring set-piece, no core changes |
+| CPU-TACTICAL-AWARENESS | critic-flash (deepseek-v4-flash) | 0731 unavailable, flash fallback | ACCEPT | gradient/fatigue/phase verified; 1914 node, 86 browser; timeout accommodation judged non-masking |
+| CPU-TACTICAL-AWARENESS | integration-reviewer-flash (deepseek-v4-flash) | 0731 unavailable, flash fallback | ACCEPT | 1914 node, 86 browser, no core/contract changes |
 
 ### Builder scoreboard
 
@@ -455,7 +459,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 40 | 24 | 8 | 3 | 3 | 2 | 60% | ~0.78 | ~38m |
-| mimo-v2.5 | 25 | 18 | 6 | 1 | 0 | 0 | 72% | ~0.36 | ~30m |
+| mimo-v2.5 | 26 | 19 | 6 | 1 | 0 | 0 | 73% | ~0.35 | ~30m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

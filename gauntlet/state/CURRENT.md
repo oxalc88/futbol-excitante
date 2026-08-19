@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: CPU-TACTICAL-AWARENESS
+next_objective_id: BROWSER-DIFFICULTY-SETTING
 
 best_known:
-  commit: 06b51ee
-  note: "MATCH-GOAL-KICK accepted (HEADLESS). Candidate commit 06b51ee; acceptance bookkeeping and publication follow in this session."
+  commit: 52557aa
+  note: "CPU-TACTICAL-AWARENESS accepted (HEADLESS). Candidate commit 52557aa; acceptance bookkeeping and publication follow in this session."
 
 active_candidate: null
 builder_in_use: null
@@ -83,17 +83,18 @@ accepted:
   - BROWSER-UI-POLISH
   - MATCH-THROW-IN
   - MATCH-GOAL-KICK
+  - CPU-TACTICAL-AWARENESS
 
 blocked: []
 
-selection_note: "Horizon transition-completion 2/5: MATCH-THROW-IN and MATCH-GOAL-KICK accepted 2026-08-19. Next: CPU-TACTICAL-AWARENESS."
+selection_note: "Horizon transition-completion 3/5: MATCH-THROW-IN, MATCH-GOAL-KICK, CPU-TACTICAL-AWARENESS accepted 2026-08-19. Next: BROWSER-DIFFICULTY-SETTING."
 ```
 ## Last accepted objective
 
-MATCH-GOAL-KICK — Goal kick set piece: ball crossing a goal line outside the posts with the attacking team's last touch awards a goal kick to the defending team (`lastTouchTeam !== defendingTeam` branch, complementary to the corner-kick branch). New `goal-kick` MatchPhase with parallel state fields, ball placed at the goal area (±47, y clamped ±9.16 preserving exit side), taker = closest defending player, teammates spread, attackers outside the area, 60-tick countdown auto-execute kicking upfield to the nearest receiver with `goal-kick-executed` event, state reset. Extends the MATCH-SET-PIECE / MATCH-CORNER-KICK / MATCH-THROW-IN infrastructure. All coefficients provisional. No PES claims. 19 unit + 14 integration tests, full node suite 1868/1868, browser 86/86. HEADLESS audit PASS.
+CPU-TACTICAL-AWARENESS — CPU tactical awareness (CPU adapter only): continuous score-gradient adaptation replacing the hard ±2 threshold (`bias = clamp(-scoreDiff/3, -1, 1)`: more attacking when losing, more defensive when winning), fatigue awareness via a deterministic per-adapter tick accumulator (increments while matchPhase === "playing", resets on half change; press radius/strength shrink when fatigued; sprint stays 1 preserving the accepted invariant), and match-phase behavior (non-playing phases → hold, kickoff → calm, only when matchPhase is present). Observation immutability preserved (adapter never mutates CpuObservation). 36 unit + 10 integration tests; full node suite 1914/1914; browser 86/86. HEADLESS audit PASS. All coefficients provisional (FATIGUE_MAX_TICKS 3600, gradient divisor 3); no PES claims. Three 1000-tick free-play fixtures in 2v2-scoring received explicit per-test timeouts because the intended score-gradient changes post-goal thresholds (more simulation events); assertions unchanged.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (after orchestrator-verified regressions fixed: observation mutation + sprint invariant; two builder fix rounds)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-19T14:31:14Z)
-- Candidate: 06b51ee
+- Evidence: durable acceptance manifest + record (2026-08-19T20:52:07Z)
+- Candidate: 52557aa

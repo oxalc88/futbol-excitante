@@ -2638,3 +2638,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 06b51ee candidate(MATCH-GOAL-KICK)
 - notes: Goal kick set piece: complementary trigger in the ball-out-of-play handler (`lastTouchTeam !== defendingTeam` → goal kick to the defending team; corner-kick branch unchanged, null last-touch guard kept), new `goal-kick` MatchPhase with parallel state fields, ball placed at goal area (±47, y clamped ±9.16 preserving exit side), taker = closest defending player, teammates spread in own half, attackers outside the area, 60-tick countdown auto-execute kicking upfield to the nearest receiver (`goal-kick-executed`), state reset. Extends MATCH-SET-PIECE / MATCH-CORNER-KICK / MATCH-THROW-IN infrastructure. 19 unit + 14 integration tests, full node suite 1868/1868, browser 86/86. HEADLESS audit PASS. All coefficients provisional (16 m/s, loft 0.25, 5.5m/9.16m goal-area); no PES claim. Horizon transition-completion 2/5.
+
+## Iteration 75 — 2026-08-19
+
+- objective_id: CPU-TACTICAL-AWARENESS
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (after 2 orchestrator-verified builder fix rounds: observation mutation + "CPU always sprints" regressions, then long-fixture timeouts)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 52557aa candidate(CPU-TACTICAL-AWARENESS)
+- notes: CPU tactical awareness (adapter only): continuous score-gradient replacing the hard ±2 threshold (bias = clamp(-scoreDiff/3, -1, 1); more attacking when losing, more defensive when winning); fatigue via deterministic per-adapter tick accumulator (increments while matchPhase === "playing", capped FATIGUE_MAX_TICKS=3600, reset on half change; press radius/strength shrink when fatigued; sprint always 1); match-phase behavior (non-playing phases → hold, kickoff → calm) gated on observation.matchPhase. Observation immutability preserved. 36 unit + 10 integration tests; full node suite 1914/1914; browser 86/86. HEADLESS audit PASS. The gradient changes post-goal thresholds in long free-play fixtures (~3x sim events); 3 heavy 1000-tick fixtures in 2v2-scoring got explicit per-test budgets (assertions unchanged). All coefficients provisional; no PES claim. Horizon transition-completion 3/5.
