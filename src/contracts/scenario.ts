@@ -35,6 +35,7 @@ export interface SimulationEvent {
     | "ball-touchline-out-of-play"
     | "corner-kick-executed"
     | "throw-in-executed"
+    | "goal-kick-executed"
     | "player-ball-contact"
     | "player-player-contact"
     | "pass"

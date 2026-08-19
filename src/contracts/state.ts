@@ -174,6 +174,7 @@ export interface WorldState {
    * - "fulltime": match ended.
    * - "corner-kick": ball went out over the goal line, corner kick set piece.
    * - "throw-in": ball went out over the touchline, throw-in set piece.
+   * - "goal-kick": ball went out over the goal line, goal kick set piece.
    *
    * Only "playing" allows regular tick progression with countdown.
    * During "goal", the `goalResetCountdown` field drives the automatic
@@ -289,6 +290,45 @@ export interface WorldState {
    * Set when matchPhase transitions to "throw-in".
    */
   throwInTouchlineIndex: 0 | 1 | null;
+
+  // -----------------------------------------------------------------
+  // Goal kick state (MATCH-GOAL-KICK)
+  // -----------------------------------------------------------------
+
+  /**
+   * Ball placement position inside the goal area.
+   * Set when matchPhase transitions to "goal-kick".
+   */
+  goalKickPosition: { x: number; y: number } | null;
+
+  /**
+   * Team awarded the goal kick (the defending team of the goal line
+   * the ball exited).
+   * Set when matchPhase transitions to "goal-kick".
+   */
+  goalKickAwardingTeam: string | null;
+
+  /**
+   * Player ID of the kick taker (closest defending-team player to the spot).
+   * Set when matchPhase transitions to "goal-kick".
+   */
+  goalKickTakerId: string | null;
+
+  /**
+   * Countdown ticks before the goal kick is auto-executed.
+   * Set when matchPhase transitions to "goal-kick".
+   * Decremented each tick while matchPhase === "goal-kick".
+   * When zero, the ball is kicked upfield and phase returns to "playing".
+   *
+   * Default: 0 (no active countdown).
+   */
+  goalKickCountdown: number;
+
+  /**
+   * Goal line index (0 = right goal line at +x, 1 = left goal line at -x)
+   * where the goal kick occurred. Used for goal-area positioning.
+   */
+  goalKickGoalIndex: 0 | 1 | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -306,4 +346,4 @@ export interface WorldState {
  * kick. Match lifecycle phases (first-half, etc.) are tracked by the
  * match runner; the simulation core only needs "playing" vs "goal".
  */
-export type MatchPhase = "playing" | "goal" | "halftime" | "fulltime" | "kickoff" | "corner-kick" | "throw-in";
+export type MatchPhase = "playing" | "goal" | "halftime" | "fulltime" | "kickoff" | "corner-kick" | "throw-in" | "goal-kick";

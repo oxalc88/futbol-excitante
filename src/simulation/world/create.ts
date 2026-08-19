@@ -195,6 +195,12 @@ export function createWorld(opts: CreateOptions): WorldState {
     throwInTakerId: null,
     throwInCountdown: 0,
     throwInTouchlineIndex: null,
+    // --- goal-kick state (MATCH-GOAL-KICK) ---
+    goalKickPosition: null,
+    goalKickAwardingTeam: null,
+    goalKickTakerId: null,
+    goalKickCountdown: 0,
+    goalKickGoalIndex: null,
     meta: {
       scenarioId: scenario.id,
       scenarioVersion: scenario.version,

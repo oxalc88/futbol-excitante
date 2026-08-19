@@ -731,6 +731,199 @@ export function createSimulation(
   }
 
   // ------------------------------------------------------------------
+  // Goal kick helpers (MATCH-GOAL-KICK)
+  // ------------------------------------------------------------------
+
+  /** Default goal kick countdown ticks (≈1 second at 60 FPS). */
+  const defaultGoalKickCountdown = 60;
+
+  /** Provisional goal-area half-width from pitch center (9.16m, ±9.16m from center). */
+  const GOAL_AREA_HALF_WIDTH = 9.16;
+
+  /** Provisional goal-area depth from the goal line (5.5m). */
+  const GOAL_AREA_DEPTH = 5.5;
+
+  /**
+   * Compute the goal-area ball placement position for a goal kick.
+   *
+   * Ball is placed inside the goal area on the side where the ball exited
+   * (same y-sign as the exit point), clamped to the goal area bounds:
+   *   |y| ≤ 9.16, |x| = GOAL_LINE_X − 5.5.
+   */
+  function computeGoalAreaPosition(
+    goalIndex: 0 | 1,
+    ballY: number,
+  ): { x: number; y: number } {
+    const goalLineX = goalIndex === 0 ? GOAL_LINE_X : -GOAL_LINE_X;
+    const kickX = goalIndex === 0 ? GOAL_LINE_X - GOAL_AREA_DEPTH : -GOAL_LINE_X + GOAL_AREA_DEPTH;
+    // Clamp y to goal area bounds, preserving the sign of ballY.
+    const clampedY = Math.max(-GOAL_AREA_HALF_WIDTH, Math.min(GOAL_AREA_HALF_WIDTH, ballY));
+    return { x: kickX, y: clampedY };
+  }
+
+  /**
+   * Set matchPhase to "goal-kick" and start the countdown.
+   * Called when a ball-out-of-play event is detected and the last touch
+   * was by the attacking team (NOT the defending team of the goal line
+   * the ball exited). Standard football rule: goal kick to the defending team.
+   */
+  function onGoalKickEvent(
+    awardingTeam: string,
+    goalKickPos: { x: number; y: number },
+    goalIndex: 0 | 1,
+  ): void {
+    if (state.matchPhase !== "playing") return;
+    state.matchPhase = "goal-kick";
+    state.goalKickCountdown = defaultGoalKickCountdown;
+    state.goalKickPosition = { ...goalKickPos };
+    state.goalKickAwardingTeam = awardingTeam;
+    state.goalKickGoalIndex = goalIndex;
+
+    // Select kick taker: closest defending-team (awarding team) player to the goal-area spot.
+    let bestPlayer: string | null = null;
+    let bestDist = Infinity;
+    for (const p of state.players) {
+      if (p.teamId !== awardingTeam) continue;
+      const dx = p.groundPosition.x - goalKickPos.x;
+      const dy = p.groundPosition.y - goalKickPos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestPlayer = p.playerId;
+      }
+    }
+    state.goalKickTakerId = bestPlayer;
+
+    // Position the kick taker at the goal-area spot.
+    if (bestPlayer) {
+      const player = state.players.find((p) => p.playerId === bestPlayer);
+      if (player) {
+        player.groundPosition = { x: goalKickPos.x, y: goalKickPos.y };
+        player.linearVelocity = { x: 0, y: 0 };
+        player.desiredVelocity = { x: 0, y: 0 };
+        // Face upfield (away from own goal).
+        const upfieldDir = goalIndex === 0 ? -1 : 1;
+        player.bodyHeading = Math.atan2(0, upfieldDir);
+        player.desiredHeading = player.bodyHeading;
+      }
+    }
+
+    // Position defending teammates in their own half (provisional, deterministic).
+    const defendingPlayers = state.players.filter(
+      (p) => p.teamId === awardingTeam && p.playerId !== bestPlayer,
+    );
+    const ownHalfX = goalIndex === 0 ? -GOAL_LINE_X / 2 : GOAL_LINE_X / 2;
+    let defIdx = 0;
+    for (const p of defendingPlayers) {
+      // Spread defenders across the defensive half, spread vertically.
+      const offsetX = ownHalfX + (defIdx % 3) * 10 - 10;
+      const offsetY = Math.floor(defIdx / 3) * 8 - 4;
+      p.groundPosition = { x: offsetX, y: offsetY };
+      p.linearVelocity = { x: 0, y: 0 };
+      p.desiredVelocity = { x: 0, y: 0 };
+      // Face upfield.
+      const faceDir = goalIndex === 0 ? 1 : -1;
+      p.bodyHeading = Math.atan2(0, faceDir);
+      p.desiredHeading = p.bodyHeading;
+      defIdx++;
+    }
+
+    // Position attacking players outside the goal area (provisional, deterministic).
+    const attackingTeam = awardingTeam === "team-a" ? "team-b" : "team-a";
+    const attackingPlayers = state.players.filter((p) => p.teamId === attackingTeam);
+    let attIdx = 0;
+    for (const p of attackingPlayers) {
+      // Position outside the goal area, spread across the attacking half.
+      const attHalfX = goalIndex === 0 ? GOAL_LINE_X / 2 : -GOAL_LINE_X / 2;
+      const offsetX = attHalfX + (attIdx % 3) * 10 - 10;
+      const offsetY = Math.floor(attIdx / 3) * 8 - 4;
+      p.groundPosition = { x: offsetX, y: offsetY };
+      p.linearVelocity = { x: 0, y: 0 };
+      p.desiredVelocity = { x: 0, y: 0 };
+      // Face toward the goal they're attacking.
+      const faceDir = goalIndex === 0 ? 1 : -1;
+      p.bodyHeading = Math.atan2(0, faceDir);
+      p.desiredHeading = p.bodyHeading;
+      attIdx++;
+    }
+  }
+
+  /**
+   * Execute the goal kick: place the ball at the goal-area spot and
+   * kick it upfield toward the nearest defending-team receiver.
+   *
+   * Called when goalKickCountdown reaches zero.
+   */
+  function applyGoalKick(): void {
+    if (!state.goalKickPosition || !state.goalKickAwardingTeam) return;
+
+    const kickPos = state.goalKickPosition;
+    const goalIndex = state.goalKickGoalIndex ?? 0;
+
+    // Find the nearest awarding-team receiver (not the taker) to kick to.
+    let bestReceiver: { x: number; y: number } | null = null;
+    let bestDist = Infinity;
+    for (const p of state.players) {
+      if (p.teamId !== state.goalKickAwardingTeam) continue;
+      if (p.playerId === state.goalKickTakerId) continue;
+      const dx = p.groundPosition.x - kickPos.x;
+      const dy = p.groundPosition.y - kickPos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 0.5 && dist < bestDist) {
+        bestDist = dist;
+        bestReceiver = { x: p.groundPosition.x, y: p.groundPosition.y };
+      }
+    }
+
+    // Default target: upfield from the goal area if no receiver found.
+    const upfieldDir = goalIndex === 0 ? -1 : 1;
+    const targetX = bestReceiver ? bestReceiver.x : kickPos.x + upfieldDir * 20;
+    const targetY = bestReceiver ? bestReceiver.y : 0;
+
+    // Compute kick direction from goal area to target.
+    const dx = targetX - kickPos.x;
+    const dy = targetY - kickPos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 0.001) return;
+
+    const dirX = dx / dist;
+    const dirY = dy / dist;
+
+    // Place ball at the goal-area spot (ground level).
+    state.ball.position.x = kickPos.x;
+    state.ball.position.y = kickPos.y;
+    state.ball.position.z = 0.11; // ball radius
+    state.ball.regime = "airborne";
+
+    // Apply kick velocity (provisional: lofted distribution pass).
+    const kickSpeed = 16; // provisional: goal kick distribution speed (m/s)
+    const verticalComponent = 0.25; // provisional: moderate loft for distribution
+    state.ball.linearVelocity.x = dirX * kickSpeed;
+    state.ball.linearVelocity.y = dirY * kickSpeed;
+    state.ball.linearVelocity.z = kickSpeed * verticalComponent;
+    state.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.lastTouchRef = null;
+
+    // Emit goal-kick-executed event.
+    eventCounter++;
+    const kickEvent: SimulationEvent = {
+      id: `goal-kick-executed-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "goal-kick-executed",
+      label: `Goal kick executed by ${state.goalKickTakerId}`,
+      payload: {
+        teamId: state.goalKickAwardingTeam,
+        kickTakerId: state.goalKickTakerId,
+        kickPosition: { ...kickPos },
+        targetPosition: { x: targetX, y: targetY },
+        kickDirection: { x: dirX, y: dirY },
+      },
+    };
+    state.events = [...state.events, kickEvent];
+  }
+
+  // ------------------------------------------------------------------
   // Internal: drain all buffers into a single flat array (ordered by tick, then insertion).
   // ------------------------------------------------------------------
 
@@ -1370,6 +1563,21 @@ export function createSimulation(
         }
       }
 
+      // 6b-2c. Process goal kick countdown (MATCH-GOAL-KICK).
+      if (state.matchPhase === "goal-kick") {
+        state.goalKickCountdown--;
+        if (state.goalKickCountdown <= 0) {
+          // Execute the goal kick: place ball at goal area, kick upfield.
+          applyGoalKick();
+          state.matchPhase = "playing";
+          state.goalKickCountdown = 0;
+          state.goalKickPosition = null;
+          state.goalKickAwardingTeam = null;
+          state.goalKickTakerId = null;
+          state.goalKickGoalIndex = null;
+        }
+      }
+
       // 6b-3. Detect ball-out-of-play events and trigger corner kick phase.
       if (state.matchPhase === "playing") {
         for (const ev of allStepEvents) {
@@ -1395,6 +1603,14 @@ export function createSimulation(
               const cornerPos = computeCornerFlagPosition(goalIndex, payload.ballPosition.y);
 
               onCornerKickEvent(attackingTeam, cornerPos, goalIndex as 0 | 1);
+              break;
+            }
+
+            // Goal kick: last touch by the attacking team (NOT the defending team).
+            if (lastTouchTeam !== defendingTeam) {
+              const goalKickPos = computeGoalAreaPosition(goalIndex, payload.ballPosition.y);
+
+              onGoalKickEvent(defendingTeam, goalKickPos, goalIndex as 0 | 1);
               break;
             }
           }
