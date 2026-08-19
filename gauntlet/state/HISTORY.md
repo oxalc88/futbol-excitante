@@ -2628,3 +2628,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 5f3fb3a candidate(MATCH-THROW-IN)
 - notes: Throw-in set piece: sideline out-of-play detection in ball-system (swept line-segment, |y|>34 while |x|<52.5, `ball-touchline-out-of-play` event), new `throw-in` MatchPhase with parallel state fields, award to team opposite last touch (null last touch → no throw-in), taker = closest awarding-team player, receiver/defensive positioning, 60-tick countdown auto-execute that places the ball at the sideline exit and throws it into play (`throw-in-executed`), state reset. Extends MATCH-SET-PIECE / MATCH-CORNER-KICK infrastructure. 19 unit + 9 integration tests, full node suite 1835/1835, browser 86/86. HEADLESS audit PASS. All coefficients provisional; no PES claim. Horizon transition-completion 1/5.
+
+## Iteration 74 — 2026-08-19
+
+- objective_id: MATCH-GOAL-KICK
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass, 0 retries)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 06b51ee candidate(MATCH-GOAL-KICK)
+- notes: Goal kick set piece: complementary trigger in the ball-out-of-play handler (`lastTouchTeam !== defendingTeam` → goal kick to the defending team; corner-kick branch unchanged, null last-touch guard kept), new `goal-kick` MatchPhase with parallel state fields, ball placed at goal area (±47, y clamped ±9.16 preserving exit side), taker = closest defending player, teammates spread in own half, attackers outside the area, 60-tick countdown auto-execute kicking upfield to the nearest receiver (`goal-kick-executed`), state reset. Extends MATCH-SET-PIECE / MATCH-CORNER-KICK / MATCH-THROW-IN infrastructure. 19 unit + 14 integration tests, full node suite 1868/1868, browser 86/86. HEADLESS audit PASS. All coefficients provisional (16 m/s, loft 0.25, 5.5m/9.16m goal-area); no PES claim. Horizon transition-completion 2/5.

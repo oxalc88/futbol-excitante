@@ -1,13 +1,13 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 3
+horizon_version: 4
 status: ACTIVE
 horizon_id: "transition-completion"
 created_from_commit: a7620fe
 created_at: 2026-08-18
 reason: "Horizon small-sided-shape exhausted (5/5 accepted). Next horizon completes remaining transition set pieces (throw-ins, goal kicks), deepens CPU tactical awareness for game-state adaptation, adds browser match-difficulty setup, and materializes the team evaluator suite to enable SMALL_SIDED_SHAPE milestone evaluation. Goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs and suites exist."
-current_index: 1
+current_index: 2
 objectives:
   - id: MATCH-THROW-IN
     status: accepted
@@ -15,7 +15,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: MATCH-SET-PIECE
   - id: MATCH-GOAL-KICK
-    status: pending
+    status: accepted
     reason: "Goal kick set piece: ball placement at goal area, kick taker selection, team positioning, and defensive setup. Extends MATCH-SET-PIECE transition infrastructure. No simulation core changes."
     builder: builder-gameplay
     prerequisite: MATCH-SET-PIECE

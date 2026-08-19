@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: MATCH-GOAL-KICK
+next_objective_id: CPU-TACTICAL-AWARENESS
 
 best_known:
-  commit: 5f3fb3a
-  note: "MATCH-THROW-IN accepted (HEADLESS). Candidate commit 5f3fb3a; acceptance bookkeeping and publication follow in this session."
+  commit: 06b51ee
+  note: "MATCH-GOAL-KICK accepted (HEADLESS). Candidate commit 06b51ee; acceptance bookkeeping and publication follow in this session."
 
 active_candidate: null
 builder_in_use: null
@@ -82,17 +82,18 @@ accepted:
   - BROWSER-PLAYER-ANIMATION
   - BROWSER-UI-POLISH
   - MATCH-THROW-IN
+  - MATCH-GOAL-KICK
 
 blocked: []
 
-selection_note: "Horizon transition-completion 1/5: MATCH-THROW-IN accepted 2026-08-19. Next: MATCH-GOAL-KICK."
+selection_note: "Horizon transition-completion 2/5: MATCH-THROW-IN and MATCH-GOAL-KICK accepted 2026-08-19. Next: CPU-TACTICAL-AWARENESS."
 ```
 ## Last accepted objective
 
-MATCH-THROW-IN — Throw-in set piece: sideline out-of-play detection (ball-system swept line-segment test, `ball-touchline-out-of-play` event), throw-in phase with countdown (60 ticks provisional), award to the team opposite last touch, taker selection (closest), receiver/defensive positioning, auto-execute throw into play with `throw-in-executed` event, state reset. Extends the MATCH-SET-PIECE / MATCH-CORNER-KICK infrastructure. All coefficients provisional. No PES claims. 28 new tests, full node suite 1835/1835, browser 86/86. HEADLESS audit PASS.
+MATCH-GOAL-KICK — Goal kick set piece: ball crossing a goal line outside the posts with the attacking team's last touch awards a goal kick to the defending team (`lastTouchTeam !== defendingTeam` branch, complementary to the corner-kick branch). New `goal-kick` MatchPhase with parallel state fields, ball placed at the goal area (±47, y clamped ±9.16 preserving exit side), taker = closest defending player, teammates spread, attackers outside the area, 60-tick countdown auto-execute kicking upfield to the nearest receiver with `goal-kick-executed` event, state reset. Extends the MATCH-SET-PIECE / MATCH-CORNER-KICK / MATCH-THROW-IN infrastructure. All coefficients provisional. No PES claims. 19 unit + 14 integration tests, full node suite 1868/1868, browser 86/86. HEADLESS audit PASS.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass; re-verified against corrected audit artifact)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT (second pass after audit artifact fix)
-- Evidence: durable acceptance manifest + record (2026-08-19T13:13:38Z)
-- Candidate: 5f3fb3a
+- critic: critic-flash / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-19T14:31:14Z)
+- Candidate: 06b51ee
