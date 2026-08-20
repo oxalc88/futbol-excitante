@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-20T05:06:46.798Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "BROWSER-DIFFICULTY-SETTING",
+  "candidate_commit": "710c07c",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "agent": "critic-qwen",
+    "model": "qwen3.6",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer-qwen",
+    "model": "qwen3.6",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  }
+}

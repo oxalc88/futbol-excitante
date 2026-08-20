@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-DIFFICULTY-SETTING
+next_objective_id: TEAM-EVALUATOR-SUITE
 
 best_known:
-  commit: 52557aa
-  note: "CPU-TACTICAL-AWARENESS accepted (HEADLESS). Candidate commit 52557aa; acceptance bookkeeping and publication follow in this session."
+  commit: 710c07c
+  note: "BROWSER-DIFFICULTY-SETTING accepted. Candidate 710c07c; acceptance bookkeeping in progress."
 
 active_candidate: null
 builder_in_use: null
@@ -84,17 +84,18 @@ accepted:
   - MATCH-THROW-IN
   - MATCH-GOAL-KICK
   - CPU-TACTICAL-AWARENESS
+  - BROWSER-DIFFICULTY-SETTING
 
 blocked: []
 
-selection_note: "Horizon transition-completion 3/5: MATCH-THROW-IN, MATCH-GOAL-KICK, CPU-TACTICAL-AWARENESS accepted 2026-08-19. Next: BROWSER-DIFFICULTY-SETTING."
+selection_note: "Horizon transition-completion 4/5: BROWSER-DIFFICULTY-SETTING accepted 2026-08-19. Next: TEAM-EVALUATOR-SUITE."
 ```
 ## Last accepted objective
 
-CPU-TACTICAL-AWARENESS — CPU tactical awareness (CPU adapter only): continuous score-gradient adaptation replacing the hard ±2 threshold (`bias = clamp(-scoreDiff/3, -1, 1)`: more attacking when losing, more defensive when winning), fatigue awareness via a deterministic per-adapter tick accumulator (increments while matchPhase === "playing", resets on half change; press radius/strength shrink when fatigued; sprint stays 1 preserving the accepted invariant), and match-phase behavior (non-playing phases → hold, kickoff → calm, only when matchPhase is present). Observation immutability preserved (adapter never mutates CpuObservation). 36 unit + 10 integration tests; full node suite 1914/1914; browser 86/86. HEADLESS audit PASS. All coefficients provisional (FATIGUE_MAX_TICKS 3600, gradient divisor 3); no PES claims. Three 1000-tick free-play fixtures in 2v2-scoring received explicit per-test timeouts because the intended score-gradient changes post-goal thresholds (more simulation events); assertions unchanged.
+BROWSER-DIFFICULTY-SETTING — Browser match difficulty HUD + CPU adapter scaling (browser UI + CPU adapter only): configurable difficulty level (Easy/Medium/Hard) via URL parameter (?difficulty=) and browser select element. Difficulty config modulates 6 base provisional constants deterministically: pressRadiusFactor, pressStrengthFactor, shotAimFactor, shotRangeFactor, facingToleranceFactor, firstTouchRangeFactor. Medium = 1.0 (no change). Easy weakens CPU; Hard strengthens. Observation immutability preserved (difficulty is optional, missing → medium). 20 unit tests on difficulty config + 15 browser tests + 1 capture test; full node suite 1935/1935. Browser 86/86. HEADLESS audit PASS. All coefficients provisional; no PES claims.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-flash / deepseek-v4-flash — ACCEPT (after orchestrator-verified regressions fixed: observation mutation + sprint invariant; two builder fix rounds)
-- integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-19T20:52:07Z)
-- Candidate: 52557aa
+- critic: critic-qwen / qwen3.6 — ACCEPT (no required fixes, 86s, 0 retries)
+- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (no regressions, 491s, dependency PASS, evaluator integrity PASS)
+- Evidence: durable acceptance manifest + record (2026-08-20T05:06:46Z)
+- Candidate: 710c07c

@@ -2646,5 +2646,15 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - critic: critic-flash / deepseek-v4-flash — ACCEPT (after 2 orchestrator-verified builder fix rounds: observation mutation + "CPU always sprints" regressions, then long-fixture timeouts)
 - integration: integration-reviewer-flash / deepseek-v4-flash — ACCEPT
 - result: accepted
-- commits: 52557aa candidate(CPU-TACTICAL-AWARENESS)
+- commits: 52557aa candidate(CPU-TACTICAL-AWARENESS), dca55e5 gauntlet(CPU-TACTICAL-AWARENESS): accept
 - notes: CPU tactical awareness (adapter only): continuous score-gradient replacing the hard ±2 threshold (bias = clamp(-scoreDiff/3, -1, 1); more attacking when losing, more defensive when winning); fatigue via deterministic per-adapter tick accumulator (increments while matchPhase === "playing", capped FATIGUE_MAX_TICKS=3600, reset on half change; press radius/strength shrink when fatigued; sprint always 1); match-phase behavior (non-playing phases → hold, kickoff → calm) gated on observation.matchPhase. Observation immutability preserved. 36 unit + 10 integration tests; full node suite 1914/1914; browser 86/86. HEADLESS audit PASS. The gradient changes post-goal thresholds in long free-play fixtures (~3x sim events); 3 heavy 1000-tick fixtures in 2v2-scoring got explicit per-test budgets (assertions unchanged). All coefficients provisional; no PES claim. Horizon transition-completion 3/5.
+
+## Iteration 76 — 2026-08-19
+
+- objective_id: BROWSER-DIFFICULTY-SETTING
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-qwen / qwen3.6 — ACCEPT (first pass, 0 retries, 86s)
+- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (0 regressions in cpu-adapter, determinism, simulation suites; dependency PASS; evaluator integrity PASS)
+- result: accepted
+- commits: 710c07c candidate(BROWSER-DIFFICULTY-SETTING)
+- notes: Browser match difficulty HUD + CPU adapter scaling. Configurable difficulty (Easy/Medium/Hard) via URL parameter (?difficulty=) and browser select element. Difficulty config modulates 6 base provisional constants deterministically (pressRadiusFactor, pressStrengthFactor, shotAimFactor, shotRangeFactor, facingToleranceFactor, firstTouchRangeFactor). Medium = 1.0; Easy weakens CPU; Hard strengthens. Optional field (missing → medium, backward compatible). 20 unit + 15 browser + 1 capture tests; full node suite 1935/1935. Browser 86/86. HEADLESS audit PASS. All coefficients provisional; no PES claim. Horizon transition-completion 4/5.
