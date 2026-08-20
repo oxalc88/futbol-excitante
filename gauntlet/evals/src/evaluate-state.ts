@@ -41,9 +41,23 @@ function evaluateHorizon(s: HorizonValidationScenario): EvaluationResult {
   return { scenario_id: s.id, decision: "state_valid" };
 }
 
+function defaultReviewerFallbacks(s: RoutingFallbackScenario): string[] {
+  return s.input.role === "critic"
+    ? ["critic-qwen", "critic-mimo"]
+    : ["integration-reviewer-qwen", "integration-reviewer-mimo"];
+}
+
 function evaluateRouting(s: RoutingFallbackScenario): EvaluationResult {
-  const modelSpecific = ["quota_exhausted", "model_unavailable", "rate_limited"].includes(s.input.failure_class);
-  if (s.input.failed_model === "deepseek-v4-flash-0731" && modelSpecific) return { scenario_id: s.id, decision: "fallback", next_agent: s.input.role === "critic" ? "critic-flash" : "integration-reviewer-flash" };
+  const modelSpecific = ["quota_exhausted", "model_unavailable", "rate_limited", "model_capability_mismatch"].includes(s.input.failure_class);
+  if (s.input.failed_model !== "deepseek-v4-flash" || !modelSpecific) return { scenario_id: s.id, decision: "do_not_model_fallback", failure_class: "reviewer_routing" };
+
+  const candidates = s.input.compatible_fallback_agents ?? (s.input.failure_class === "model_capability_mismatch" ? [] : defaultReviewerFallbacks(s));
+  const nextAgent = candidates[0];
+  if (nextAgent) return { scenario_id: s.id, decision: "fallback", next_agent: nextAgent };
+
+  if (s.input.failure_class === "model_capability_mismatch") {
+    return { scenario_id: s.id, decision: "preserve_step_for_capable_route", failure_class: "model_capability_mismatch" };
+  }
   return { scenario_id: s.id, decision: "do_not_model_fallback", failure_class: "reviewer_routing" };
 }
 
@@ -88,7 +102,8 @@ function evaluateUniqueness(s: EvidenceUniquenessGateScenario): EvaluationResult
 }
 
 function evaluateTimingConsistency(s: TimingConsistencyGateScenario): EvaluationResult {
-  if (!s.input.tracking_markers_match || !s.input.clock_measurement_matches || !s.input.latest_rows_present) return { scenario_id: s.id, decision: "repair_tracking", failure_class: "timing_state_inconsistent" };
+  const globalFresh = s.input.global_aggregates_through_latest !== false;
+  if (!s.input.tracking_markers_match || !s.input.clock_measurement_matches || !s.input.latest_rows_present || !globalFresh) return { scenario_id: s.id, decision: "repair_tracking", failure_class: "timing_state_inconsistent" };
   return { scenario_id: s.id, decision: "timing_consistent" };
 }
 
