@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "PLAYABLE-1V1-PROFILE-EVALUATION",
+  "accepted_at": "2026-08-20T09:24:09.092Z",
+  "candidate_commit": "d6044c8",
+  "evidence_class": null,
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/PLAYABLE-1V1-PROFILE-EVALUATION/audit.json",
+      "sha256": "04845e2ecfc89e35cfe032e624160b8185e112ea020a9f234a5354ccfc7fc93f",
+      "git_blob": "32caf0e1fc23137d26acbd5fa57459111900ea03",
+      "candidate_commit": "d6044c8",
+      "bytes": 2689,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-20/2026-08-20T09-24-09-092Z-PLAYABLE-1V1-PROFILE-EVALUATION-acceptance.json"
+}

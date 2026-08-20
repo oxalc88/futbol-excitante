@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: PLAYABLE-1V1-PROFILE-EVALUATION
+next_objective_id: ""
 
 best_known:
-  commit: 505e056
-  note: "PLAYABLE-CONTROL-SLOT-ROUTING accepted. Candidate 505e056; acceptance bookkeeping in progress."
+  commit: d6044c8
+  note: "PLAYABLE-1V1-PROFILE-EVALUATION accepted. Candidate d6044c8; acceptance bookkeeping in progress."
 
 active_candidate: null
 builder_in_use: null
@@ -89,14 +89,21 @@ accepted:
   - ARCHETYPE-BLINDED-COMPARISON
   - PLAYABLE-SECOND-TOUCH
   - PLAYABLE-CONTROL-SLOT-ROUTING
+  - PLAYABLE-1V1-PROFILE-EVALUATION
 
 blocked: []
 
-selection_note: "Horizon playable-1v1-enabler 3/4: PLAYABLE-CONTROL-SLOT-ROUTING accepted 2026-08-20. Next: PLAYABLE-1V1-PROFILE-EVALUATION."
+selection_note: "Horizon playable-1v1-enabler 4/4: PLAYABLE-1V1-PROFILE-EVALUATION accepted 2026-08-20. Result: INVALID_RUN (browser evidence absent, archetype NOT_EVALUATED). Horizon EXHAUSTED."
 ```
 ## Last accepted objective
 
-PLAYABLE-CONTROL-SLOT-ROUTING — Slot ownership and player switching: stable slot→player mapping (findSlotForPlayer, getSlotTeamId, isSlotActive), Tab-key cycling via computeExplicitSwitchTarget (NEXT/PREVIOUS, deterministic sorted, edge-triggered), slot-keyed maps prevent cross-slot interference, slot wiring invariant checked every tick. fromPlayer payload corrected (captures pre-switch ID). 45 tests (12 groups); 1969 total tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 3/4.
+PLAYABLE-1V1-PROFILE-EVALUATION — PLAYABLE_1V1 profile evaluation: runs playable-evaluator against current codebase. Result: INVALID_RUN (browser evidence absent — BROWSER-CORE/BROWSER-1V1 cases, ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW, ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED due to no disk artifacts). MUTANT_1V1_PASS = PASS (9 implementable mutants detected). Evaluation infrastructure verified: ARCHETYPE_BLINDED_COMPARISON_PASS evaluated via real code, not placeholder. 47 tests; 554 eval tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 4/4, EXHAUSTED.
+
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (first pass, 0 retries, 491s, independence OK)
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (dependency PASS, evaluator integrity PASS, 0 regressions)
+- Evidence: durable acceptance manifest + record (2026-08-20T09:24:09Z)
+- Candidate: d6044c8
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic-qwen / qwen3.6 — ACCEPT (retry, 0 required fixes, 28s, independence OK)

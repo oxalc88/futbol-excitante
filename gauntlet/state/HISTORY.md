@@ -2698,3 +2698,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 505e056 candidate(PLAYABLE-CONTROL-SLOT-ROUTING)
 - notes: Slot ownership and player switching: stable slot→player mapping, Tab-key cycling (NEXT/PREVIOUS, deterministic sorted, edge-triggered), slot-keyed maps prevent cross-slot interference, slot wiring invariant per tick, fromPlayer payload fixed. 45 new tests (12 groups); 1969 total tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 3/4.
+
+## Iteration 81 — 2026-08-20
+
+- objective_id: PLAYABLE-1V1-PROFILE-EVALUATION
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (first pass, 0 retries, 491s, independence OK)
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (dependency PASS, evaluator integrity PASS, 0 regressions)
+- result: accepted
+- commits: d6044c8 candidate(PLAYABLE-1V1-PROFILE-EVALUATION)
+- notes: PLAYABLE_1V1 profile evaluation: runs playable-evaluator against current codebase. Result INVALID_RUN — browser evidence absent (all BROWSER-CORE/BROWSER-1V1 cases INVALID_RUN), ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED (no disk artifacts), ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW. MUTANT_1V1_PASS = PASS (9 implementable mutants). Evaluation infrastructure verified: archetype evaluated via real code, mutant via real reduction. 47 new tests; 554 eval tests, 0 failures. HEADLESS audit PASS. Horizon playable-1v1-enabler 4/4, EXHAUSTED.

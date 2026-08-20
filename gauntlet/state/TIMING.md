@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: PLAYABLE-CONTROL-SLOT-ROUTING
-usage_aggregates_through: PLAYABLE-CONTROL-SLOT-ROUTING
-clock_aggregates_through: PLAYABLE-CONTROL-SLOT-ROUTING
-model_evaluation_through: PLAYABLE-CONTROL-SLOT-ROUTING
+last_tracked_objective: PLAYABLE-1V1-PROFILE-EVALUATION
+usage_aggregates_through: PLAYABLE-1V1-PROFILE-EVALUATION
+clock_aggregates_through: PLAYABLE-1V1-PROFILE-EVALUATION
+model_evaluation_through: PLAYABLE-1V1-PROFILE-EVALUATION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -150,6 +150,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | ARCHETYPE-BLINDED-COMPARISON | accepted | ~48m | 28m | 14m | 7m | 0.5m | ~8M est. | n/a** |
 | PLAYABLE-SECOND-TOUCH | accepted | ~19m | 9m | 5m | 3m | 0.5m | ~4M est. | n/a** |
 | PLAYABLE-CONTROL-SLOT-ROUTING | accepted | ~32m | 15m | 8m | 6m | 0.5m | ~6M est. | n/a** |
+| PLAYABLE-1V1-PROFILE-EVALUATION | accepted | ~20m | 10m | 8m | 4m | 0.5m | ~4M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -375,6 +376,8 @@ on an H task is the interesting result.
 | ARCHETYPE-BLINDED-COMPARISON | qwen3.6 | H | High — perceptual rubric, canvas rendering, evaluator wiring | 0 | B | 51 eval tests, 507 total (critic retry: 5 substantive fixes) |
 | PLAYABLE-SECOND-TOUCH | mimo-v2.5 | H | High — new physics contact system, dribble state machine | 0 | A | 30 new tests (16 groups), 67 integration, 377 regression, first-pass clean |
 | PLAYABLE-CONTROL-SLOT-ROUTING | mimo-v2.5 | M | Medium — slot routing, player switching, pure functions | 0 | B | 45 tests, 1969 total (critic retry: fromPlayer payload fix) |
+| PLAYABLE-1V1-PROFILE-EVALUATION | qwen3.6 | M | Medium — profile evaluation runner, result analysis | 0 | A | 47 eval tests, 554 total, INVALID_RUN verdict correct |
+| PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
 
@@ -472,6 +475,8 @@ on an H task is the interesting result.
 | PLAYABLE-SECOND-TOUCH | integration-reviewer-qwen (qwen3.6) | 0731 unavailable, flash unavailable, qwen fallback | ACCEPT | 377 regression tests, no core changes, dependency clean |
 | PLAYABLE-CONTROL-SLOT-ROUTING | critic-qwen (qwen3.6) | 0731 unavailable, flash unavailable, qwen fallback | ACCEPT (retry) | fromPlayer payload fix: pre-switch ID captured correctly |
 | PLAYABLE-CONTROL-SLOT-ROUTING | integration-reviewer-qwen (qwen3.6) | 0731 unavailable, flash unavailable, qwen fallback | ACCEPT | 159 loop/input tests, 0 regressions, dependency clean |
+| PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
+| PLAYABLE-1V1-PROFILE-EVALUATION | integration-reviewer-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | dependency PASS, evaluator integrity PASS, 0 regressions |
 
 ### Builder scoreboard
 
