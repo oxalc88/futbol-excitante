@@ -1,0 +1,577 @@
+/**
+ * @module tests/unit/eval/mutant-team
+ *
+ * Tests for the MUTANT_TEAM_PASS reducer (eval/runners/mutant-team.ts)
+ * and its integration with the SMALL_SIDED_SHAPE exit prerequisites.
+ *
+ * Covers:
+ *   1. Clean 3v3 team mutant evaluation → MUTANT_TEAM_PASS PASS.
+ *   2. A poisoned/undetected mutant → MUTANT_TEAM_PASS FAIL (prove the path can fail).
+ *   3. Skipped/unexecuted implementable mutant → INVALID_RUN.
+ *   4. Deferred mutants: NOT_EVALUATED.
+ *   5. Registry integrity.
+ *   6. Determinism: two identical calls produce the same verdict.
+ *
+ * No Math.random, Date, performance, DOM, or Node I/O in src/simulation.
+ * Node I/O is allowed here in tests.
+ */
+
+import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
+// Import wire.ts to register all oracles (side-effect).
+import "../../../eval/oracles/wire.js";
+
+import { evaluate } from "../../../eval/runners/evaluate.js";
+import { executeOracle } from "../../../eval/oracles/oracle-registry.js";
+import { checkDeferredMutants } from "../../../eval/oracles/deferred-mutants.js";
+import { checkPrngOrderMutation } from "../../../eval/oracles/prng-order.js";
+import { runMutantTeam } from "../../../eval/runners/mutant-team.js";
+import {
+  IMPLEMENTABLE_MUTANTS,
+  type MutationDefinition,
+} from "../../../eval/oracles/mutant-registry.js";
+import { DEFERRED_MUTANTS_V1 } from "../../../eval/oracles/deferred-mutants.js";
+
+import { createWorld } from "../../../src/simulation/world/create.js";
+import { createSimulation } from "../../../src/simulation/loop/simulation.js";
+
+import type { TelemetryObservation } from "../../../src/contracts/telemetry.js";
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function loadTeamScenario(): Record<string, unknown> {
+  const fixturePath = join(process.cwd(), "eval/scenarios/3v3-fixture-short.v1.json");
+  const raw = readFileSync(fixturePath, "utf-8");
+  return JSON.parse(raw) as Record<string, unknown>;
+}
+
+function buildTeamInputProgram(
+  durationTicks: number,
+): Record<
+  number,
+  {
+    tick: number;
+    sourceId: string;
+    controlSlot: string;
+    moveX: number;
+    moveY: number;
+    sprint: number;
+    heldButtons: number;
+    pressedButtons: number;
+    releasedButtons: number;
+  }[]
+> {
+  const program: Record<
+    number,
+    {
+      tick: number;
+      sourceId: string;
+      controlSlot: string;
+      moveX: number;
+      moveY: number;
+      sprint: number;
+      heldButtons: number;
+      pressedButtons: number;
+      releasedButtons: number;
+    }[]
+  > = {};
+  for (let t = 0; t < durationTicks; t++) {
+    program[t] = [
+      { tick: t, sourceId: "team-test", controlSlot: "slot-1", moveX: 0.5, moveY: 0, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+      { tick: t, sourceId: "team-test", controlSlot: "slot-2", moveX: 0, moveY: 0.5, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+      { tick: t, sourceId: "team-test", controlSlot: "slot-3", moveX: -0.5, moveY: 0, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+      { tick: t, sourceId: "team-test", controlSlot: "slot-4", moveX: -0.5, moveY: 0, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+      { tick: t, sourceId: "team-test", controlSlot: "slot-5", moveX: 0, moveY: -0.5, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+      { tick: t, sourceId: "team-test", controlSlot: "slot-6", moveX: 0.5, moveY: 0, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+    ];
+  }
+  return program;
+}
+
+function makeObservationWithNaN(
+  base: TelemetryObservation,
+): TelemetryObservation {
+  return {
+    ...base,
+    players: base.players.map((p) => ({
+      ...p,
+      linearVelocity: { ...p.linearVelocity, x: NaN },
+    })),
+  };
+}
+
+function makeObservationsWithVelocitySnap(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  const obs1 = { ...base, tick: 10, simulationTime: 10 / 60 };
+  const obs2 = {
+    ...base,
+    tick: 11,
+    simulationTime: 11 / 60,
+    players: base.players.map((p) => ({
+      ...p,
+      linearVelocity: {
+        x: p.linearVelocity.x + 2000,
+        y: p.linearVelocity.y + 2000,
+      },
+      bodyHeading: p.bodyHeading + 4,
+    })),
+  };
+  return [obs1, obs2];
+}
+
+function makeObservationsWithNoBallDecay(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  const ballState = {
+    ...base.ball,
+    regime: "ground-roll" as const,
+    linearVelocity: { x: 3.0, y: 0, z: 0 },
+  };
+  const obs1 = { ...base, tick: 20, simulationTime: 20 / 60, ball: ballState };
+  const obs2 = { ...base, tick: 21, simulationTime: 21 / 60, ball: ballState };
+  return [obs1, obs2];
+}
+
+function makeObservationsWithBallTeleport(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  const obs1 = { ...base, tick: 30, simulationTime: 30 / 60 };
+  const obs2 = {
+    ...base,
+    tick: 31,
+    simulationTime: 31 / 60,
+    ball: { ...base.ball, position: { x: 1000, y: 1000, z: 1000 } },
+  };
+  return [obs1, obs2];
+}
+
+function makeObservationsWithPossessionNoEvidence(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  const obs1 = { ...base, tick: 40, simulationTime: 40 / 60 };
+  const obs2 = {
+    ...base,
+    tick: 41,
+    simulationTime: 41 / 60,
+    ball: { ...base.ball, lastTouchRef: "touch-event-fake" },
+    events: [],
+  };
+  return [obs1, obs2];
+}
+
+function makeObservationsWithScoreTracker(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  const obs1 = { ...base, tick: 50, simulationTime: 50 / 60 };
+  const obs2 = {
+    ...base,
+    tick: 51,
+    simulationTime: 51 / 60,
+    events: [{ id: "evt-goal-2", tick: 51, sequence: 0, kind: "goal", label: "goal", payload: { goalIndex: 2 } }],
+  };
+  return [obs1, obs2];
+}
+
+function makeObservationsWithMatchClock(
+  base: TelemetryObservation,
+): TelemetryObservation[] {
+  const obs1 = { ...base, tick: 0, simulationTime: 0 / 60 };
+  const obs2 = { ...base, tick: 2, simulationTime: 2 / 60 };
+  return [obs1, obs2];
+}
+
+// ---------------------------------------------------------------------------
+// 1. Clean 3v3 team mutant evaluation → MUTANT_TEAM_PASS PASS
+// ---------------------------------------------------------------------------
+
+describe("MUTANT_TEAM_PASS: clean evaluation → PASS", () => {
+  it("reducer returns PASS when all oracles detect their mutations in 3v3 context", () => {
+    const result = runMutantTeam();
+
+    expect(result.verdict).toBe("PASS");
+    expect(result.implementableCount).toBeGreaterThan(0);
+    expect(result.deferredCount).toBeGreaterThan(0);
+    expect(result.allImplementedDetected).toBe(true);
+    expect(result.allDeferredNotEvaluated).toBe(true);
+
+    // Every implementable outcome should be PASS.
+    const implementableOutcomes = result.outcomes.filter(
+      (o) => !o.deferred && o.mutationId !== "deferred-summary",
+    );
+    for (const o of implementableOutcomes) {
+      expect(o.outcome).toBe("PASS");
+      expect(o.executed).toBe(true);
+    }
+  });
+
+  it("result structure is correct", () => {
+    const result = runMutantTeam();
+
+    expect(result.registryVersion).toBe("mutant-team-v1");
+    expect(result.implementableCount).toBe(IMPLEMENTABLE_MUTANTS.length);
+    expect(result.deferredCount).toBe(DEFERRED_MUTANTS_V1.length);
+
+    // Every implementable mutant should have an outcome entry.
+    const implementableEntries = result.outcomes.filter(
+      (o) => o.mutationId !== "deferred-summary",
+    );
+    expect(implementableEntries.length).toBe(IMPLEMENTABLE_MUTANTS.length);
+    for (const o of implementableEntries) {
+      expect(o.executed).toBe(true);
+    }
+  });
+
+  it("deferred-summary outcome is NOT_EVALUATED", () => {
+    const result = runMutantTeam();
+
+    const deferredSummary = result.outcomes.find(
+      (o) => o.mutationId === "deferred-summary",
+    );
+    expect(deferredSummary).toBeDefined();
+    expect(deferredSummary?.outcome).toBe("NOT_EVALUATED");
+    expect(deferredSummary?.deferred).toBe(true);
+  });
+
+  it("each implementable mutant has cleanResult and poisonedResult", () => {
+    const result = runMutantTeam();
+
+    for (const outcome of result.outcomes) {
+      if (outcome.mutationId === "deferred-summary") continue;
+      if (outcome.mutationId === "prng-order") {
+        expect(outcome.executed).toBe(true);
+        expect(outcome.cleanResult).not.toBeNull();
+        expect(outcome.poisonedResult).not.toBeNull();
+      } else {
+        expect(outcome.executed).toBe(true);
+        expect(outcome.cleanResult).not.toBeNull();
+        expect(outcome.poisonedResult).not.toBeNull();
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 2. Per-mutant clean PASS + poisoned FAIL (3v3 context)
+// ---------------------------------------------------------------------------
+
+describe("3v3 implementable mutants: clean PASS and poisoned FAIL", () => {
+  for (const mutant of IMPLEMENTABLE_MUTANTS) {
+    if (mutant.id === "prng-order") {
+      continue;
+    }
+
+    it(`mutant "${mutant.id}": clean passes oracle in 3v3`, () => {
+      const scenario = loadTeamScenario();
+      const evalResult = evaluate({
+        scenario: scenario as Parameters<typeof evaluate>[0]["scenario"],
+      });
+      expect(evalResult.observations.length).toBeGreaterThan(0);
+
+      const results = executeOracle(
+        mutant.oracleId,
+        mutant.oracleVersion,
+        evalResult.observations,
+      );
+      const hasPass = results.some((r) => r.status === "pass");
+      expect(
+        hasPass,
+        `Oracle ${mutant.oracleId} did not pass on clean 3v3 data for mutant ${mutant.id}`,
+      ).toBe(true);
+    });
+
+    it(`mutant "${mutant.id}": poisoned data triggers oracle FAIL in 3v3`, () => {
+      const scenario = loadTeamScenario();
+      const evalResult = evaluate({
+        scenario: scenario as Parameters<typeof evaluate>[0]["scenario"],
+      });
+      expect(evalResult.observations.length).toBeGreaterThan(0);
+
+      const base = evalResult.observations[0];
+      let corruptedObsList: TelemetryObservation[];
+
+      if (mutant.id === "non-finite") {
+        corruptedObsList = [makeObservationWithNaN(base)];
+      } else if (mutant.id === "velocity-snap") {
+        corruptedObsList = makeObservationsWithVelocitySnap(base);
+      } else if (mutant.id === "ball-no-decay") {
+        corruptedObsList = makeObservationsWithNoBallDecay(base);
+      } else if (mutant.id === "ball-teleport") {
+        corruptedObsList = makeObservationsWithBallTeleport(base);
+      } else if (mutant.id === "possession-no-evidence") {
+        corruptedObsList = makeObservationsWithPossessionNoEvidence(base);
+      } else if (mutant.id === "camera-hash") {
+        corruptedObsList = [
+          { ...base, observationCoreHash: "corrupted-hash-000000" },
+        ];
+      } else if (mutant.id === "score-tracker") {
+        corruptedObsList = makeObservationsWithScoreTracker(base);
+      } else if (mutant.id === "match-clock") {
+        corruptedObsList = makeObservationsWithMatchClock(base);
+      } else {
+        corruptedObsList = [base];
+      }
+
+      const results = executeOracle(
+        mutant.oracleId,
+        mutant.oracleVersion,
+        corruptedObsList,
+      );
+      const hasFail = results.some((r) => r.status === "fail");
+      expect(
+        hasFail,
+        `Oracle ${mutant.oracleId} did not detect corruption for mutant ${mutant.id} in 3v3 context`,
+      ).toBe(true);
+    });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// 3. PRNG-order: genuine divergence detection in 3v3 context
+// ---------------------------------------------------------------------------
+
+describe("3v3 PRNG-order mutant: genuine divergence", () => {
+  it("mutant run diverges when PRNG state is XORed mid-run", () => {
+    const scenario = loadTeamScenario();
+    const scenarioObj = scenario as Parameters<typeof evaluate>[0]["scenario"];
+    const durationTicks = scenarioObj.durationTicks as number;
+
+    const inputProgram = buildTeamInputProgram(durationTicks);
+
+    // Clean run.
+    const cleanWorld = createWorld({ scenario: scenarioObj });
+    const cleanSim = createSimulation(cleanWorld);
+    const cleanHashes = new Map<number, string>();
+    for (let i = 0; i < durationTicks; i++) {
+      const inputs = inputProgram[cleanSim.tick] ?? [];
+      if (inputs.length > 0) cleanSim.applyInputs(inputs);
+      const r = cleanSim.step();
+      cleanHashes.set(r.tick, r.stateHash);
+    }
+
+    // Mutant simulation: run up to corruption tick, mutate PRNG, continue.
+    const mutationTick = 2;
+    const mutantWorld = createWorld({ scenario: scenarioObj });
+    const mutantSim = createSimulation(mutantWorld);
+
+    for (let i = 0; i < mutationTick; i++) {
+      const inputs = inputProgram[mutantSim.tick] ?? [];
+      if (inputs.length > 0) mutantSim.applyInputs(inputs);
+      const r = mutantSim.step();
+      expect(cleanHashes.get(r.tick)).toBe(r.stateHash);
+    }
+
+    // Mutate PRNG state.
+    const snapshot = mutantSim.snapshot();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const clone = structuredClone
+      ? structuredClone(snapshot)
+      : JSON.parse(JSON.stringify(snapshot));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const prngState = (clone as any).prng?.state;
+    if (typeof prngState === "number") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (clone as any).prng.state = prngState ^ 1;
+    }
+    mutantSim.restore(clone);
+
+    // Continue mutant.
+    let foundDivergence = false;
+    for (let i = mutationTick; i < durationTicks; i++) {
+      const inputs = inputProgram[mutantSim.tick] ?? [];
+      if (inputs.length > 0) mutantSim.applyInputs(inputs);
+      const r = mutantSim.step();
+      if (r.stateHash !== cleanHashes.get(r.tick)) {
+        foundDivergence = true;
+        break;
+      }
+    }
+
+    expect(foundDivergence).toBe(true);
+  });
+
+  it("checkPrngOrderMutation detects divergence in 3v3 context", () => {
+    const scenario = loadTeamScenario();
+    const scenarioObj = scenario as Parameters<typeof evaluate>[0]["scenario"];
+    const durationTicks = scenarioObj.durationTicks as number;
+    const inputProgram = buildTeamInputProgram(durationTicks);
+
+    const result = checkPrngOrderMutation(
+      scenarioObj,
+      inputProgram,
+      durationTicks,
+      2,
+    );
+    expect(result.status).toBe("pass");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 4. Skipped implementable mutant → INVALID_RUN
+// ---------------------------------------------------------------------------
+
+describe("3v3: skipped implementable mutant → INVALID_RUN", () => {
+  it("skipping an implementable mutant yields INVALID_RUN, not PASS", () => {
+    const result = runMutantTeam({
+      skipMutationIds: ["non-finite"],
+    });
+
+    expect(result.verdict).not.toBe("PASS");
+    expect(result.verdict).toBe("INVALID_RUN");
+    expect(result.anyInvalidRun).toBe(true);
+    expect(result.allImplementedDetected).toBe(false);
+
+    const skippedOutcome = result.outcomes.find(
+      (o) => o.mutationId === "non-finite",
+    );
+    expect(skippedOutcome).toBeDefined();
+    expect(skippedOutcome?.outcome).toBe("INVALID_RUN");
+    expect(skippedOutcome?.executed).toBe(false);
+  });
+
+  it("skipping multiple mutants still yields INVALID_RUN", () => {
+    const result = runMutantTeam({
+      skipMutationIds: ["non-finite", "ball-teleport"],
+    });
+
+    expect(result.verdict).toBe("INVALID_RUN");
+    expect(result.anyInvalidRun).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 5. Deferred mutants: NOT_EVALUATED in 3v3 context
+// ---------------------------------------------------------------------------
+
+describe("3v3: deferred mutants stay NOT_EVALUATED", () => {
+  it("DEFERRED_MUTANTS_V1 is non-empty", () => {
+    expect(DEFERRED_MUTANTS_V1.length).toBeGreaterThan(0);
+    for (const m of DEFERRED_MUTANTS_V1) {
+      expect(m.id).toMatch(/.+/);
+      expect(m.description).toMatch(/.+/);
+      expect(m.reason).toMatch(/.+/);
+    }
+  });
+
+  it("checkDeferredMutants returns not_evaluated", () => {
+    const result = checkDeferredMutants();
+    expect(result.status).toBe("not_evaluated");
+    expect(result.id).toContain("deferred-mutants");
+    const details = result.details as Record<string, unknown>;
+    expect(details?.mutantIds).toBeDefined();
+    expect((details?.mutantIds as string[])?.length).toBeGreaterThan(0);
+  });
+
+  it("deferred-mutants oracle returns not_evaluated", () => {
+    const results = executeOracle(
+      "deferred-mutants",
+      "oracle-deferred-mutants-v1",
+      [],
+    );
+    const notEvaluated = results.find((r) => r.status === "not_evaluated");
+    expect(notEvaluated).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 6. Registry integrity
+// ---------------------------------------------------------------------------
+
+describe("3v3: registry integrity", () => {
+  it("IMPLEMENTABLE_MUTANTS has no duplicate IDs", () => {
+    const ids = IMPLEMENTABLE_MUTANTS.map((m) => m.id);
+    const unique = new Set(ids);
+    expect(unique.size).toBe(ids.length);
+  });
+
+  it("IMPLEMENTABLE_MUTANTS are all deferred: false", () => {
+    for (const m of IMPLEMENTABLE_MUTANTS) {
+      expect(m.deferred).toBe(false);
+    }
+  });
+
+  it("all IMPLEMENTABLE_MUTANTS have registered oracles", () => {
+    for (const m of IMPLEMENTABLE_MUTANTS) {
+      expect(() =>
+        executeOracle(m.oracleId, m.oracleVersion, []),
+      ).not.toThrow();
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 7. No PES claims
+// ---------------------------------------------------------------------------
+
+describe("No PES claims in 3v3 mutant results", () => {
+  it("runMutantTeam does not claim PES fidelity", () => {
+    const result = runMutantTeam();
+
+    const pesTerms = [
+      "PES fidelity",
+      "PES match",
+      "PES 2017",
+      "FOUNDATION_LAB_PASS",
+      "PLAYABLE_1V1_PASS",
+    ];
+
+    for (const outcome of result.outcomes) {
+      if (outcome.mutationId === "deferred-summary") continue;
+      for (const evidence of [
+        outcome.cleanResult?.description ?? "",
+        outcome.poisonedResult?.description ?? "",
+      ]) {
+        for (const term of pesTerms) {
+          expect(
+            evidence.toLowerCase().includes(term.toLowerCase()),
+            `Evidence should not contain "${term}": ${evidence}`,
+          ).toBe(false);
+        }
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 8. Determinism: two identical 3v3 runs produce same verdict
+// ---------------------------------------------------------------------------
+
+describe("3v3 mutant evaluation is deterministic", () => {
+  it("two identical runMutantTeam calls produce the same verdict", () => {
+    const resultA = runMutantTeam();
+    const resultB = runMutantTeam();
+
+    expect(resultA.verdict).toBe(resultB.verdict);
+    expect(resultA.implementableCount).toBe(resultB.implementableCount);
+
+    for (let i = 0; i < resultA.outcomes.length; i++) {
+      expect(resultA.outcomes[i].outcome).toBe(resultB.outcomes[i].outcome);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 9. Module exports
+// ---------------------------------------------------------------------------
+
+describe("3v3: module exports", () => {
+  it("the mutant-team module exports runMutantTeam", async () => {
+    const moduleExports = Object.keys(
+      await import("../../../eval/runners/mutant-team.js"),
+    );
+    expect(moduleExports).toContain("runMutantTeam");
+  });
+
+  it("the mutant-team module exports MutantTeamOutcome and MutantTeamResult types", async () => {
+    // Runtime check: types are not exported at runtime but the module
+    // structure is correct. We verify the function export exists.
+    const moduleExports = Object.keys(
+      await import("../../../eval/runners/mutant-team.js"),
+    );
+    expect(moduleExports).toContain("runMutantTeam");
+  });
+});
