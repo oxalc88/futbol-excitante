@@ -2688,3 +2688,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 5375ded candidate(PLAYABLE-SECOND-TOUCH)
 - notes: Dribble state machine: second-touch detection, turn mechanics (heading 15° threshold, 4-tick cooldown, 2-tick delay), velocity dampening, maxDribbleTicks limit. Ball independence preserved (position never modified). 30 new tests (16 groups); 67 integration tests, 0 regressions. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 2/4.
+
+## Iteration 80 — 2026-08-20
+
+- objective_id: PLAYABLE-CONTROL-SLOT-ROUTING
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-qwen / qwen3.6 — ACCEPT (retry, fromPlayer payload fix, 28s, independence OK)
+- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (159 loop/input tests, 0 regressions)
+- result: accepted
+- commits: 505e056 candidate(PLAYABLE-CONTROL-SLOT-ROUTING)
+- notes: Slot ownership and player switching: stable slot→player mapping, Tab-key cycling (NEXT/PREVIOUS, deterministic sorted, edge-triggered), slot-keyed maps prevent cross-slot interference, slot wiring invariant per tick, fromPlayer payload fixed. 45 new tests (12 groups); 1969 total tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 3/4.

@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: PLAYABLE-CONTROL-SLOT-ROUTING
+next_objective_id: PLAYABLE-1V1-PROFILE-EVALUATION
 
 best_known:
-  commit: 5375ded
-  note: "PLAYABLE-SECOND-TOUCH accepted. Candidate 5375ded; acceptance bookkeeping in progress."
+  commit: 505e056
+  note: "PLAYABLE-CONTROL-SLOT-ROUTING accepted. Candidate 505e056; acceptance bookkeeping in progress."
 
 active_candidate: null
 builder_in_use: null
@@ -88,17 +88,18 @@ accepted:
   - TEAM-EVALUATOR-SUITE
   - ARCHETYPE-BLINDED-COMPARISON
   - PLAYABLE-SECOND-TOUCH
+  - PLAYABLE-CONTROL-SLOT-ROUTING
 
 blocked: []
 
-selection_note: "Horizon playable-1v1-enabler 2/4: PLAYABLE-SECOND-TOUCH accepted 2026-08-20. Next: PLAYABLE-CONTROL-SLOT-ROUTING."
+selection_note: "Horizon playable-1v1-enabler 3/4: PLAYABLE-CONTROL-SLOT-ROUTING accepted 2026-08-20. Next: PLAYABLE-1V1-PROFILE-EVALUATION."
 ```
 ## Last accepted objective
 
-PLAYABLE-SECOND-TOUCH — Dribble state machine: second-touch detection, turn mechanics (heading threshold 15°, cooldown 4 ticks, delay 2 ticks), velocity dampening toward player movement, maxDribbleTicks limit. Ball remains independent 3D entity (position never modified, only velocity). Dribble state in simulation closure, correctly reconstructed on restore. 30 new tests covering 16 test groups; 67 integration tests, 0 regressions. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 2/4.
+PLAYABLE-CONTROL-SLOT-ROUTING — Slot ownership and player switching: stable slot→player mapping (findSlotForPlayer, getSlotTeamId, isSlotActive), Tab-key cycling via computeExplicitSwitchTarget (NEXT/PREVIOUS, deterministic sorted, edge-triggered), slot-keyed maps prevent cross-slot interference, slot wiring invariant checked every tick. fromPlayer payload corrected (captures pre-switch ID). 45 tests (12 groups); 1969 total tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 3/4.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-qwen / qwen3.6 — ACCEPT (first pass, 0 retries, 269s, independence OK)
-- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (377 regression tests, 0 failures)
-- Evidence: durable acceptance manifest + record (2026-08-20T07:54:11Z)
-- Candidate: 5375ded
+- critic: critic-qwen / qwen3.6 — ACCEPT (retry, 0 required fixes, 28s, independence OK)
+- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (159 loop/input tests, 0 regressions)
+- Evidence: durable acceptance manifest + record (2026-08-20T08:39:45Z)
+- Candidate: 505e056

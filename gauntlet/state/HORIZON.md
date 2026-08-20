@@ -7,7 +7,7 @@ horizon_id: "playable-1v1-enabler"
 created_from_commit: b155671
 created_at: 2026-08-20
 reason: "Horizon transition-completion exhausted (5/5 accepted). TEAM-EVALUATOR-SUITE materialized MUTANT_TEAM_PASS and TEAM_SHAPE_SUITE_PASS, satisfying SMALL_SIDED_SHAPE exit prerequisites. However, SMALL_SIDED_SHAPE entry_prerequisite PLAYABLE_1V1_PASS is still blocked by ARCHETYPE_BLINDED_COMPARISON_PASS. New horizon builds the perceptual archetype comparison framework (rubric + browser artifacts) and fills remaining capability gaps toward PLAYABLE_1V1_PASS."
-current_index: 2
+current_index: 3
 objectives:
   - id: ARCHETYPE-BLINDED-COMPARISON
     status: accepted
@@ -20,7 +20,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: PLAYABLE-FIRST-TOUCH
   - id: PLAYABLE-CONTROL-SLOT-ROUTING
-    status: pending
+    status: accepted
     reason: "Improve local control slot routing for multi-player 1v1 scenarios: stable player switching, controlled player selection, and slot ownership."
     builder: builder-gameplay
     prerequisite: PLAYABLE-BROWSER-1V1
