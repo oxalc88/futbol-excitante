@@ -1,5 +1,5 @@
 {
-  "version": "gauntlet-models-v5",
+  "version": "gauntlet-models-v6",
   "notes": "Role names describe responsibilities; model selection is routing. Keep this file aligned with the agent model declarations used by the Gauntlet. See gauntlet/README.md.",
   "roles": {
     "orchestrator": {
@@ -21,9 +21,7 @@
       "model": "deepseek-v4-flash",
       "api_model": "deepseek-v4-flash",
       "reasoning_effort": "high",
-      "fallback": [
-        "deepseek-v4-flash-0731"
-      ],
+      "fallback": [],
       "constraint": "Overflow pickup only. Same canonical orchestrator contract with runtime-specific pickup semantics. Critic independence is versus the builder, not this agent. Keep timing output separated by exact model ID and role."
     },
     "builder_structured": {
@@ -47,24 +45,13 @@
       "role_contract": "gauntlet/roles/critic.md",
       "mode": "subagent",
       "provider": "nan",
-      "model": "deepseek-v4-flash-0731",
-      "api_model": "deepseek-v4-flash-0731",
+      "model": "deepseek-v4-flash",
+      "api_model": "deepseek-v4-flash",
       "fallback": [
-        "critic-flash",
         "critic-qwen",
         "critic-mimo"
       ],
-      "constraint": "Never use the same model that implemented the candidate under review. If 0731 is unavailable or out of allowance, spawn critic-flash as a distinct agent type; do not override critic's model in place."
-    },
-    "critic_flash": {
-      "agent": "critic-flash",
-      "role_contract": "gauntlet/roles/critic.md",
-      "mode": "subagent",
-      "provider": "nan",
-      "hidden": true,
-      "model": "deepseek-v4-flash",
-      "api_model": "deepseek-v4-flash",
-      "constraint": "DeepSeek fallback critic. Same canonical critic contract. Never use if the builder model is DeepSeek/current Flash."
+      "constraint": "Primary DeepSeek critic. Never use the same model that implemented the candidate under review. On model-specific unavailability/capability failure, reroute to an independent Qwen/MiMo critic rather than overriding the agent model in place."
     },
     "critic_qwen": {
       "agent": "critic-qwen",
@@ -89,24 +76,13 @@
       "role_contract": "gauntlet/roles/integration-reviewer.md",
       "mode": "subagent",
       "provider": "nan",
-      "model": "deepseek-v4-flash-0731",
-      "api_model": "deepseek-v4-flash-0731",
+      "model": "deepseek-v4-flash",
+      "api_model": "deepseek-v4-flash",
       "fallback": [
-        "integration-reviewer-flash",
         "qwen3.6",
         "mimo-v2.5"
       ],
-      "constraint": "Prefer DeepSeek. If 0731 is unavailable or out of allowance, spawn integration-reviewer-flash as a distinct agent type. Otherwise use a NaN model different from the builder under review."
-    },
-    "integration_reviewer_flash": {
-      "agent": "integration-reviewer-flash",
-      "role_contract": "gauntlet/roles/integration-reviewer.md",
-      "mode": "subagent",
-      "provider": "nan",
-      "hidden": true,
-      "model": "deepseek-v4-flash",
-      "api_model": "deepseek-v4-flash",
-      "constraint": "DeepSeek fallback integration reviewer. Same canonical integration contract. Must differ from the builder under review."
+      "constraint": "Primary DeepSeek integration reviewer. On model-specific unavailability/capability failure, use a NaN model different from the builder under review."
     },
     "aux": {
       "agent": "aux",
@@ -148,7 +124,6 @@
   "high_volume": [
     "qwen3.6",
     "mimo-v2.5",
-    "deepseek-v4-flash-0731",
     "deepseek-v4-flash",
     "gemma4"
   ],
