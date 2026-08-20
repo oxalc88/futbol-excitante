@@ -39,6 +39,7 @@ import {
 } from "../contracts/profiles.js";
 import { BROWSER_CASES } from "../contracts/browser-cases.js";
 import { evaluateMutant1v1 } from "./mutant-1v1.js";
+import { evaluateArchetypeComparison } from "./archetype-comparison.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -264,17 +265,42 @@ function checkExitPrerequisites(
         });
       }
     } else if (prereq === "ARCHETYPE_BLINDED_COMPARISON_PASS") {
-      // ARCHETYPE_BLINDED_COMPARISON_PASS is a perceptual evaluation that
-      // requires a versioned rubric and deterministic browser artifacts
-      // (e.g., rendered frames, perceptual hash comparison).  Neither the
-      // rubric nor the browser artifacts exist yet.  This MUST stay NOT_EVALUATED.
-      results.push({
-        componentId: `EXIT_PREREQ:${prereq}`,
-        outcome: "NOT_EVALUATED",
-        evidence: [
-          `Exit prerequisite "${prereq}" requires a versioned perceptual rubric and deterministic browser artifacts (rendered frames, perceptual hash comparison); these are not yet implemented`,
-        ],
-      });
+      // ARCHETYPE_BLINDED_COMPARISON_PASS is a perceptual evaluation
+      // that uses real browser-captured artifacts from disk.  When
+      // artifacts exist, runs the rubric reduction; when they do not,
+      // returns NOT_EVALUATED (no theatrical always-PASS).
+      try {
+        const archetypeResult = evaluateArchetypeComparison({
+          useDiskArtifacts: true,
+        });
+        const outcome = archetypeResult.verdict as SubComponentResult["outcome"];
+        results.push({
+          componentId: `EXIT_PREREQ:${prereq}`,
+          outcome,
+          evidence: [
+            `ARCHETYPE_BLINDED_COMPARISON verdict: ${archetypeResult.verdict}`,
+            `All pairs detectable: ${archetypeResult.allDetectable}`,
+            `Min confidence: ${archetypeResult.minConfidence}`,
+            ...archetypeResult.pairs.map(
+              (p) =>
+                `${p.pair.archetype_a} vs ${p.pair.archetype_b}: diff=${p.hashDiffRatio.toFixed(4)} detectable=${p.detectable}`,
+            ),
+            archetypeResult.verdict === "NOT_EVALUATED"
+              ? "Perceptual rubric evaluation: no real artifact hashes available — deferred until browser capture produces frames"
+              : archetypeResult.verdict === "PASS"
+                ? "Perceptual rubric: all archetype pairs are perceptually distinguishable"
+                : "Perceptual rubric: some archetype pairs are not perceptually distinguishable",
+          ],
+        });
+      } catch (err) {
+        results.push({
+          componentId: `EXIT_PREREQ:${prereq}`,
+          outcome: "NOT_EVALUATED",
+          evidence: [
+            `ARCHETYPE_BLINDED_COMPARISON threw an error: ${err instanceof Error ? err.message : String(err)}`,
+          ],
+        });
+      }
     } else {
       // Unknown exit prerequisite — treat as NOT_EVALUATED.
       results.push({

@@ -15,3 +15,17 @@ export type {
   TeamShapeTestResult,
   CommonCriterionCheck,
 } from "./team-shape-evaluator.js";
+
+// Archetype comparison (perceptual evaluation).
+export { captureArchetypeArtifacts } from "./archetype-capture.js";
+export type { CapturedFrame, PairCaptureResult, CaptureResult } from "./archetype-capture.js";
+export {
+  evaluateArchetypeComparison,
+  compareFrames,
+  verifyArchetypeHashUniqueness,
+  computeHashDiffRatio,
+  COMPARISON_PAIRS,
+  RUBRIC_META,
+  DETECTABILITY_THRESHOLD,
+} from "./archetype-comparison.js";
+export type { HashedFrame, FrameComparison } from "./archetype-comparison.js";
