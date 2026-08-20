@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: TEAM-EVALUATOR-SUITE
+next_objective_id: ""
 
 best_known:
-  commit: 710c07c
-  note: "BROWSER-DIFFICULTY-SETTING accepted. Candidate 710c07c; acceptance bookkeeping in progress."
+  commit: 0c5e328
+  note: "TEAM-EVALUATOR-SUITE accepted. Candidate 0c5e328; acceptance bookkeeping in progress."
 
 active_candidate: null
 builder_in_use: null
@@ -85,17 +85,18 @@ accepted:
   - MATCH-GOAL-KICK
   - CPU-TACTICAL-AWARENESS
   - BROWSER-DIFFICULTY-SETTING
+  - TEAM-EVALUATOR-SUITE
 
 blocked: []
 
-selection_note: "Horizon transition-completion 4/5: BROWSER-DIFFICULTY-SETTING accepted 2026-08-19. Next: TEAM-EVALUATOR-SUITE."
+selection_note: "Horizon transition-completion EXHAUSTED (5/5). Last accepted: TEAM-EVALUATOR-SUITE. Horizon needs replanning."
 ```
 ## Last accepted objective
 
-BROWSER-DIFFICULTY-SETTING — Browser match difficulty HUD + CPU adapter scaling (browser UI + CPU adapter only): configurable difficulty level (Easy/Medium/Hard) via URL parameter (?difficulty=) and browser select element. Difficulty config modulates 6 base provisional constants deterministically: pressRadiusFactor, pressStrengthFactor, shotAimFactor, shotRangeFactor, facingToleranceFactor, firstTouchRangeFactor. Medium = 1.0 (no change). Easy weakens CPU; Hard strengthens. Observation immutability preserved (difficulty is optional, missing → medium). 20 unit tests on difficulty config + 15 browser tests + 1 capture test; full node suite 1935/1935. Browser 86/86. HEADLESS audit PASS. All coefficients provisional; no PES claims.
+TEAM-EVALUATOR-SUITE — Team evaluator suite: MUTANT_TEAM_PASS reducer (9 implementable mutants against 3v3 team context, detect+clean → PASS, deferred → NOT_EVALUATED, missing → INVALID_RUN) and TEAM_SHAPE_SUITE_PASS reducer (16 TEAM_SUITE tests against 3v3 scenario, checks COMMON-FINITE/REFERENCES/BOUNDS, reduces to PASS/FAIL/NOT_EVALUATED/INVALID_RUN). Enables SMALL_SIDED_SHAPE milestone evaluation. Structured TypeScript work in eval/ layer. 53 new tests (34 mutant-team + 19 team-shape); full node suite 1675/1675. HEADLESS audit PASS. No PES claims. Horizon transition-completion EXHAUSTED (5/5).
 
-- builder: builder-gameplay / mimo-v2.5
-- critic: critic-qwen / qwen3.6 — ACCEPT (no required fixes, 86s, 0 retries)
-- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (no regressions, 491s, dependency PASS, evaluator integrity PASS)
-- Evidence: durable acceptance manifest + record (2026-08-20T05:06:46Z)
-- Candidate: 710c07c
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (first pass, 0 retries, 426s, independence OK)
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (0 regressions, dependency PASS, evaluator integrity PASS)
+- Evidence: durable acceptance manifest + record (2026-08-20T05:59:49Z)
+- Candidate: 0c5e328

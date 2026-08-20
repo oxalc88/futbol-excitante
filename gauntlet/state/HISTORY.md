@@ -2656,5 +2656,15 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - critic: critic-qwen / qwen3.6 — ACCEPT (first pass, 0 retries, 86s)
 - integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (0 regressions in cpu-adapter, determinism, simulation suites; dependency PASS; evaluator integrity PASS)
 - result: accepted
-- commits: 710c07c candidate(BROWSER-DIFFICULTY-SETTING)
+- commits: 710c07c candidate(BROWSER-DIFFICULTY-SETTING), fa59610 gauntlet(BROWSER-DIFFICULTY-SETTING): accept
 - notes: Browser match difficulty HUD + CPU adapter scaling. Configurable difficulty (Easy/Medium/Hard) via URL parameter (?difficulty=) and browser select element. Difficulty config modulates 6 base provisional constants deterministically (pressRadiusFactor, pressStrengthFactor, shotAimFactor, shotRangeFactor, facingToleranceFactor, firstTouchRangeFactor). Medium = 1.0; Easy weakens CPU; Hard strengthens. Optional field (missing → medium, backward compatible). 20 unit + 15 browser + 1 capture tests; full node suite 1935/1935. Browser 86/86. HEADLESS audit PASS. All coefficients provisional; no PES claim. Horizon transition-completion 4/5.
+
+## Iteration 77 — 2026-08-20
+
+- objective_id: TEAM-EVALUATOR-SUITE
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (first pass, 0 retries, 426s, independence OK)
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (dependency PASS, evaluator integrity PASS, 0 regressions)
+- result: accepted
+- commits: 0c5e328 candidate(TEAM-EVALUATOR-SUITE), TBD gauntlet(TEAM-EVALUATOR-SUITE): accept
+- notes: Team evaluator suite: MUTANT_TEAM_PASS reducer (9 implementable mutants against 3v3 context, detect+clean → PASS, deferred → NOT_EVALUATED, missing → INVALID_RUN) and TEAM_SHAPE_SUITE_PASS reducer (16 TEAM_SUITE tests against 3v3 scenario, checks COMMON-FINITE/REFERENCES/BOUNDS). Enables SMALL_SIDED_SHAPE milestone evaluation. 53 new tests (34 mutant-team + 19 team-shape); full suite 1675/1675. HEADLESS audit PASS. Horizon transition-completion EXHAUSTED (5/5).
