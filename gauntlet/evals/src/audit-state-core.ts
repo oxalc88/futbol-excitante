@@ -97,7 +97,7 @@ export async function runStateChecks(repoRoot: string): Promise<{ objective: str
   const indexed = parsed.currentIndex !== null ? parsed.objectives[parsed.currentIndex]?.id ?? null : null;
   checks.push({ name: "CURRENT next objective matches HORIZON index", pass: nextObjective === indexed || (indexed === null && nextObjective === null), detail: nextObjective === indexed || (indexed === null && nextObjective === null) ? undefined : `CURRENT=${nextObjective}, HORIZON=${indexed}`, owner: "orchestrator" });
 
-  for (const key of ["last_tracked_objective", "usage_aggregates_through", "model_evaluation_through"]) {
+  for (const key of ["last_tracked_objective", "usage_aggregates_through", "model_evaluation_through", "clock_aggregates_through"]) {
     const value = yamlValue(timing, key);
     checks.push({ name: `${key} matches latest accepted`, pass: value === objective, detail: value === objective ? undefined : `expected ${objective}, found ${value ?? "missing"}`, owner: "orchestrator" });
   }

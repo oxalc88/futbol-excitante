@@ -8,6 +8,7 @@ const RULES: GateRule[] = [
   { name: "canonical principles exist", file: "gauntlet/principles.md", mustContain: ["Deterministic audits may invalidate evidence or state", "Scripts establish facts. Cheap auditors resolve bounded ambiguity. Critics judge quality against the bar.", "Provider, transport, quota, authentication, and harness failures are non-progress events", "gauntlet/provider-failure-contract.md"] },
   { name: "provider failures cannot masquerade as completed inference", file: "gauntlet/provider-failure-contract.md", mustContain: ["A completed CLI turn is not sufficient evidence of a successful inference", "HTTP 403: System error, please try again later.", "TRANSIENT_PROVIDER_FAILURE", "bounded exponential backoff with jitter", "maximum attempts: 5", "no state advancement", "same objective resumes"] },
   { name: "provider failure retry policy stays bounded", file: "gauntlet/provider-failure-contract.md", mustContain: ["base delays: 2s, 5s, 10s, 20s, 40s", "jitter: +/- 20%", "Never spin indefinitely", "Do not classify every 403 as transient"] },
+  { name: "model capability mismatch is explicit", file: "gauntlet/model-capability-contract.md", mustContain: ["MODEL_CAPABILITY_MISMATCH", "No endpoints found that support image input.", "preserve the same objective and exact pipeline step", "explicitly compatible independent fallback route"] },
   { name: "main gauntlet entrypoint requires explicit allowed stop reason", file: ".grok/skills/gauntlet/SKILL.md", mustContain: ["`allowed_stop_reason`", "Tests passing", "execute that action instead of stopping"] },
   { name: "continue entrypoint requires explicit allowed stop reason", file: ".grok/skills/gauntlet-continue/SKILL.md", mustContain: ["`allowed_stop_reason`", "Tests passing", "execute that action instead of stopping"] },
   { name: "normal test capture is isolated from durable evidence", file: "package.json", mustContain: ["GAUNTLET_EVIDENCE_CAPTURE=1", "__EVIDENCE__:", "gauntlet:candidate-scope"] },
@@ -29,8 +30,8 @@ const RULES: GateRule[] = [
   { name: "class-based evidence contract cannot regress", file: "gauntlet/evidence-contract.md", mustContain: ["`HEADLESS`", "`BROWSER_VISIBLE`", "`MULTI_TICK`", "`DYNAMIC_VISUAL`", "3–5 semantic frames", "temporal and browser-visible", "centered on that event", "`PRESENTATION`", "`BOOKKEEPING`", "manifest.json", "The critic is mandatory"] },
   { name: "evidence manifest contract exists", file: "gauntlet/evidence-manifest-contract.md", mustContain: ["candidate_commit", "sha256", "sequence.json", "video-reference.json", "milestones", "never silently overwritten"] },
   { name: "semantic audit is bounded and cannot accept", file: "gauntlet/semantic-audit-contract.md", mustContain: ["VALID|INVALID|INSUFFICIENT_CONTEXT", "can never produce objective `ACCEPT`"] },
-  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.9.3\"", "\"previous_system_version\": \"0.9.2\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene"] },
-  { name: "reviewer fallback remains explicit", file: "gauntlet/PROMPT.md", mustContain: ["critic-flash", "integration-reviewer-flash"] },
+  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.9.4\"", "\"previous_system_version\": \"0.9.3\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene", "model-capability-routing", "timing-aggregate-consistency"] },
+  { name: "reviewer fallback remains explicit", file: "gauntlet/PROMPT.md", mustContain: ["critic-qwen", "critic-mimo", "integration-reviewer-qwen", "integration-reviewer-mimo", "gauntlet/model-capability-contract.md"] },
 ];
 
 const WRAPPER_CONTRACTS: Record<string, string> = {
@@ -39,11 +40,11 @@ const WRAPPER_CONTRACTS: Record<string, string> = {
   "builder-structured.md": "gauntlet/roles/builder-structured.md",
   "builder-gameplay.md": "gauntlet/roles/builder-gameplay.md",
   "critic.md": "gauntlet/roles/critic.md",
-  "critic-flash.md": "gauntlet/roles/critic.md",
   "critic-qwen.md": "gauntlet/roles/critic.md",
   "critic-mimo.md": "gauntlet/roles/critic.md",
   "integration-reviewer.md": "gauntlet/roles/integration-reviewer.md",
-  "integration-reviewer-flash.md": "gauntlet/roles/integration-reviewer.md",
+  "integration-reviewer-qwen.md": "gauntlet/roles/integration-reviewer.md",
+  "integration-reviewer-mimo.md": "gauntlet/roles/integration-reviewer.md",
 };
 
 async function roleWrapperCheck(repoRoot: string): Promise<PromptGateResult> {

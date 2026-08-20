@@ -28,6 +28,7 @@ export const GAUNTLET_FAILURE_CLASSES = [
   "tracking_missing",
   "prompt_contract",
   "model_unavailable",
+  "model_capability_mismatch",
   "rate_limited",
   "quota_exhausted",
   "internal_error",

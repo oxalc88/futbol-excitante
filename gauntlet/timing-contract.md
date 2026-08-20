@@ -13,20 +13,22 @@ If a metric is unavailable, write `n/a` and state why. Estimated values must be 
 The YAML metadata block near the top of `TIMING.md` must include:
 
 ```yaml
-tracking_contract_version: 1
+tracking_contract_version: 2
 last_tracked_objective: <objective-id>
 usage_aggregates_through: <objective-id>
 model_evaluation_through: <objective-id>
+clock_aggregates_through: <objective-id>
 ```
 
-All three objective markers must equal the latest accepted objective before the acceptance commit is delegated.
+All four objective markers must equal the latest accepted objective before the acceptance commit is delegated. Advancing the first three markers while leaving the global Clock/aggregate section anchored to older totals is invalid bookkeeping.
 
 ## Required update after each accepted objective
 
 1. Add or refresh the objective row under `## Per-step time and tokens`, including the actual builder/critic/integration/commit timing and prompt/completion usage when available.
 2. Refresh the relevant `## By model (tokens and wall)` aggregates from the actual session data. Keep role/model identities separate; do not merge orchestration and bookkeeping simply because they used the same model family.
-3. Add or refresh the objective under `### Per-objective grade` using the existing difficulty/retry grading policy for builder performance.
-4. Add or refresh the objective under `### Reviewer route and catches` with this shape:
+3. Refresh the global `## Clock` / session aggregate values whenever their source rows changed. If exact reconstruction is unavailable, keep unknown values as `n/a` or explicitly estimated rather than retaining known-stale totals. Set `clock_aggregates_through` only after this refresh is complete.
+4. Add or refresh the objective under `### Per-objective grade` using the existing difficulty/retry grading policy for builder performance.
+5. Add or refresh the objective under `### Reviewer route and catches` with this shape:
 
 ```markdown
 | Step | Orchestrator | Builder | Critic | Critic path | Integrator | Final gate | Fallbacks / incidents |
@@ -35,8 +37,8 @@ All three objective markers must equal the latest accepted objective before the 
 
 Record model IDs, critic retry/reject path, integration verdict, final orchestrator gate, reviewer fallbacks, and any relevant `ORCH-REG-*`/incident IDs. This table evaluates reviewer/orchestrator behavior without pretending that token count alone measures quality.
 
-5. Refresh derived builder/model scoreboards when their source rows changed. Reviewer quality should be interpreted from catches/misses, fallback frequency, latency/usage, and later-gate reversals rather than from raw token count alone.
-6. Set the three machine-readable objective markers only after the per-step usage, model aggregates, and model-evaluation entries are actually refreshed.
+6. Refresh derived builder/model scoreboards when their source rows changed. Reviewer quality should be interpreted from catches/misses, fallback frequency, latency/usage, and later-gate reversals rather than from raw token count alone.
+7. Set the four machine-readable objective markers only after the per-step usage, model aggregates, global clock aggregates, and model-evaluation entries are actually refreshed.
 
 ## Acceptance gate
 
