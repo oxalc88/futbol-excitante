@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-16T12:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: ARCHETYPE-BLINDED-COMPARISON
-usage_aggregates_through: ARCHETYPE-BLINDED-COMPARISON
-clock_aggregates_through: ARCHETYPE-BLINDED-COMPARISON
-model_evaluation_through: ARCHETYPE-BLINDED-COMPARISON
+last_tracked_objective: PLAYABLE-SECOND-TOUCH
+usage_aggregates_through: PLAYABLE-SECOND-TOUCH
+clock_aggregates_through: PLAYABLE-SECOND-TOUCH
+model_evaluation_through: PLAYABLE-SECOND-TOUCH
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -148,6 +148,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | BROWSER-DIFFICULTY-SETTING | accepted | ~14m | 8m | 3m | 2m | 0.5m | ~3M est. | n/a** |
 | TEAM-EVALUATOR-SUITE | accepted | ~28m | 18m | 7m | 5m | 0.5m | ~5M est. | n/a** |
 | ARCHETYPE-BLINDED-COMPARISON | accepted | ~48m | 28m | 14m | 7m | 0.5m | ~8M est. | n/a** |
+| PLAYABLE-SECOND-TOUCH | accepted | ~19m | 9m | 5m | 3m | 0.5m | ~4M est. | n/a** |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -371,6 +372,7 @@ on an H task is the interesting result.
 | BROWSER-DIFFICULTY-SETTING | mimo-v2.5 | M | Medium — configurable difficulty scaling, browser HUD | 0 | A | 20 unit + 15 browser + 1 capture tests, 1935 node, first-pass clean |
 | TEAM-EVALUATOR-SUITE | qwen3.6 | M | Medium — structured evaluator runners, 3v3 context | 0 | A | 53 eval tests, 1675 total, first-pass clean |
 | ARCHETYPE-BLINDED-COMPARISON | qwen3.6 | H | High — perceptual rubric, canvas rendering, evaluator wiring | 0 | B | 51 eval tests, 507 total (critic retry: 5 substantive fixes) |
+| PLAYABLE-SECOND-TOUCH | mimo-v2.5 | H | High — new physics contact system, dribble state machine | 0 | A | 30 new tests (16 groups), 67 integration, 377 regression, first-pass clean |
 
 ### Reviewer route and catches
 
@@ -464,6 +466,8 @@ on an H task is the interesting result.
 | TEAM-EVALUATOR-SUITE | integration-reviewer-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 1675 node, no core changes, dependency clean, evaluator integrity PASS |
 | ARCHETYPE-BLINDED-COMPARISON | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT (retry) | 5 substantive fixes: playable evaluator wiring, HEADLESS NOT_EVALUATED, Buffer fix, game frame rendering, full hash sampling |
 | ARCHETYPE-BLINDED-COMPARISON | integration-reviewer-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 507 eval tests, no core changes, dependency clean, evaluator integrity PASS |
+| PLAYABLE-SECOND-TOUCH | critic-qwen (qwen3.6) | 0731 unavailable, flash unavailable, qwen fallback | ACCEPT | 30 tests, 67 integration, ball independence verified, no PES claims |
+| PLAYABLE-SECOND-TOUCH | integration-reviewer-qwen (qwen3.6) | 0731 unavailable, flash unavailable, qwen fallback | ACCEPT | 377 regression tests, no core changes, dependency clean |
 
 ### Builder scoreboard
 

@@ -7,7 +7,7 @@ horizon_id: "playable-1v1-enabler"
 created_from_commit: b155671
 created_at: 2026-08-20
 reason: "Horizon transition-completion exhausted (5/5 accepted). TEAM-EVALUATOR-SUITE materialized MUTANT_TEAM_PASS and TEAM_SHAPE_SUITE_PASS, satisfying SMALL_SIDED_SHAPE exit prerequisites. However, SMALL_SIDED_SHAPE entry_prerequisite PLAYABLE_1V1_PASS is still blocked by ARCHETYPE_BLINDED_COMPARISON_PASS. New horizon builds the perceptual archetype comparison framework (rubric + browser artifacts) and fills remaining capability gaps toward PLAYABLE_1V1_PASS."
-current_index: 1
+current_index: 2
 objectives:
   - id: ARCHETYPE-BLINDED-COMPARISON
     status: accepted
@@ -15,7 +15,7 @@ objectives:
     builder: builder-structured
     prerequisite: null
   - id: PLAYABLE-SECOND-TOUCH
-    status: pending
+    status: accepted
     reason: "Extend first-touch capability with second-touch/turn mechanics for realistic ball control under pressure. Gameplay-coupled physics behavior."
     builder: builder-gameplay
     prerequisite: PLAYABLE-FIRST-TOUCH

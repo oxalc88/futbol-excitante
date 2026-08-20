@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "PLAYABLE-SECOND-TOUCH",
+  "accepted_at": "2026-08-20T07:54:11.180Z",
+  "candidate_commit": "5375ded",
+  "evidence_class": null,
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/PLAYABLE-SECOND-TOUCH/audit.json",
+      "sha256": "2d81ee777371be8ce91ba45e2b37c6f7ce841bae9ff6c9d101f9d8fe449b64ba",
+      "git_blob": "a01015a72402daf6a54c9c2e96e95c609dc8dd7b",
+      "candidate_commit": "5375ded",
+      "bytes": 2679,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-qwen",
+      "model": "qwen3.6",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer-qwen",
+      "model": "qwen3.6",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-20/2026-08-20T07-54-11-180Z-PLAYABLE-SECOND-TOUCH-acceptance.json"
+}

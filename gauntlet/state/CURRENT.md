@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: PLAYABLE-SECOND-TOUCH
+next_objective_id: PLAYABLE-CONTROL-SLOT-ROUTING
 
 best_known:
-  commit: 66282db
-  note: "ARCHETYPE-BLINDED-COMPARISON accepted. Candidate 66282db; acceptance bookkeeping in progress."
+  commit: 5375ded
+  note: "PLAYABLE-SECOND-TOUCH accepted. Candidate 5375ded; acceptance bookkeeping in progress."
 
 active_candidate: null
 builder_in_use: null
@@ -87,17 +87,18 @@ accepted:
   - BROWSER-DIFFICULTY-SETTING
   - TEAM-EVALUATOR-SUITE
   - ARCHETYPE-BLINDED-COMPARISON
+  - PLAYABLE-SECOND-TOUCH
 
 blocked: []
 
-selection_note: "Horizon playable-1v1-enabler 1/4: ARCHETYPE-BLINDED-COMPARISON accepted 2026-08-20. Next: PLAYABLE-SECOND-TOUCH."
+selection_note: "Horizon playable-1v1-enabler 2/4: PLAYABLE-SECOND-TOUCH accepted 2026-08-20. Next: PLAYABLE-CONTROL-SLOT-ROUTING."
 ```
 ## Last accepted objective
 
-ARCHETYPE-BLINDED-COMPARISON — Perceptual archetype comparison framework: versioned rubric with 5 archetypes, 4 comparison pairs, detectability threshold (0.1), confidence threshold (0.5). Browser artifact capture from actual PresentationSnapshot game frames via Playwright. Hash comparison engine with NOT_EVALUATED HEADLESS fallback (no theatrical PASS). Playable evaluator wired to exit prerequisite check. 51 tests; 507 eval tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 1/4.
+PLAYABLE-SECOND-TOUCH — Dribble state machine: second-touch detection, turn mechanics (heading threshold 15°, cooldown 4 ticks, delay 2 ticks), velocity dampening toward player movement, maxDribbleTicks limit. Ball remains independent 3D entity (position never modified, only velocity). Dribble state in simulation closure, correctly reconstructed on restore. 30 new tests covering 16 test groups; 67 integration tests, 0 regressions. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 2/4.
 
-- builder: builder-structured / qwen3.6
-- critic: critic-mimo / mimo-v2.5 — ACCEPT (retry, 5 required fixes applied, 804s)
-- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (dependency PASS, evaluator integrity PASS)
-- Evidence: durable acceptance manifest + record (2026-08-20T07:23:56Z)
-- Candidate: 66282db
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-qwen / qwen3.6 — ACCEPT (first pass, 0 retries, 269s, independence OK)
+- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (377 regression tests, 0 failures)
+- Evidence: durable acceptance manifest + record (2026-08-20T07:54:11Z)
+- Candidate: 5375ded

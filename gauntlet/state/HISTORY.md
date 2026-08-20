@@ -2678,3 +2678,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 66282db candidate(ARCHETYPE-BLINDED-COMPARISON)
 - notes: Perceptual archetype comparison framework: versioned rubric (5 archetypes, 4 comparison pairs), Playwright canvas capture from actual PresentationSnapshot game frames, hash comparison engine with NOT_EVALUATED HEADLESS fallback (no theatrical PASS), playable-evaluator wired to exit prerequisite check. 51 new tests; 507 eval tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 1/4.
+
+## Iteration 79 — 2026-08-20
+
+- objective_id: PLAYABLE-SECOND-TOUCH
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-qwen / qwen3.6 — ACCEPT (first pass, 0 retries, 269s, independence OK)
+- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (377 regression tests, 0 failures)
+- result: accepted
+- commits: 5375ded candidate(PLAYABLE-SECOND-TOUCH)
+- notes: Dribble state machine: second-touch detection, turn mechanics (heading 15° threshold, 4-tick cooldown, 2-tick delay), velocity dampening, maxDribbleTicks limit. Ball independence preserved (position never modified). 30 new tests (16 groups); 67 integration tests, 0 regressions. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 2/4.
