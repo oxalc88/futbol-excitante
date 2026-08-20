@@ -29,6 +29,7 @@ import type { InputFrame } from "../../contracts/input.js";
 import { SWITCH_PLAYER_BIT } from "../../contracts/input.js";
 import type { Simulation } from "../../simulation/loop/simulation.js";
 import { createCpuAdapter, buildCpuObservation } from "../../adapters/input-browser/cpu-adapter.js";
+import type { DifficultyLevel } from "../../adapters/input-browser/cpu-adapter.js";
 import { computeTeamDecision } from "../../adapters/input-browser/team-decision-profile.js";
 
 // ---------------------------------------------------------------------------
@@ -98,6 +99,7 @@ const teamANameInput = document.getElementById("team-a-name") as HTMLInputElemen
 const teamBNameInput = document.getElementById("team-b-name") as HTMLInputElement | null;
 const startButton = document.getElementById("start-button");
 const backToMenuButton = document.getElementById("back-to-menu");
+const difficultySelect = document.getElementById("difficulty-select") as HTMLSelectElement | null;
 
 // ---------------------------------------------------------------------------
 // Match stats accumulator
@@ -254,6 +256,31 @@ const statsPassesA = document.getElementById("stats-passes-a");
 const statsPassesB = document.getElementById("stats-passes-b");
 
 // ---------------------------------------------------------------------------
+// Difficulty HUD indicator (BROWSER-DIFFICULTY-SETTING)
+// ---------------------------------------------------------------------------
+
+const difficultyHud = document.createElement("div");
+difficultyHud.id = "difficulty-hud";
+Object.assign(difficultyHud.style, {
+  position: "fixed",
+  top: "14px",
+  right: "14px",
+  background: "rgba(0, 0, 0, 0.65)",
+  borderRadius: "6px",
+  padding: "4px 10px",
+  fontFamily: '"Courier New", Courier, monospace',
+  fontSize: "11px",
+  color: "rgba(255, 255, 255, 0.7)",
+  zIndex: "100",
+  pointerEvents: "none",
+  userSelect: "none",
+  letterSpacing: "0.5px",
+  display: "none",
+});
+difficultyHud.textContent = "Difficulty: Medium";
+document.body.appendChild(difficultyHud);
+
+// ---------------------------------------------------------------------------
 // Match phase overlay (created once, reused across matches)
 // ---------------------------------------------------------------------------
 
@@ -354,6 +381,7 @@ function showSetupMenu(): void {
   if (controlsHintEl) controlsHintEl.classList.add("hidden");
   if (backToMenuButton) backToMenuButton.classList.add("hidden");
   statsPanel.style.display = "none";
+  difficultyHud.style.display = "none";
 }
 
 function hideSetupMenu(): void {
@@ -364,6 +392,7 @@ function hideSetupMenu(): void {
   if (controlsHintEl) controlsHintEl.classList.remove("hidden");
   if (backToMenuButton) backToMenuButton.classList.remove("hidden");
   statsPanel.style.display = "";
+  difficultyHud.style.display = "";
 }
 
 // ---------------------------------------------------------------------------
@@ -385,6 +414,7 @@ function startMatch(
   teamALabel: string,
   teamBLabel: string,
   controlsHint: string,
+  difficulty: DifficultyLevel = "medium",
 ): void {
   stopMatch();
   hideSetupMenu();
@@ -403,6 +433,10 @@ function startMatch(
   if (scoreboardNameA) scoreboardNameA.textContent = teamALabel;
   if (scoreboardNameB) scoreboardNameB.textContent = teamBLabel;
   if (controlsHintEl) controlsHintEl.textContent = controlsHint;
+
+  // Update difficulty HUD indicator.
+  const difficultyLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+  difficultyHud.textContent = `Difficulty: ${difficultyLabel}`;
 
   // 1. Create world from the scenario.
   const world = createWorld({ scenario });
@@ -553,12 +587,14 @@ function startMatch(
         for (const { teamId: tid, controlledPlayerId } of cpuSlots) {
           if (!teamDecisions.has(tid)) {
             const teamObs = buildCpuObservation(snapshot, tid, controlledPlayerId);
+            teamObs.difficulty = difficulty;
             teamDecisions.set(tid, computeTeamDecision(teamObs, tid));
           }
         }
 
         for (const { adapter: cpuAd, controlSlot, teamId: tid, controlledPlayerId } of cpuSlots) {
           const obs = buildCpuObservation(snapshot, tid, controlledPlayerId);
+          obs.difficulty = difficulty;
           obs.teamDecision = teamDecisions.get(tid);
           const cpuFrame = cpuAd.sample(sim.tick, obs);
           cpuFrame.controlSlot = controlSlot;
@@ -566,6 +602,7 @@ function startMatch(
         }
       } else if (cpuAdapter) {
         const obs = buildCpuObservation(sim.snapshot(), cpuTeamId, cpuControlledPlayerId);
+        obs.difficulty = difficulty;
         const cpuFrame = cpuAdapter.sample(sim.tick, obs);
         allFrames.push(cpuFrame);
       }
@@ -690,7 +727,8 @@ if (startButton) {
     const entry = resolveMatchMode(modeId);
     const teamA = teamANameInput?.value?.trim() || "HOME";
     const teamB = teamBNameInput?.value?.trim() || "AWAY";
-    startMatch(entry.scenario, entry.urlMode, teamA, teamB, entry.hint);
+    const selectedDifficulty = (difficultySelect?.value ?? "medium") as DifficultyLevel;
+    startMatch(entry.scenario, entry.urlMode, teamA, teamB, entry.hint, selectedDifficulty);
   });
 }
 
@@ -703,10 +741,15 @@ function hasUrlModeParams(): boolean {
   return params.has("mode") || params.has("scenario") || params.has("slots");
 }
 
-function getScenarioFromUrl(): { scenario: ScenarioDefinition; urlMode: string; hint: string } {
+function getScenarioFromUrl(): { scenario: ScenarioDefinition; urlMode: string; hint: string; difficulty: DifficultyLevel } {
   const search = window.location.search;
   const scenario = selectBrowserScenario(search);
   const urlMode = new URLSearchParams(search).get("mode") ?? "";
+
+  // Parse difficulty from URL (case-insensitive; invalid/absent → "medium").
+  const rawDifficulty = (new URLSearchParams(search).get("difficulty") ?? "").toLowerCase();
+  const difficulty: DifficultyLevel =
+    rawDifficulty === "easy" || rawDifficulty === "hard" ? rawDifficulty : "medium";
 
   // Map URL mode to a display hint.
   const hintMap: Record<string, string> = {
@@ -719,7 +762,7 @@ function getScenarioFromUrl(): { scenario: ScenarioDefinition; urlMode: string; 
     "human-vs-ai-5v3": "5v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
   };
 
-  return { scenario, urlMode, hint: hintMap[urlMode] ?? "" };
+  return { scenario, urlMode, hint: hintMap[urlMode] ?? "", difficulty };
 }
 
 // ---------------------------------------------------------------------------
@@ -730,8 +773,8 @@ function bootstrap(): void {
   if (hasUrlModeParams()) {
     // URL params present → auto-start the match (existing behavior).
     if (setupMenu) setupMenu.classList.add("hidden");
-    const { scenario, urlMode, hint } = getScenarioFromUrl();
-    startMatch(scenario, urlMode, "HOME", "AWAY", hint);
+    const { scenario, urlMode, hint, difficulty } = getScenarioFromUrl();
+    startMatch(scenario, urlMode, "HOME", "AWAY", hint, difficulty);
   } else {
     // No URL params → show the setup menu.
     showSetupMenu();

@@ -18,6 +18,8 @@
  *    position over time, blended with chase direction.
  *  - Off-ball attacking: non-possessing players push forward during
  *    team possession (role-aware forward runs, cycling pattern).
+ *  - Difficulty scaling: optional difficulty level modulates decision
+ *    quality and reaction speed (Easy/Medium/Hard).
  *
  * Deterministic: same (tick, observation) → same InputFrame.
  * No Math.random, Date, DOM, or Node I/O.
@@ -43,6 +45,86 @@ import { teamHasPossession } from "./team-decision-profile.js";
 import type { TeamDecision } from "./team-decision-profile.js";
 export type { TeamDecision, DefensiveSubMode } from "./team-decision-profile.js";
 export { computeTeamDecision, getBallZone, teamHasPossession } from "./team-decision-profile.js";
+
+// ---------------------------------------------------------------------------
+// Difficulty configuration (BROWSER-DIFFICULTY-SETTING, provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * CPU difficulty level — provisional, not a measured PES 2017 concept.
+ * Easy = weakest CPU, Hard = strongest CPU. Monotonically ordered.
+ */
+export type DifficultyLevel = "easy" | "medium" | "hard";
+
+/**
+ * Deterministic difficulty factors modulating CPU adapter behavior.
+ * All values are multipliers applied to the base provisional constants.
+ *
+ * - pressRadiusFactor: scales PRESS_RADIUS (pressing range).
+ * - pressStrengthFactor: scales PRESS_STRENGTH (press aggressiveness).
+ * - shotAimFactor: scales shot lateral aim offset (higher = wider = less accurate).
+ * - shotRangeFactor: scales SHOT_RANGE_CLOSE and SHOT_RANGE_WIDE (higher = shoots from farther).
+ * - facingToleranceFactor: scales FACING_TOLERANCE_CLOSE (higher = can shoot from more angles).
+ * - firstTouchRangeFactor: scales FIRST_TOUCH_RANGE (higher = reacts to ball from farther = faster reaction).
+ *
+ * Monotonically ordered: Easy < Medium < Hard in CPU strength.
+ * Provisional — not a measured PES 2017 concept.
+ */
+export interface DifficultyConfig {
+  pressRadiusFactor: number;
+  pressStrengthFactor: number;
+  shotAimFactor: number;
+  shotRangeFactor: number;
+  facingToleranceFactor: number;
+  firstTouchRangeFactor: number;
+}
+
+/**
+ * Provisional difficulty level → factor mapping.
+ * Medium (default) uses factors of 1.0 (no change from baseline).
+ * Easy weakens the CPU; Hard strengthens it.
+ *
+ * Deterministic: same level → same config.
+ */
+const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
+  easy: {
+    pressRadiusFactor: 0.7,
+    pressStrengthFactor: 0.8,
+    shotAimFactor: 1.5,       // wider aim = less accurate
+    shotRangeFactor: 0.8,     // shorter shot range
+    facingToleranceFactor: 0.7, // narrower tolerance = pickier shooter
+    firstTouchRangeFactor: 0.8, // shorter reaction range
+  },
+  medium: {
+    pressRadiusFactor: 1.0,
+    pressStrengthFactor: 1.0,
+    shotAimFactor: 1.0,
+    shotRangeFactor: 1.0,
+    facingToleranceFactor: 1.0,
+    firstTouchRangeFactor: 1.0,
+  },
+  hard: {
+    pressRadiusFactor: 1.3,
+    pressStrengthFactor: 1.2,
+    shotAimFactor: 0.7,       // narrower aim = more accurate
+    shotRangeFactor: 1.3,     // longer shot range
+    facingToleranceFactor: 1.3, // wider tolerance = shoots from more angles
+    firstTouchRangeFactor: 1.2, // longer reaction range = faster reaction
+  },
+};
+
+/**
+ * Resolve a difficulty level string to its config.
+ * Invalid or absent values return the medium (default) config.
+ *
+ * Deterministic: same input → same output.
+ */
+export function resolveDifficultyConfig(level?: string | DifficultyLevel): DifficultyConfig {
+  if (level === "easy" || level === "medium" || level === "hard") {
+    return DIFFICULTY_CONFIGS[level];
+  }
+  return DIFFICULTY_CONFIGS.medium;
+}
 
 // ---------------------------------------------------------------------------
 // CpuObservation — minimal read-only subset of world state
@@ -175,6 +257,25 @@ export interface CpuObservation {
    * Provisional — not a measured PES 2017 concept.
    */
   fatigue?: number;
+
+  // -----------------------------------------------------------------
+  // Difficulty scaling (BROWSER-DIFFICULTY-SETTING)
+  // All optional for backward compatibility.
+  // -----------------------------------------------------------------
+
+  /**
+   * CPU difficulty level affecting decision quality and reaction speed.
+   * - "easy": weaker CPU (wider aim, shorter range, slower reactions).
+   * - "medium": baseline CPU (default when absent).
+   * - "hard": stronger CPU (tighter aim, wider range, faster reactions).
+   *
+   * When absent, the adapter behaves identically to "medium" (all
+   * difficulty factors = 1.0).  This preserves byte-identical behavior
+   * for all existing tests that do not set difficulty.
+   *
+   * Provisional — not a measured PES 2017 concept.
+   */
+  difficulty?: DifficultyLevel;
 }
 
 // ---------------------------------------------------------------------------
@@ -1586,6 +1687,9 @@ export function createCpuAdapter(): CpuAdapter {
       const playerX = cpuPlayer.groundPosition.x;
       const playerY = cpuPlayer.groundPosition.y;
 
+      // Resolve difficulty config (defaults to medium when absent).
+      const diffConfig = resolveDifficultyConfig(observation.difficulty);
+
       // --- Fatigue accumulator + phase hold (CPU-TACTICAL-AWARENESS) ---
       // Guarded: only runs when observation carries matchPhase (real runtime).
       // In the headless runner (buildTeamCpuObservation), matchPhase is absent
@@ -1618,8 +1722,10 @@ export function createCpuAdapter(): CpuAdapter {
       );
 
       // Is ball in FIRST_TOUCH range this tick?
+      // Difficulty scales the reaction range: higher factor = reacts from farther.
+      const effectiveFirstTouchRange = FIRST_TOUCH_RANGE * diffConfig.firstTouchRangeFactor;
       const ballInRange =
-        distToBall < FIRST_TOUCH_RANGE && ballHSpeed < FIRST_TOUCH_SPEED_THRESHOLD;
+        distToBall < effectiveFirstTouchRange && ballHSpeed < FIRST_TOUCH_SPEED_THRESHOLD;
 
       // Update possession state:
       //   Gain: ball was in range on previous tick (confirming control).
@@ -1664,8 +1770,9 @@ export function createCpuAdapter(): CpuAdapter {
 
         // Normalized direction toward the goal aim point.
         // Aim at a deterministic lateral offset within goal width.
+        // Difficulty scales the aim accuracy: higher shotAimFactor = wider offset = less accurate.
         if (distToGoal > 0.001) {
-          const aimY = getShotAimOffsetY(tick);
+          const aimY = getShotAimOffsetY(tick) * diffConfig.shotAimFactor;
           const goalAimX = goalX;
           const goalAimY = aimY;
           const aimDx = goalAimX - playerX;
@@ -1803,7 +1910,8 @@ export function createCpuAdapter(): CpuAdapter {
         // Distance-based shooting decision.
         // Compute facing check once (applies at any distance).
         // Urgency widens tolerance when CPU is behind.
-        const adjustedTolerance = FACING_TOLERANCE_CLOSE * urgency;
+        // Difficulty scales the tolerance and range: higher factor = easier shooting.
+        const adjustedTolerance = FACING_TOLERANCE_CLOSE * urgency * diffConfig.facingToleranceFactor;
         const cappedTolerance = Math.min(adjustedTolerance, Math.PI);
         const goalAngle = Math.atan2(gdy, gdx);
         const headingDiff = normalizeAngle(cpuPlayer.bodyHeading - goalAngle);
@@ -1811,13 +1919,16 @@ export function createCpuAdapter(): CpuAdapter {
 
         // Close range: always shoot if within close range.
         // Apply urgency multiplier to lower the distance threshold for backup.
-        const adjustedCloseRange = SHOT_RANGE_CLOSE / urgency;
-        if (distToGoal <= SHOT_RANGE_CLOSE) {
+        // Difficulty scales the effective ranges.
+        const effectiveShotRangeClose = SHOT_RANGE_CLOSE * diffConfig.shotRangeFactor;
+        const effectiveShotRangeWide = SHOT_RANGE_WIDE * diffConfig.shotRangeFactor;
+        const adjustedCloseRange = effectiveShotRangeClose / urgency;
+        if (distToGoal <= effectiveShotRangeClose) {
           if (distToGoal <= adjustedCloseRange) {
             heldButtons |= SHOT_BIT;
             pressedButtons |= SHOT_BIT;
           }
-        } else if (distToGoal <= SHOT_RANGE_WIDE && isFacingGoal) {
+        } else if (distToGoal <= effectiveShotRangeWide && isFacingGoal) {
           // Medium range: shoot if facing within tolerance.
           heldButtons |= SHOT_BIT;
           pressedButtons |= SHOT_BIT;
@@ -1833,7 +1944,7 @@ export function createCpuAdapter(): CpuAdapter {
         const shotNotPressed = (pressedButtons & SHOT_BIT) === 0;
         if (shotNotPressed) {
           const shouldPressPass =
-            distToGoal > SHOT_RANGE_WIDE || !isFacingGoal;
+            distToGoal > effectiveShotRangeWide || !isFacingGoal;
 
           // Aim the pass toward the best forward teammate when available.
           if (shouldPressPass && observation.teammates &&
@@ -1897,7 +2008,7 @@ export function createCpuAdapter(): CpuAdapter {
 
         // Track pass state for edge detection on next tick.
         state.passWasPressed = shotNotPressed &&
-          (distToGoal > SHOT_RANGE_WIDE || !isFacingGoal);
+          (distToGoal > effectiveShotRangeWide || !isFacingGoal);
       } else {
         // ----------------------------------------------------------------
         // DEFENSE MODE — chase ball / mark opponents / press carrier
@@ -2024,16 +2135,15 @@ export function createCpuAdapter(): CpuAdapter {
         // Press trigger: when the ball enters the nearest defender's zone,
         // increase sprint to signal more aggressive pressing behavior.
         // Fatigue modulates: press strength and radius shrink when tired.
+        // Difficulty modulates: harder = wider radius + stronger press.
         if (isDefensiveMode && isNearestToBall && cpuTeamId) {
           const playerFatigue = state.fatigueTicks > 0
             ? Math.min(state.fatigueTicks / FATIGUE_MAX_TICKS, 1)
             : 0;
-          const effectivePressRadius = playerFatigue > 0
-            ? PRESS_RADIUS * (1 - playerFatigue * 0.4)
-            : PRESS_RADIUS;
-          const effectivePressStrength = playerFatigue > 0
-            ? PRESS_STRENGTH * (1 - playerFatigue * 0.3)
-            : PRESS_STRENGTH;
+          const fatigueRadiusReduction = playerFatigue > 0 ? (1 - playerFatigue * 0.4) : 1;
+          const fatigueStrengthReduction = playerFatigue > 0 ? (1 - playerFatigue * 0.3) : 1;
+          const effectivePressRadius = PRESS_RADIUS * fatigueRadiusReduction * diffConfig.pressRadiusFactor;
+          const effectivePressStrength = PRESS_STRENGTH * fatigueStrengthReduction * diffConfig.pressStrengthFactor;
           const ballCarrier = findBallCarrierPlayer(observation, cpuTeamId);
           if (ballCarrier) {
             const bcdx = ballCarrier.position.x - playerX;

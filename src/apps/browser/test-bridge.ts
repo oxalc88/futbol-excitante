@@ -33,6 +33,7 @@ import type { InputFrame } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
 import type { PresentationSnapshot } from "../../contracts/presentation.js";
 import { buildCpuObservation, createCpuAdapter } from "../../adapters/input-browser/cpu-adapter.js";
+import type { DifficultyLevel } from "../../adapters/input-browser/cpu-adapter.js";
 import { computeTeamDecision } from "../../adapters/input-browser/team-decision-profile.js";
 
 // ---------------------------------------------------------------------------
@@ -143,6 +144,7 @@ export interface TestBridge {
 export function createTestBridge(
   container: HTMLElement,
   scenario?: import("../../contracts/scenario.js").ScenarioDefinition,
+  difficulty?: DifficultyLevel,
 ): TestBridge {
   let sim: Simulation;
   let session: PresentationSession;
@@ -216,6 +218,7 @@ export function createTestBridge(
               entry.teamId,
               entry.controlledPlayerId,
             );
+            if (difficulty) teamObs.difficulty = difficulty;
             teamDecisions.set(entry.teamId, computeTeamDecision(teamObs, entry.teamId));
           }
         }
@@ -226,6 +229,7 @@ export function createTestBridge(
             entry.teamId,
             entry.controlledPlayerId,
           );
+          if (difficulty) observation.difficulty = difficulty;
           observation.teamDecision = teamDecisions.get(entry.teamId);
           const frame = entry.adapter.sample(sim.tick, observation);
           frame.controlSlot = entry.controlSlot;
