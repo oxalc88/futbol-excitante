@@ -28,6 +28,7 @@ import type { ScenarioDefinition } from "../../contracts/scenario.js";
 import type { InputFrame } from "../../contracts/input.js";
 import { SWITCH_PLAYER_BIT } from "../../contracts/input.js";
 import type { Simulation } from "../../simulation/loop/simulation.js";
+import { computeExplicitSwitchTarget } from "../../simulation/input/input-system.js";
 import { createCpuAdapter, buildCpuObservation } from "../../adapters/input-browser/cpu-adapter.js";
 import type { DifficultyLevel } from "../../adapters/input-browser/cpu-adapter.js";
 import { computeTeamDecision } from "../../adapters/input-browser/team-decision-profile.js";
@@ -450,18 +451,12 @@ function startMatch(
 
   function nextEligiblePlayer(controlSlot: string): string | null {
     const liveState = sim.snapshot();
-    const assignment = liveState.controlAssignments[controlSlot];
-    if (!assignment) return null;
-    const teamId = assignment.teamId;
-    const currentId = assignment.controlledPlayerId;
-    const teammates = scenario.players
-      .filter((p) => p.teamId === teamId)
-      .map((p) => p.playerId)
-      .sort();
-    if (teammates.length <= 1) return null;
-    const idx = teammates.indexOf(currentId);
-    if (idx < 0) return null;
-    return teammates[(idx + 1) % teammates.length];
+    return computeExplicitSwitchTarget(
+      controlSlot,
+      liveState.controlAssignments,
+      liveState.players,
+      "NEXT",
+    );
   }
 
   // Track keyboard adapters (empty in AI-vs-AI mode).

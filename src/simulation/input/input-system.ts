@@ -344,3 +344,254 @@ export const NEUTRAL_INPUT: InputFrame = Object.freeze({
   pressedButtons: 0,
   releasedButtons: 0,
 });
+
+// ---------------------------------------------------------------------------
+// Control Slot Routing
+// ---------------------------------------------------------------------------
+
+/**
+ * Minimal player reference for slot routing — avoids coupling to full WorldState.
+ */
+export interface SlotRoutingPlayer {
+  playerId: string;
+  teamId: string;
+  groundPosition: { x: number; y: number };
+}
+
+/**
+ * Minimal control assignment for slot routing.
+ */
+export interface SlotRoutingAssignment {
+  teamId: string;
+  controlledPlayerId: string;
+  mode: string;
+}
+
+// ---------------------------------------------------------------------------
+// Slot ownership: find slot for a player
+// ---------------------------------------------------------------------------
+
+/**
+ * Find which control slot owns a given player ID.
+ *
+ * Uses the authoritative controlAssignments map (slot → assignment).
+ * Returns the slot key, or null if no slot controls this player.
+ *
+ * Deterministic, no randomness, no I/O.
+ */
+export function findSlotForPlayer(
+  playerId: string,
+  controlAssignments: Record<string, SlotRoutingAssignment>,
+): string | null {
+  for (const slot of Object.keys(controlAssignments)) {
+    if (controlAssignments[slot].controlledPlayerId === playerId) {
+      return slot;
+    }
+  }
+  return null;
+}
+
+/**
+ * Check whether a control slot is active (has input frames for the given tick).
+ *
+ * A slot is "active" if at least one frame exists for it at the target tick.
+ */
+export function isSlotActive(
+  controlSlot: string,
+  framesForTick: readonly InputFrame[],
+): boolean {
+  return framesForTick.some((f) => f.controlSlot === controlSlot);
+}
+
+/**
+ * Get the team ID assigned to a control slot.
+ */
+export function getSlotTeamId(
+  controlSlot: string,
+  controlAssignments: Record<string, SlotRoutingAssignment>,
+): string | null {
+  const assignment = controlAssignments[controlSlot];
+  if (!assignment) return null;
+  return assignment.teamId;
+}
+
+// ---------------------------------------------------------------------------
+// Proximity-based teammate selection
+// ---------------------------------------------------------------------------
+
+/**
+ * Euclidean distance on the ground plane.
+ */
+function groundDistance(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+): number {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+/**
+ * Select the nearest teammate to a reference position, excluding a set of
+ * player IDs (typically: the current owner, or a teammate owned by another slot).
+ *
+ * Deterministic — when distances tie, the lower playerId (lexicographic) wins.
+ * No randomness, no I/O, no wall-clock.
+ *
+ * @param referencePos - Position to measure distance from.
+ * @param teamId - Only consider players on this team.
+ * @param players - All players in the world.
+ * @param excludeIds - Player IDs to exclude from selection.
+ * @returns The nearest eligible teammate's player ID, or null if none.
+ */
+export function selectNearestTeammate(
+  referencePos: { x: number; y: number },
+  teamId: string,
+  players: readonly SlotRoutingPlayer[],
+  excludeIds: readonly string[],
+): string | null {
+  const excludeSet = new Set(excludeIds);
+  let bestId: string | null = null;
+  let bestDist = Infinity;
+
+  for (const p of players) {
+    if (p.teamId !== teamId) continue;
+    if (excludeSet.has(p.playerId)) continue;
+    const dist = groundDistance(referencePos, p.groundPosition);
+    if (dist < bestDist || (dist === bestDist && bestId !== null && p.playerId < bestId)) {
+      bestDist = dist;
+      bestId = p.playerId;
+    }
+  }
+  return bestId;
+}
+
+// ---------------------------------------------------------------------------
+// Explicit player switching
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the next teammate for explicit switching (Tab-button press).
+ *
+ * Cycles through teammates sorted by playerId (deterministic order).
+ * Excludes the current controlled player. Returns null if only one
+ * teammate exists (no switch needed).
+ *
+ * @param controlSlot - The slot requesting a switch.
+ * @param controlAssignments - Current slot ownership map.
+ * @param players - All players in the world.
+ * @param direction - "NEXT" cycles forward, "PREVIOUS" cycles backward.
+ * @returns The next player ID, or null if switching is not possible.
+ */
+export function computeExplicitSwitchTarget(
+  controlSlot: string,
+  controlAssignments: Record<string, SlotRoutingAssignment>,
+  players: readonly SlotRoutingPlayer[],
+  direction: "NEXT" | "PREVIOUS" = "NEXT",
+): string | null {
+  const assignment = controlAssignments[controlSlot];
+  if (!assignment) return null;
+
+  const teamId = assignment.teamId;
+  const currentId = assignment.controlledPlayerId;
+
+  const teammates = players
+    .filter((p) => p.teamId === teamId)
+    .map((p) => p.playerId)
+    .sort();
+
+  if (teammates.length <= 1) return null;
+
+  const idx = teammates.indexOf(currentId);
+  if (idx < 0) return null;
+
+  if (direction === "NEXT") {
+    return teammates[(idx + 1) % teammates.length];
+  }
+  // PREVIOUS
+  return teammates[(idx - 1 + teammates.length) % teammates.length];
+}
+
+// ---------------------------------------------------------------------------
+// Slot wiring invariant check
+// ---------------------------------------------------------------------------
+
+/**
+ * Verify slot wiring invariants across all control assignments:
+ *
+ * 1. Every slot maps to a valid player ID.
+ * 2. No two slots control the same player.
+ * 3. Every assigned player belongs to the slot's team.
+ * 4. Every assigned player ID exists in the players array.
+ *
+ * Returns { ok: true } on success, or { ok: false, violations: [...] } on failure.
+ */
+export function checkSlotWiringInvariant(
+  controlAssignments: Record<string, SlotRoutingAssignment>,
+  players: readonly SlotRoutingPlayer[],
+): { ok: true } | { ok: false; violations: string[] } {
+  const violations: string[] = [];
+  const validPlayerIds = new Set(players.map((p) => p.playerId));
+  const playerTeams = new Map(players.map((p) => [p.playerId, p.teamId]));
+  const seenPlayerIds = new Set<string>();
+
+  for (const slot of Object.keys(controlAssignments)) {
+    const assignment = controlAssignments[slot];
+    const playerId = assignment.controlledPlayerId;
+
+    // 1. Valid player reference
+    if (!validPlayerIds.has(playerId)) {
+      violations.push(
+        `Slot "${slot}" controls unknown player "${playerId}"`,
+      );
+      continue;
+    }
+
+    // 2. No duplicate player ownership
+    if (seenPlayerIds.has(playerId)) {
+      violations.push(
+        `Player "${playerId}" is controlled by multiple slots`,
+      );
+    }
+    seenPlayerIds.add(playerId);
+
+    // 3. Team match
+    const playerTeam = playerTeams.get(playerId);
+    if (playerTeam !== assignment.teamId) {
+      violations.push(
+        `Slot "${slot}" (team "${assignment.teamId}") controls player "${playerId}" on team "${playerTeam}"`,
+      );
+    }
+  }
+
+  if (violations.length > 0) {
+    return { ok: false, violations };
+  }
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Full slot resolution for a tick
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the effective player control map for a single tick.
+ *
+ * For each slot, determines which player it actually controls:
+ * - If the slot has input frames at this tick, it uses its assigned player.
+ * - If the slot has no input and a fallback policy applies, the caller
+ *   should handle that via resolveInputForPlayer (repeat-held / neutral).
+ *
+ * This function does NOT mutate any state — it is a pure computation.
+ *
+ * @returns Map of slot → controlled player ID.
+ */
+export function resolveSlotMap(
+  controlAssignments: Record<string, SlotRoutingAssignment>,
+): Record<string, string> {
+  const slotMap: Record<string, string> = {};
+  for (const slot of Object.keys(controlAssignments)) {
+    slotMap[slot] = controlAssignments[slot].controlledPlayerId;
+  }
+  return slotMap;
+}

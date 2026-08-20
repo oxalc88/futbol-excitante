@@ -54,8 +54,14 @@ import {
   filterDuplicateFrames,
   resolveInputForPlayer,
   createRejectionEvent,
+  findSlotForPlayer,
+  computeExplicitSwitchTarget,
+  checkSlotWiringInvariant,
+  isSlotActive,
+  resolveSlotMap,
   NEUTRAL_INPUT,
 } from "../input/input-system.js";
+import { SWITCH_PLAYER_BIT } from "../../contracts/input.js";
 import { stepLocomotion } from "../locomotion/locomotion-system.js";
 import { stepBall } from "../ball/ball-system.js";
 import { stepContacts } from "../contacts/contact-system.js";
@@ -990,11 +996,68 @@ export function createSimulation(
       frameBySlot.set(f.controlSlot, f);
     }
 
+    // --- Player switching on SWITCH_PLAYER_BIT --------------------------
+    // Process explicit switch requests BEFORE resolving input so the
+    // newly selected player receives the frame's movement on this tick.
+    for (const [slot, frame] of frameBySlot) {
+      if ((frame.pressedButtons & SWITCH_PLAYER_BIT) !== 0) {
+        const nextId = computeExplicitSwitchTarget(
+          slot,
+          state.controlAssignments,
+          state.players,
+          "NEXT",
+        );
+        if (nextId) {
+          const fromId = state.controlAssignments[slot].controlledPlayerId;
+          state.controlAssignments[slot].controlledPlayerId = nextId;
+
+          // Emit a slot-switch event for observability.
+          const switchEv: SimulationEvent = {
+            id: `slot-switch-${slot}-${targetTick}-${++eventCounter}`,
+            tick: targetTick,
+            sequence: eventCounter,
+            kind: "slot-switch",
+            label: `Slot "${slot}" switched to player "${nextId}"`,
+            payload: {
+              controlSlot: slot,
+              fromPlayer: fromId,
+              toPlayer: nextId,
+            },
+          };
+          const clonedSwitch = deepClone(switchEv) as SimulationEvent;
+          state.events = [...state.events, clonedSwitch];
+          events.push(clonedSwitch);
+        }
+      }
+    }
+
+    // --- Slot wiring invariant check ------------------------------------
+    // Validate slot ownership on every input resolution tick.
+    const wiringCheck = checkSlotWiringInvariant(
+      state.controlAssignments,
+      state.players,
+    );
+    if (!wiringCheck.ok) {
+      const wiringEv: SimulationEvent = {
+        id: `slot-wiring-violation-${targetTick}-${++eventCounter}`,
+        tick: targetTick,
+        sequence: eventCounter,
+        kind: "slot-wiring-violation",
+        label: `Slot wiring invariant violated: ${wiringCheck.violations.join("; ")}`,
+        payload: {
+          violations: wiringCheck.violations,
+        },
+      };
+      const clonedWiring = deepClone(wiringEv) as SimulationEvent;
+      state.events = [...state.events, clonedWiring];
+      events.push(clonedWiring);
+    }
+
     // For each player, check if there is a frame for its control slot.
     // In the bootstrap we use the first control slot from the scenario.
     for (const player of state.players) {
       // Find the slot that controls this player from controlAssignments.
-      const slot = findControlSlotForPlayer(player.playerId);
+      const slot = findSlotForPlayer(player.playerId, state.controlAssignments);
       if (!slot) continue;
 
       const frameForSlot = frameBySlot.get(slot);
@@ -1037,22 +1100,6 @@ export function createSimulation(
     }
 
     return events;
-  }
-
-  /**
-   * Find the controlSlot that controls the given playerId.
-   *
-   * Uses the authoritative controlAssignments stored on WorldState.
-   */
-  function findControlSlotForPlayer(playerId: string): string | null {
-    const assignments = state.controlAssignments;
-    if (!assignments) return null;
-    for (const slot of Object.keys(assignments)) {
-      if ((assignments[slot] as { controlledPlayerId?: string })?.controlledPlayerId === playerId) {
-        return slot;
-      }
-    }
-    return null;
   }
 
   // ------------------------------------------------------------------
