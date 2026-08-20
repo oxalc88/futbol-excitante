@@ -1,71 +1,51 @@
 # Gauntlet Loop
 
-Grok Build orchestration for this football simulation. It is project-specific. It is not a generic agent framework.
+Grok Build orchestration for this football simulation. It is project-specific, not a generic agent framework.
 
 The loop is:
 
 ```text
-orchestrator → builder → required evidence → critic → fix/retry → integration → evidence gate → accept → next horizon objective
+orchestrator → builder → required evidence → critic → fix/retry → integration → evidence gate → candidate commit → acceptance/bookkeeping → remote verification → next horizon objective
 ```
 
-The orchestrator is Grok 4.6 (`grok-4.6`), not Grok 4 or another 4.x ID. High-token implementation, testing, fixing, experimentation, and repeated criticism stay on NaN models.
-
-All Gauntlet agents, the `/gauntlet` skill, and model routing live **in this repository**. They are not installed into `~/.grok/agents/`, oxStack, or a global plugin. Grok loads them from project `.grok/agents/` and `.grok/skills/` when the working directory is this repo.
-
-NaN model endpoints cannot live in the repo. Register them once in `~/.grok/config.toml` (see [NaN models](#nan-models)). Runtime auth is `NAN_API_KEY`. Grok cannot reuse an OpenCode persisted `nan` login.
-
-An empty implementation is a valid start. `BOOTSTRAP-01` is the initial objective only while the toolchain and `src/` are missing. Strategic reassessment occurs at rolling-horizon boundaries; ordinary acceptance advances to the next validated horizon entry.
-
-`.opencode/` and `opencode.json` are unused leftovers from the OpenCode harness. Do not launch this loop with `opencode`.
+All Gauntlet agents, skills, routing, deterministic evals, and contracts live in this repository. NaN endpoint registration/auth remains user-level runtime configuration; the repo only declares which registered model IDs each role uses.
 
 ## Gauntlet system version
 
-The Gauntlet is versioned as a complete harness under SemVer in `gauntlet/VERSION.json`: prompts + agents + skills + routing + deterministic tooling/evals + evidence/timing contracts + acceptance/state-audit machinery. Legacy changelog labels such as `v6-browser-evidence-model-tracking` are prompt-generation names, not SemVer releases. The normalized predecessor is `0.6.0`; the published release before this PR is `0.7.0`, while this checkout declares the candidate `0.8.0`.
+`gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-`gauntlet/VERSION.json` identifies the version represented by a checkout. A version becomes a published Gauntlet release only after merge to `main` and creation of the immutable `gauntlet-vX.Y.Z` tag. `.github/workflows/publish-gauntlet-tag.yml` only publishes the tag when `gauntlet/VERSION.json` changes on `main`; it does not infer SemVer and does not rerun Gauntlet evaluation.
+Current candidate: **0.9.4** over 0.9.3.
 
-Canonical acceptance philosophy lives in `gauntlet/principles.md` and is referenced by runtime prompts rather than duplicated into every agent. v0.8 remains deterministic-first and critic-always: scripts establish facts, bounded ambiguity can be sent cheaply to `aux`/Gemma (Qwen fallback), but every candidate still reaches an independent qualitative critic before integration and final acceptance.
-
-Run the pre-review audit with `pnpm run gauntlet:audit`; candidate acceptance persistence uses `pnpm run gauntlet:acceptance:persist`; post-bookkeeping consistency remains `pnpm run gauntlet:eval:state`.
+0.9.4 does not change gameplay. It updates model routing and strengthens timing-bookkeeping consistency.
 
 ## Launch
 
 From the repository root:
 
 ```bash
-export NAN_API_KEY=...   # required for Qwen, MiMo, DeepSeek, Gemma
+export NAN_API_KEY=...
 grok --agent orchestrator --always-approve
 ```
 
-Then run:
+Then:
 
 ```text
 /gauntlet
 ```
 
-That is the single prompt. The orchestrator inspects the tree and starts the next iteration.
-
-Equivalent explicit launches:
+When the Grok 4.6 parent reaches the configured SuperGrok handoff threshold, continue with:
 
 ```bash
-grok --agent orchestrator --always-approve
+grok --agent orchestrator-deepseek --model deepseek-v4-flash --reasoning-effort high --always-approve
 ```
 
-```bash
-grok --agent orchestrator --always-approve --prompt-file gauntlet/PROMPT.md
-```
+then `/gauntlet-continue`.
 
-Optional extra focus after `/gauntlet`:
-
-```text
-/gauntlet continue from BOOTSTRAP-07 only
-```
-
-`--always-approve` skips permission prompts. Project `.grok/config.toml` still denies `git rebase`, `sudo`, and `rm -rf /`. `git commit` / `git push` are allowed only so `git-committer` can run them; the orchestrator and builders must not. Do not start Grok on the built-in `general-purpose` agent for this loop unless you then run `/gauntlet` and stay on Grok 4.6.
+There is no deprecated DeepSeek snapshot fallback in 0.9.4.
 
 ## Canonical role contracts
 
-Shared role behavior is stored once:
+Shared behavior lives once:
 
 - orchestrator: `gauntlet/PROMPT.md`
 - critic: `gauntlet/roles/critic.md`
@@ -73,91 +53,76 @@ Shared role behavior is stored once:
 - structured builder: `gauntlet/roles/builder-structured.md`
 - gameplay builder: `gauntlet/roles/builder-gameplay.md`
 
-Project `.grok/agents/*.md` files are thin runtime wrappers: frontmatter, model binding, and only behavior genuinely specific to that runtime/model. Shared rules belong in the canonical role contract, not duplicated into fallback wrappers.
+`.grok/agents/*.md` files are thin runtime wrappers containing frontmatter/model binding plus only runtime-specific behavior. Shared rules belong in the canonical role contracts.
 
-Two deterministic checks protect this split: each wrapper must reference an existing canonical contract, and its frontmatter model must match `gauntlet/models.json`.
+Two deterministic checks protect this split: wrappers must reference an existing canonical contract, and wrapper frontmatter models must match `gauntlet/models.json`.
 
-## Agents
+## Current agents
 
-| Agent | Kind | Default model | Writes | Job |
-|---|---|---|---|---|
-| `orchestrator` | primary | `grok-4.6` | `gauntlet/state/**`, `gauntlet/objectives.md` | Follow canonical orchestration. Hands off at 89% SuperGrok weekly usage (`/usage`). |
-| `orchestrator-deepseek` | primary (overflow) | `deepseek-v4-flash` | `gauntlet/state/**`, `gauntlet/objectives.md` | Same canonical loop. Picks up from `HANDOFF.md` + `CURRENT.md` + `HORIZON.md`. |
-| `builder-structured` | subagent | `qwen3.6` | implementation files | Toolchain, contracts, determinism, replay, evaluators, tests, structured TypeScript |
-| `builder-gameplay` | subagent | `mimo-v2.5` | implementation files | Gameplay, ball/control/team behavior, presentation-facing gameplay integration |
-| `critic` | subagent | `deepseek-v4-flash-0731` | none | Preferred independent evaluation of builder evidence |
-| `critic-flash` | fallback subagent | `deepseek-v4-flash` | none | Current-Flash critic fallback when 0731 is unavailable/out of allowance |
-| `critic-qwen` | fallback subagent | `qwen3.6` | none | Independent Qwen fallback critic |
-| `critic-mimo` | fallback subagent | `mimo-v2.5` | none | Independent MiMo fallback critic |
-| `integration-reviewer` | subagent | `deepseek-v4-flash-0731` | none | Preferred architecture and neighboring-regression review after critic accept |
-| `integration-reviewer-flash` | fallback subagent | `deepseek-v4-flash` | none | Current-Flash integration fallback when 0731 is unavailable/out of allowance |
-| `aux` | subagent | `gemma4` | none | Cheap summaries, file lists, bounded semantic audit |
-| `git-committer` | subagent | `gemma4` | git only | Atomic conventional commits and push when explicitly asked |
+| Agent | Kind | Model | Job |
+|---|---|---|---|
+| `orchestrator` | primary | `grok-4.6` | canonical orchestration; hands off at the configured weekly threshold |
+| `orchestrator-deepseek` | overflow primary | `deepseek-v4-flash` | resumes from persisted handoff/state |
+| `builder-structured` | subagent | `qwen3.6` | toolchain, contracts, determinism, evaluators, tests, structured TypeScript |
+| `builder-gameplay` | subagent | `mimo-v2.5` | gameplay, ball/control/team behavior, presentation-facing integration |
+| `critic` | subagent | `deepseek-v4-flash` | primary independent qualitative critic |
+| `critic-qwen` | fallback critic | `qwen3.6` | independent critic fallback |
+| `critic-mimo` | fallback critic | `mimo-v2.5` | independent critic fallback |
+| `integration-reviewer` | subagent | `deepseek-v4-flash` | primary integration/neighbouring-regression review |
+| `integration-reviewer-qwen` | fallback integration | `qwen3.6` | independent integration fallback |
+| `integration-reviewer-mimo` | fallback integration | `mimo-v2.5` | independent integration fallback |
+| `aux` | subagent | `gemma4` | cheap summaries and bounded semantic audit |
+| `git-committer` | subagent | `gemma4` | atomic conventional commits and requested publication |
 
-Exact IDs are recorded in `gauntlet/models.json` and in each `.grok/agents/<name>.md` frontmatter `model`.
-
-The orchestrator delegates with `spawn_subagent`. `subagent_type` is the agent name. Builders use `capability_mode: all`. Critics, integration reviewers, `aux`, and `git-committer` use `capability_mode: execute`. Route DeepSeek reviewer fallback by agent type: if the 0731 role fails specifically for model availability, allowance exhaustion, or model-specific capacity/rate limiting, spawn `critic-flash` or `integration-reviewer-flash`. Do **not** retry `critic` or `integration-reviewer` with an in-place `model: deepseek-v4-flash` override. Do not change models for authentication, network, context, test, or ordinary task failures. A child that inherits `grok-4.6` is a routing bug. Commits go to `git-committer` / `gemma4`, never to the orchestrator.
-
-
-### Builder choice
-
-The orchestrator chooses one builder role per objective by responsibility, not by provider:
-
-- `builder-structured` for toolchain, contracts, determinism, serialization, input, replay, evaluator registries, tests, and CLI glue.
-- `builder-gameplay` for locomotion, ball integration, controls, passing/shooting/contact, gameplay-coupled team behavior, presentation-facing gameplay integration, or large-spec gameplay work.
-
-If an objective spans both responsibilities, choose the dominant one or decompose it. Do not add another builder role until a concrete recurring responsibility requires it.
-
-Grok 4.6 never implements. If builders repeatedly fail, Grok must reconsider/decompose, apply critic feedback, reroute only when the other existing role genuinely fits, or mark the objective blocked with evidence.
-
-### Parallel builders
-
-Allow two builders only when all of these are true:
-
-- their file sets do not overlap
-- they do not both change world/schema/config contracts
-- `gauntlet/objectives.md` lists the pair as isolatable
-
-Critics may run in parallel; they are read-only.
+Exact IDs and fallback ordering live in `gauntlet/models.json`.
 
 ## Model routing
 
-| Role | Exact model | Fallback |
+Current registered model IDs used by the Gauntlet are:
+
+- `deepseek-v4-flash`
+- `qwen3.6`
+- `mimo-v2.5`
+- `gemma4`
+- `grok-4.6` for the parent orchestrator
+
+`deepseek-v4-flash-0731` is deprecated and is not part of current Gauntlet routing.
+
+Primary reviewer routing:
+
+| Role | Primary | Fallbacks |
 |---|---|---|
-| Orchestrator | `grok-4.6` | `orchestrator-deepseek` at ≥89% SuperGrok weekly usage (`/usage`) |
-| Overflow orchestrator | `deepseek-v4-flash` (high reasoning) | explicit relaunch on `deepseek-v4-flash-0731` only for model-specific availability/allowance/capacity failure |
-| Structured builder | `qwen3.6` | no implicit model swap; reroute/decompose by responsibility |
-| Gameplay builder | `mimo-v2.5` | no implicit model swap; reroute/decompose by responsibility |
-| Primary critic | `critic` / `deepseek-v4-flash-0731` | `critic-flash` / current Flash, then independent Qwen/MiMo |
-| Integration reviewer | `integration-reviewer` / `deepseek-v4-flash-0731` | `integration-reviewer-flash` / current Flash, then a model different from the builder |
+| Critic | `critic` / `deepseek-v4-flash` | `critic-qwen`, then `critic-mimo` |
+| Integration reviewer | `integration-reviewer` / `deepseek-v4-flash` | `integration-reviewer-qwen`, then `integration-reviewer-mimo` |
 | Cheap auxiliary | `gemma4` | `qwen3.6` |
 | Git committer | `gemma4` | `qwen3.6` |
 
-Hard rule: the critic model must differ from the implementation model for that candidate.
+Hard rule: the critic/reviewer model used for a candidate must remain independent from the builder model where the applicable role contract requires independence.
 
-Use NaN models for high-token implementation, test fixing, experimentation, and repeated criticism. Use `gemma4` for summaries and git commits. Use Grok 4.6 for orchestration until **SuperGrok weekly usage** (`/usage`, not the context footer) hits **89%**. Then continue on `orchestrator-deepseek` using current `deepseek-v4-flash` from `gauntlet/state/HANDOFF.md`. Auto-compact is still 65% of the 500k **context** window (`~/.grok/config.toml` `[session] auto_compact_threshold_percent = 65`). That setting lives in the user config, not project `.grok/config.toml`.
+### Model capability routing
 
-Overflow launch (always pass `--model`):
+Availability is not the same as capability. Follow `gauntlet/model-capability-contract.md`.
 
-```bash
-grok --agent orchestrator-deepseek --model deepseek-v4-flash --reasoning-effort high --always-approve
+The observed error:
+
+```text
+No endpoints found that support image input.
 ```
 
-Then `/gauntlet-continue`.
+is `MODEL_CAPABILITY_MISMATCH`. It is not a gameplay failure and not a reviewer verdict. Preserve the same objective and review step. Reroute only to a model explicitly known to support the required modality. If none is configured, keep the perceptual review pending and surface the human-needed blocker rather than discarding prior progress or restarting the builder.
 
-If current Flash itself fails with a model-specific availability, allowance, or capacity failure, explicitly relaunch the same overflow role once with the 0731 snapshot:
+DeepSeek Flash is explicitly treated as not accepting image attachments on the currently observed NaN endpoint. Capability of other NaN routes is not assumed unless explicitly established by runtime/provider configuration.
 
-```bash
-grok --agent orchestrator-deepseek --model deepseek-v4-flash-0731 --always-approve
-```
+## Builder choice
 
-## NaN models
+Choose one builder by responsibility, not provider:
 
-The model IDs used by the Gauntlet are `qwen3.6`, `mimo-v2.5`, `deepseek-v4-flash`, `deepseek-v4-flash-0731`, and `gemma4`. No `[subagents.models]` change is part of the 0.8 repository update.
+- `builder-structured` for toolchain, contracts, determinism, serialization, input/replay, evaluator registries, tests, and CLI glue.
+- `builder-gameplay` for locomotion, ball integration, controls, passing/shooting/contact, gameplay-coupled team behavior, and presentation-facing gameplay integration.
 
-Confirm with `grok models`. The process must have `NAN_API_KEY` set. A missing key registers the names but every NaN request fails with 401.
+If an objective spans both, choose the dominant responsibility or decompose it. Do not add another builder role merely to switch models.
 
-## Loop
+## Acceptance pipeline
 
 ```text
 OBJECTIVE
@@ -166,10 +131,7 @@ BUILDER ROLE
   ↓
 tests + class-specific artifacts
   ↓
-gauntlet:audit (deterministic facts)
-  ├─ FAIL/builder → retry builder
-  ├─ FAIL/orchestrator → repair state and re-audit
-  └─ REVIEW_REQUIRED → bounded aux/Gemma audit → re-enter gate
+gauntlet:audit
   ↓
 mandatory independent CRITIC
   ↓
@@ -187,71 +149,59 @@ gauntlet:eval:state
   ↓
 final acceptance commit
   ↓
+push + origin/main durability verification
+  ↓
 ACCEPT → next horizon objective / replan
 ```
 
-Deterministic and cheap semantic audits can block progression but cannot accept an objective. See `gauntlet/principles.md`, `gauntlet/evidence-classes.md`, `gauntlet/evidence-contract.md`, and `gauntlet/evidence-manifest-contract.md`.
+Deterministic and bounded semantic audits may invalidate or request more evidence but cannot substitute for the qualitative critic.
 
-Reviewer fallback, rolling-horizon planning, retry/revert semantics, SuperGrok handoff, and builder/critic model independence remain unchanged.
+## Timing bookkeeping
 
-## What counts as success
+`gauntlet/state/TIMING.md` is acceptance persistence. 0.9.4 requires all four tracking markers to reach the latest accepted objective:
 
-Authoritative specs:
-
-- `specs/TECHNICAL_SPEC.md`
-- `specs/GAMEPLAY_EVALUATION_SPEC.md`
-- `specs/VISUAL_SPEC.md`
-
-While a bootstrap candidate is selected, success is that candidate's acceptance criteria from `BOOTSTRAP_PLAN.md`. Bootstrap results use `BOOTSTRAP-*` invariants only.
-
-After that, milestone verdicts follow the Gameplay Evaluation Spec:
-
-- required hard invariants can `PASS` or `FAIL`
-- missing PES targets are `BLOCKED_MISSING_REFERENCE`
-- missing perceptual rubrics are `NEEDS_PERCEPTUAL_REVIEW`
-- no invented regression `PASS`
-
-## Files
-
-```text
-gauntlet/
-  README.md
-  VERSION.json
-  PROMPT.md
-  principles.md
-  models.json
-  roles/                     canonical reusable role contracts
-  objectives.md
-  evidence-contract.md
-  evidence-manifest-contract.md
-  state/
-  evals/
-  artifacts/
-
-.grok/agents/               thin project-local runtime/model wrappers
-.grok/skills/               project-local user-invocable skills
-.grok/config.toml           project deny rules
-AGENTS.md                   repository rules for every agent
+```yaml
+last_tracked_objective: <objective-id>
+usage_aggregates_through: <objective-id>
+model_evaluation_through: <objective-id>
+clock_aggregates_through: <objective-id>
 ```
 
-Do not add these agents under `~/.grok/agents/`. That would make them appear in every Grok project on the machine.
+The global Clock/session aggregates must be refreshed when their source rows change. Advancing the other markers while leaving old global totals is a state-audit failure owned by the orchestrator, not a gameplay regression. See `gauntlet/timing-contract.md`.
+
+## Evidence and observability
+
+Repository evidence is canonical and observer tooling remains read-only. See:
+
+- `gauntlet/evidence-contract.md`
+- `gauntlet/evidence-manifest-contract.md`
+- `gauntlet/observability-contract.md`
+- `gauntlet/milestone-playtest-contract.md`
+
+Normal regression tests must not rewrite accepted historical evidence. Durable capture is explicit; temporary test artifacts remain ephemeral.
+
+## Permissions
+
+Unattended Gauntlet is the intended mode.
+
+- Orchestrator does not implement gameplay.
+- Builders may edit implementation/test files within their assigned scope, not Gauntlet contracts/specs.
+- Critics/integration reviewers are read-only.
+- Only `git-committer` performs candidate/acceptance commits and requested pushes.
+- `gauntlet/state/**` is owned by the running orchestrator/bookkeeping flow, not maintenance PRs.
 
 ## Change model routing later
 
 1. Edit `gauntlet/models.json`.
-2. Change the matching `.grok/agents/<name>.md` frontmatter `model`.
-3. If a NaN API id or endpoint changes, update the corresponding model configuration used by the runtime.
-4. Keep role behavior in `gauntlet/roles/**` / `gauntlet/PROMPT.md`; do not duplicate a canonical contract merely to change models.
-5. Confirm with `pnpm run gauntlet:eval` that wrapper-contract and model-routing consistency pass.
-6. Record semantic routing/rule changes in `docs/gauntlet-changelog.md`; do not write them into generated live state solely for documentation.
+2. Change the matching `.grok/agents/<name>.md` frontmatter model.
+3. Add/remove fallback wrappers only when the fallback actually uses a different model/route.
+4. Keep shared role behavior in `gauntlet/roles/**` / `gauntlet/PROMPT.md`.
+5. Update capability declarations only from observed/provider-backed facts; unknown capability stays unknown.
+6. Run `pnpm run gauntlet:eval` and Maintenance PR CI.
+7. Record release/routing changes in the Gauntlet release notes/changelog.
 
-## Permissions
+Authoritative product specs remain:
 
-Unattended Gauntlet is the intended mode. Launch with `grok --agent orchestrator --always-approve`.
-
-- Orchestrator cannot edit `src/`, `eval/`, or specs. It writes Gauntlet state only. That limit is in the agent prompt; Grok project denies are session-wide and would also block builders if pointed at `src/`.
-- Builders can create and edit implementation files. They cannot edit specs, research, `.grok/agents/`, or canonical Gauntlet role/routing contracts.
-- Critics and the integration reviewer cannot edit files. They may run read-only validation (`git`, `mise`, `pnpm`, `npx`, `node`, `vitest`, and inspect commands).
-- Orchestrator, builders, critics, and `aux` must not `git commit`, `git push`, `git rebase`, `sudo`, or `rm -rf /`.
-- After critic + integration ACCEPT and the orchestrator evidence gate, `git-committer` creates the candidate snapshot commit. After persistence/bookkeeping/state audit, it creates the separate final acceptance commit. Push only when the parent explicitly asks.
-- Builders must run installs non-interactively (`CI=1`, `mise trust --all` after writing `mise.toml`).
+- `specs/TECHNICAL_SPEC.md`
+- `specs/GAMEPLAY_EVALUATION_SPEC.md`
+- `specs/VISUAL_SPEC.md`
