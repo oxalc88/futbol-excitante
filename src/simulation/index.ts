@@ -8,5 +8,6 @@ export * from "./world/clone.js";
 export * from "./loop/simulation.js";
 export * from "./ball/ball-system.js";
 export * from "./contacts/contact-system.js";
+export * from "./contacts/second-touch-system.js";
 export * from "./player-contact/player-contact-system.js";
 export * from "./telemetry/observer.js";

@@ -60,6 +60,8 @@ import { stepLocomotion } from "../locomotion/locomotion-system.js";
 import { stepBall } from "../ball/ball-system.js";
 import { stepContacts } from "../contacts/contact-system.js";
 import { stepPlayerContacts } from "../player-contact/player-contact-system.js";
+import { stepDribble } from "../contacts/second-touch-system.js";
+import type { DribbleState } from "../contacts/second-touch-system.js";
 import {
   FOUNDATION_LOCOMOTION_V1,
   FOUNDATION_BALL_V1,
@@ -266,6 +268,10 @@ export function createSimulation(
   // Per-player dribble-touch cooldown — maps playerId → last tick a dribble-touch occurred.
   // Lives in the simulation closure; does not affect world state or hashing.
   const dribbleCooldowns: Map<string, number> = new Map();
+
+  // Per-player dribble state for second-touch mechanics.
+  // Lives in the simulation closure; does not affect world state or hashing.
+  const dribbleStates: Map<string, DribbleState> = new Map();
 
   // Shot config override (used by capability evaluation for low vs high exitSpeed).
   // Lives in the closure; does not affect world state or hashing.
@@ -1166,6 +1172,7 @@ export function createSimulation(
       effectiveShotConfig,
       FOUNDATION_CLOSE_CONTROL_V1,
       dribbleCooldowns,
+      dribbleStates,
     );
     eventCounter = counter.value;
     return events;
@@ -1501,6 +1508,23 @@ export function createSimulation(
         state.events = [...state.events, ev];
       }
 
+      // 4.6. Second-touch / dribble state machine (after contacts, before ball integration)
+      const dribbleCounter = { value: eventCounter };
+      const dribbleEvents = stepDribble(
+        state.players,
+        state.ball,
+        dribbleStates,
+        currentFrames,
+        state.controlAssignments,
+        undefined,
+        dribbleCounter,
+        state.tick,
+      );
+      eventCounter = dribbleCounter.value;
+      for (const ev of dribbleEvents) {
+        state.events = [...state.events, ev];
+      }
+
       // 5. Ball integration
       const ballEvents = ballIntegrationStage();
       for (const ev of ballEvents) {
@@ -1509,7 +1533,7 @@ export function createSimulation(
 
       // 6. Invariant validation
       const invariantsOk = validateInvariants();
-      const allStepEvents = [...oldTickEvents, ...schedEvents, ...playerContactEvents, ...contactEvents, ...ballEvents];
+      const allStepEvents = [...oldTickEvents, ...schedEvents, ...playerContactEvents, ...contactEvents, ...dribbleEvents, ...ballEvents];
 
       // ------------------------------------------------------------------
       // Match phase processing (MATCH-SET-PIECE)
@@ -1740,6 +1764,39 @@ export function createSimulation(
             if (prev === undefined || ev.tick > prev) {
               dribbleCooldowns.set(payload.playerId, ev.tick);
             }
+          }
+        }
+      }
+      // Reconstruct second-touch dribble state from event history.
+      // A first-touch contact starts dribble; second-touch events extend it;
+      // ball-out-of-play or goal events end it.
+      dribbleStates.clear();
+      for (const ev of state.events) {
+        if (ev.kind === "player-ball-contact") {
+          const payload = ev.payload as { contactType?: string; playerId?: string } | undefined;
+          if (payload?.contactType === "first-touch" && payload.playerId) {
+            const ds: DribbleState = {
+              active: true,
+              startTick: ev.tick,
+              lastTurnTick: ev.tick - 100,
+              dribbleTicks: 0,
+              ballDribbleHeading: 0,
+              ballDribbleSpeed: 0,
+            };
+            dribbleStates.set(payload.playerId, ds);
+          }
+        } else if (ev.kind === "second-touch") {
+          const payload = ev.payload as { playerId?: string } | undefined;
+          if (payload?.playerId) {
+            const ds = dribbleStates.get(payload.playerId);
+            if (ds) {
+              ds.lastTurnTick = ev.tick;
+            }
+          }
+        } else if (ev.kind === "ball-out-of-play" || ev.kind === "goal") {
+          // End all active dribbles on ball-out-of-play or goal.
+          for (const ds of dribbleStates.values()) {
+            ds.active = false;
           }
         }
       }

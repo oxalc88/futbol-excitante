@@ -209,6 +209,34 @@ export const FOUNDATION_SHOT_V1 = {
   verticalComponent: { value: 0.15, note: "provisional upward velocity fraction for loft" },
 } as const;
 
+// -- Second-touch / dribble state (provisional) -------------------------------
+
+/**
+ * Provisional second-touch / dribble state coefficients.
+ *
+ * Every value is provisional — hand-tuned for laboratory testing only.
+ * No PES 2017 calibration claim is made.
+ *
+ * After a first-touch contact, the player enters a "dribble" state where
+ * the ball stays within range, velocity is dampened to match player
+ * movement, and the player can perform turn/drag/feint actions. The
+ * ball remains an independent 3D entity; position is never teleported.
+ */
+export const FOUNDATION_SECOND_TOUCH_V1 = {
+  id: "foundation-second-touch-v1",
+  label: "provisional",
+  /** Proximity radius (metres) within which the ball stays during active dribble. */
+  dribbleRange: { value: 1.5, unit: "m", note: "provisional dribble proximity range" },
+  /** Maximum ball speed factor relative to player speed during dribble [0..1]. */
+  ballSpeedFactor: { value: 0.8, note: "provisional fraction of player speed applied to ball during dribble" },
+  /** Minimum ticks between turn actions during dribble. */
+  turnCooldownTicks: { value: 4, unit: "ticks", note: "provisional minimum ticks between turn actions" },
+  /** Maximum consecutive ticks of active dribble before ball becomes loose. */
+  maxDribbleTicks: { value: 120, unit: "ticks", note: "provisional max dribble duration before loose ball" },
+  /** Tick after first-touch before second-touch/turn actions are allowed. */
+  secondTouchDelay: { value: 2, unit: "ticks", note: "provisional ticks after first touch before turn actions" },
+} as const;
+
 // -- Close-control / dribble-touch (provisional) ------------------------------
 
 /**
@@ -309,6 +337,7 @@ export const FOUNDATION_CONFIG = {
   loftedPass: FOUNDATION_LOFTED_PASS_V1,
   shot: FOUNDATION_SHOT_V1,
   closeControl: FOUNDATION_CLOSE_CONTROL_V1,
+  secondTouch: FOUNDATION_SECOND_TOUCH_V1,
   playerContact: FOUNDATION_PLAYER_CONTACT_V1,
   goal: FOUNDATION_GOAL_V1,
 } as const;

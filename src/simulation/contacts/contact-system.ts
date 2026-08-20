@@ -21,6 +21,8 @@ import type { InputFrame } from "../../contracts/input.js";
 import type { SimulationEvent } from "../../contracts/scenario.js";
 import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT, LOFTED_PASS_BIT, THROUGH_BALL_BIT } from "../../contracts/input.js";
 import { FOUNDATION_CONTACT_V1, FOUNDATION_PASS_V1, FOUNDATION_SHOT_V1, FOUNDATION_CLOSE_CONTROL_V1, FOUNDATION_LOFTED_PASS_V1 } from "../config/foundation.js";
+import { enterDribble } from "./second-touch-system.js";
+import type { DribbleState } from "./second-touch-system.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -309,6 +311,7 @@ export interface ContactStepResult {
  * @param shotConfig - Shot coefficient set (default: FOUNDATION_SHOT_V1).
  * @param closeControlConfig - Close-control coefficient set (default: FOUNDATION_CLOSE_CONTROL_V1).
  * @param dribbleCooldowns - Mutable per-player cooldown map (keyed by playerId, value is last dribble-touch tick).
+ * @param dribbleStates - Mutable per-player dribble state map for second-touch mechanics.
  * @returns Contact events and whether a touch occurred.
  */
 export function stepContacts(
@@ -323,6 +326,7 @@ export function stepContacts(
   shotConfig: ShotConfig = FOUNDATION_SHOT_V1,
   closeControlConfig: CloseControlConfig = FOUNDATION_CLOSE_CONTROL_V1,
   dribbleCooldowns: Map<string, number> = new Map(),
+  dribbleStates: Map<string, DribbleState> = new Map(),
 ): ContactStepResult {
   const events: SimulationEvent[] = [];
   const radius = config.contactRadius.value;
@@ -672,6 +676,12 @@ export function stepContacts(
   // Record dribble-touch cooldown for this player.
   if (action === "dribble-touch") {
     dribbleCooldowns.set(contactPlayer.playerId, tick);
+  }
+
+  // Enter second-touch dribble state after first-touch contact.
+  // Shot, pass, lofted-pass, and through-ball do not enter dribble.
+  if (action === "first-touch") {
+    enterDribble(dribbleStates, contactPlayer.playerId, tick);
   }
 
   return { events, touched: true };
