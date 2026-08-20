@@ -7,10 +7,10 @@ horizon_id: "playable-1v1-enabler"
 created_from_commit: b155671
 created_at: 2026-08-20
 reason: "Horizon transition-completion exhausted (5/5 accepted). TEAM-EVALUATOR-SUITE materialized MUTANT_TEAM_PASS and TEAM_SHAPE_SUITE_PASS, satisfying SMALL_SIDED_SHAPE exit prerequisites. However, SMALL_SIDED_SHAPE entry_prerequisite PLAYABLE_1V1_PASS is still blocked by ARCHETYPE_BLINDED_COMPARISON_PASS. New horizon builds the perceptual archetype comparison framework (rubric + browser artifacts) and fills remaining capability gaps toward PLAYABLE_1V1_PASS."
-current_index: 0
+current_index: 1
 objectives:
   - id: ARCHETYPE-BLINDED-COMPARISON
-    status: pending
+    status: accepted
     reason: "Implement the perceptual archetype comparison framework: versioned rubric, deterministic browser artifacts (rendered frames, perceptual hash comparison), and comparison logic. Required exit prerequisite for PLAYABLE_1V1 profile."
     builder: builder-structured
     prerequisite: null

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "ARCHETYPE-BLINDED-COMPARISON",
+  "accepted_at": "2026-08-20T07:23:56.134Z",
+  "candidate_commit": "66282db",
+  "evidence_class": null,
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/ARCHETYPE-BLINDED-COMPARISON/audit.json",
+      "sha256": "a7e45e1863db14be81d2ff685e1a95efcf8138ac9edd2c24182a966445baeaf3",
+      "git_blob": "b78f80cc19c7cdde03dc5e0076f4f60ef8e53170",
+      "candidate_commit": "66282db",
+      "bytes": 2686,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-20/2026-08-20T07-23-56-134Z-ARCHETYPE-BLINDED-COMPARISON-acceptance.json"
+}

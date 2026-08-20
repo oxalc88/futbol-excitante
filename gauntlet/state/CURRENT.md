@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ARCHETYPE-BLINDED-COMPARISON
+next_objective_id: PLAYABLE-SECOND-TOUCH
 
 best_known:
-  commit: b155671
-  note: "TEAM-EVALUATOR-SUITE accepted, horizon transition-completion EXHAUSTED (5/5). New horizon 'playable-1v1-enabler' created."
+  commit: 66282db
+  note: "ARCHETYPE-BLINDED-COMPARISON accepted. Candidate 66282db; acceptance bookkeeping in progress."
 
 active_candidate: null
 builder_in_use: null
@@ -86,17 +86,18 @@ accepted:
   - CPU-TACTICAL-AWARENESS
   - BROWSER-DIFFICULTY-SETTING
   - TEAM-EVALUATOR-SUITE
+  - ARCHETYPE-BLINDED-COMPARISON
 
 blocked: []
 
-selection_note: "Horizon transition-completion EXHAUSTED (5/5). New horizon 'playable-1v1-enabler' v6 created. Next: ARCHETYPE-BLINDED-COMPARISON."
+selection_note: "Horizon playable-1v1-enabler 1/4: ARCHETYPE-BLINDED-COMPARISON accepted 2026-08-20. Next: PLAYABLE-SECOND-TOUCH."
 ```
 ## Last accepted objective
 
-TEAM-EVALUATOR-SUITE — Team evaluator suite: MUTANT_TEAM_PASS reducer (9 implementable mutants against 3v3 context, detect+clean → PASS, deferred → NOT_EVALUATED, missing → INVALID_RUN) and TEAM_SHAPE_SUITE_PASS reducer (16 TEAM_SUITE tests against 3v3 scenario, checks COMMON-FINITE/REFERENCES/BOUNDS, reduces to PASS/FAIL/NOT_EVALUATED/INVALID_RUN). Enables SMALL_SIDED_SHAPE milestone evaluation. Structured TypeScript work in eval/ layer. 53 new tests (34 mutant-team + 19 team-shape); full node suite 1675/1675. HEADLESS audit PASS. No PES claims. Horizon transition-completion EXHAUSTED (5/5). New horizon 'playable-1v1-enabler' v6 created.
+ARCHETYPE-BLINDED-COMPARISON — Perceptual archetype comparison framework: versioned rubric with 5 archetypes, 4 comparison pairs, detectability threshold (0.1), confidence threshold (0.5). Browser artifact capture from actual PresentationSnapshot game frames via Playwright. Hash comparison engine with NOT_EVALUATED HEADLESS fallback (no theatrical PASS). Playable evaluator wired to exit prerequisite check. 51 tests; 507 eval tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 1/4.
 
 - builder: builder-structured / qwen3.6
-- critic: critic-mimo / mimo-v2.5 — ACCEPT (first pass, 0 retries, 426s, independence OK)
-- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (dependency PASS, evaluator integrity PASS, 0 regressions)
-- Evidence: durable acceptance manifest + record (2026-08-20T05:59:49Z)
-- Candidate: 0c5e328
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (retry, 5 required fixes applied, 804s)
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (dependency PASS, evaluator integrity PASS)
+- Evidence: durable acceptance manifest + record (2026-08-20T07:23:56Z)
+- Candidate: 66282db

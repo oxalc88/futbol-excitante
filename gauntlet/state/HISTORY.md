@@ -2668,3 +2668,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 0c5e328 candidate(TEAM-EVALUATOR-SUITE), TBD gauntlet(TEAM-EVALUATOR-SUITE): accept
 - notes: Team evaluator suite: MUTANT_TEAM_PASS reducer (9 implementable mutants against 3v3 context, detect+clean → PASS, deferred → NOT_EVALUATED, missing → INVALID_RUN) and TEAM_SHAPE_SUITE_PASS reducer (16 TEAM_SUITE tests against 3v3 scenario, checks COMMON-FINITE/REFERENCES/BOUNDS). Enables SMALL_SIDED_SHAPE milestone evaluation. 53 new tests (34 mutant-team + 19 team-shape); full suite 1675/1675. HEADLESS audit PASS. Horizon transition-completion EXHAUSTED (5/5).
+
+## Iteration 78 — 2026-08-20
+
+- objective_id: ARCHETYPE-BLINDED-COMPARISON
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (retry, 5 required fixes applied: playable evaluator wiring, HEADLESS NOT_EVALUATED, Buffer fix, game frame rendering, full hash sampling, 804s)
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (dependency PASS, evaluator integrity PASS)
+- result: accepted
+- commits: 66282db candidate(ARCHETYPE-BLINDED-COMPARISON)
+- notes: Perceptual archetype comparison framework: versioned rubric (5 archetypes, 4 comparison pairs), Playwright canvas capture from actual PresentationSnapshot game frames, hash comparison engine with NOT_EVALUATED HEADLESS fallback (no theatrical PASS), playable-evaluator wired to exit prerequisite check. 51 new tests; 507 eval tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 1/4.
