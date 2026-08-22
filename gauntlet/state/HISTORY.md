@@ -2898,3 +2898,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: a1878c5 candidate(PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN)
 - notes: Overall NOT_EVALUATED; entry prereqs unverified. Horizon v11 2/3.
+
+## Iteration 101 — 2026-08-22
+
+- objective_id: SMALL-SIDED-AFTER-DETERMINISTIC
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 2485e2c candidate(SMALL-SIDED-AFTER-DETERMINISTIC)
+- notes: SMALL_SIDED_SHAPE remains NOT_EVALUATED. Horizon v11 3/3 EXHAUSTED.

@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-AFTER-DETERMINISTIC
+next_objective_id: ""
 
 best_known:
-  commit: a1878c57582289d1f7ab3829994197edcab64a96
-  note: "PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN accepted (overall NOT_EVALUATED). Next: SMALL-SIDED-AFTER-DETERMINISTIC."
+  commit: 2485e2c4f1e8c16f2719219507521e1f0fe523bc
+  note: "SMALL-SIDED-AFTER-DETERMINISTIC accepted as NOT_EVALUATED. Horizon v11 exhausted."
 
 active_candidate: null
 builder_in_use: null
@@ -109,17 +109,18 @@ accepted:
   - SMALL-SIDED-AFTER-ARCH-DIFF
   - PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
   - PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN
+  - SMALL-SIDED-AFTER-DETERMINISTIC
 
 blocked: []
 
-selection_note: "Horizon v11 2/3. PLAYABLE_1V1 overall NOT_EVALUATED. Next: SMALL-SIDED-AFTER-DETERMINISTIC."
+selection_note: "Horizon v11 3/3 EXHAUSTED. SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 NOT_EVALUATED, not PASS)."
 ```
 ## Last accepted objective
 
-PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN — Honest NOT_EVALUATED. COMMON-DETERMINISTIC PASS; CORE/CONTROL/ARCH-DIFF/archetype PASS; entry prereqs NOT_EVALUATED. No PLAYABLE_1V1_PASS.
+SMALL-SIDED-AFTER-DETERMINISTIC — Honest NOT_EVALUATED after PLAYABLE_1V1 NOT_EVALUATED. Eight situations unevaluated. No milestone PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T14:23:19Z)
-- Candidate: a1878c5
+- Evidence: durable acceptance manifest + record (2026-08-22T14:31:17Z)
+- Candidate: 2485e2c
