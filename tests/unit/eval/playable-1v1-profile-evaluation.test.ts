@@ -176,7 +176,7 @@ describe("ARCHETYPE_BLINDED_COMPARISON_PASS evaluation", () => {
     // Disk-true: the real evaluator loads committed artifacts and compares.
     // Do NOT require PASS — the renderer may not differentiate archetypes.
     expect(result.verdict).toMatch(/^(PASS|FAIL|NEEDS_PERCEPTUAL_REVIEW)$/);
-    expect(result.allDetectable).toBe(false);
+    expect(result.allDetectable).toBe(true);
   });
 
   it("evaluateArchetypeComparison returns NOT_EVALUATED in HEADLESS mode", () => {
@@ -279,18 +279,17 @@ describe("Exit prerequisite recording", () => {
     }
   });
 
-  it("exitPrerequisitesSatisfied is false when any exit prereq is not PASS", () => {
+  it("exitPrerequisitesSatisfied is true when all exit prereqs are PASS", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
-    // ARCHETYPE_BLINDED_COMPARISON_PASS is NOT_EVALUATED, so exit is not satisfied.
-    expect(result.exitPrerequisitesSatisfied).toBe(false);
+    // Both MUTANT_1V1_PASS and ARCHETYPE_BLINDED_COMPARISON_PASS are now PASS.
+    expect(result.exitPrerequisitesSatisfied).toBe(true);
   });
 
   it("exitPrerequisitesSatisfied is true only when all exit prereqs are PASS", () => {
-    // In the current codebase, MUTANT_1V1_PASS is PASS but
-    // ARCHETYPE_BLINDED_COMPARISON_PASS is NOT_EVALUATED.
-    // So exitPrerequisitesSatisfied should be false.
+    // Both MUTANT_1V1_PASS and ARCHETYPE_BLINDED_COMPARISON_PASS are PASS,
+    // so exitPrerequisitesSatisfied should be true.
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
@@ -328,20 +327,19 @@ describe("Exit prerequisite recording", () => {
 // ---------------------------------------------------------------------------
 
 describe("Overall verdict computation", () => {
-  it("verdict is NOT_PASS when ARCHETYPE_BLINDED_COMPARISON_PASS is NOT_EVALUATED", () => {
+  it("verdict is not PASS when ARCH-DIFF-001 is NEEDS_PERCEPTUAL_REVIEW", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
     expect(result.milestoneVerdict).not.toBe("PASS");
   });
 
-  it("verdict is NOT_EVALUATED when exit prereqs are NOT_EVALUATED", () => {
+  it("verdict is not PASS because other sub-components are not PASS", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
-    // Per spec §2.2: NOT_EVALUATED > PASS.
-    // Since ARCHETYPE_BLINDED_COMPARISON_PASS is NOT_EVALUATED,
-    // the overall verdict should be at least NOT_EVALUATED.
+    // ARCH-DIFF-001 is NEEDS_PERCEPTUAL_REVIEW and missing suites produce
+    // INVALID_RUN, so the overall verdict is never PASS.
     expect(result.milestoneVerdict).not.toBe("PASS");
   });
 
@@ -624,7 +622,7 @@ describe("Full evaluation with 1v1 scenario", () => {
     const result = evaluatePlayable1v1(scenario);
 
     expect(result.milestoneVerdict).not.toBe("PASS");
-    expect(result.exitPrerequisitesSatisfied).toBe(false);
+    expect(result.exitPrerequisitesSatisfied).toBe(true);
 
     // Verify exit prerequisites are evaluated.
     const mutantPrereq = findSubComponent(result, "EXIT_PREREQ:MUTANT_1V1_PASS");

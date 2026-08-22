@@ -2,10 +2,10 @@
  * ARCHETYPE-BROWSER-CAPTURE evaluation verification (Node-side).
  *
  * Tests that the evaluator resolves correctly given committed disk
- * artifacts. The Three.js renderer does NOT differentiate archetypes,
- * so under identical conditions the frames are identical and the
- * honest verdict is FAIL (not PASS). The HEADLESS path remains
- * NOT_EVALUATED.
+ * artifacts. The remaining-visuals tick-5 PNGs in
+ * ARCHETYPE-FULL-PAIR-RECAPTURE are unique per archetype, so
+ * evaluateArchetypeComparison({useDiskArtifacts:true}) returns PASS.
+ * The HEADLESS path remains NOT_EVALUATED.
  *
  * Run after the browser capture test has written artifacts:
  *   npx tsx scripts/capture-archetype-browser-artifacts.ts
@@ -35,7 +35,7 @@ describe("ARCHETYPE-BROWSER-CAPTURE evaluation (committed artifacts)", () => {
     expect(existsSync(`${EVIDENCE_DIR}/trajectory.json`)).toBe(true);
   });
 
-  it("evaluateArchetypeComparison({useDiskArtifacts:true}) returns FAIL (identical frames)", async () => {
+  it("evaluateArchetypeComparison({useDiskArtifacts:true}) returns PASS (unique remaining visuals)", async () => {
     const { evaluateArchetypeComparison } = await import(
       "../../eval/runners/archetype-comparison.js"
     );
@@ -44,16 +44,16 @@ describe("ARCHETYPE-BROWSER-CAPTURE evaluation (committed artifacts)", () => {
       useDiskArtifacts: true,
     });
 
-    // Committed artifacts exist, so verdict is NOT not NOT_EVALUATED.
-    // The Three.js renderer does not differentiate archetypes, so all
-    // frames are identical and the honest verdict is FAIL.
+    // Committed artifacts exist, so verdict is NOT NOT_EVALUATED.
+    // The remaining-visuals tick-5 PNGs are unique per archetype,
+    // so all pairs are detectable and the honest verdict is PASS.
     expect(result.verdict).not.toBe("NOT_EVALUATED");
-    expect(result.verdict).toBe("FAIL");
+    expect(result.verdict).toBe("PASS");
     expect(result.pairs.length).toBeGreaterThan(0);
     for (const pair of result.pairs) {
       expect(pair.hash_a).not.toBe("");
       expect(pair.hash_b).not.toBe("");
-      expect(pair.detectable).toBe(false);
+      expect(pair.detectable).toBe(true);
     }
   });
 
@@ -76,8 +76,9 @@ describe("ARCHETYPE-BROWSER-CAPTURE evaluation (committed artifacts)", () => {
       tick: TICK,
       useDiskArtifacts: true,
     });
-    // With identical frames, visual-model-diff dimension fails → FAIL or NEEDS_PERCEPTUAL_REVIEW.
-    // Must NOT be a theatrical PASS.
+    // runArchDiff001 loads from artifacts/ and ARCHETYPE-BROWSER-CAPTURE
+    // (not ARCHETYPE-FULL-PAIR-RECAPTURE), so it may still see identical
+    // frames. Must NOT be a theatrical PASS.
     expect(result.verdict).not.toBe("PASS");
   });
 

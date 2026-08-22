@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "gauntlet_version": "0.9.4",
+  "generated_at": "2026-08-22T11:28:21.337Z",
+  "objective_id": "ARCHETYPE-FULL-PAIR-RECAPTURE",
+  "candidate_commit": null,
+  "evidence_class": "DYNAMIC_VISUAL",
+  "status": "REVIEW_REQUIRED",
+  "checks": [
+    {
+      "name": "tests result",
+      "status": "PASS",
+      "owner": "builder"
+    },
+    {
+      "name": "required screenshot exists",
+      "status": "PASS",
+      "owner": "builder"
+    },
+    {
+      "name": "semantic visual sequence",
+      "status": "PASS",
+      "owner": "builder"
+    },
+    {
+      "name": "required trajectory exists",
+      "status": "PASS",
+      "owner": "builder"
+    },
+    {
+      "name": "integration test result",
+      "status": "PASS",
+      "owner": "builder"
+    },
+    {
+      "name": "slot/player wiring invariants",
+      "status": "NOT_APPLICABLE",
+      "owner": "builder"
+    },
+    {
+      "name": "screenshot SHA uniqueness",
+      "status": "REVIEW_REQUIRED",
+      "owner": "semantic",
+      "detail": "[{\"current\":\"archetype-agility-frame-005.png\",\"other\":\"ARCHETYPE-REMAINING-VISUALS/archetype-agility-frame-005.png\",\"sha256\":\"9b1a1df24da2fa070cca30f79c6637bf2abaf29a5492443f9f901f51990fd35c\"},{\"current\":\"archetype-power-frame-005.png\",\"other\":\"ARCHETYPE-REMAINING-VISUALS/archetype-power-frame-005.png\",\"sha256\":\"bdeb04b76b6f166b71cafa5556fcd04af1cb7ed3ddfdb83ffad5331605c5fda3\"},{\"current\":\"archetype-technical-frame-005.png\",\"other\":\"ARCHETYPE-REMAINING-VISUALS/archetype-technical-frame-005.png\",\"sha256\":\"3840188e2cd51272f90cae0b1fbda563f65e4d0f7d89f56587a9cc11b48e2728\"}]"
+    },
+    {
+      "name": "CURRENT accepted list contains latest accepted",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "HORIZON current_index matches first pending",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "latest accepted horizon entry is not pending",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "CURRENT next objective matches HORIZON index",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "last_tracked_objective matches latest accepted",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "usage_aggregates_through matches latest accepted",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "model_evaluation_through matches latest accepted",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "clock_aggregates_through matches latest accepted",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "TIMING latest per-step row exists",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "TIMING latest builder grade exists",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "TIMING latest reviewer route exists",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "TIMING clock measurement date matches measured_at",
+      "status": "PASS",
+      "owner": "orchestrator"
+    },
+    {
+      "name": "acceptance result freshness",
+      "status": "PASS",
+      "owner": "orchestrator"
+    }
+  ]
+}

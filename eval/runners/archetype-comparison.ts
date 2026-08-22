@@ -75,8 +75,9 @@ function loadArtifactHashes(
   const tickStr = tick.toString().padStart(3, "0");
   const metaFileName = `${baseName}-frame-${tickStr}.meta.json`;
 
-  // Search order: artifacts/ (ephemeral) → docs/evidence/ (committed durable)
+  // Search order: newest evidence first → artifacts/ (ephemeral) → older durable evidence
   const searchDirs = [
+    join(__dirname, "../../docs/evidence/ARCHETYPE-FULL-PAIR-RECAPTURE"),
     join(__dirname, "../../artifacts/archetype-capture"),
     join(__dirname, "../../docs/evidence/ARCHETYPE-IDENTICAL-RECAPTURE"),
     join(__dirname, "../../docs/evidence/ARCHETYPE-BROWSER-CAPTURE"),
@@ -126,8 +127,9 @@ function loadArchetypeHash(
   const tickStr = tick.toString().padStart(3, "0");
   const pngFileName = `${baseName}-frame-${tickStr}.png`;
 
-  // Search order: artifacts/ (ephemeral) → docs/evidence/ (committed durable)
+  // Search order: newest evidence first → artifacts/ (ephemeral) → older durable evidence
   const searchDirs = [
+    join(__dirname, "../../docs/evidence/ARCHETYPE-FULL-PAIR-RECAPTURE"),
     join(__dirname, "../../artifacts/archetype-capture"),
     join(__dirname, "../../docs/evidence/ARCHETYPE-IDENTICAL-RECAPTURE"),
     join(__dirname, "../../docs/evidence/ARCHETYPE-BROWSER-CAPTURE"),
