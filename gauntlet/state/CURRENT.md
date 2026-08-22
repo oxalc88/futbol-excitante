@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-AFTER-PREREQ-EVIDENCE
+next_objective_id: ""
 
 best_known:
-  commit: ae17857bf7f45bd8b8f1bdbd6aadcd4b0c173e02
-  note: "PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE accepted; live profile runner milestoneVerdict PASS. Next: SMALL-SIDED-AFTER-PREREQ-EVIDENCE."
+  commit: 01e7d1c4bfb2b2fcec3ebb60e9299bdcf70d6f4e
+  note: "SMALL-SIDED-AFTER-PREREQ-EVIDENCE accepted as NOT_EVALUATED. Horizon v13 exhausted."
 
 active_candidate: null
 builder_in_use: null
@@ -117,17 +117,18 @@ accepted:
   - FOUNDATION-LAB-PASS-EVIDENCE
   - CAPABILITY-DESIGN-PROFILE-EVIDENCE
   - PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
+  - SMALL-SIDED-AFTER-PREREQ-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v13 4/5. Live PLAYABLE_1V1 profile runner milestoneVerdict PASS. Next: SMALL-SIDED-AFTER-PREREQ-EVIDENCE. No PES claim."
+selection_note: "Horizon v13 5/5 EXHAUSTED. PLAYABLE_1V1 live runner PASS; SMALL_SIDED_SHAPE remains NOT_EVALUATED (TEAM_DECISION_PROFILE and situations unmet). No PES claim."
 ```
 ## Last accepted objective
 
-PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE — Live profile-runner milestoneVerdict PASS after executable entry-prereq eval.json. Not a PES fidelity claim.
+SMALL-SIDED-AFTER-PREREQ-EVIDENCE — Honest NOT_EVALUATED. PLAYABLE_1V1_PASS from live 1v1 eval.json; TEAM_DECISION_PROFILE still NOT_EVALUATED. Eight situations unevaluated.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T17:12:10Z)
-- Candidate: ae17857
+- Evidence: durable acceptance manifest + record (2026-08-22T17:25:09Z)
+- Candidate: 01e7d1c

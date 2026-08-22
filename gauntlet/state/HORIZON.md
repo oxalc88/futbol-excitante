@@ -2,12 +2,12 @@
 
 ```yaml
 horizon_version: 13
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "entry-prereq-executable-evidence"
 created_from_commit: 2d466a167e57511381928357f33b1f1337c7ad07
 created_at: 2026-08-22
 reason: "Horizon playable-1v1-entry-prereq-caller exhausted (3/3). PLAYABLE_1V1 is honest BLOCKED_MISSING_REFERENCE because docs/evidence/FOUNDATION_LAB_PASS and CAPABILITY_DESIGN_PROFILE do not exist. FOUNDATION-PROMOTION and CAPABILITY-DESIGN-PROFILE are accepted Gauntlet objectives, not those milestone evidence dirs. The current resolver treats Gauntlet audit PASS as prereq PASS, which would invent FOUNDATION_LAB_PASS if those dirs were created without executable eval.json. New horizon first binds the resolver to executable milestone verdicts, then persists honest evaluateFoundationLab / evaluateCapabilityDesign evidence, then re-runs 1v1 and SMALL_SIDED."
-current_index: 4
+current_index: 5
 objectives:
   - id: ENTRY-PREREQ-RESOLVER-EVAL-JSON
     status: accepted
@@ -30,7 +30,7 @@ objectives:
     builder: builder-structured
     prerequisite: CAPABILITY-DESIGN-PROFILE-EVIDENCE
   - id: SMALL-SIDED-AFTER-PREREQ-EVIDENCE
-    status: pending
+    status: accepted
     reason: "Re-attempt SMALL_SIDED_SHAPE. Remains NOT_EVALUATED unless PLAYABLE_1V1_PASS is actually achieved."
     builder: builder-structured
     prerequisite: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
