@@ -2728,3 +2728,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: f12c52a feat(eval): add versioned perceptual rubric
 - notes: Versioned ARCH-DIFF-001 rubric v1 with four dimensions; missing artifacts NEEDS_PERCEPTUAL_REVIEW; no theatrical PASS; no PES claims. HEADLESS audit PASS. Horizon playable-1v1-browser-evidence 2/5.
+
+## Iteration 84 — 2026-08-22
+
+- objective_id: ARCHETYPE-BROWSER-CAPTURE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (retry 2, synthetic 2D then position-offset theatrical PASS, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (evaluator integrity PASS, no theatrical PASS)
+- result: accepted
+- commits: 7d60fe3 candidate(ARCHETYPE-BROWSER-CAPTURE)
+- notes: Identical-condition test-bridge frames; renderer ignores archetypeId so hashes identical; disk comparison FAIL; HEADLESS NOT_EVALUATED. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS. Horizon playable-1v1-browser-evidence 3/5.

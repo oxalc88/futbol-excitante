@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ARCHETYPE-BROWSER-CAPTURE
+next_objective_id: PLAYABLE-1V1-RE-EVALUATION
 
 best_known:
-  commit: f12c52a9d2e78edb93094e92fbeb3a6ee328cd5c
-  note: "ARCH-DIFF-001-RUBRIC accepted. Versioned perceptual rubric executable; missing artifacts stay NEEDS_PERCEPTUAL_REVIEW."
+  commit: 7d60fe365e6990592d7391f546c2e24ba2667e95
+  note: "ARCHETYPE-BROWSER-CAPTURE accepted. Identical-condition frames; disk comparison honest FAIL because renderer ignores archetypeId."
 
 active_candidate: null
 builder_in_use: null
@@ -92,17 +92,18 @@ accepted:
   - PLAYABLE-1V1-PROFILE-EVALUATION
   - BROWSER-CORE-EVIDENCE
   - ARCH-DIFF-001-RUBRIC
+  - ARCHETYPE-BROWSER-CAPTURE
 
 blocked: []
 
-selection_note: "Horizon v7 'playable-1v1-browser-evidence' 2/5. ARCH-DIFF-001-RUBRIC accepted. Next: ARCHETYPE-BROWSER-CAPTURE."
+selection_note: "Horizon v7 'playable-1v1-browser-evidence' 3/5. ARCHETYPE-BROWSER-CAPTURE accepted (honest FAIL). Next: PLAYABLE-1V1-RE-EVALUATION."
 ```
 ## Last accepted objective
 
-ARCH-DIFF-001-RUBRIC — Versioned perceptual rubric (arch-diff-001-rubric-v1) with four criterion dimensions and deterministic PASS/FAIL/NEEDS_PERCEPTUAL_REVIEW reduction. Missing artifacts stay NEEDS_PERCEPTUAL_REVIEW. HEADLESS audit PASS. No PLAYABLE_1V1_PASS. Browser capture deferred to ARCHETYPE-BROWSER-CAPTURE.
+ARCHETYPE-BROWSER-CAPTURE — Real test-bridge 800x600 frames under identical conditions (only archetypeId varies). Renderer ignores archetypeId so all five PNGs share SHA 444184c5…; evaluateArchetypeComparison({useDiskArtifacts:true}) is FAIL, HEADLESS remains NOT_EVALUATED. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS.
 
-- builder: builder-structured / qwen3.6
-- critic: critic / deepseek-v4-flash — ACCEPT (retry 1: TS4104 + disk stateHash, independence OK)
-- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (624 eval unit tests, evaluator integrity PASS)
-- Evidence: durable acceptance manifest + record (2026-08-22T04:58:17Z)
-- Candidate: f12c52a
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (retry 2: synthetic 2D then position-offset theatrical PASS, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (evaluator integrity PASS, no theatrical PASS)
+- Evidence: durable acceptance manifest + record (2026-08-22T06:06:23Z)
+- Candidate: 7d60fe3
