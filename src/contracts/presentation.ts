@@ -55,6 +55,15 @@ export interface PlayerPresentation {
   actionState: string | null;
   /** Semantic contact state (placeholder for later fields). */
   contactState: string | null;
+  /**
+   * Fictional archetype assigned to this player (e.g. "archetype-burst-v1").
+   *
+   * Presentation-only — used for visual differentiation.  Renderer consumes
+   * this to apply provisional archetype-specific visual mappings.  The value
+   * is NOT an authoritative simulation input and must never alter football
+   * outcomes.
+   */
+  archetypeId?: string;
 }
 
 /**

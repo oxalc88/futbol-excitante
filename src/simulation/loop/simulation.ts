@@ -1289,6 +1289,7 @@ export function createSimulation(
           isControlled: controlledPlayerIds.has(p.playerId),
           actionState: null,
           contactState: null,
+          archetypeId: p.archetypeId,
         };
       },
     );

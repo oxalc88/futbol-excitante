@@ -102,6 +102,70 @@ export const DEFAULT_RENDERER_CONFIG: RendererConfig = {
 };
 
 // ---------------------------------------------------------------------------
+// Provisional archetype visual mapping (v0.1.0)
+// ---------------------------------------------------------------------------
+// All coefficients are provisional and versioned.  No PES fidelity claim.
+// Hidden labels: archetype IDs are presentation-only and never surface
+// as text in the renderer.  Renderer visual changes must never alter
+// football outcomes.
+// ---------------------------------------------------------------------------
+
+/**
+ * Visual override for a known archetype.
+ *
+ * All values are provisional and versioned.  Every coefficient carries a
+ * provenance note so future calibration can replace guesses without
+ * changing the contract.
+ */
+interface ArchetypeVisualOverride {
+  /** Uniform scale multiplier applied to the player group.  1.0 = baseline. */
+  bodyScale: { value: number; note: string };
+  /** RGB tint blended toward the team color via emissive.  [0..1] per channel. */
+  emissiveTint: { value: [number, number, number]; note: string };
+  /** Emissive intensity multiplier.  0 = no emissive. */
+  emissiveIntensity: { value: number; note: string };
+}
+
+/** Default: no visual override (identity mapping). */
+const ARCHETYPE_VISUAL_BASELINE: ArchetypeVisualOverride = {
+  bodyScale: { value: 1.0, note: "provisional baseline — no deviation" },
+  emissiveTint: { value: [0, 0, 0], note: "provisional — no tint" },
+  emissiveIntensity: { value: 0, note: "provisional — no emissive" },
+};
+
+/**
+ * Registry of known archetype visual overrides.
+ *
+ * Keys match archetypeId values from the simulation world state.
+ * Unknown archetype IDs fall back to ARCHETYPE_VISUAL_BASELINE.
+ *
+ * Burst: provisional warm emissive glow + slight scale-up to visually
+ * communicate the explosive transient-acceleration characteristic.
+ * Steady: no visual change (identity mapping) — already the baseline.
+ */
+const ARCHETYPE_VISUAL_REGISTRY: Record<string, ArchetypeVisualOverride> = {
+  "archetype-burst-v1": {
+    bodyScale: { value: 1.06, note: "provisional 6% scale-up — burst signature (no PES calibration)" },
+    emissiveTint: { value: [0.45, 0.25, 0.0], note: "provisional warm amber tint — burst signature" },
+    emissiveIntensity: { value: 0.18, note: "provisional 0.18 intensity — burst signature" },
+  },
+  "archetype-steady-v1": {
+    bodyScale: { value: 1.0, note: "provisional baseline — steady uses identity scale" },
+    emissiveTint: { value: [0.0, 0.1, 0.2], note: "provisional cool blue tint — steady signature" },
+    emissiveIntensity: { value: 0.08, note: "provisional 0.08 intensity — steady signature" },
+  },
+};
+
+/**
+ * Resolve the visual override for a given archetype ID.
+ * Unknown IDs return the baseline (no visual deviation).
+ */
+function resolveArchetypeVisual(archetypeId: string | undefined): ArchetypeVisualOverride {
+  if (!archetypeId) return ARCHETYPE_VISUAL_BASELINE;
+  return ARCHETYPE_VISUAL_REGISTRY[archetypeId] ?? ARCHETYPE_VISUAL_BASELINE;
+}
+
+// ---------------------------------------------------------------------------
 // Presentation Session (deterministic, test-compatible)
 // ---------------------------------------------------------------------------
 
@@ -281,12 +345,23 @@ function createPrimitivePlayer(
   playerId: string,
   teamId: string,
   config: RendererConfig,
+  archetypeOverride?: ArchetypeVisualOverride,
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = `player-${playerId}`;
 
   const bodyColor =
     teamId === "team-a" ? config.playerColorA : config.playerColorB;
+
+  const scale = archetypeOverride?.bodyScale.value ?? 1.0;
+  const emissive = archetypeOverride
+    ? new THREE.Color(
+        (archetypeOverride.emissiveTint.value[0] * config.playerColorA) | 0,
+        (archetypeOverride.emissiveTint.value[1] * 0x80) | 0,
+        (archetypeOverride.emissiveTint.value[2] * 0x40) | 0,
+      )
+    : new THREE.Color(0x000000);
+  const emissiveIntensity = archetypeOverride?.emissiveIntensity.value ?? 0;
 
   // Body — torso
   const bodyGeometry = new THREE.BoxGeometry(
@@ -298,6 +373,8 @@ function createPrimitivePlayer(
     color: bodyColor,
     roughness: 0.7,
     metalness: 0.1,
+    emissive,
+    emissiveIntensity,
   });
   const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
   body.position.y = config.playerHeight * 0.48;
@@ -309,6 +386,8 @@ function createPrimitivePlayer(
   const headMaterial = new THREE.MeshStandardMaterial({
     color: bodyColor,
     roughness: 0.5,
+    emissive,
+    emissiveIntensity,
   });
   const head = new THREE.Mesh(headGeometry, headMaterial);
   head.position.y = config.playerHeight * 0.85;
@@ -343,6 +422,14 @@ function createPrimitivePlayer(
   cone.position.set(config.playerWidth / 2 + 0.12, config.playerHeight * 0.7, 0);
   cone.name = "direction";
   group.add(cone);
+
+  // Apply archetype provisional scale.
+  group.scale.setScalar(scale);
+
+  // Track archetype on userData for change detection.
+  group.userData.archetypeId = archetypeOverride?.bodyScale.value !== 1.0 || archetypeOverride?.emissiveIntensity.value !== 0
+    ? archetypeOverride
+    : undefined;
 
   return group;
 }
@@ -608,9 +695,28 @@ export function createPresentationSession(
     for (const pp of snapshot.players) {
       activePlayerIds.add(pp.playerId);
 
+      const archetypeVisual = resolveArchetypeVisual(pp.archetypeId);
       let mesh = playerMeshes.get(pp.playerId);
+      // Recreate mesh if archetype changed (disposes old GPU resources).
+      if (mesh && mesh.userData.archetypeId !== archetypeVisual) {
+        scene.remove(mesh);
+        mesh.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.geometry.dispose();
+            if (Array.isArray(child.material)) {
+              child.material.forEach((m) => m.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        });
+        playerMeshes.delete(pp.playerId);
+        playerLegAnimState.delete(`player-${pp.playerId}`);
+        mesh = undefined;
+      }
       if (!mesh) {
-        mesh = createPrimitivePlayer(pp.playerId, pp.teamId, config);
+        mesh = createPrimitivePlayer(pp.playerId, pp.teamId, config, archetypeVisual);
+        mesh.userData.archetypeId = archetypeVisual;
         scene.add(mesh);
         playerMeshes.set(pp.playerId, mesh);
       }
