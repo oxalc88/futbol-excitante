@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-22T09:43:53.008Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-SHAPE-RERUN",
+  "candidate_commit": "f896bafde98c34c012847e6e9cc1daad47195fff",
+  "evidence_class": "HEADLESS",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "agent": "critic",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  }
+}

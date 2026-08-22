@@ -2798,3 +2798,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 708591f candidate(PLAYABLE-1V1-PROFILE-RERUN)
 - notes: Two-player CONTROL cross-check; overall FAIL; no PLAYABLE_1V1_PASS. Horizon v8 4/5.
+
+## Iteration 91 — 2026-08-22
+
+- objective_id: SMALL-SIDED-SHAPE-RERUN
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (first pass, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: f896baf candidate(SMALL-SIDED-SHAPE-RERUN)
+- notes: SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1_PASS unmet, 8 situations unevaluated). No milestone PASS. Horizon v8 5/5 EXHAUSTED.

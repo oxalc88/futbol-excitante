@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SHAPE-RERUN
+next_objective_id: ""
 
 best_known:
-  commit: 708591f9e3962a94b49ef5bcfc81df72276b2a7e
-  note: "PLAYABLE-1V1-PROFILE-RERUN accepted (overall FAIL, CONTROL PASS). Next: SMALL-SIDED-SHAPE-RERUN."
+  commit: f896bafde98c34c012847e6e9cc1daad47195fff
+  note: "SMALL-SIDED-SHAPE-RERUN accepted as NOT_EVALUATED. Horizon v8 exhausted."
 
 active_candidate: null
 builder_in_use: null
@@ -99,17 +99,18 @@ accepted:
   - ARCHETYPE-RENDER-DIFFERENCE
   - ARCHETYPE-IDENTICAL-RECAPTURE
   - PLAYABLE-1V1-PROFILE-RERUN
+  - SMALL-SIDED-SHAPE-RERUN
 
 blocked: []
 
-selection_note: "Horizon v8 4/5. PLAYABLE-1V1-PROFILE-RERUN accepted (FAIL). Next: SMALL-SIDED-SHAPE-RERUN."
+selection_note: "Horizon v8 5/5 EXHAUSTED. SMALL-SIDED-SHAPE-RERUN accepted as NOT_EVALUATED (PLAYABLE_1V1_PASS unmet)."
 ```
 ## Last accepted objective
 
-PLAYABLE-1V1-PROFILE-RERUN — Re-run with two-player CONTROL cross-check: CORE+CONTROL PASS, ARCH-DIFF NPR, archetype FAIL, overall FAIL. No PLAYABLE_1V1_PASS. Accepted 1v1-control evidence unmutated.
+SMALL-SIDED-SHAPE-RERUN — Honest NOT_EVALUATED after PLAYABLE_1V1 FAIL. All eight required situations unevaluated. No milestone PASS.
 
 - builder: builder-structured / qwen3.6
-- critic: critic / deepseek-v4-flash — ACCEPT after REJECT of fabricated hashes
+- critic: critic / deepseek-v4-flash — ACCEPT
 - integration: integration-reviewer / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T09:25:11Z)
-- Candidate: 708591f
+- Evidence: durable acceptance manifest + record (2026-08-22T09:43:53Z)
+- Candidate: f896baf
