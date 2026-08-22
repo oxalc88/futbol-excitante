@@ -77,21 +77,42 @@ export interface Playable1v1ProfileResult {
 // ---------------------------------------------------------------------------
 
 /**
- * Scan docs/evidence for accepted evidence directories for the given
- * prerequisite names.  An accepted prerequisite has both manifest.json
- * and an audit.json whose final verdict is "PASS".
- *
- * Returns a map from prerequisite name → outcome.  When no accepted
- * evidence exists for a prerequisite, the map omits the key so the
- * caller-side defaults to BLOCKED_MISSING_REFERENCE.
+ * Executable verdict strings recognised by the eval.json resolver.
  */
-function resolveEntryPrereqOutcomes(
+type ExecutableVerdict =
+  | "PASS"
+  | "FAIL"
+  | "NEEDS_PERCEPTUAL_REVIEW"
+  | "NOT_EVALUATED"
+  | "INVALID_RUN"
+  | "BLOCKED_MISSING_REFERENCE";
+
+/**
+ * Read executable eval.json verdicts for the given prerequisite names.
+ *
+ * For each prerequisite, looks for `docs/evidence/<prereq>/eval.json`.
+ * If missing, unreadable, or lacking a usable verdict field → omit the key
+ * (caller defaults to BLOCKED_MISSING_REFERENCE).  If present, reads the
+ * executable verdict from `milestoneVerdict` if present, else `overall`.
+ *
+ * Gauntlet `audit.json` PASS / `manifest.accepted` must NOT become
+ * a milestone PASS under any circumstance.
+ *
+ * @param prereqNames - Names of entry prerequisites to resolve.
+ * @param evidenceBase - Base directory for evidence dirs.  Defaults to
+ *   `docs/evidence` relative to this module, but is injectable so unit
+ *   tests can use temp dirs without writing into durable `docs/evidence/`.
+ * @returns Map from prerequisite name → outcome.  Missing keys mean the
+ *   caller should use BLOCKED_MISSING_REFERENCE.
+ */
+export function resolveEntryPrereqOutcomes(
   prereqNames: string[],
+  evidenceBase?: string,
 ): Record<
   string,
   "PASS" | "FAIL" | "NEEDS_PERCEPTUAL_REVIEW" | "NOT_EVALUATED" | "INVALID_RUN" | "BLOCKED_MISSING_REFERENCE"
 > {
-  const evidenceBase = join(
+  const base = evidenceBase ?? join(
     dirname(fileURLToPath(import.meta.url)),
     "../../docs/evidence",
   );
@@ -100,8 +121,17 @@ function resolveEntryPrereqOutcomes(
     "PASS" | "FAIL" | "NEEDS_PERCEPTUAL_REVIEW" | "NOT_EVALUATED" | "INVALID_RUN" | "BLOCKED_MISSING_REFERENCE"
   > = {};
 
+  const validVerdicts = new Set([
+    "PASS",
+    "FAIL",
+    "NEEDS_PERCEPTUAL_REVIEW",
+    "NOT_EVALUATED",
+    "INVALID_RUN",
+    "BLOCKED_MISSING_REFERENCE",
+  ]);
+
   for (const prereq of prereqNames) {
-    const dir = join(evidenceBase, prereq);
+    const dir = join(base, prereq);
     if (!existsSync(dir)) {
       console.error(
         `[profile-runner] Evidence dir not found: ${dir}`,
@@ -109,35 +139,40 @@ function resolveEntryPrereqOutcomes(
       continue;
     }
 
-    const manifestPath = join(dir, "manifest.json");
-    const auditPath = join(dir, "audit.json");
+    const evalPath = join(dir, "eval.json");
 
-    if (!existsSync(manifestPath) || !existsSync(auditPath)) {
+    if (!existsSync(evalPath)) {
       console.error(
-        `[profile-runner] Missing manifest or audit in ${dir}`,
+        `[profile-runner] No eval.json in ${dir} — ${prereq} omitted`,
       );
       continue;
     }
 
     try {
-      const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
-      const audit = JSON.parse(readFileSync(auditPath, "utf-8"));
+      const raw = readFileSync(evalPath, "utf-8");
+      const evalDoc = JSON.parse(raw) as Record<string, unknown>;
 
-      // We accept the prerequisite when an accepted manifest exists
-      // and the audit verdict is PASS.
-      if (manifest?.accepted === true && audit?.verdict === "PASS") {
-        outcomes[prereq] = "PASS";
+      // Prefer milestoneVerdict; fall back to overall.
+      const rawVerdict =
+        typeof evalDoc.milestoneVerdict === "string"
+          ? evalDoc.milestoneVerdict
+          : typeof evalDoc.overall === "string"
+            ? evalDoc.overall
+            : undefined;
+
+      if (rawVerdict && validVerdicts.has(rawVerdict)) {
+        outcomes[prereq] = rawVerdict as ExecutableVerdict;
         console.error(
-          `[profile-runner] Accepted evidence for "${prereq}"`,
+          `[profile-runner] eval.json verdict for "${prereq}": ${rawVerdict}`,
         );
       } else {
         console.error(
-          `[profile-runner] Evidence for "${prereq}" not accepted (manifest.accepted=${manifest?.accepted}, audit.verdict=${audit?.verdict})`,
+          `[profile-runner] eval.json for "${prereq}" lacks usable verdict (milestoneVerdict/overall), omitting`,
         );
       }
     } catch (err) {
       console.error(
-        `[profile-runner] Error reading evidence for "${prereq}": ${err instanceof Error ? err.message : String(err)}`,
+        `[profile-runner] Error reading eval.json for "${prereq}": ${err instanceof Error ? err.message : String(err)}`,
       );
     }
   }
