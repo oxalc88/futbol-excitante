@@ -1,0 +1,50 @@
+## Builder report
+
+- **objective_id**: TEAM-DECISION-PROFILE-EVIDENCE
+- **builder_agent**: builder-structured
+- **builder_model**: qwen3.6
+- **evidence_class**: HEADLESS
+- **hypothesis**: SMALL_SIDED_SHAPE remains NOT_EVALUATED because `TEAM_DECISION_PROFILE` has no executable `docs/evidence/TEAM_DECISION_PROFILE/eval.json`. `CPU-TEAM-DECISION-PROFILE` is a different Gauntlet evidence identity (adapter team-decision state machine integration evidence). The `computeTeamDecision` / `getBallZone` / `teamHasPossession` pure functions in `src/adapters/input-browser/team-decision-profile.ts` have no eval.json evidence. Mirror FOUNDATION_LAB_PASS / CAPABILITY_DESIGN_PROFILE evidence binding: execute a real evaluator, persist honest overall/milestoneVerdict.
+- **files_changed**:
+  - `eval/runners/team-decision-eval-runner.ts` (new) — Node I/O runner exercising the team-decision profile against executable criteria
+  - `docs/evidence/TEAM_DECISION_PROFILE/eval.json` (new) — executable evaluation result (overall=PASS, milestoneVerdict=PASS)
+  - `tests/unit/eval/team-decision-evidence-binding.node.test.ts` (new) — evidence-binding tests
+  - `docs/evidence/TEAM-DECISION-PROFILE-EVIDENCE/RESULT.md` (new) — this file
+- **commands_run**:
+  - `tsx eval/runners/team-decision-eval-runner.ts` → exit code 0
+  - `npx vitest run tests/unit/eval/team-decision-evidence-binding.node.test.ts` → exit code 0 (12 tests passed)
+  - `npx vitest run tests/unit/cpu-adapter.test.ts` → exit code 0 (22 tests passed)
+  - `npx vitest run tests/unit/cpu-adapter/` → exit code 0 (321 tests passed, 17 test files)
+  - `npx vitest run tests/unit/eval/team-shape.test.ts` → exit code 0 (existing neighboring test)
+- **tests_run**:
+  - `tests/unit/eval/team-decision-evidence-binding.node.test.ts` → PASS (12 tests)
+  - `tests/unit/cpu-adapter.test.ts` → PASS (22 tests)
+  - `tests/unit/cpu-adapter/team-decision-profile.test.ts` → PASS (15 tests)
+  - `tests/unit/cpu-adapter/` (all 17 test files) → PASS (321 tests)
+- **integration_test_result**: Not applicable — this is a HEADLESS evidence objective.
+- **slot_wiring_result**: Not applicable — no slot wiring changes.
+- **required_evidence**: HEADLESS (executed tests)
+- **artifacts**:
+  - `eval/runners/team-decision-eval-runner.ts` — eval layer runner exercising `computeTeamDecision`, `getBallZone`, `teamHasPossession`
+  - `docs/evidence/TEAM_DECISION_PROFILE/eval.json` — structured evaluation result (overall=PASS, milestoneVerdict=PASS, 6 axes)
+  - `tests/unit/eval/team-decision-evidence-binding.node.test.ts` — 12 evidence-binding tests
+  - `docs/evidence/TEAM-DECISION-PROFILE-EVIDENCE/RESULT.md` — this builder report
+- **spec_sections**: GAMEPLAY_EVALUATION_SPEC.md §8 (team suite), TEAM_DECISION_PROFILE specification in `src/adapters/input-browser/team-decision-profile.ts`
+- **acceptance_criteria_met**:
+  - `runTeamDecisionEval()` executed against 6 axes: ball-zone-detection, possession-detection, strategy-selection, determinism, defensive-sub-mode, set-piece-phases
+  - `docs/evidence/TEAM_DECISION_PROFILE/eval.json` persisted with `overall=PASS`, `milestoneVerdict=PASS`, all 6 axes PASS
+  - Evidence-binding tests prove: eval.json exists at the expected path, structure is valid (profileVersion, axes, overall, milestoneVerdict), axes are non-empty with correct types, live re-run produces identical verdict, no forbidden claims (PES fidelity / invented reference envelopes)
+  - CPU-TEAM-DECISION-PROFILE is NOT conflated — it is a separate evidence identity under `docs/evidence/CPU-TEAM-DECISION-PROFILE/` with its own manifest.json and audit.json
+  - `resolveEntryPrereqOutcomes(["TEAM_DECISION_PROFILE"])` would return the verdict from the persisted eval.json (tested by the general framework in resolve-entry-prereq-outcomes.test.ts)
+  - All existing cpu-adapter / team-decision-profile tests still pass (321 tests across 17 files)
+- **known_gaps**:
+  - This objective only produces the eval.json evidence for TEAM_DECISION_PROFILE; it does not claim SMALL_SIDED_SHAPE_PASS or any product milestone.
+  - The TEAM_DECISION_PROFILE evidence is now at PASS in the eval layer, but SMALL_SIDED_SHAPE acceptance requires critic and integration review per the Gauntlet contract.
+  - No manifest.json was written (out of scope for this objective).
+- **claims_not_made**:
+  - No claim of `FOUNDATION_LAB_PASS`, `SMALL_SIDED_SHAPE_PASS`, or PES fidelity in CURRENT/HORIZON or this report.
+  - No `manifest.json` written (out of scope).
+  - No spec, research, role, agent prompt, routing, AGENTS.md, or mise.toml edits.
+  - No historical evidence mutated.
+  - No commits or pushes.
+  - No next objective started (MUTANT-TEAM-PASS-EVIDENCE not begun).
