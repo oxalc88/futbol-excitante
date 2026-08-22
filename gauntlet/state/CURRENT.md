@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-AFTER-ENTRY-PREREQS
+next_objective_id: ""
 
 best_known:
-  commit: 536e9b6c4b7adc82fda7357e44a28c3cca658c8c
-  note: "PLAYABLE-1V1-AFTER-ENTRY-PREREQS accepted (BLOCKED_MISSING_REFERENCE). Next: SMALL-SIDED-AFTER-ENTRY-PREREQS."
+  commit: d617673c2e6b5e88b7a893a0ccc5e93163e4d1b9
+  note: "SMALL-SIDED-AFTER-ENTRY-PREREQS accepted as NOT_EVALUATED. Horizon v12 exhausted."
 
 active_candidate: null
 builder_in_use: null
@@ -112,17 +112,18 @@ accepted:
   - SMALL-SIDED-AFTER-DETERMINISTIC
   - PLAYABLE-1V1-ENTRY-PREREQ-CALLER
   - PLAYABLE-1V1-AFTER-ENTRY-PREREQS
+  - SMALL-SIDED-AFTER-ENTRY-PREREQS
 
 blocked: []
 
-selection_note: "Horizon v12 2/3. PLAYABLE_1V1 overall BLOCKED_MISSING_REFERENCE. Next: SMALL-SIDED-AFTER-ENTRY-PREREQS."
+selection_note: "Horizon v12 3/3 EXHAUSTED. SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 BLOCKED_MISSING_REFERENCE, not PASS)."
 ```
 ## Last accepted objective
 
-PLAYABLE-1V1-AFTER-ENTRY-PREREQS — Honest BLOCKED_MISSING_REFERENCE. Executable criteria PASS; FOUNDATION_LAB_PASS and CAPABILITY_DESIGN_PROFILE missing evidence dirs. No PLAYABLE_1V1_PASS.
+SMALL-SIDED-AFTER-ENTRY-PREREQS — Honest NOT_EVALUATED after PLAYABLE_1V1 BLOCKED_MISSING_REFERENCE. Eight situations unevaluated. No milestone PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T15:28:54Z)
-- Candidate: 536e9b6
+- Evidence: durable acceptance manifest + record (2026-08-22T15:40:57Z)
+- Candidate: d617673

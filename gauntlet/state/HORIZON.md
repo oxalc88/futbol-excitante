@@ -2,12 +2,12 @@
 
 ```yaml
 horizon_version: 12
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "playable-1v1-entry-prereq-caller"
 created_from_commit: 340329da8bd1e66f77a0b4a540f2bda0a4e728e6
 created_at: 2026-08-22
 reason: "Horizon playable-1v1-deterministic-two-run exhausted (3/3). PLAYABLE_1V1 is honest NOT_EVALUATED solely because entry prereqs FOUNDATION_LAB_PASS and CAPABILITY_DESIGN_PROFILE are unverified by the caller even though CORE/CONTROL/ARCH-DIFF/archetype/COMMON-DETERMINISTIC/MUTANT_1V1 pass. SMALL_SIDED_SHAPE remains NOT_EVALUATED. New horizon lets the caller pass only executable, already-accepted prerequisite evidence into evaluatePlayable1v1 — no fake FOUNDATION_LAB_PASS — then re-runs 1v1 and SMALL_SIDED honestly."
-current_index: 2
+current_index: 3
 objectives:
   - id: PLAYABLE-1V1-ENTRY-PREREQ-CALLER
     status: accepted
@@ -20,7 +20,7 @@ objectives:
     builder: builder-structured
     prerequisite: PLAYABLE-1V1-ENTRY-PREREQ-CALLER
   - id: SMALL-SIDED-AFTER-ENTRY-PREREQS
-    status: pending
+    status: accepted
     reason: "Re-attempt SMALL_SIDED_SHAPE. Remains NOT_EVALUATED unless PLAYABLE_1V1_PASS is actually achieved."
     builder: builder-structured
     prerequisite: PLAYABLE-1V1-AFTER-ENTRY-PREREQS

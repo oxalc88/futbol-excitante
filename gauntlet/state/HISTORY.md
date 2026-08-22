@@ -2928,3 +2928,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 536e9b6 candidate(PLAYABLE-1V1-AFTER-ENTRY-PREREQS)
 - notes: Overall BLOCKED_MISSING_REFERENCE; executable criteria PASS. Horizon v12 2/3.
+
+## Iteration 104 — 2026-08-22
+
+- objective_id: SMALL-SIDED-AFTER-ENTRY-PREREQS
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: d617673 candidate(SMALL-SIDED-AFTER-ENTRY-PREREQS)
+- notes: SMALL_SIDED_SHAPE remains NOT_EVALUATED. Horizon v12 3/3 EXHAUSTED.
