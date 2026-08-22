@@ -139,9 +139,11 @@ const ARCHETYPE_VISUAL_BASELINE: ArchetypeVisualOverride = {
  * Keys match archetypeId values from the simulation world state.
  * Unknown archetype IDs fall back to ARCHETYPE_VISUAL_BASELINE.
  *
- * Burst: provisional warm emissive glow + slight scale-up to visually
- * communicate the explosive transient-acceleration characteristic.
- * Steady: no visual change (identity mapping) — already the baseline.
+ * Burst: warm emissive glow + slight scale-up for explosive acceleration.
+ * Steady: baseline identity mapping with subtle cool tint.
+ * Technical: leaner scale + cyan tint for precision/control feel.
+ * Power: larger scale + warm red tint for strength feel.
+ * Agility: lighter scale + green tint for quickness feel.
  */
 const ARCHETYPE_VISUAL_REGISTRY: Record<string, ArchetypeVisualOverride> = {
   "archetype-burst-v1": {
@@ -153,6 +155,21 @@ const ARCHETYPE_VISUAL_REGISTRY: Record<string, ArchetypeVisualOverride> = {
     bodyScale: { value: 1.0, note: "provisional baseline — steady uses identity scale" },
     emissiveTint: { value: [0.0, 0.1, 0.2], note: "provisional cool blue tint — steady signature" },
     emissiveIntensity: { value: 0.08, note: "provisional 0.08 intensity — steady signature" },
+  },
+  "archetype-technical-v1": {
+    bodyScale: { value: 0.94, note: "provisional 6% scale-down — technical leaner signature (no PES calibration)" },
+    emissiveTint: { value: [0.0, 0.3, 0.5], note: "provisional cyan tint — technical precision signature" },
+    emissiveIntensity: { value: 0.15, note: "provisional 0.15 intensity — technical signature" },
+  },
+  "archetype-power-v1": {
+    bodyScale: { value: 1.12, note: "provisional 12% scale-up — power broader signature (no PES calibration)" },
+    emissiveTint: { value: [0.5, 0.15, 0.0], note: "provisional warm red tint — power strength signature" },
+    emissiveIntensity: { value: 0.22, note: "provisional 0.22 intensity — power signature" },
+  },
+  "archetype-agility-v1": {
+    bodyScale: { value: 0.90, note: "provisional 10% scale-down — agility lighter signature (no PES calibration)" },
+    emissiveTint: { value: [0.15, 0.4, 0.1], note: "provisional green tint — agility quickness signature" },
+    emissiveIntensity: { value: 0.12, note: "provisional 0.12 intensity — agility signature" },
   },
 };
 

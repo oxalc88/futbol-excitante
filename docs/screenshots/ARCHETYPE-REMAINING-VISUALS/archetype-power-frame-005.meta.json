@@ -1,0 +1,12 @@
+{
+  "archetypeId": "archetype-power-v1",
+  "perceptualHash": "bdeb04b76b6f166b71cafa5556fcd04af1cb7ed3ddfdb83ffad5331605c5fda3",
+  "stateHash": "fnv1a64-v1:45976fef99f2fa25",
+  "sha256": "bdeb04b76b6f166b71cafa5556fcd04af1cb7ed3ddfdb83ffad5331605c5fda3",
+  "tick": 5,
+  "width": 800,
+  "height": 600,
+  "captureVersion": "archetype-remaining-visuals-v1",
+  "renderer": "three.js-via-test-bridge",
+  "identicalConditions": true
+}
