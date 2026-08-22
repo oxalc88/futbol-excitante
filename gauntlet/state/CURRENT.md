@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ENTRY-PREREQ-RESOLVER-EVAL-JSON
+next_objective_id: FOUNDATION-LAB-PASS-EVIDENCE
 
 best_known:
-  commit: d617673c2e6b5e88b7a893a0ccc5e93163e4d1b9
-  note: "SMALL-SIDED-AFTER-ENTRY-PREREQS accepted as NOT_EVALUATED. Horizon v13 starts at ENTRY-PREREQ-RESOLVER-EVAL-JSON."
+  commit: 037550cbe67057b9b41a36aee5ad454422e84e5d
+  note: "ENTRY-PREREQ-RESOLVER-EVAL-JSON accepted. Resolver reads eval.json; next: FOUNDATION-LAB-PASS-EVIDENCE."
 
 active_candidate: null
 builder_in_use: null
@@ -113,17 +113,18 @@ accepted:
   - PLAYABLE-1V1-ENTRY-PREREQ-CALLER
   - PLAYABLE-1V1-AFTER-ENTRY-PREREQS
   - SMALL-SIDED-AFTER-ENTRY-PREREQS
+  - ENTRY-PREREQ-RESOLVER-EVAL-JSON
 
 blocked: []
 
-selection_note: "Horizon v13 0/5 ACTIVE. Bind resolver to executable eval.json, then persist honest FOUNDATION_LAB / capability-design evidence. SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 BLOCKED_MISSING_REFERENCE, not PASS)."
+selection_note: "Horizon v13 1/5. Resolver consumes eval.json. Next: FOUNDATION-LAB-PASS-EVIDENCE. PLAYABLE_1V1 remains BLOCKED_MISSING_REFERENCE."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-AFTER-ENTRY-PREREQS — Honest NOT_EVALUATED after PLAYABLE_1V1 BLOCKED_MISSING_REFERENCE. Eight situations unevaluated. No milestone PASS.
+ENTRY-PREREQ-RESOLVER-EVAL-JSON — Resolver reads executable eval.json; Gauntlet audit PASS is not FOUNDATION_LAB_PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T15:40:57Z)
-- Candidate: d617673
+- Evidence: durable acceptance manifest + record (2026-08-22T16:05:43Z)
+- Candidate: 037550c

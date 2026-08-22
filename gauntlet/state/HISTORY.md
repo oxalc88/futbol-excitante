@@ -2938,3 +2938,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: d617673 candidate(SMALL-SIDED-AFTER-ENTRY-PREREQS)
 - notes: SMALL_SIDED_SHAPE remains NOT_EVALUATED. Horizon v12 3/3 EXHAUSTED.
+
+## Iteration 105 — 2026-08-22
+
+- objective_id: ENTRY-PREREQ-RESOLVER-EVAL-JSON
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 037550c candidate(ENTRY-PREREQ-RESOLVER-EVAL-JSON)
+- notes: Resolver reads eval.json milestoneVerdict/overall; Gauntlet audit PASS is not FOUNDATION_LAB_PASS. Horizon v13 1/5.
