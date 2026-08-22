@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: PLAYABLE-1V1-PROFILE-RERUN
+next_objective_id: SMALL-SIDED-SHAPE-RERUN
 
 best_known:
-  commit: bbcf0d16666faa37a62472664bb01e2d14d3518d
-  note: "ARCHETYPE-IDENTICAL-RECAPTURE accepted (honest FAIL technical vs power). Next: PLAYABLE-1V1-PROFILE-RERUN."
+  commit: 708591f9e3962a94b49ef5bcfc81df72276b2a7e
+  note: "PLAYABLE-1V1-PROFILE-RERUN accepted (overall FAIL, CONTROL PASS). Next: SMALL-SIDED-SHAPE-RERUN."
 
 active_candidate: null
 builder_in_use: null
@@ -98,17 +98,18 @@ accepted:
   - BROWSER-1V1-CONTROL-EVIDENCE
   - ARCHETYPE-RENDER-DIFFERENCE
   - ARCHETYPE-IDENTICAL-RECAPTURE
+  - PLAYABLE-1V1-PROFILE-RERUN
 
 blocked: []
 
-selection_note: "Horizon v8 3/5. ARCHETYPE-IDENTICAL-RECAPTURE accepted. Next: PLAYABLE-1V1-PROFILE-RERUN."
+selection_note: "Horizon v8 4/5. PLAYABLE-1V1-PROFILE-RERUN accepted (FAIL). Next: SMALL-SIDED-SHAPE-RERUN."
 ```
 ## Last accepted objective
 
-ARCHETYPE-IDENTICAL-RECAPTURE — Recaptured identical-condition frames after renderer difference. Burst vs steady detectable; technical vs power identical → honest FAIL. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS.
+PLAYABLE-1V1-PROFILE-RERUN — Re-run with two-player CONTROL cross-check: CORE+CONTROL PASS, ARCH-DIFF NPR, archetype FAIL, overall FAIL. No PLAYABLE_1V1_PASS. Accepted 1v1-control evidence unmutated.
 
-- builder: builder-gameplay / mimo-v2.5
-- critic: critic / deepseek-v4-flash — ACCEPT (independence OK)
-- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (evaluator integrity PASS)
-- Evidence: durable acceptance manifest + record (2026-08-22T08:55:56Z)
-- Candidate: bbcf0d1
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT after REJECT of fabricated hashes
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-22T09:25:11Z)
+- Candidate: 708591f

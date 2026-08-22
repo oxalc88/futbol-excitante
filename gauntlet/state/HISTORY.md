@@ -2788,3 +2788,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: bbcf0d1 candidate(ARCHETYPE-IDENTICAL-RECAPTURE)
 - notes: Recapture after renderer difference; burst vs steady detectable; technical vs power identical → honest FAIL. Horizon v8 3/5.
+
+## Iteration 90 — 2026-08-22
+
+- objective_id: PLAYABLE-1V1-PROFILE-RERUN
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT after REJECT of fabricated CONTROL hashes
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 708591f candidate(PLAYABLE-1V1-PROFILE-RERUN)
+- notes: Two-player CONTROL cross-check; overall FAIL; no PLAYABLE_1V1_PASS. Horizon v8 4/5.

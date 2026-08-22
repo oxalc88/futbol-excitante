@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "PLAYABLE-1V1-PROFILE-RERUN",
+  "accepted_at": "2026-08-22T09:25:11.129Z",
+  "candidate_commit": "708591f9e3962a94b49ef5bcfc81df72276b2a7e",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/PLAYABLE-1V1-PROFILE-RERUN/audit.json",
+      "sha256": "c9db266312b80a35a40fc3beea0d8ffaffec506d98cabd0ba1f16440f2c75345",
+      "git_blob": "836145fe5356ecc9d445f9870046209e6e2b911f",
+      "candidate_commit": "708591f9e3962a94b49ef5bcfc81df72276b2a7e",
+      "bytes": 2684,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-22/2026-08-22T09-25-11-129Z-PLAYABLE-1V1-PROFILE-RERUN-acceptance.json"
+}

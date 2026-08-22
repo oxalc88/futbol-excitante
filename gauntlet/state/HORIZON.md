@@ -7,7 +7,7 @@ horizon_id: "playable-1v1-control-and-archetype-render"
 created_from_commit: d1a8bf50ced29c4d2ea1a4e53ee7959228cd6bb3
 created_at: 2026-08-22
 reason: "Horizon playable-1v1-browser-evidence exhausted (5/5). PLAYABLE_1V1 remains INVALID_RUN because BROWSER-1V1-CONTROL-001 has no evidence. ARCHETYPE_BLINDED_COMPARISON_PASS is honest FAIL because the renderer ignores archetypeId. New horizon captures 1v1 control browser evidence and adds honest archetype-visible presentation under identical conditions."
-current_index: 3
+current_index: 4
 objectives:
   - id: BROWSER-1V1-CONTROL-EVIDENCE
     status: accepted
@@ -25,7 +25,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: ARCHETYPE-RENDER-DIFFERENCE
   - id: PLAYABLE-1V1-PROFILE-RERUN
-    status: pending
+    status: accepted
     reason: "Re-run PLAYABLE_1V1 after 1v1-control evidence and (if ready) archetype recapture. Expect remaining honest blockers, not a forced PASS."
     builder: builder-structured
     prerequisite: BROWSER-1V1-CONTROL-EVIDENCE
