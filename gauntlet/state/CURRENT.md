@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: ARCH-DIFF-001-FRAME-BINDING
 
 best_known:
   commit: 5fc9ce3662b11977fd680bfac9e9b17b63ce3588
-  note: "SMALL-SIDED-SHAPE-AFTER-1V1 accepted as NOT_EVALUATED. Horizon v9 exhausted."
+  note: "SMALL-SIDED-SHAPE-AFTER-1V1 accepted as NOT_EVALUATED. Horizon v10 next: ARCH-DIFF-001-FRAME-BINDING."
 
 active_candidate: null
 builder_in_use: null
@@ -107,7 +107,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v9 4/4 EXHAUSTED. SMALL-SIDED-SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 NPR, not PASS)."
+selection_note: "Horizon v10 0/3. Next: ARCH-DIFF-001-FRAME-BINDING (ARCH-DIFF still hardcoded NPR)."
 ```
 ## Last accepted objective
 
