@@ -1,41 +1,36 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 13
-status: EXHAUSTED
-horizon_id: "entry-prereq-executable-evidence"
-created_from_commit: 2d466a167e57511381928357f33b1f1337c7ad07
+horizon_version: 14
+status: ACTIVE
+horizon_id: "team-decision-profile-and-small-sided"
+created_from_commit: c9ff1613d4c28857dc8db9fb7ef9e475e7fb6fdf
 created_at: 2026-08-22
-reason: "Horizon playable-1v1-entry-prereq-caller exhausted (3/3). PLAYABLE_1V1 is honest BLOCKED_MISSING_REFERENCE because docs/evidence/FOUNDATION_LAB_PASS and CAPABILITY_DESIGN_PROFILE do not exist. FOUNDATION-PROMOTION and CAPABILITY-DESIGN-PROFILE are accepted Gauntlet objectives, not those milestone evidence dirs. The current resolver treats Gauntlet audit PASS as prereq PASS, which would invent FOUNDATION_LAB_PASS if those dirs were created without executable eval.json. New horizon first binds the resolver to executable milestone verdicts, then persists honest evaluateFoundationLab / evaluateCapabilityDesign evidence, then re-runs 1v1 and SMALL_SIDED."
-current_index: 5
+reason: "Horizon entry-prereq-executable-evidence exhausted (5/5). PLAYABLE_1V1 live profile-runner PASS. SMALL_SIDED_SHAPE remains NOT_EVALUATED because TEAM_DECISION_PROFILE has no executable eval.json (CPU-TEAM-DECISION-PROFILE is a different identity), MUTANT_TEAM_PASS and TEAM_SHAPE_SUITE_PASS lack eval.json, and eight situations are unevaluated. New horizon binds honest TEAM_DECISION_PROFILE / mutant-team / team-shape evidence then re-runs SMALL_SIDED."
+current_index: 0
 objectives:
-  - id: ENTRY-PREREQ-RESOLVER-EVAL-JSON
-    status: accepted
-    reason: "resolveEntryPrereqOutcomes must consume eval.json milestone/overall verdict. Missing eval.json stays BLOCKED_MISSING_REFERENCE. Gauntlet audit PASS must not become FOUNDATION_LAB_PASS."
+  - id: TEAM-DECISION-PROFILE-EVIDENCE
+    status: pending
+    reason: "Persist honest TEAM_DECISION_PROFILE eval.json. Do not treat CPU-TEAM-DECISION-PROFILE Gauntlet evidence as TEAM_DECISION_PROFILE. Do not invent PASS."
     builder: builder-structured
     prerequisite: null
-  - id: FOUNDATION-LAB-PASS-EVIDENCE
-    status: accepted
-    reason: "Execute evaluateFoundationLab with durable BROWSER-CORE-EVIDENCE. Persist honest eval.json under docs/evidence/FOUNDATION_LAB_PASS. Do not invent PASS."
+  - id: MUTANT-TEAM-PASS-EVIDENCE
+    status: pending
+    reason: "Execute evaluateMutantTeam. Persist honest eval.json under docs/evidence/MUTANT_TEAM_PASS. Do not invent PASS."
     builder: builder-structured
-    prerequisite: ENTRY-PREREQ-RESOLVER-EVAL-JSON
-  - id: CAPABILITY-DESIGN-PROFILE-EVIDENCE
-    status: accepted
-    reason: "Execute evaluateCapabilityDesign. Persist honest eval.json under docs/evidence/CAPABILITY_DESIGN_PROFILE. Do not invent PASS."
+    prerequisite: TEAM-DECISION-PROFILE-EVIDENCE
+  - id: TEAM-SHAPE-SUITE-PASS-EVIDENCE
+    status: pending
+    reason: "Execute team-shape-evaluator. Persist honest eval.json under docs/evidence/TEAM_SHAPE_SUITE_PASS. Do not invent PASS."
     builder: builder-structured
-    prerequisite: FOUNDATION-LAB-PASS-EVIDENCE
-  - id: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
-    status: accepted
-    reason: "Re-run PLAYABLE_1V1 after executable prereq evidence. Expect remaining honest FAIL/NPR/NOT_EVALUATED/BLOCKED_MISSING_REFERENCE unless both prereqs actually PASS."
+    prerequisite: MUTANT-TEAM-PASS-EVIDENCE
+  - id: SMALL-SIDED-AFTER-TEAM-PREREQS
+    status: pending
+    reason: "Re-attempt SMALL_SIDED_SHAPE after executable team prereqs. Remains NOT_EVALUATED unless required situations and prereqs actually PASS."
     builder: builder-structured
-    prerequisite: CAPABILITY-DESIGN-PROFILE-EVIDENCE
-  - id: SMALL-SIDED-AFTER-PREREQ-EVIDENCE
-    status: accepted
-    reason: "Re-attempt SMALL_SIDED_SHAPE. Remains NOT_EVALUATED unless PLAYABLE_1V1_PASS is actually achieved."
-    builder: builder-structured
-    prerequisite: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
-observable_progress_target: "PLAYABLE_1V1 entry prereqs reflect executable FOUNDATION_LAB / capability-design verdicts instead of missing dirs or Gauntlet audit PASS."
-infrastructure_only_justification: "Resolver + evidence binding must precede the 1v1 rerun so audit PASS cannot be mistaken for FOUNDATION_LAB_PASS; the horizon still ends in playable-milestone re-evaluation."
+    prerequisite: TEAM-SHAPE-SUITE-PASS-EVIDENCE
+observable_progress_target: "SMALL_SIDED_SHAPE can leave TEAM_DECISION_PROFILE / mutant-team / team-shape as missing-dir NOT_EVALUATED and report honest executable verdicts instead."
+infrastructure_only_justification: "Executable team-prereq evidence must precede another SMALL_SIDED rerun so CPU-TEAM-DECISION-PROFILE audit PASS cannot be mistaken for TEAM_DECISION_PROFILE; the horizon still ends in a playable-milestone re-evaluation."
 last_invalidation_reason: null
 replan_if:
   - objective_blocked

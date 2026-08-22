@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: TEAM-DECISION-PROFILE-EVIDENCE
 
 best_known:
   commit: 01e7d1c4bfb2b2fcec3ebb60e9299bdcf70d6f4e
-  note: "SMALL-SIDED-AFTER-PREREQ-EVIDENCE accepted as NOT_EVALUATED. Horizon v13 exhausted."
+  note: "SMALL-SIDED-AFTER-PREREQ-EVIDENCE accepted as NOT_EVALUATED. Horizon v14 starts at TEAM-DECISION-PROFILE-EVIDENCE."
 
 active_candidate: null
 builder_in_use: null
@@ -121,7 +121,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v13 5/5 EXHAUSTED. PLAYABLE_1V1 live runner PASS; SMALL_SIDED_SHAPE remains NOT_EVALUATED (TEAM_DECISION_PROFILE and situations unmet). No PES claim."
+selection_note: "Horizon v14 0/4 ACTIVE. Bind honest TEAM_DECISION_PROFILE eval.json (not CPU-TEAM-DECISION-PROFILE). SMALL_SIDED_SHAPE remains NOT_EVALUATED. No PES claim."
 ```
 ## Last accepted objective
 
