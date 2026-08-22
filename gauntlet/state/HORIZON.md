@@ -7,10 +7,10 @@ horizon_id: "playable-1v1-deterministic-two-run"
 created_from_commit: d52990c29b34f68c14f0e6b01d43608326a13aeb
 created_at: 2026-08-22
 reason: "Horizon arch-diff-frame-binding-and-1v1-rerun exhausted (3/3). PLAYABLE_1V1 is honest NOT_EVALUATED: CORE/CONTROL/ARCH-DIFF/archetype PASS, but COMMON-DETERMINISTIC stays NOT_EVALUATED on the single-run path. A two-run compare path already exists in foundation promotion. SMALL_SIDED_SHAPE remains NOT_EVALUATED. New horizon binds that two-run check into PLAYABLE_1V1 without inventing envelopes, re-runs the profile, and re-attempts SMALL_SIDED_SHAPE only if 1v1 actually passes."
-current_index: 0
+current_index: 1
 objectives:
   - id: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
-    status: pending
+    status: accepted
     reason: "Wire existing two-run COMMON-DETERMINISTIC comparison into PLAYABLE_1V1 evaluation. Honest PASS/FAIL/BLOCKED_MISSING_REFERENCE. Do not invent envelopes."
     builder: builder-structured
     prerequisite: null

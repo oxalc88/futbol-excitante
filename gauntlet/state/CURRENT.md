@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
+next_objective_id: PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN
 
 best_known:
-  commit: bde71a9c564c90005cf006e64563d6ab67385fc3
-  note: "SMALL-SIDED-AFTER-ARCH-DIFF accepted as NOT_EVALUATED. Horizon v11 next: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN."
+  commit: ab5f690bf9883621d27da041b09f489793d1322f
+  note: "PLAYABLE-1V1-DETERMINISTIC-TWO-RUN accepted (COMMON-DETERMINISTIC PASS). Next: PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN."
 
 active_candidate: null
 builder_in_use: null
@@ -107,17 +107,18 @@ accepted:
   - ARCH-DIFF-001-FRAME-BINDING
   - PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING
   - SMALL-SIDED-AFTER-ARCH-DIFF
+  - PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
 
 blocked: []
 
-selection_note: "Horizon v11 0/3. Next: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN (COMMON-DETERMINISTIC still single-run NOT_EVALUATED)."
+selection_note: "Horizon v11 1/3. COMMON-DETERMINISTIC two-run PASS. Next: PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-AFTER-ARCH-DIFF — Honest NOT_EVALUATED after PLAYABLE_1V1 NOT_EVALUATED. Eight situations unevaluated. No milestone PASS.
+PLAYABLE-1V1-DETERMINISTIC-TWO-RUN — COMMON-DETERMINISTIC two-run PASS. PLAYABLE_1V1 still NOT_EVALUATED (entry prereqs unverified). No PLAYABLE_1V1_PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T13:02:44Z)
-- Candidate: bde71a9
+- Evidence: durable acceptance manifest + record (2026-08-22T13:58:08Z)
+- Candidate: ab5f690

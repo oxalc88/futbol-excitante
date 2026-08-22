@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-22T13:02:44Z
+measured_at: 2026-08-22T13:58:08Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-AFTER-ARCH-DIFF
-usage_aggregates_through: SMALL-SIDED-AFTER-ARCH-DIFF
-clock_aggregates_through: SMALL-SIDED-AFTER-ARCH-DIFF
-model_evaluation_through: SMALL-SIDED-AFTER-ARCH-DIFF
+last_tracked_objective: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
+usage_aggregates_through: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
+clock_aggregates_through: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
+model_evaluation_through: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,13 +42,13 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 43h 03m |
+| Calendar span (first work → measurement) | 43h 58m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | 37h 42m |
-| Sum of per-step agent time | 30h 01m |
+| Active work (anything running) | 38h 37m |
+| Sum of per-step agent time | 30h 56m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T13:02:44Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T13:58:08Z`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -168,6 +168,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | ARCH-DIFF-001-FRAME-BINDING | accepted | 46m | 26m | 6m | 8m | 1m | n/a | n/a |
 | PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING | accepted | 13m | 2.5m | 1.5m | 6m | 0.5m | n/a | n/a |
 | SMALL-SIDED-AFTER-ARCH-DIFF | accepted | 10m | 2m | 2m | 2m | 0.5m | n/a | n/a |
+| PLAYABLE-1V1-DETERMINISTIC-TWO-RUN | accepted | 55m | 39m | 6m | 7m | 1m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -411,6 +412,7 @@ on an H task is the interesting result.
 | ARCH-DIFF-001-FRAME-BINDING | qwen3.6 | M | Medium — wire ARCH-DIFF rubric to recapture frames | 0 | A | hash-diff PASS; no hardcoded NPR |
 | PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING | qwen3.6 | M | Medium — profile re-run after ARCH-DIFF binding | 0 | A | honest NOT_EVALUATED |
 | SMALL-SIDED-AFTER-ARCH-DIFF | qwen3.6 | M | Medium — milestone playtest after ARCH-DIFF 1v1 | 0 | A | NOT_EVALUATED; PLAYABLE_1V1 not PASS |
+| PLAYABLE-1V1-DETERMINISTIC-TWO-RUN | qwen3.6 | M | Medium — two-run COMMON-DETERMINISTIC wiring | 0 | A | two-run hashes match |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -545,6 +547,8 @@ on an H task is the interesting result.
 | PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 | SMALL-SIDED-AFTER-ARCH-DIFF | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | honest NOT_EVALUATED |
 | SMALL-SIDED-AFTER-ARCH-DIFF | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
+| PLAYABLE-1V1-DETERMINISTIC-TWO-RUN | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | two-run hashes match |
+| PLAYABLE-1V1-DETERMINISTIC-TWO-RUN | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 
 ### Builder scoreboard
 
@@ -552,7 +556,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 50 | 32 | 10 | 3 | 3 | 2 | 64% | ~0.66 | ~34m |
+| qwen3.6 | 51 | 33 | 10 | 3 | 3 | 2 | 65% | ~0.65 | ~35m |
 | mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
