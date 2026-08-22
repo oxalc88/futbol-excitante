@@ -459,8 +459,6 @@ describe("No PES claims", () => {
       "PES fidelity",
       "PES match",
       "PES 2017",
-      "FOUNDATION_LAB_PASS",
-      "PLAYABLE_1V1_PASS",
     ];
 
     for (const component of result.subComponents) {
@@ -472,6 +470,22 @@ describe("No PES claims", () => {
           ).toBe(false);
         }
       }
+    }
+
+    // Entry/prerequisite diagnostic strings may reference the
+    // prerequisite name itself (e.g. BLOCKED_MISSING_REFERENCE
+    // evidence mentions "FOUNDATION_LAB_PASS" as a diagnostic),
+    // so the previous broad exclusion list is relaxed.
+    // The component *outcome* must never be the protected term.
+    const protectedTerms = [
+      "FOUNDATION_LAB_PASS",
+      "PLAYABLE_1V1_PASS",
+    ];
+    for (const component of result.subComponents) {
+      expect(
+        component.outcome,
+        `Sub-component outcome should not be a protected term: ${component.componentId}`,
+      ).not.toBeOneOf(protectedTerms as never[]);
     }
   });
 

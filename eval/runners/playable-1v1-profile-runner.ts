@@ -10,7 +10,7 @@
  * Node I/O is allowed in the eval layer.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { evaluatePlayable1v1, type Playable1v1Result } from "./playable-evaluator.js";
@@ -77,12 +77,85 @@ export interface Playable1v1ProfileResult {
 // ---------------------------------------------------------------------------
 
 /**
+ * Scan docs/evidence for accepted evidence directories for the given
+ * prerequisite names.  An accepted prerequisite has both manifest.json
+ * and an audit.json whose final verdict is "PASS".
+ *
+ * Returns a map from prerequisite name → outcome.  When no accepted
+ * evidence exists for a prerequisite, the map omits the key so the
+ * caller-side defaults to BLOCKED_MISSING_REFERENCE.
+ */
+function resolveEntryPrereqOutcomes(
+  prereqNames: string[],
+): Record<
+  string,
+  "PASS" | "FAIL" | "NEEDS_PERCEPTUAL_REVIEW" | "NOT_EVALUATED" | "INVALID_RUN" | "BLOCKED_MISSING_REFERENCE"
+> {
+  const evidenceBase = join(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../docs/evidence",
+  );
+  const outcomes: Record<
+    string,
+    "PASS" | "FAIL" | "NEEDS_PERCEPTUAL_REVIEW" | "NOT_EVALUATED" | "INVALID_RUN" | "BLOCKED_MISSING_REFERENCE"
+  > = {};
+
+  for (const prereq of prereqNames) {
+    const dir = join(evidenceBase, prereq);
+    if (!existsSync(dir)) {
+      console.error(
+        `[profile-runner] Evidence dir not found: ${dir}`,
+      );
+      continue;
+    }
+
+    const manifestPath = join(dir, "manifest.json");
+    const auditPath = join(dir, "audit.json");
+
+    if (!existsSync(manifestPath) || !existsSync(auditPath)) {
+      console.error(
+        `[profile-runner] Missing manifest or audit in ${dir}`,
+      );
+      continue;
+    }
+
+    try {
+      const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+      const audit = JSON.parse(readFileSync(auditPath, "utf-8"));
+
+      // We accept the prerequisite when an accepted manifest exists
+      // and the audit verdict is PASS.
+      if (manifest?.accepted === true && audit?.verdict === "PASS") {
+        outcomes[prereq] = "PASS";
+        console.error(
+          `[profile-runner] Accepted evidence for "${prereq}"`,
+        );
+      } else {
+        console.error(
+          `[profile-runner] Evidence for "${prereq}" not accepted (manifest.accepted=${manifest?.accepted}, audit.verdict=${audit?.verdict})`,
+        );
+      }
+    } catch (err) {
+      console.error(
+        `[profile-runner] Error reading evidence for "${prereq}": ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  return outcomes;
+}
+
+/**
  * Run the full PLAYABLE_1V1 profile evaluation and return structured result.
  */
 function runProfileEvaluation(
   scenario: ScenarioDefinition,
   scenarioFile: string,
   twoPlayerScenario?: ScenarioDefinition,
+  entryPrereqOutcomes?: Record<
+    string,
+    "PASS" | "FAIL" | "NEEDS_PERCEPTUAL_REVIEW" | "NOT_EVALUATED" | "INVALID_RUN" | "BLOCKED_MISSING_REFERENCE"
+  >,
 ): Playable1v1ProfileResult {
   const registry = loadRegistrySet();
 
@@ -124,6 +197,9 @@ function runProfileEvaluation(
   const result = evaluatePlayable1v1(scenario, {
     browserCases: browserCases.length > 0 ? browserCases : undefined,
     twoPlayerScenario,
+    entryPrereqOutcomes: entryPrereqOutcomes && Object.keys(entryPrereqOutcomes).length > 0
+      ? entryPrereqOutcomes
+      : undefined,
   });
 
   // Extract exit prerequisites with details.
@@ -243,8 +319,19 @@ export function main(scenarioPath?: string): Playable1v1ProfileResult {
     );
   }
 
+  // Resolve entry-prerequisite outcomes from accepted evidence.
+  const entryPrereqNames = PLAYABLE_1V1_PROFILE.entry_prerequisites;
+  const entryPrereqOutcomes = resolveEntryPrereqOutcomes(
+    entryPrereqNames,
+  );
+
   // Run the evaluation.
-  const result = runProfileEvaluation(scenario, resolvedPath, twoPlayerScenario);
+  const result = runProfileEvaluation(
+    scenario,
+    resolvedPath,
+    twoPlayerScenario,
+    entryPrereqOutcomes,
+  );
 
   // Also run exit prerequisites independently for cross-checking.
   console.error("[profile-runner] Running MUTANT_1V1 evaluation...");

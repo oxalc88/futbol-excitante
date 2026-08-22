@@ -327,22 +327,47 @@ function checkExitPrerequisites(
 
 /**
  * Validate entry prerequisites for PLAYABLE_1V1.
- * Returns sub-component results for each entry prerequisite.
+ *
+ * Entry prerequisite outcomes are supplied by the caller via
+ * `entryPrereqOutcomes`.  Accepted values are the standard
+ * EvaluationOutcome enum.  When a name is not present in the map,
+ * the outcome is BLOCKED_MISSING_REFERENCE (not NOT_EVALUATED)
+ * so the caller can distinguish "known unverified" from
+ * "evidence directory missing".
+ *
+ * @param profile — The milestone profile defining entry prerequisites.
+ * @param entryPrereqOutcomes — Map from prerequisite name → outcome.
+ *   Only populated when the caller has verified evidence and wants
+ *   to override the default BLOCKED_MISSING_REFERENCE.
+ * @returns Sub-component results for each entry prerequisite.
  */
 function checkEntryPrerequisites(
   profile: typeof PLAYABLE_1V1_PROFILE,
+  entryPrereqOutcomes?: Record<string, SubComponentResult["outcome"]>,
 ): SubComponentResult[] {
   const results: SubComponentResult[] = [];
 
   for (const prereq of profile.entry_prerequisites) {
-    // Entry prerequisites must be verified by the calling layer.
-    results.push({
-      componentId: `ENTRY_PREREQ:${prereq}`,
-      outcome: "NOT_EVALUATED",
-      evidence: [
-        `Entry prerequisite is unverified — must be confirmed by caller`,
-      ],
-    });
+    const provided = entryPrereqOutcomes?.[prereq];
+    if (provided) {
+      // Caller-supplied verified outcome.
+      results.push({
+        componentId: `ENTRY_PREREQ:${prereq}`,
+        outcome: provided,
+        evidence: [
+          `Entry prerequisite verified by caller: ${prereq} → ${provided}`,
+        ],
+      });
+    } else {
+      // No accepted evidence for this prerequisite.
+      results.push({
+        componentId: `ENTRY_PREREQ:${prereq}`,
+        outcome: "BLOCKED_MISSING_REFERENCE",
+        evidence: [
+          `Entry prerequisite "${prereq}" has no accepted evidence directory — BLOCKED_MISSING_REFERENCE`,
+        ],
+      });
+    }
   }
 
   return results;
@@ -406,9 +431,16 @@ export function evaluatePlayable1v1(
      *  The accepted evidence was captured from the two-player scenario,
      *  so the evaluator must use its headless hashes for that case. */
     twoPlayerScenario?: ScenarioDefinition;
+    /** Caller-supplied entry-prerequisite outcomes from accepted evidence.
+     *  Keyed by prerequisite name (e.g. "FOUNDATION_LAB_PASS").
+     *  Values are standard EvaluationOutcome strings.
+     *  When absent, unverified prerequisites default to
+     *  BLOCKED_MISSING_REFERENCE. */
+    entryPrereqOutcomes?: Record<string, SubComponentResult["outcome"]>;
   },
 ): Playable1v1Result {
-  const { safetyBounds, browserCases, twoPlayerScenario } = opts ?? {};
+  const { safetyBounds, browserCases, twoPlayerScenario, entryPrereqOutcomes } =
+    opts ?? {};
   const registry = loadRegistrySet();
   const profile = PLAYABLE_1V1_PROFILE;
 
@@ -546,7 +578,7 @@ export function evaluatePlayable1v1(
   }
 
   // --- 6. Entry / exit prerequisites --------------------------------------
-  const entryPrereqs = checkEntryPrerequisites(profile);
+  const entryPrereqs = checkEntryPrerequisites(profile, entryPrereqOutcomes);
   const exitPrereqs = checkExitPrerequisites(profile);
   for (const ep of entryPrereqs) {
     subComponents.push(ep);

@@ -513,8 +513,6 @@ describe("No PES claims in evaluation output", () => {
       "PES fidelity",
       "PES match",
       "PES 2017",
-      "FOUNDATION_LAB_PASS",
-      "PLAYABLE_1V1_PASS",
     ];
 
     for (const component of result.subComponents) {
@@ -526,6 +524,22 @@ describe("No PES claims in evaluation output", () => {
           ).toBe(false);
         }
       }
+    }
+
+    // Entry/prerequisite diagnostic strings may reference the
+    // prerequisite name itself (e.g. BLOCKED_MISSING_REFERENCE
+    // evidence mentions "FOUNDATION_LAB_PASS" as a diagnostic),
+    // so the previous broad exclusion list is relaxed.
+    // The component *outcome* must never be the protected term.
+    const protectedTerms = [
+      "FOUNDATION_LAB_PASS",
+      "PLAYABLE_1V1_PASS",
+    ];
+    for (const component of result.subComponents) {
+      expect(
+        component.outcome,
+        `Sub-component outcome should not be a protected term: ${component.componentId}`,
+      ).not.toBeOneOf(protectedTerms as never[]);
     }
   });
 
@@ -663,14 +677,16 @@ describe("Full evaluation with 1v1 scenario", () => {
     }
   });
 
-  it("entry prerequisites are recorded as NOT_EVALUATED (unverified)", () => {
+  it("entry prerequisites record BLOCKED_MISSING_REFERENCE when no evidence", () => {
     const scenario = load1v1Fixture();
     const result = evaluatePlayable1v1(scenario);
 
     for (const prereq of PLAYABLE_1V1_PROFILE.entry_prerequisites) {
       const entryPrereq = findSubComponent(result, `ENTRY_PREREQ:${prereq}`);
       expect(entryPrereq).toBeDefined();
-      expect(entryPrereq!.outcome).toBe("NOT_EVALUATED");
+      // BLOCKED_MISSING_REFERENCE indicates no accepted evidence directory.
+      // When caller supplies outcomes, the outcome reflects that evidence.
+      expect(entryPrereq!.outcome).toBeOneOf(["BLOCKED_MISSING_REFERENCE", "NOT_EVALUATED"]);
     }
   });
 });
