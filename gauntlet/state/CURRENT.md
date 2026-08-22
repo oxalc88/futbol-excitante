@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
+next_objective_id: SMALL-SIDED-AFTER-PREREQ-EVIDENCE
 
 best_known:
-  commit: d4326ca0d478640fcdb4c6761b52f03618055422
-  note: "CAPABILITY-DESIGN-PROFILE-EVIDENCE accepted; evaluateCapabilityDesign PASS. Next: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE."
+  commit: ae17857bf7f45bd8b8f1bdbd6aadcd4b0c173e02
+  note: "PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE accepted; live profile runner milestoneVerdict PASS. Next: SMALL-SIDED-AFTER-PREREQ-EVIDENCE."
 
 active_candidate: null
 builder_in_use: null
@@ -116,17 +116,18 @@ accepted:
   - ENTRY-PREREQ-RESOLVER-EVAL-JSON
   - FOUNDATION-LAB-PASS-EVIDENCE
   - CAPABILITY-DESIGN-PROFILE-EVIDENCE
+  - PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v13 3/5. Both entry-prereq eval.json files are PASS. Next: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE. Do not claim PLAYABLE_1V1_PASS until the rerun."
+selection_note: "Horizon v13 4/5. Live PLAYABLE_1V1 profile runner milestoneVerdict PASS. Next: SMALL-SIDED-AFTER-PREREQ-EVIDENCE. No PES claim."
 ```
 ## Last accepted objective
 
-CAPABILITY-DESIGN-PROFILE-EVIDENCE — Honest evaluateCapabilityDesign PASS (five implemented axes). Not a PLAYABLE_1V1_PASS claim.
+PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE — Live profile-runner milestoneVerdict PASS after executable entry-prereq eval.json. Not a PES fidelity claim.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T16:59:51Z)
-- Candidate: d4326ca
+- Evidence: durable acceptance manifest + record (2026-08-22T17:12:10Z)
+- Candidate: ae17857
