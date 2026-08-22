@@ -8,14 +8,14 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: BROWSER-CORE-EVIDENCE
 
 best_known:
-  commit: d6044c8
-  note: "PLAYABLE-1V1-PROFILE-EVALUATION accepted. Candidate d6044c8; acceptance bookkeeping in progress."
+  commit: e997a538f375f3259297e93606d801bc3c679bc6
+  note: "PLAYABLE-1V1-PROFILE-EVALUATION accepted, horizon v6 exhausted. New horizon v7 'playable-1v1-browser-evidence' created."
 
 active_candidate: null
-builder_in_use: null
+builder_in_use: builder-gameplay
 critic_in_use: null
 retry_count: 0
 max_retries_per_objective: 3
@@ -93,7 +93,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon playable-1v1-enabler 4/4: PLAYABLE-1V1-PROFILE-EVALUATION accepted 2026-08-20. Result: INVALID_RUN (browser evidence absent, archetype NOT_EVALUATED). Horizon EXHAUSTED."
+selection_note: "Horizon v6 'playable-1v1-enabler' exhausted (6/6 including sentinel). New horizon v7 'playable-1v1-browser-evidence' created. Next: BROWSER-CORE-EVIDENCE."
 ```
 ## Last accepted objective
 
@@ -104,9 +104,3 @@ PLAYABLE-1V1-PROFILE-EVALUATION — PLAYABLE_1V1 profile evaluation: runs playab
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (dependency PASS, evaluator integrity PASS, 0 regressions)
 - Evidence: durable acceptance manifest + record (2026-08-20T09:24:09Z)
 - Candidate: d6044c8
-
-- builder: builder-gameplay / mimo-v2.5
-- critic: critic-qwen / qwen3.6 — ACCEPT (retry, 0 required fixes, 28s, independence OK)
-- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (159 loop/input tests, 0 regressions)
-- Evidence: durable acceptance manifest + record (2026-08-20T08:39:45Z)
-- Candidate: 505e056

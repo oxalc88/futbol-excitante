@@ -1,42 +1,47 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 6
+horizon_version: 7
 status: ACTIVE
-horizon_id: "playable-1v1-enabler"
-created_from_commit: b155671
+horizon_id: "playable-1v1-browser-evidence"
+created_from_commit: e997a538f375f3259297e93606d801bc3c679bc6
 created_at: 2026-08-20
-reason: "Horizon transition-completion exhausted (5/5 accepted). TEAM-EVALUATOR-SUITE materialized MUTANT_TEAM_PASS and TEAM_SHAPE_SUITE_PASS, satisfying SMALL_SIDED_SHAPE exit prerequisites. New horizon builds the perceptual archetype comparison framework (rubric + browser artifacts) and fills remaining capability gaps toward PLAYABLE_1V1_PASS."
-current_index: 6
+reason: "Horizon playable-1v1-enabler exhausted (6/6 accepted including sentinel). PLAYABLE_1V1 profile evaluation returned INVALID_RUN due to missing browser evidence and ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED (no disk artifacts). New horizon focuses on browser evidence capture and perceptual rubric implementation to enable PLAYABLE_1V1_PASS evaluation."
+current_index: 0
 objectives:
-  - id: ARCHETYPE-BLINDED-COMPARISON
-    status: accepted
-    reason: "Implement the perceptual archetype comparison framework: versioned rubric, deterministic browser artifacts (rendered frames, perceptual hash comparison), and comparison logic. Required exit prerequisite for PLAYABLE_1V1 profile."
+  - id: BROWSER-CORE-EVIDENCE
+    status: pending
+    reason: "Capture required browser evidence (BROWSER-CORE-RESET-001, BROWSER-CORE-STEP-001) for the PLAYABLE_1V1 profile evaluation. Enables PLAYABLE_1V1 profile to move from INVALID_RUN toward evaluation."
+    builder: builder-gameplay
+    prerequisite: null
+  - id: ARCH-DIFF-001-RUBRIC
+    status: pending
+    reason: "Implement versioned perceptual rubric for ARCH-DIFF-001 (archetype visual difference detection). Required for ARCHETYPE_BLINDED_COMPARISON_PASS from NOT_EVALUATED to PASS or FAIL."
     builder: builder-structured
     prerequisite: null
-  - id: PLAYABLE-SECOND-TOUCH
-    status: accepted
-    reason: "Extend first-touch capability with second-touch/turn mechanics for realistic ball control under pressure. Gameplay-coupled physics behavior."
+  - id: ARCHETYPE-BROWSER-CAPTURE
+    status: pending
+    reason: "Capture archetype comparison browser artifacts (PNG frames via Playwright/2D canvas) for PLAYABLE_1V1 profile evaluation. Enables ARCHETYPE_BLINDED_COMPARISON_PASS from NOT_EVALUATED to PASS/FAIL."
     builder: builder-gameplay
-    prerequisite: PLAYABLE-FIRST-TOUCH
-  - id: PLAYABLE-CONTROL-SLOT-ROUTING
-    status: accepted
-    reason: "Improve local control slot routing for multi-player 1v1 scenarios: stable player switching, controlled player selection, and slot ownership."
-    builder: builder-gameplay
-    prerequisite: PLAYABLE-BROWSER-1V1
-  - id: PLAYABLE-1V1-PROFILE-EVALUATION
-    status: accepted
-    reason: "Run the PLAYABLE_1V1 profile evaluation against current codebase. Result: INVALID_RUN (browser evidence absent, ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED due to no disk artifacts). Evaluation infrastructure verified correct."
+    prerequisite: BROWSER-CORE-EVIDENCE
+  - id: PLAYABLE-1V1-RE-EVALUATION
+    status: pending
+    reason: "Re-run PLAYABLE_1V1 profile evaluation after browser evidence and archetype artifacts are captured. Expected: INVALID_RUN → FAIL or NEEDS_PERCEPTUAL_REVIEW → PASS."
     builder: builder-structured
-    prerequisite: ARCHETYPE-BLINDED-COMPARISON
-  - id: __HORIZON_END_SENTINEL
-    status: accepted
-    reason: "Internal sentinel marking horizon exhaustion. current_index=6 means past all 6 entries (all accepted)."
-    builder: orchestrator
-    prerequisite: null
-  - id: PLAYABLE-1V1-PROFILE-EVALUATION
-    status: accepted
-observable_progress_target: "PLAYABLE_1V1 profile evaluation passes with ARCHETYPE_BLINDED_COMPARISON_PASS, enabling SMALL_SIDED_SHAPE milestone evaluation."
-infrastructure_only_justification: null
+    prerequisite: ARCHETYPE-BROWSER-CAPTURE
+  - id: SMALL-SIDED-MILESTONE-EVALUATION
+    status: pending
+    reason: "Attempt SMALL_SIDED_SHAPE milestone evaluation if PLAYABLE_1V1_PASS is achieved. Otherwise reports NOT_EVALUATED with clear blockers documented."
+    builder: builder-structured
+    prerequisite: PLAYABLE-1V1-RE-EVALUATION
+observable_progress_target: "PLAYABLE_1V1 profile evaluation returns FAIL/NEEDS_PERCEPTUAL_REVIEW (no longer INVALID_RUN), enabling downstream SMALL_SIDED_SHAPE evaluation."
+infrastructure_only_justification: "All objectives contribute to observable browser evidence and evaluation results."
 last_invalidation_reason: null
-```
+replan_if:
+  - objective_blocked
+  - architectural_invalidation
+  - dependency_changed
+  - planned_objective_no_longer_applicable
+  - unsafe_due_to_new_defect
+  - materially_higher_value_evidence
+  - human_needed_spec_or_legal_blocker
