@@ -2868,3 +2868,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 306631e candidate(PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING)
 - notes: Overall NOT_EVALUATED; ARCH-DIFF PASS. No PLAYABLE_1V1_PASS. Horizon v10 2/3.
+
+## Iteration 98 — 2026-08-22
+
+- objective_id: SMALL-SIDED-AFTER-ARCH-DIFF
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: bde71a9 candidate(SMALL-SIDED-AFTER-ARCH-DIFF)
+- notes: SMALL_SIDED_SHAPE remains NOT_EVALUATED. Horizon v10 3/3 EXHAUSTED.
