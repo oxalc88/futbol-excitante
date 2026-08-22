@@ -1,31 +1,41 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 12
-status: EXHAUSTED
-horizon_id: "playable-1v1-entry-prereq-caller"
-created_from_commit: 340329da8bd1e66f77a0b4a540f2bda0a4e728e6
+horizon_version: 13
+status: ACTIVE
+horizon_id: "entry-prereq-executable-evidence"
+created_from_commit: 2d466a167e57511381928357f33b1f1337c7ad07
 created_at: 2026-08-22
-reason: "Horizon playable-1v1-deterministic-two-run exhausted (3/3). PLAYABLE_1V1 is honest NOT_EVALUATED solely because entry prereqs FOUNDATION_LAB_PASS and CAPABILITY_DESIGN_PROFILE are unverified by the caller even though CORE/CONTROL/ARCH-DIFF/archetype/COMMON-DETERMINISTIC/MUTANT_1V1 pass. SMALL_SIDED_SHAPE remains NOT_EVALUATED. New horizon lets the caller pass only executable, already-accepted prerequisite evidence into evaluatePlayable1v1 — no fake FOUNDATION_LAB_PASS — then re-runs 1v1 and SMALL_SIDED honestly."
-current_index: 3
+reason: "Horizon playable-1v1-entry-prereq-caller exhausted (3/3). PLAYABLE_1V1 is honest BLOCKED_MISSING_REFERENCE because docs/evidence/FOUNDATION_LAB_PASS and CAPABILITY_DESIGN_PROFILE do not exist. FOUNDATION-PROMOTION and CAPABILITY-DESIGN-PROFILE are accepted Gauntlet objectives, not those milestone evidence dirs. The current resolver treats Gauntlet audit PASS as prereq PASS, which would invent FOUNDATION_LAB_PASS if those dirs were created without executable eval.json. New horizon first binds the resolver to executable milestone verdicts, then persists honest evaluateFoundationLab / evaluateCapabilityDesign evidence, then re-runs 1v1 and SMALL_SIDED."
+current_index: 0
 objectives:
-  - id: PLAYABLE-1V1-ENTRY-PREREQ-CALLER
-    status: accepted
-    reason: "Let the PLAYABLE_1V1 runner pass caller-verified entry prereqs from accepted executable evidence. Do not invent FOUNDATION_LAB_PASS. Honest PASS/FAIL/NOT_EVALUATED/BLOCKED_MISSING_REFERENCE."
+  - id: ENTRY-PREREQ-RESOLVER-EVAL-JSON
+    status: pending
+    reason: "resolveEntryPrereqOutcomes must consume eval.json milestone/overall verdict. Missing eval.json stays BLOCKED_MISSING_REFERENCE. Gauntlet audit PASS must not become FOUNDATION_LAB_PASS."
     builder: builder-structured
     prerequisite: null
-  - id: PLAYABLE-1V1-AFTER-ENTRY-PREREQS
-    status: accepted
-    reason: "Re-run PLAYABLE_1V1 after caller wiring. Expect remaining honest NOT_EVALUATED/FAIL, not a forced PASS."
+  - id: FOUNDATION-LAB-PASS-EVIDENCE
+    status: pending
+    reason: "Execute evaluateFoundationLab with durable BROWSER-CORE-EVIDENCE. Persist honest eval.json under docs/evidence/FOUNDATION_LAB_PASS. Do not invent PASS."
     builder: builder-structured
-    prerequisite: PLAYABLE-1V1-ENTRY-PREREQ-CALLER
-  - id: SMALL-SIDED-AFTER-ENTRY-PREREQS
-    status: accepted
+    prerequisite: ENTRY-PREREQ-RESOLVER-EVAL-JSON
+  - id: CAPABILITY-DESIGN-PROFILE-EVIDENCE
+    status: pending
+    reason: "Execute evaluateCapabilityDesign. Persist honest eval.json under docs/evidence/CAPABILITY_DESIGN_PROFILE. Do not invent PASS."
+    builder: builder-structured
+    prerequisite: FOUNDATION-LAB-PASS-EVIDENCE
+  - id: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
+    status: pending
+    reason: "Re-run PLAYABLE_1V1 after executable prereq evidence. Expect remaining honest FAIL/NPR/NOT_EVALUATED/BLOCKED_MISSING_REFERENCE unless both prereqs actually PASS."
+    builder: builder-structured
+    prerequisite: CAPABILITY-DESIGN-PROFILE-EVIDENCE
+  - id: SMALL-SIDED-AFTER-PREREQ-EVIDENCE
+    status: pending
     reason: "Re-attempt SMALL_SIDED_SHAPE. Remains NOT_EVALUATED unless PLAYABLE_1V1_PASS is actually achieved."
     builder: builder-structured
-    prerequisite: PLAYABLE-1V1-AFTER-ENTRY-PREREQS
-observable_progress_target: "PLAYABLE_1V1 entry prereqs stop being blank NOT_EVALUATED when accepted executable evidence already exists."
-infrastructure_only_justification: "Caller wiring is required so PLAYABLE_1V1 can leave unverified-prereq NOT_EVALUATED; the horizon still ends in a playable-milestone re-evaluation."
+    prerequisite: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
+observable_progress_target: "PLAYABLE_1V1 entry prereqs reflect executable FOUNDATION_LAB / capability-design verdicts instead of missing dirs or Gauntlet audit PASS."
+infrastructure_only_justification: "Resolver + evidence binding must precede the 1v1 rerun so audit PASS cannot be mistaken for FOUNDATION_LAB_PASS; the horizon still ends in playable-milestone re-evaluation."
 last_invalidation_reason: null
 replan_if:
   - objective_blocked

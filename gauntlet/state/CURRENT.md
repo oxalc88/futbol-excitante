@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: ENTRY-PREREQ-RESOLVER-EVAL-JSON
 
 best_known:
   commit: d617673c2e6b5e88b7a893a0ccc5e93163e4d1b9
-  note: "SMALL-SIDED-AFTER-ENTRY-PREREQS accepted as NOT_EVALUATED. Horizon v12 exhausted."
+  note: "SMALL-SIDED-AFTER-ENTRY-PREREQS accepted as NOT_EVALUATED. Horizon v13 starts at ENTRY-PREREQ-RESOLVER-EVAL-JSON."
 
 active_candidate: null
 builder_in_use: null
@@ -116,7 +116,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v12 3/3 EXHAUSTED. SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 BLOCKED_MISSING_REFERENCE, not PASS)."
+selection_note: "Horizon v13 0/5 ACTIVE. Bind resolver to executable eval.json, then persist honest FOUNDATION_LAB / capability-design evidence. SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 BLOCKED_MISSING_REFERENCE, not PASS)."
 ```
 ## Last accepted objective
 
