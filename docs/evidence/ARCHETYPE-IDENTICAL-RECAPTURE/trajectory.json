@@ -1,0 +1,194 @@
+{
+  "objective": "ARCHETYPE-IDENTICAL-RECAPTURE",
+  "class": "DYNAMIC_VISUAL",
+  "description": "Recaptured identical-condition archetype frames after ARCHETYPE-RENDER-DIFFERENCE renderer change. Same scenario/camera/tick program; only archetypeId varies.",
+  "identicalConditions": true,
+  "prerequisite": "ARCHETYPE-RENDER-DIFFERENCE",
+  "archetypes": [
+    {
+      "archetypeId": "archetype-burst-v1",
+      "frames": [
+        {
+          "tick": 1,
+          "sha256": "210975cafa32687988d0e4dc78c65e0a63dad34043aa0c5611438eac11d0b23e",
+          "stateHash": "fnv1a64-v1:df769da69185fe01",
+          "bytes": 20086
+        },
+        {
+          "tick": 3,
+          "sha256": "4d48d5dc9aa0eb42a3eb94c13f86858a74bda38e753cf212983bb6ba130ada9a",
+          "stateHash": "fnv1a64-v1:04874f7837cdd2b7",
+          "bytes": 20076
+        },
+        {
+          "tick": 6,
+          "sha256": "498a84ad5bf9e0572570e79528da8c382f00dcf599af3ff3fa072a13e4cf526f",
+          "stateHash": "fnv1a64-v1:bf01058cedaddd9f",
+          "bytes": 20114
+        },
+        {
+          "tick": 9,
+          "sha256": "abc7b5c3f4dfd8c7b1c637f09205b04b7ae93e63e702676d3fb30afbef81fc6a",
+          "stateHash": "fnv1a64-v1:9b5f89ed83f00c8d",
+          "bytes": 20054
+        },
+        {
+          "tick": 12,
+          "sha256": "d84c529c6b43af54c20f7a6d86d3eb12eaed832a75d755cec9b8821e7e93c58b",
+          "stateHash": "fnv1a64-v1:fc95c6d3b9d5ca06",
+          "bytes": 20077
+        }
+      ]
+    },
+    {
+      "archetypeId": "archetype-steady-v1",
+      "frames": [
+        {
+          "tick": 1,
+          "sha256": "5fa13b0a0a608239ad71c70c1fb48be110a179c7132190a2dd8e22936a5a1719",
+          "stateHash": "fnv1a64-v1:ce2274a016386846",
+          "bytes": 20085
+        },
+        {
+          "tick": 3,
+          "sha256": "4ea1ad51d5bc4d17b4ef29c55c8730cac9ef0b0966a8fe8b2c4b41773f377d65",
+          "stateHash": "fnv1a64-v1:891c2dc8483b5caf",
+          "bytes": 20121
+        },
+        {
+          "tick": 6,
+          "sha256": "5a86370b3692565f4363215f059e62809d0f9783c0c3a1beb7f15b3055e90c76",
+          "stateHash": "fnv1a64-v1:672647ecea1b0b40",
+          "bytes": 20104
+        },
+        {
+          "tick": 9,
+          "sha256": "fa6a9c14233366ef5089f540c70a004b9df341201270ee9b7cd7c591de69456d",
+          "stateHash": "fnv1a64-v1:da44792a0a25df58",
+          "bytes": 20080
+        },
+        {
+          "tick": 12,
+          "sha256": "55ad245285f5ca4d9cb866246363b8afd9b19a7667e7e961e74388af79bd88fa",
+          "stateHash": "fnv1a64-v1:790e9bff6b680cec",
+          "bytes": 20124
+        }
+      ]
+    },
+    {
+      "archetypeId": "archetype-technical-v1",
+      "frames": [
+        {
+          "tick": 1,
+          "sha256": "3689fee57359cef65c58259635d01234d8d0b4cdbf40449738add3d6f8f826f9",
+          "stateHash": "fnv1a64-v1:777563f413f76399",
+          "bytes": 20099
+        },
+        {
+          "tick": 3,
+          "sha256": "9328fdc2704925c330e42101cb3ec0cac7c44071bcba1403fc54db490578da44",
+          "stateHash": "fnv1a64-v1:6b0e5dfb2b6ee736",
+          "bytes": 20131
+        },
+        {
+          "tick": 6,
+          "sha256": "2c36987c0eb88ea181d6fa18cf07205ec48dc528bc88b5876fc9cef5e8088a61",
+          "stateHash": "fnv1a64-v1:b435e708824e04ed",
+          "bytes": 20122
+        },
+        {
+          "tick": 9,
+          "sha256": "f4cc278bf846104e1995573ddaae920d244d5ad86d3559c1275563cca8bf492e",
+          "stateHash": "fnv1a64-v1:02fa7df031baa561",
+          "bytes": 20101
+        },
+        {
+          "tick": 12,
+          "sha256": "b471625ab1fd9609ca1376c7430cdf3c0f00506aab174ca722b869e2e3d11213",
+          "stateHash": "fnv1a64-v1:4e20648984d3c0c5",
+          "bytes": 20141
+        }
+      ]
+    },
+    {
+      "archetypeId": "archetype-power-v1",
+      "frames": [
+        {
+          "tick": 1,
+          "sha256": "3689fee57359cef65c58259635d01234d8d0b4cdbf40449738add3d6f8f826f9",
+          "stateHash": "fnv1a64-v1:d0eaa17362c3c963",
+          "bytes": 20099
+        },
+        {
+          "tick": 3,
+          "sha256": "9328fdc2704925c330e42101cb3ec0cac7c44071bcba1403fc54db490578da44",
+          "stateHash": "fnv1a64-v1:3b52ad3eddc8982c",
+          "bytes": 20131
+        },
+        {
+          "tick": 6,
+          "sha256": "2c36987c0eb88ea181d6fa18cf07205ec48dc528bc88b5876fc9cef5e8088a61",
+          "stateHash": "fnv1a64-v1:03d614c64992d8e3",
+          "bytes": 20122
+        },
+        {
+          "tick": 9,
+          "sha256": "f4cc278bf846104e1995573ddaae920d244d5ad86d3559c1275563cca8bf492e",
+          "stateHash": "fnv1a64-v1:3db7f14aee5ae46f",
+          "bytes": 20101
+        },
+        {
+          "tick": 12,
+          "sha256": "b471625ab1fd9609ca1376c7430cdf3c0f00506aab174ca722b869e2e3d11213",
+          "stateHash": "fnv1a64-v1:7ca057a6b35ef6f3",
+          "bytes": 20141
+        }
+      ]
+    },
+    {
+      "archetypeId": "archetype-agility-v1",
+      "frames": [
+        {
+          "tick": 1,
+          "sha256": "3689fee57359cef65c58259635d01234d8d0b4cdbf40449738add3d6f8f826f9",
+          "stateHash": "fnv1a64-v1:b726b81848e02af5",
+          "bytes": 20099
+        },
+        {
+          "tick": 3,
+          "sha256": "9328fdc2704925c330e42101cb3ec0cac7c44071bcba1403fc54db490578da44",
+          "stateHash": "fnv1a64-v1:40539bf6c85d2f5e",
+          "bytes": 20131
+        },
+        {
+          "tick": 6,
+          "sha256": "2c36987c0eb88ea181d6fa18cf07205ec48dc528bc88b5876fc9cef5e8088a61",
+          "stateHash": "fnv1a64-v1:999084d1963a04a5",
+          "bytes": 20122
+        },
+        {
+          "tick": 9,
+          "sha256": "f4cc278bf846104e1995573ddaae920d244d5ad86d3559c1275563cca8bf492e",
+          "stateHash": "fnv1a64-v1:b4bd242b6840f591",
+          "bytes": 20101
+        },
+        {
+          "tick": 12,
+          "sha256": "b471625ab1fd9609ca1376c7430cdf3c0f00506aab174ca722b869e2e3d11213",
+          "stateHash": "fnv1a64-v1:90d992dbbbb72121",
+          "bytes": 20141
+        }
+      ]
+    }
+  ],
+  "captureTicks": [
+    1,
+    3,
+    6,
+    9,
+    12
+  ],
+  "fixtureId": "foundation-move-and-roll-v1 (shared scenario, archetypeId only)",
+  "captureVersion": "archetype-identical-recapture-v1",
+  "renderer": "three.js-via-test-bridge"
+}

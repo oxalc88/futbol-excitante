@@ -1,0 +1,13 @@
+{
+  "archetypeId": "archetype-burst-v1",
+  "perceptualHash": "4d48d5dc9aa0eb42a3eb94c13f86858a74bda38e753cf212983bb6ba130ada9a",
+  "stateHash": "fnv1a64-v1:04874f7837cdd2b7",
+  "sha256": "4d48d5dc9aa0eb42a3eb94c13f86858a74bda38e753cf212983bb6ba130ada9a",
+  "tick": 3,
+  "width": 800,
+  "height": 600,
+  "captureVersion": "archetype-identical-recapture-v1",
+  "renderer": "three.js-via-test-bridge",
+  "identicalConditions": true,
+  "prerequisite": "ARCHETYPE-RENDER-DIFFERENCE"
+}

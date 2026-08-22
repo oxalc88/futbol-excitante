@@ -78,6 +78,7 @@ function loadArtifactHashes(
   // Search order: artifacts/ (ephemeral) → docs/evidence/ (committed durable)
   const searchDirs = [
     join(__dirname, "../../artifacts/archetype-capture"),
+    join(__dirname, "../../docs/evidence/ARCHETYPE-IDENTICAL-RECAPTURE"),
     join(__dirname, "../../docs/evidence/ARCHETYPE-BROWSER-CAPTURE"),
   ];
 
@@ -128,6 +129,7 @@ function loadArchetypeHash(
   // Search order: artifacts/ (ephemeral) → docs/evidence/ (committed durable)
   const searchDirs = [
     join(__dirname, "../../artifacts/archetype-capture"),
+    join(__dirname, "../../docs/evidence/ARCHETYPE-IDENTICAL-RECAPTURE"),
     join(__dirname, "../../docs/evidence/ARCHETYPE-BROWSER-CAPTURE"),
   ];
 
