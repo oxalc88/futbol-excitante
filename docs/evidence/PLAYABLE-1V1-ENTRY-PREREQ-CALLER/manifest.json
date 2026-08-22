@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "PLAYABLE-1V1-ENTRY-PREREQ-CALLER",
+  "accepted_at": "2026-08-22T15:09:31.939Z",
+  "candidate_commit": "e896aa7a2351d38d6db081677ad64e74f2d989d8",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/PLAYABLE-1V1-ENTRY-PREREQ-CALLER/audit.json",
+      "sha256": "1242e79b39f1254d48dab06e4ebc268d188afdca5d2b947c2deb9d8e675432e3",
+      "git_blob": "0425782923c6bdf2b5f266054e874f48ee913687",
+      "candidate_commit": "e896aa7a2351d38d6db081677ad64e74f2d989d8",
+      "bytes": 2690,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-22/2026-08-22T15-09-31-939Z-PLAYABLE-1V1-ENTRY-PREREQ-CALLER-acceptance.json"
+}

@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: PLAYABLE-1V1-ENTRY-PREREQ-CALLER
+next_objective_id: PLAYABLE-1V1-AFTER-ENTRY-PREREQS
 
 best_known:
-  commit: 2485e2c4f1e8c16f2719219507521e1f0fe523bc
-  note: "SMALL-SIDED-AFTER-DETERMINISTIC accepted as NOT_EVALUATED. Horizon v12 next: PLAYABLE-1V1-ENTRY-PREREQ-CALLER."
+  commit: e896aa7a2351d38d6db081677ad64e74f2d989d8
+  note: "PLAYABLE-1V1-ENTRY-PREREQ-CALLER accepted (BLOCKED_MISSING_REFERENCE for unverified prereqs). Next: PLAYABLE-1V1-AFTER-ENTRY-PREREQS."
 
 active_candidate: null
 builder_in_use: null
@@ -110,17 +110,18 @@ accepted:
   - PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
   - PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN
   - SMALL-SIDED-AFTER-DETERMINISTIC
+  - PLAYABLE-1V1-ENTRY-PREREQ-CALLER
 
 blocked: []
 
-selection_note: "Horizon v12 0/3. Next: PLAYABLE-1V1-ENTRY-PREREQ-CALLER (entry prereqs still unverified by caller)."
+selection_note: "Horizon v12 1/3. Entry-prereq caller accepted. Next: PLAYABLE-1V1-AFTER-ENTRY-PREREQS."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-AFTER-DETERMINISTIC — Honest NOT_EVALUATED after PLAYABLE_1V1 NOT_EVALUATED. Eight situations unevaluated. No milestone PASS.
+PLAYABLE-1V1-ENTRY-PREREQ-CALLER — Caller-verified entry prereqs; missing evidence stays BLOCKED_MISSING_REFERENCE. No invented FOUNDATION_LAB_PASS. No PLAYABLE_1V1_PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T14:31:17Z)
-- Candidate: 2485e2c
+- Evidence: durable acceptance manifest + record (2026-08-22T15:09:31Z)
+- Candidate: e896aa7
