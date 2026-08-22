@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "objective_id": "BROWSER-1V1-CONTROL-EVIDENCE",
+  "frames": [
+    {
+      "label": "before",
+      "path": "frame-before.png",
+      "tick": 0
+    },
+    {
+      "label": "slot1-moves",
+      "path": "frame-slot1-moves.png",
+      "tick": 5
+    },
+    {
+      "label": "slot2-moves",
+      "path": "frame-slot2-moves.png",
+      "tick": 10
+    },
+    {
+      "label": "both-move",
+      "path": "frame-both-move.png",
+      "tick": 15
+    },
+    {
+      "label": "result",
+      "path": "frame-result.png",
+      "tick": 25
+    }
+  ]
+}

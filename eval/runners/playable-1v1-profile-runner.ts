@@ -85,31 +85,42 @@ function runProfileEvaluation(
 ): Playable1v1ProfileResult {
   const registry = loadRegistrySet();
 
-  // Load browser-cases.json if present (durable browser evidence).
-  let browserCases: BrowserCaseResult[] | undefined;
-  const browserCasesPath = join(
+  // Load browser-cases.json from all evidence directories (durable browser evidence).
+  let browserCases: BrowserCaseResult[] = [];
+  const evidenceBase = join(
     dirname(fileURLToPath(import.meta.url)),
-    "../../docs/evidence/BROWSER-CORE-EVIDENCE/browser-cases.json",
+    "../../docs/evidence",
   );
-  if (existsSync(browserCasesPath)) {
-    try {
-      const raw = readFileSync(browserCasesPath, "utf-8");
-      browserCases = JSON.parse(raw) as BrowserCaseResult[];
-      console.error(
-        `[profile-runner] Loaded ${browserCases.length} browser case results from ${browserCasesPath}`,
-      );
-    } catch {
-      console.error(
-        `[profile-runner] Warning: could not parse browser-cases.json — running without browser evidence`,
-      );
+  const browserCaseFiles = [
+    "BROWSER-CORE-EVIDENCE/browser-cases.json",
+    "BROWSER-1V1-CONTROL-EVIDENCE/browser-cases.json",
+  ];
+  let anyLoaded = false;
+  for (const relPath of browserCaseFiles) {
+    const full = join(evidenceBase, relPath);
+    if (existsSync(full)) {
+      try {
+        const raw = readFileSync(full, "utf-8");
+        const parsed = JSON.parse(raw) as BrowserCaseResult[];
+        browserCases = browserCases.concat(parsed);
+        anyLoaded = true;
+        console.error(
+          `[profile-runner] Loaded ${parsed.length} browser case results from ${relPath}`,
+        );
+      } catch {
+        console.error(
+          `[profile-runner] Warning: could not parse ${relPath} — skipping`,
+        );
+      }
     }
-  } else {
+  }
+  if (!anyLoaded) {
     console.error(
       "[profile-runner] No browser-cases.json found — browser cases will be INVALID_RUN",
     );
   }
 
-  const result = evaluatePlayable1v1(scenario, { browserCases });
+  const result = evaluatePlayable1v1(scenario, { browserCases: browserCases.length > 0 ? browserCases : undefined });
 
   // Extract exit prerequisites with details.
   const exitPrereqs = PLAYABLE_1V1_PROFILE.exit_prerequisites;
