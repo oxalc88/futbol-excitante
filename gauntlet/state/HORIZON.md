@@ -2,12 +2,12 @@
 
 ```yaml
 horizon_version: 7
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "playable-1v1-browser-evidence"
 created_from_commit: e997a538f375f3259297e93606d801bc3c679bc6
 created_at: 2026-08-20
 reason: "Horizon playable-1v1-enabler exhausted (6/6 accepted including sentinel). PLAYABLE_1V1 profile evaluation returned INVALID_RUN due to missing browser evidence and ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED (no disk artifacts). New horizon focuses on browser evidence capture and perceptual rubric implementation to enable PLAYABLE_1V1_PASS evaluation."
-current_index: 4
+current_index: 5
 objectives:
   - id: BROWSER-CORE-EVIDENCE
     status: accepted
@@ -30,7 +30,7 @@ objectives:
     builder: builder-structured
     prerequisite: ARCHETYPE-BROWSER-CAPTURE
   - id: SMALL-SIDED-MILESTONE-EVALUATION
-    status: pending
+    status: accepted
     reason: "Attempt SMALL_SIDED_SHAPE milestone evaluation if PLAYABLE_1V1_PASS is achieved. Otherwise reports NOT_EVALUATED with clear blockers documented."
     builder: builder-structured
     prerequisite: PLAYABLE-1V1-RE-EVALUATION

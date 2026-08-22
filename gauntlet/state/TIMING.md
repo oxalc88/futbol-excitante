@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-22T06:33:03Z
+measured_at: 2026-08-22T06:43:02Z
 tracking_contract_version: 1
-last_tracked_objective: PLAYABLE-1V1-RE-EVALUATION
-usage_aggregates_through: PLAYABLE-1V1-RE-EVALUATION
-clock_aggregates_through: PLAYABLE-1V1-RE-EVALUATION
-model_evaluation_through: PLAYABLE-1V1-RE-EVALUATION
+last_tracked_objective: SMALL-SIDED-MILESTONE-EVALUATION
+usage_aggregates_through: SMALL-SIDED-MILESTONE-EVALUATION
+clock_aggregates_through: SMALL-SIDED-MILESTONE-EVALUATION
+model_evaluation_through: SMALL-SIDED-MILESTONE-EVALUATION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -45,10 +45,10 @@ style meter is the live context window, not session cost.
 | Calendar span (first work → measurement) | 39h 25m |
 | Unexplained stop (excluded) | 5h 16m |
 | Active work (anything running) | 34h 09m |
-| Sum of per-step agent time | 24h 10m |
+| Sum of per-step agent time | 24h 17m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T06:33:03Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T06:43:02Z`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -155,6 +155,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | ARCH-DIFF-001-RUBRIC | accepted | 25m | 10m | 3m | 11m | 1m | n/a | n/a |
 | ARCHETYPE-BROWSER-CAPTURE | accepted | 65m | 49m | 4m | 8m | 4m | n/a | n/a |
 | PLAYABLE-1V1-RE-EVALUATION | accepted | 24m | 4m | 15m | 5m | 0.5m | n/a | n/a |
+| SMALL-SIDED-MILESTONE-EVALUATION | accepted | 7m | 1m | 1m | 5m | 0.5m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -385,6 +386,7 @@ on an H task is the interesting result.
 | ARCH-DIFF-001-RUBRIC | qwen3.6 | M | Medium — versioned perceptual rubric and deterministic evaluator | 1 | B | 61 rubric tests; critic retry TS4104 + disk stateHash |
 | ARCHETYPE-BROWSER-CAPTURE | mimo-v2.5 | H | High — real renderer capture under identical conditions | 2 | C | critic/orchestrator retries: synthetic 2D then position-offset theatrical PASS |
 | PLAYABLE-1V1-RE-EVALUATION | qwen3.6 | M | Medium — re-run profile evaluator with new evidence | 0 | A | 29 tests; honest INVALID_RUN |
+| SMALL-SIDED-MILESTONE-EVALUATION | qwen3.6 | M | Medium — milestone playtest attempt | 0 | A | NOT_EVALUATED; PLAYABLE_1V1_PASS unmet |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -493,6 +495,8 @@ on an H task is the interesting result.
 | ARCHETYPE-BROWSER-CAPTURE | integration-reviewer (deepseek-v4-flash) | primary flash; independent of mimo builder | ACCEPT | evaluator integrity PASS, HEADLESS NOT_EVALUATED preserved |
 | PLAYABLE-1V1-RE-EVALUATION | critic (deepseek-v4-flash) | primary flash; independent of qwen builder | ACCEPT | honest INVALID_RUN; historical evidence untouched |
 | PLAYABLE-1V1-RE-EVALUATION | integration-reviewer (deepseek-v4-flash) | primary flash; independent of qwen builder | ACCEPT | 653 eval unit tests, evaluator integrity PASS |
+| SMALL-SIDED-MILESTONE-EVALUATION | critic (deepseek-v4-flash) | primary flash; independent of qwen builder | ACCEPT | honest NOT_EVALUATED |
+| SMALL-SIDED-MILESTONE-EVALUATION | integration-reviewer (deepseek-v4-flash) | primary flash; independent of qwen builder | ACCEPT | evaluator integrity PASS, no milestone PASS |
 
 ### Builder scoreboard
 
@@ -500,7 +504,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 42 | 25 | 9 | 3 | 3 | 2 | 60% | ~0.76 | ~37m |
+| qwen3.6 | 43 | 26 | 9 | 3 | 3 | 2 | 60% | ~0.74 | ~36m |
 | mimo-v2.5 | 28 | 19 | 7 | 2 | 0 | 0 | 68% | ~0.43 | ~32m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

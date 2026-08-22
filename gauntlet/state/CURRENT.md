@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-MILESTONE-EVALUATION
+next_objective_id: ""
 
 best_known:
-  commit: 88420c36ad28c67285907f661c13299f9cbfc449
-  note: "PLAYABLE-1V1-RE-EVALUATION accepted. CORE cases PASS; overall still INVALID_RUN (missing BROWSER-1V1-CONTROL-001)."
+  commit: 2d5b75392874d7ab1c341caee476798fdf221e55
+  note: "SMALL-SIDED-MILESTONE-EVALUATION accepted as NOT_EVALUATED. Horizon v7 exhausted."
 
 active_candidate: null
 builder_in_use: null
@@ -94,17 +94,18 @@ accepted:
   - ARCH-DIFF-001-RUBRIC
   - ARCHETYPE-BROWSER-CAPTURE
   - PLAYABLE-1V1-RE-EVALUATION
+  - SMALL-SIDED-MILESTONE-EVALUATION
 
 blocked: []
 
-selection_note: "Horizon v7 'playable-1v1-browser-evidence' 4/5. PLAYABLE-1V1-RE-EVALUATION accepted (still INVALID_RUN). Next: SMALL-SIDED-MILESTONE-EVALUATION."
+selection_note: "Horizon v7 'playable-1v1-browser-evidence' 5/5 EXHAUSTED. SMALL_SIDED_SHAPE NOT_EVALUATED (PLAYABLE_1V1_PASS unmet)."
 ```
 ## Last accepted objective
 
-PLAYABLE-1V1-RE-EVALUATION — Re-ran PLAYABLE_1V1: BROWSER-CORE-RESET/STEP PASS; BROWSER-1V1-CONTROL-001 INVALID_RUN; ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW; ARCHETYPE_BLINDED_COMPARISON_PASS FAIL; MUTANT_1V1_PASS PASS. Overall INVALID_RUN. No PLAYABLE_1V1_PASS. Historical profile-evaluation evidence untouched.
+SMALL-SIDED-MILESTONE-EVALUATION — SMALL_SIDED_SHAPE playtest NOT_EVALUATED: PLAYABLE_1V1_PASS unmet (INVALID_RUN), required situations unevaluated. No milestone PASS. HEADLESS audit PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic / deepseek-v4-flash — ACCEPT (first pass, independence OK)
-- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (653 eval unit tests, evaluator integrity PASS)
-- Evidence: durable acceptance manifest + record (2026-08-22T06:33:03Z)
-- Candidate: 88420c3
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (evaluator integrity PASS)
+- Evidence: durable acceptance manifest + record (2026-08-22T06:43:02Z)
+- Candidate: 2d5b753
