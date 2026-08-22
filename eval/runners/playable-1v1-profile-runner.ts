@@ -82,6 +82,7 @@ export interface Playable1v1ProfileResult {
 function runProfileEvaluation(
   scenario: ScenarioDefinition,
   scenarioFile: string,
+  twoPlayerScenario?: ScenarioDefinition,
 ): Playable1v1ProfileResult {
   const registry = loadRegistrySet();
 
@@ -120,7 +121,10 @@ function runProfileEvaluation(
     );
   }
 
-  const result = evaluatePlayable1v1(scenario, { browserCases: browserCases.length > 0 ? browserCases : undefined });
+  const result = evaluatePlayable1v1(scenario, {
+    browserCases: browserCases.length > 0 ? browserCases : undefined,
+    twoPlayerScenario,
+  });
 
   // Extract exit prerequisites with details.
   const exitPrereqs = PLAYABLE_1V1_PROFILE.exit_prerequisites;
@@ -227,8 +231,20 @@ export function main(scenarioPath?: string): Playable1v1ProfileResult {
   const raw = readFileSync(resolvedPath, "utf-8");
   const scenario = JSON.parse(raw) as ScenarioDefinition;
 
+  // Load the two-player scenario for BROWSER-1V1-CONTROL-001 cross-check.
+  const twoPlayerPath = join(__dirname, "../scenarios/two-player-duel.v1.json");
+  let twoPlayerScenario: ScenarioDefinition | undefined;
+  try {
+    const tpRaw = readFileSync(twoPlayerPath, "utf-8");
+    twoPlayerScenario = JSON.parse(tpRaw) as ScenarioDefinition;
+  } catch {
+    console.error(
+      "[profile-runner] Warning: two-player-duel.v1.json not found — BROWSER-1V1-CONTROL-001 cross-check may fail",
+    );
+  }
+
   // Run the evaluation.
-  const result = runProfileEvaluation(scenario, resolvedPath);
+  const result = runProfileEvaluation(scenario, resolvedPath, twoPlayerScenario);
 
   // Also run exit prerequisites independently for cross-checking.
   console.error("[profile-runner] Running MUTANT_1V1 evaluation...");

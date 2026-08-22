@@ -114,12 +114,15 @@ function generateHeadlessReferenceHashes(
  * the case is not yet executable.
  *
  * @param browserCases - Browser case results from a browser evaluation run.
- * @param headless - Headless reference hashes from the same scenario.
+ * @param headless - Headless reference hashes from the profile scenario.
+ * @param perCaseHeadless - Optional per-case headless references (e.g. two-player
+ *   hashes for BROWSER-1V1-CONTROL-001 which was captured from a different scenario).
  * @returns Verdicts per case.
  */
 function validateBrowserCasesFor1v1(
   browserCases: BrowserCaseResult[],
   headless: { initialHash: string; perTickHashes: string[] },
+  perCaseHeadless?: Record<string, { initialHash: string; perTickHashes: string[] }>,
 ): Array<{ case_id: string; verdict: EvaluationOutcome }> {
   const profile = PLAYABLE_1V1_PROFILE;
   const requiredIds = profile.required_browser_case_ids;
@@ -168,7 +171,11 @@ function validateBrowserCasesFor1v1(
       continue;
     }
 
-    if (found.evidence.initialHash !== headless.initialHash) {
+    // Use per-case headless reference when available (e.g. two-player scenario
+    // for BROWSER-1V1-CONTROL-001), otherwise fall back to the profile scenario.
+    const refHeadless = perCaseHeadless?.[caseId] ?? headless;
+
+    if (found.evidence.initialHash !== refHeadless.initialHash) {
       verdicts.push({ case_id: caseId, verdict: "INVALID_RUN" });
       continue;
     }
@@ -183,7 +190,7 @@ function validateBrowserCasesFor1v1(
           verdicts.push({ case_id: caseId, verdict: "INVALID_RUN" });
           continue;
         }
-        if (found.evidence.perTickHashes[i] !== headless.perTickHashes[i]) {
+        if (found.evidence.perTickHashes[i] !== refHeadless.perTickHashes[i]) {
           verdicts.push({ case_id: caseId, verdict: "INVALID_RUN" });
           continue;
         }
@@ -389,9 +396,13 @@ export function evaluatePlayable1v1(
     };
     /** Browser case results from a browser evaluation run. */
     browserCases?: BrowserCaseResult[];
+    /** Two-player scenario for BROWSER-1V1-CONTROL-001 cross-check.
+     *  The accepted evidence was captured from the two-player scenario,
+     *  so the evaluator must use its headless hashes for that case. */
+    twoPlayerScenario?: ScenarioDefinition;
   },
 ): Playable1v1Result {
-  const { safetyBounds, browserCases } = opts ?? {};
+  const { safetyBounds, browserCases, twoPlayerScenario } = opts ?? {};
   const registry = loadRegistrySet();
   const profile = PLAYABLE_1V1_PROFILE;
 
@@ -480,9 +491,17 @@ export function evaluatePlayable1v1(
   });
 
   // --- 4. Browser case validation -----------------------------------------
+  // For BROWSER-1V1-CONTROL-001, the evidence was captured from the two-player
+  // scenario, not the profile scenario. Use the caller-provided scenario.
+  let perCaseHeadless: Record<string, { initialHash: string; perTickHashes: string[] } | undefined> = {};
+  if (twoPlayerScenario) {
+    perCaseHeadless["BROWSER-1V1-CONTROL-001"] = generateHeadlessReferenceHashes(twoPlayerScenario);
+  }
+
   const browserCaseVerdicts = validateBrowserCasesFor1v1(
     browserResults,
     headlessRef,
+    perCaseHeadless,
   );
 
   // Convert browser verdicts to sub-components.
