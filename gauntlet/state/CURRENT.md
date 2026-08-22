@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: CAPABILITY-DESIGN-PROFILE-EVIDENCE
+next_objective_id: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
 
 best_known:
-  commit: 755dfb1444e4886d30bc122e6977d298cde81ab1
-  note: "FOUNDATION-LAB-PASS-EVIDENCE accepted; evaluateFoundationLab PASS. Next: CAPABILITY-DESIGN-PROFILE-EVIDENCE."
+  commit: d4326ca0d478640fcdb4c6761b52f03618055422
+  note: "CAPABILITY-DESIGN-PROFILE-EVIDENCE accepted; evaluateCapabilityDesign PASS. Next: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE."
 
 active_candidate: null
 builder_in_use: null
@@ -115,17 +115,18 @@ accepted:
   - SMALL-SIDED-AFTER-ENTRY-PREREQS
   - ENTRY-PREREQ-RESOLVER-EVAL-JSON
   - FOUNDATION-LAB-PASS-EVIDENCE
+  - CAPABILITY-DESIGN-PROFILE-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v13 2/5. FOUNDATION_LAB_PASS eval.json is PASS. Next: CAPABILITY-DESIGN-PROFILE-EVIDENCE. PLAYABLE_1V1 still needs capability-design evidence."
+selection_note: "Horizon v13 3/5. Both entry-prereq eval.json files are PASS. Next: PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE. Do not claim PLAYABLE_1V1_PASS until the rerun."
 ```
 ## Last accepted objective
 
-FOUNDATION-LAB-PASS-EVIDENCE — Honest evaluateFoundationLab PASS against durable BROWSER-CORE-EVIDENCE. Not a PLAYABLE_1V1_PASS claim.
+CAPABILITY-DESIGN-PROFILE-EVIDENCE — Honest evaluateCapabilityDesign PASS (five implemented axes). Not a PLAYABLE_1V1_PASS claim.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T16:40:06Z)
-- Candidate: 755dfb1
+- Evidence: durable acceptance manifest + record (2026-08-22T16:59:51Z)
+- Candidate: d4326ca
