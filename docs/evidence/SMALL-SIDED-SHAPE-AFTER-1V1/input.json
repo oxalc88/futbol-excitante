@@ -1,0 +1,42 @@
+{
+  "entry_prerequisites_pass": false,
+  "exit_prerequisites_pass": false,
+  "situation_outcomes": {
+    "PASS_RECEPTION": "NOT_EVALUATED",
+    "SHOT_TO_RESULT": "NOT_EVALUATED",
+    "PHYSICAL_DUEL": "NOT_EVALUATED",
+    "SUPPORT_AND_PASSING_LANES": "NOT_EVALUATED",
+    "SETTLED_ATTACK_VS_DEFENCE": "NOT_EVALUATED",
+    "ATTACK_TO_DEFENCE_TRANSITION": "NOT_EVALUATED",
+    "DEFENCE_TO_ATTACK_TRANSITION": "NOT_EVALUATED",
+    "COORDINATED_PRESS": "NOT_EVALUATED"
+  },
+  "critic_verdict": "MISSING",
+  "evidence": {
+    "blockers_from_playable_1v1_re_evaluation": [
+      "ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW — PERCEPTUAL_TARGET case requiring a versioned rubric and human subject data",
+      "COMMON-DETERMINISTIC NOT_EVALUATED across all HARD_INVARIANT suites — catalogued but does not drive FAIL",
+      "ENTRY_PREREQ:FOUNDATION_LAB_PASS NOT_EVALUATED — unverified by caller",
+      "ENTRY_PREREQ:CAPABILITY_DESIGN_PROFILE NOT_EVALUATED — unverified by caller",
+      "PLAYABLE_1V1 overall NEEDS_PERCEPTUAL_REVIEW — does not satisfy SMALL_SIDED_SHAPE entry prerequisite PLAYABLE_1V1_PASS"
+    ],
+    "entry_prerequisite_failures": {
+      "PLAYABLE_1V1_PASS": "NEEDS_PERCEPTUAL_REVIEW — PLAYABLE_1V1 milestone not achieved (PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES verdict: NEEDS_PERCEPTUAL_REVIEW)",
+      "TEAM_DECISION_PROFILE": "NOT_EVALUATED — unverified by caller"
+    },
+    "situation_blockers": {
+      "PASS_RECEPTION": "Requires BASIC_ACTIONS, FIRST_TOUCH, INDEPENDENT_BALL — 1v1 not yet achieved, no team-pass test scenarios materialized",
+      "SHOT_TO_RESULT": "Requires BASIC_ACTIONS, INDEPENDENT_BALL — 1v1 not yet achieved, no shot test scenarios materialized",
+      "PHYSICAL_DUEL": "Requires PLAYER_DUELS, LOCOMOTION, INDEPENDENT_BALL — duels suite required but 1v1 blocker prevents team-level duel evaluation",
+      "SUPPORT_AND_PASSING_LANES": "Requires TEAM_TACTICS, SMALL_SIDED_CARDINALITY — neither capability profile materialized",
+      "SETTLED_ATTACK_VS_DEFENCE": "Requires TEAM_TACTICS, SMALL_SIDED_CARDINALITY — neither capability profile materialized",
+      "ATTACK_TO_DEFENCE_TRANSITION": "Requires TEAM_TACTICS, TRANSITION_PHASES, SMALL_SIDED_CARDINALITY — none materialized",
+      "DEFENCE_TO_ATTACK_TRANSITION": "Requires TEAM_TACTICS, TRANSITION_PHASES, SMALL_SIDED_CARDINALITY — none materialized",
+      "COORDINATED_PRESS": "Requires TEAM_TACTICS, TRANSITION_PHASES, SMALL_SIDED_CARDINALITY — none materialized"
+    },
+    "context_notes": [
+      "ARCHETYPE_BLINDED_COMPARISON_PASS has improved from FAIL to PASS (diff=0.9375, all pairs detectable).",
+      "ENTRY/EXIT prereqs remain NOT_EVALUATED/PASS respectively per caller, same as prior run."
+    ]
+  }
+}
