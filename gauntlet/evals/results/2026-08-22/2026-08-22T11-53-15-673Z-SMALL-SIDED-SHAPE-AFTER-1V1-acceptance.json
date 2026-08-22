@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-22T11:53:15.673Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-SHAPE-AFTER-1V1",
+  "candidate_commit": "5fc9ce3662b11977fd680bfac9e9b17b63ce3588",
+  "evidence_class": "HEADLESS",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "agent": "critic-mimo",
+    "model": "mimo-v2.5",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer-mimo",
+    "model": "mimo-v2.5",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  }
+}

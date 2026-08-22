@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-22T11:43:18Z
+measured_at: 2026-08-22T11:53:15Z
 tracking_contract_version: 1
-last_tracked_objective: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
-usage_aggregates_through: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
-clock_aggregates_through: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
-model_evaluation_through: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
+last_tracked_objective: SMALL-SIDED-SHAPE-AFTER-1V1
+usage_aggregates_through: SMALL-SIDED-SHAPE-AFTER-1V1
+clock_aggregates_through: SMALL-SIDED-SHAPE-AFTER-1V1
+model_evaluation_through: SMALL-SIDED-SHAPE-AFTER-1V1
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,13 +42,13 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 41h 43m |
+| Calendar span (first work → measurement) | 41h 53m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | 36h 22m |
-| Sum of per-step agent time | 28h 42m |
+| Active work (anything running) | 36h 32m |
+| Sum of per-step agent time | 28h 52m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T11:43:18Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T11:53:15Z`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -164,6 +164,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | ARCHETYPE-REMAINING-VISUALS | accepted | 48m | 41m | 4m | 1m | 1m | n/a | n/a |
 | ARCHETYPE-FULL-PAIR-RECAPTURE | accepted | 55m | 49m | 2m | 2m | 1m | n/a | n/a |
 | PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES | accepted | 10m | 2.5m | 2.5m | 1m | 0.5m | n/a | n/a |
+| SMALL-SIDED-SHAPE-AFTER-1V1 | accepted | 10m | 2m | 1m | 3.5m | 0.5m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -403,6 +404,7 @@ on an H task is the interesting result.
 | ARCHETYPE-REMAINING-VISUALS | mimo-v2.5 | M | Medium — provisional remaining renderer mappings | 1 | B | critic RETRY: simulation registry physics |
 | ARCHETYPE-FULL-PAIR-RECAPTURE | mimo-v2.5 | M | Medium — identical-condition pair recapture | 1 | B | critic RETRY uniqueness vs remaining-visuals |
 | PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES | qwen3.6 | M | Medium — profile re-run after recapture | 0 | A | honest NPR; archetype PASS |
+| SMALL-SIDED-SHAPE-AFTER-1V1 | qwen3.6 | M | Medium — milestone playtest after NPR | 0 | A | NOT_EVALUATED; PLAYABLE_1V1 NPR |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -529,6 +531,8 @@ on an H task is the interesting result.
 | ARCHETYPE-FULL-PAIR-RECAPTURE | integration-reviewer-qwen (qwen3.6) | flash 401, qwen fallback; independent of mimo builder | ACCEPT | disk comparison PASS, ARCH-DIFF NPR |
 | PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | honest NPR; archetype PASS |
 | PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
+| SMALL-SIDED-SHAPE-AFTER-1V1 | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | honest NOT_EVALUATED |
+| SMALL-SIDED-SHAPE-AFTER-1V1 | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 
 ### Builder scoreboard
 
@@ -536,7 +540,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 46 | 28 | 10 | 3 | 3 | 2 | 61% | ~0.72 | ~35m |
+| qwen3.6 | 47 | 29 | 10 | 3 | 3 | 2 | 62% | ~0.70 | ~35m |
 | mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

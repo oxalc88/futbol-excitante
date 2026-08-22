@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SHAPE-AFTER-1V1
+next_objective_id: ""
 
 best_known:
-  commit: de03e13fd304a0e4d086973565e225882d57e384
-  note: "PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES accepted (overall NPR). Next: SMALL-SIDED-SHAPE-AFTER-1V1."
+  commit: 5fc9ce3662b11977fd680bfac9e9b17b63ce3588
+  note: "SMALL-SIDED-SHAPE-AFTER-1V1 accepted as NOT_EVALUATED. Horizon v9 exhausted."
 
 active_candidate: null
 builder_in_use: null
@@ -103,17 +103,18 @@ accepted:
   - ARCHETYPE-REMAINING-VISUALS
   - ARCHETYPE-FULL-PAIR-RECAPTURE
   - PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
+  - SMALL-SIDED-SHAPE-AFTER-1V1
 
 blocked: []
 
-selection_note: "Horizon v9 3/4. PLAYABLE-1V1 overall NPR (archetype PASS, ARCH-DIFF NPR). Next: SMALL-SIDED-SHAPE-AFTER-1V1."
+selection_note: "Horizon v9 4/4 EXHAUSTED. SMALL-SIDED-SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 NPR, not PASS)."
 ```
 ## Last accepted objective
 
-PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES — Honest NEEDS_PERCEPTUAL_REVIEW. Archetype comparison PASS; ARCH-DIFF-001 still NPR. No PLAYABLE_1V1_PASS.
+SMALL-SIDED-SHAPE-AFTER-1V1 — Honest NOT_EVALUATED after PLAYABLE_1V1 NPR. Eight situations unevaluated. No milestone PASS.
 
 - builder: builder-structured / qwen3.6
-- critic: critic-mimo / mimo-v2.5 — ACCEPT (primary flash 401; qwen blocked same-as-builder)
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (primary flash 401; qwen blocked)
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T11:43:18Z)
-- Candidate: de03e13
+- Evidence: durable acceptance manifest + record (2026-08-22T11:53:15Z)
+- Candidate: 5fc9ce3

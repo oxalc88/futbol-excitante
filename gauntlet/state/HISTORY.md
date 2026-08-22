@@ -2838,3 +2838,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: de03e13 candidate(PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES)
 - notes: Overall NPR; archetype comparison PASS; ARCH-DIFF NPR. No PLAYABLE_1V1_PASS. Horizon v9 3/4.
+
+## Iteration 95 — 2026-08-22
+
+- objective_id: SMALL-SIDED-SHAPE-AFTER-1V1
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 5fc9ce3 candidate(SMALL-SIDED-SHAPE-AFTER-1V1)
+- notes: SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 NPR not PASS). Horizon v9 4/4 EXHAUSTED.
