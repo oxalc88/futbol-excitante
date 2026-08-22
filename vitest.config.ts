@@ -4,9 +4,10 @@ import viteConfig from "./vite.config";
 export default defineConfig({
   ...viteConfig,
   define: {
-    // Inject process.env.WIP_SECTION and WIP_FRAMES for browser mode.
+    // Inject process.env.WIP_* for browser mode (capture-wip reads these).
     "process.env.WIP_SECTION": JSON.stringify(process.env.WIP_SECTION || "capture"),
     "process.env.WIP_FRAMES": JSON.stringify(process.env.WIP_FRAMES || "1"),
+    "process.env.WIP_FRAME_STRIDE": JSON.stringify(process.env.WIP_FRAME_STRIDE || "30"),
   },
   test: {
     projects: [

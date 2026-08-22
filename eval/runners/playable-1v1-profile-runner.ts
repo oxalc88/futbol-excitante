@@ -10,16 +10,16 @@
  * Node I/O is allowed in the eval layer.
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-
 import { evaluatePlayable1v1, type Playable1v1Result } from "./playable-evaluator.js";
 import { evaluateMutant1v1 } from "./mutant-1v1.js";
 import { evaluateArchetypeComparison } from "./archetype-comparison.js";
 import { PLAYABLE_1V1_PROFILE } from "../contracts/profiles.js";
 import { loadRegistrySet } from "../contracts/loader.js";
 import { evaluate } from "./evaluate.js";
+import type { BrowserCaseResult } from "../contracts/browser-cases.js";
 
 import type { ScenarioDefinition } from "../../src/contracts/scenario.js";
 
@@ -84,7 +84,32 @@ function runProfileEvaluation(
   scenarioFile: string,
 ): Playable1v1ProfileResult {
   const registry = loadRegistrySet();
-  const result = evaluatePlayable1v1(scenario);
+
+  // Load browser-cases.json if present (durable browser evidence).
+  let browserCases: BrowserCaseResult[] | undefined;
+  const browserCasesPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../docs/evidence/BROWSER-CORE-EVIDENCE/browser-cases.json",
+  );
+  if (existsSync(browserCasesPath)) {
+    try {
+      const raw = readFileSync(browserCasesPath, "utf-8");
+      browserCases = JSON.parse(raw) as BrowserCaseResult[];
+      console.error(
+        `[profile-runner] Loaded ${browserCases.length} browser case results from ${browserCasesPath}`,
+      );
+    } catch {
+      console.error(
+        `[profile-runner] Warning: could not parse browser-cases.json — running without browser evidence`,
+      );
+    }
+  } else {
+    console.error(
+      "[profile-runner] No browser-cases.json found — browser cases will be INVALID_RUN",
+    );
+  }
+
+  const result = evaluatePlayable1v1(scenario, { browserCases });
 
   // Extract exit prerequisites with details.
   const exitPrereqs = PLAYABLE_1V1_PROFILE.exit_prerequisites;
@@ -218,21 +243,29 @@ if (process.argv[1]?.endsWith("playable-1v1-profile-runner.ts")) {
   const scenarioPath = process.argv[2];
   const result = main(scenarioPath);
 
-  // Write a copy to docs/evidence/playable-1v1-profile-evaluation/eval.json.
+  // Write a copy to docs/evidence/BROWSER-CORE-EVIDENCE/ (never overwrite accepted manifests).
   try {
     const evidenceDir = join(
       dirname(__dirname),
-      "../../docs/evidence/playable-1v1-profile-evaluation",
+      "../../docs/evidence/BROWSER-CORE-EVIDENCE",
     );
     mkdirSync(evidenceDir, { recursive: true });
-    writeFileSync(
-      join(evidenceDir, "eval.json"),
-      JSON.stringify(result, null, 2),
-      "utf-8",
-    );
-    console.error(
-      `[profile-runner] Written result to ${evidenceDir}/eval.json`,
-    );
+    const evalPath = join(evidenceDir, "eval.json");
+    // Gate: do not overwrite if accepted manifest already exists for another objective.
+    if (!existsSync(join(evidenceDir, "manifest.json"))) {
+      writeFileSync(
+        evalPath,
+        JSON.stringify(result, null, 2),
+        "utf-8",
+      );
+      console.error(
+        `[profile-runner] Written result to ${evalPath}`,
+      );
+    } else {
+      console.error(
+        `[profile-runner] Skipped eval.json write — manifest.json already exists`,
+      );
+    }
   } catch {
     // Best effort — don't fail the evaluation if the directory doesn't exist.
   }

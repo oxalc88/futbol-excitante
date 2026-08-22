@@ -1,0 +1,14 @@
+{
+  "objective": "BROWSER-CORE-EVIDENCE",
+  "class": "DYNAMIC_VISUAL",
+  "scenario": "foundation-move-and-roll.v1",
+  "ticks": 5,
+  "initialHash": "fnv1a64-v1:34e2d4d971acfac7",
+  "perTickHashes": [
+    "fnv1a64-v1:8c5a4de12a69786f",
+    "fnv1a64-v1:b6ee757dceea6a4b",
+    "fnv1a64-v1:05fe10d10bf674a5",
+    "fnv1a64-v1:26ce153d93f06982",
+    "fnv1a64-v1:17c754fd49e5a844"
+  ]
+}
