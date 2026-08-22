@@ -542,3 +542,48 @@ describe("TOUCH_AND_ACTIONS: unimplemented tests are NOT_EVALUATED", () => {
     expect(crossHi!.overall).toBe("NOT_EVALUATED");
   });
 });
+
+// ---------------------------------------------------------------------------
+// 9. COMMON-DETERMINISTIC two-run evaluation
+// ---------------------------------------------------------------------------
+
+describe("COMMON-DETERMINISTIC two-run evaluation", () => {
+  it("COMMON_DETERMINISTIC sub-component is present and evaluates to PASS", () => {
+    const scenario = loadFixture();
+    const result = evaluatePlayable1v1(scenario);
+
+    const comp = result.subComponents.find(
+      (s) => s.componentId === "COMMON_DETERMINISTIC",
+    );
+    expect(comp).toBeDefined();
+    expect(comp!.componentId).toBe("COMMON_DETERMINISTIC");
+    expect(comp!.outcome).toBe("PASS");
+    expect(comp!.evidence).toBeInstanceOf(Array);
+  });
+
+  it("allHardInvariantPass is true when all HARD_INVARIANT criteria pass", () => {
+    const scenario = loadFixture();
+    const result = evaluatePlayable1v1(scenario);
+
+    expect(result.allHardInvariantPass).toBe(true);
+  });
+
+  it("COMMON-DETERMINISTIC appears as PASS in HARD_INVARIANT_SUITES evidence", () => {
+    const scenario = loadFixture();
+    const result = evaluatePlayable1v1(scenario);
+
+    const suitesComp = result.subComponents.find(
+      (s) => s.componentId === "HARD_INVARIANT_SUITES",
+    );
+    expect(suitesComp).toBeDefined();
+
+    // All COMMON-DETERMINISTIC entries should be PASS after two-run resolution.
+    const cdEntries = (suitesComp!.evidence as string[]).filter((e) =>
+      e.startsWith("COMMON-DETERMINISTIC="),
+    );
+    expect(cdEntries.length).toBeGreaterThan(0);
+    for (const entry of cdEntries) {
+      expect(entry).toBe("COMMON-DETERMINISTIC=PASS");
+    }
+  });
+});

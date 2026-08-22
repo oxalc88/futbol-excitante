@@ -6,16 +6,18 @@
  * Architecture:
  *  1. Evaluate HARD_INVARIANT suites (using evaluateFoundation for the
  *     existing suites: fast, locomotion, ball).
- *  2. Check for missing required suites (touch_and_actions, duels).
- *  3. Evaluate ENGINE_DESIGN_TARGET via evaluateCapabilityDesign.
- *  4. Validate required browser cases.
+ *  2. COMMON-DETERMINISTIC two-run comparison via compareAndEvaluateFoundation.
+ *  3. Check for missing required suites (touch_and_actions, duels).
+ *  4. Evaluate ENGINE_DESIGN_TARGET via evaluateCapabilityDesign.
+ *  5. Validate required browser cases.
  *     - ARCH-DIFF-001 is special: it is a PERCEPTUAL_TARGET case that
  *       returns NEEDS_PERCEPTUAL_REVIEW when evidence is missing or
  *       the case is not yet executable.  This MUST prevent an overall
  *       PLAYABLE_1V1_PASS / milestoneVerdict PASS.
  *     - BROWSER-1V1-CONTROL-001 is required; without evidence → INVALID_RUN.
- *  5. Check entry and exit prerequisites.
- *  6. Reduce verdict using spec precedence:
+ *  6. Check entry and exit prerequisites.
+ *  7. Prerequisites satisfaction check.
+ *  8. Reduce verdict using spec precedence:
  *     INVALID_RUN > FAIL > NEEDS_PERCEPTUAL_REVIEW
  *       > BLOCKED_MISSING_REFERENCE > NOT_EVALUATED > PASS
  *
@@ -41,6 +43,7 @@ import { BROWSER_CASES } from "../contracts/browser-cases.js";
 import { evaluateMutant1v1 } from "./mutant-1v1.js";
 import { evaluateArchetypeComparison } from "./archetype-comparison.js";
 import { runArchDiff001 } from "./arch-diff-001-evaluator.js";
+import { compareAndEvaluateFoundation } from "./compare-foundation.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -375,11 +378,13 @@ function computeOverallVerdict(
  *
  * Runs:
  *  1. Suite evaluation for existing required suites (fast, locomotion, ball).
- *  2. Checks for missing required suites (touch_and_actions, duels).
- *  3. ENGINE_DESIGN_TARGET evaluation via evaluateCapabilityDesign.
- *  4. Browser case validation (including special handling for ARCH-DIFF-001).
- *  5. Entry and exit prerequisite checks.
- *  6. Verdict reduction.
+ *  2. COMMON-DETERMINISTIC two-run comparison via compareAndEvaluateFoundation.
+ *  3. Checks for missing required suites (touch_and_actions, duels).
+ *  4. ENGINE_DESIGN_TARGET evaluation via evaluateCapabilityDesign.
+ *  5. Browser case validation (including special handling for ARCH-DIFF-001).
+ *  6. Entry and exit prerequisite checks.
+ *  7. Prerequisites satisfaction check.
+ *  8. Verdict reduction.
  *
  * @param scenario — The scenario to evaluate.
  * @param opts — Evaluation options.
@@ -419,7 +424,9 @@ export function evaluatePlayable1v1(
     skipBrowserValidation: true,
   });
 
-  // Collect HARD_INVARIANT results.
+  // Collect HARD_INVARIANT results from suites.
+  // COMMON-DETERMINISTIC is NOT_EVALUATED in single-run suite evaluation,
+  // so we add the two-run comparison result below.
   const allHardInvariantCriteria: Array<{
     criterionId: string;
     outcome: string;
@@ -435,6 +442,23 @@ export function evaluatePlayable1v1(
           });
         }
       }
+    }
+  }
+
+  // --- 2. COMMON-DETERMINISTIC (two-run comparison) ----------------------
+  const compareResult = compareAndEvaluateFoundation(scenario, {
+    safetyBounds,
+  });
+  const commonDeterministicOutcome =
+    compareResult.commonDeterministicOutcome === "PASS"
+      ? "PASS"
+      : "FAIL";
+
+  // Replace all single-run COMMON-DETERMINISTIC entries (NOT_EVALUATED)
+  // with the resolved two-run outcome.
+  for (const c of allHardInvariantCriteria) {
+    if (c.criterionId === "COMMON-DETERMINISTIC") {
+      c.outcome = commonDeterministicOutcome;
     }
   }
 
@@ -465,14 +489,21 @@ export function evaluatePlayable1v1(
     ),
   });
 
-  // --- 2. Missing required suites ----------------------------------------
+  // Add COMMON_DETERMINISTIC as a dedicated sub-component.
+  subComponents.push({
+    componentId: "COMMON_DETERMINISTIC",
+    outcome: commonDeterministicOutcome,
+    evidence: compareResult.commonDeterministicEvidence,
+  });
+
+  // --- 3. Missing required suites ----------------------------------------
   const missingSuiteResults = checkMissingSuites(profile.required_suite_ids);
   for (const ms of missingSuiteResults) {
     subComponents.push(ms);
     hasMissingSuites = true;
   }
 
-  // --- 3. ENGINE_DESIGN_TARGET evaluation --------------------------------
+  // --- 4. ENGINE_DESIGN_TARGET evaluation --------------------------------
   const capDesignResult = evaluateCapabilityDesign();
   const engineDesignTargetOverall = capDesignResult.overall;
 
@@ -491,7 +522,7 @@ export function evaluatePlayable1v1(
     ),
   });
 
-  // --- 4. Browser case validation -----------------------------------------
+  // --- 5. Browser case validation -----------------------------------------
   // For BROWSER-1V1-CONTROL-001, the evidence was captured from the two-player
   // scenario, not the profile scenario. Use the caller-provided scenario.
   let perCaseHeadless: Record<string, { initialHash: string; perTickHashes: string[] } | undefined> = {};
@@ -514,7 +545,7 @@ export function evaluatePlayable1v1(
     });
   }
 
-  // --- 5. Entry / exit prerequisites --------------------------------------
+  // --- 6. Entry / exit prerequisites --------------------------------------
   const entryPrereqs = checkEntryPrerequisites(profile);
   const exitPrereqs = checkExitPrerequisites(profile);
   for (const ep of entryPrereqs) {
@@ -524,7 +555,7 @@ export function evaluatePlayable1v1(
     subComponents.push(ep);
   }
 
-  // --- 6. Check prerequisites satisfaction -------------------------------
+  // --- 7. Check prerequisites satisfaction -------------------------------
   // Entry: all entry prereqs must be PASS or NOT_EVALUATED (for now).
   const entrySatisfied = entryPrereqs.every(
     (p) => p.outcome === "NOT_EVALUATED" || p.outcome === "PASS",
@@ -536,7 +567,7 @@ export function evaluatePlayable1v1(
     (p) => p.outcome === "PASS",
   );
 
-  // --- 7. Compute overall verdict ----------------------------------------
+  // --- 8. Compute overall verdict ----------------------------------------
   const overallVerdict = computeOverallVerdict(subComponents);
 
   const details =
