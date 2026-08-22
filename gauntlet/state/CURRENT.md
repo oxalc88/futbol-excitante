@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN
 
 best_known:
   commit: bde71a9c564c90005cf006e64563d6ab67385fc3
-  note: "SMALL-SIDED-AFTER-ARCH-DIFF accepted as NOT_EVALUATED. Horizon v10 exhausted."
+  note: "SMALL-SIDED-AFTER-ARCH-DIFF accepted as NOT_EVALUATED. Horizon v11 next: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN."
 
 active_candidate: null
 builder_in_use: null
@@ -110,7 +110,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v10 3/3 EXHAUSTED. SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 NOT_EVALUATED, not PASS)."
+selection_note: "Horizon v11 0/3. Next: PLAYABLE-1V1-DETERMINISTIC-TWO-RUN (COMMON-DETERMINISTIC still single-run NOT_EVALUATED)."
 ```
 ## Last accepted objective
 
