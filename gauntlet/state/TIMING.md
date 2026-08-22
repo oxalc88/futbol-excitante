@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-22T16:05:43Z
+measured_at: 2026-08-22T16:40:06Z
 tracking_contract_version: 1
-last_tracked_objective: ENTRY-PREREQ-RESOLVER-EVAL-JSON
-usage_aggregates_through: ENTRY-PREREQ-RESOLVER-EVAL-JSON
-clock_aggregates_through: ENTRY-PREREQ-RESOLVER-EVAL-JSON
-model_evaluation_through: ENTRY-PREREQ-RESOLVER-EVAL-JSON
+last_tracked_objective: FOUNDATION-LAB-PASS-EVIDENCE
+usage_aggregates_through: FOUNDATION-LAB-PASS-EVIDENCE
+clock_aggregates_through: FOUNDATION-LAB-PASS-EVIDENCE
+model_evaluation_through: FOUNDATION-LAB-PASS-EVIDENCE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,13 +42,13 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 46h 06m |
+| Calendar span (first work → measurement) | 46h 40m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | 40h 37m |
-| Sum of per-step agent time | 32h 50m |
+| Active work (anything running) | 41h 09m |
+| Sum of per-step agent time | 33h 22m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T16:05:43Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T16:40:06Z`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -175,6 +175,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | PLAYABLE-1V1-AFTER-ENTRY-PREREQS | accepted | 19m | 5m | 8m | 4m | 0.5m | n/a | n/a |
 | SMALL-SIDED-AFTER-ENTRY-PREREQS | accepted | 12m | 4m | 0.7m | 4m | 0.5m | n/a | n/a |
 | ENTRY-PREREQ-RESOLVER-EVAL-JSON | accepted | 17m | 9m | 2.6m | 4.9m | 0.5m | n/a | n/a |
+| FOUNDATION-LAB-PASS-EVIDENCE | accepted | 32m | 11m | 7m | 12.5m | 0.5m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -425,6 +426,7 @@ on an H task is the interesting result.
 | PLAYABLE-1V1-AFTER-ENTRY-PREREQS | qwen3.6 | M | Medium — profile re-run after entry-prereq caller | 0 | A | honest BLOCKED_MISSING_REFERENCE |
 | SMALL-SIDED-AFTER-ENTRY-PREREQS | qwen3.6 | M | Medium — milestone playtest after entry-prereq 1v1 | 0 | A | NOT_EVALUATED; PLAYABLE_1V1 not PASS |
 | ENTRY-PREREQ-RESOLVER-EVAL-JSON | qwen3.6 | M | Medium — resolver binds entry prereqs to eval.json | 0 | A | audit PASS is not FOUNDATION_LAB_PASS |
+| FOUNDATION-LAB-PASS-EVIDENCE | qwen3.6 | M | Medium — persist honest evaluateFoundationLab eval.json | 0 | A | live evaluator PASS vs durable hashes |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -573,6 +575,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-AFTER-ENTRY-PREREQS | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 | ENTRY-PREREQ-RESOLVER-EVAL-JSON | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | eval.json not audit PASS |
 | ENTRY-PREREQ-RESOLVER-EVAL-JSON | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
+| FOUNDATION-LAB-PASS-EVIDENCE | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | live evaluator PASS |
+| FOUNDATION-LAB-PASS-EVIDENCE | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 
 ### Builder scoreboard
 
@@ -580,7 +584,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 57 | 39 | 10 | 3 | 3 | 2 | 68% | ~0.58 | ~33m |
+| qwen3.6 | 58 | 40 | 10 | 3 | 3 | 2 | 69% | ~0.57 | ~33m |
 | mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

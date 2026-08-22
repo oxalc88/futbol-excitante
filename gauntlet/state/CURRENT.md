@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: FOUNDATION-LAB-PASS-EVIDENCE
+next_objective_id: CAPABILITY-DESIGN-PROFILE-EVIDENCE
 
 best_known:
-  commit: 037550cbe67057b9b41a36aee5ad454422e84e5d
-  note: "ENTRY-PREREQ-RESOLVER-EVAL-JSON accepted. Resolver reads eval.json; next: FOUNDATION-LAB-PASS-EVIDENCE."
+  commit: 755dfb1444e4886d30bc122e6977d298cde81ab1
+  note: "FOUNDATION-LAB-PASS-EVIDENCE accepted; evaluateFoundationLab PASS. Next: CAPABILITY-DESIGN-PROFILE-EVIDENCE."
 
 active_candidate: null
 builder_in_use: null
@@ -114,17 +114,18 @@ accepted:
   - PLAYABLE-1V1-AFTER-ENTRY-PREREQS
   - SMALL-SIDED-AFTER-ENTRY-PREREQS
   - ENTRY-PREREQ-RESOLVER-EVAL-JSON
+  - FOUNDATION-LAB-PASS-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v13 1/5. Resolver consumes eval.json. Next: FOUNDATION-LAB-PASS-EVIDENCE. PLAYABLE_1V1 remains BLOCKED_MISSING_REFERENCE."
+selection_note: "Horizon v13 2/5. FOUNDATION_LAB_PASS eval.json is PASS. Next: CAPABILITY-DESIGN-PROFILE-EVIDENCE. PLAYABLE_1V1 still needs capability-design evidence."
 ```
 ## Last accepted objective
 
-ENTRY-PREREQ-RESOLVER-EVAL-JSON — Resolver reads executable eval.json; Gauntlet audit PASS is not FOUNDATION_LAB_PASS.
+FOUNDATION-LAB-PASS-EVIDENCE — Honest evaluateFoundationLab PASS against durable BROWSER-CORE-EVIDENCE. Not a PLAYABLE_1V1_PASS claim.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T16:05:43Z)
-- Candidate: 037550c
+- Evidence: durable acceptance manifest + record (2026-08-22T16:40:06Z)
+- Candidate: 755dfb1

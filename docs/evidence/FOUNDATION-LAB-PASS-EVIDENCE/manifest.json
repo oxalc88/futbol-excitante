@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "FOUNDATION-LAB-PASS-EVIDENCE",
+  "accepted_at": "2026-08-22T16:40:06.726Z",
+  "candidate_commit": "755dfb1444e4886d30bc122e6977d298cde81ab1",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/FOUNDATION-LAB-PASS-EVIDENCE/audit.json",
+      "sha256": "3b67bec66eed32a39e82730b55c35142f56c1deb044b4d3d607b7dde4e82ab3f",
+      "git_blob": "beffb002534d29852573506a62751db120be6126",
+      "candidate_commit": "755dfb1444e4886d30bc122e6977d298cde81ab1",
+      "bytes": 2686,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-22/2026-08-22T16-40-06-726Z-FOUNDATION-LAB-PASS-EVIDENCE-acceptance.json"
+}
