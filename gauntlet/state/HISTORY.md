@@ -2988,3 +2988,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 01e7d1c candidate(SMALL-SIDED-AFTER-PREREQ-EVIDENCE)
 - notes: SMALL_SIDED_SHAPE remains NOT_EVALUATED (TEAM_DECISION_PROFILE missing). Horizon v13 5/5 EXHAUSTED.
+
+## Iteration 110 — 2026-08-22
+
+- objective_id: TEAM-DECISION-PROFILE-EVIDENCE
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 67a3886 candidate(TEAM-DECISION-PROFILE-EVIDENCE)
+- notes: Live team-decision evaluator PASS; not CPU-TEAM-DECISION-PROFILE audit. Horizon v14 1/4.

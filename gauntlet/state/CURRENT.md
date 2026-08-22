@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: TEAM-DECISION-PROFILE-EVIDENCE
+next_objective_id: MUTANT-TEAM-PASS-EVIDENCE
 
 best_known:
-  commit: 01e7d1c4bfb2b2fcec3ebb60e9299bdcf70d6f4e
-  note: "SMALL-SIDED-AFTER-PREREQ-EVIDENCE accepted as NOT_EVALUATED. Horizon v14 starts at TEAM-DECISION-PROFILE-EVIDENCE."
+  commit: 67a3886204f01bad1cc96c243745c447c125920f
+  note: "TEAM-DECISION-PROFILE-EVIDENCE accepted; live team-decision eval PASS. Next: MUTANT-TEAM-PASS-EVIDENCE."
 
 active_candidate: null
 builder_in_use: null
@@ -118,17 +118,18 @@ accepted:
   - CAPABILITY-DESIGN-PROFILE-EVIDENCE
   - PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
   - SMALL-SIDED-AFTER-PREREQ-EVIDENCE
+  - TEAM-DECISION-PROFILE-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v14 0/4 ACTIVE. Bind honest TEAM_DECISION_PROFILE eval.json (not CPU-TEAM-DECISION-PROFILE). SMALL_SIDED_SHAPE remains NOT_EVALUATED. No PES claim."
+selection_note: "Horizon v14 1/4. TEAM_DECISION_PROFILE eval.json is PASS. Next: MUTANT-TEAM-PASS-EVIDENCE. SMALL_SIDED_SHAPE remains NOT_EVALUATED. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-AFTER-PREREQ-EVIDENCE — Honest NOT_EVALUATED. PLAYABLE_1V1_PASS from live 1v1 eval.json; TEAM_DECISION_PROFILE still NOT_EVALUATED. Eight situations unevaluated.
+TEAM-DECISION-PROFILE-EVIDENCE — Honest live computeTeamDecision evaluator PASS (six axes). Distinct from CPU-TEAM-DECISION-PROFILE.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T17:25:09Z)
-- Candidate: 01e7d1c
+- Evidence: durable acceptance manifest + record (2026-08-22T17:39:58Z)
+- Candidate: 67a3886
