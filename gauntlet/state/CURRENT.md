@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: ARCHETYPE-REMAINING-VISUALS
 
 best_known:
   commit: f896bafde98c34c012847e6e9cc1daad47195fff
-  note: "SMALL-SIDED-SHAPE-RERUN accepted as NOT_EVALUATED. Horizon v8 exhausted."
+  note: "SMALL-SIDED-SHAPE-RERUN accepted as NOT_EVALUATED. Horizon v9 next: ARCHETYPE-REMAINING-VISUALS."
 
 active_candidate: null
 builder_in_use: null
@@ -103,7 +103,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v8 5/5 EXHAUSTED. SMALL-SIDED-SHAPE-RERUN accepted as NOT_EVALUATED (PLAYABLE_1V1_PASS unmet)."
+selection_note: "Horizon v9 0/4. Next: ARCHETYPE-REMAINING-VISUALS (technical/power/agility still baseline-identical)."
 ```
 ## Last accepted objective
 
