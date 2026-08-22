@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-22T10:36:20Z
+measured_at: 2026-08-22T11:33:55Z
 tracking_contract_version: 1
-last_tracked_objective: ARCHETYPE-REMAINING-VISUALS
-usage_aggregates_through: ARCHETYPE-REMAINING-VISUALS
-clock_aggregates_through: ARCHETYPE-REMAINING-VISUALS
-model_evaluation_through: ARCHETYPE-REMAINING-VISUALS
+last_tracked_objective: ARCHETYPE-FULL-PAIR-RECAPTURE
+usage_aggregates_through: ARCHETYPE-FULL-PAIR-RECAPTURE
+clock_aggregates_through: ARCHETYPE-FULL-PAIR-RECAPTURE
+model_evaluation_through: ARCHETYPE-FULL-PAIR-RECAPTURE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,13 +42,13 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 40h 36m |
+| Calendar span (first work → measurement) | 41h 34m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | 35h 16m |
-| Sum of per-step agent time | 27h 37m |
+| Active work (anything running) | 36h 12m |
+| Sum of per-step agent time | 28h 32m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T10:36:20Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T11:33:55Z`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -162,6 +162,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | PLAYABLE-1V1-PROFILE-RERUN | accepted | 30m | 14m | 8m | 4m | 1m | n/a | n/a |
 | SMALL-SIDED-SHAPE-RERUN | accepted | 17m | 1.5m | 3m | 5m | 1m | n/a | n/a |
 | ARCHETYPE-REMAINING-VISUALS | accepted | 48m | 41m | 4m | 1m | 1m | n/a | n/a |
+| ARCHETYPE-FULL-PAIR-RECAPTURE | accepted | 55m | 49m | 2m | 2m | 1m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -399,6 +400,7 @@ on an H task is the interesting result.
 | PLAYABLE-1V1-PROFILE-RERUN | qwen3.6 | M | Medium — profile re-run with two-player CONTROL check | 1 | B | critic REJECT then honest FAIL |
 | SMALL-SIDED-SHAPE-RERUN | qwen3.6 | M | Medium — milestone playtest rerun | 0 | A | NOT_EVALUATED; PLAYABLE_1V1_PASS unmet |
 | ARCHETYPE-REMAINING-VISUALS | mimo-v2.5 | M | Medium — provisional remaining renderer mappings | 1 | B | critic RETRY: simulation registry physics |
+| ARCHETYPE-FULL-PAIR-RECAPTURE | mimo-v2.5 | M | Medium — identical-condition pair recapture | 1 | B | critic RETRY uniqueness vs remaining-visuals |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -521,6 +523,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-SHAPE-RERUN | integration-reviewer (deepseek-v4-flash) | primary flash; independent of qwen builder | ACCEPT | evaluator integrity PASS |
 | ARCHETYPE-REMAINING-VISUALS | critic-qwen (qwen3.6) | 0731/flash 401, qwen fallback; independent of mimo builder | ACCEPT (retry 1) | simulation registry physics reverted |
 | ARCHETYPE-REMAINING-VISUALS | integration-reviewer-qwen (qwen3.6) | flash 401, qwen fallback; independent of mimo builder | ACCEPT | presentation_authority PASS |
+| ARCHETYPE-FULL-PAIR-RECAPTURE | critic-qwen (qwen3.6) | flash 401, qwen fallback; independent of mimo builder | ACCEPT (retry 1) | uniqueness vs remaining-visuals VALID |
+| ARCHETYPE-FULL-PAIR-RECAPTURE | integration-reviewer-qwen (qwen3.6) | flash 401, qwen fallback; independent of mimo builder | ACCEPT | disk comparison PASS, ARCH-DIFF NPR |
 
 ### Builder scoreboard
 
@@ -529,7 +533,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 45 | 27 | 10 | 3 | 3 | 2 | 60% | ~0.73 | ~36m |
-| mimo-v2.5 | 32 | 20 | 10 | 2 | 0 | 0 | 62% | ~0.44 | ~32m |
+| mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

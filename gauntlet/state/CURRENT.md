@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ARCHETYPE-FULL-PAIR-RECAPTURE
+next_objective_id: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
 
 best_known:
-  commit: 14b0a78ceb81a67cc47f235533ef3e53d57a265a
-  note: "ARCHETYPE-REMAINING-VISUALS accepted (provisional technical/power/agility visuals). Next: ARCHETYPE-FULL-PAIR-RECAPTURE."
+  commit: 998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb
+  note: "ARCHETYPE-FULL-PAIR-RECAPTURE accepted (disk comparison PASS). Next: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES."
 
 active_candidate: null
 builder_in_use: null
@@ -101,17 +101,18 @@ accepted:
   - PLAYABLE-1V1-PROFILE-RERUN
   - SMALL-SIDED-SHAPE-RERUN
   - ARCHETYPE-REMAINING-VISUALS
+  - ARCHETYPE-FULL-PAIR-RECAPTURE
 
 blocked: []
 
-selection_note: "Horizon v9 1/4. ARCHETYPE-REMAINING-VISUALS accepted. Next: ARCHETYPE-FULL-PAIR-RECAPTURE."
+selection_note: "Horizon v9 2/4. ARCHETYPE-FULL-PAIR-RECAPTURE accepted. Next: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES."
 ```
 ## Last accepted objective
 
-ARCHETYPE-REMAINING-VISUALS — Provisional renderer mappings for technical/power/agility; unique 800x600 frames; simulation registry unchanged. No PLAYABLE_1V1_PASS.
+ARCHETYPE-FULL-PAIR-RECAPTURE — Identical-condition recapture of all five archetypes at tick 5; disk comparison PASS. SHA reuse vs remaining-visuals VALID. No PLAYABLE_1V1_PASS.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic-qwen / qwen3.6 — ACCEPT (retry 1, foundation.ts physics reverted; primary flash 401)
+- critic: critic-qwen / qwen3.6 — ACCEPT (retry 1 uniqueness-bar; primary flash 401)
 - integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (primary flash 401)
-- Evidence: durable acceptance manifest + record (2026-08-22T10:36:20Z)
-- Candidate: 14b0a78
+- Evidence: durable acceptance manifest + record (2026-08-22T11:33:55Z)
+- Candidate: 998b6e3

@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-22T11:33:55.509Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "ARCHETYPE-FULL-PAIR-RECAPTURE",
+  "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "semantic_audit": {
+    "verdict": "VALID"
+  },
+  "critic": {
+    "agent": "critic-qwen",
+    "model": "qwen3.6",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer-qwen",
+    "model": "qwen3.6",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  }
+}

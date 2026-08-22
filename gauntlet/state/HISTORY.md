@@ -2818,3 +2818,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 14b0a78 candidate(ARCHETYPE-REMAINING-VISUALS)
 - notes: Provisional technical/power/agility visuals; unique 800x600 frames; no sim physics. Horizon v9 1/4.
+
+## Iteration 93 — 2026-08-22
+
+- objective_id: ARCHETYPE-FULL-PAIR-RECAPTURE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-qwen / qwen3.6 — ACCEPT (retry 1 uniqueness vs remaining-visuals; aux VALID)
+- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT
+- result: accepted
+- commits: 998b6e3 candidate(ARCHETYPE-FULL-PAIR-RECAPTURE)
+- notes: Tick-5 recapture; disk comparison PASS; tests unfrozen from FAIL. No PLAYABLE_1V1_PASS. Horizon v9 2/4.

@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "ARCHETYPE-FULL-PAIR-RECAPTURE",
+  "accepted_at": "2026-08-22T11:33:55.509Z",
+  "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/ARCHETYPE-FULL-PAIR-RECAPTURE/archetype-agility-frame-005.png",
+        "sha256": "9b1a1df24da2fa070cca30f79c6637bf2abaf29a5492443f9f901f51990fd35c",
+        "git_blob": "29d654f37288384e2a0c3122d9b46a0cbeb4e6f5",
+        "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+        "bytes": 20563,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/ARCHETYPE-FULL-PAIR-RECAPTURE/archetype-burst-frame-005.png",
+        "sha256": "574f338ca0592efcd6337e7701564ec990f486bde53c49c0470df1cc22206537",
+        "git_blob": "886579a526cc73a91fdcbad047611c304c90fafd",
+        "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+        "bytes": 20702,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/ARCHETYPE-FULL-PAIR-RECAPTURE/archetype-power-frame-005.png",
+        "sha256": "bdeb04b76b6f166b71cafa5556fcd04af1cb7ed3ddfdb83ffad5331605c5fda3",
+        "git_blob": "955c4ae698687b80bf80a6fa0b35e12d6c13c4fc",
+        "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+        "bytes": 20697,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/ARCHETYPE-FULL-PAIR-RECAPTURE/archetype-steady-frame-005.png",
+        "sha256": "301ef99be544a000cde0b200052e1c03a0fbd09b406309461872a9bacf59d865",
+        "git_blob": "477e1a852f47b879f2043de29f2de761dbcaba72",
+        "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+        "bytes": 20706,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/ARCHETYPE-FULL-PAIR-RECAPTURE/archetype-technical-frame-005.png",
+        "sha256": "3840188e2cd51272f90cae0b1fbda563f65e4d0f7d89f56587a9cc11b48e2728",
+        "git_blob": "2732e6907a9788eb4184debac9616d7cad4be1a2",
+        "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+        "bytes": 20572,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "ARCHETYPE-FULL-PAIR-RECAPTURE",
+        "description": "Real Three.js renderer frames for all 5 archetypes under identical conditions at tick 5. Only archetypeId varies. The ARCHETYPE_VISUAL_REGISTRY produces distinct renders per archetype.",
+        "frames": [
+          {
+            "label": "archetype-burst-v1",
+            "path": "archetype-burst-frame-005.png",
+            "tick": 5,
+            "sha256": "574f338ca0592efcd6337e7701564ec990f486bde53c49c0470df1cc22206537"
+          },
+          {
+            "label": "archetype-steady-v1",
+            "path": "archetype-steady-frame-005.png",
+            "tick": 5,
+            "sha256": "301ef99be544a000cde0b200052e1c03a0fbd09b406309461872a9bacf59d865"
+          },
+          {
+            "label": "archetype-technical-v1",
+            "path": "archetype-technical-frame-005.png",
+            "tick": 5,
+            "sha256": "3840188e2cd51272f90cae0b1fbda563f65e4d0f7d89f56587a9cc11b48e2728"
+          },
+          {
+            "label": "archetype-power-v1",
+            "path": "archetype-power-frame-005.png",
+            "tick": 5,
+            "sha256": "bdeb04b76b6f166b71cafa5556fcd04af1cb7ed3ddfdb83ffad5331605c5fda3"
+          },
+          {
+            "label": "archetype-agility-v1",
+            "path": "archetype-agility-frame-005.png",
+            "tick": 5,
+            "sha256": "9b1a1df24da2fa070cca30f79c6637bf2abaf29a5492443f9f901f51990fd35c"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/ARCHETYPE-FULL-PAIR-RECAPTURE/sequence.json",
+        "sha256": "8dbfa4a1d2149c97fcc7d18c657012bc4e7006f3e702398a7d9155890930c6ab",
+        "git_blob": "2bf6a9bff3182d36c1a17ac29123c448c83202da",
+        "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+        "bytes": 1299,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/ARCHETYPE-FULL-PAIR-RECAPTURE/trajectory.json",
+      "sha256": "939f93eec2aa163f30288e3c715db2c8f218de67b8490543d8e0b15cb9ac5164",
+      "git_blob": "56f35cb6fb3b2e9411ec4c588c12250b7d38aa41",
+      "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+      "bytes": 1847,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/ARCHETYPE-FULL-PAIR-RECAPTURE/audit.json",
+      "sha256": "c99c1146500bc7fa099cc00cc24363a515b9a9eb99cd99cdfba914316c27cb91",
+      "git_blob": "825bc2540771f097dc2921e23dbf4c84280e97ac",
+      "candidate_commit": "998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb",
+      "bytes": 3299,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": {
+      "verdict": "VALID"
+    },
+    "critic": {
+      "agent": "critic-qwen",
+      "model": "qwen3.6",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer-qwen",
+      "model": "qwen3.6",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-22/2026-08-22T11-33-55-509Z-ARCHETYPE-FULL-PAIR-RECAPTURE-acceptance.json"
+}
