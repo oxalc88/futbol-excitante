@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ARCH-DIFF-001-RUBRIC
+next_objective_id: ARCHETYPE-BROWSER-CAPTURE
 
 best_known:
-  commit: e38daff264dfbb4587d700234604518ae32b5a45
-  note: "BROWSER-CORE-EVIDENCE accepted. RESET-001 and STEP-001 browser-cases.json loadable; DYNAMIC_VISUAL frames recaptured after critic RETRY."
+  commit: f12c52a9d2e78edb93094e92fbeb3a6ee328cd5c
+  note: "ARCH-DIFF-001-RUBRIC accepted. Versioned perceptual rubric executable; missing artifacts stay NEEDS_PERCEPTUAL_REVIEW."
 
 active_candidate: null
 builder_in_use: null
@@ -91,17 +91,18 @@ accepted:
   - PLAYABLE-CONTROL-SLOT-ROUTING
   - PLAYABLE-1V1-PROFILE-EVALUATION
   - BROWSER-CORE-EVIDENCE
+  - ARCH-DIFF-001-RUBRIC
 
 blocked: []
 
-selection_note: "Horizon v7 'playable-1v1-browser-evidence' 1/5. BROWSER-CORE-EVIDENCE accepted. Next: ARCH-DIFF-001-RUBRIC."
+selection_note: "Horizon v7 'playable-1v1-browser-evidence' 2/5. ARCH-DIFF-001-RUBRIC accepted. Next: ARCHETYPE-BROWSER-CAPTURE."
 ```
 ## Last accepted objective
 
-BROWSER-CORE-EVIDENCE — Durable BROWSER-CORE-RESET-001 and BROWSER-CORE-STEP-001 evidence: browser-cases.json + trajectory + four 800x600 semantic frames (after critic RETRY on identical 205x460 crops). Profile runner loads the JSON; those two cases PASS when present, remain INVALID_RUN when absent. No PLAYABLE_1V1_PASS claim. DYNAMIC_VISUAL audit PASS.
+ARCH-DIFF-001-RUBRIC — Versioned perceptual rubric (arch-diff-001-rubric-v1) with four criterion dimensions and deterministic PASS/FAIL/NEEDS_PERCEPTUAL_REVIEW reduction. Missing artifacts stay NEEDS_PERCEPTUAL_REVIEW. HEADLESS audit PASS. No PLAYABLE_1V1_PASS. Browser capture deferred to ARCHETYPE-BROWSER-CAPTURE.
 
-- builder: builder-gameplay / mimo-v2.5
-- critic: critic / deepseek-v4-flash — ACCEPT (retry 1: recapture distinct frames, independence OK)
-- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (dependency PASS, evaluator integrity PASS, neighboring tests PASS)
-- Evidence: durable acceptance manifest + record (2026-08-22T04:30:14Z)
-- Candidate: e38daff
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (retry 1: TS4104 + disk stateHash, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (624 eval unit tests, evaluator integrity PASS)
+- Evidence: durable acceptance manifest + record (2026-08-22T04:58:17Z)
+- Candidate: f12c52a

@@ -2718,3 +2718,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: e38daff candidate(BROWSER-CORE-EVIDENCE)
 - notes: Loadable browser-cases.json for BROWSER-CORE-RESET-001 and BROWSER-CORE-STEP-001; profile runner wires opts.browserCases; trajectory.json; four distinct 800x600 frames + sequence.json after critic RETRY on byte-identical 205x460 crops. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS. Horizon playable-1v1-browser-evidence 1/5.
+
+## Iteration 83 — 2026-08-22
+
+- objective_id: ARCH-DIFF-001-RUBRIC
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (retry 1, TS4104 + disk stateHash, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (624 eval unit tests, 0 regressions)
+- result: accepted
+- commits: f12c52a feat(eval): add versioned perceptual rubric
+- notes: Versioned ARCH-DIFF-001 rubric v1 with four dimensions; missing artifacts NEEDS_PERCEPTUAL_REVIEW; no theatrical PASS; no PES claims. HEADLESS audit PASS. Horizon playable-1v1-browser-evidence 2/5.

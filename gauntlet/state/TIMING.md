@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-22T04:30:14Z
+measured_at: 2026-08-22T04:58:17Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-CORE-EVIDENCE
-usage_aggregates_through: BROWSER-CORE-EVIDENCE
-clock_aggregates_through: BROWSER-CORE-EVIDENCE
-model_evaluation_through: BROWSER-CORE-EVIDENCE
+last_tracked_objective: ARCH-DIFF-001-RUBRIC
+usage_aggregates_through: ARCH-DIFF-001-RUBRIC
+clock_aggregates_through: ARCH-DIFF-001-RUBRIC
+model_evaluation_through: ARCH-DIFF-001-RUBRIC
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -45,10 +45,10 @@ style meter is the live context window, not session cost.
 | Calendar span (first work → measurement) | 39h 25m |
 | Unexplained stop (excluded) | 5h 16m |
 | Active work (anything running) | 34h 09m |
-| Sum of per-step agent time | 22h 16m |
+| Sum of per-step agent time | 22h 41m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T04:30:14Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T04:58:17Z`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -152,6 +152,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | PLAYABLE-CONTROL-SLOT-ROUTING | accepted | ~32m | 15m | 8m | 6m | 0.5m | ~6M est. | n/a** |
 | PLAYABLE-1V1-PROFILE-EVALUATION | accepted | ~20m | 10m | 8m | 4m | 0.5m | ~4M est. | n/a** |
 | BROWSER-CORE-EVIDENCE | accepted | 55m | 43m | 3m | 8m | 1m | n/a | n/a |
+| ARCH-DIFF-001-RUBRIC | accepted | 25m | 10m | 3m | 11m | 1m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -379,6 +380,7 @@ on an H task is the interesting result.
 | PLAYABLE-CONTROL-SLOT-ROUTING | mimo-v2.5 | M | Medium — slot routing, player switching, pure functions | 0 | B | 45 tests, 1969 total (critic retry: fromPlayer payload fix) |
 | PLAYABLE-1V1-PROFILE-EVALUATION | qwen3.6 | M | Medium — profile evaluation runner, result analysis | 0 | A | 47 eval tests, 554 total, INVALID_RUN verdict correct |
 | BROWSER-CORE-EVIDENCE | mimo-v2.5 | M | Medium — browser case evidence capture, runner wiring, semantic frames | 1 | B | 20 browser + 9 unit evidence tests; critic retry recaptured distinct 800x600 frames |
+| ARCH-DIFF-001-RUBRIC | qwen3.6 | M | Medium — versioned perceptual rubric and deterministic evaluator | 1 | B | 61 rubric tests; critic retry TS4104 + disk stateHash |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -481,6 +483,8 @@ on an H task is the interesting result.
 | PLAYABLE-1V1-PROFILE-EVALUATION | integration-reviewer-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | dependency PASS, evaluator integrity PASS, 0 regressions |
 | BROWSER-CORE-EVIDENCE | critic (deepseek-v4-flash) | primary flash; independent of mimo builder | ACCEPT (retry 1) | caught byte-identical 205x460 frames; recapture 800x600 unique SHAs |
 | BROWSER-CORE-EVIDENCE | integration-reviewer (deepseek-v4-flash) | primary flash; independent of mimo builder | ACCEPT | core-smoke 16/16, evaluator integrity PASS, no PLAYABLE_1V1_PASS claim |
+| ARCH-DIFF-001-RUBRIC | critic (deepseek-v4-flash) | primary flash; independent of qwen builder | ACCEPT (retry 1) | TS4104 in rubric criteria; disk path must not synthesize stateHash |
+| ARCH-DIFF-001-RUBRIC | integration-reviewer (deepseek-v4-flash) | primary flash; independent of qwen builder | ACCEPT | 624 eval unit tests, missing artifacts stay NEEDS_PERCEPTUAL_REVIEW |
 
 ### Builder scoreboard
 
@@ -488,7 +492,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 40 | 24 | 8 | 3 | 3 | 2 | 60% | ~0.78 | ~38m |
+| qwen3.6 | 41 | 24 | 9 | 3 | 3 | 2 | 59% | ~0.78 | ~37m |
 | mimo-v2.5 | 27 | 19 | 7 | 1 | 0 | 0 | 70% | ~0.37 | ~31m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

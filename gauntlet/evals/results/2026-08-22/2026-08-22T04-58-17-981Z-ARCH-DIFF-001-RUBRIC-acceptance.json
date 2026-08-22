@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-22T04:58:17.981Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "ARCH-DIFF-001-RUBRIC",
+  "candidate_commit": "f12c52a9d2e78edb93094e92fbeb3a6ee328cd5c",
+  "evidence_class": "HEADLESS",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "agent": "critic",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  }
+}
