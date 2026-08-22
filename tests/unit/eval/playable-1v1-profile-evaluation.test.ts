@@ -327,10 +327,13 @@ describe("Exit prerequisite recording", () => {
 // ---------------------------------------------------------------------------
 
 describe("Overall verdict computation", () => {
-  it("verdict is not PASS when ARCH-DIFF-001 is NEEDS_PERCEPTUAL_REVIEW", () => {
+  it("verdict is not PASS — ARCH-DIFF now passes, blocked by other sub-components", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
+    // ARCH-DIFF-001 is now evaluated via the wired rubric and passes.
+    // Overall verdict is not PASS because other components (missing suites,
+    // missing browser evidence for BROWSER-1V1-CONTROL-001) prevent it.
     expect(result.milestoneVerdict).not.toBe("PASS");
   });
 
@@ -338,8 +341,8 @@ describe("Overall verdict computation", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
-    // ARCH-DIFF-001 is NEEDS_PERCEPTUAL_REVIEW and missing suites produce
-    // INVALID_RUN, so the overall verdict is never PASS.
+    // Missing suites produce INVALID_RUN, so the overall verdict is
+    // INVALID_RUN. ARCH-DIFF-001 now passes from the wired evaluator.
     expect(result.milestoneVerdict).not.toBe("PASS");
   });
 
@@ -472,7 +475,7 @@ describe("Blocker identification", () => {
     expect(result.details).toContain(result.milestoneVerdict);
   });
 
-  it("ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW is a blocker", () => {
+  it("ARCH-DIFF-001 evaluates to PASS via wired rubric", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
@@ -480,7 +483,8 @@ describe("Blocker identification", () => {
       (v) => v.case_id === "ARCH-DIFF-001",
     );
     expect(archDiffVerdict).toBeDefined();
-    expect(archDiffVerdict!.verdict).toBe("NEEDS_PERCEPTUAL_REVIEW");
+    // With recaptured artifacts, the wired evaluator produces PASS.
+    expect(archDiffVerdict!.verdict).toBe("PASS");
   });
 
   it("details mention all major blockers", () => {

@@ -175,9 +175,10 @@ function loadArtifactHashes(
   const tickStr = String(tick).padStart(3, "0");
   const metaFileName = `${baseName}-frame-${tickStr}.meta.json`;
 
-  // Search order: artifacts/ (ephemeral) → docs/evidence/ (committed durable)
+  // Search order: artifacts/ (ephemeral) → docs/evidence/ (committed durable, newest first)
   const searchDirs = [
     join(__dirname, "../../artifacts/archetype-capture"),
+    join(__dirname, "../../docs/evidence/ARCHETYPE-FULL-PAIR-RECAPTURE"),
     join(__dirname, "../../docs/evidence/ARCHETYPE-BROWSER-CAPTURE"),
   ];
 

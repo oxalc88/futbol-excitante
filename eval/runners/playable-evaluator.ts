@@ -40,6 +40,7 @@ import {
 import { BROWSER_CASES } from "../contracts/browser-cases.js";
 import { evaluateMutant1v1 } from "./mutant-1v1.js";
 import { evaluateArchetypeComparison } from "./archetype-comparison.js";
+import { runArchDiff001 } from "./arch-diff-001-evaluator.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -133,17 +134,17 @@ function validateBrowserCasesFor1v1(
 
     // Check if this is the special ARCH-DIFF-001 case.
     if (caseId === "ARCH-DIFF-001") {
-      // ARCH-DIFF-001 is a PERCEPTUAL_TARGET case.
-      // It requires a versioned rubric and browser artifacts.
-      // Without those, it is NEEDS_PERCEPTUAL_REVIEW.
-      const found = browserCases.find((r) => r.case_id === caseId);
-      if (!found) {
+      // ARCH-DIFF-001 is a PERCEPTUAL_TARGET case evaluated via
+      // the versioned rubric against committed disk artifacts.
+      try {
+        const archResult = runArchDiff001({ useDiskArtifacts: true });
+        verdicts.push({ case_id: caseId, verdict: archResult.verdict as EvaluationOutcome });
+        continue;
+      } catch {
+        // No artifacts found — falls through to NEEDS_PERCEPTUAL_REVIEW.
         verdicts.push({ case_id: caseId, verdict: "NEEDS_PERCEPTUAL_REVIEW" });
         continue;
       }
-      // Even with evidence, ARCH-DIFF-001 needs a perceptual rubric.
-      verdicts.push({ case_id: caseId, verdict: "NEEDS_PERCEPTUAL_REVIEW" });
-      continue;
     }
 
     // For non-special required cases, use standard browser validation.

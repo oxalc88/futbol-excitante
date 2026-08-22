@@ -186,32 +186,23 @@ describe("PLAYABLE_1V1 evaluator: missing suites", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 3. ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW → overall is not PASS
+// 3. ARCH-DIFF-001 wired to rubric evaluator
 // ---------------------------------------------------------------------------
 
-describe("PLAYABLE_1V1 evaluator: ARCH-DIFF-001 perceptual review", () => {
-  it("ARCH-DIFF-001 is classified as NEEDS_PERCEPTUAL_REVIEW", () => {
+describe("PLAYABLE_1V1 evaluator: ARCH-DIFF-001 wired to rubric", () => {
+  it("ARCH-DIFF-001 is evaluated via runArchDiff001 with disk artifacts", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
     const archDiff = result.browserCaseVerdicts.find(
       (v) => v.case_id === "ARCH-DIFF-001",
     );
+    // With committed recapture artifacts, the honest rubric verdict is PASS.
     expect(archDiff).toBeDefined();
-    expect(archDiff!.verdict).toBe("NEEDS_PERCEPTUAL_REVIEW");
+    expect(archDiff!.verdict).toBe("PASS");
   });
 
-  it("overall verdict is not PASS when ARCH-DIFF is NEEDS_PERCEPTUAL_REVIEW", () => {
-    const scenario = loadFixture();
-    const result = evaluatePlayable1v1(scenario);
-
-    // Per spec §2.2: NEEDS_PERCEPTUAL_REVIEW > NOT_EVALUATED > PASS.
-    // A milestone with a required perceptual case that has not been
-    // reviewed cannot be PASS.
-    expect(result.milestoneVerdict).not.toBe("PASS");
-  });
-
-  it("subComponents include ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW verdict", () => {
+  it("subComponents include ARCH-DIFF-001 PASS verdict", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
@@ -219,7 +210,7 @@ describe("PLAYABLE_1V1 evaluator: ARCH-DIFF-001 perceptual review", () => {
       (s) => s.componentId === "BROWSER_CASE:ARCH-DIFF-001",
     );
     expect(archDiffComponent).toBeDefined();
-    expect(archDiffComponent!.outcome).toBe("NEEDS_PERCEPTUAL_REVIEW");
+    expect(archDiffComponent!.outcome).toBe("PASS");
   });
 });
 

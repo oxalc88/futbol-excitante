@@ -68,7 +68,7 @@ describe("ARCHETYPE-BROWSER-CAPTURE evaluation (committed artifacts)", () => {
     expect(result.verdict).toBe("NOT_EVALUATED");
   });
 
-  it("runArchDiff001({useDiskArtifacts:true}) returns FAIL or NEEDS_PERCEPTUAL_REVIEW", async () => {
+  it("runArchDiff001({useDiskArtifacts:true}) returns PASS (recaptured artifacts)", async () => {
     const { runArchDiff001 } = await import(
       "../../eval/runners/arch-diff-001-evaluator.js"
     );
@@ -76,10 +76,9 @@ describe("ARCHETYPE-BROWSER-CAPTURE evaluation (committed artifacts)", () => {
       tick: TICK,
       useDiskArtifacts: true,
     });
-    // runArchDiff001 loads from artifacts/ and ARCHETYPE-BROWSER-CAPTURE
-    // (not ARCHETYPE-FULL-PAIR-RECAPTURE), so it may still see identical
-    // frames. Must NOT be a theatrical PASS.
-    expect(result.verdict).not.toBe("PASS");
+    // runArchDiff001 now loads from ARCHETYPE-FULL-PAIR-RECAPTURE which
+    // has unique per-archetype perceptual hashes (burst vs steady differ).
+    expect(result.verdict).toBe("PASS");
   });
 
   it("runArchDiff001({useDiskArtifacts:false}) returns NEEDS_PERCEPTUAL_REVIEW", async () => {
