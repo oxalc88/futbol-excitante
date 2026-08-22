@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: PLAYABLE-1V1-ENTRY-PREREQ-CALLER
 
 best_known:
   commit: 2485e2c4f1e8c16f2719219507521e1f0fe523bc
-  note: "SMALL-SIDED-AFTER-DETERMINISTIC accepted as NOT_EVALUATED. Horizon v11 exhausted."
+  note: "SMALL-SIDED-AFTER-DETERMINISTIC accepted as NOT_EVALUATED. Horizon v12 next: PLAYABLE-1V1-ENTRY-PREREQ-CALLER."
 
 active_candidate: null
 builder_in_use: null
@@ -113,7 +113,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v11 3/3 EXHAUSTED. SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 NOT_EVALUATED, not PASS)."
+selection_note: "Horizon v12 0/3. Next: PLAYABLE-1V1-ENTRY-PREREQ-CALLER (entry prereqs still unverified by caller)."
 ```
 ## Last accepted objective
 
