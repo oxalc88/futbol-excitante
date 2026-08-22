@@ -2858,3 +2858,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 96f27ce candidate(ARCH-DIFF-001-FRAME-BINDING)
 - notes: ARCH-DIFF-001 no longer hardcoded NPR; hash-diff PASS on recapture. Horizon v10 1/3.
+
+## Iteration 97 — 2026-08-22
+
+- objective_id: PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 306631e candidate(PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING)
+- notes: Overall NOT_EVALUATED; ARCH-DIFF PASS. No PLAYABLE_1V1_PASS. Horizon v10 2/3.
