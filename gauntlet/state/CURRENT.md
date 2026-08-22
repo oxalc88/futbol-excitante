@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ARCH-DIFF-001-FRAME-BINDING
+next_objective_id: PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING
 
 best_known:
-  commit: 5fc9ce3662b11977fd680bfac9e9b17b63ce3588
-  note: "SMALL-SIDED-SHAPE-AFTER-1V1 accepted as NOT_EVALUATED. Horizon v10 next: ARCH-DIFF-001-FRAME-BINDING."
+  commit: 96f27cec0cce7e75b4fb2b0d8e244a0871193fcf
+  note: "ARCH-DIFF-001-FRAME-BINDING accepted (rubric wired; hash-diff PASS). Next: PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING."
 
 active_candidate: null
 builder_in_use: null
@@ -104,17 +104,18 @@ accepted:
   - ARCHETYPE-FULL-PAIR-RECAPTURE
   - PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
   - SMALL-SIDED-SHAPE-AFTER-1V1
+  - ARCH-DIFF-001-FRAME-BINDING
 
 blocked: []
 
-selection_note: "Horizon v10 0/3. Next: ARCH-DIFF-001-FRAME-BINDING (ARCH-DIFF still hardcoded NPR)."
+selection_note: "Horizon v10 1/3. ARCH-DIFF-001-FRAME-BINDING accepted. Next: PLAYABLE-1V1-AFTER-ARCH-DIFF-BINDING."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-SHAPE-AFTER-1V1 — Honest NOT_EVALUATED after PLAYABLE_1V1 NPR. Eight situations unevaluated. No milestone PASS.
+ARCH-DIFF-001-FRAME-BINDING — ARCH-DIFF-001 wired to versioned rubric + recapture frames; hash-diff PASS. No PLAYABLE_1V1_PASS claimed.
 
 - builder: builder-structured / qwen3.6
-- critic: critic-mimo / mimo-v2.5 — ACCEPT (primary flash 401; qwen blocked)
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (flash 401; qwen blocked)
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T11:53:15Z)
-- Candidate: 5fc9ce3
+- Evidence: durable acceptance manifest + record (2026-08-22T12:39:16Z)
+- Candidate: 96f27ce

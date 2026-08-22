@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-22T12:39:16.427Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "ARCH-DIFF-001-FRAME-BINDING",
+  "candidate_commit": "96f27cec0cce7e75b4fb2b0d8e244a0871193fcf",
+  "evidence_class": "HEADLESS",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "agent": "critic-mimo",
+    "model": "mimo-v2.5",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer-mimo",
+    "model": "mimo-v2.5",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  }
+}

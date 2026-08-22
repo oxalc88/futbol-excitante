@@ -7,10 +7,10 @@ horizon_id: "arch-diff-frame-binding-and-1v1-rerun"
 created_from_commit: e0de8b80299d1df67b59d417ea2ddd050056b865
 created_at: 2026-08-22
 reason: "Horizon remaining-archetype-visuals-and-1v1-rerun exhausted (4/4). PLAYABLE_1V1 is honest NEEDS_PERCEPTUAL_REVIEW: CORE/CONTROL PASS, archetype comparison PASS, ARCH-DIFF-001 still hardcoded NPR in the playable evaluator even though a versioned rubric and recapture frames exist. SMALL_SIDED_SHAPE remains NOT_EVALUATED. New horizon binds ARCH-DIFF-001 to the rubric/frames without inventing human-subject data, re-runs PLAYABLE_1V1 honestly, and re-attempts SMALL_SIDED_SHAPE only if 1v1 actually passes."
-current_index: 0
+current_index: 1
 objectives:
   - id: ARCH-DIFF-001-FRAME-BINDING
-    status: pending
+    status: accepted
     reason: "Stop always-NPR for ARCH-DIFF-001 when rubric and recapture frames exist. Wire playable-evaluator to the versioned rubric/disk evaluator. Honest PASS/FAIL/NPR. No invented human-subject data or PES envelopes."
     builder: builder-structured
     prerequisite: null

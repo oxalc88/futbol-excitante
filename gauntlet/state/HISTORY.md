@@ -2848,3 +2848,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 5fc9ce3 candidate(SMALL-SIDED-SHAPE-AFTER-1V1)
 - notes: SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1 NPR not PASS). Horizon v9 4/4 EXHAUSTED.
+
+## Iteration 96 — 2026-08-22
+
+- objective_id: ARCH-DIFF-001-FRAME-BINDING
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 96f27ce candidate(ARCH-DIFF-001-FRAME-BINDING)
+- notes: ARCH-DIFF-001 no longer hardcoded NPR; hash-diff PASS on recapture. Horizon v10 1/3.
