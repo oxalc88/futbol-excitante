@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ARCHETYPE-IDENTICAL-RECAPTURE
+next_objective_id: PLAYABLE-1V1-PROFILE-RERUN
 
 best_known:
-  commit: a40953508662b3ecc97f28e47e6dd899af864728
-  note: "ARCHETYPE-RENDER-DIFFERENCE accepted. Next: ARCHETYPE-IDENTICAL-RECAPTURE."
+  commit: bbcf0d16666faa37a62472664bb01e2d14d3518d
+  note: "ARCHETYPE-IDENTICAL-RECAPTURE accepted (honest FAIL technical vs power). Next: PLAYABLE-1V1-PROFILE-RERUN."
 
 active_candidate: null
 builder_in_use: null
@@ -97,17 +97,18 @@ accepted:
   - SMALL-SIDED-MILESTONE-EVALUATION
   - BROWSER-1V1-CONTROL-EVIDENCE
   - ARCHETYPE-RENDER-DIFFERENCE
+  - ARCHETYPE-IDENTICAL-RECAPTURE
 
 blocked: []
 
-selection_note: "Horizon v8 2/5. ARCHETYPE-RENDER-DIFFERENCE accepted. Next: ARCHETYPE-IDENTICAL-RECAPTURE."
+selection_note: "Horizon v8 3/5. ARCHETYPE-IDENTICAL-RECAPTURE accepted. Next: PLAYABLE-1V1-PROFILE-RERUN."
 ```
 ## Last accepted objective
 
-ARCHETYPE-RENDER-DIFFERENCE — Presentation snapshot carries archetypeId; Three.js provisional scale/emissive makes burst vs steady distinguishable. PRESENTATION audit PASS. No PES claim.
+ARCHETYPE-IDENTICAL-RECAPTURE — Recaptured identical-condition frames after renderer difference. Burst vs steady detectable; technical vs power identical → honest FAIL. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS.
 
 - builder: builder-gameplay / mimo-v2.5
 - critic: critic / deepseek-v4-flash — ACCEPT (independence OK)
-- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (core-smoke 16/16, presentation authority PASS)
-- Evidence: durable acceptance manifest + record (2026-08-22T07:58:38Z)
-- Candidate: a409535
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (evaluator integrity PASS)
+- Evidence: durable acceptance manifest + record (2026-08-22T08:55:56Z)
+- Candidate: bbcf0d1

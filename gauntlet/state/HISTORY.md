@@ -2778,3 +2778,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: a409535 candidate(ARCHETYPE-RENDER-DIFFERENCE)
 - notes: Provisional burst vs steady renderer visuals; snapshot archetypeId; no PES. Horizon v8 2/5.
+
+## Iteration 89 — 2026-08-22
+
+- objective_id: ARCHETYPE-IDENTICAL-RECAPTURE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (evaluator integrity PASS)
+- result: accepted
+- commits: bbcf0d1 candidate(ARCHETYPE-IDENTICAL-RECAPTURE)
+- notes: Recapture after renderer difference; burst vs steady detectable; technical vs power identical → honest FAIL. Horizon v8 3/5.
