@@ -1,41 +1,41 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 7
-status: EXHAUSTED
-horizon_id: "playable-1v1-browser-evidence"
-created_from_commit: e997a538f375f3259297e93606d801bc3c679bc6
-created_at: 2026-08-20
-reason: "Horizon playable-1v1-enabler exhausted (6/6 accepted including sentinel). PLAYABLE_1V1 profile evaluation returned INVALID_RUN due to missing browser evidence and ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED (no disk artifacts). New horizon focuses on browser evidence capture and perceptual rubric implementation to enable PLAYABLE_1V1_PASS evaluation."
-current_index: 5
+horizon_version: 8
+status: ACTIVE
+horizon_id: "playable-1v1-control-and-archetype-render"
+created_from_commit: d1a8bf50ced29c4d2ea1a4e53ee7959228cd6bb3
+created_at: 2026-08-22
+reason: "Horizon playable-1v1-browser-evidence exhausted (5/5). PLAYABLE_1V1 remains INVALID_RUN because BROWSER-1V1-CONTROL-001 has no evidence. ARCHETYPE_BLINDED_COMPARISON_PASS is honest FAIL because the renderer ignores archetypeId. New horizon captures 1v1 control browser evidence and adds honest archetype-visible presentation under identical conditions."
+current_index: 0
 objectives:
-  - id: BROWSER-CORE-EVIDENCE
-    status: accepted
-    reason: "Capture required browser evidence (BROWSER-CORE-RESET-001, BROWSER-CORE-STEP-001) for the PLAYABLE_1V1 profile evaluation. Enables PLAYABLE_1V1 profile to move from INVALID_RUN toward evaluation."
+  - id: BROWSER-1V1-CONTROL-EVIDENCE
+    status: pending
+    reason: "Capture BROWSER-1V1-CONTROL-001 browser-case evidence so PLAYABLE_1V1 is no longer INVALID_RUN solely from a missing 1v1 control case."
     builder: builder-gameplay
     prerequisite: null
-  - id: ARCH-DIFF-001-RUBRIC
-    status: accepted
-    reason: "Implement versioned perceptual rubric for ARCH-DIFF-001 (archetype visual difference detection). Required for ARCHETYPE_BLINDED_COMPARISON_PASS from NOT_EVALUATED to PASS or FAIL."
-    builder: builder-structured
-    prerequisite: null
-  - id: ARCHETYPE-BROWSER-CAPTURE
-    status: accepted
-    reason: "Capture archetype comparison browser artifacts (PNG frames via Playwright/2D canvas) for PLAYABLE_1V1 profile evaluation. Enables ARCHETYPE_BLINDED_COMPARISON_PASS from NOT_EVALUATED to PASS/FAIL."
+  - id: ARCHETYPE-RENDER-DIFFERENCE
+    status: pending
+    reason: "Make presentation/renderer show distinguishable burst vs steady (etc.) under identical camera/task without inventing PES meshes. Versioned provisional visuals only. Fixes honest FAIL of identical frames."
     builder: builder-gameplay
-    prerequisite: BROWSER-CORE-EVIDENCE
-  - id: PLAYABLE-1V1-RE-EVALUATION
-    status: accepted
-    reason: "Re-run PLAYABLE_1V1 profile evaluation after browser evidence and archetype artifacts are captured. Expected: INVALID_RUN → FAIL or NEEDS_PERCEPTUAL_REVIEW → PASS."
+    prerequisite: null
+  - id: ARCHETYPE-IDENTICAL-RECAPTURE
+    status: pending
+    reason: "Recapture identical-condition archetype frames after renderer difference exists; disk comparison may then FAIL or PASS honestly."
+    builder: builder-gameplay
+    prerequisite: ARCHETYPE-RENDER-DIFFERENCE
+  - id: PLAYABLE-1V1-PROFILE-RERUN
+    status: pending
+    reason: "Re-run PLAYABLE_1V1 after 1v1-control evidence and (if ready) archetype recapture. Expect remaining honest blockers, not a forced PASS."
     builder: builder-structured
-    prerequisite: ARCHETYPE-BROWSER-CAPTURE
-  - id: SMALL-SIDED-MILESTONE-EVALUATION
-    status: accepted
-    reason: "Attempt SMALL_SIDED_SHAPE milestone evaluation if PLAYABLE_1V1_PASS is achieved. Otherwise reports NOT_EVALUATED with clear blockers documented."
+    prerequisite: BROWSER-1V1-CONTROL-EVIDENCE
+  - id: SMALL-SIDED-SHAPE-RERUN
+    status: pending
+    reason: "Re-attempt SMALL_SIDED_SHAPE. Remains NOT_EVALUATED unless PLAYABLE_1V1_PASS is actually achieved."
     builder: builder-structured
-    prerequisite: PLAYABLE-1V1-RE-EVALUATION
-observable_progress_target: "PLAYABLE_1V1 profile evaluation returns FAIL/NEEDS_PERCEPTUAL_REVIEW (no longer INVALID_RUN), enabling downstream SMALL_SIDED_SHAPE evaluation."
-infrastructure_only_justification: "All objectives contribute to observable browser evidence and evaluation results."
+    prerequisite: PLAYABLE-1V1-PROFILE-RERUN
+observable_progress_target: "BROWSER-1V1-CONTROL-001 leaves INVALID_RUN; archetype comparison uses real renderer difference rather than spawn-offset theatrical PASS."
+infrastructure_only_justification: "All objectives produce browser-visible or evaluation-visible 1v1 progress."
 last_invalidation_reason: null
 replan_if:
   - objective_blocked
@@ -45,3 +45,4 @@ replan_if:
   - unsafe_due_to_new_defect
   - materially_higher_value_evidence
   - human_needed_spec_or_legal_blocker
+```

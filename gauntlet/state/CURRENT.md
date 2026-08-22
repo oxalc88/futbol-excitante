@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: BROWSER-1V1-CONTROL-EVIDENCE
 
 best_known:
-  commit: 2d5b75392874d7ab1c341caee476798fdf221e55
-  note: "SMALL-SIDED-MILESTONE-EVALUATION accepted as NOT_EVALUATED. Horizon v7 exhausted."
+  commit: d1a8bf50ced29c4d2ea1a4e53ee7959228cd6bb3
+  note: "Horizon v7 exhausted. New horizon v8 playable-1v1-control-and-archetype-render. Next: BROWSER-1V1-CONTROL-EVIDENCE."
 
 active_candidate: null
 builder_in_use: null
@@ -98,7 +98,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v7 'playable-1v1-browser-evidence' 5/5 EXHAUSTED. SMALL_SIDED_SHAPE NOT_EVALUATED (PLAYABLE_1V1_PASS unmet)."
+selection_note: "Horizon v8 'playable-1v1-control-and-archetype-render' created after v7 exhaustion. Next: BROWSER-1V1-CONTROL-EVIDENCE."
 ```
 ## Last accepted objective
 
