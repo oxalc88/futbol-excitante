@@ -2738,3 +2738,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 7d60fe3 candidate(ARCHETYPE-BROWSER-CAPTURE)
 - notes: Identical-condition test-bridge frames; renderer ignores archetypeId so hashes identical; disk comparison FAIL; HEADLESS NOT_EVALUATED. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS. Horizon playable-1v1-browser-evidence 3/5.
+
+## Iteration 85 — 2026-08-22
+
+- objective_id: PLAYABLE-1V1-RE-EVALUATION
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (first pass, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (653 eval unit tests)
+- result: accepted
+- commits: 88420c3 candidate(PLAYABLE-1V1-RE-EVALUATION)
+- notes: CORE reset/step PASS; 1v1-control INVALID_RUN; ARCH-DIFF NPR; archetype comparison FAIL; overall INVALID_RUN. No PLAYABLE_1V1_PASS. Horizon playable-1v1-browser-evidence 4/5.

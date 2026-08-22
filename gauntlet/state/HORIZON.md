@@ -7,7 +7,7 @@ horizon_id: "playable-1v1-browser-evidence"
 created_from_commit: e997a538f375f3259297e93606d801bc3c679bc6
 created_at: 2026-08-20
 reason: "Horizon playable-1v1-enabler exhausted (6/6 accepted including sentinel). PLAYABLE_1V1 profile evaluation returned INVALID_RUN due to missing browser evidence and ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED (no disk artifacts). New horizon focuses on browser evidence capture and perceptual rubric implementation to enable PLAYABLE_1V1_PASS evaluation."
-current_index: 3
+current_index: 4
 objectives:
   - id: BROWSER-CORE-EVIDENCE
     status: accepted
@@ -25,7 +25,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: BROWSER-CORE-EVIDENCE
   - id: PLAYABLE-1V1-RE-EVALUATION
-    status: pending
+    status: accepted
     reason: "Re-run PLAYABLE_1V1 profile evaluation after browser evidence and archetype artifacts are captured. Expected: INVALID_RUN → FAIL or NEEDS_PERCEPTUAL_REVIEW → PASS."
     builder: builder-structured
     prerequisite: ARCHETYPE-BROWSER-CAPTURE

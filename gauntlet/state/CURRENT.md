@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: PLAYABLE-1V1-RE-EVALUATION
+next_objective_id: SMALL-SIDED-MILESTONE-EVALUATION
 
 best_known:
-  commit: 7d60fe365e6990592d7391f546c2e24ba2667e95
-  note: "ARCHETYPE-BROWSER-CAPTURE accepted. Identical-condition frames; disk comparison honest FAIL because renderer ignores archetypeId."
+  commit: 88420c36ad28c67285907f661c13299f9cbfc449
+  note: "PLAYABLE-1V1-RE-EVALUATION accepted. CORE cases PASS; overall still INVALID_RUN (missing BROWSER-1V1-CONTROL-001)."
 
 active_candidate: null
 builder_in_use: null
@@ -93,17 +93,18 @@ accepted:
   - BROWSER-CORE-EVIDENCE
   - ARCH-DIFF-001-RUBRIC
   - ARCHETYPE-BROWSER-CAPTURE
+  - PLAYABLE-1V1-RE-EVALUATION
 
 blocked: []
 
-selection_note: "Horizon v7 'playable-1v1-browser-evidence' 3/5. ARCHETYPE-BROWSER-CAPTURE accepted (honest FAIL). Next: PLAYABLE-1V1-RE-EVALUATION."
+selection_note: "Horizon v7 'playable-1v1-browser-evidence' 4/5. PLAYABLE-1V1-RE-EVALUATION accepted (still INVALID_RUN). Next: SMALL-SIDED-MILESTONE-EVALUATION."
 ```
 ## Last accepted objective
 
-ARCHETYPE-BROWSER-CAPTURE — Real test-bridge 800x600 frames under identical conditions (only archetypeId varies). Renderer ignores archetypeId so all five PNGs share SHA 444184c5…; evaluateArchetypeComparison({useDiskArtifacts:true}) is FAIL, HEADLESS remains NOT_EVALUATED. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS.
+PLAYABLE-1V1-RE-EVALUATION — Re-ran PLAYABLE_1V1: BROWSER-CORE-RESET/STEP PASS; BROWSER-1V1-CONTROL-001 INVALID_RUN; ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW; ARCHETYPE_BLINDED_COMPARISON_PASS FAIL; MUTANT_1V1_PASS PASS. Overall INVALID_RUN. No PLAYABLE_1V1_PASS. Historical profile-evaluation evidence untouched.
 
-- builder: builder-gameplay / mimo-v2.5
-- critic: critic / deepseek-v4-flash — ACCEPT (retry 2: synthetic 2D then position-offset theatrical PASS, independence OK)
-- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (evaluator integrity PASS, no theatrical PASS)
-- Evidence: durable acceptance manifest + record (2026-08-22T06:06:23Z)
-- Candidate: 7d60fe3
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (first pass, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (653 eval unit tests, evaluator integrity PASS)
+- Evidence: durable acceptance manifest + record (2026-08-22T06:33:03Z)
+- Candidate: 88420c3
