@@ -1,0 +1,3 @@
+$ tsx gauntlet/evals/src/evaluate-milestone-playtest.ts -- --milestone SMALL_SIDED_SHAPE --input docs/evidence/SMALL-SIDED-AFTER-ARCH-DIFF/input.json
+/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-22T12-56-17-758Z.json
+[ELIFECYCLE] Command failed with exit code 1.
