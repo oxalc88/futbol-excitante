@@ -8,14 +8,14 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-CORE-EVIDENCE
+next_objective_id: ARCH-DIFF-001-RUBRIC
 
 best_known:
-  commit: e997a538f375f3259297e93606d801bc3c679bc6
-  note: "PLAYABLE-1V1-PROFILE-EVALUATION accepted, horizon v6 exhausted. New horizon v7 'playable-1v1-browser-evidence' created."
+  commit: e38daff264dfbb4587d700234604518ae32b5a45
+  note: "BROWSER-CORE-EVIDENCE accepted. RESET-001 and STEP-001 browser-cases.json loadable; DYNAMIC_VISUAL frames recaptured after critic RETRY."
 
 active_candidate: null
-builder_in_use: builder-gameplay
+builder_in_use: null
 critic_in_use: null
 retry_count: 0
 max_retries_per_objective: 3
@@ -90,17 +90,18 @@ accepted:
   - PLAYABLE-SECOND-TOUCH
   - PLAYABLE-CONTROL-SLOT-ROUTING
   - PLAYABLE-1V1-PROFILE-EVALUATION
+  - BROWSER-CORE-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v6 'playable-1v1-enabler' exhausted (6/6 including sentinel). New horizon v7 'playable-1v1-browser-evidence' created. Next: BROWSER-CORE-EVIDENCE."
+selection_note: "Horizon v7 'playable-1v1-browser-evidence' 1/5. BROWSER-CORE-EVIDENCE accepted. Next: ARCH-DIFF-001-RUBRIC."
 ```
 ## Last accepted objective
 
-PLAYABLE-1V1-PROFILE-EVALUATION — PLAYABLE_1V1 profile evaluation: runs playable-evaluator against current codebase. Result: INVALID_RUN (browser evidence absent — BROWSER-CORE/BROWSER-1V1 cases, ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW, ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED due to no disk artifacts). MUTANT_1V1_PASS = PASS (9 implementable mutants detected). Evaluation infrastructure verified: ARCHETYPE_BLINDED_COMPARISON_PASS evaluated via real code, not placeholder. 47 tests; 554 eval tests, 0 failures. HEADLESS audit PASS. No PES claims. Horizon playable-1v1-enabler 4/4, EXHAUSTED.
+BROWSER-CORE-EVIDENCE — Durable BROWSER-CORE-RESET-001 and BROWSER-CORE-STEP-001 evidence: browser-cases.json + trajectory + four 800x600 semantic frames (after critic RETRY on identical 205x460 crops). Profile runner loads the JSON; those two cases PASS when present, remain INVALID_RUN when absent. No PLAYABLE_1V1_PASS claim. DYNAMIC_VISUAL audit PASS.
 
-- builder: builder-structured / qwen3.6
-- critic: critic-mimo / mimo-v2.5 — ACCEPT (first pass, 0 retries, 491s, independence OK)
-- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT (dependency PASS, evaluator integrity PASS, 0 regressions)
-- Evidence: durable acceptance manifest + record (2026-08-20T09:24:09Z)
-- Candidate: d6044c8
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (retry 1: recapture distinct frames, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (dependency PASS, evaluator integrity PASS, neighboring tests PASS)
+- Evidence: durable acceptance manifest + record (2026-08-22T04:30:14Z)
+- Candidate: e38daff

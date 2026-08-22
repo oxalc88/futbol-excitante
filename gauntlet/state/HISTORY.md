@@ -2708,3 +2708,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: d6044c8 candidate(PLAYABLE-1V1-PROFILE-EVALUATION)
 - notes: PLAYABLE_1V1 profile evaluation: runs playable-evaluator against current codebase. Result INVALID_RUN — browser evidence absent (all BROWSER-CORE/BROWSER-1V1 cases INVALID_RUN), ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED (no disk artifacts), ARCH-DIFF-001 NEEDS_PERCEPTUAL_REVIEW. MUTANT_1V1_PASS = PASS (9 implementable mutants). Evaluation infrastructure verified: archetype evaluated via real code, mutant via real reduction. 47 new tests; 554 eval tests, 0 failures. HEADLESS audit PASS. Horizon playable-1v1-enabler 4/4, EXHAUSTED.
+
+## Iteration 82 — 2026-08-22
+
+- objective_id: BROWSER-CORE-EVIDENCE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (retry 1, identical-frame recapture, 184s critic wall, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (core-smoke 16/16, evidence tests 13/13, playable-evaluator 40/40, profile-evaluation 47/47)
+- result: accepted
+- commits: e38daff candidate(BROWSER-CORE-EVIDENCE)
+- notes: Loadable browser-cases.json for BROWSER-CORE-RESET-001 and BROWSER-CORE-STEP-001; profile runner wires opts.browserCases; trajectory.json; four distinct 800x600 frames + sequence.json after critic RETRY on byte-identical 205x460 crops. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS. Horizon playable-1v1-browser-evidence 1/5.
