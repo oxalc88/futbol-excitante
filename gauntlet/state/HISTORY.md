@@ -2828,3 +2828,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 998b6e3 candidate(ARCHETYPE-FULL-PAIR-RECAPTURE)
 - notes: Tick-5 recapture; disk comparison PASS; tests unfrozen from FAIL. No PLAYABLE_1V1_PASS. Horizon v9 2/4.
+
+## Iteration 94 — 2026-08-22
+
+- objective_id: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (flash 401; qwen blocked)
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: de03e13 candidate(PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES)
+- notes: Overall NPR; archetype comparison PASS; ARCH-DIFF NPR. No PLAYABLE_1V1_PASS. Horizon v9 3/4.

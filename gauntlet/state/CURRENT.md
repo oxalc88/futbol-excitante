@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
+next_objective_id: SMALL-SIDED-SHAPE-AFTER-1V1
 
 best_known:
-  commit: 998b6e3e1a1e4da9301aedd269bb3f81c3c0b6eb
-  note: "ARCHETYPE-FULL-PAIR-RECAPTURE accepted (disk comparison PASS). Next: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES."
+  commit: de03e13fd304a0e4d086973565e225882d57e384
+  note: "PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES accepted (overall NPR). Next: SMALL-SIDED-SHAPE-AFTER-1V1."
 
 active_candidate: null
 builder_in_use: null
@@ -102,17 +102,18 @@ accepted:
   - SMALL-SIDED-SHAPE-RERUN
   - ARCHETYPE-REMAINING-VISUALS
   - ARCHETYPE-FULL-PAIR-RECAPTURE
+  - PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES
 
 blocked: []
 
-selection_note: "Horizon v9 2/4. ARCHETYPE-FULL-PAIR-RECAPTURE accepted. Next: PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES."
+selection_note: "Horizon v9 3/4. PLAYABLE-1V1 overall NPR (archetype PASS, ARCH-DIFF NPR). Next: SMALL-SIDED-SHAPE-AFTER-1V1."
 ```
 ## Last accepted objective
 
-ARCHETYPE-FULL-PAIR-RECAPTURE — Identical-condition recapture of all five archetypes at tick 5; disk comparison PASS. SHA reuse vs remaining-visuals VALID. No PLAYABLE_1V1_PASS.
+PLAYABLE-1V1-AFTER-REMAINING-ARCHETYPES — Honest NEEDS_PERCEPTUAL_REVIEW. Archetype comparison PASS; ARCH-DIFF-001 still NPR. No PLAYABLE_1V1_PASS.
 
-- builder: builder-gameplay / mimo-v2.5
-- critic: critic-qwen / qwen3.6 — ACCEPT (retry 1 uniqueness-bar; primary flash 401)
-- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (primary flash 401)
-- Evidence: durable acceptance manifest + record (2026-08-22T11:33:55Z)
-- Candidate: 998b6e3
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT (primary flash 401; qwen blocked same-as-builder)
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-22T11:43:18Z)
+- Candidate: de03e13
