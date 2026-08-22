@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "ARCHETYPE-REMAINING-VISUALS",
+  "accepted_at": "2026-08-22T10:36:20.876Z",
+  "candidate_commit": "14b0a78ceb81a67cc47f235533ef3e53d57a265a",
+  "evidence_class": "PRESENTATION",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/ARCHETYPE-REMAINING-VISUALS/archetype-agility-frame-005.png",
+        "sha256": "9b1a1df24da2fa070cca30f79c6637bf2abaf29a5492443f9f901f51990fd35c",
+        "git_blob": "29d654f37288384e2a0c3122d9b46a0cbeb4e6f5",
+        "candidate_commit": "14b0a78ceb81a67cc47f235533ef3e53d57a265a",
+        "bytes": 20563,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/ARCHETYPE-REMAINING-VISUALS/archetype-power-frame-005.png",
+        "sha256": "bdeb04b76b6f166b71cafa5556fcd04af1cb7ed3ddfdb83ffad5331605c5fda3",
+        "git_blob": "955c4ae698687b80bf80a6fa0b35e12d6c13c4fc",
+        "candidate_commit": "14b0a78ceb81a67cc47f235533ef3e53d57a265a",
+        "bytes": 20697,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/ARCHETYPE-REMAINING-VISUALS/archetype-technical-frame-005.png",
+        "sha256": "3840188e2cd51272f90cae0b1fbda563f65e4d0f7d89f56587a9cc11b48e2728",
+        "git_blob": "2732e6907a9788eb4184debac9616d7cad4be1a2",
+        "candidate_commit": "14b0a78ceb81a67cc47f235533ef3e53d57a265a",
+        "bytes": 20572,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "ARCHETYPE-REMAINING-VISUALS",
+        "description": "Remaining archetype frames captured under identical conditions. Each has unique SHA-256.",
+        "frames": [
+          {
+            "label": "archetype-technical-v1",
+            "path": "archetype-technical-frame-005.png",
+            "tick": 5,
+            "sha256": "3840188e2cd51272f90cae0b1fbda563f65e4d0f7d89f56587a9cc11b48e2728"
+          },
+          {
+            "label": "archetype-power-v1",
+            "path": "archetype-power-frame-005.png",
+            "tick": 5,
+            "sha256": "bdeb04b76b6f166b71cafa5556fcd04af1cb7ed3ddfdb83ffad5331605c5fda3"
+          },
+          {
+            "label": "archetype-agility-v1",
+            "path": "archetype-agility-frame-005.png",
+            "tick": 5,
+            "sha256": "9b1a1df24da2fa070cca30f79c6637bf2abaf29a5492443f9f901f51990fd35c"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/ARCHETYPE-REMAINING-VISUALS/sequence.json",
+        "sha256": "ad0a9147e38097c5a0f8558324ac6c7bb4815af885aceed655513e8f3accc75b",
+        "git_blob": "080516eb6b4d89af6e9f7a462322e4ab085575a3",
+        "candidate_commit": "14b0a78ceb81a67cc47f235533ef3e53d57a265a",
+        "bytes": 805,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/ARCHETYPE-REMAINING-VISUALS/audit.json",
+      "sha256": "cc38cb3bd6d548df9517b9e574dbb7958850ee89386abe452e0f5602805016ff",
+      "git_blob": "b90c8c36439bce3a625c51ef81f9d49e7098e18c",
+      "candidate_commit": "14b0a78ceb81a67cc47f235533ef3e53d57a265a",
+      "bytes": 2669,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-qwen",
+      "model": "qwen3.6",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer-qwen",
+      "model": "qwen3.6",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-22/2026-08-22T10-36-20-876Z-ARCHETYPE-REMAINING-VISUALS-acceptance.json"
+}

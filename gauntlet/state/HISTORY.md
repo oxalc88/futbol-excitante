@@ -2808,3 +2808,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: f896baf candidate(SMALL-SIDED-SHAPE-RERUN)
 - notes: SMALL_SIDED_SHAPE remains NOT_EVALUATED (PLAYABLE_1V1_PASS unmet, 8 situations unevaluated). No milestone PASS. Horizon v8 5/5 EXHAUSTED.
+
+## Iteration 92 — 2026-08-22
+
+- objective_id: ARCHETYPE-REMAINING-VISUALS
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-qwen / qwen3.6 — ACCEPT (retry 1, simulation registry reverted; primary flash 401)
+- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (primary flash 401)
+- result: accepted
+- commits: 14b0a78 candidate(ARCHETYPE-REMAINING-VISUALS)
+- notes: Provisional technical/power/agility visuals; unique 800x600 frames; no sim physics. Horizon v9 1/4.

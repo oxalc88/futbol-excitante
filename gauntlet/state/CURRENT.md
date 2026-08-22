@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ARCHETYPE-REMAINING-VISUALS
+next_objective_id: ARCHETYPE-FULL-PAIR-RECAPTURE
 
 best_known:
-  commit: f896bafde98c34c012847e6e9cc1daad47195fff
-  note: "SMALL-SIDED-SHAPE-RERUN accepted as NOT_EVALUATED. Horizon v9 next: ARCHETYPE-REMAINING-VISUALS."
+  commit: 14b0a78ceb81a67cc47f235533ef3e53d57a265a
+  note: "ARCHETYPE-REMAINING-VISUALS accepted (provisional technical/power/agility visuals). Next: ARCHETYPE-FULL-PAIR-RECAPTURE."
 
 active_candidate: null
 builder_in_use: null
@@ -100,17 +100,18 @@ accepted:
   - ARCHETYPE-IDENTICAL-RECAPTURE
   - PLAYABLE-1V1-PROFILE-RERUN
   - SMALL-SIDED-SHAPE-RERUN
+  - ARCHETYPE-REMAINING-VISUALS
 
 blocked: []
 
-selection_note: "Horizon v9 0/4. Next: ARCHETYPE-REMAINING-VISUALS (technical/power/agility still baseline-identical)."
+selection_note: "Horizon v9 1/4. ARCHETYPE-REMAINING-VISUALS accepted. Next: ARCHETYPE-FULL-PAIR-RECAPTURE."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-SHAPE-RERUN — Honest NOT_EVALUATED after PLAYABLE_1V1 FAIL. All eight required situations unevaluated. No milestone PASS.
+ARCHETYPE-REMAINING-VISUALS — Provisional renderer mappings for technical/power/agility; unique 800x600 frames; simulation registry unchanged. No PLAYABLE_1V1_PASS.
 
-- builder: builder-structured / qwen3.6
-- critic: critic / deepseek-v4-flash — ACCEPT
-- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T09:43:53Z)
-- Candidate: f896baf
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic-qwen / qwen3.6 — ACCEPT (retry 1, foundation.ts physics reverted; primary flash 401)
+- integration: integration-reviewer-qwen / qwen3.6 — ACCEPT (primary flash 401)
+- Evidence: durable acceptance manifest + record (2026-08-22T10:36:20Z)
+- Candidate: 14b0a78

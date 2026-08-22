@@ -7,10 +7,10 @@ horizon_id: "remaining-archetype-visuals-and-1v1-rerun"
 created_from_commit: c46791a3211ccd999bb55fd918cf93f4bd06a749
 created_at: 2026-08-22
 reason: "Horizon playable-1v1-control-and-archetype-render exhausted (5/5). PLAYABLE_1V1 is honest FAIL: CONTROL/CORE PASS, ARCH-DIFF-001 NPR, ARCHETYPE_BLINDED_COMPARISON_PASS FAIL because technical/power/agility still share baseline pixels (burst vs steady already distinguishable). SMALL_SIDED_SHAPE remains NOT_EVALUATED. New horizon adds provisional remaining-archetype visuals, recaptures identical-condition pairs, re-runs PLAYABLE_1V1 without forcing PASS, and re-attempts SMALL_SIDED_SHAPE only if 1v1 actually passes."
-current_index: 0
+current_index: 1
 objectives:
   - id: ARCHETYPE-REMAINING-VISUALS
-    status: pending
+    status: accepted
     reason: "Give technical/power/agility versioned provisional renderer mappings so remaining comparison pairs are not byte-identical. No PES meshes or invented envelopes. Snapshot-only presentation."
     builder: builder-gameplay
     prerequisite: null
