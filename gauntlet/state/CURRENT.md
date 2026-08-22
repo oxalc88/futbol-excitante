@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-1V1-CONTROL-EVIDENCE
+next_objective_id: ARCHETYPE-RENDER-DIFFERENCE
 
 best_known:
-  commit: d1a8bf50ced29c4d2ea1a4e53ee7959228cd6bb3
-  note: "Horizon v7 exhausted. New horizon v8 playable-1v1-control-and-archetype-render. Next: BROWSER-1V1-CONTROL-EVIDENCE."
+  commit: 3f2d14152312e395891f99e79587681707525926
+  note: "BROWSER-1V1-CONTROL-EVIDENCE accepted. Next: ARCHETYPE-RENDER-DIFFERENCE."
 
 active_candidate: null
 builder_in_use: null
@@ -95,17 +95,18 @@ accepted:
   - ARCHETYPE-BROWSER-CAPTURE
   - PLAYABLE-1V1-RE-EVALUATION
   - SMALL-SIDED-MILESTONE-EVALUATION
+  - BROWSER-1V1-CONTROL-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v8 'playable-1v1-control-and-archetype-render' created after v7 exhaustion. Next: BROWSER-1V1-CONTROL-EVIDENCE."
+selection_note: "Horizon v8 1/5. BROWSER-1V1-CONTROL-EVIDENCE accepted. Next: ARCHETYPE-RENDER-DIFFERENCE."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-MILESTONE-EVALUATION — SMALL_SIDED_SHAPE playtest NOT_EVALUATED: PLAYABLE_1V1_PASS unmet (INVALID_RUN), required situations unevaluated. No milestone PASS. HEADLESS audit PASS.
+BROWSER-1V1-CONTROL-EVIDENCE — Two-slot HUMAN control browser case: hashes match headless; five 800x600 semantic frames; slot isolation tests PASS. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS.
 
-- builder: builder-structured / qwen3.6
-- critic: critic / deepseek-v4-flash — ACCEPT (first pass, independence OK)
-- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (evaluator integrity PASS)
-- Evidence: durable acceptance manifest + record (2026-08-22T06:43:02Z)
-- Candidate: 2d5b753
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (first completed pass after two provider 400s, independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (8/8 1v1-control tests, evaluator integrity PASS)
+- Evidence: durable acceptance manifest + record (2026-08-22T07:24:14Z)
+- Candidate: 3f2d141

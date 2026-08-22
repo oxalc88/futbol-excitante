@@ -2758,3 +2758,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 2d5b753 candidate(SMALL-SIDED-MILESTONE-EVALUATION)
 - notes: SMALL_SIDED_SHAPE NOT_EVALUATED (PLAYABLE_1V1_PASS unmet, required situations unevaluated). No milestone PASS. Horizon playable-1v1-browser-evidence 5/5 EXHAUSTED.
+
+## Iteration 87 — 2026-08-22
+
+- objective_id: BROWSER-1V1-CONTROL-EVIDENCE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (8/8 1v1-control tests)
+- result: accepted
+- commits: 3f2d141 candidate(BROWSER-1V1-CONTROL-EVIDENCE)
+- notes: Two-slot control hashes match headless; five semantic frames; no PLAYABLE_1V1_PASS. Horizon v8 1/5.
