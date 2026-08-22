@@ -141,7 +141,7 @@ describe("ARCHETYPE_BLINDED_COMPARISON_PASS evaluation", () => {
     expect(prereq!.componentId).toBe("EXIT_PREREQ:ARCHETYPE_BLINDED_COMPARISON_PASS");
   });
 
-  it("ARCHETYPE_BLINDED_COMPARISON_PASS outcome is NOT_EVALUATED (no disk artifacts)", () => {
+  it("ARCHETYPE_BLINDED_COMPARISON_PASS outcome is a valid verdict from the real evaluator", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
@@ -149,7 +149,9 @@ describe("ARCHETYPE_BLINDED_COMPARISON_PASS evaluation", () => {
       result,
       "EXIT_PREREQ:ARCHETYPE_BLINDED_COMPARISON_PASS",
     );
-    expect(prereq!.outcome).toBe("NOT_EVALUATED");
+    // Disk-true: the real evaluator runs and returns a non-placeholder verdict.
+    // Do NOT require PASS — the renderer may not differentiate archetypes.
+    expect(prereq!.outcome).toMatch(/^(PASS|FAIL|NEEDS_PERCEPTUAL_REVIEW)$/);
   });
 
   it("evidence mentions perceptual rubric", () => {
@@ -168,11 +170,12 @@ describe("ARCHETYPE_BLINDED_COMPARISON_PASS evaluation", () => {
     expect(hasRubricEvidence).toBe(true);
   });
 
-  it("evaluateArchetypeComparison returns NOT_EVALUATED without disk artifacts", () => {
+  it("evaluateArchetypeComparison with useDiskArtifacts:true returns a valid verdict", () => {
     const result = evaluateArchetypeComparison({ useDiskArtifacts: true });
 
-    // Without real artifacts on disk, the evaluation returns NOT_EVALUATED.
-    expect(result.verdict).toBe("NOT_EVALUATED");
+    // Disk-true: the real evaluator loads committed artifacts and compares.
+    // Do NOT require PASS — the renderer may not differentiate archetypes.
+    expect(result.verdict).toMatch(/^(PASS|FAIL|NEEDS_PERCEPTUAL_REVIEW)$/);
     expect(result.allDetectable).toBe(false);
   });
 
@@ -299,8 +302,10 @@ describe("Exit prerequisite recording", () => {
 
     // MUTANT_1V1_PASS should be PASS (or at least not NOT_EVALUATED).
     expect(mutantPrereq!.outcome).not.toBe("NOT_EVALUATED");
-    // ARCHETYPE_BLINDED_COMPARISON_PASS should be NOT_EVALUATED.
-    expect(archetypePrereq!.outcome).toBe("NOT_EVALUATED");
+    // ARCHETYPE_BLINDED_COMPARISON_PASS: disk-true verdict (PASS, FAIL, or NEEDS_PERCEPTUAL_REVIEW).
+    expect(archetypePrereq!.outcome).toMatch(
+      /^(PASS|FAIL|NEEDS_PERCEPTUAL_REVIEW)$/,
+    );
   });
 
   it("each exit prerequisite subComponent has outcome and evidence", () => {
@@ -452,12 +457,18 @@ describe("Profile result contract", () => {
 // ---------------------------------------------------------------------------
 
 describe("Blocker identification", () => {
-  it("ARCHETYPE_BLINDED_COMPARISON_PASS NOT_EVALUATED is a blocker", () => {
+  it("ARCHETYPE_BLINDED_COMPARISON_PASS not-PASS is a blocker", () => {
     const scenario = loadFixture();
     const result = evaluatePlayable1v1(scenario);
 
-    // The exitPrerequisitesSatisfied should be false.
-    expect(result.exitPrerequisitesSatisfied).toBe(false);
+    const archetypePrereq = findSubComponent(
+      result,
+      "EXIT_PREREQ:ARCHETYPE_BLINDED_COMPARISON_PASS",
+    );
+    // When the disk-true verdict is not PASS, exit prerequisites are not satisfied.
+    if (archetypePrereq!.outcome !== "PASS") {
+      expect(result.exitPrerequisitesSatisfied).toBe(false);
+    }
 
     // The details should mention the verdict.
     expect(result.details).toContain(result.milestoneVerdict);
@@ -625,7 +636,8 @@ describe("Full evaluation with 1v1 scenario", () => {
     expect(mutantPrereq).toBeDefined();
     expect(archetypePrereq).toBeDefined();
     expect(mutantPrereq!.outcome).not.toBe("NOT_EVALUATED");
-    expect(archetypePrereq!.outcome).toBe("NOT_EVALUATED");
+    // ARCHETYPE_BLINDED_COMPARISON_PASS: disk-true verdict (not a static placeholder).
+    expect(archetypePrereq!.outcome).toMatch(/^(PASS|FAIL|NEEDS_PERCEPTUAL_REVIEW)$/);
   });
 
   it("HARD_INVARIANT suites evaluate correctly with 1v1 scenario", () => {

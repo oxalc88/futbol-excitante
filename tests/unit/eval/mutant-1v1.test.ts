@@ -558,7 +558,7 @@ describe("evaluatePlayable1v1: exit prerequisites wired correctly", () => {
     expect(hasMutantEvidence).toBe(true);
   });
 
-  it("ARCHETYPE_BLINDED_COMPARISON_PASS stays NOT_EVALUATED", () => {
+  it("ARCHETYPE_BLINDED_COMPARISON_PASS returns a valid disk-true verdict", () => {
     const scenario = load1v1Scenario();
     const result = evaluatePlayable1v1(
       scenario as Parameters<typeof evaluate>[0]["scenario"],
@@ -568,7 +568,9 @@ describe("evaluatePlayable1v1: exit prerequisites wired correctly", () => {
       (s) => s.componentId === "EXIT_PREREQ:ARCHETYPE_BLINDED_COMPARISON_PASS",
     );
     expect(archetypePrereq).toBeDefined();
-    expect(archetypePrereq!.outcome).toBe("NOT_EVALUATED");
+    // Disk-true: the real evaluator returns PASS, FAIL, or NEEDS_PERCEPTUAL_REVIEW.
+    // Do NOT require PASS — the renderer may not differentiate archetypes.
+    expect(archetypePrereq!.outcome).toMatch(/^(PASS|FAIL|NEEDS_PERCEPTUAL_REVIEW)$/);
     // Evidence should mention the perceptual rubric requirement.
     const hasRubricEvidence = archetypePrereq!.evidence.some((e) =>
       e.toLowerCase().includes("perceptual") ||
@@ -586,15 +588,19 @@ describe("evaluatePlayable1v1: exit prerequisites wired correctly", () => {
     expect(result.milestoneVerdict).not.toBe("PASS");
   });
 
-  it("exitPrerequisitesSatisfied is false when MUTANT_1V1 is not all PASS", () => {
+  it("exitPrerequisitesSatisfied is false when ARCHETYPE_BLINDED is not PASS", () => {
     const scenario = load1v1Scenario();
     const result = evaluatePlayable1v1(
       scenario as Parameters<typeof evaluate>[0]["scenario"],
     );
 
-    // Even if MUTANT_1V1 passes, ARCHETYPE_BLINDED_COMPARISON_PASS is NOT_EVALUATED,
-    // so exitPrerequisitesSatisfied should be false.
-    expect(result.exitPrerequisitesSatisfied).toBe(false);
+    const archetypePrereq = result.subComponents.find(
+      (s) => s.componentId === "EXIT_PREREQ:ARCHETYPE_BLINDED_COMPARISON_PASS",
+    );
+    // When the disk-true verdict is not PASS, exit prerequisites are not satisfied.
+    if (archetypePrereq && archetypePrereq.outcome !== "PASS") {
+      expect(result.exitPrerequisitesSatisfied).toBe(false);
+    }
   });
 });
 

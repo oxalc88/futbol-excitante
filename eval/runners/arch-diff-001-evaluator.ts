@@ -171,27 +171,30 @@ function loadArtifactHashes(
   archetypeId: string,
   tick: number,
 ): { perceptualHash: string | null; stateHash: string | null } {
-  try {
-    const artifactDir = join(
-      __dirname,
-      "../../artifacts/archetype-capture",
-    );
-    const baseName = archetypeId.replace(/-v\d+$/, "");
-    const filePath = join(
-      artifactDir,
-      `${baseName}-frame-${String(tick).padStart(3, "0")}.meta.json`,
-    );
-    const raw = readFileSync(filePath, "utf-8");
-    const meta = JSON.parse(
-      raw,
-    ) as { perceptualHash?: string; stateHash?: string };
-    return {
-      perceptualHash: meta.perceptualHash ?? null,
-      stateHash: meta.stateHash ?? null,
-    };
-  } catch {
-    return { perceptualHash: null, stateHash: null };
+  const baseName = archetypeId.replace(/-v\d+$/, "");
+  const tickStr = String(tick).padStart(3, "0");
+  const metaFileName = `${baseName}-frame-${tickStr}.meta.json`;
+
+  // Search order: artifacts/ (ephemeral) → docs/evidence/ (committed durable)
+  const searchDirs = [
+    join(__dirname, "../../artifacts/archetype-capture"),
+    join(__dirname, "../../docs/evidence/ARCHETYPE-BROWSER-CAPTURE"),
+  ];
+
+  for (const dir of searchDirs) {
+    try {
+      const filePath = join(dir, metaFileName);
+      const raw = readFileSync(filePath, "utf-8");
+      const meta = JSON.parse(raw) as { perceptualHash?: string; stateHash?: string };
+      return {
+        perceptualHash: meta.perceptualHash ?? null,
+        stateHash: meta.stateHash ?? null,
+      };
+    } catch {
+      // try next directory
+    }
   }
+  return { perceptualHash: null, stateHash: null };
 }
 
 /**

@@ -71,21 +71,27 @@ function loadArtifactHashes(
   archetypeId: string,
   tick: number,
 ): string | null {
-  try {
-    const artifactDir = join(__dirname, "../../artifacts/archetype-capture");
-    const artifactFile = join(
-      artifactDir,
-      `${archetypeId.replace(/-v\d+$/, "")}-frame-${tick
-        .toString()
-        .padStart(3, "0")}.meta.json`,
-    );
-    const raw = readFileSync(artifactFile, "utf-8");
-    const meta = JSON.parse(raw) as { perceptualHash?: string; stateHash?: string };
-    // Try perceptualHash first, fall back to stateHash
-    return meta.perceptualHash ?? meta.stateHash ?? null;
-  } catch {
-    return null;
+  const baseName = archetypeId.replace(/-v\d+$/, "");
+  const tickStr = tick.toString().padStart(3, "0");
+  const metaFileName = `${baseName}-frame-${tickStr}.meta.json`;
+
+  // Search order: artifacts/ (ephemeral) → docs/evidence/ (committed durable)
+  const searchDirs = [
+    join(__dirname, "../../artifacts/archetype-capture"),
+    join(__dirname, "../../docs/evidence/ARCHETYPE-BROWSER-CAPTURE"),
+  ];
+
+  for (const dir of searchDirs) {
+    try {
+      const artifactFile = join(dir, metaFileName);
+      const raw = readFileSync(artifactFile, "utf-8");
+      const meta = JSON.parse(raw) as { perceptualHash?: string; stateHash?: string };
+      return meta.perceptualHash ?? meta.stateHash ?? null;
+    } catch {
+      // try next directory
+    }
   }
+  return null;
 }
 
 /**
@@ -115,19 +121,26 @@ function loadArchetypeHash(
   archetypeId: string,
   tick: number,
 ): string | null {
-  try {
-    const artifactDir = join(__dirname, "../../artifacts/archetype-capture");
-    const pngFile = join(
-      artifactDir,
-      `${archetypeId.replace(/-v\d+$/, "")}-frame-${tick
-        .toString()
-        .padStart(3, "0")}.png`,
-    );
-    const data = readFileSync(pngFile);
-    return computePerceptualHashFromData(data);
-  } catch {
-    return null;
+  const baseName = archetypeId.replace(/-v\d+$/, "");
+  const tickStr = tick.toString().padStart(3, "0");
+  const pngFileName = `${baseName}-frame-${tickStr}.png`;
+
+  // Search order: artifacts/ (ephemeral) → docs/evidence/ (committed durable)
+  const searchDirs = [
+    join(__dirname, "../../artifacts/archetype-capture"),
+    join(__dirname, "../../docs/evidence/ARCHETYPE-BROWSER-CAPTURE"),
+  ];
+
+  for (const dir of searchDirs) {
+    try {
+      const pngFile = join(dir, pngFileName);
+      const data = readFileSync(pngFile);
+      return computePerceptualHashFromData(data);
+    } catch {
+      // try next directory
+    }
   }
+  return null;
 }
 
 /**
