@@ -1,0 +1,131 @@
+{
+  "registrySetId": "fnv1a64-v1:d1a691b2c1211c76",
+  "profileVersion": "milestone-foundation-v1",
+  "subComponents": [
+    {
+      "componentId": "BROWSER_CASES",
+      "outcome": "PASS",
+      "evidence": [
+        "All 2 required browser case(s) validated"
+      ]
+    },
+    {
+      "componentId": "COMMON-DETERMINISTIC",
+      "outcome": "PASS",
+      "evidence": [
+        "state/hashes-run-a.jsonl",
+        "state/hashes-run-b.jsonl",
+        "comparison-condition-hash-match: identical seed, inputs, config"
+      ]
+    },
+    {
+      "componentId": "MUTANT_CORE",
+      "outcome": "PASS",
+      "evidence": [
+        "MUTANT_CORE PASS: all 9 implementable mutants detected; 3 deferred mutants catalogued"
+      ]
+    },
+    {
+      "componentId": "HARD_INVARIANT_SUITES",
+      "outcome": "PASS",
+      "evidence": [
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "BALL-GND-001-CONTACT=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "BALL-IND-001-CONT=PASS",
+        "BALL-IND-001-POSS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "LOC-BALL-001-FREE=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "BALL-GND-001-CONTACT=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "BALL-IND-001-CONT=PASS",
+        "BALL-IND-001-POSS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS"
+      ]
+    },
+    {
+      "componentId": "SUITES_OVERALL",
+      "outcome": "PASS",
+      "evidence": [
+        "suites=fast,locomotion,ball"
+      ]
+    }
+  ],
+  "allHardInvariantPass": true,
+  "commonDeterministicPass": true,
+  "mutantCorePass": true,
+  "browserCases": [
+    {
+      "case_id": "BROWSER-CORE-RESET-001",
+      "passed": true,
+      "evidence": {
+        "initialHash": "fnv1a64-v1:34e2d4d971acfac7"
+      }
+    },
+    {
+      "case_id": "BROWSER-CORE-STEP-001",
+      "passed": true,
+      "evidence": {
+        "initialHash": "fnv1a64-v1:34e2d4d971acfac7",
+        "perTickHashes": [
+          "fnv1a64-v1:8c5a4de12a69786f",
+          "fnv1a64-v1:b6ee757dceea6a4b",
+          "fnv1a64-v1:05fe10d10bf674a5",
+          "fnv1a64-v1:26ce153d93f06982",
+          "fnv1a64-v1:17c754fd49e5a844"
+        ]
+      }
+    }
+  ],
+  "milestoneVerdict": "PASS",
+  "details": "FOUNDATION_LAB PASS: all required HARD_INVARIANT criteria, browser cases, COMMON_DETERMINISTIC, and MUTANT_CORE passed"
+}

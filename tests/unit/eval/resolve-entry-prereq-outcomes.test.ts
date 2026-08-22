@@ -326,11 +326,14 @@ describe("resolveEntryPrereqOutcomes: multiple prerequisites", () => {
 
 describe("resolveEntryPrereqOutcomes: default evidenceBase", () => {
   it("defaults to docs/evidence relative to module when no arg provided", () => {
-    // When no evidenceBase is given, the function should read from the
-    // durable docs/evidence path.  Since no entry-prereq eval.jsons exist
-    // there yet, the result should be an empty map.
+    // When no evidenceBase is given, the function reads from the
+    // durable docs/evidence path. FOUNDATION_LAB_PASS/eval.json now exists
+    // (produced by foundation-lab-eval-runner), so the resolver returns it.
     const result = resolveEntryPrereqOutcomes(PREREQS);
-    expect(Object.keys(result)).toHaveLength(0);
+    expect(result).toHaveProperty("FOUNDATION_LAB_PASS");
+    expect(result["FOUNDATION_LAB_PASS"]).toBe("PASS");
+    // CAPABILITY_DESIGN_PROFILE has no eval.json yet → omitted.
+    expect(result).not.toHaveProperty("CAPABILITY_DESIGN_PROFILE");
   });
 });
 
