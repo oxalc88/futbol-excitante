@@ -2888,3 +2888,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: ab5f690 candidate(PLAYABLE-1V1-DETERMINISTIC-TWO-RUN)
 - notes: Two-run COMMON-DETERMINISTIC PASS; overall still NOT_EVALUATED. Horizon v11 1/3.
+
+## Iteration 100 — 2026-08-22
+
+- objective_id: PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: a1878c5 candidate(PLAYABLE-1V1-AFTER-DETERMINISTIC-TWO-RUN)
+- notes: Overall NOT_EVALUATED; entry prereqs unverified. Horizon v11 2/3.
