@@ -29,3 +29,13 @@ export {
   DETECTABILITY_THRESHOLD,
 } from "./archetype-comparison.js";
 export type { HashedFrame, FrameComparison } from "./archetype-comparison.js";
+
+// ARCH-DIFF-001 perceptual rubric (archetype visual difference detection).
+export {
+  runArchDiff001,
+  evaluateArchDiff001,
+  compareGameFrames,
+  evaluateArchDiff001NoEvidence,
+  generateDeterministicStateHash,
+} from "./arch-diff-001-evaluator.js";
+export type { GameFrameSnapshot, ArchDiffComparison } from "./arch-diff-001-evaluator.js";
