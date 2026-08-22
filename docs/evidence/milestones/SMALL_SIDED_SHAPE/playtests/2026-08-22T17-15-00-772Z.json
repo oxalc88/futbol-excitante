@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "record_type": "milestone_playtest_result",
+  "milestone_id": "SMALL_SIDED_SHAPE",
+  "playtest_plan_version": "small-sided-shape-playtest-v1",
+  "generated_at": "2026-08-22T17:15:00.772Z",
+  "required_situations": [
+    "PASS_RECEPTION",
+    "SHOT_TO_RESULT",
+    "PHYSICAL_DUEL",
+    "SUPPORT_AND_PASSING_LANES",
+    "SETTLED_ATTACK_VS_DEFENCE",
+    "ATTACK_TO_DEFENCE_TRANSITION",
+    "DEFENCE_TO_ATTACK_TRANSITION",
+    "COORDINATED_PRESS"
+  ],
+  "situation_outcomes": {
+    "PASS_RECEPTION": "NOT_EVALUATED",
+    "SHOT_TO_RESULT": "NOT_EVALUATED",
+    "PHYSICAL_DUEL": "NOT_EVALUATED",
+    "SUPPORT_AND_PASSING_LANES": "NOT_EVALUATED",
+    "SETTLED_ATTACK_VS_DEFENCE": "NOT_EVALUATED",
+    "ATTACK_TO_DEFENCE_TRANSITION": "NOT_EVALUATED",
+    "DEFENCE_TO_ATTACK_TRANSITION": "NOT_EVALUATED",
+    "COORDINATED_PRESS": "NOT_EVALUATED"
+  },
+  "entry_prerequisites_pass": false,
+  "exit_prerequisites_pass": false,
+  "critic_verdict": "MISSING",
+  "evidence": {
+    "entry_prerequisite_status": {
+      "PLAYABLE_1V1_PASS": "PASS — live eval.json at docs/evidence/PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE/eval.json shows milestoneVerdict PASS",
+      "TEAM_DECISION_PROFILE": "NOT_EVALUATED — no executable TEAM_DECISION_PROFILE eval.json exists; CPU-TEAM-DECISION-PROFILE is a different evidence identity and does not satisfy this prerequisite"
+    },
+    "exit_prerequisite_status": {
+      "MUTANT_TEAM_PASS": "NOT_EVALUATED — no executable eval.json exists",
+      "TEAM_SHAPE_SUITE_PASS": "NOT_EVALUATED — no executable eval.json exists"
+    },
+    "situation_status": {
+      "PASS_RECEPTION": "NOT_EVALUATED — no 3v3 test scenarios materialized for this situation",
+      "SHOT_TO_RESULT": "NOT_EVALUATED — no 3v3 test scenarios materialized for this situation",
+      "PHYSICAL_DUEL": "NOT_EVALUATED — no 3v3 test scenarios materialized for this situation",
+      "SUPPORT_AND_PASSING_LANES": "NOT_EVALUATED — no 3v3 test scenarios materialized for this situation",
+      "SETTLED_ATTACK_VS_DEFENCE": "NOT_EVALUATED — no 3v3 test scenarios materialized for this situation",
+      "ATTACK_TO_DEFENCE_TRANSITION": "NOT_EVALUATED — no 3v3 test scenarios materialized for this situation",
+      "DEFENCE_TO_ATTACK_TRANSITION": "NOT_EVALUATED — no 3v3 test scenarios materialized for this situation",
+      "COORDINATED_PRESS": "NOT_EVALUATED — no 3v3 test scenarios materialized for this situation"
+    }
+  },
+  "decision": "milestone_not_evaluated",
+  "milestone_verdict": "NOT_EVALUATED",
+  "failure_class": "milestone_playtest_incomplete"
+}
