@@ -1,0 +1,270 @@
+{
+  "scenarioFile": "/home/ubuntu/projects/oxDeveloop/pes-simulator/eval/scenarios/foundation-move-and-roll.v1.json",
+  "registrySetId": "fnv1a64-v1:d1a691b2c1211c76",
+  "profileVersion": "milestone-1v1-v1",
+  "milestoneVerdict": "PASS",
+  "subComponents": [
+    {
+      "componentId": "HARD_INVARIANT_SUITES",
+      "outcome": "PASS",
+      "evidence": [
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "BALL-GND-001-CONTACT=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "BALL-IND-001-CONT=PASS",
+        "BALL-IND-001-POSS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "LOC-BALL-001-FREE=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "BALL-GND-001-CONTACT=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "BALL-IND-001-CONT=PASS",
+        "BALL-IND-001-POSS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS",
+        "COMMON-FINITE=PASS",
+        "COMMON-DETERMINISTIC=PASS",
+        "COMMON-REFERENCES=PASS",
+        "COMMON-BOUNDS=PASS"
+      ]
+    },
+    {
+      "componentId": "COMMON_DETERMINISTIC",
+      "outcome": "PASS",
+      "evidence": [
+        "state/hashes-run-a.jsonl",
+        "state/hashes-run-b.jsonl",
+        "comparison-condition-hash-match: identical seed, inputs, config"
+      ]
+    },
+    {
+      "componentId": "ENGINE_DESIGN_TARGET",
+      "outcome": "PASS",
+      "evidence": [
+        "Axis \"transient-acceleration\" (IMPLEMENTED): outcome PASS",
+        "Axis \"transient-acceleration\": low=0, high=1",
+        "Estimator: delta-speed-at-t10 vestimator-delta-speed-v1, tick=10",
+        "Speed at t10: low=2.000000, high=3.523004",
+        "Delta speed: 1.523004",
+        "Sustainable-speed plateau: low=7.000000, high=7.000000",
+        "Plateau delta: 0.000000",
+        "Monotonic direction check (INCREASE): PASS",
+        "Minimum material effect: 1.523004 >= 0.05 ? true",
+        "Cross-coupling OK: plateau delta 0.000000 <= threshold",
+        "Axis \"physical-contact\" (IMPLEMENTED): outcome PASS",
+        "Axis \"physical-contact\": low=0.1, high=1",
+        "Estimator: delta-displacement-at-t20 vestimator-delta-displacement-v1",
+        "Contact events: low=44, high=44",
+        "Displacement at t20: low=0.016842, high=0.000000",
+        "Delta displacement: -0.016842",
+        "Monotonic direction check (DECREASE): PASS",
+        "Minimum material effect: 0.016842 >= 0.005 ? true",
+        "Cross-coupling OK",
+        "Axis \"body-control\" (IMPLEMENTED): outcome PASS",
+        "Axis \"body-control\": low=4, high=7",
+        "Estimator: delta-heading-change-at-t20 vestimator-delta-heading-change-v1",
+        "Heading change at t20: low=0.066667, high=0.000000",
+        "Delta heading change: -0.066667",
+        "Heading changes produced in [t5..t20]: low=true, high=true",
+        "Monotonic direction check (DECREASE): PASS",
+        "Minimum material effect: 0.066667 >= 0.01 ? true",
+        "Cross-coupling OK",
+        "Axis \"shooting-power\" (IMPLEMENTED): outcome PASS",
+        "Axis \"shooting-power\": low=8, high=16",
+        "Estimator: delta-ball-speed-at-t10 vestimator-delta-ball-speed-v1",
+        "Shot events: low=1, high=1",
+        "Ball speed at t10: low=8.089499, high=16.178999",
+        "Delta ball speed: 8.089499",
+        "Monotonic direction check (INCREASE): PASS",
+        "Minimum material effect: 8.089499 >= 0.5 ? true",
+        "Cross-coupling OK",
+        "Axis \"swerve\" (IMPLEMENTED): outcome PASS",
+        "Axis \"swerve\": low curveCoeff=0.001, high curveCoeff=0.02",
+        "Estimator: delta-lateral-deviation-at-t10 vestimator-lateral-deviation-v1",
+        "Ball has nonzero spin at start (honesty check OK)",
+        "Ball distance at t10: low=0.671206, high=0.874027",
+        "Lateral deviation at t10: low=6.225629, high=27.316759",
+        "Delta lateral deviation: 21.091130",
+        "Monotonic direction check (INCREASE): PASS",
+        "Minimum material effect: 21.091130 >= 0.001 ? true",
+        "Cross-coupling OK",
+        "Protected output 'straight-shot-symmetry' enforced: zero curve coeff → zero curve force"
+      ]
+    },
+    {
+      "componentId": "BROWSER_CASE:BROWSER-CORE-RESET-001",
+      "outcome": "PASS",
+      "evidence": [
+        "Browser case \"BROWSER-CORE-RESET-001\" verdict: PASS"
+      ]
+    },
+    {
+      "componentId": "BROWSER_CASE:BROWSER-CORE-STEP-001",
+      "outcome": "PASS",
+      "evidence": [
+        "Browser case \"BROWSER-CORE-STEP-001\" verdict: PASS"
+      ]
+    },
+    {
+      "componentId": "BROWSER_CASE:BROWSER-1V1-CONTROL-001",
+      "outcome": "PASS",
+      "evidence": [
+        "Browser case \"BROWSER-1V1-CONTROL-001\" verdict: PASS"
+      ]
+    },
+    {
+      "componentId": "BROWSER_CASE:ARCH-DIFF-001",
+      "outcome": "PASS",
+      "evidence": [
+        "Browser case \"ARCH-DIFF-001\" verdict: PASS"
+      ]
+    },
+    {
+      "componentId": "ENTRY_PREREQ:FOUNDATION_LAB_PASS",
+      "outcome": "PASS",
+      "evidence": [
+        "Entry prerequisite verified by caller: FOUNDATION_LAB_PASS → PASS"
+      ]
+    },
+    {
+      "componentId": "ENTRY_PREREQ:CAPABILITY_DESIGN_PROFILE",
+      "outcome": "PASS",
+      "evidence": [
+        "Entry prerequisite verified by caller: CAPABILITY_DESIGN_PROFILE → PASS"
+      ]
+    },
+    {
+      "componentId": "EXIT_PREREQ:MUTANT_1V1_PASS",
+      "outcome": "PASS",
+      "evidence": [
+        "MUTANT_1V1 reduction verdict: PASS",
+        "Implementable mutants detected: true",
+        "Deferred mutants NOT_EVALUATED: true",
+        "MUTANT_1V1 PASS: all 9 implementable mutants detected in 1v1 context; 3 deferred mutants catalogued"
+      ]
+    },
+    {
+      "componentId": "EXIT_PREREQ:ARCHETYPE_BLINDED_COMPARISON_PASS",
+      "outcome": "PASS",
+      "evidence": [
+        "ARCHETYPE_BLINDED_COMPARISON verdict: PASS",
+        "All pairs detectable: true",
+        "Min confidence: 1",
+        "archetype-burst-v1 vs archetype-steady-v1: diff=0.9375 detectable=true",
+        "archetype-technical-v1 vs archetype-power-v1: diff=0.9375 detectable=true",
+        "archetype-agility-v1 vs archetype-steady-v1: diff=0.9375 detectable=true",
+        "archetype-burst-v1 vs archetype-technical-v1: diff=0.9375 detectable=true",
+        "Perceptual rubric: all archetype pairs are perceptually distinguishable"
+      ]
+    }
+  ],
+  "allHardInvariantPass": true,
+  "engineDesignTargetOverall": "PASS",
+  "entryPrerequisites": [
+    {
+      "name": "FOUNDATION_LAB_PASS",
+      "outcome": "PASS"
+    },
+    {
+      "name": "CAPABILITY_DESIGN_PROFILE",
+      "outcome": "PASS"
+    }
+  ],
+  "exitPrerequisites": [
+    {
+      "name": "MUTANT_1V1_PASS",
+      "outcome": "PASS",
+      "details": "MUTANT_1V1 reduction verdict: PASS\nImplementable mutants detected: true\nDeferred mutants NOT_EVALUATED: true\nMUTANT_1V1 PASS: all 9 implementable mutants detected in 1v1 context; 3 deferred mutants catalogued"
+    },
+    {
+      "name": "ARCHETYPE_BLINDED_COMPARISON_PASS",
+      "outcome": "PASS",
+      "details": "ARCHETYPE_BLINDED_COMPARISON verdict: PASS\nAll pairs detectable: true\nMin confidence: 1\narchetype-burst-v1 vs archetype-steady-v1: diff=0.9375 detectable=true\narchetype-technical-v1 vs archetype-power-v1: diff=0.9375 detectable=true\narchetype-agility-v1 vs archetype-steady-v1: diff=0.9375 detectable=true\narchetype-burst-v1 vs archetype-technical-v1: diff=0.9375 detectable=true\nPerceptual rubric: all archetype pairs are perceptually distinguishable"
+    }
+  ],
+  "browserCaseVerdicts": [
+    {
+      "case_id": "BROWSER-CORE-RESET-001",
+      "verdict": "PASS"
+    },
+    {
+      "case_id": "BROWSER-CORE-STEP-001",
+      "verdict": "PASS"
+    },
+    {
+      "case_id": "BROWSER-1V1-CONTROL-001",
+      "verdict": "PASS"
+    },
+    {
+      "case_id": "ARCH-DIFF-001",
+      "verdict": "PASS"
+    }
+  ],
+  "entryPrerequisitesSatisfied": true,
+  "exitPrerequisitesSatisfied": true,
+  "blockers": [],
+  "details": "PLAYABLE_1V1 PASS: all required criteria passed",
+  "timestamp": "2026-08-22T17:02:31.793Z"
+}
