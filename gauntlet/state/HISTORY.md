@@ -2768,3 +2768,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 3f2d141 candidate(BROWSER-1V1-CONTROL-EVIDENCE)
 - notes: Two-slot control hashes match headless; five semantic frames; no PLAYABLE_1V1_PASS. Horizon v8 1/5.
+
+## Iteration 88 — 2026-08-22
+
+- objective_id: ARCHETYPE-RENDER-DIFFERENCE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (core-smoke 16/16)
+- result: accepted
+- commits: a409535 candidate(ARCHETYPE-RENDER-DIFFERENCE)
+- notes: Provisional burst vs steady renderer visuals; snapshot archetypeId; no PES. Horizon v8 2/5.

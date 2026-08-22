@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ARCHETYPE-RENDER-DIFFERENCE
+next_objective_id: ARCHETYPE-IDENTICAL-RECAPTURE
 
 best_known:
-  commit: 3f2d14152312e395891f99e79587681707525926
-  note: "BROWSER-1V1-CONTROL-EVIDENCE accepted. Next: ARCHETYPE-RENDER-DIFFERENCE."
+  commit: a40953508662b3ecc97f28e47e6dd899af864728
+  note: "ARCHETYPE-RENDER-DIFFERENCE accepted. Next: ARCHETYPE-IDENTICAL-RECAPTURE."
 
 active_candidate: null
 builder_in_use: null
@@ -96,17 +96,18 @@ accepted:
   - PLAYABLE-1V1-RE-EVALUATION
   - SMALL-SIDED-MILESTONE-EVALUATION
   - BROWSER-1V1-CONTROL-EVIDENCE
+  - ARCHETYPE-RENDER-DIFFERENCE
 
 blocked: []
 
-selection_note: "Horizon v8 1/5. BROWSER-1V1-CONTROL-EVIDENCE accepted. Next: ARCHETYPE-RENDER-DIFFERENCE."
+selection_note: "Horizon v8 2/5. ARCHETYPE-RENDER-DIFFERENCE accepted. Next: ARCHETYPE-IDENTICAL-RECAPTURE."
 ```
 ## Last accepted objective
 
-BROWSER-1V1-CONTROL-EVIDENCE — Two-slot HUMAN control browser case: hashes match headless; five 800x600 semantic frames; slot isolation tests PASS. DYNAMIC_VISUAL audit PASS. No PLAYABLE_1V1_PASS.
+ARCHETYPE-RENDER-DIFFERENCE — Presentation snapshot carries archetypeId; Three.js provisional scale/emissive makes burst vs steady distinguishable. PRESENTATION audit PASS. No PES claim.
 
 - builder: builder-gameplay / mimo-v2.5
-- critic: critic / deepseek-v4-flash — ACCEPT (first completed pass after two provider 400s, independence OK)
-- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (8/8 1v1-control tests, evaluator integrity PASS)
-- Evidence: durable acceptance manifest + record (2026-08-22T07:24:14Z)
-- Candidate: 3f2d141
+- critic: critic / deepseek-v4-flash — ACCEPT (independence OK)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (core-smoke 16/16, presentation authority PASS)
+- Evidence: durable acceptance manifest + record (2026-08-22T07:58:38Z)
+- Candidate: a409535

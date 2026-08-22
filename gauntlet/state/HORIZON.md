@@ -7,7 +7,7 @@ horizon_id: "playable-1v1-control-and-archetype-render"
 created_from_commit: d1a8bf50ced29c4d2ea1a4e53ee7959228cd6bb3
 created_at: 2026-08-22
 reason: "Horizon playable-1v1-browser-evidence exhausted (5/5). PLAYABLE_1V1 remains INVALID_RUN because BROWSER-1V1-CONTROL-001 has no evidence. ARCHETYPE_BLINDED_COMPARISON_PASS is honest FAIL because the renderer ignores archetypeId. New horizon captures 1v1 control browser evidence and adds honest archetype-visible presentation under identical conditions."
-current_index: 1
+current_index: 2
 objectives:
   - id: BROWSER-1V1-CONTROL-EVIDENCE
     status: accepted
@@ -15,7 +15,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: null
   - id: ARCHETYPE-RENDER-DIFFERENCE
-    status: pending
+    status: accepted
     reason: "Make presentation/renderer show distinguishable burst vs steady (etc.) under identical camera/task without inventing PES meshes. Versioned provisional visuals only. Fixes honest FAIL of identical frames."
     builder: builder-gameplay
     prerequisite: null

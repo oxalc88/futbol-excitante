@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "ARCHETYPE-RENDER-DIFFERENCE",
+  "accepted_at": "2026-08-22T07:58:38.678Z",
+  "candidate_commit": "a40953508662b3ecc97f28e47e6dd899af864728",
+  "evidence_class": "PRESENTATION",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/ARCHETYPE-RENDER-DIFFERENCE/burst-archetype-tick-10.png",
+        "sha256": "2a230901952109d3ed18eac4a31416aa464c9ad0dbd925ec8470233682549366",
+        "git_blob": "eb2bb52b25b2c12de81677c25d4c8571f9b71de9",
+        "candidate_commit": "a40953508662b3ecc97f28e47e6dd899af864728",
+        "bytes": 20003,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/ARCHETYPE-RENDER-DIFFERENCE/steady-archetype-tick-10.png",
+        "sha256": "aa4733e902e1138e7c4c33bb135b3e37696bbb18ea8ed82013f0199bc328f6fa",
+        "git_blob": "19b5c36caa4f0100c5affaea0cd6784cfad1b12e",
+        "candidate_commit": "a40953508662b3ecc97f28e47e6dd899af864728",
+        "bytes": 20089,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/ARCHETYPE-RENDER-DIFFERENCE/audit.json",
+      "sha256": "afb08c7fbf5c93b0ad29022f90b093ea110bab1798224e8feb891cac2dc27540",
+      "git_blob": "d4f9c6cb5e3727ef45794755f212c62503a4464d",
+      "candidate_commit": "a40953508662b3ecc97f28e47e6dd899af864728",
+      "bytes": 2669,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-22/2026-08-22T07-58-38-678Z-ARCHETYPE-RENDER-DIFFERENCE-acceptance.json"
+}
