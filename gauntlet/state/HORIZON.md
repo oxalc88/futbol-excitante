@@ -2,12 +2,12 @@
 
 ```yaml
 horizon_version: 14
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "team-decision-profile-and-small-sided"
 created_from_commit: c9ff1613d4c28857dc8db9fb7ef9e475e7fb6fdf
 created_at: 2026-08-22
 reason: "Horizon entry-prereq-executable-evidence exhausted (5/5). PLAYABLE_1V1 live profile-runner PASS. SMALL_SIDED_SHAPE remains NOT_EVALUATED because TEAM_DECISION_PROFILE has no executable eval.json (CPU-TEAM-DECISION-PROFILE is a different identity), MUTANT_TEAM_PASS and TEAM_SHAPE_SUITE_PASS lack eval.json, and eight situations are unevaluated. New horizon binds honest TEAM_DECISION_PROFILE / mutant-team / team-shape evidence then re-runs SMALL_SIDED."
-current_index: 3
+current_index: 4
 objectives:
   - id: TEAM-DECISION-PROFILE-EVIDENCE
     status: accepted
@@ -25,7 +25,7 @@ objectives:
     builder: builder-structured
     prerequisite: MUTANT-TEAM-PASS-EVIDENCE
   - id: SMALL-SIDED-AFTER-TEAM-PREREQS
-    status: pending
+    status: accepted
     reason: "Re-attempt SMALL_SIDED_SHAPE after executable team prereqs. Remains NOT_EVALUATED unless required situations and prereqs actually PASS."
     builder: builder-structured
     prerequisite: TEAM-SHAPE-SUITE-PASS-EVIDENCE

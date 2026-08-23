@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SMALL-SIDED-AFTER-TEAM-PREREQS",
+  "accepted_at": "2026-08-23T05:42:58.102Z",
+  "candidate_commit": "78bbf01d559041fb2b1e3e4896e960403cfdf7d7",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-AFTER-TEAM-PREREQS/audit.json",
+      "sha256": "9d7a0eed50ab7d2be06e05920f63e4a78f9dd84dee1f67326e4b5cf9814a06da",
+      "git_blob": "c0b707ffdd45b34d5899bd2bd489d360c07ddaf9",
+      "candidate_commit": "78bbf01d559041fb2b1e3e4896e960403cfdf7d7",
+      "bytes": 2688,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer-mimo",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-23/2026-08-23T05-42-58-102Z-SMALL-SIDED-AFTER-TEAM-PREREQS-acceptance.json"
+}

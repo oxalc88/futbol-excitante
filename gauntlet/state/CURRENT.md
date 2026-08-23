@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-AFTER-TEAM-PREREQS
+next_objective_id: ""
 
 best_known:
-  commit: c05460ba24eb2a1cfa9a46f5b2369e715bd717f7
-  note: "TEAM-SHAPE-SUITE-PASS-EVIDENCE accepted; live suite verdict PASS. Next: SMALL-SIDED-AFTER-TEAM-PREREQS."
+  commit: 78bbf01d559041fb2b1e3e4896e960403cfdf7d7
+  note: "SMALL-SIDED-AFTER-TEAM-PREREQS accepted as NOT_EVALUATED. Horizon v14 exhausted."
 
 active_candidate: null
 builder_in_use: null
@@ -121,17 +121,18 @@ accepted:
   - TEAM-DECISION-PROFILE-EVIDENCE
   - MUTANT-TEAM-PASS-EVIDENCE
   - TEAM-SHAPE-SUITE-PASS-EVIDENCE
+  - SMALL-SIDED-AFTER-TEAM-PREREQS
 
 blocked: []
 
-selection_note: "Horizon v14 3/4. TEAM_DECISION_PROFILE, MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS eval.json all PASS. Next: SMALL-SIDED-AFTER-TEAM-PREREQS. No PES claim."
+selection_note: "Horizon v14 4/4 EXHAUSTED. All SMALL_SIDED prereqs (entry+exit) PASS from live eval.json; eight situations NOT_EVALUATED. SMALL_SIDED_SHAPE still NOT_EVALUATED. No PES claim."
 ```
 ## Last accepted objective
 
-TEAM-SHAPE-SUITE-PASS-EVIDENCE — Honest live team-shape suite verdict PASS (16 tests, common criteria). Structural; team-specific criteria gap documented.
+SMALL-SIDED-AFTER-TEAM-PREREQS — Honest NOT_EVALUATED. Entry and exit prerequisite gates now PASS from live eval.json; eight gameplay situations still unevaluated.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T05:34:11Z)
-- Candidate: c05460b
+- Evidence: durable acceptance manifest + record (2026-08-23T05:42:58Z)
+- Candidate: 78bbf01

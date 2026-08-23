@@ -3018,3 +3018,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: c05460b candidate(TEAM-SHAPE-SUITE-PASS-EVIDENCE)
 - notes: Live team-shape suite verdict PASS (16 tests). Horizon v14 3/4.
+
+## Iteration 113 — 2026-08-23
+
+- objective_id: SMALL-SIDED-AFTER-TEAM-PREREQS
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 78bbf01 candidate(SMALL-SIDED-AFTER-TEAM-PREREQS)
+- notes: SMALL_SIDED_SHAPE NOT_EVALUATED; entry/exit prereq gates PASS from live eval.json; eight situations unevaluated. Horizon v14 4/4 EXHAUSTED.
