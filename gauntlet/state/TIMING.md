@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-22T17:39:58Z
+measured_at: 2026-08-23T05:19:05Z
 tracking_contract_version: 1
-last_tracked_objective: TEAM-DECISION-PROFILE-EVIDENCE
-usage_aggregates_through: TEAM-DECISION-PROFILE-EVIDENCE
-clock_aggregates_through: TEAM-DECISION-PROFILE-EVIDENCE
-model_evaluation_through: TEAM-DECISION-PROFILE-EVIDENCE
+last_tracked_objective: MUTANT-TEAM-PASS-EVIDENCE
+usage_aggregates_through: MUTANT-TEAM-PASS-EVIDENCE
+clock_aggregates_through: MUTANT-TEAM-PASS-EVIDENCE
+model_evaluation_through: MUTANT-TEAM-PASS-EVIDENCE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,13 +42,13 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 47h 40m |
+| Calendar span (first work → measurement) | 52h 20m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | 41h 58m |
-| Sum of per-step agent time | 34h 11m |
+| Active work (anything running) | 42h 18m |
+| Sum of per-step agent time | 34h 30m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-22T17:39:58Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-23T05:19:05Z`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -180,6 +180,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE | accepted | 10m | 3m | 4m | 0.8m | 0.5m | n/a | n/a |
 | SMALL-SIDED-AFTER-PREREQ-EVIDENCE | accepted | 10m | 5.6m | 1.2m | 2.6m | 0.5m | n/a | n/a |
 | TEAM-DECISION-PROFILE-EVIDENCE | accepted | 11m | 5.5m | 2.4m | 2.3m | 0.5m | n/a | n/a |
+| MUTANT-TEAM-PASS-EVIDENCE | accepted | 12m | 3.5m | 1.2m | 5.6m | 0.5m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -435,6 +436,7 @@ on an H task is the interesting result.
 | PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE | qwen3.6 | M | Medium — PLAYABLE_1V1 rerun after executable prereqs | 0 | A | live profile runner PASS |
 | SMALL-SIDED-AFTER-PREREQ-EVIDENCE | qwen3.6 | M | Medium — SMALL_SIDED playtest after 1v1 PASS | 0 | A | honest NOT_EVALUATED; TEAM_DECISION_PROFILE unmet |
 | TEAM-DECISION-PROFILE-EVIDENCE | qwen3.6 | M | Medium — persist honest TEAM_DECISION_PROFILE eval.json | 0 | A | live computeTeamDecision PASS |
+| MUTANT-TEAM-PASS-EVIDENCE | qwen3.6 | M | Medium — persist honest runMutantTeam eval.json | 0 | A | nine implementable mutants PASS |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -593,6 +595,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-AFTER-PREREQ-EVIDENCE | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 | TEAM-DECISION-PROFILE-EVIDENCE | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | live evaluator PASS |
 | TEAM-DECISION-PROFILE-EVIDENCE | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
+| MUTANT-TEAM-PASS-EVIDENCE | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | live evaluator PASS |
+| MUTANT-TEAM-PASS-EVIDENCE | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 
 ### Builder scoreboard
 
@@ -600,7 +604,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 62 | 44 | 10 | 3 | 3 | 2 | 71% | ~0.53 | ~32m |
+| qwen3.6 | 63 | 45 | 10 | 3 | 3 | 2 | 71% | ~0.52 | ~32m |
 | mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

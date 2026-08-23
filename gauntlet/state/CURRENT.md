@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: MUTANT-TEAM-PASS-EVIDENCE
+next_objective_id: TEAM-SHAPE-SUITE-PASS-EVIDENCE
 
 best_known:
-  commit: 67a3886204f01bad1cc96c243745c447c125920f
-  note: "TEAM-DECISION-PROFILE-EVIDENCE accepted; live team-decision eval PASS. Next: MUTANT-TEAM-PASS-EVIDENCE."
+  commit: 79ecca825e230c9ef5cc175fdc6b17b431ad1173
+  note: "MUTANT-TEAM-PASS-EVIDENCE accepted; live runMutantTeam PASS. Next: TEAM-SHAPE-SUITE-PASS-EVIDENCE."
 
 active_candidate: null
 builder_in_use: null
@@ -119,17 +119,18 @@ accepted:
   - PLAYABLE-1V1-AFTER-PREREQ-EVIDENCE
   - SMALL-SIDED-AFTER-PREREQ-EVIDENCE
   - TEAM-DECISION-PROFILE-EVIDENCE
+  - MUTANT-TEAM-PASS-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v14 1/4. TEAM_DECISION_PROFILE eval.json is PASS. Next: MUTANT-TEAM-PASS-EVIDENCE. SMALL_SIDED_SHAPE remains NOT_EVALUATED. No PES claim."
+selection_note: "Horizon v14 2/4. TEAM_DECISION_PROFILE and MUTANT_TEAM_PASS eval.json are PASS. Next: TEAM-SHAPE-SUITE-PASS-EVIDENCE. SMALL_SIDED_SHAPE remains NOT_EVALUATED. No PES claim."
 ```
 ## Last accepted objective
 
-TEAM-DECISION-PROFILE-EVIDENCE — Honest live computeTeamDecision evaluator PASS (six axes). Distinct from CPU-TEAM-DECISION-PROFILE.
+MUTANT-TEAM-PASS-EVIDENCE — Honest live runMutantTeam PASS (nine implementable mutants). Not a SMALL_SIDED_SHAPE PASS claim.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-22T17:39:58Z)
-- Candidate: 67a3886
+- Evidence: durable acceptance manifest + record (2026-08-23T05:19:05Z)
+- Candidate: 79ecca8

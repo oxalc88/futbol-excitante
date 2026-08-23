@@ -2998,3 +2998,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 67a3886 candidate(TEAM-DECISION-PROFILE-EVIDENCE)
 - notes: Live team-decision evaluator PASS; not CPU-TEAM-DECISION-PROFILE audit. Horizon v14 1/4.
+
+## Iteration 111 — 2026-08-23
+
+- objective_id: MUTANT-TEAM-PASS-EVIDENCE
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 79ecca8 candidate(MUTANT-TEAM-PASS-EVIDENCE)
+- notes: Live runMutantTeam PASS; nine implementable mutants detected. Horizon v14 2/4.
