@@ -3038,3 +3038,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 48eb72a candidate(SMALL-SIDED-SITUATION-FIXTURES)
 - notes: Two deterministic 3v3 situation fixtures and situation-event mapping module. No verdicts. Horizon v15 1/6.
+
+## Iteration 115 — 2026-08-23
+
+- objective_id: SMALL-SIDED-SITUATION-EVALUATOR
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: a3cc801 candidate(SMALL-SIDED-SITUATION-EVALUATOR)
+- notes: Deterministic per-situation evaluator over the two situation fixtures with honest verdict rules. Horizon v15 2/6.

@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SITUATION-EVALUATOR
+next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-1
 
 best_known:
-  commit: 48eb72a2e5d91c41a583cc8943224e0e3e2412f1
-  note: "SMALL-SIDED-SITUATION-FIXTURES accepted. Next: SMALL-SIDED-SITUATION-EVALUATOR."
+  commit: a3cc801564220591243e26e0b7a9fee527b41fc8
+  note: "SMALL-SIDED-SITUATION-EVALUATOR accepted. Next: SMALL-SIDED-SITUATIONS-BATCH-1."
 
 active_candidate: null
 builder_in_use: null
@@ -123,17 +123,18 @@ accepted:
   - TEAM-SHAPE-SUITE-PASS-EVIDENCE
   - SMALL-SIDED-AFTER-TEAM-PREREQS
   - SMALL-SIDED-SITUATION-FIXTURES
+  - SMALL-SIDED-SITUATION-EVALUATOR
 
 blocked: []
 
-selection_note: "Horizon v15 1/6. Two 3v3 situation fixtures + mapping accepted. Next: SMALL-SIDED-SITUATION-EVALUATOR. No PES claim."
+selection_note: "Horizon v15 2/6. Evaluator runner accepted. Next: SMALL-SIDED-SITUATIONS-BATCH-1. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-SITUATION-FIXTURES — Deterministic 3v3 situation fixtures and event mapping for eight SMALL_SIDED situations. No verdicts claimed.
+SMALL-SIDED-SITUATION-EVALUATOR — Deterministic per-situation evaluator with honest verdict rules. No situation PASS claimed on the milestone.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T06:08:55Z)
-- Candidate: 48eb72a
+- Evidence: durable acceptance manifest + record (2026-08-23T06:36:48Z)
+- Candidate: a3cc801
