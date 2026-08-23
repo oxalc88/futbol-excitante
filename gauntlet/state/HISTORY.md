@@ -3112,3 +3112,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 ## Horizon v16 exhaustion (5/5 accepted)
 
 All 5 objectives of horizon v16 accepted. Milestone did not pass — honest evaluation required horizon v17 for event diversity extension.
+
+## Iteration 122 — 2026-08-23
+
+- objective_id: FIXTURE-EVENT-EXTENSION
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 0ac5fe9 candidate(FIXTURE-EVENT-EXTENSION)
+- notes: Extended fixture now produces second-touch events. pitch-contact/ball-out-of-play pre-existing simulation limitations (ball settles after first contact). 273/273 regression tests pass. Horizon v17 1/3.

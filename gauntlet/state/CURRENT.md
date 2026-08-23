@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: FIXTURE-EVENT-EXTENSION
+next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-3
 
 best_known:
-  commit: ec1e054
-  note: "SMALL-SIDED-MILESTONE-RE-EVALUATION accepted (honest FAIL: 4 FAIL, 4 NOT_EVALUATED; milestone did not pass). Horizon v16 EXHAUSTED. Horizon v17 created: drive fixture event diversity."
+  commit: 0ac5fe9
+  note: "FIXTURE-EVENT-EXTENSION accepted (second-touch now emits; pitch-contact/ball-out-of-play are sim limitations). Horizon v17 advances to BATCH-3."
 
 active_candidate: null
 builder_in_use: null
@@ -130,17 +130,18 @@ accepted:
   - SMALL-SIDED-SITUATIONS-BATCH-2-RERUN
   - BROWSER-SMALL-SIDED-001-CASE
   - SMALL-SIDED-MILESTONE-RE-EVALUATION
+  - FIXTURE-EVENT-EXTENSION
 
 blocked: []
 
-selection_note: "Horizon v16 EXHAUSTED (5/5 accepted). Milestone FAIL honest. Horizon v17 ACTIVE: drive fixture event diversity so FAIL situations can become PASS. No PES claim."
+selection_note: "Horizon v17 1/3 ACTIVE. Second-touch now emits via extended fixture. Next: batch-3 on extended fixture, then milestone re-run. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-MILESTONE-RE-EVALUATION — Re-ran milestone evaluator with all accumulated evidence. Honest verdict: FAIL (4 FAIL, 4 NOT_EVALUATED). Fix: extend fixture input programs to produce missing indicative event kinds. No milestone PASS claimed.
+FIXTURE-EVENT-EXTENSION — Extended situation fixture now produces second-touch events (5/5 tests pass, 24/24 existing fixture tests pass, 273/273 scenario tests pass). pitch-contact and ball-out-of-play remain pre-existing simulation limitations (ball settles after first contact). Honest report only.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T09:37:04Z)
-- Candidate: ec1e054
+- Evidence: durable acceptance manifest + record (2026-08-23T11:25:04Z)
+- Candidate: 0ac5fe9
