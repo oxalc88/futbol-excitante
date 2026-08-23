@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-23T05:34:11.982Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "TEAM-SHAPE-SUITE-PASS-EVIDENCE",
+  "candidate_commit": "c05460ba24eb2a1cfa9a46f5b2369e715bd717f7",
+  "evidence_class": "HEADLESS",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "agent": "critic-mimo",
+    "model": "mimo-v2.5",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer-mimo",
+    "model": "mimo-v2.5",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  }
+}

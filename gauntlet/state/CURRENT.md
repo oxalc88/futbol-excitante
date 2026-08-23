@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: TEAM-SHAPE-SUITE-PASS-EVIDENCE
+next_objective_id: SMALL-SIDED-AFTER-TEAM-PREREQS
 
 best_known:
-  commit: 79ecca825e230c9ef5cc175fdc6b17b431ad1173
-  note: "MUTANT-TEAM-PASS-EVIDENCE accepted; live runMutantTeam PASS. Next: TEAM-SHAPE-SUITE-PASS-EVIDENCE."
+  commit: c05460ba24eb2a1cfa9a46f5b2369e715bd717f7
+  note: "TEAM-SHAPE-SUITE-PASS-EVIDENCE accepted; live suite verdict PASS. Next: SMALL-SIDED-AFTER-TEAM-PREREQS."
 
 active_candidate: null
 builder_in_use: null
@@ -120,17 +120,18 @@ accepted:
   - SMALL-SIDED-AFTER-PREREQ-EVIDENCE
   - TEAM-DECISION-PROFILE-EVIDENCE
   - MUTANT-TEAM-PASS-EVIDENCE
+  - TEAM-SHAPE-SUITE-PASS-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v14 2/4. TEAM_DECISION_PROFILE and MUTANT_TEAM_PASS eval.json are PASS. Next: TEAM-SHAPE-SUITE-PASS-EVIDENCE. SMALL_SIDED_SHAPE remains NOT_EVALUATED. No PES claim."
+selection_note: "Horizon v14 3/4. TEAM_DECISION_PROFILE, MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS eval.json all PASS. Next: SMALL-SIDED-AFTER-TEAM-PREREQS. No PES claim."
 ```
 ## Last accepted objective
 
-MUTANT-TEAM-PASS-EVIDENCE — Honest live runMutantTeam PASS (nine implementable mutants). Not a SMALL_SIDED_SHAPE PASS claim.
+TEAM-SHAPE-SUITE-PASS-EVIDENCE — Honest live team-shape suite verdict PASS (16 tests, common criteria). Structural; team-specific criteria gap documented.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T05:19:05Z)
-- Candidate: 79ecca8
+- Evidence: durable acceptance manifest + record (2026-08-23T05:34:11Z)
+- Candidate: c05460b
