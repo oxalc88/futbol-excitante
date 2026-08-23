@@ -3088,3 +3088,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 05fea7a candidate(SMALL-SIDED-SITUATIONS-BATCH-2-RERUN)
 - notes: Re-ran situation evaluator on driven transition fixture; SETTLED_ATTACK_VS_DEFENCE NOT_EVALUATED (only indicative shot), 3 transitions FAIL. 90 tests + binding pass; no source changes; invariant disclosed. Horizon v16 3/5.
+
+## Iteration 120 — 2026-08-23
+
+- objective_id: BROWSER-SMALL-SIDED-001-CASE
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 2ac6f87 candidate(BROWSER-SMALL-SIDED-001-CASE)
+- notes: Materialized BROWSER-SMALL-SIDED-001 browser case: 4 semantic frames, headless hash correspondence, durable browser-cases.json. 10/10 browser tests + 9/9 existing 3v3 tests pass. No source changes. Horizon v16 4/5.

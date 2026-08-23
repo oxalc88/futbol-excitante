@@ -7,7 +7,7 @@ horizon_id: "driven-situations-and-small-sided-milestone"
 created_from_commit: 0e50a45f2f059bed1b38367fe316529c437dae1c
 created_at: 2026-08-23
 reason: "Horizon small-sided-situations-and-browser-case invalidated by evidence: SMALL-SIDED-SITUATIONS-BATCH-1 ran the accepted 3v3 situation fixture and produced zero simulation events in 600 ticks (inputProgram empty, no scheduled events), so all eight situations are honestly NOT_EVALUATED and BATCH-2 plus the milestone re-eval could only repeat NOT_EVALUATED. New horizon first drives the situation fixtures with deterministic inputs/CPU behavior so pass/shot/contact/transition events actually occur, then re-runs batch evidence, materializes BROWSER-SMALL-SIDED-001, and re-evaluates the milestone."
-current_index: 3
+current_index: 4
 objectives:
   - id: SITUATION-FIXTURE-DRIVING
     status: accepted
@@ -25,7 +25,7 @@ objectives:
     builder: builder-structured
     prerequisite: SMALL-SIDED-SITUATIONS-BATCH-1-RERUN
   - id: BROWSER-SMALL-SIDED-001-CASE
-    status: pending
+    status: accepted
     reason: "Materialize required browser case BROWSER-SMALL-SIDED-001 with hash cross-check and semantic frames (DYNAMIC_VISUAL)."
     builder: builder-structured
     prerequisite: SMALL-SIDED-SITUATIONS-BATCH-2-RERUN

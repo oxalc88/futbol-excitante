@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-SMALL-SIDED-001-CASE
+next_objective_id: SMALL-SIDED-MILESTONE-RE-EVALUATION
 
 best_known:
-  commit: 05fea7a
-  note: "SMALL-SIDED-SITUATIONS-BATCH-2-RERUN accepted (transition fixture: SETTLED NOT_EVALUATED, 3 transitions FAIL, honest). Horizon v16 advances to BROWSER-SMALL-SIDED-001-CASE."
+  commit: 2ac6f87
+  note: "BROWSER-SMALL-SIDED-001-CASE accepted (4 semantic frames, hash correspondence, 10/10 browser tests). Horizon v16 advances to SMALL-SIDED-MILESTONE-RE-EVALUATION."
 
 active_candidate: null
 builder_in_use: null
@@ -128,17 +128,18 @@ accepted:
   - SITUATION-FIXTURE-DRIVING
   - SMALL-SIDED-SITUATIONS-BATCH-1-RERUN
   - SMALL-SIDED-SITUATIONS-BATCH-2-RERUN
+  - BROWSER-SMALL-SIDED-001-CASE
 
 blocked: []
 
-selection_note: "Horizon v16 3/5 ACTIVE. Both batch reruns persisted honest verdicts on driven fixtures. Next: BROWSER-SMALL-SIDED-001 case, milestone re-eval. No PES claim."
+selection_note: "Horizon v16 4/5 ACTIVE. Both batch reruns + browser case materialized. Next: SMALL-SIDED-MILESTONE-RE-EVALUATION. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-SITUATIONS-BATCH-2-RERUN — Re-ran the situation evaluator on the driven transition fixture. SETTLED_ATTACK_VS_DEFENCE NOT_EVALUATED (only indicative shot present); ATTACK_TO_DEFENCE_TRANSITION / DEFENCE_TO_ATTACK_TRANSITION / COORDINATED_PRESS FAIL. event-references invariant disclosed. Honest verdicts only; no milestone PASS.
+BROWSER-SMALL-SIDED-001-CASE — Materialized the required browser case with 4 semantic frames, headless hash correspondence, and durable browser-cases.json. 10/10 browser tests + 9/9 existing 3v3 tests pass. Critic ACCEPT (deepseek-v4-flash), integration ACCEPT (mimo-v2.5). No milestone PASS.
 
 - builder: builder-structured / qwen3.6
-- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- critic: critic / deepseek-v4-flash — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T08:54:58Z)
-- Candidate: 05fea7a
+- Evidence: durable acceptance manifest + record (2026-08-23T09:24:47Z)
+- Candidate: 2ac6f87
