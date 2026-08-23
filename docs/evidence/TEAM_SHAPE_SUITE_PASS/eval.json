@@ -1,0 +1,2516 @@
+{
+  "suiteId": "team",
+  "suiteVersion": "suite-team-v1",
+  "testCount": 16,
+  "testResults": [
+    {
+      "test_id": "OFF-RUN-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "OFF-SUP-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "DEF-SHAPE-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "DEF-SHIFT-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "PRESS-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "PRESS-GG-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "PRESS-REC-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "TACT-COMP-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "TACT-DLINE-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "TACT-SUP-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "TACT-TIKI-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "TACT-MARK-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "AI-ADAPT-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "AI-ADAPT-002",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "TRANS-AD-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    },
+    {
+      "test_id": "TRANS-DA-001",
+      "criteria": [
+        {
+          "criterion_id": "COMMON-FINITE",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-REFERENCES",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        },
+        {
+          "criterion_id": "COMMON-BOUNDS",
+          "class": "HARD_INVARIANT",
+          "outcome": "PASS"
+        }
+      ],
+      "overall": "PASS"
+    }
+  ],
+  "commonCriteriaCheck": [
+    {
+      "criterionId": "COMMON-FINITE",
+      "oracleResults": [
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "finite-number",
+          "status": "pass",
+          "description": "All numeric values are finite (not NaN or ±Infinity)"
+        },
+        {
+          "id": "ball-continuity-tick-2",
+          "status": "pass",
+          "description": "Ball displacement at tick 2 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-3",
+          "status": "pass",
+          "description": "Ball displacement at tick 3 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-4",
+          "status": "pass",
+          "description": "Ball displacement at tick 4 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-5",
+          "status": "pass",
+          "description": "Ball displacement at tick 5 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-6",
+          "status": "pass",
+          "description": "Ball displacement at tick 6 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-7",
+          "status": "pass",
+          "description": "Ball displacement at tick 7 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-8",
+          "status": "pass",
+          "description": "Ball displacement at tick 8 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-9",
+          "status": "pass",
+          "description": "Ball displacement at tick 9 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-10",
+          "status": "pass",
+          "description": "Ball displacement at tick 10 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-11",
+          "status": "pass",
+          "description": "Ball displacement at tick 11 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-12",
+          "status": "pass",
+          "description": "Ball displacement at tick 12 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-13",
+          "status": "pass",
+          "description": "Ball displacement at tick 13 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-14",
+          "status": "pass",
+          "description": "Ball displacement at tick 14 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-15",
+          "status": "pass",
+          "description": "Ball displacement at tick 15 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-16",
+          "status": "pass",
+          "description": "Ball displacement at tick 16 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-17",
+          "status": "pass",
+          "description": "Ball displacement at tick 17 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-18",
+          "status": "pass",
+          "description": "Ball displacement at tick 18 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-19",
+          "status": "pass",
+          "description": "Ball displacement at tick 19 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-20",
+          "status": "pass",
+          "description": "Ball displacement at tick 20 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-21",
+          "status": "pass",
+          "description": "Ball displacement at tick 21 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-22",
+          "status": "pass",
+          "description": "Ball displacement at tick 22 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-23",
+          "status": "pass",
+          "description": "Ball displacement at tick 23 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-24",
+          "status": "pass",
+          "description": "Ball displacement at tick 24 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-25",
+          "status": "pass",
+          "description": "Ball displacement at tick 25 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-26",
+          "status": "pass",
+          "description": "Ball displacement at tick 26 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-27",
+          "status": "pass",
+          "description": "Ball displacement at tick 27 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-28",
+          "status": "pass",
+          "description": "Ball displacement at tick 28 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-29",
+          "status": "pass",
+          "description": "Ball displacement at tick 29 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-30",
+          "status": "pass",
+          "description": "Ball displacement at tick 30 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-31",
+          "status": "pass",
+          "description": "Ball displacement at tick 31 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-32",
+          "status": "pass",
+          "description": "Ball displacement at tick 32 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-33",
+          "status": "pass",
+          "description": "Ball displacement at tick 33 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-34",
+          "status": "pass",
+          "description": "Ball displacement at tick 34 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-35",
+          "status": "pass",
+          "description": "Ball displacement at tick 35 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-36",
+          "status": "pass",
+          "description": "Ball displacement at tick 36 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-37",
+          "status": "pass",
+          "description": "Ball displacement at tick 37 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-38",
+          "status": "pass",
+          "description": "Ball displacement at tick 38 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-39",
+          "status": "pass",
+          "description": "Ball displacement at tick 39 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-40",
+          "status": "pass",
+          "description": "Ball displacement at tick 40 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-41",
+          "status": "pass",
+          "description": "Ball displacement at tick 41 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-42",
+          "status": "pass",
+          "description": "Ball displacement at tick 42 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-43",
+          "status": "pass",
+          "description": "Ball displacement at tick 43 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-44",
+          "status": "pass",
+          "description": "Ball displacement at tick 44 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-45",
+          "status": "pass",
+          "description": "Ball displacement at tick 45 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-46",
+          "status": "pass",
+          "description": "Ball displacement at tick 46 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-47",
+          "status": "pass",
+          "description": "Ball displacement at tick 47 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-48",
+          "status": "pass",
+          "description": "Ball displacement at tick 48 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-49",
+          "status": "pass",
+          "description": "Ball displacement at tick 49 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-50",
+          "status": "pass",
+          "description": "Ball displacement at tick 50 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-51",
+          "status": "pass",
+          "description": "Ball displacement at tick 51 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-52",
+          "status": "pass",
+          "description": "Ball displacement at tick 52 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-53",
+          "status": "pass",
+          "description": "Ball displacement at tick 53 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-54",
+          "status": "pass",
+          "description": "Ball displacement at tick 54 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-55",
+          "status": "pass",
+          "description": "Ball displacement at tick 55 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-56",
+          "status": "pass",
+          "description": "Ball displacement at tick 56 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-57",
+          "status": "pass",
+          "description": "Ball displacement at tick 57 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-58",
+          "status": "pass",
+          "description": "Ball displacement at tick 58 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-59",
+          "status": "pass",
+          "description": "Ball displacement at tick 59 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-60",
+          "status": "pass",
+          "description": "Ball displacement at tick 60 is 0.000000 m (max 10 m)"
+        }
+      ],
+      "outcome": "PASS",
+      "evidence": [
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "All numeric values are finite (not NaN or ±Infinity)",
+        "Ball displacement at tick 2 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 3 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 4 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 5 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 6 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 7 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 8 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 9 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 10 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 11 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 12 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 13 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 14 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 15 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 16 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 17 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 18 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 19 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 20 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 21 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 22 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 23 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 24 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 25 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 26 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 27 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 28 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 29 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 30 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 31 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 32 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 33 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 34 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 35 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 36 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 37 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 38 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 39 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 40 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 41 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 42 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 43 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 44 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 45 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 46 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 47 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 48 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 49 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 50 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 51 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 52 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 53 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 54 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 55 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 56 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 57 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 58 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 59 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 60 is 0.000000 m (max 10 m)"
+      ]
+    },
+    {
+      "criterionId": "COMMON-REFERENCES",
+      "oracleResults": [
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "event-references",
+          "status": "pass",
+          "description": "All event references resolve; no duplicate sequence numbers"
+        },
+        {
+          "id": "ball-continuity-tick-2",
+          "status": "pass",
+          "description": "Ball displacement at tick 2 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-3",
+          "status": "pass",
+          "description": "Ball displacement at tick 3 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-4",
+          "status": "pass",
+          "description": "Ball displacement at tick 4 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-5",
+          "status": "pass",
+          "description": "Ball displacement at tick 5 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-6",
+          "status": "pass",
+          "description": "Ball displacement at tick 6 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-7",
+          "status": "pass",
+          "description": "Ball displacement at tick 7 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-8",
+          "status": "pass",
+          "description": "Ball displacement at tick 8 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-9",
+          "status": "pass",
+          "description": "Ball displacement at tick 9 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-10",
+          "status": "pass",
+          "description": "Ball displacement at tick 10 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-11",
+          "status": "pass",
+          "description": "Ball displacement at tick 11 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-12",
+          "status": "pass",
+          "description": "Ball displacement at tick 12 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-13",
+          "status": "pass",
+          "description": "Ball displacement at tick 13 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-14",
+          "status": "pass",
+          "description": "Ball displacement at tick 14 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-15",
+          "status": "pass",
+          "description": "Ball displacement at tick 15 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-16",
+          "status": "pass",
+          "description": "Ball displacement at tick 16 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-17",
+          "status": "pass",
+          "description": "Ball displacement at tick 17 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-18",
+          "status": "pass",
+          "description": "Ball displacement at tick 18 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-19",
+          "status": "pass",
+          "description": "Ball displacement at tick 19 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-20",
+          "status": "pass",
+          "description": "Ball displacement at tick 20 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-21",
+          "status": "pass",
+          "description": "Ball displacement at tick 21 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-22",
+          "status": "pass",
+          "description": "Ball displacement at tick 22 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-23",
+          "status": "pass",
+          "description": "Ball displacement at tick 23 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-24",
+          "status": "pass",
+          "description": "Ball displacement at tick 24 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-25",
+          "status": "pass",
+          "description": "Ball displacement at tick 25 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-26",
+          "status": "pass",
+          "description": "Ball displacement at tick 26 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-27",
+          "status": "pass",
+          "description": "Ball displacement at tick 27 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-28",
+          "status": "pass",
+          "description": "Ball displacement at tick 28 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-29",
+          "status": "pass",
+          "description": "Ball displacement at tick 29 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-30",
+          "status": "pass",
+          "description": "Ball displacement at tick 30 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-31",
+          "status": "pass",
+          "description": "Ball displacement at tick 31 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-32",
+          "status": "pass",
+          "description": "Ball displacement at tick 32 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-33",
+          "status": "pass",
+          "description": "Ball displacement at tick 33 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-34",
+          "status": "pass",
+          "description": "Ball displacement at tick 34 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-35",
+          "status": "pass",
+          "description": "Ball displacement at tick 35 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-36",
+          "status": "pass",
+          "description": "Ball displacement at tick 36 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-37",
+          "status": "pass",
+          "description": "Ball displacement at tick 37 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-38",
+          "status": "pass",
+          "description": "Ball displacement at tick 38 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-39",
+          "status": "pass",
+          "description": "Ball displacement at tick 39 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-40",
+          "status": "pass",
+          "description": "Ball displacement at tick 40 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-41",
+          "status": "pass",
+          "description": "Ball displacement at tick 41 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-42",
+          "status": "pass",
+          "description": "Ball displacement at tick 42 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-43",
+          "status": "pass",
+          "description": "Ball displacement at tick 43 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-44",
+          "status": "pass",
+          "description": "Ball displacement at tick 44 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-45",
+          "status": "pass",
+          "description": "Ball displacement at tick 45 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-46",
+          "status": "pass",
+          "description": "Ball displacement at tick 46 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-47",
+          "status": "pass",
+          "description": "Ball displacement at tick 47 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-48",
+          "status": "pass",
+          "description": "Ball displacement at tick 48 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-49",
+          "status": "pass",
+          "description": "Ball displacement at tick 49 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-50",
+          "status": "pass",
+          "description": "Ball displacement at tick 50 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-51",
+          "status": "pass",
+          "description": "Ball displacement at tick 51 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-52",
+          "status": "pass",
+          "description": "Ball displacement at tick 52 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-53",
+          "status": "pass",
+          "description": "Ball displacement at tick 53 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-54",
+          "status": "pass",
+          "description": "Ball displacement at tick 54 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-55",
+          "status": "pass",
+          "description": "Ball displacement at tick 55 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-56",
+          "status": "pass",
+          "description": "Ball displacement at tick 56 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-57",
+          "status": "pass",
+          "description": "Ball displacement at tick 57 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-58",
+          "status": "pass",
+          "description": "Ball displacement at tick 58 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-59",
+          "status": "pass",
+          "description": "Ball displacement at tick 59 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-60",
+          "status": "pass",
+          "description": "Ball displacement at tick 60 is 0.000000 m (max 10 m)"
+        }
+      ],
+      "outcome": "PASS",
+      "evidence": [
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "All event references resolve; no duplicate sequence numbers",
+        "Ball displacement at tick 2 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 3 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 4 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 5 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 6 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 7 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 8 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 9 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 10 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 11 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 12 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 13 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 14 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 15 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 16 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 17 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 18 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 19 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 20 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 21 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 22 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 23 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 24 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 25 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 26 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 27 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 28 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 29 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 30 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 31 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 32 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 33 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 34 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 35 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 36 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 37 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 38 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 39 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 40 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 41 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 42 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 43 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 44 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 45 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 46 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 47 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 48 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 49 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 50 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 51 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 52 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 53 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 54 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 55 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 56 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 57 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 58 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 59 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 60 is 0.000000 m (max 10 m)"
+      ]
+    },
+    {
+      "criterionId": "COMMON-BOUNDS",
+      "oracleResults": [
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "bounds",
+          "status": "pass",
+          "description": "All positions within safety bounds"
+        },
+        {
+          "id": "ball-continuity-tick-2",
+          "status": "pass",
+          "description": "Ball displacement at tick 2 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-3",
+          "status": "pass",
+          "description": "Ball displacement at tick 3 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-4",
+          "status": "pass",
+          "description": "Ball displacement at tick 4 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-5",
+          "status": "pass",
+          "description": "Ball displacement at tick 5 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-6",
+          "status": "pass",
+          "description": "Ball displacement at tick 6 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-7",
+          "status": "pass",
+          "description": "Ball displacement at tick 7 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-8",
+          "status": "pass",
+          "description": "Ball displacement at tick 8 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-9",
+          "status": "pass",
+          "description": "Ball displacement at tick 9 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-10",
+          "status": "pass",
+          "description": "Ball displacement at tick 10 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-11",
+          "status": "pass",
+          "description": "Ball displacement at tick 11 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-12",
+          "status": "pass",
+          "description": "Ball displacement at tick 12 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-13",
+          "status": "pass",
+          "description": "Ball displacement at tick 13 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-14",
+          "status": "pass",
+          "description": "Ball displacement at tick 14 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-15",
+          "status": "pass",
+          "description": "Ball displacement at tick 15 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-16",
+          "status": "pass",
+          "description": "Ball displacement at tick 16 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-17",
+          "status": "pass",
+          "description": "Ball displacement at tick 17 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-18",
+          "status": "pass",
+          "description": "Ball displacement at tick 18 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-19",
+          "status": "pass",
+          "description": "Ball displacement at tick 19 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-20",
+          "status": "pass",
+          "description": "Ball displacement at tick 20 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-21",
+          "status": "pass",
+          "description": "Ball displacement at tick 21 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-22",
+          "status": "pass",
+          "description": "Ball displacement at tick 22 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-23",
+          "status": "pass",
+          "description": "Ball displacement at tick 23 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-24",
+          "status": "pass",
+          "description": "Ball displacement at tick 24 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-25",
+          "status": "pass",
+          "description": "Ball displacement at tick 25 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-26",
+          "status": "pass",
+          "description": "Ball displacement at tick 26 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-27",
+          "status": "pass",
+          "description": "Ball displacement at tick 27 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-28",
+          "status": "pass",
+          "description": "Ball displacement at tick 28 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-29",
+          "status": "pass",
+          "description": "Ball displacement at tick 29 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-30",
+          "status": "pass",
+          "description": "Ball displacement at tick 30 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-31",
+          "status": "pass",
+          "description": "Ball displacement at tick 31 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-32",
+          "status": "pass",
+          "description": "Ball displacement at tick 32 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-33",
+          "status": "pass",
+          "description": "Ball displacement at tick 33 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-34",
+          "status": "pass",
+          "description": "Ball displacement at tick 34 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-35",
+          "status": "pass",
+          "description": "Ball displacement at tick 35 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-36",
+          "status": "pass",
+          "description": "Ball displacement at tick 36 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-37",
+          "status": "pass",
+          "description": "Ball displacement at tick 37 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-38",
+          "status": "pass",
+          "description": "Ball displacement at tick 38 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-39",
+          "status": "pass",
+          "description": "Ball displacement at tick 39 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-40",
+          "status": "pass",
+          "description": "Ball displacement at tick 40 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-41",
+          "status": "pass",
+          "description": "Ball displacement at tick 41 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-42",
+          "status": "pass",
+          "description": "Ball displacement at tick 42 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-43",
+          "status": "pass",
+          "description": "Ball displacement at tick 43 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-44",
+          "status": "pass",
+          "description": "Ball displacement at tick 44 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-45",
+          "status": "pass",
+          "description": "Ball displacement at tick 45 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-46",
+          "status": "pass",
+          "description": "Ball displacement at tick 46 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-47",
+          "status": "pass",
+          "description": "Ball displacement at tick 47 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-48",
+          "status": "pass",
+          "description": "Ball displacement at tick 48 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-49",
+          "status": "pass",
+          "description": "Ball displacement at tick 49 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-50",
+          "status": "pass",
+          "description": "Ball displacement at tick 50 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-51",
+          "status": "pass",
+          "description": "Ball displacement at tick 51 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-52",
+          "status": "pass",
+          "description": "Ball displacement at tick 52 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-53",
+          "status": "pass",
+          "description": "Ball displacement at tick 53 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-54",
+          "status": "pass",
+          "description": "Ball displacement at tick 54 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-55",
+          "status": "pass",
+          "description": "Ball displacement at tick 55 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-56",
+          "status": "pass",
+          "description": "Ball displacement at tick 56 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-57",
+          "status": "pass",
+          "description": "Ball displacement at tick 57 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-58",
+          "status": "pass",
+          "description": "Ball displacement at tick 58 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-59",
+          "status": "pass",
+          "description": "Ball displacement at tick 59 is 0.000000 m (max 10 m)"
+        },
+        {
+          "id": "ball-continuity-tick-60",
+          "status": "pass",
+          "description": "Ball displacement at tick 60 is 0.000000 m (max 10 m)"
+        }
+      ],
+      "outcome": "PASS",
+      "evidence": [
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "All positions within safety bounds",
+        "Ball displacement at tick 2 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 3 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 4 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 5 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 6 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 7 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 8 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 9 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 10 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 11 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 12 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 13 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 14 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 15 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 16 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 17 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 18 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 19 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 20 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 21 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 22 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 23 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 24 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 25 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 26 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 27 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 28 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 29 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 30 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 31 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 32 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 33 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 34 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 35 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 36 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 37 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 38 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 39 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 40 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 41 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 42 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 43 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 44 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 45 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 46 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 47 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 48 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 49 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 50 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 51 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 52 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 53 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 54 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 55 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 56 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 57 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 58 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 59 is 0.000000 m (max 10 m)",
+        "Ball displacement at tick 60 is 0.000000 m (max 10 m)"
+      ]
+    }
+  ],
+  "allTestsPass": true,
+  "overall": "PASS",
+  "milestoneVerdict": "PASS",
+  "verdict": "PASS",
+  "details": "TEAM_SHAPE_SUITE_PASS PASS: all 16 tests pass common criteria"
+}
