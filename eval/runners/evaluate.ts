@@ -115,8 +115,12 @@ export function evaluate(opts: EvaluateOptions): EvaluationResult {
   const allEvents: Array<{ tick: number; id: string; kind: string; label: string }> = [];
 
   for (let i = 0; i < scenario.durationTicks; i++) {
-    // Apply inputs for the current tick.
-    const tickInputs = scenario.inputProgram[sim.tick] ?? [];
+    // Apply inputs for the tick that step() will resolve.
+    // step() increments world.tick first, then resolves inputBuffers[world.tick].
+    // So we apply scenario.inputProgram[sim.tick + 1] so frames (tick: sim.tick+1)
+    // land under the correct buffer key consumed by the next step().
+    const nextTick = sim.tick + 1;
+    const tickInputs = scenario.inputProgram[nextTick] ?? [];
     if (tickInputs.length > 0) {
       sim.applyInputs(tickInputs);
     }
