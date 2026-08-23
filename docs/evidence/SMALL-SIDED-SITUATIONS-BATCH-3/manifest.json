@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SMALL-SIDED-SITUATIONS-BATCH-3",
+  "accepted_at": "2026-08-23T11:49:52.551Z",
+  "candidate_commit": "36a2b82",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-3/audit.json",
+      "sha256": "c6f85db825aec654cd7d05231cdd65edefb86049cb04b1a610ce664b8e6030a9",
+      "git_blob": "331b4bd9deab6bf42111ec084f629788f72c3ece",
+      "candidate_commit": "36a2b82",
+      "bytes": 2688,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "1 PASS (SETTLED), 7 FAIL",
+      "second-touch present but evaluator filtering hides it"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "passed": 19,
+      "failed": 0
+    },
+    "semantic_audit": null,
+    "critic": {
+      "verdict": "ACCEPT",
+      "model": "mimo-v2.5",
+      "builder_model": "qwen3.6"
+    },
+    "integration": {
+      "verdict": "ACCEPT",
+      "model": "mimo-v2.5",
+      "builder_model": "qwen3.6"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-23/2026-08-23T11-49-52-551Z-SMALL-SIDED-SITUATIONS-BATCH-3-acceptance.json"
+}

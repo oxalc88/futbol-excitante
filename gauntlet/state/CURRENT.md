@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-3
+next_objective_id: SMALL-SIDED-MILESTONE-RERUN
 
 best_known:
-  commit: 0ac5fe9
-  note: "FIXTURE-EVENT-EXTENSION accepted (second-touch now emits; pitch-contact/ball-out-of-play are sim limitations). Horizon v17 advances to BATCH-3."
+  commit: 36a2b82
+  note: "SMALL-SIDED-SITUATIONS-BATCH-3 accepted (extended fixture: 1 PASS, 7 FAIL; evaluator second-touch limitation honest). Horizon v17 advances to milestone-rerun."
 
 active_candidate: null
 builder_in_use: null
@@ -131,17 +131,18 @@ accepted:
   - BROWSER-SMALL-SIDED-001-CASE
   - SMALL-SIDED-MILESTONE-RE-EVALUATION
   - FIXTURE-EVENT-EXTENSION
+  - SMALL-SIDED-SITUATIONS-BATCH-3
 
 blocked: []
 
-selection_note: "Horizon v17 1/3 ACTIVE. Second-touch now emits via extended fixture. Next: batch-3 on extended fixture, then milestone re-run. No PES claim."
+selection_note: "Horizon v17 2/3 ACTIVE. BATCH-3 persisted on extended fixture; second-touch limitation documented. Next: milestone re-run. No PES claim."
 ```
 ## Last accepted objective
 
-FIXTURE-EVENT-EXTENSION — Extended situation fixture now produces second-touch events (5/5 tests pass, 24/24 existing fixture tests pass, 273/273 scenario tests pass). pitch-contact and ball-out-of-play remain pre-existing simulation limitations (ball settles after first contact). Honest report only.
+SMALL-SIDED-SITUATIONS-BATCH-3 — Extended fixture: 1 PASS (SETTLED_ATTACK_VS_DEFENCE), 7 FAIL. second-touch present but evaluator's `isRelevantEvent` filtering hides it from indicative kinds — honestly documented. 79/79 regression tests pass.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T11:25:04Z)
-- Candidate: 0ac5fe9
+- Evidence: durable acceptance manifest + record (2026-08-23T11:49:52Z)
+- Candidate: 36a2b82

@@ -9,7 +9,7 @@ horizon_id: "driven-fixture-event-extension"
 created_from_commit: ec1e054e250a09024532100a3f5c4d4a68102a25
 created_at: 2026-08-23
 reason: "Horizon v16 milestone FAILED (4 FAIL, 4 NOT_EVALUATED). Root cause: driven fixtures emit limited event diversity. New horizon extends input programs to produce missing indicative kinds so FAIL situations can be re-evaluated honestly."
-current_index: 1
+current_index: 2
 objectives:
   - id: FIXTURE-EVENT-EXTENSION
     status: accepted
@@ -17,7 +17,7 @@ objectives:
     builder: builder-structured
     prerequisite: null
   - id: SMALL-SIDED-SITUATIONS-BATCH-3
-    status: pending
+    status: accepted
     reason: "Re-run situation evaluator on extended fixtures; persist honest verdicts."
     builder: builder-structured
     prerequisite: FIXTURE-EVENT-EXTENSION
@@ -38,12 +38,7 @@ replan_if:
   - human_needed_spec_or_legal_blocker
 ```
 
-## Completed horizon v16 (driven-situations-and-small-sided-milestone) — EXHAUSTED
+## Completed horizons
 
-All 5 objectives accepted. Milestone did not pass — honest evaluation required horizon v17 for event diversity extension.
-
-- SITUATION-FIXTURE-DRIVING — accepted
-- SMALL-SIDED-SITUATIONS-BATCH-1-RERUN — accepted
-- SMALL-SIDED-SITUATIONS-BATCH-2-RERUN — accepted
-- BROWSER-SMALL-SIDED-001-CASE — accepted
-- SMALL-SIDED-MILESTONE-RE-EVALUATION — accepted
+Horizon v16 (driven-situations-and-small-sided-milestone) — EXHAUSTED: 5/5 accepted.
+Horizon v15 (small-sided-situations-and-browser-case) — EXHAUSTED: 6/6 accepted.

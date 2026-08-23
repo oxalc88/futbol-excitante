@@ -3122,3 +3122,13 @@ All 5 objectives of horizon v16 accepted. Milestone did not pass — honest eval
 - result: accepted
 - commits: 0ac5fe9 candidate(FIXTURE-EVENT-EXTENSION)
 - notes: Extended fixture now produces second-touch events. pitch-contact/ball-out-of-play pre-existing simulation limitations (ball settles after first contact). 273/273 regression tests pass. Horizon v17 1/3.
+
+## Iteration 123 — 2026-08-23
+
+- objective_id: SMALL-SIDED-SITUATIONS-BATCH-3
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 36a2b82 candidate(SMALL-SIDED-SITUATIONS-BATCH-3)
+- notes: Extended fixture: 1 PASS, 7 FAIL. second-touch present but evaluator's isRelevantEvent filtering hides it from indicative kinds — honestly documented. 79/79 regression tests pass. Horizon v17 2/3.
