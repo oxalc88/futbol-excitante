@@ -1,0 +1,149 @@
+{
+  "id": "3v3-transition-fixture-v1",
+  "version": "1.0.0",
+  "family": "situation-fixture",
+  "situation_ids": [
+    "ATTACK_TO_DEFENCE_TRANSITION",
+    "DEFENCE_TO_ATTACK_TRANSITION",
+    "COORDINATED_PRESS"
+  ],
+  "durationTicks": 600,
+  "matchDurationTicks": 600,
+  "seed": 42,
+  "prngAlgorithmId": "mulberry32-v1",
+  "schemaVersion": "state-v1",
+  "simulationVersion": "sim-v1",
+  "configVersion": "foundation-config-v1",
+  "profile": "LABORATORY",
+  "pitchLength": 105,
+  "pitchWidth": 68,
+  "safetyBounds": {
+    "maxX": 52.5,
+    "maxY": 34,
+    "minZ": -0.5,
+    "maxZ": 20
+  },
+  "players": [
+    {
+      "playerId": "player-1",
+      "teamId": "team-a",
+      "groundPosition": { "x": -25, "y": -5 },
+      "formationRole": "defender",
+      "linearVelocity": { "x": 0, "y": 0 },
+      "desiredVelocity": { "x": 0, "y": 0 },
+      "bodyHeading": 0.3,
+      "desiredHeading": 0.3,
+      "archetypeId": "archetype-burst-v1"
+    },
+    {
+      "playerId": "player-2",
+      "teamId": "team-a",
+      "groundPosition": { "x": -5, "y": 2 },
+      "formationRole": "midfielder",
+      "linearVelocity": { "x": 1.5, "y": 0.5 },
+      "desiredVelocity": { "x": 2, "y": 0.5 },
+      "bodyHeading": 0.2,
+      "desiredHeading": 0.2,
+      "archetypeId": "archetype-steady-v1"
+    },
+    {
+      "playerId": "player-3",
+      "teamId": "team-a",
+      "groundPosition": { "x": 10, "y": -3 },
+      "formationRole": "attacker",
+      "linearVelocity": { "x": 2, "y": 0 },
+      "desiredVelocity": { "x": 2.5, "y": 0 },
+      "bodyHeading": 0,
+      "desiredHeading": 0,
+      "archetypeId": "archetype-steady-v1"
+    },
+    {
+      "playerId": "player-4",
+      "teamId": "team-b",
+      "groundPosition": { "x": 18, "y": 0 },
+      "formationRole": "defender",
+      "linearVelocity": { "x": 0, "y": 0 },
+      "desiredVelocity": { "x": 0, "y": 0 },
+      "bodyHeading": 0,
+      "desiredHeading": 0,
+      "archetypeId": "archetype-burst-v1"
+    },
+    {
+      "playerId": "player-5",
+      "teamId": "team-b",
+      "groundPosition": { "x": 0, "y": -8 },
+      "formationRole": "midfielder",
+      "linearVelocity": { "x": 0, "y": 0 },
+      "desiredVelocity": { "x": 0, "y": 0 },
+      "bodyHeading": 3.141592653589793,
+      "desiredHeading": 3.141592653589793,
+      "archetypeId": "archetype-steady-v1"
+    },
+    {
+      "playerId": "player-6",
+      "teamId": "team-b",
+      "groundPosition": { "x": -10, "y": 8 },
+      "formationRole": "attacker",
+      "linearVelocity": { "x": 0, "y": 0 },
+      "desiredVelocity": { "x": 0, "y": 0 },
+      "bodyHeading": 3.141592653589793,
+      "desiredHeading": 3.141592653589793,
+      "archetypeId": "archetype-steady-v1"
+    }
+  ],
+  "ball": {
+    "position": { "x": 12, "y": 0, "z": 0.11 },
+    "linearVelocity": { "x": -3, "y": 0, "z": 0 },
+    "angularVelocity": { "x": 0, "y": 0, "z": 0 },
+    "regime": "ground-roll"
+  },
+  "controlAssignments": {
+    "slot-1": {
+      "controlSlot": "slot-1",
+      "teamId": "team-a",
+      "controlledPlayerId": "player-1",
+      "mode": "AI_FALLBACK"
+    },
+    "slot-2": {
+      "controlSlot": "slot-2",
+      "teamId": "team-a",
+      "controlledPlayerId": "player-2",
+      "mode": "AI_FALLBACK"
+    },
+    "slot-3": {
+      "controlSlot": "slot-3",
+      "teamId": "team-a",
+      "controlledPlayerId": "player-3",
+      "mode": "AI_FALLBACK"
+    },
+    "slot-4": {
+      "controlSlot": "slot-4",
+      "teamId": "team-b",
+      "controlledPlayerId": "player-4",
+      "mode": "AI_FALLBACK"
+    },
+    "slot-5": {
+      "controlSlot": "slot-5",
+      "teamId": "team-b",
+      "controlledPlayerId": "player-5",
+      "mode": "AI_FALLBACK"
+    },
+    "slot-6": {
+      "controlSlot": "slot-6",
+      "teamId": "team-b",
+      "controlledPlayerId": "player-6",
+      "mode": "AI_FALLBACK"
+    }
+  },
+  "missingInputPolicy": "REPEAT_HELD_WITH_ZERO_EDGES",
+  "maxConsecutiveMissing": 3,
+  "inputProgram": {},
+  "scheduledEvents": {},
+  "observationWindows": [
+    { "startTick": 0, "endTick": 600 }
+  ],
+  "requestedMetrics": [
+    "player-displacement",
+    "ball-distance"
+  ]
+}
