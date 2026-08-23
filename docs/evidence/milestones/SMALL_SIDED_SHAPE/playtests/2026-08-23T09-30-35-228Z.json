@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "record_type": "milestone_playtest_result",
+  "milestone_id": "SMALL_SIDED_SHAPE",
+  "playtest_plan_version": "small-sided-shape-playtest-v1",
+  "generated_at": "2026-08-23T09:30:35.228Z",
+  "required_situations": [
+    "PASS_RECEPTION",
+    "SHOT_TO_RESULT",
+    "PHYSICAL_DUEL",
+    "SUPPORT_AND_PASSING_LANES",
+    "SETTLED_ATTACK_VS_DEFENCE",
+    "ATTACK_TO_DEFENCE_TRANSITION",
+    "DEFENCE_TO_ATTACK_TRANSITION",
+    "COORDINATED_PRESS"
+  ],
+  "situation_outcomes": {
+    "PASS_RECEPTION": "NOT_EVALUATED",
+    "SHOT_TO_RESULT": "FAIL",
+    "PHYSICAL_DUEL": "NOT_EVALUATED",
+    "SUPPORT_AND_PASSING_LANES": "NOT_EVALUATED",
+    "SETTLED_ATTACK_VS_DEFENCE": "NOT_EVALUATED",
+    "ATTACK_TO_DEFENCE_TRANSITION": "FAIL",
+    "DEFENCE_TO_ATTACK_TRANSITION": "FAIL",
+    "COORDINATED_PRESS": "FAIL"
+  },
+  "entry_prerequisites_pass": true,
+  "exit_prerequisites_pass": true,
+  "critic_verdict": "ACCEPT",
+  "evidence": {
+    "batch_1": {
+      "objective": "SMALL-SIDED-SITUATIONS-BATCH-1",
+      "fixture": "3v3-situation-fixture.v1.json",
+      "seed": 42,
+      "total_ticks": 600,
+      "index_path": "docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-1/situations/index.json",
+      "situations_dir": "docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-1/situations/",
+      "verdict_summary": {
+        "PASS_RECEPTION": "NOT_EVALUATED — 0 relevant events",
+        "SHOT_TO_RESULT": "NOT_EVALUATED — 0 relevant events",
+        "PHYSICAL_DUEL": "NOT_EVALUATED — 0 relevant events",
+        "SUPPORT_AND_PASSING_LANES": "NOT_EVALUATED — 0 relevant events",
+        "SETTLED_ATTACK_VS_DEFENCE": "NOT_EVALUATED — 0 relevant events",
+        "ATTACK_TO_DEFENCE_TRANSITION": "NOT_EVALUATED — 0 relevant events",
+        "DEFENCE_TO_ATTACK_TRANSITION": "NOT_EVALUATED — 0 relevant events",
+        "COORDINATED_PRESS": "NOT_EVALUATED — 0 relevant events"
+      }
+    },
+    "batch_1_rerun": {
+      "objective": "SMALL-SIDED-SITUATIONS-BATCH-1-RERUN",
+      "fixture": "3v3-situation-fixture.v1.json",
+      "seed": 42,
+      "total_ticks": 600,
+      "index_path": "docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-1-RERUN/situations/index.json",
+      "note": "Byte-identical re-run of BATCH-1, all NOT_EVALUATED"
+    },
+    "batch_2_rerun": {
+      "objective": "SMALL-SIDED-SITUATIONS-BATCH-2-RERUN",
+      "fixture": "3v3-transition-driven.v1.json",
+      "seed": 42,
+      "total_ticks": 60,
+      "hasInvariantFailures": true,
+      "index_path": "docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-2-RERUN/situations/index.json",
+      "situations_dir": "docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-2-RERUN/situations/",
+      "verdict_summary": {
+        "PASS_RECEPTION": "NOT_EVALUATED — 0 relevant events",
+        "SHOT_TO_RESULT": "FAIL — 1 shot at tick 2, required 'goal'/'shot-off-target' absent",
+        "PHYSICAL_DUEL": "NOT_EVALUATED — 0 relevant events",
+        "SUPPORT_AND_PASSING_LANES": "NOT_EVALUATED — 0 relevant events",
+        "SETTLED_ATTACK_VS_DEFENCE": "NOT_EVALUATED — shot indicative only, required kinds absent",
+        "ATTACK_TO_DEFENCE_TRANSITION": "FAIL — shot present, required/indicative absent",
+        "DEFENCE_TO_ATTACK_TRANSITION": "FAIL — shot present, required/indicative absent",
+        "COORDINATED_PRESS": "FAIL — shot present, required 'player-ball-contact' absent"
+      }
+    },
+    "browser_case": {
+      "objective": "BROWSER-SMALL-SIDED-001-CASE",
+      "semantic_frames": 4,
+      "trajectory_ticks": 360,
+      "hash_correspondence": "browser-headless deterministic match",
+      "dir": "docs/evidence/BROWSER-SMALL-SIDED-001-CASE/"
+    },
+    "situation_best_verdict_reason": {
+      "PASS_RECEPTION": "BATCH-1: NOT_EVALUATED (0 events); BATCH-2-RERUN: NOT_EVALUATED (0 events). Best: NOT_EVALUATED.",
+      "SHOT_TO_RESULT": "BATCH-1: NOT_EVALUATED (0 events); BATCH-2-RERUN: FAIL (shot present, required absent). Best: FAIL.",
+      "PHYSICAL_DUEL": "BATCH-1: NOT_EVALUATED (0 events); BATCH-2-RERUN: NOT_EVALUATED (0 events). Best: NOT_EVALUATED.",
+      "SUPPORT_AND_PASSING_LANES": "BATCH-1: NOT_EVALUATED (0 events); BATCH-2-RERUN: NOT_EVALUATED (0 events). Best: NOT_EVALUATED.",
+      "SETTLED_ATTACK_VS_DEFENCE": "BATCH-1: NOT_EVALUATED (0 events); BATCH-2-RERUN: NOT_EVALUATED (shot indicative only). Best: NOT_EVALUATED.",
+      "ATTACK_TO_DEFENCE_TRANSITION": "BATCH-1: NOT_EVALUATED (0 events); BATCH-2-RERUN: FAIL (shot present, required absent). Best: FAIL.",
+      "DEFENCE_TO_ATTACK_TRANSITION": "BATCH-1: NOT_EVALUATED (0 events); BATCH-2-RERUN: FAIL (shot present, required absent). Best: FAIL.",
+      "COORDINATED_PRESS": "BATCH-1: NOT_EVALUATED (0 events); BATCH-2-RERUN: FAIL (shot present, required absent). Best: FAIL."
+    }
+  },
+  "decision": "milestone_failed",
+  "milestone_verdict": "FAIL",
+  "failure_class": "milestone_playtest_failed"
+}
