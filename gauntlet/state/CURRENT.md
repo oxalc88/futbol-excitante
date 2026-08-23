@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-1
+next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-2
 
 best_known:
-  commit: a3cc801564220591243e26e0b7a9fee527b41fc8
-  note: "SMALL-SIDED-SITUATION-EVALUATOR accepted. Next: SMALL-SIDED-SITUATIONS-BATCH-1."
+  commit: 5153ffdffbe89e08f70ec950619817b1a2ada1f0
+  note: "SMALL-SIDED-SITUATIONS-BATCH-1 accepted; situation fixture yields zero events so all NOT_EVALUATED. Next (pending replan): fixture driving."
 
 active_candidate: null
 builder_in_use: null
@@ -124,17 +124,18 @@ accepted:
   - SMALL-SIDED-AFTER-TEAM-PREREQS
   - SMALL-SIDED-SITUATION-FIXTURES
   - SMALL-SIDED-SITUATION-EVALUATOR
+  - SMALL-SIDED-SITUATIONS-BATCH-1
 
 blocked: []
 
-selection_note: "Horizon v15 2/6. Evaluator runner accepted. Next: SMALL-SIDED-SITUATIONS-BATCH-1. No PES claim."
+selection_note: "Horizon v15 3/6. BATCH-1 evidence all NOT_EVALUATED (fixture yields zero events). Pending strategic replan to drive fixtures before BATCH-2/milestone."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-SITUATION-EVALUATOR — Deterministic per-situation evaluator with honest verdict rules. No situation PASS claimed on the milestone.
+SMALL-SIDED-SITUATIONS-BATCH-1 — Honest NOT_EVALUATED evidence for PASS_RECEPTION, SHOT_TO_RESULT, PHYSICAL_DUEL, SUPPORT_AND_PASSING_LANES. Fixture produces zero events.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T06:36:48Z)
-- Candidate: a3cc801
+- Evidence: durable acceptance manifest + record (2026-08-23T06:50:01Z)
+- Candidate: 5153ffd
