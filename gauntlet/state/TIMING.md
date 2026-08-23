@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-23T05:42:58Z
+measured_at: 2026-08-23T06:08:55Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-AFTER-TEAM-PREREQS
-usage_aggregates_through: SMALL-SIDED-AFTER-TEAM-PREREQS
-clock_aggregates_through: SMALL-SIDED-AFTER-TEAM-PREREQS
-model_evaluation_through: SMALL-SIDED-AFTER-TEAM-PREREQS
+last_tracked_objective: SMALL-SIDED-SITUATION-FIXTURES
+usage_aggregates_through: SMALL-SIDED-SITUATION-FIXTURES
+clock_aggregates_through: SMALL-SIDED-SITUATION-FIXTURES
+model_evaluation_through: SMALL-SIDED-SITUATION-FIXTURES
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,13 +42,13 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 52h 42m |
+| Calendar span (first work → measurement) | 53h 08m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | 42h 40m |
-| Sum of per-step agent time | 34h 52m |
+| Active work (anything running) | 43h 05m |
+| Sum of per-step agent time | 35h 17m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-23T05:42:58Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-23T06:08:55Z`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -183,6 +183,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | MUTANT-TEAM-PASS-EVIDENCE | accepted | 12m | 3.5m | 1.2m | 5.6m | 0.5m | n/a | n/a |
 | TEAM-SHAPE-SUITE-PASS-EVIDENCE | accepted | 14m | 3m | 3.2m | 5.5m | 0.5m | n/a | n/a |
 | SMALL-SIDED-AFTER-TEAM-PREREQS | accepted | 9m | 2.3m | 0.8m | 2.4m | 0.5m | n/a | n/a |
+| SMALL-SIDED-SITUATION-FIXTURES | accepted | 26m | 11.4m | 3.9m | 7.8m | 0.5m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -441,6 +442,7 @@ on an H task is the interesting result.
 | MUTANT-TEAM-PASS-EVIDENCE | qwen3.6 | M | Medium — persist honest runMutantTeam eval.json | 0 | A | nine implementable mutants PASS |
 | TEAM-SHAPE-SUITE-PASS-EVIDENCE | qwen3.6 | M | Medium — persist honest team-shape suite eval.json | 0 | A | 16 tests common criteria PASS |
 | SMALL-SIDED-AFTER-TEAM-PREREQS | qwen3.6 | M | Medium — SMALL_SIDED playtest after team prereqs | 0 | A | honest NOT_EVALUATED; prereq gates PASS |
+| SMALL-SIDED-SITUATION-FIXTURES | qwen3.6 | M | Medium — materialize 3v3 situation fixtures + mapping | 0 | A | deterministic; no verdicts |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -605,6 +607,8 @@ on an H task is the interesting result.
 | TEAM-SHAPE-SUITE-PASS-EVIDENCE | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 | SMALL-SIDED-AFTER-TEAM-PREREQS | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | honest NOT_EVALUATED |
 | SMALL-SIDED-AFTER-TEAM-PREREQS | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
+| SMALL-SIDED-SITUATION-FIXTURES | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | fixtures + mapping, no verdicts |
+| SMALL-SIDED-SITUATION-FIXTURES | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 
 ### Builder scoreboard
 
@@ -612,7 +616,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 65 | 47 | 10 | 3 | 3 | 2 | 72% | ~0.50 | ~32m |
+| qwen3.6 | 66 | 48 | 10 | 3 | 3 | 2 | 73% | ~0.49 | ~31m |
 | mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

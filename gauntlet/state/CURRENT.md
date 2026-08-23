@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SITUATION-FIXTURES
+next_objective_id: SMALL-SIDED-SITUATION-EVALUATOR
 
 best_known:
-  commit: 78bbf01d559041fb2b1e3e4896e960403cfdf7d7
-  note: "SMALL-SIDED-AFTER-TEAM-PREREQS accepted as NOT_EVALUATED. Horizon v15 starts at SMALL-SIDED-SITUATION-FIXTURES."
+  commit: 48eb72a2e5d91c41a583cc8943224e0e3e2412f1
+  note: "SMALL-SIDED-SITUATION-FIXTURES accepted. Next: SMALL-SIDED-SITUATION-EVALUATOR."
 
 active_candidate: null
 builder_in_use: null
@@ -122,17 +122,18 @@ accepted:
   - MUTANT-TEAM-PASS-EVIDENCE
   - TEAM-SHAPE-SUITE-PASS-EVIDENCE
   - SMALL-SIDED-AFTER-TEAM-PREREQS
+  - SMALL-SIDED-SITUATION-FIXTURES
 
 blocked: []
 
-selection_note: "Horizon v15 0/6 ACTIVE. Materialize 3v3 situation fixtures + evaluator + evidence batches + BROWSER-SMALL-SIDED-001 + milestone re-eval. No PES claim."
+selection_note: "Horizon v15 1/6. Two 3v3 situation fixtures + mapping accepted. Next: SMALL-SIDED-SITUATION-EVALUATOR. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-AFTER-TEAM-PREREQS — Honest NOT_EVALUATED. Entry and exit prerequisite gates now PASS from live eval.json; eight gameplay situations still unevaluated.
+SMALL-SIDED-SITUATION-FIXTURES — Deterministic 3v3 situation fixtures and event mapping for eight SMALL_SIDED situations. No verdicts claimed.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T05:42:58Z)
-- Candidate: 78bbf01
+- Evidence: durable acceptance manifest + record (2026-08-23T06:08:55Z)
+- Candidate: 48eb72a

@@ -7,10 +7,10 @@ horizon_id: "small-sided-situations-and-browser-case"
 created_from_commit: 6afc73b190302d6d8af58ad06b9b1a71f382166a
 created_at: 2026-08-23
 reason: "Horizon team-decision-profile-and-small-sided exhausted (4/4). SMALL_SIDED_SHAPE entry and exit prerequisite gates now PASS from live eval.json (PLAYABLE_1V1, TEAM_DECISION_PROFILE, MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS), but the eight required gameplay situations are all NOT_EVALUATED and BROWSER-SMALL-SIDED-001 is not materialized. New horizon materializes executable 3v3 situation fixtures and evaluation, produces honest per-situation evidence, materializes the required browser case, then re-evaluates the milestone."
-current_index: 0
+current_index: 1
 objectives:
   - id: SMALL-SIDED-SITUATION-FIXTURES
-    status: pending
+    status: accepted
     reason: "Materialize executable 3v3 scenario fixtures plus event/observation mapping for the eight SMALL_SIDED situations. Register in eval contracts. Unit tests only."
     builder: builder-structured
     prerequisite: null

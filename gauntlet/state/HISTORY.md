@@ -3028,3 +3028,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 78bbf01 candidate(SMALL-SIDED-AFTER-TEAM-PREREQS)
 - notes: SMALL_SIDED_SHAPE NOT_EVALUATED; entry/exit prereq gates PASS from live eval.json; eight situations unevaluated. Horizon v14 4/4 EXHAUSTED.
+
+## Iteration 114 — 2026-08-23
+
+- objective_id: SMALL-SIDED-SITUATION-FIXTURES
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 48eb72a candidate(SMALL-SIDED-SITUATION-FIXTURES)
+- notes: Two deterministic 3v3 situation fixtures and situation-event mapping module. No verdicts. Horizon v15 1/6.
