@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-2
+next_objective_id: SITUATION-FIXTURE-DRIVING
 
 best_known:
   commit: 5153ffdffbe89e08f70ec950619817b1a2ada1f0
-  note: "SMALL-SIDED-SITUATIONS-BATCH-1 accepted; situation fixture yields zero events so all NOT_EVALUATED. Next (pending replan): fixture driving."
+  note: "SMALL-SIDED-SITUATIONS-BATCH-1 accepted (all NOT_EVALUATED; fixtures emit zero events). Horizon v16 starts at SITUATION-FIXTURE-DRIVING."
 
 active_candidate: null
 builder_in_use: null
@@ -128,7 +128,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v15 3/6. BATCH-1 evidence all NOT_EVALUATED (fixture yields zero events). Pending strategic replan to drive fixtures before BATCH-2/milestone."
+selection_note: "Horizon v16 0/5 ACTIVE. Drive situation fixtures deterministically, then batch evidence, BROWSER-SMALL-SIDED-001, milestone re-eval. No PES claim."
 ```
 ## Last accepted objective
 
