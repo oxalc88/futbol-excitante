@@ -1,36 +1,46 @@
 # Rolling Gauntlet horizon
 
 ```yaml
-horizon_version: 14
-status: EXHAUSTED
-horizon_id: "team-decision-profile-and-small-sided"
-created_from_commit: c9ff1613d4c28857dc8db9fb7ef9e475e7fb6fdf
-created_at: 2026-08-22
-reason: "Horizon entry-prereq-executable-evidence exhausted (5/5). PLAYABLE_1V1 live profile-runner PASS. SMALL_SIDED_SHAPE remains NOT_EVALUATED because TEAM_DECISION_PROFILE has no executable eval.json (CPU-TEAM-DECISION-PROFILE is a different identity), MUTANT_TEAM_PASS and TEAM_SHAPE_SUITE_PASS lack eval.json, and eight situations are unevaluated. New horizon binds honest TEAM_DECISION_PROFILE / mutant-team / team-shape evidence then re-runs SMALL_SIDED."
-current_index: 4
+horizon_version: 15
+status: ACTIVE
+horizon_id: "small-sided-situations-and-browser-case"
+created_from_commit: 6afc73b190302d6d8af58ad06b9b1a71f382166a
+created_at: 2026-08-23
+reason: "Horizon team-decision-profile-and-small-sided exhausted (4/4). SMALL_SIDED_SHAPE entry and exit prerequisite gates now PASS from live eval.json (PLAYABLE_1V1, TEAM_DECISION_PROFILE, MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS), but the eight required gameplay situations are all NOT_EVALUATED and BROWSER-SMALL-SIDED-001 is not materialized. New horizon materializes executable 3v3 situation fixtures and evaluation, produces honest per-situation evidence, materializes the required browser case, then re-evaluates the milestone."
+current_index: 0
 objectives:
-  - id: TEAM-DECISION-PROFILE-EVIDENCE
-    status: accepted
-    reason: "Persist honest TEAM_DECISION_PROFILE eval.json. Do not treat CPU-TEAM-DECISION-PROFILE Gauntlet evidence as TEAM_DECISION_PROFILE. Do not invent PASS."
+  - id: SMALL-SIDED-SITUATION-FIXTURES
+    status: pending
+    reason: "Materialize executable 3v3 scenario fixtures plus event/observation mapping for the eight SMALL_SIDED situations. Register in eval contracts. Unit tests only."
     builder: builder-structured
     prerequisite: null
-  - id: MUTANT-TEAM-PASS-EVIDENCE
-    status: accepted
-    reason: "Execute evaluateMutantTeam. Persist honest eval.json under docs/evidence/MUTANT_TEAM_PASS. Do not invent PASS."
+  - id: SMALL-SIDED-SITUATION-EVALUATOR
+    status: pending
+    reason: "Add an eval-layer runner producing per-situation trajectory and event evidence (eval.json per situation) with honest verdicts. No situation PASS invented."
     builder: builder-structured
-    prerequisite: TEAM-DECISION-PROFILE-EVIDENCE
-  - id: TEAM-SHAPE-SUITE-PASS-EVIDENCE
-    status: accepted
-    reason: "Execute team-shape-evaluator. Persist honest eval.json under docs/evidence/TEAM_SHAPE_SUITE_PASS. Do not invent PASS."
+    prerequisite: SMALL-SIDED-SITUATION-FIXTURES
+  - id: SMALL-SIDED-SITUATIONS-BATCH-1
+    status: pending
+    reason: "Execute honest evaluation evidence for PASS_RECEPTION, SHOT_TO_RESULT, PHYSICAL_DUEL, SUPPORT_AND_PASSING_LANES against 3v3 fixtures. Accept even if a situation FAILs."
     builder: builder-structured
-    prerequisite: MUTANT-TEAM-PASS-EVIDENCE
-  - id: SMALL-SIDED-AFTER-TEAM-PREREQS
-    status: accepted
-    reason: "Re-attempt SMALL_SIDED_SHAPE after executable team prereqs. Remains NOT_EVALUATED unless required situations and prereqs actually PASS."
+    prerequisite: SMALL-SIDED-SITUATION-EVALUATOR
+  - id: SMALL-SIDED-SITUATIONS-BATCH-2
+    status: pending
+    reason: "Execute honest evaluation evidence for SETTLED_ATTACK_VS_DEFENCE, ATTACK_TO_DEFENCE_TRANSITION, DEFENCE_TO_ATTACK_TRANSITION, COORDINATED_PRESS against 3v3 fixtures."
     builder: builder-structured
-    prerequisite: TEAM-SHAPE-SUITE-PASS-EVIDENCE
-observable_progress_target: "SMALL_SIDED_SHAPE can leave TEAM_DECISION_PROFILE / mutant-team / team-shape as missing-dir NOT_EVALUATED and report honest executable verdicts instead."
-infrastructure_only_justification: "Executable team-prereq evidence must precede another SMALL_SIDED rerun so CPU-TEAM-DECISION-PROFILE audit PASS cannot be mistaken for TEAM_DECISION_PROFILE; the horizon still ends in a playable-milestone re-evaluation."
+    prerequisite: SMALL-SIDED-SITUATIONS-BATCH-1
+  - id: BROWSER-SMALL-SIDED-001-CASE
+    status: pending
+    reason: "Materialize required browser case BROWSER-SMALL-SIDED-001 with hash cross-check and semantic frame sequence (DYNAMIC_VISUAL).",
+    builder: builder-structured
+    prerequisite: SMALL-SIDED-SITUATIONS-BATCH-2
+  - id: SMALL-SIDED-MILESTONE-RE-EVALUATION
+    status: pending
+    reason: "Re-run SMALL_SIDED_SHAPE milestone:evaluate with all situation evidence and the browser case; critic judges; derive milestone bundle. Honest PASS only if every required item passes.",
+    builder: builder-structured
+    prerequisite: BROWSER-SMALL-SIDED-001-CASE
+observable_progress_target: "SMALL_SIDED_SHAPE moves from eight-situation NOT_EVALUATED to real per-situation verdicts, a materialized BROWSER-SMALL-SIDED-001 case, and an honest milestone re-evaluation."
+infrastructure_only_justification: "Situation fixtures/evaluator are required before any per-situation evidence can exist; the horizon ends in the observable milestone re-evaluation and required browser case."
 last_invalidation_reason: null
 replan_if:
   - objective_blocked

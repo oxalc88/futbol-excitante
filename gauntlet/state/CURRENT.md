@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: ""
+next_objective_id: SMALL-SIDED-SITUATION-FIXTURES
 
 best_known:
   commit: 78bbf01d559041fb2b1e3e4896e960403cfdf7d7
-  note: "SMALL-SIDED-AFTER-TEAM-PREREQS accepted as NOT_EVALUATED. Horizon v14 exhausted."
+  note: "SMALL-SIDED-AFTER-TEAM-PREREQS accepted as NOT_EVALUATED. Horizon v15 starts at SMALL-SIDED-SITUATION-FIXTURES."
 
 active_candidate: null
 builder_in_use: null
@@ -125,7 +125,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v14 4/4 EXHAUSTED. All SMALL_SIDED prereqs (entry+exit) PASS from live eval.json; eight situations NOT_EVALUATED. SMALL_SIDED_SHAPE still NOT_EVALUATED. No PES claim."
+selection_note: "Horizon v15 0/6 ACTIVE. Materialize 3v3 situation fixtures + evaluator + evidence batches + BROWSER-SMALL-SIDED-001 + milestone re-eval. No PES claim."
 ```
 ## Last accepted objective
 
