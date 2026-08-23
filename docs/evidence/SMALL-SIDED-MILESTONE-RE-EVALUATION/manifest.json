@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SMALL-SIDED-MILESTONE-RE-EVALUATION",
+  "accepted_at": "2026-08-23T09:37:04.834Z",
+  "candidate_commit": "ec1e054",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-MILESTONE-RE-EVALUATION/audit.json",
+      "sha256": "80b5a989849ef99308afa7238146b0c73a7802a031b406aba74b12469911e753",
+      "git_blob": "42739d1554b4b0a58141292258f9c0bd7dd14b95",
+      "candidate_commit": "ec1e054",
+      "bytes": 2693,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "milestone_verdict: FAIL",
+      "4 FAIL, 4 NOT_EVALUATED from batch evidence"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "passed": 19,
+      "failed": 0
+    },
+    "semantic_audit": null,
+    "critic": {
+      "verdict": "ACCEPT",
+      "model": "mimo-v2.5",
+      "builder_model": "qwen3.6"
+    },
+    "integration": {
+      "verdict": "ACCEPT",
+      "model": "mimo-v2.5",
+      "builder_model": "qwen3.6"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-23/2026-08-23T09-37-04-834Z-SMALL-SIDED-MILESTONE-RE-EVALUATION-acceptance.json"
+}

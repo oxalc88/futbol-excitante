@@ -1,0 +1,34 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-23T09:37:04.834Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-MILESTONE-RE-EVALUATION",
+  "candidate_commit": "ec1e054",
+  "evidence_class": "HEADLESS",
+  "deterministic_audit": {
+    "status": "PASS",
+    "passed": 19,
+    "failed": 0
+  },
+  "critic": {
+    "verdict": "ACCEPT",
+    "model": "mimo-v2.5",
+    "builder_model": "qwen3.6"
+  },
+  "integration": {
+    "verdict": "ACCEPT",
+    "model": "mimo-v2.5",
+    "builder_model": "qwen3.6"
+  },
+  "builder": {
+    "model": "qwen3.6",
+    "agent": "builder-structured"
+  },
+  "metrics": [
+    "milestone_verdict: FAIL",
+    "4 FAIL, 4 NOT_EVALUATED from batch evidence"
+  ]
+}

@@ -3098,3 +3098,17 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: 2ac6f87 candidate(BROWSER-SMALL-SIDED-001-CASE)
 - notes: Materialized BROWSER-SMALL-SIDED-001 browser case: 4 semantic frames, headless hash correspondence, durable browser-cases.json. 10/10 browser tests + 9/9 existing 3v3 tests pass. No source changes. Horizon v16 4/5.
+
+## Iteration 121 — 2026-08-23
+
+- objective_id: SMALL-SIDED-MILESTONE-RE-EVALUATION
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: ec1e054 candidate(SMALL-SIDED-MILESTONE-RE-EVALUATION)
+- notes: Milestone evaluator: FAIL (4 FAIL from batch-2, 4 NOT_EVALUATED from batch-2). Honest verdict. Fix: extend fixture input programs for missing indicative kinds. Horizon v16 EXHAUSTED (5/5). Horizon v17 created (FIXTURE-EVENT-EXTENSION).
+
+## Horizon v16 exhaustion (5/5 accepted)
+
+All 5 objectives of horizon v16 accepted. Milestone did not pass — honest evaluation required horizon v17 for event diversity extension.

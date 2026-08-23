@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-MILESTONE-RE-EVALUATION
+next_objective_id: FIXTURE-EVENT-EXTENSION
 
 best_known:
-  commit: 2ac6f87
-  note: "BROWSER-SMALL-SIDED-001-CASE accepted (4 semantic frames, hash correspondence, 10/10 browser tests). Horizon v16 advances to SMALL-SIDED-MILESTONE-RE-EVALUATION."
+  commit: ec1e054
+  note: "SMALL-SIDED-MILESTONE-RE-EVALUATION accepted (honest FAIL: 4 FAIL, 4 NOT_EVALUATED; milestone did not pass). Horizon v16 EXHAUSTED. Horizon v17 created: drive fixture event diversity."
 
 active_candidate: null
 builder_in_use: null
@@ -129,17 +129,18 @@ accepted:
   - SMALL-SIDED-SITUATIONS-BATCH-1-RERUN
   - SMALL-SIDED-SITUATIONS-BATCH-2-RERUN
   - BROWSER-SMALL-SIDED-001-CASE
+  - SMALL-SIDED-MILESTONE-RE-EVALUATION
 
 blocked: []
 
-selection_note: "Horizon v16 4/5 ACTIVE. Both batch reruns + browser case materialized. Next: SMALL-SIDED-MILESTONE-RE-EVALUATION. No PES claim."
+selection_note: "Horizon v16 EXHAUSTED (5/5 accepted). Milestone FAIL honest. Horizon v17 ACTIVE: drive fixture event diversity so FAIL situations can become PASS. No PES claim."
 ```
 ## Last accepted objective
 
-BROWSER-SMALL-SIDED-001-CASE — Materialized the required browser case with 4 semantic frames, headless hash correspondence, and durable browser-cases.json. 10/10 browser tests + 9/9 existing 3v3 tests pass. Critic ACCEPT (deepseek-v4-flash), integration ACCEPT (mimo-v2.5). No milestone PASS.
+SMALL-SIDED-MILESTONE-RE-EVALUATION — Re-ran milestone evaluator with all accumulated evidence. Honest verdict: FAIL (4 FAIL, 4 NOT_EVALUATED). Fix: extend fixture input programs to produce missing indicative event kinds. No milestone PASS claimed.
 
 - builder: builder-structured / qwen3.6
-- critic: critic / deepseek-v4-flash — ACCEPT
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T09:24:47Z)
-- Candidate: 2ac6f87
+- Evidence: durable acceptance manifest + record (2026-08-23T09:37:04Z)
+- Candidate: ec1e054
