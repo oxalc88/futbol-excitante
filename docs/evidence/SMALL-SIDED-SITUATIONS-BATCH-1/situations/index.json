@@ -1,0 +1,51 @@
+{
+  "fixtureName": "3v3-situation-fixture.v1.json",
+  "scenarioId": "3v3-situation-fixture-v1",
+  "totalTicks": 600,
+  "seed": 42,
+  "hasInvariantFailures": false,
+  "finalStateHash": "fnv1a64-v1:348d58df9da054f5",
+  "situationCount": 8,
+  "situations": [
+    {
+      "situation_id": "PASS_RECEPTION",
+      "verdict": "NOT_EVALUATED",
+      "relevant_event_count": 0
+    },
+    {
+      "situation_id": "SHOT_TO_RESULT",
+      "verdict": "NOT_EVALUATED",
+      "relevant_event_count": 0
+    },
+    {
+      "situation_id": "PHYSICAL_DUEL",
+      "verdict": "NOT_EVALUATED",
+      "relevant_event_count": 0
+    },
+    {
+      "situation_id": "SUPPORT_AND_PASSING_LANES",
+      "verdict": "NOT_EVALUATED",
+      "relevant_event_count": 0
+    },
+    {
+      "situation_id": "SETTLED_ATTACK_VS_DEFENCE",
+      "verdict": "NOT_EVALUATED",
+      "relevant_event_count": 0
+    },
+    {
+      "situation_id": "ATTACK_TO_DEFENCE_TRANSITION",
+      "verdict": "NOT_EVALUATED",
+      "relevant_event_count": 0
+    },
+    {
+      "situation_id": "DEFENCE_TO_ATTACK_TRANSITION",
+      "verdict": "NOT_EVALUATED",
+      "relevant_event_count": 0
+    },
+    {
+      "situation_id": "COORDINATED_PRESS",
+      "verdict": "NOT_EVALUATED",
+      "relevant_event_count": 0
+    }
+  ]
+}
