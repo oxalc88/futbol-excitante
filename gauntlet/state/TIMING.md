@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-23T06:50:01Z
+measured_at: 2026-08-23T07:56:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-SITUATIONS-BATCH-1
-usage_aggregates_through: SMALL-SIDED-SITUATIONS-BATCH-1
-clock_aggregates_through: SMALL-SIDED-SITUATIONS-BATCH-1
-model_evaluation_through: SMALL-SIDED-SITUATIONS-BATCH-1
+last_tracked_objective: SITUATION-FIXTURE-DRIVING
+usage_aggregates_through: SITUATION-FIXTURE-DRIVING
+clock_aggregates_through: SITUATION-FIXTURE-DRIVING
+model_evaluation_through: SITUATION-FIXTURE-DRIVING
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -186,6 +186,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-SITUATION-FIXTURES | accepted | 26m | 11.4m | 3.9m | 7.8m | 0.5m | n/a | n/a |
 | SMALL-SIDED-SITUATION-EVALUATOR | accepted | 20m | 12m | 3.1m | 7.7m | 0.5m | n/a | n/a |
 | SMALL-SIDED-SITUATIONS-BATCH-1 | accepted | 9m | 3.5m | 0.8m | 2.4m | 0.5m | n/a | n/a |
+| SITUATION-FIXTURE-DRIVING | accepted | 24m | 18.4m | 1.3m | 3.4m | 0.5m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -447,6 +448,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-SITUATION-FIXTURES | qwen3.6 | M | Medium — materialize 3v3 situation fixtures + mapping | 0 | A | deterministic; no verdicts |
 | SMALL-SIDED-SITUATION-EVALUATOR | qwen3.6 | M | Medium — per-situation evaluator runner | 0 | A | honest verdict rules |
 | SMALL-SIDED-SITUATIONS-BATCH-1 | qwen3.6 | M | Medium — batch-1 situation evidence | 0 | A | honest NOT_EVALUATED; zero events |
+| SITUATION-FIXTURE-DRIVING | qwen3.6 | M | Medium — input-driven situation fixtures | 0 | A | driven fixtures emit events; 1 PASS, 7 FAIL honest |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -617,6 +619,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-SITUATION-EVALUATOR | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
 | SMALL-SIDED-SITUATIONS-BATCH-1 | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | honest NOT_EVALUATED |
 | SMALL-SIDED-SITUATIONS-BATCH-1 | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | evaluator integrity PASS |
+| SITUATION-FIXTURE-DRIVING | critic-mimo (mimo-v2.5) | flash 401, qwen blocked (same as builder), mimo fallback | ACCEPT | driven fixtures, honest FAIL, validity of evaluate() fix checked |
+| SITUATION-FIXTURE-DRIVING | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback; reroute-flag corrected | ACCEPT | 855 tests/34 suites PASS, fixtures immutable, BATCH-1 binding intact |
 
 ### Builder scoreboard
 
@@ -624,7 +628,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 68 | 50 | 10 | 3 | 3 | 2 | 74% | ~0.47 | ~31m |
+| qwen3.6 | 69 | 51 | 10 | 3 | 3 | 2 | 74% | ~0.45 | ~31m |
 | mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

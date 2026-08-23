@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SITUATION-FIXTURE-DRIVING",
+  "accepted_at": "2026-08-23T07:55:50.237Z",
+  "candidate_commit": "ae726aa",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SITUATION-FIXTURE-DRIVING/audit.json",
+      "sha256": "270ceede757efdc8d7b6605c2bfd9bf64112454dd3cdabcce31dc55d3a0b1a4d",
+      "git_blob": "13093437b9f631faa5a51d67d42529d3084ff494",
+      "candidate_commit": "ae726aa",
+      "bytes": 2683,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "situation-driven:1 pass 7 fail",
+      "transition-driven:shot-only"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "passed": 19,
+      "failed": 0
+    },
+    "semantic_audit": null,
+    "critic": {
+      "verdict": "ACCEPT",
+      "model": "mimo-v2.5",
+      "builder_model": "qwen3.6"
+    },
+    "integration": {
+      "verdict": "ACCEPT",
+      "model": "mimo-v2.5",
+      "builder_model": "qwen3.6"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-23/2026-08-23T07-55-50-237Z-SITUATION-FIXTURE-DRIVING-acceptance.json"
+}

@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SITUATION-FIXTURE-DRIVING
+next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-1-RERUN
 
 best_known:
-  commit: 5153ffdffbe89e08f70ec950619817b1a2ada1f0
-  note: "SMALL-SIDED-SITUATIONS-BATCH-1 accepted (all NOT_EVALUATED; fixtures emit zero events). Horizon v16 starts at SITUATION-FIXTURE-DRIVING."
+  commit: ae726aa
+  note: "SITUATION-FIXTURE-DRIVING accepted (driven fixtures emit events; 1-situation PASS, others FAIL/NOT_EVALUATED honest). Horizon v16 advances to SMALL-SIDED-SITUATIONS-BATCH-1-RERUN."
 
 active_candidate: null
 builder_in_use: null
@@ -125,17 +125,18 @@ accepted:
   - SMALL-SIDED-SITUATION-FIXTURES
   - SMALL-SIDED-SITUATION-EVALUATOR
   - SMALL-SIDED-SITUATIONS-BATCH-1
+  - SITUATION-FIXTURE-DRIVING
 
 blocked: []
 
-selection_note: "Horizon v16 0/5 ACTIVE. Drive situation fixtures deterministically, then batch evidence, BROWSER-SMALL-SIDED-001, milestone re-eval. No PES claim."
+selection_note: "Horizon v16 1/5 ACTIVE. Situation fixtures are now input-driven and emit events. Next: re-run batch evidence (BATCH-1, BATCH-2), BROWSER-SMALL-SIDED-001, milestone re-eval. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-SITUATIONS-BATCH-1 — Honest NOT_EVALUATED evidence for PASS_RECEPTION, SHOT_TO_RESULT, PHYSICAL_DUEL, SUPPORT_AND_PASSING_LANES. Fixture produces zero events.
+SITUATION-FIXTURE-DRIVING — Deterministic input drives added so the situation and transition fixtures emit pass/shot/contact/possession events. SETTLED_ATTACK_VS_DEFENCE PASS; 7 situations honest FAIL (required present, indicative absent); zero NOT_EVALUATED for mapped situations in the driven fixture.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T06:50:01Z)
-- Candidate: 5153ffd
+- Evidence: durable acceptance manifest + record (2026-08-23T07:55:50Z)
+- Candidate: ae726aa
