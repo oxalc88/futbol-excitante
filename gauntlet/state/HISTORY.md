@@ -3068,3 +3068,13 @@ Prior critic passes: none (first pass). Evidence: re-ran typecheck 0 and 980/980
 - result: accepted
 - commits: ae726aa candidate(SITUATION-FIXTURE-DRIVING)
 - notes: New input-driven fixtures (3v3-situation-driven.v1.json, 3v3-transition-driven.v1.json) plus an evaluate() runner input-buffering fix so frames land under the key step() consumes. All 8 situations now emit at least one required event kind; SETTLED_ATTACK_VS_DEFENCE PASS, 7 honest FAIL (required present, indicative absent). Accepted fixtures untouched. No milestone PASS claimed. Horizon v16 1/5.
+
+## Iteration 118 — 2026-08-23
+
+- objective_id: SMALL-SIDED-SITUATIONS-BATCH-1-RERUN
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 3228f56 candidate(SMALL-SIDED-SITUATIONS-BATCH-1-RERUN)
+- notes: Re-ran situation evaluator on the driven fixture; honest verdicts persisted (4 batch-1 situations FAIL, SETTLED PASS, transitions/PRESS FAIL). event-references invariant flagged (cross-tick lastTouchRef, benign) and disclosed; ball-continuity clean. 64 eval tests + binding all pass; no source changes. Horizon v16 2/5.
