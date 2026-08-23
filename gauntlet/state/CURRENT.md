@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-2-RERUN
+next_objective_id: BROWSER-SMALL-SIDED-001-CASE
 
 best_known:
-  commit: 3228f56
-  note: "SMALL-SIDED-SITUATIONS-BATCH-1-RERUN accepted (driven fixture: 4 batch-1 situations FAIL, SETTLED PASS, transitions/PRESS FAIL; invariant disclosed). Horizon v16 advances to BATCH-2-RERUN."
+  commit: 05fea7a
+  note: "SMALL-SIDED-SITUATIONS-BATCH-2-RERUN accepted (transition fixture: SETTLED NOT_EVALUATED, 3 transitions FAIL, honest). Horizon v16 advances to BROWSER-SMALL-SIDED-001-CASE."
 
 active_candidate: null
 builder_in_use: null
@@ -127,17 +127,18 @@ accepted:
   - SMALL-SIDED-SITUATIONS-BATCH-1
   - SITUATION-FIXTURE-DRIVING
   - SMALL-SIDED-SITUATIONS-BATCH-1-RERUN
+  - SMALL-SIDED-SITUATIONS-BATCH-2-RERUN
 
 blocked: []
 
-selection_note: "Horizon v16 2/5 ACTIVE. BATCH-1 rerun persisted honest verdicts on driven fixtures. Next: BATCH-2-RERUN (transition fixture), BROWSER-SMALL-SIDED-001, milestone re-eval. No PES claim."
+selection_note: "Horizon v16 3/5 ACTIVE. Both batch reruns persisted honest verdicts on driven fixtures. Next: BROWSER-SMALL-SIDED-001 case, milestone re-eval. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-SITUATIONS-BATCH-1-RERUN — Re-ran the situation evaluator on the driven fixture. 4 batch-1 situations honest FAIL (required present, indicative absent), SETTLED_ATTACK_VS_DEFENCE PASS, transitions/PRESS FAIL. event-references invariant (cross-tick lastTouchRef) disclosed, ball-continuity clean. No milestone PASS.
+SMALL-SIDED-SITUATIONS-BATCH-2-RERUN — Re-ran the situation evaluator on the driven transition fixture. SETTLED_ATTACK_VS_DEFENCE NOT_EVALUATED (only indicative shot present); ATTACK_TO_DEFENCE_TRANSITION / DEFENCE_TO_ATTACK_TRANSITION / COORDINATED_PRESS FAIL. event-references invariant disclosed. Honest verdicts only; no milestone PASS.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T08:33:48Z)
-- Candidate: 3228f56
+- Evidence: durable acceptance manifest + record (2026-08-23T08:54:58Z)
+- Candidate: 05fea7a
