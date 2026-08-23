@@ -1,0 +1,243 @@
+{
+  "registryVersion": "mutant-team-v1",
+  "implementableCount": 9,
+  "deferredCount": 3,
+  "outcomes": [
+    {
+      "mutationId": "non-finite",
+      "description": "Non-finite state value injected into a player or ball field",
+      "deferred": false,
+      "executed": true,
+      "cleanResult": {
+        "id": "clean-finite-number",
+        "status": "pass",
+        "description": "Clean oracle finite-number returned at least one pass result"
+      },
+      "poisonedResult": {
+        "id": "poisoned-finite-number",
+        "status": "fail",
+        "description": "Oracle finite-number detected non-finite state"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "mutationId": "prng-order",
+      "description": "PRNG state mutated mid-run producing divergent trajectory",
+      "deferred": false,
+      "executed": true,
+      "cleanResult": {
+        "id": "clean-prng-order",
+        "status": "pass",
+        "description": "PRNG-order mutation test requires simulation pair, not observation oracle"
+      },
+      "poisonedResult": {
+        "id": "poisoned-prng-order",
+        "status": "fail",
+        "description": "PRNG-order mutation detected divergence in 3v3 team context"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "mutationId": "velocity-snap",
+      "description": "Instantaneous velocity or body-heading snap between consecutive ticks",
+      "deferred": false,
+      "executed": true,
+      "cleanResult": {
+        "id": "clean-velocity-snap",
+        "status": "pass",
+        "description": "Clean oracle velocity-snap returned at least one pass result"
+      },
+      "poisonedResult": {
+        "id": "poisoned-velocity-snap",
+        "status": "fail",
+        "description": "Oracle velocity-snap detected velocity/heading snap"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "mutationId": "ball-no-decay",
+      "description": "Ball ground-roll with constant non-zero velocity (decay disabled)",
+      "deferred": false,
+      "executed": true,
+      "cleanResult": {
+        "id": "clean-ball-decay",
+        "status": "pass",
+        "description": "Clean oracle ball-decay returned at least one pass result"
+      },
+      "poisonedResult": {
+        "id": "poisoned-ball-decay",
+        "status": "fail",
+        "description": "Oracle ball-decay detected disabled ball decay"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "mutationId": "ball-teleport",
+      "description": "Ball position changes by a macroscopic amount (parenting / teleport)",
+      "deferred": false,
+      "executed": true,
+      "cleanResult": {
+        "id": "clean-ball-teleport",
+        "status": "pass",
+        "description": "Clean oracle ball-teleport returned at least one pass result"
+      },
+      "poisonedResult": {
+        "id": "poisoned-ball-teleport",
+        "status": "fail",
+        "description": "Oracle ball-teleport detected ball teleport"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "mutationId": "possession-no-evidence",
+      "description": "lastTouchRef changes without a corresponding touch event",
+      "deferred": false,
+      "executed": true,
+      "cleanResult": {
+        "id": "clean-possession-evidence",
+        "status": "pass",
+        "description": "Clean oracle possession-evidence returned at least one pass result"
+      },
+      "poisonedResult": {
+        "id": "poisoned-possession-evidence",
+        "status": "fail",
+        "description": "Oracle possession-evidence detected possession without evidence"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "mutationId": "camera-hash",
+      "description": "observationCoreHash mismatch — presentation/camera mutation affecting core hash",
+      "deferred": false,
+      "executed": true,
+      "cleanResult": {
+        "id": "clean-camera-hash",
+        "status": "pass",
+        "description": "Clean oracle camera-hash returned at least one pass result"
+      },
+      "poisonedResult": {
+        "id": "poisoned-camera-hash",
+        "status": "fail",
+        "description": "Oracle camera-hash detected camera-hash inconsistency"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "mutationId": "score-tracker",
+      "description": "Goal event missing or incorrectly attributed",
+      "deferred": false,
+      "executed": true,
+      "cleanResult": {
+        "id": "clean-score-tracker",
+        "status": "pass",
+        "description": "Clean oracle score-tracker returned at least one pass result"
+      },
+      "poisonedResult": {
+        "id": "poisoned-score-tracker",
+        "status": "fail",
+        "description": "Oracle score-tracker detected invalid goal event"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "mutationId": "match-clock",
+      "description": "Tick sequence non-sequential",
+      "deferred": false,
+      "executed": true,
+      "cleanResult": {
+        "id": "clean-match-clock",
+        "status": "pass",
+        "description": "Clean oracle match-clock returned at least one pass result"
+      },
+      "poisonedResult": {
+        "id": "poisoned-match-clock",
+        "status": "fail",
+        "description": "Oracle match-clock detected non-sequential ticks"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "mutationId": "deferred-summary",
+      "description": "3 deferred mutant(s) catalogued as NOT_EVALUATED",
+      "deferred": true,
+      "executed": true,
+      "cleanResult": {
+        "id": "deferred-not_evaluated",
+        "status": "pass",
+        "description": "Deferred mutants all return NOT_EVALUATED"
+      },
+      "poisonedResult": null,
+      "outcome": "NOT_EVALUATED"
+    }
+  ],
+  "allImplementedDetected": true,
+  "allDeferredNotEvaluated": true,
+  "anyInvalidRun": false,
+  "verdict": "PASS",
+  "details": "MUTANT_TEAM_PASS PASS: all 9 implementable mutants detected in 3v3 team context; 3 deferred mutants catalogued",
+  "overall": "PASS",
+  "milestoneVerdict": "PASS",
+  "rationale": "MUTANT_TEAM_PASS PASS: all 9 implementable mutants detected in 3v3 team context; 3 deferred mutants catalogued",
+  "perMutant": [
+    {
+      "mutationId": "non-finite",
+      "outcome": "PASS",
+      "executed": true,
+      "deferred": false
+    },
+    {
+      "mutationId": "prng-order",
+      "outcome": "PASS",
+      "executed": true,
+      "deferred": false
+    },
+    {
+      "mutationId": "velocity-snap",
+      "outcome": "PASS",
+      "executed": true,
+      "deferred": false
+    },
+    {
+      "mutationId": "ball-no-decay",
+      "outcome": "PASS",
+      "executed": true,
+      "deferred": false
+    },
+    {
+      "mutationId": "ball-teleport",
+      "outcome": "PASS",
+      "executed": true,
+      "deferred": false
+    },
+    {
+      "mutationId": "possession-no-evidence",
+      "outcome": "PASS",
+      "executed": true,
+      "deferred": false
+    },
+    {
+      "mutationId": "camera-hash",
+      "outcome": "PASS",
+      "executed": true,
+      "deferred": false
+    },
+    {
+      "mutationId": "score-tracker",
+      "outcome": "PASS",
+      "executed": true,
+      "deferred": false
+    },
+    {
+      "mutationId": "match-clock",
+      "outcome": "PASS",
+      "executed": true,
+      "deferred": false
+    },
+    {
+      "mutationId": "deferred-summary",
+      "outcome": "NOT_EVALUATED",
+      "executed": true,
+      "deferred": true
+    }
+  ]
+}
