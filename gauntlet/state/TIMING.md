@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-23T11:51:00Z
+measured_at: 2026-08-23T12:06:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-SITUATIONS-BATCH-3
-usage_aggregates_through: SMALL-SIDED-SITUATIONS-BATCH-3
-clock_aggregates_through: SMALL-SIDED-SITUATIONS-BATCH-3
-model_evaluation_through: SMALL-SIDED-SITUATIONS-BATCH-3
+last_tracked_objective: SMALL-SIDED-MILESTONE-RERUN
+usage_aggregates_through: SMALL-SIDED-MILESTONE-RERUN
+clock_aggregates_through: SMALL-SIDED-MILESTONE-RERUN
+model_evaluation_through: SMALL-SIDED-MILESTONE-RERUN
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -193,6 +193,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-MILESTONE-RE-EVALUATION | accepted | 10m | 3.1m | 1.6m | 2.1m | 0.3m | n/a | n/a |
 | FIXTURE-EVENT-EXTENSION | accepted | 52m | 40.4m | 9.1m | 1.8m | 0.4m | n/a | n/a |
 | SMALL-SIDED-SITUATIONS-BATCH-3 | accepted | 10m | 3.5m | 3.6m | 2.4m | 0.3m | n/a | n/a |
+| SMALL-SIDED-MILESTONE-RERUN | accepted | 10m | 1.1m | 2.5m | 0.2m | 0.2m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -461,6 +462,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-MILESTONE-RE-EVALUATION | qwen3.6 | M | Medium — milestone re-evaluation with batch evidence | 0 | A | Honest FAIL verdict (4 FAIL, 4 NOT_EVALUATED) |
 | FIXTURE-EVENT-EXTENSION | qwen3.6 | M | Medium — fixture extension for second-touch (HEADLESS) | 0 | A | second-touch now emits; ball-out-of-play: sim limitation |
 | SMALL-SIDED-SITUATIONS-BATCH-3 | qwen3.6 | M | Medium — batch-3 on extended fixture (HEADLESS) | 0 | A | 1 PASS, 7 FAIL; second-touch evaluator filtering limitation |
+| SMALL-SIDED-MILESTONE-RERUN | qwen3.6 | M | Medium — milestone re-evaluation with accumulated evidence | 0 | A | Honest FAIL (7/8 FAIL) |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -645,6 +647,8 @@ on an H task is the interesting result.
 | FIXTURE-EVENT-EXTENSION | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | 273/273 scenario tests; no src changes; no regression |
 | SMALL-SIDED-SITUATIONS-BATCH-3 | critic-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | 53 tests; evaluator limitation honest |
 | SMALL-SIDED-SITUATIONS-BATCH-3 | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | 79/79 tests; no regression; dependency clean |
+| SMALL-SIDED-MILESTONE-RERUN | critic-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | FAIL verdict verified; honest report; no source changes |
+| SMALL-SIDED-MILESTONE-RERUN | integration-reviewer-mimo (mimo-v2.5) | flash 401, qwen blocked, mimo fallback | ACCEPT | no evaluator/fixture changes; FAIL honest; dependency clean |
 
 ### Builder scoreboard
 
@@ -652,7 +656,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 75 | 53 | 10 | 3 | 3 | 2 | 72% | ~0.43 | ~31m |
+| qwen3.6 | 76 | 53 | 10 | 3 | 3 | 2 | 72% | ~0.42 | ~31m |
 | mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

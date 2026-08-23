@@ -3123,6 +3123,30 @@ All 5 objectives of horizon v16 accepted. Milestone did not pass — honest eval
 - commits: 0ac5fe9 candidate(FIXTURE-EVENT-EXTENSION)
 - notes: Extended fixture now produces second-touch events. pitch-contact/ball-out-of-play pre-existing simulation limitations (ball settles after first contact). 273/273 regression tests pass. Horizon v17 1/3.
 
+## Iteration 124 — 2026-08-23
+
+- objective_id: SMALL-SIDED-SITUATIONS-BATCH-3
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 36a2b82 candidate(SMALL-SIDED-SITUATIONS-BATCH-3)
+- notes: Extended fixture: 1 PASS, 7 FAIL. second-touch present but evaluator's isRelevantEvent filtering hides it from indicative kinds — honestly documented. 79/79 regression tests pass. Horizon v17 2/3.
+
+## Iteration 125 — 2026-08-23
+
+- objective_id: SMALL-SIDED-MILESTONE-RERUN
+- builder: builder-structured / qwen3.6
+- critic: critic-mimo / mimo-v2.5 — ACCEPT
+- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
+- result: accepted
+- commits: 8393a81 candidate(SMALL-SIDED-MILESTONE-RERUN)
+- notes: Milestone evaluator: FAIL (7/8 FAIL, 1 PASS). Accumulated best across all v17 batches. Honest verdict. Horizon v17 EXHAUSTED (3/3). Horizon v18 created: fix isRelevantEvent().
+
+## Horizon v17 exhaustion (3/3 accepted)
+
+All 3 objectives of horizon v17 accepted. Milestone did not pass — honest evaluation required horizon v18 to fix the evaluator's isRelevantEvent() filtering so second-touch is correctly recognized as indicative.
+
 ## Iteration 123 — 2026-08-23
 
 - objective_id: SMALL-SIDED-SITUATIONS-BATCH-3

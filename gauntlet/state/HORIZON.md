@@ -3,31 +3,31 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 17
+horizon_version: 18
 status: ACTIVE
-horizon_id: "driven-fixture-event-extension"
-created_from_commit: ec1e054e250a09024532100a3f5c4d4a68102a25
+horizon_id: "event-diversity-through-evaluator-fix"
+created_from_commit: 8393a8199a3107f26573e9a0d134687595d9b587
 created_at: 2026-08-23
-reason: "Horizon v16 milestone FAILED (4 FAIL, 4 NOT_EVALUATED). Root cause: driven fixtures emit limited event diversity. New horizon extends input programs to produce missing indicative kinds so FAIL situations can be re-evaluated honestly."
-current_index: 2
+reason: "Horizon v17 milestone FAILED (7/8 FAIL) because second-touch events from extended fixtures are not recognized as indicative for PASS_RECEPTION / SUPPORT_AND_PASSING_LANES — the evaluator's isRelevantEvent() function does not include second-touch in the indicative_event_kinds. New horizon first fixes the evaluator mapping to include second-touch, then re-runs batch evidence and milestone."
+current_index: 0
 objectives:
-  - id: FIXTURE-EVENT-EXTENSION
-    status: accepted
-    reason: "Extend input programs in the accepted situation and transition driven fixtures so all missing indicative event kinds are emitted. No physics invention — only input-driven behaviors."
+  - id: EVALUATOR-ISRELEVANT-FIX
+    status: pending
+    reason: "Fix eval/runners/small-sided-situation-evaluator.ts isRelevantEvent() to include second-touch, ball-out-of-play, and pitch-contact as indicative kinds where the situation-mapping defines them. Also fix SUPPORT_AND_PASSING_LANES indicative kinds if second-touch is missing there. This is a minimal evaluator change required for honest verdicts from extended fixtures."
     builder: builder-structured
     prerequisite: null
-  - id: SMALL-SIDED-SITUATIONS-BATCH-3
-    status: accepted
-    reason: "Re-run situation evaluator on extended fixtures; persist honest verdicts."
-    builder: builder-structured
-    prerequisite: FIXTURE-EVENT-EXTENSION
-  - id: SMALL-SIDED-MILESTONE-RERUN
+  - id: SMALL-SIDED-SITUATIONS-BATCH-4
     status: pending
-    reason: "Re-run SMALL_SIDED_SHAPE milestone:evaluate with extended batch evidence and browser case. Honest verdict only."
+    reason: "Re-run situation evaluator on extended fixtures after evaluator fix. Verify PASS_RECEPTION and SUPPORT_AND_PASSING_LANES now PASS where second-touch was emitted."
     builder: builder-structured
-    prerequisite: SMALL-SIDED-SITUATIONS-BATCH-3
-observable_progress_target: "SMALL_SIDED_SHAPE obtains honest per-situation verdicts from fully-driven fixtures."
-last_invalidation_reason: "Horizon v16 milestone FAILED (4 FAIL, 4 NOT_EVALUATED) due to limited event diversity in driven fixtures."
+    prerequisite: EVALUATOR-ISRELEVANT-FIX
+  - id: SMALL-SIDED-MILESTONE-RERUN-2
+    status: pending
+    reason: "Re-run SMALL_SIDED_SHAPE milestone:evaluate with corrected batch evidence."
+    builder: builder-structured
+    prerequisite: SMALL-SIDED-SITUATIONS-BATCH-4
+observable_progress_target: "SMALL_SIDED_SHAPE obtains honest per-situation verdicts with second-touch correctly recognized as indicative."
+last_invalidation_reason: "Horizon v17 evaluator did not fix isRelevantEvent() to recognize second-touch as indicative, causing honest FAIL where second-touch was present."
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -40,5 +40,5 @@ replan_if:
 
 ## Completed horizons
 
+Horizon v17 (driven-fixture-event-extension) — EXHAUSTED: 3/3 accepted. Milestone FAILED (7/8 FAIL).
 Horizon v16 (driven-situations-and-small-sided-milestone) — EXHAUSTED: 5/5 accepted.
-Horizon v15 (small-sided-situations-and-browser-case) — EXHAUSTED: 6/6 accepted.

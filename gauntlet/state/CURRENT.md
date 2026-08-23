@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-MILESTONE-RERUN
+next_objective_id: EVALUATOR-ISRELEVANT-FIX
 
 best_known:
-  commit: 36a2b82
-  note: "SMALL-SIDED-SITUATIONS-BATCH-3 accepted (extended fixture: 1 PASS, 7 FAIL; evaluator second-touch limitation honest). Horizon v17 advances to milestone-rerun."
+  commit: 8393a81
+  note: "SMALL-SIDED-MILESTONE-RERUN accepted (FAIL 7/8). Horizon v17 EXHAUSTED. Horizon v18 created: fix isRelevantEvent() to recognize second-touch as indicative."
 
 active_candidate: null
 builder_in_use: null
@@ -132,17 +132,18 @@ accepted:
   - SMALL-SIDED-MILESTONE-RE-EVALUATION
   - FIXTURE-EVENT-EXTENSION
   - SMALL-SIDED-SITUATIONS-BATCH-3
+  - SMALL-SIDED-MILESTONE-RERUN
 
 blocked: []
 
-selection_note: "Horizon v17 2/3 ACTIVE. BATCH-3 persisted on extended fixture; second-touch limitation documented. Next: milestone re-run. No PES claim."
+selection_note: "Horizon v17 EXHAUSTED (3/3). Milestone FAIL honest. Horizon v18 ACTIVE: fix evaluator's isRelevantEvent to recognize second-touch as indicative. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-SITUATIONS-BATCH-3 — Extended fixture: 1 PASS (SETTLED_ATTACK_VS_DEFENCE), 7 FAIL. second-touch present but evaluator's `isRelevantEvent` filtering hides it from indicative kinds — honestly documented. 79/79 regression tests pass.
+SMALL-SIDED-MILESTONE-RERUN — Re-ran milestone evaluator with all accumulated evidence from v17. Honest verdict: FAIL (7/8 FAIL, 1 PASS). Second-touch emitted but evaluator's isRelevantEvent filtering hides it from indicative kinds. Fix required in next horizon.
 
 - builder: builder-structured / qwen3.6
 - critic: critic-mimo / mimo-v2.5 — ACCEPT
 - integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T11:49:52Z)
-- Candidate: 36a2b82
+- Evidence: durable acceptance manifest + record (2026-08-23T12:04:25Z)
+- Candidate: 8393a81
