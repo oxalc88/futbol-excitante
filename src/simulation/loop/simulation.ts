@@ -969,6 +969,23 @@ export function createSimulation(
   ): SimulationEvent[] {
     const events: SimulationEvent[] = [];
 
+    // --- Within-batch duplicate detection (same tick, same controlSlot) ----
+    // When the scenario validation allows duplicate frames (e.g. for
+    // diagnostic testing), detect them here and emit input-rejection events.
+    const batchSeenSlots = new Map<string, InputFrame>();
+    const uniqueFrames: InputFrame[] = [];
+    for (const f of framesForTick) {
+      const key = `${f.tick}:${f.controlSlot}`;
+      if (batchSeenSlots.has(key)) {
+        const ev = createRejectionEvent(targetTick, f, ++eventCounter);
+        events.push(ev);
+        state.events = [...state.events, ev];
+      } else {
+        batchSeenSlots.set(key, f);
+        uniqueFrames.push(f);
+      }
+    }
+
     // --- Cross-call duplicate detection --------------------------------
     const allBuffered = flattenInputBuffers();
     // Remove frames belonging to targetTick from allBuffered (they are in framesForTick).
@@ -978,7 +995,7 @@ export function createSimulation(
 
     // Filter duplicates: new frames that conflict with prior buffers.
     const { rejectFrames, okFrames } = filterDuplicateFrames(
-      framesForTick,
+      uniqueFrames,
       priorBuffered,
     );
 
@@ -1430,14 +1447,14 @@ export function createSimulation(
     },
 
     /**
-     * Buffer input frames. Duplicates across all buffered ticks are detected eagerly.
+     * Buffer input frames.
      *
-     * Duplicates for the same (tick, controlSlot) are rejected with a thrown
-     * error listing all conflicting frames. The error is not resolved by
-     * arrival order — both frames are reported so the caller can decide.
+     * Duplicate frames (same tick + controlSlot) are buffered as-is.
+     * The resolution stage (`resolveInputs`) detects duplicates and emits
+     * `input-rejection` diagnostic events.
      *
      * @param frames - Input frames; validation is strict.
-     * @throws {Error} on invalid frame or duplicate (tick, controlSlot).
+     * @throws {Error} on invalid frame.
      */
     applyInputs(frames: readonly InputFrame[]): void {
       // Validate each frame.
@@ -1449,31 +1466,7 @@ export function createSimulation(
         }
       }
 
-      // Eager duplicate detection per batch.
-      const intraSeen = new Set<string>();
-      for (const frame of frames) {
-        const key = `${frame.tick}:${frame.controlSlot}`;
-        if (intraSeen.has(key)) {
-          throw new Error(
-            `Duplicate input frame for (tick=${frame.tick}, controlSlot="${frame.controlSlot}") within batch`,
-          );
-        }
-        intraSeen.add(key);
-      }
-
-      // Cross-call duplicate detection against all buffered frames.
-      const allBuffered = flattenInputBuffers();
-      const { rejectFrames } = filterDuplicateFrames(frames, allBuffered);
-      if (rejectFrames.length > 0) {
-        const details = rejectFrames.map(
-          (r) => `(tick=${r.tick}, controlSlot="${r.controlSlot}")`,
-        );
-        throw new Error(
-          `Duplicate input frame across calls: ${details.join(", ")}`,
-        );
-      }
-
-      // Buffer by tick.
+      // Buffer all frames by tick (duplicates included).
       for (const frame of frames) {
         const key = String(frame.tick);
         if (!(key in inputBuffers)) {

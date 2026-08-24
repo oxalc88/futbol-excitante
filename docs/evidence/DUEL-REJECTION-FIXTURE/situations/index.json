@@ -1,0 +1,51 @@
+{
+  "fixtureName": "3v3-situation-driven-duel-rejection.v1.json",
+  "scenarioId": "3v3-situation-driven-duel-rejection-v1",
+  "totalTicks": 60,
+  "seed": 42,
+  "hasInvariantFailures": true,
+  "finalStateHash": "fnv1a64-v1:f75ef7cb99e0345b",
+  "situationCount": 8,
+  "situations": [
+    {
+      "situation_id": "PASS_RECEPTION",
+      "verdict": "PASS",
+      "relevant_event_count": 6
+    },
+    {
+      "situation_id": "SHOT_TO_RESULT",
+      "verdict": "FAIL",
+      "relevant_event_count": 1
+    },
+    {
+      "situation_id": "PHYSICAL_DUEL",
+      "verdict": "PASS",
+      "relevant_event_count": 7
+    },
+    {
+      "situation_id": "SUPPORT_AND_PASSING_LANES",
+      "verdict": "PASS",
+      "relevant_event_count": 6
+    },
+    {
+      "situation_id": "SETTLED_ATTACK_VS_DEFENCE",
+      "verdict": "PASS",
+      "relevant_event_count": 10
+    },
+    {
+      "situation_id": "ATTACK_TO_DEFENCE_TRANSITION",
+      "verdict": "PASS",
+      "relevant_event_count": 10
+    },
+    {
+      "situation_id": "DEFENCE_TO_ATTACK_TRANSITION",
+      "verdict": "PASS",
+      "relevant_event_count": 10
+    },
+    {
+      "situation_id": "COORDINATED_PRESS",
+      "verdict": "PASS",
+      "relevant_event_count": 11
+    }
+  ]
+}

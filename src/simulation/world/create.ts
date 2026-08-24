@@ -18,7 +18,6 @@ import { createMulberry32 } from "../determinism/rng.js";
 import {
   validateScenario,
   validateWorldState,
-  validateInputUniqueness,
   validateInputFrame,
 } from "./validate.js";
 import { freezeWorldState, freezeScenario } from "./clone.js";
@@ -133,12 +132,10 @@ export function createWorld(opts: CreateOptions): WorldState {
       }
     }
   }
-  const uniqErrors = validateInputUniqueness(allFrames);
-  if (uniqErrors.length > 0) {
-    throw new Error(
-      `Input uniqueness validation failed:\n${uniqErrors.join("\n")}`,
-    );
-  }
+  // Note: duplicate (tick, controlSlot) frames in the input program are
+  // allowed — only the first frame per (tick, controlSlot) is applied;
+  // duplicate frames are excluded from gameplay. The simulation resolution
+  // stage detects them and emits input-rejection diagnostic events.
 
   // 4. Build initial state — deep-cloned from scenario data
   const sortedPlayers = [...scenario.players]

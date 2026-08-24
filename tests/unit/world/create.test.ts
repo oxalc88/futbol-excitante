@@ -12,6 +12,8 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { describe, it, expect } from "vitest";
 import { createWorld } from "../../../src/simulation/world/create.js";
+import { createSimulation } from "../../../src/simulation/loop/simulation.js";
+import { NO_OP_OBSERVER } from "../../../src/simulation/telemetry/observer.js";
 import {
   encodeCanonical,
   hashFnv1a64,
@@ -354,8 +356,8 @@ describe("BOOTSTRAP-04-VALIDATION-ORDER-001: validation order", () => {
 // 8. Duplicate input frame rejection (BOOTSTRAP-05 integration)
 // ---------------------------------------------------------------------------
 
-describe("BOOTSTRAP-05-UNIQUENESS-001: createWorld rejects duplicate input frames", () => {
-  it("rejects scenario with duplicate (tick, controlSlot) frames", () => {
+describe("BOOTSTRAP-05-UNIQUENESS-001: createWorld allows duplicates, simulation resolves them", () => {
+  it("createWorld does NOT throw on duplicate (tick, controlSlot) frames", () => {
     const scenario = loadFixture("foundation-move-and-roll.v1.json");
     // Add a duplicate frame: same tick 0, same controlSlot slot-1
     scenario.inputProgram[0]!.push({
@@ -370,13 +372,16 @@ describe("BOOTSTRAP-05-UNIQUENESS-001: createWorld rejects duplicate input frame
       releasedButtons: 0,
     });
 
-    expect(() => createWorld({ scenario })).toThrow("Input uniqueness validation failed");
+    // createWorld warns on duplicates but does NOT throw — resolution
+    // happens at simulation step time where input-rejection events are emitted.
+    expect(() => createWorld({ scenario })).not.toThrow();
   });
 
-  it("rejects duplicates across different sourceIds", () => {
+  it("createWorld does NOT throw on duplicates across different sourceIds", () => {
     const scenario = loadFixture("foundation-move-and-roll.v1.json");
-    // Same tick/slot but different sourceId — still a duplicate
-    const dupFrame = {
+    // Same tick/slot but different sourceId — still a duplicate at the
+    // (tick, controlSlot) level, but createWorld allows it.
+    scenario.inputProgram[0]!.push({
       tick: 0,
       sourceId: "another-source",
       controlSlot: "slot-1",
@@ -386,10 +391,48 @@ describe("BOOTSTRAP-05-UNIQUENESS-001: createWorld rejects duplicate input frame
       heldButtons: 0,
       pressedButtons: 0,
       releasedButtons: 0,
-    };
-    scenario.inputProgram[0]!.push(dupFrame);
+    });
 
-    expect(() => createWorld({ scenario })).toThrow("Input uniqueness validation failed");
+    expect(() => createWorld({ scenario })).not.toThrow();
+  });
+
+  it("simulation step emits input-rejection for duplicate (tick, controlSlot) frames", () => {
+    const scenario = loadFixture("foundation-move-and-roll.v1.json");
+    const world = createWorld({ scenario });
+    const sim = createSimulation(world, NO_OP_OBSERVER);
+
+    // Manually apply the same (tick, slot) frame twice — simulates a
+    // duplicate arriving at simulation time (e.g. from scenario inputProgram
+    // or multiple sourceId feeds). The first apply is valid; the second is
+    // silently buffered as a duplicate.
+    sim.applyInputs([{
+      tick: 0,
+      sourceId: "source-a",
+      controlSlot: "slot-1",
+      moveX: 0.5,
+      moveY: 0,
+      sprint: 0,
+      heldButtons: 0,
+      pressedButtons: 0,
+      releasedButtons: 0,
+    }]);
+    sim.applyInputs([{
+      tick: 0,
+      sourceId: "source-b",
+      controlSlot: "slot-1",
+      moveX: 1,
+      moveY: 1,
+      sprint: 1,
+      heldButtons: 0,
+      pressedButtons: 0,
+      releasedButtons: 0,
+    }]);
+
+    // Step resolves duplicates: only the first frame per slot is applied;
+    // the duplicate emits an input-rejection event.
+    const result = sim.step();
+    const rejectionEvents = result.events.filter((e) => e.kind === "input-rejection");
+    expect(rejectionEvents.length).toBeGreaterThan(0);
   });
 
   it("accepts frames with same tick but different controlSlots", () => {
