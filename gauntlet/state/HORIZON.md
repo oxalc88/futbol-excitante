@@ -9,10 +9,10 @@ horizon_id: "event-diversity-through-evaluator-fix"
 created_from_commit: 8393a8199a3107f26573e9a0d134687595d9b587
 created_at: 2026-08-23
 reason: "Horizon v17 milestone FAILED (7/8 FAIL) because second-touch events from extended fixtures are not recognized as indicative for PASS_RECEPTION / SUPPORT_AND_PASSING_LANES — the evaluator's isRelevantEvent() function does not include second-touch in the indicative_event_kinds. New horizon first fixes the evaluator mapping to include second-touch, then re-runs batch evidence and milestone."
-current_index: 0
+current_index: 1
 objectives:
   - id: EVALUATOR-ISRELEVANT-FIX
-    status: pending
+    status: accepted
     reason: "Fix eval/runners/small-sided-situation-evaluator.ts isRelevantEvent() to include second-touch, ball-out-of-play, and pitch-contact as indicative kinds where the situation-mapping defines them. Also fix SUPPORT_AND_PASSING_LANES indicative kinds if second-touch is missing there. This is a minimal evaluator change required for honest verdicts from extended fixtures."
     builder: builder-structured
     prerequisite: null

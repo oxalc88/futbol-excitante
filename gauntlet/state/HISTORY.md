@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 126 — 2026-08-24
+
+- objective_id: EVALUATOR-ISRELEVANT-FIX
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: a93ce09 candidate(EVALUATOR-ISRELEVANT-FIX)
+- notes: Fixed situation-mapping isRelevantEvent() to include SITUATION_EVIDENCE_REQUIREMENTS indicative_event_kinds (additive). second-touch now recognized as indicative for PASS_RECEPTION/SUPPORT_AND_PASSING_LANES; transition situations PASS where indicative events exist; SHOT_TO_RESULT/PHYSICAL_DUEL remain FAIL honestly (pitch-contact/input-rejection absent). 116/116 objective eval tests pass. Deterministic audit PASS, HEADLESS. Resume continuation: candidate builder work pre-existing in tree, critic+integration completed this session. Horizon v18 1/3.
+
 ## Iteration 1 — 2026-08-13
 
 - objective_id: BOOTSTRAP-01

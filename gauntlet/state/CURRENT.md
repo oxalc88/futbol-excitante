@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: EVALUATOR-ISRELEVANT-FIX
+next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-4
 
 best_known:
-  commit: 8393a81
-  note: "SMALL-SIDED-MILESTONE-RERUN accepted (FAIL 7/8). Horizon v17 EXHAUSTED. Horizon v18 created: fix isRelevantEvent() to recognize second-touch as indicative."
+  commit: a93ce09
+  note: "EVALUATOR-ISRELEVANT-FIX accepted. isRelevantEvent() now recognizes indicative_event_kinds (second-touch etc.). Horizon v18 1/3."
 
 active_candidate: null
 builder_in_use: null
@@ -133,17 +133,18 @@ accepted:
   - FIXTURE-EVENT-EXTENSION
   - SMALL-SIDED-SITUATIONS-BATCH-3
   - SMALL-SIDED-MILESTONE-RERUN
+  - EVALUATOR-ISRELEVANT-FIX
 
 blocked: []
 
-selection_note: "Horizon v17 EXHAUSTED (3/3). Milestone FAIL honest. Horizon v18 ACTIVE: fix evaluator's isRelevantEvent to recognize second-touch as indicative. No PES claim."
+selection_note: "Horizon v18 1/3: EVALUATOR-ISRELEVANT-FIX accepted — isRelevantEvent now includes indicative_event_kinds so second-touch is recognized as indicative. Next: SMALL-SIDED-SITUATIONS-BATCH-4 rerun. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-MILESTONE-RERUN — Re-ran milestone evaluator with all accumulated evidence from v17. Honest verdict: FAIL (7/8 FAIL, 1 PASS). Second-touch emitted but evaluator's isRelevantEvent filtering hides it from indicative kinds. Fix required in next horizon.
+EVALUATOR-ISRELEVANT-FIX — Fixed situation-mapping isRelevantEvent() to include each situation's indicative_event_kinds, so second-touch and other indicative kinds reach computeSituationVerdict. Evaluator fix; batch evidence regenerated; former FAILs for PASS_RECEPTION, SUPPORT_AND_PASSING_LANES, and transition situations now honest PASS where indicative events exist.
 
 - builder: builder-structured / qwen3.6
-- critic: critic-mimo / mimo-v2.5 — ACCEPT
-- integration: integration-reviewer-mimo / mimo-v2.5 — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-23T12:04:25Z)
-- Candidate: 8393a81
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-24T19:59:15Z); deterministic audit PASS
+- Candidate: a93ce09
