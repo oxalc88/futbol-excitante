@@ -8,9 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
+next_objective_id: SMALL-SIDED-EXIT-PREREQ-IDENTITY
+
 best_known:
-  commit: 571a2c30
-  note: "SMALL-SIDED-MILESTONE-RERUN-3 accepted — SMALL_SIDED_SHAPE milestone honest PASS (8/8 situations + critic ACCEPT). Horizon v19 EXHAUSTED (4/4). Milestone bundle superseded."
+  commit: 567c1a20
+  note: "SMALL_SIDED_SHAPE milestone honest PASS achieved and durable (Horizon v19 EXHAUSTED 4/4). Horizon v20 ACTIVE: milestone exit-prereq identity correction, visual-readability evidence, browser-path coherence, profile reducer extension."
 
 active_candidate: null
 builder_in_use: null
@@ -141,7 +143,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v19 COMPLETE 4/4: SHOT/DUEL fixture objectives, BATCH-5 (8/8 PASS), and MILESTONE-RERUN-3 (SMALL_SIDED_SHAPE honest PASS with critic ACCEPT). Milestone bundle superseded with full history. Next horizon required; no PES claim."
+selection_note: "Horizon v20 ACTIVE 0/4: SMALL-SIDED-EXIT-PREREQ-IDENTITY (correct milestone record exit-prereq identity to profile MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS). Reassessment at v19 exhaustion found milestone-record exit-prereq identity gap, unevidenced visual-readability dimensions, stale browser-path coherence, and no executable team-exit reducer. GK/regulation/full-match deferred; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
