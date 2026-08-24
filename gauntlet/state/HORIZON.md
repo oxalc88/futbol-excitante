@@ -4,12 +4,12 @@
 
 ```yaml
 horizon_version: 19
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "small-sided-milestone-completion"
 created_from_commit: 1c664e661e4e4e0a466bb76e17a496053a990c1b
 created_at: 2026-08-24
 reason: "Horizon v18 accepted all 3 objectives and returned an honest milestone FAIL (6/8 PASS). The remaining two FAILs are fixture-engineering gaps, not evaluator or engine defects: (1) SHOT_TO_RESULT — a shot fired at tick 51 has vz≈1.8 m/s (exitSpeed 12 x verticalComponent 0.15) and returns to the pitch after ≈22 ticks, past the 60-tick window, so no pitch-contact event is emitted though the engine supports it; (2) PHYSICAL_DUEL — the driven input program never produces a duplicate/conflicting input at a contact tick, so input-rejection never fires though input-system.ts emits it. This horizon closes those gaps honestly via fixture extension + batch re-run, then re-runs the SMALL_SIDED_SHAPE milestone with the goal of an honest 8/8 PASS and milestone bundle."
-current_index: 3
+current_index: 4
 objectives:
   - id: SHOT-RESULT-RESOLUTION-FIXTURE
     status: accepted
@@ -27,7 +27,7 @@ objectives:
     builder: builder-structured
     prerequisite: [SHOT-RESULT-RESOLUTION-FIXTURE, DUEL-REJECTION-FIXTURE]
   - id: SMALL-SIDED-MILESTONE-RERUN-3
-    status: pending
+    status: accepted
     reason: "Re-run SMALL_SIDED_SHAPE milestone:evaluate with batch-5 evidence (8/8 PASS) and generate the milestone bundle. Milestone PASS is possible only if every required situation PASS and the deterministic reducer + critic accept; honest FAIL otherwise. Milestone is completion truth, not acceptance authority."
     builder: builder-structured
     prerequisite: SMALL-SIDED-SITUATIONS-BATCH-5
@@ -45,7 +45,7 @@ replan_if:
 
 ## Completed horizons
 
-Horizon v19 (small-sided-milestone-completion) — ACTIVE.
+Horizon v19 (small-sided-milestone-completion) — EXHAUSTED: 4/4 accepted. SHOT/DUEL fixture objectives closed the two FAIL gaps; BATCH-5 consolidated 8/8 situation PASS; MILESTONE-RERUN-3 achieved SMALL_SIDED_SHAPE honest PASS (critic ACCEPT) with milestone bundle superseded (history: 8 NOT_EVALUATED → 3 FAIL → NEEDS_PERCEPTUAL_REVIEW → PASS).
 Horizon v18 (event-diversity-through-evaluator-fix) — EXHAUSTED: 3/3 accepted. isRelevantEvent indicative fix applied; BATCH-4 6 PASS/2 FAIL; milestone FAIL honest (6/8); bundle generated.
 Horizon v17 (driven-fixture-event-extension) — EXHAUSTED: 3/3 accepted. Milestone FAILED (7/8 FAIL).
 Horizon v16 (driven-situations-and-small-sided-milestone) — EXHAUSTED: 5/5 accepted.

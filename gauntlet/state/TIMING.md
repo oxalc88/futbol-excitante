@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-SITUATIONS-BATCH-5
-usage_aggregates_through: SMALL-SIDED-SITUATIONS-BATCH-5
-clock_aggregates_through: SMALL-SIDED-SITUATIONS-BATCH-5
-model_evaluation_through: SMALL-SIDED-SITUATIONS-BATCH-5
+last_tracked_objective: SMALL-SIDED-MILESTONE-RERUN-3
+usage_aggregates_through: SMALL-SIDED-MILESTONE-RERUN-3
+clock_aggregates_through: SMALL-SIDED-MILESTONE-RERUN-3
+model_evaluation_through: SMALL-SIDED-MILESTONE-RERUN-3
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -200,6 +200,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SHOT-RESULT-RESOLUTION-FIXTURE | accepted | 22m | 13m | 7m | 3m | 0.4m | n/a | n/a |
 | DUEL-REJECTION-FIXTURE | accepted | ~18m | 9m | 6m | 2.5m | 0.4m | n/a | n/a |
 | SMALL-SIDED-SITUATIONS-BATCH-5 | accepted | ~18m | 9m | 6m | 3.5m | 0.5m | n/a | n/a |
+| SMALL-SIDED-MILESTONE-RERUN-3 | accepted | ~20m | 3m | 8.5m | 2m | 0.5m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -475,6 +476,7 @@ on an H task is the interesting result.
 | SHOT-RESULT-RESOLUTION-FIXTURE | qwen3.6 | M | Medium — shot-resolution driven fixture (HEADLESS) | 0 | A | SHOT_TO_RESULT honest PASS; shot+pitch-contact; 10/10 binding |
 | DUEL-REJECTION-FIXTURE | qwen3.6 | M | Medium — duel-rejection driven fixture + input resolution (HEADLESS) | 0 | A | PHYSICAL_DUEL honest PASS; input-rejection emitted; 30 tests; no core I/O |
 | SMALL-SIDED-SITUATIONS-BATCH-5 | qwen3.6 | M | Medium — consolidate batch-5 evidence 8/8 PASS (HEADLESS) | 0 | A | 8/8 honest PASS; source_fixture provenance; byte-identity; 161 tests |
+| SMALL-SIDED-MILESTONE-RERUN-3 | qwen3.6 | M | Medium — milestone re-run with 8/8 evidence (HEADLESS) | 0 | A | SMALL_SIDED_SHAPE PASS; critic-gated; finale by orchestrator |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -673,6 +675,8 @@ on an H task is the interesting result.
 | DUEL-REJECTION-FIXTURE | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | composition clean; non-weakening verified; tmp excluded; independent of SHOT |
 | SMALL-SIDED-SITUATIONS-BATCH-5 | critic (deepseek-v4-flash) | base flash | ACCEPT | 8/8 honest; byte-identity reproduced; FAIL paths exist; manifest draft regeneration flagged |
 | SMALL-SIDED-SITUATIONS-BATCH-5 | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | composition clean; 161 tests/7 files; BATCH-1..4 intact; milestone dependency coherent |
+| SMALL-SIDED-MILESTONE-RERUN-3 | critic (deepseek-v4-flash) | base flash | ACCEPT | 8/8 PASS reproducible; reducer critic gate verified; ACCEPT unlocks milestone PASS |
+| SMALL-SIDED-MILESTONE-RERUN-3 | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | composition clean; 174 tests/6 suites; PASS record coherent; bundle supersede deferred |
 
 ### Builder scoreboard
 

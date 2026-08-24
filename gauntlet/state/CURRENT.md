@@ -8,11 +8,9 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-MILESTONE-RERUN-3
-
 best_known:
-  commit: a96e7fec
-  note: "SMALL-SIDED-SITUATIONS-BATCH-5 accepted — situation evidence consolidated 8/8 honest PASS across resolved fixtures. Horizon v19 3/4."
+  commit: 571a2c30
+  note: "SMALL-SIDED-MILESTONE-RERUN-3 accepted — SMALL_SIDED_SHAPE milestone honest PASS (8/8 situations + critic ACCEPT). Horizon v19 EXHAUSTED (4/4). Milestone bundle superseded."
 
 active_candidate: null
 builder_in_use: null
@@ -139,17 +137,18 @@ accepted:
   - SHOT-RESULT-RESOLUTION-FIXTURE
   - DUEL-REJECTION-FIXTURE
   - SMALL-SIDED-SITUATIONS-BATCH-5
+  - SMALL-SIDED-MILESTONE-RERUN-3
 
 blocked: []
 
-selection_note: "Horizon v19 3/4: SHOT, DUEL fixture objectives and BATCH-5 accepted — batch evidence consolidated 8/8 honest PASS on resolved fixtures. Next: SMALL-SIDED-MILESTONE-RERUN-3 (8/8 milestone + bundle). No PES claim."
+selection_note: "Horizon v19 COMPLETE 4/4: SHOT/DUEL fixture objectives, BATCH-5 (8/8 PASS), and MILESTONE-RERUN-3 (SMALL_SIDED_SHAPE honest PASS with critic ACCEPT). Milestone bundle superseded with full history. Next horizon required; no PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-SITUATIONS-BATCH-5 — Consolidated batch-5 situation evidence on the resolved fixtures: 8/8 honest PASS with per-situation source_fixture provenance (6 from extended fixture, SHOT_TO_RESULT from shot-resolution, PHYSICAL_DUEL from duel-rejection). Byte-identity binding test 19/19; 161 tests across 7 eval files; audit PASS. No engine/contract/fixture changes. Horizon v19 3/4.
+SMALL-SIDED-MILESTONE-RERUN-3 — SMALL_SIDED_SHAPE milestone honest PASS: 8/8 required situations PASS from BATCH-5 consolidated evidence (extended + shot-resolution + duel-rejection fixtures), entry/exit prereqs accepted, independent critic (deepseek-v4-flash) ACCEPT recorded in the reducer input. Durable playtest record 2026-08-24T23-18-30-040Z (milestone_verdict_ready/PASS); pre-critic NEEDS_PERCEPTUAL_REVIEW record retained as honest history. Milestone bundle superseded with full playtest history (12 runs: 8 NOT_EVALUATED → 3 FAIL → 1 NEEDS_PERCEPTUAL_REVIEW → PASS). Horizon v19 complete 4/4.
 
 - builder: builder-structured / qwen3.6
 - critic: critic / deepseek-v4-flash — ACCEPT
 - integration: integration-reviewer / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-24T23:00:34Z); deterministic audit PASS
-- Candidate: a96e7fec
+- Evidence: durable acceptance manifest + record (2026-08-24T23:22:33Z); deterministic audit PASS
+- Candidate: 571a2c30
