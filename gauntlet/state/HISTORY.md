@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 131 — 2026-08-24
+
+- objective_id: SMALL-SIDED-SITUATIONS-BATCH-5
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: a96e7fec candidate(SMALL-SIDED-SITUATIONS-BATCH-5)
+- notes: Consolidated batch-5 evidence on resolved fixtures — honest 8/8 PASS (6 from extended fixture; SHOT_TO_RESULT from shot-resolution; PHYSICAL_DUEL from duel-rejection), per-situation source_fixture provenance. Byte-identity binding 19/19; 161/161 eval tests across 7 files; no engine/contract/fixture changes. Manifest draft regenerated at persist (critic-flagged reconciliation). Horizon v19 3/4.
+
 ## Iteration 130 — 2026-08-24
 
 - objective_id: DUEL-REJECTION-FIXTURE

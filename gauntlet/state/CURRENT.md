@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-5
+next_objective_id: SMALL-SIDED-MILESTONE-RERUN-3
 
 best_known:
-  commit: 81e4aa1
-  note: "DUEL-REJECTION-FIXTURE accepted — PHYSICAL_DUEL now honestly PASS (player-player-contact + input-rejection). Horizon v19 2/4."
+  commit: a96e7fec
+  note: "SMALL-SIDED-SITUATIONS-BATCH-5 accepted — situation evidence consolidated 8/8 honest PASS across resolved fixtures. Horizon v19 3/4."
 
 active_candidate: null
 builder_in_use: null
@@ -138,17 +138,18 @@ accepted:
   - SMALL-SIDED-MILESTONE-RERUN-2
   - SHOT-RESULT-RESOLUTION-FIXTURE
   - DUEL-REJECTION-FIXTURE
+  - SMALL-SIDED-SITUATIONS-BATCH-5
 
 blocked: []
 
-selection_note: "Horizon v19 2/4: SHOT-RESULT-RESOLUTION-FIXTURE and DUEL-REJECTION-FIXTURE accepted. Next: SMALL-SIDED-SITUATIONS-BATCH-5 (needs both fixture objectives). No PES claim."
+selection_note: "Horizon v19 3/4: SHOT, DUEL fixture objectives and BATCH-5 accepted — batch evidence consolidated 8/8 honest PASS on resolved fixtures. Next: SMALL-SIDED-MILESTONE-RERUN-3 (8/8 milestone + bundle). No PES claim."
 ```
 ## Last accepted objective
 
-DUEL-REJECTION-FIXTURE — New driven fixture (3v3-situation-driven-duel-rejection.v1.json) makes PHYSICAL_DUEL honestly evaluable: real `player-player-contact` + `input-rejection` (duplicate/conflicting input frames at the contact tick). Input-system.ts resolveInputs now buffers duplicate frames and emits `input-rejection` (first-frame-per-tick-slot policy) instead of throwing. DOM-free core preserved. Binding test 10/10, audit PASS. Horizon v19 2/4.
+SMALL-SIDED-SITUATIONS-BATCH-5 — Consolidated batch-5 situation evidence on the resolved fixtures: 8/8 honest PASS with per-situation source_fixture provenance (6 from extended fixture, SHOT_TO_RESULT from shot-resolution, PHYSICAL_DUEL from duel-rejection). Byte-identity binding test 19/19; 161 tests across 7 eval files; audit PASS. No engine/contract/fixture changes. Horizon v19 3/4.
 
 - builder: builder-structured / qwen3.6
 - critic: critic / deepseek-v4-flash — ACCEPT
 - integration: integration-reviewer / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-24T22:32:16Z); deterministic audit PASS
-- Candidate: 81e4aa1
+- Evidence: durable acceptance manifest + record (2026-08-24T23:00:34Z); deterministic audit PASS
+- Candidate: a96e7fec
