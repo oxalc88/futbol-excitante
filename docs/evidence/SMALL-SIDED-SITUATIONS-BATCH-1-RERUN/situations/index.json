@@ -34,18 +34,18 @@
     },
     {
       "situation_id": "ATTACK_TO_DEFENCE_TRANSITION",
-      "verdict": "FAIL",
-      "relevant_event_count": 2
+      "verdict": "PASS",
+      "relevant_event_count": 9
     },
     {
       "situation_id": "DEFENCE_TO_ATTACK_TRANSITION",
-      "verdict": "FAIL",
-      "relevant_event_count": 3
+      "verdict": "PASS",
+      "relevant_event_count": 9
     },
     {
       "situation_id": "COORDINATED_PRESS",
-      "verdict": "FAIL",
-      "relevant_event_count": 8
+      "verdict": "PASS",
+      "relevant_event_count": 9
     }
   ]
 }

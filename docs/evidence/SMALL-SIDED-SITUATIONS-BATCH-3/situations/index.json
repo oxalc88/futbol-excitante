@@ -9,8 +9,8 @@
   "situations": [
     {
       "situation_id": "PASS_RECEPTION",
-      "verdict": "FAIL",
-      "relevant_event_count": 3
+      "verdict": "PASS",
+      "relevant_event_count": 6
     },
     {
       "situation_id": "SHOT_TO_RESULT",
@@ -24,8 +24,8 @@
     },
     {
       "situation_id": "SUPPORT_AND_PASSING_LANES",
-      "verdict": "FAIL",
-      "relevant_event_count": 3
+      "verdict": "PASS",
+      "relevant_event_count": 6
     },
     {
       "situation_id": "SETTLED_ATTACK_VS_DEFENCE",
@@ -34,18 +34,18 @@
     },
     {
       "situation_id": "ATTACK_TO_DEFENCE_TRANSITION",
-      "verdict": "FAIL",
-      "relevant_event_count": 2
+      "verdict": "PASS",
+      "relevant_event_count": 10
     },
     {
       "situation_id": "DEFENCE_TO_ATTACK_TRANSITION",
-      "verdict": "FAIL",
-      "relevant_event_count": 4
+      "verdict": "PASS",
+      "relevant_event_count": 10
     },
     {
       "situation_id": "COORDINATED_PRESS",
-      "verdict": "FAIL",
-      "relevant_event_count": 8
+      "verdict": "PASS",
+      "relevant_event_count": 10
     }
   ]
 }

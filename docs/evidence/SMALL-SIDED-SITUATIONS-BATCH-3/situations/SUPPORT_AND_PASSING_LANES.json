@@ -14,8 +14,8 @@
     "mapping_status": "NOT_EVALUATED",
     "evidence_chain": "pass event → receiver position → teammate positions at pass time → verify teammate was in support position without breaking formation"
   },
-  "verdict": "FAIL",
-  "verdict_reason": "Required event kinds present for SUPPORT_AND_PASSING_LANES but no indicative kinds (second-touch) observed; events: pass, player-ball-contact",
+  "verdict": "PASS",
+  "verdict_reason": "Required + indicative event kinds present for SUPPORT_AND_PASSING_LANES (pass, player-ball-contact, second-touch); second-touch observed",
   "relevant_events": [
     {
       "tick": 2,
@@ -34,6 +34,24 @@
       "id": "player-ball-contact-18-19",
       "kind": "player-ball-contact",
       "label": "Player player-2 dribble-touch close-control"
+    },
+    {
+      "tick": 18,
+      "id": "second-touch-18-20",
+      "kind": "second-touch",
+      "label": "Player player-2 second-touch turn"
+    },
+    {
+      "tick": 23,
+      "id": "second-touch-23-26",
+      "kind": "second-touch",
+      "label": "Player player-2 second-touch turn"
+    },
+    {
+      "tick": 51,
+      "id": "second-touch-51-33",
+      "kind": "second-touch",
+      "label": "Player player-2 second-touch turn"
     }
   ],
   "relevant_observations": [
@@ -47,6 +65,14 @@
     },
     {
       "tick": 18,
+      "event_count": 2
+    },
+    {
+      "tick": 23,
+      "event_count": 1
+    },
+    {
+      "tick": 51,
       "event_count": 2
     }
   ],

@@ -16,8 +16,8 @@
     "mapping_status": "NOT_EVALUATED",
     "evidence_chain": "Player-player contact near opponent with ball → verify multiple team members press (not just one) → ball possession changes indicate successful or failed press"
   },
-  "verdict": "FAIL",
-  "verdict_reason": "Required event kinds present for COORDINATED_PRESS but no indicative kinds (player-ball-contact) observed; events: player-player-contact, pass, shot",
+  "verdict": "PASS",
+  "verdict_reason": "Required + indicative event kinds present for COORDINATED_PRESS (player-player-contact, pass, player-ball-contact, shot); player-ball-contact observed",
   "relevant_events": [
     {
       "tick": 1,
@@ -62,6 +62,12 @@
       "label": "Player-player contact between player-1 and player-5"
     },
     {
+      "tick": 11,
+      "id": "player-ball-contact-11-13",
+      "kind": "player-ball-contact",
+      "label": "Player player-2 first-touch contact"
+    },
+    {
       "tick": 16,
       "id": "shot-16-19",
       "kind": "shot",
@@ -92,6 +98,10 @@
     {
       "tick": 6,
       "event_count": 2
+    },
+    {
+      "tick": 11,
+      "event_count": 1
     },
     {
       "tick": 16,

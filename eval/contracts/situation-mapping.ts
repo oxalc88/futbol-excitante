@@ -36,57 +36,69 @@ export function isRelevantEvent(
   situationId: string,
 ): boolean {
   switch (situationId) {
-    case "PASS_RECEPTION":
-      // Pass emission + player-ball-contact (receiver's first touch)
-      return event.kind === "pass" || event.kind === "player-ball-contact";
+    case "PASS_RECEPTION": {
+      const req = SITUATION_EVIDENCE_REQUIREMENTS[situationId];
+      return event.kind === "pass" || event.kind === "player-ball-contact" || req.indicative_event_kinds.includes(event.kind);
+    }
 
-    case "SHOT_TO_RESULT":
-      // Shot emission + goal or non-goal outcome
-      return event.kind === "shot" || event.kind === "goal" || event.kind === "ball-out-of-play";
+    case "SHOT_TO_RESULT": {
+      const req = SITUATION_EVIDENCE_REQUIREMENTS[situationId];
+      return event.kind === "shot" || event.kind === "goal" || event.kind === "ball-out-of-play" || req.indicative_event_kinds.includes(event.kind);
+    }
 
-    case "PHYSICAL_DUEL":
-      // Player-player contact
-      return event.kind === "player-player-contact";
+    case "PHYSICAL_DUEL": {
+      const req = SITUATION_EVIDENCE_REQUIREMENTS[situationId];
+      return event.kind === "player-player-contact" || req.indicative_event_kinds.includes(event.kind);
+    }
 
-    case "SUPPORT_AND_PASSING_LANES":
-      // Pass events + player-ball-contact + telemetry positions
-      return event.kind === "pass" || event.kind === "player-ball-contact";
+    case "SUPPORT_AND_PASSING_LANES": {
+      const req = SITUATION_EVIDENCE_REQUIREMENTS[situationId];
+      return event.kind === "pass" || event.kind === "player-ball-contact" || req.indicative_event_kinds.includes(event.kind);
+    }
 
-    case "SETTLED_ATTACK_VS_DEFENCE":
-      // Pass, shot, or player-ball-contact events during settled play
+    case "SETTLED_ATTACK_VS_DEFENCE": {
+      const req = SITUATION_EVIDENCE_REQUIREMENTS[situationId];
       return (
         event.kind === "pass" ||
         event.kind === "shot" ||
         event.kind === "player-ball-contact" ||
-        event.kind === "player-player-contact"
+        event.kind === "player-player-contact" ||
+        req.indicative_event_kinds.includes(event.kind)
       );
+    }
 
-    case "ATTACK_TO_DEFENCE_TRANSITION":
-      // Possession loss → ball-out-of-play or opponent pass/shot
+    case "ATTACK_TO_DEFENCE_TRANSITION": {
+      const req = SITUATION_EVIDENCE_REQUIREMENTS[situationId];
       return (
         event.kind === "ball-out-of-play" ||
         event.kind === "pass" ||
         event.kind === "shot" ||
-        event.kind === "goal"
+        event.kind === "goal" ||
+        req.indicative_event_kinds.includes(event.kind)
       );
+    }
 
-    case "DEFENCE_TO_ATTACK_TRANSITION":
-      // Recovery → player-ball-contact then pass/shot
+    case "DEFENCE_TO_ATTACK_TRANSITION": {
+      const req = SITUATION_EVIDENCE_REQUIREMENTS[situationId];
       return (
         event.kind === "player-ball-contact" ||
         event.kind === "pass" ||
         event.kind === "shot" ||
-        event.kind === "goal"
+        event.kind === "goal" ||
+        req.indicative_event_kinds.includes(event.kind)
       );
+    }
 
-    case "COORDINATED_PRESS":
-      // Player-player contact + pass/shot by pressured team
+    case "COORDINATED_PRESS": {
+      const req = SITUATION_EVIDENCE_REQUIREMENTS[situationId];
       return (
         event.kind === "player-player-contact" ||
         event.kind === "pass" ||
         event.kind === "shot" ||
-        event.kind === "input-rejection"
+        event.kind === "input-rejection" ||
+        req.indicative_event_kinds.includes(event.kind)
       );
+    }
 
     default:
       return false;

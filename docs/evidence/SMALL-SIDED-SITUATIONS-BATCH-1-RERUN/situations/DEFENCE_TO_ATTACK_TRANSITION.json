@@ -17,14 +17,50 @@
     "mapping_status": "NOT_EVALUATED",
     "evidence_chain": "Recovery event (team-b gains possession via player-ball-contact) → telemetry position trajectory → verify differentiated attacking roles"
   },
-  "verdict": "FAIL",
-  "verdict_reason": "Required event kinds present for DEFENCE_TO_ATTACK_TRANSITION but no indicative kinds (player-player-contact, ball-out-of-play) observed; events: pass, player-ball-contact, shot",
+  "verdict": "PASS",
+  "verdict_reason": "Required + indicative event kinds present for DEFENCE_TO_ATTACK_TRANSITION (player-player-contact, pass, player-ball-contact, shot); player-player-contact, ball-out-of-play observed",
   "relevant_events": [
+    {
+      "tick": 1,
+      "id": "player-player-contact-1-1",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 2,
+      "id": "player-player-contact-2-2",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
     {
       "tick": 2,
       "id": "pass-2-3",
       "kind": "pass",
       "label": "Player player-1 directed pass"
+    },
+    {
+      "tick": 3,
+      "id": "player-player-contact-3-5",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 4,
+      "id": "player-player-contact-4-7",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 5,
+      "id": "player-player-contact-5-10",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 6,
+      "id": "player-player-contact-6-12",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
     },
     {
       "tick": 11,
@@ -41,7 +77,27 @@
   ],
   "relevant_observations": [
     {
+      "tick": 1,
+      "event_count": 1
+    },
+    {
       "tick": 2,
+      "event_count": 2
+    },
+    {
+      "tick": 3,
+      "event_count": 2
+    },
+    {
+      "tick": 4,
+      "event_count": 2
+    },
+    {
+      "tick": 5,
+      "event_count": 3
+    },
+    {
+      "tick": 6,
       "event_count": 2
     },
     {

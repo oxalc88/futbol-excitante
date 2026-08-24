@@ -11,17 +11,17 @@
  *  2. Each artifact's verdict and relevant_event_count match the index.
  *  3. A fresh run to a temp directory produces byte-identical artifacts.
  *  4. Honest verdicts match expectations:
- *     - PASS_RECEPTION: FAIL (required present, indicative second-touch NOT in relevantEvents
- *       because isRelevantEvent does not include second-touch for this situation)
+ *     - PASS_RECEPTION: PASS (required + indicative second-touch present)
  *     - SHOT_TO_RESULT: FAIL (shot present, pitch-contact absent)
  *     - PHYSICAL_DUEL: FAIL (player-player-contact present, input-rejection absent)
- *     - SUPPORT_AND_PASSING_LANES: FAIL (required present, indicative absent)
+ *     - SUPPORT_AND_PASSING_LANES: PASS (required + indicative second-touch present)
  *     - SETTLED_ATTACK_VS_DEFENCE: PASS (all required + indicative shot)
- *     - ATTACK_TO_DEFENCE_TRANSITION: FAIL (pass+shot present, indicative absent)
- *     - DEFENCE_TO_ATTACK_TRANSITION: FAIL (player-ball-contact+shot present, indicative absent)
- *     - COORDINATED_PRESS: FAIL (required present, indicative absent)
- *  5. Extended fixture produces second-touch events (all_events) but
- *     evaluator relevance filter does not include them for PASS_RECEPTION.
+ *     - ATTACK_TO_DEFENCE_TRANSITION: PASS (required + indicative present)
+ *     - DEFENCE_TO_ATTACK_TRANSITION: PASS (required + indicative present)
+ *     - COORDINATED_PRESS: PASS (required + indicative present)
+ *  5. Extended fixture produces second-touch events that now appear in
+ *     relevant_events for PASS_RECEPTION and SUPPORT_AND_PASSING_LANES
+ *     (isRelevantEvent now includes indicative_event_kinds).
  *
  * Node I/O is allowed.
  */
@@ -64,14 +64,14 @@ const BATCH_3_TARGETS = [
 
 /** Expected verdicts for the extended situation-driven fixture */
 const EXPECTED_VERDICTS: Record<string, "PASS" | "FAIL" | "NOT_EVALUATED"> = {
-  PASS_RECEPTION: "FAIL",
+  PASS_RECEPTION: "PASS",
   SHOT_TO_RESULT: "FAIL",
   PHYSICAL_DUEL: "FAIL",
-  SUPPORT_AND_PASSING_LANES: "FAIL",
+  SUPPORT_AND_PASSING_LANES: "PASS",
   SETTLED_ATTACK_VS_DEFENCE: "PASS",
-  ATTACK_TO_DEFENCE_TRANSITION: "FAIL",
-  DEFENCE_TO_ATTACK_TRANSITION: "FAIL",
-  COORDINATED_PRESS: "FAIL",
+  ATTACK_TO_DEFENCE_TRANSITION: "PASS",
+  DEFENCE_TO_ATTACK_TRANSITION: "PASS",
+  COORDINATED_PRESS: "PASS",
 };
 
 // ---------------------------------------------------------------------------
@@ -370,7 +370,7 @@ describe("BATCH-3 binding: index metadata", () => {
 // ---------------------------------------------------------------------------
 
 describe("BATCH-3 binding: extended fixture event kinds", () => {
-  it("PASS_RECEPTION: all_events include second-touch but relevant_events does not", () => {
+  it("PASS_RECEPTION: all_events and relevant_events both include second-touch", () => {
     const artifact = JSON.parse(
       readFileSync(join(BATCH_3_DIR, "PASS_RECEPTION.json"), "utf-8"),
     ) as SituationEvidenceArtifact;
@@ -379,10 +379,10 @@ describe("BATCH-3 binding: extended fixture event kinds", () => {
     expect(allKinds.has("second-touch")).toBe(true);
 
     const relevantKinds = new Set(artifact.relevant_events.map((e) => e.kind));
-    expect(relevantKinds.has("second-touch")).toBe(false);
+    expect(relevantKinds.has("second-touch")).toBe(true);
   });
 
-  it("SUPPORT_AND_PASSING_LANES: all_events include second-touch but relevant_events does not", () => {
+  it("SUPPORT_AND_PASSING_LANES: all_events and relevant_events both include second-touch", () => {
     const artifact = JSON.parse(
       readFileSync(join(BATCH_3_DIR, "SUPPORT_AND_PASSING_LANES.json"), "utf-8"),
     ) as SituationEvidenceArtifact;
@@ -391,48 +391,50 @@ describe("BATCH-3 binding: extended fixture event kinds", () => {
     expect(allKinds.has("second-touch")).toBe(true);
 
     const relevantKinds = new Set(artifact.relevant_events.map((e) => e.kind));
-    expect(relevantKinds.has("second-touch")).toBe(false);
+    expect(relevantKinds.has("second-touch")).toBe(true);
   });
 
-  it("PASS_RECEPTION: relevant events have pass + player-ball-contact", () => {
+  it("PASS_RECEPTION: relevant events have pass, player-ball-contact, second-touch", () => {
     const artifact = JSON.parse(
       readFileSync(join(BATCH_3_DIR, "PASS_RECEPTION.json"), "utf-8"),
     ) as SituationEvidenceArtifact;
 
-    expect(artifact.verdict).toBe("FAIL");
+    expect(artifact.verdict).toBe("PASS");
     const eventKinds = new Set(artifact.relevant_events.map((e) => e.kind));
     expect(eventKinds.has("pass")).toBe(true);
     expect(eventKinds.has("player-ball-contact")).toBe(true);
+    expect(eventKinds.has("second-touch")).toBe(true);
   });
 
-  it("DEFENCE_TO_ATTACK_TRANSITION: relevant events include pass, player-ball-contact, shot", () => {
+  it("DEFENCE_TO_ATTACK_TRANSITION: relevant events include indicative kinds present", () => {
     const artifact = JSON.parse(
       readFileSync(join(BATCH_3_DIR, "DEFENCE_TO_ATTACK_TRANSITION.json"), "utf-8"),
     ) as SituationEvidenceArtifact;
 
-    expect(artifact.verdict).toBe("FAIL");
+    expect(artifact.verdict).toBe("PASS");
     const eventKinds = new Set(artifact.relevant_events.map((e) => e.kind));
     expect(eventKinds.has("player-ball-contact")).toBe(true);
     expect(eventKinds.has("shot")).toBe(true);
-    // Indicative: player-player-contact, ball-out-of-play — neither in relevant
-    expect(eventKinds.has("player-player-contact")).toBe(false);
+    expect(eventKinds.has("player-player-contact")).toBe(true);
+    // ball-out-of-play is indicative but not present in this fixture
     expect(eventKinds.has("ball-out-of-play")).toBe(false);
   });
 
-  it("COORDINATED_PRESS: required present but input-rejection (required) and player-ball-contact (indicative) absent", () => {
+  it("COORDINATED_PRESS: required present and indicative player-ball-contact included in relevant", () => {
     const artifact = JSON.parse(
       readFileSync(join(BATCH_3_DIR, "COORDINATED_PRESS.json"), "utf-8"),
     ) as SituationEvidenceArtifact;
 
-    expect(artifact.verdict).toBe("FAIL");
+    expect(artifact.verdict).toBe("PASS");
     const eventKinds = new Set(artifact.relevant_events.map((e) => e.kind));
-    // Required kinds for COORDINATED_PRESS: [player-player-contact, input-rejection, pass, shot]
+    // Required kinds: player-player-contact, input-rejection, pass, shot
     expect(eventKinds.has("player-player-contact")).toBe(true);
-    // input-rejection is a REQUIRED kind — its absence means required is not fully satisfied
-    // but hasRequired is true because at least one required kind present
+    expect(eventKinds.has("pass")).toBe(true);
+    expect(eventKinds.has("shot")).toBe(true);
+    // input-rejection is a REQUIRED kind but not present in this fixture
     expect(eventKinds.has("input-rejection")).toBe(false);
-    // Indicative: player-ball-contact
-    expect(eventKinds.has("player-ball-contact")).toBe(false);
+    // Indicative: player-ball-contact — now included in relevant
+    expect(eventKinds.has("player-ball-contact")).toBe(true);
   });
 });
 
