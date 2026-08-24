@@ -1,0 +1,7578 @@
+{
+  "situation_id": "SHOT_TO_RESULT",
+  "evidence_requirement": {
+    "situation_id": "SHOT_TO_RESULT",
+    "required_event_kinds": [
+      "shot",
+      "goal",
+      "ball-out-of-play"
+    ],
+    "indicative_event_kinds": [
+      "pitch-contact"
+    ],
+    "requires_position_data": true,
+    "requires_team_geometry": false,
+    "mapping_status": "NOT_EVALUATED",
+    "evidence_chain": "shot event → ball trajectory (telemetry) → goal or ball-out-of-play event within finite ticks"
+  },
+  "verdict": "PASS",
+  "verdict_reason": "Required + indicative event kinds present for SHOT_TO_RESULT (pitch-contact, shot); pitch-contact observed",
+  "relevant_events": [
+    {
+      "tick": 18,
+      "id": "ball-pitch-contact-18-19",
+      "kind": "pitch-contact",
+      "label": "Ball pitch contact"
+    },
+    {
+      "tick": 21,
+      "id": "shot-21-23",
+      "kind": "shot",
+      "label": "Player player-2 directed shot"
+    },
+    {
+      "tick": 47,
+      "id": "ball-pitch-contact-47-55",
+      "kind": "pitch-contact",
+      "label": "Ball pitch contact"
+    }
+  ],
+  "relevant_observations": [
+    {
+      "tick": 18,
+      "event_count": 2
+    },
+    {
+      "tick": 21,
+      "event_count": 2
+    },
+    {
+      "tick": 47,
+      "event_count": 2
+    }
+  ],
+  "team_geometry": [
+    {
+      "tick": 1,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.05
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.35
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 2,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.07500000000000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 3,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.08750000000000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 4,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09375
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.096875
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.396875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 6,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09843750000000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3984375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 7,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09921875000000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39921875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 8,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.099609375
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.399609375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 9,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.0998046875
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3998046875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09990234375000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39990234375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 11,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09995117187500001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.399951171875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 12,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.0999755859375
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999755859375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 13,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09998779296875
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39998779296875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 14,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999389648437501
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.399993896484375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999694824218751
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999969482421875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 16,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999847412109375
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999847412109374
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 17,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999923706054688
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999923706054685
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 18,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999961853027345
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999961853027344
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 19,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999980926513673
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999980926513673
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999990463256836
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999990463256835
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 21,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999995231628418
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.49666666666666665,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999995231628416
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 22,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.0999999761581421
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.49,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999761581421
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 23,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999998807907105
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.48,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999998807907106
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 24,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999403953552
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.4666666666666667,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999940395355
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 25,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999701976776
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.4575,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999701976774
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 26,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999850988389
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.4525,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999985098839
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 27,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999925494195
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999925494195
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 28,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999962747097
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999962747096
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 29,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999981373549
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999981373546
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 30,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999990686775
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999990686774
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 31,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999995343388
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999534339
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 32,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999997671694
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999767169
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 33,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999998835847
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999998835845
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 34,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999417925
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999417923
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 35,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999708963
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999708963
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 36,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999854481
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999985448
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 37,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999927241
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999992724
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 38,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999963621
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999996362
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 39,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999981811
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999998181
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999990905
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999990904
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 41,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999995453
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999545
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 42,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999997727
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999997726
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 43,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999998864
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999998864
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 44,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999432
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999943
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 45,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999716
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999714
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 46,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999859
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999986
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 47,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.0999999999999993
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999993
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 48,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999964
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999963
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 49,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999983
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999998
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 50,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999992
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999999
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 51,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999996
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 52,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999998
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 53,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999999
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 54,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 55,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 56,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 57,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 58,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 59,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ]
+    }
+  ],
+  "all_events": [
+    {
+      "tick": 1,
+      "id": "player-player-contact-1-1",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 2,
+      "id": "player-player-contact-2-2",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 3,
+      "id": "player-player-contact-3-3",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 4,
+      "id": "player-player-contact-4-4",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 5,
+      "id": "player-player-contact-5-5",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 6,
+      "id": "player-player-contact-6-6",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 7,
+      "id": "player-player-contact-7-7",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 8,
+      "id": "player-player-contact-8-8",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 9,
+      "id": "player-player-contact-9-9",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 10,
+      "id": "player-player-contact-10-10",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 11,
+      "id": "player-player-contact-11-11",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 12,
+      "id": "player-player-contact-12-12",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 13,
+      "id": "player-player-contact-13-13",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 14,
+      "id": "player-player-contact-14-14",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 15,
+      "id": "player-player-contact-15-15",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 16,
+      "id": "player-player-contact-16-16",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 17,
+      "id": "player-player-contact-17-17",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 18,
+      "id": "player-player-contact-18-18",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 18,
+      "id": "ball-pitch-contact-18-19",
+      "kind": "pitch-contact",
+      "label": "Ball pitch contact"
+    },
+    {
+      "tick": 19,
+      "id": "player-player-contact-19-20",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 20,
+      "id": "player-player-contact-20-21",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 21,
+      "id": "player-player-contact-21-22",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 21,
+      "id": "shot-21-23",
+      "kind": "shot",
+      "label": "Player player-2 directed shot"
+    },
+    {
+      "tick": 22,
+      "id": "input-fallback-slot-2-REPEAT_HELD_WITH_ZERO_EDGES",
+      "kind": "scheduler",
+      "label": "Slot slot-2: REPEAT_HELD_WITH_ZERO_EDGES (count 1/3)"
+    },
+    {
+      "tick": 22,
+      "id": "player-player-contact-22-25",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 23,
+      "id": "input-fallback-slot-2-REPEAT_HELD_WITH_ZERO_EDGES",
+      "kind": "scheduler",
+      "label": "Slot slot-2: REPEAT_HELD_WITH_ZERO_EDGES (count 2/3)"
+    },
+    {
+      "tick": 23,
+      "id": "player-player-contact-23-27",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 24,
+      "id": "input-fallback-slot-2-REPEAT_HELD_WITH_ZERO_EDGES",
+      "kind": "scheduler",
+      "label": "Slot slot-2: REPEAT_HELD_WITH_ZERO_EDGES (count 3/3)"
+    },
+    {
+      "tick": 24,
+      "id": "input-neutral-fallback-slot-2",
+      "kind": "scheduler",
+      "label": "Slot slot-2: exceeded max consecutive missing → neutral"
+    },
+    {
+      "tick": 24,
+      "id": "player-player-contact-24-30",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 25,
+      "id": "input-neutral-fallback-slot-2",
+      "kind": "scheduler",
+      "label": "Slot slot-2: exceeded max consecutive missing → neutral"
+    },
+    {
+      "tick": 25,
+      "id": "player-player-contact-25-32",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 26,
+      "id": "player-player-contact-26-33",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 27,
+      "id": "player-player-contact-27-34",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 28,
+      "id": "player-player-contact-28-35",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 29,
+      "id": "player-player-contact-29-36",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 30,
+      "id": "player-player-contact-30-37",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 31,
+      "id": "player-player-contact-31-38",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 32,
+      "id": "player-player-contact-32-39",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 33,
+      "id": "player-player-contact-33-40",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 34,
+      "id": "player-player-contact-34-41",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 35,
+      "id": "player-player-contact-35-42",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 36,
+      "id": "player-player-contact-36-43",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 37,
+      "id": "player-player-contact-37-44",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 38,
+      "id": "player-player-contact-38-45",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 39,
+      "id": "player-player-contact-39-46",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 40,
+      "id": "player-player-contact-40-47",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 41,
+      "id": "player-player-contact-41-48",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 42,
+      "id": "player-player-contact-42-49",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 43,
+      "id": "player-player-contact-43-50",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 44,
+      "id": "player-player-contact-44-51",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 45,
+      "id": "player-player-contact-45-52",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 46,
+      "id": "player-player-contact-46-53",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 47,
+      "id": "player-player-contact-47-54",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 47,
+      "id": "ball-pitch-contact-47-55",
+      "kind": "pitch-contact",
+      "label": "Ball pitch contact"
+    },
+    {
+      "tick": 48,
+      "id": "player-player-contact-48-56",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 49,
+      "id": "player-player-contact-49-57",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 50,
+      "id": "player-player-contact-50-58",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 51,
+      "id": "player-player-contact-51-59",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 52,
+      "id": "player-player-contact-52-60",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 53,
+      "id": "player-player-contact-53-61",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    },
+    {
+      "tick": 54,
+      "id": "player-player-contact-54-62",
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-5"
+    }
+  ],
+  "all_observations": [
+    {
+      "tick": 1,
+      "event_count": 1
+    },
+    {
+      "tick": 2,
+      "event_count": 1
+    },
+    {
+      "tick": 3,
+      "event_count": 1
+    },
+    {
+      "tick": 4,
+      "event_count": 1
+    },
+    {
+      "tick": 5,
+      "event_count": 1
+    },
+    {
+      "tick": 6,
+      "event_count": 1
+    },
+    {
+      "tick": 7,
+      "event_count": 1
+    },
+    {
+      "tick": 8,
+      "event_count": 1
+    },
+    {
+      "tick": 9,
+      "event_count": 1
+    },
+    {
+      "tick": 10,
+      "event_count": 1
+    },
+    {
+      "tick": 11,
+      "event_count": 1
+    },
+    {
+      "tick": 12,
+      "event_count": 1
+    },
+    {
+      "tick": 13,
+      "event_count": 1
+    },
+    {
+      "tick": 14,
+      "event_count": 1
+    },
+    {
+      "tick": 15,
+      "event_count": 1
+    },
+    {
+      "tick": 16,
+      "event_count": 1
+    },
+    {
+      "tick": 17,
+      "event_count": 1
+    },
+    {
+      "tick": 18,
+      "event_count": 2
+    },
+    {
+      "tick": 19,
+      "event_count": 1
+    },
+    {
+      "tick": 20,
+      "event_count": 1
+    },
+    {
+      "tick": 21,
+      "event_count": 2
+    },
+    {
+      "tick": 22,
+      "event_count": 2
+    },
+    {
+      "tick": 23,
+      "event_count": 2
+    },
+    {
+      "tick": 24,
+      "event_count": 3
+    },
+    {
+      "tick": 25,
+      "event_count": 2
+    },
+    {
+      "tick": 26,
+      "event_count": 1
+    },
+    {
+      "tick": 27,
+      "event_count": 1
+    },
+    {
+      "tick": 28,
+      "event_count": 1
+    },
+    {
+      "tick": 29,
+      "event_count": 1
+    },
+    {
+      "tick": 30,
+      "event_count": 1
+    },
+    {
+      "tick": 31,
+      "event_count": 1
+    },
+    {
+      "tick": 32,
+      "event_count": 1
+    },
+    {
+      "tick": 33,
+      "event_count": 1
+    },
+    {
+      "tick": 34,
+      "event_count": 1
+    },
+    {
+      "tick": 35,
+      "event_count": 1
+    },
+    {
+      "tick": 36,
+      "event_count": 1
+    },
+    {
+      "tick": 37,
+      "event_count": 1
+    },
+    {
+      "tick": 38,
+      "event_count": 1
+    },
+    {
+      "tick": 39,
+      "event_count": 1
+    },
+    {
+      "tick": 40,
+      "event_count": 1
+    },
+    {
+      "tick": 41,
+      "event_count": 1
+    },
+    {
+      "tick": 42,
+      "event_count": 1
+    },
+    {
+      "tick": 43,
+      "event_count": 1
+    },
+    {
+      "tick": 44,
+      "event_count": 1
+    },
+    {
+      "tick": 45,
+      "event_count": 1
+    },
+    {
+      "tick": 46,
+      "event_count": 1
+    },
+    {
+      "tick": 47,
+      "event_count": 2
+    },
+    {
+      "tick": 48,
+      "event_count": 1
+    },
+    {
+      "tick": 49,
+      "event_count": 1
+    },
+    {
+      "tick": 50,
+      "event_count": 1
+    },
+    {
+      "tick": 51,
+      "event_count": 1
+    },
+    {
+      "tick": 52,
+      "event_count": 1
+    },
+    {
+      "tick": 53,
+      "event_count": 1
+    },
+    {
+      "tick": 54,
+      "event_count": 1
+    },
+    {
+      "tick": 55,
+      "event_count": 0
+    },
+    {
+      "tick": 56,
+      "event_count": 0
+    },
+    {
+      "tick": 57,
+      "event_count": 0
+    },
+    {
+      "tick": 58,
+      "event_count": 0
+    },
+    {
+      "tick": 59,
+      "event_count": 0
+    },
+    {
+      "tick": 60,
+      "event_count": 0
+    }
+  ],
+  "trajectory": [
+    {
+      "tick": 1,
+      "hash": "fnv1a64-v1:08f9ba189c755457",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.05
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.35
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.9139431009722223
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 2,
+      "hash": "fnv1a64-v1:b337bb1595d4abe3",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.07500000000000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.8251626816427617
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 3,
+      "hash": "fnv1a64-v1:2f6f3374ef20780a",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.08750000000000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.7336587874036233
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 4,
+      "hash": "fnv1a64-v1:c07e7de4316408ff",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09375
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.6394314636460554
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 5,
+      "hash": "fnv1a64-v1:13eb53c58d65fe63",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.096875
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.396875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.5424807557605502
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 6,
+      "hash": "fnv1a64-v1:f7f1753c4fbbaff7",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09843750000000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3984375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.442806709136843
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 7,
+      "hash": "fnv1a64-v1:c7ca5f97d3d17828",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09921875000000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39921875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.340409369163913
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 8,
+      "hash": "fnv1a64-v1:f3546d25ed83c1c3",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.099609375
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.399609375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.2352887812299824
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 9,
+      "hash": "fnv1a64-v1:967c8ee9116beebe",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.0998046875
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3998046875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.1274449907225175
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 10,
+      "hash": "fnv1a64-v1:b36e0da9cf68c30c",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09990234375000001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39990234375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 1.0168780430282276
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 11,
+      "hash": "fnv1a64-v1:e744b937b1c32466",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09995117187500001
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.399951171875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.903587983533066
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 12,
+      "hash": "fnv1a64-v1:61c75d31e97bccbb",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.0999755859375
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999755859375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.7875748576222293
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 13,
+      "hash": "fnv1a64-v1:7d902ab6da89f01b",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09998779296875
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39998779296875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.6688387106801579
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 14,
+      "hash": "fnv1a64-v1:2530430992e0a91e",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999389648437501
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.399993896484375
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.5473795880905354
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 15,
+      "hash": "fnv1a64-v1:613eadfd3dae11db",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999694824218751
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999969482421875
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.4231975352362895
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 16,
+      "hash": "fnv1a64-v1:7bc9855137937b89",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999847412109375
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999847412109374
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.29629259749959114
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 17,
+      "hash": "fnv1a64-v1:35062d30fb365946",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999923706054688
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999923706054685
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.16666482026185506
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 18,
+      "hash": "fnv1a64-v1:8d6047f2787df561",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999961853027345
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999961853027344
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.19236280374261872
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 19,
+      "hash": "fnv1a64-v1:70619e9d6b056957",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999980926513673
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999980926513673
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.2608704838202158
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 20,
+      "hash": "fnv1a64-v1:fa341b3293a81ae4",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999990463256836
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.5,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999990463256835
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.5,
+          "y": 0,
+          "z": 0.32665206751981163
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 21,
+      "hash": "fnv1a64-v1:ef4f9d86553d9ead",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999995231628418
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.49666666666666665,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999995231628416
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.3000033333333333,
+          "y": 0,
+          "z": 0.3539266129364783
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 22,
+      "hash": "fnv1a64-v1:e70a42ef828b6c80",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.0999999761581421
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.49,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999761581421
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": -0.10000999994444437,
+          "y": 0,
+          "z": 0.3784757491940547
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 23,
+      "hash": "fnv1a64-v1:5f3166ee423a7a17",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999998807907105
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.48,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999998807907106
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 0.0999800002222214,
+          "y": 0,
+          "z": 0.4002995217160268
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 24,
+      "hash": "fnv1a64-v1:421fa68ec1425dec",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999403953552
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.4666666666666667,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999940395355
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 0.29996666722221765,
+          "y": 0,
+          "z": 0.4193979759251235
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 25,
+      "hash": "fnv1a64-v1:78ee4eab6dddd4ac",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999701976776
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.4575,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999701976774
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 0.4999500011110973,
+          "y": 0,
+          "z": 0.4357711572433168
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 26,
+      "hash": "fnv1a64-v1:3a293b5978b2a089",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999850988389
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.4525,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999985098839
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 0.6999300019444121,
+          "y": 0,
+          "z": 0.44941911109182137
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 27,
+      "hash": "fnv1a64-v1:8caab830f4f5f400",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999925494195
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999925494195
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 0.899906669777713,
+          "y": 0,
+          "z": 0.4603418828910952
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 28,
+      "hash": "fnv1a64-v1:8c9ac2a5f4872edb",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999962747097
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999962747096
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 1.09988000466655,
+          "y": 0,
+          "z": 0.468539518060839
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 29,
+      "hash": "fnv1a64-v1:541c926fed500f91",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999981373549
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999981373546
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 1.2998500066664722,
+          "y": 0,
+          "z": 0.4740120620199966
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 30,
+      "hash": "fnv1a64-v1:2aead28912826644",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999990686775
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999990686774
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 1.4998166758330278,
+          "y": 0,
+          "z": 0.47675956018675497
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 31,
+      "hash": "fnv1a64-v1:7269b7a757ebb5c7",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999995343388
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999534339
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 1.699780012221764,
+          "y": 0,
+          "z": 0.47678205797854384
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 32,
+      "hash": "fnv1a64-v1:8903cffba9718df9",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999997671694
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999767169
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 1.899740015888227,
+          "y": 0,
+          "z": 0.4740796008120362
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 33,
+      "hash": "fnv1a64-v1:9ed9a2fb0d88cf13",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999998835847
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999998835845
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 2.0996966868879623,
+          "y": 0,
+          "z": 0.468652234103148
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 34,
+      "hash": "fnv1a64-v1:dabf7fa97798dceb",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999417925
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999417923
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 2.299650025276514,
+          "y": 0,
+          "z": 0.46050000326703827
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 35,
+      "hash": "fnv1a64-v1:50b03a33ccbf26ce",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999708963
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999708963
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 2.499600031109426,
+          "y": 0,
+          "z": 0.4496229537181091
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 36,
+      "hash": "fnv1a64-v1:c9c264f8636df349",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999854481
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999985448
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 2.699546704442241,
+          "y": 0,
+          "z": 0.4360211308700058
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 37,
+      "hash": "fnv1a64-v1:d6d191f2a7784561",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999927241
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999992724
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 2.8994900453305004,
+          "y": 0,
+          "z": 0.41969458013561667
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 38,
+      "hash": "fnv1a64-v1:fb302ba61b5be7a8",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999963621
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999996362
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 3.099430053829745,
+          "y": 0,
+          "z": 0.40064334692707304
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 39,
+      "hash": "fnv1a64-v1:ba2f801520ad68bf",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999981811
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999998181
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 3.2993667299955147,
+          "y": 0,
+          "z": 0.3788674766557496
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 40,
+      "hash": "fnv1a64-v1:c229cc3fa5d13b9a",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999990905
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999990904
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 3.499300073883348,
+          "y": 0,
+          "z": 0.354367014732264
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 41,
+      "hash": "fnv1a64-v1:85de982855bf4cde",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999995453
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999545
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 3.6992300855487836,
+          "y": 0,
+          "z": 0.32714200656647713
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 42,
+      "hash": "fnv1a64-v1:0c0a02713adba134",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999997727
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999997726
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 3.899156765047358,
+          "y": 0,
+          "z": 0.297192497567493
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 43,
+      "hash": "fnv1a64-v1:54ae686344ef49ad",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999998864
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999998864
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 4.099080112434607,
+          "y": 0,
+          "z": 0.26451853314365886
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 44,
+      "hash": "fnv1a64-v1:98a0c5b5ed52b39b",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999432
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999943
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 4.2990001277660665,
+          "y": 0,
+          "z": 0.22912015870256514
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 45,
+      "hash": "fnv1a64-v1:216cd31aecef05a2",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999716
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999714
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 4.498916811097271,
+          "y": 0,
+          "z": 0.1909974196510454
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 46,
+      "hash": "fnv1a64-v1:43d9a5d7f41b42fd",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999859
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999986
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 4.698830162483753,
+          "y": 0,
+          "z": 0.15015036139517657
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 47,
+      "hash": "fnv1a64-v1:fdf1bf641e0f7033",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.0999999999999993
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999993
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 4.913808116580577,
+          "y": 0,
+          "z": 0.113746267055262
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 48,
+      "hash": "fnv1a64-v1:7d03018e4442a6a9",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999964
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999963
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 5.109716414130703,
+          "y": 0,
+          "z": 0.13477116684181292
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 49,
+      "hash": "fnv1a64-v1:10ab04a6e159afdd",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999983
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999998
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 5.305621446542537,
+          "y": 0,
+          "z": 0.15307076163003408
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 50,
+      "hash": "fnv1a64-v1:c180f918169a8eaa",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999992
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.3999999999999999
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 5.501523213870497,
+          "y": 0,
+          "z": 0.16864509684167545
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 51,
+      "hash": "fnv1a64-v1:eb3c81825a7509e7",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999996
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 5.697421716169002,
+          "y": 0,
+          "z": 0.18149421789772993
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 52,
+      "hash": "fnv1a64-v1:d18951992062d15b",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999998
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 5.8933169534924685,
+          "y": 0,
+          "z": 0.1916181702184335
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 53,
+      "hash": "fnv1a64-v1:ba3b284b4cc2bb42",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.09999999999999999
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 6.089208925895313,
+          "y": 0,
+          "z": 0.19901699922326505
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 54,
+      "hash": "fnv1a64-v1:c33f00254d4b87e3",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 6.28509763343195,
+          "y": 0,
+          "z": 0.20369075033094652
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 55,
+      "hash": "fnv1a64-v1:94da0ba0ab2d2932",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 6.480983076156796,
+          "y": 0,
+          "z": 0.20563946895944285
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 56,
+      "hash": "fnv1a64-v1:5571fe2250d6e733",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 6.676865254124262,
+          "y": 0,
+          "z": 0.20486320052596205
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 57,
+      "hash": "fnv1a64-v1:7eaff2495c798fe7",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 6.872744167388763,
+          "y": 0,
+          "z": 0.20136199044695513
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 58,
+      "hash": "fnv1a64-v1:147268c467d448c7",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 7.068619816004709,
+          "y": 0,
+          "z": 0.1951358841381162
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 59,
+      "hash": "fnv1a64-v1:1cd044ad71def74d",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 7.2644922000265115,
+          "y": 0,
+          "z": 0.1861849270143824
+        },
+        "regime": "airborne"
+      }
+    },
+    {
+      "tick": 60,
+      "hash": "fnv1a64-v1:790025136d23f334",
+      "players": [
+        {
+          "playerId": "player-1",
+          "teamId": "team-a",
+          "position": {
+            "x": -2,
+            "y": -0.1
+          }
+        },
+        {
+          "playerId": "player-2",
+          "teamId": "team-a",
+          "position": {
+            "x": -0.45166666666666666,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "playerId": "player-4",
+          "teamId": "team-b",
+          "position": {
+            "x": 0.5,
+            "y": 0.1
+          }
+        },
+        {
+          "playerId": "player-5",
+          "teamId": "team-b",
+          "position": {
+            "x": -2,
+            "y": 0.39999999999999997
+          }
+        },
+        {
+          "playerId": "player-6",
+          "teamId": "team-b",
+          "position": {
+            "x": 52,
+            "y": 0
+          }
+        }
+      ],
+      "ball": {
+        "position": {
+          "x": 7.46036131950858,
+          "y": 0,
+          "z": 0.17450916448993403
+        },
+        "regime": "airborne"
+      }
+    }
+  ],
+  "has_invariant_failures": true,
+  "total_ticks": 60,
+  "scenario_id": "3v3-situation-driven-shot-resolution-v1",
+  "source_fixture": "3v3-situation-driven-shot-resolution.v1.json"
+}
