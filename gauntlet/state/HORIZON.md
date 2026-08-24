@@ -4,12 +4,12 @@
 
 ```yaml
 horizon_version: 18
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "event-diversity-through-evaluator-fix"
 created_from_commit: 8393a8199a3107f26573e9a0d134687595d9b587
 created_at: 2026-08-23
 reason: "Horizon v17 milestone FAILED (7/8 FAIL) because second-touch events from extended fixtures are not recognized as indicative for PASS_RECEPTION / SUPPORT_AND_PASSING_LANES — the evaluator's isRelevantEvent() function does not include second-touch in the indicative_event_kinds. New horizon first fixes the evaluator mapping to include second-touch, then re-runs batch evidence and milestone."
-current_index: 2
+current_index: 3
 objectives:
   - id: EVALUATOR-ISRELEVANT-FIX
     status: accepted
@@ -22,7 +22,7 @@ objectives:
     builder: builder-structured
     prerequisite: EVALUATOR-ISRELEVANT-FIX
   - id: SMALL-SIDED-MILESTONE-RERUN-2
-    status: pending
+    status: accepted
     reason: "Re-run SMALL_SIDED_SHAPE milestone:evaluate with corrected batch evidence."
     builder: builder-structured
     prerequisite: SMALL-SIDED-SITUATIONS-BATCH-4
@@ -40,5 +40,6 @@ replan_if:
 
 ## Completed horizons
 
+Horizon v18 (event-diversity-through-evaluator-fix) — EXHAUSTED: 3/3 accepted. isRelevantEvent indicative fix applied; BATCH-4 evidence 6 PASS/2 FAIL; milestone FAIL honest (6/8 PASS); bundle generated.
 Horizon v17 (driven-fixture-event-extension) — EXHAUSTED: 3/3 accepted. Milestone FAILED (7/8 FAIL).
 Horizon v16 (driven-situations-and-small-sided-milestone) — EXHAUSTED: 5/5 accepted.

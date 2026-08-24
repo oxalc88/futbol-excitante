@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-24T20:36:36.802Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-MILESTONE-RERUN-2",
+  "candidate_commit": "5a9742c",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "verdict": "ACCEPT",
+    "model": "deepseek-v4-flash",
+    "agent": "critic"
+  },
+  "integration": {
+    "verdict": "ACCEPT",
+    "model": "deepseek-v4-flash",
+    "agent": "integration-reviewer"
+  },
+  "evidence_class": "HEADLESS",
+  "metrics": [
+    "milestone_verdict: FAIL (milestone_playtest_failed)",
+    "6/8 situations PASS after EVALUATOR-ISRELEVANT-FIX; SHOT_TO_RESULT/PHYSICAL_DUEL FAIL due to missing fixture events",
+    "103/103 milestone-contract tests pass"
+  ]
+}

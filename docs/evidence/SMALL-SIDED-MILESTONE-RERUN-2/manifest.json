@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SMALL-SIDED-MILESTONE-RERUN-2",
+  "accepted_at": "2026-08-24T20:36:36.802Z",
+  "candidate_commit": "5a9742c",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-MILESTONE-RERUN-2/audit.json",
+      "sha256": "4d173a36ed5cb03e86c27c57d5a42645058f31ffd268cf89636ca050cb3f5649",
+      "git_blob": "9955c1692245023713140938e9cf34ed96e4853b",
+      "candidate_commit": "5a9742c",
+      "bytes": 2687,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "milestone_verdict: FAIL (milestone_playtest_failed)",
+      "6/8 situations PASS after EVALUATOR-ISRELEVANT-FIX; SHOT_TO_RESULT/PHYSICAL_DUEL FAIL due to missing fixture events",
+      "103/103 milestone-contract tests pass"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "verdict": "ACCEPT",
+      "model": "deepseek-v4-flash",
+      "agent": "critic"
+    },
+    "integration": {
+      "verdict": "ACCEPT",
+      "model": "deepseek-v4-flash",
+      "agent": "integration-reviewer"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-24/2026-08-24T20-36-36-802Z-SMALL-SIDED-MILESTONE-RERUN-2-acceptance.json"
+}

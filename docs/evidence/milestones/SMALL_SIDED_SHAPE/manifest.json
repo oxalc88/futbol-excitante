@@ -1,0 +1,432 @@
+{
+  "schema_version": 2,
+  "record_type": "milestone_evidence_bundle",
+  "milestone_id": "SMALL_SIDED_SHAPE",
+  "generated_at": "2026-08-24T20:36:46.753Z",
+  "gameplay_situation_registry_version": "gameplay-situations-v1",
+  "applicable_gameplay_situations": [
+    {
+      "situation_id": "PASS_RECEPTION",
+      "label": "Pass to teammate and reception",
+      "required_capabilities": [
+        "BASIC_ACTIONS",
+        "FIRST_TOUCH",
+        "INDEPENDENT_BALL"
+      ],
+      "first_testable_milestone": "PLAYABLE_1V1",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": [
+        "pass_contact",
+        "free_ball_trajectory",
+        "receiver_contact",
+        "event_centered_sequence"
+      ],
+      "source_refs": [
+        "PASS-LOW-001",
+        "PASS-RUN-001",
+        "TOUCH-SLOW-001"
+      ]
+    },
+    {
+      "situation_id": "SHOT_TO_RESULT",
+      "label": "Shot, ball trajectory and result",
+      "required_capabilities": [
+        "BASIC_ACTIONS",
+        "INDEPENDENT_BALL"
+      ],
+      "first_testable_milestone": "PLAYABLE_1V1",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": [
+        "shot_contact",
+        "ball_trajectory",
+        "goal_or_non_goal_event",
+        "event_centered_sequence"
+      ],
+      "source_refs": [
+        "SHOT-PWR-001",
+        "SHOT-IND-001",
+        "SHOT-SWV-001"
+      ]
+    },
+    {
+      "situation_id": "PHYSICAL_DUEL",
+      "label": "Player contact, displacement and recovery",
+      "required_capabilities": [
+        "PLAYER_DUELS",
+        "LOCOMOTION",
+        "INDEPENDENT_BALL"
+      ],
+      "first_testable_milestone": "PLAYABLE_1V1",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": [
+        "approach_contact_recovery_state",
+        "event_centered_sequence"
+      ],
+      "source_refs": [
+        "PHY-SHLD-001",
+        "PHY-STR-001",
+        "PHY-BC-001",
+        "PHY-PC-001"
+      ]
+    },
+    {
+      "situation_id": "SUPPORT_AND_PASSING_LANES",
+      "label": "Teammate support without abandoning team structure",
+      "required_capabilities": [
+        "TEAM_TACTICS",
+        "SMALL_SIDED_CARDINALITY"
+      ],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": [
+        "team_positions_over_time",
+        "passing_lane_graph",
+        "support_event_sequence"
+      ],
+      "source_refs": [
+        "OFF-SUP-001",
+        "OFF-RUN-001"
+      ]
+    },
+    {
+      "situation_id": "SETTLED_ATTACK_VS_DEFENCE",
+      "label": "Attacking progression against preserved defensive shape",
+      "required_capabilities": [
+        "TEAM_TACTICS",
+        "SMALL_SIDED_CARDINALITY"
+      ],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": [
+        "world_space_team_geometry",
+        "role_assignments",
+        "semantic_frame_strip"
+      ],
+      "source_refs": [
+        "DEF-SHAPE-001",
+        "DEF-SHIFT-001",
+        "OFF-SUP-001"
+      ]
+    },
+    {
+      "situation_id": "ATTACK_TO_DEFENCE_TRANSITION",
+      "label": "Possession loss to defensive transition and recovered shape",
+      "required_capabilities": [
+        "TEAM_TACTICS",
+        "TRANSITION_PHASES",
+        "SMALL_SIDED_CARDINALITY"
+      ],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": [
+        "possession_loss_event",
+        "phase_events",
+        "team_geometry_trajectory",
+        "event_centered_sequence"
+      ],
+      "source_refs": [
+        "TRANS-AD-001",
+        "DEF-SHAPE-001"
+      ]
+    },
+    {
+      "situation_id": "DEFENCE_TO_ATTACK_TRANSITION",
+      "label": "Recovery to differentiated attacking/support roles",
+      "required_capabilities": [
+        "TEAM_TACTICS",
+        "TRANSITION_PHASES",
+        "SMALL_SIDED_CARDINALITY"
+      ],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": [
+        "recovery_event",
+        "phase_events",
+        "role_changes",
+        "event_centered_sequence"
+      ],
+      "source_refs": [
+        "TRANS-DA-001",
+        "OFF-RUN-001",
+        "OFF-SUP-001"
+      ]
+    },
+    {
+      "situation_id": "COORDINATED_PRESS",
+      "label": "Pressure with press and cover responsibilities",
+      "required_capabilities": [
+        "TEAM_TACTICS",
+        "TRANSITION_PHASES",
+        "SMALL_SIDED_CARDINALITY"
+      ],
+      "first_testable_milestone": "SMALL_SIDED_SHAPE",
+      "integrated_playtest_milestone": "SMALL_SIDED_SHAPE",
+      "final_match_required": true,
+      "evidence": [
+        "press_cover_assignments",
+        "team_geometry_trajectory",
+        "event_centered_sequence"
+      ],
+      "source_refs": [
+        "PRESS-001",
+        "PRESS-REC-001",
+        "TRANS-AD-001"
+      ]
+    }
+  ],
+  "playtest_plan": {
+    "schema_version": 1,
+    "playtest_plan_version": "small-sided-shape-playtest-v1",
+    "milestone_id": "SMALL_SIDED_SHAPE",
+    "status": "PLAN_ONLY",
+    "normative_profile": "milestone-small-sided-v1",
+    "required_situations": [
+      "PASS_RECEPTION",
+      "SHOT_TO_RESULT",
+      "PHYSICAL_DUEL",
+      "SUPPORT_AND_PASSING_LANES",
+      "SETTLED_ATTACK_VS_DEFENCE",
+      "ATTACK_TO_DEFENCE_TRANSITION",
+      "DEFENCE_TO_ATTACK_TRANSITION",
+      "COORDINATED_PRESS"
+    ],
+    "visual_readability_dimensions": [
+      "ball_readability_under_congestion",
+      "team_classification",
+      "facing_orientation",
+      "action_recognition",
+      "contact_comprehension",
+      "team_shape_readability",
+      "camera_readability",
+      "silhouette_stability"
+    ],
+    "current_repo_reference_objectives": [
+      "CPU-TEAM-DECISION-PROFILE",
+      "SCENARIO-3V3-FIXTURE",
+      "CPU-3V3-FORMATION",
+      "CPU-3V3-TEAMPLAY",
+      "MATCH-SET-PIECE",
+      "BROWSER-3V3-MATCH"
+    ],
+    "interpretation": "The listed 3v3 objectives are current implementation/evidence inputs. Their acceptance does not itself imply SMALL_SIDED_SHAPE PASS. The playtest must evaluate the required situations and normative profile prerequisites.",
+    "result_policy": "Do not write PASS into this plan. Milestone verdicts are derived evaluation artifacts."
+  },
+  "playtest_runs": [
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-22T06-35-35-721Z.json",
+      "generated_at": "2026-08-22T06:35:35.721Z",
+      "milestone_verdict": "NOT_EVALUATED"
+    },
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-22T09-26-59-205Z.json",
+      "generated_at": "2026-08-22T09:26:59.205Z",
+      "milestone_verdict": "NOT_EVALUATED"
+    },
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-22T11-45-57-745Z.json",
+      "generated_at": "2026-08-22T11:45:57.745Z",
+      "milestone_verdict": "NOT_EVALUATED"
+    },
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-22T12-56-17-758Z.json",
+      "generated_at": "2026-08-22T12:56:17.758Z",
+      "milestone_verdict": "NOT_EVALUATED"
+    },
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-22T15-32-43-682Z.json",
+      "generated_at": "2026-08-22T15:32:43.682Z",
+      "milestone_verdict": "NOT_EVALUATED"
+    },
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-22T17-15-00-772Z.json",
+      "generated_at": "2026-08-22T17:15:00.772Z",
+      "milestone_verdict": "NOT_EVALUATED"
+    },
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-23T05-37-07-685Z.json",
+      "generated_at": "2026-08-23T05:37:07.685Z",
+      "milestone_verdict": "NOT_EVALUATED"
+    },
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-23T09-30-35-228Z.json",
+      "generated_at": "2026-08-23T09:30:35.228Z",
+      "milestone_verdict": "FAIL"
+    },
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-23T11-53-23-415Z.json",
+      "generated_at": "2026-08-23T11:53:23.415Z",
+      "milestone_verdict": "FAIL"
+    },
+    {
+      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-24T20-27-15-138Z.json",
+      "generated_at": "2026-08-24T20:27:15.138Z",
+      "milestone_verdict": "FAIL"
+    }
+  ],
+  "latest_playtest_result": {
+    "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-24T20-27-15-138Z.json",
+    "result": {
+      "schema_version": 1,
+      "record_type": "milestone_playtest_result",
+      "milestone_id": "SMALL_SIDED_SHAPE",
+      "playtest_plan_version": "small-sided-shape-playtest-v1",
+      "generated_at": "2026-08-24T20:27:15.138Z",
+      "required_situations": [
+        "PASS_RECEPTION",
+        "SHOT_TO_RESULT",
+        "PHYSICAL_DUEL",
+        "SUPPORT_AND_PASSING_LANES",
+        "SETTLED_ATTACK_VS_DEFENCE",
+        "ATTACK_TO_DEFENCE_TRANSITION",
+        "DEFENCE_TO_ATTACK_TRANSITION",
+        "COORDINATED_PRESS"
+      ],
+      "situation_outcomes": {
+        "PASS_RECEPTION": "PASS",
+        "SHOT_TO_RESULT": "FAIL",
+        "PHYSICAL_DUEL": "FAIL",
+        "SUPPORT_AND_PASSING_LANES": "PASS",
+        "SETTLED_ATTACK_VS_DEFENCE": "PASS",
+        "ATTACK_TO_DEFENCE_TRANSITION": "PASS",
+        "DEFENCE_TO_ATTACK_TRANSITION": "PASS",
+        "COORDINATED_PRESS": "PASS"
+      },
+      "entry_prerequisites_pass": true,
+      "exit_prerequisites_pass": true,
+      "critic_verdict": "MISSING",
+      "evidence": {
+        "accumulated_horizon": "v17",
+        "batch_sources": [
+          "BATCH-4 (extended driven fixture 3v3-situation-driven-extended.v1.json after EVALUATOR-ISRELEVANT-FIX)"
+        ],
+        "entry_prerequisite_accepted": [
+          "PLAYABLE_1V1_PASS",
+          "TEAM_DECISION_PROFILE"
+        ],
+        "exit_prerequisite_accepted": [
+          "MUTANT_1V1_PASS",
+          "ARCHETYPE_BLINDED_COMPARISON"
+        ],
+        "browser_case": "BROWSER-SMALL-SIDED-001 materialized",
+        "remark": "BATCH-4 reports 6 PASS / 2 FAIL. SHOT_TO_RESULT and PHYSICAL_DUEL FAIL because the extended fixture lacks pitch-contact events and input-rejection logic — these are honest verdicts reflecting fixture event limitations, not implementation defects. EVALUATOR-ISRELEVANT-FIX corrected situation-mapping is applied."
+      },
+      "decision": "milestone_failed",
+      "milestone_verdict": "FAIL",
+      "failure_class": "milestone_playtest_failed"
+    }
+  },
+  "source_objectives": [
+    {
+      "objective_id": "EVALUATOR-ISRELEVANT-FIX",
+      "candidate_commit": "a93ce091294defecbd1651fda35b86fcb7ef1732",
+      "accepted_at": "2026-08-24T19:59:15.067Z",
+      "evidence_class": "HEADLESS",
+      "source_manifest": "docs/evidence/EVALUATOR-ISRELEVANT-FIX/manifest.json",
+      "copied": [
+        {
+          "kind": "audit",
+          "source": "docs/evidence/EVALUATOR-ISRELEVANT-FIX/audit.json",
+          "target": "EVALUATOR-ISRELEVANT-FIX-audit.json"
+        }
+      ],
+      "metrics": [
+        "5/5 eval test files pass (116 tests)",
+        "second-touch now recognized as indicative for PASS_RECEPTION and SUPPORT_AND_PASSING_LANES"
+      ],
+      "reviews": {
+        "deterministic_audit": {
+          "status": "PASS"
+        },
+        "semantic_audit": null,
+        "critic": {
+          "verdict": "ACCEPT",
+          "model": "deepseek-v4-flash",
+          "agent": "critic"
+        },
+        "integration": {
+          "verdict": "ACCEPT",
+          "model": "deepseek-v4-flash",
+          "agent": "integration-reviewer"
+        }
+      }
+    },
+    {
+      "objective_id": "SMALL-SIDED-SITUATIONS-BATCH-4",
+      "candidate_commit": "8708068",
+      "accepted_at": "2026-08-24T20:22:04.133Z",
+      "evidence_class": "HEADLESS",
+      "source_manifest": "docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-4/manifest.json",
+      "copied": [
+        {
+          "kind": "audit",
+          "source": "docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-4/audit.json",
+          "target": "SMALL-SIDED-SITUATIONS-BATCH-4-audit.json"
+        }
+      ],
+      "metrics": [
+        "6/6 eval test files pass (142 tests)",
+        "PASS_RECEPTION and SUPPORT_AND_PASSING_LANES now PASS with second-touch indicative",
+        "SHOT_TO_RESULT/PHYSICAL_DUEL remain honest FAIL (pitch-contact/input-rejection absent)"
+      ],
+      "reviews": {
+        "deterministic_audit": {
+          "status": "PASS"
+        },
+        "semantic_audit": null,
+        "critic": {
+          "verdict": "ACCEPT",
+          "model": "deepseek-v4-flash",
+          "agent": "critic"
+        },
+        "integration": {
+          "verdict": "ACCEPT",
+          "model": "deepseek-v4-flash",
+          "agent": "integration-reviewer"
+        }
+      }
+    },
+    {
+      "objective_id": "SMALL-SIDED-MILESTONE-RERUN-2",
+      "candidate_commit": "5a9742c",
+      "accepted_at": "2026-08-24T20:36:36.802Z",
+      "evidence_class": "HEADLESS",
+      "source_manifest": "docs/evidence/SMALL-SIDED-MILESTONE-RERUN-2/manifest.json",
+      "copied": [
+        {
+          "kind": "audit",
+          "source": "docs/evidence/SMALL-SIDED-MILESTONE-RERUN-2/audit.json",
+          "target": "SMALL-SIDED-MILESTONE-RERUN-2-audit.json"
+        }
+      ],
+      "metrics": [
+        "milestone_verdict: FAIL (milestone_playtest_failed)",
+        "6/8 situations PASS after EVALUATOR-ISRELEVANT-FIX; SHOT_TO_RESULT/PHYSICAL_DUEL FAIL due to missing fixture events",
+        "103/103 milestone-contract tests pass"
+      ],
+      "reviews": {
+        "deterministic_audit": {
+          "status": "PASS"
+        },
+        "semantic_audit": null,
+        "critic": {
+          "verdict": "ACCEPT",
+          "model": "deepseek-v4-flash",
+          "agent": "critic"
+        },
+        "integration": {
+          "verdict": "ACCEPT",
+          "model": "deepseek-v4-flash",
+          "agent": "integration-reviewer"
+        }
+      }
+    }
+  ],
+  "preservation_policy": "source objective evidence and playtest runs are immutable; bundle files are derived copies and this bundle is write-once"
+}

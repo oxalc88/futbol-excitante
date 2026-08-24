@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-24T20:25:00Z
+measured_at: 2026-08-24T20:40:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-SITUATIONS-BATCH-4
-usage_aggregates_through: SMALL-SIDED-SITUATIONS-BATCH-4
-clock_aggregates_through: SMALL-SIDED-SITUATIONS-BATCH-4
-model_evaluation_through: SMALL-SIDED-SITUATIONS-BATCH-4
+last_tracked_objective: SMALL-SIDED-MILESTONE-RERUN-2
+usage_aggregates_through: SMALL-SIDED-MILESTONE-RERUN-2
+clock_aggregates_through: SMALL-SIDED-MILESTONE-RERUN-2
+model_evaluation_through: SMALL-SIDED-MILESTONE-RERUN-2
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -48,7 +48,7 @@ style meter is the live context window, not session cost.
 | Sum of per-step agent time | 35h 52m |
 | Orchestrator thinking between steps | ~12h 48m |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-24T20:25:01Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-24T20:40:01Z`.
 The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
 "orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
 bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
@@ -196,6 +196,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-MILESTONE-RERUN | accepted | 10m | 1.1m | 2.5m | 0.2m | 0.2m | n/a | n/a |
 | EVALUATOR-ISRELEVANT-FIX | accepted | 15m | 8m | 4m | 2m | 0.4m | n/a | n/a |
 | SMALL-SIDED-SITUATIONS-BATCH-4 | accepted | 12m | 4m | 3m | 2m | 0.4m | n/a | n/a |
+| SMALL-SIDED-MILESTONE-RERUN-2 | accepted | 11m | 3m | 2m | 2m | 0.4m | n/a | n/a |
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -467,6 +468,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-MILESTONE-RERUN | qwen3.6 | M | Medium — milestone re-evaluation with accumulated evidence | 0 | A | Honest FAIL (7/8 FAIL) |
 | EVALUATOR-ISRELEVANT-FIX | qwen3.6 | M | Medium — isRelevantEvent() includes indicative_event_kinds (HEADLESS) | 0 | A | 5/5 eval files 116 tests; second-touch indicative; no verdict regression |
 | SMALL-SIDED-SITUATIONS-BATCH-4 | qwen3.6 | M | Medium — batch-4 evidence on extended fixture (HEADLESS) | 0 | A | 6/6 eval files 142 tests; 6 PASS, 2 FAIL honest |
+| SMALL-SIDED-MILESTONE-RERUN-2 | qwen3.6 | M | Medium — milestone re-run with corrected batch evidence (HEADLESS) | 0 | A | milestone FAIL honest (6/8 PASS); bundle generated |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -657,6 +659,8 @@ on an H task is the interesting result.
 | EVALUATOR-ISRELEVANT-FIX | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | composition clean; neighbor scan zero regression; audit + critic present |
 | SMALL-SIDED-SITUATIONS-BATCH-4 | critic (deepseek-v4-flash) | base flash | ACCEPT | 6/6 eval files 142 tests; verdicts honest; byte-identity genuine |
 | SMALL-SIDED-SITUATIONS-BATCH-4 | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | composition clean; BATCH-3 unchanged; tmp dir excluded; 0 PASS→FAIL |
+| SMALL-SIDED-MILESTONE-RERUN-2 | critic (deepseek-v4-flash) | base flash | ACCEPT | 103/103 tests; input==BATCH-4 index; FAIL derivation honest; no overclaim |
+| SMALL-SIDED-MILESTONE-RERUN-2 | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | composition clean; 103 tests; output byte-identical to durable record; critic verified |
 
 ### Builder scoreboard
 
@@ -664,7 +668,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 78 | 55 | 10 | 3 | 3 | 2 | 73% | ~0.42 | ~31m |
+| qwen3.6 | 79 | 56 | 10 | 3 | 3 | 2 | 73% | ~0.42 | ~31m |
 | mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

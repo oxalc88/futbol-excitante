@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 128 — 2026-08-24
+
+- objective_id: SMALL-SIDED-MILESTONE-RERUN-2
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 5a9742c candidate(SMALL-SIDED-MILESTONE-RERUN-2)
+- notes: SMALL_SIDED_SHAPE milestone re-run with corrected BATCH-4 evidence. Honest FAIL (milestone_playtest_failed), 6/8 PASS. SHOT_TO_RESULT/PHYSICAL_DUEL remain FAIL — fixture lacks pitch-contact/input-rejection. 103/103 milestone-contract tests pass. Milestone bundle generated (docs/evidence/milestones/SMALL_SIDED_SHAPE/manifest.json). Horizon v18 EXHAUSTED (3/3).
+
 ## Iteration 127 — 2026-08-24
 
 - objective_id: SMALL-SIDED-SITUATIONS-BATCH-4
