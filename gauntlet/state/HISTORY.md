@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 129 — 2026-08-24
+
+- objective_id: SHOT-RESULT-RESOLUTION-FIXTURE
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 39c0486 candidate(SHOT-RESULT-RESOLUTION-FIXTURE)
+- notes: New driven fixture makes SHOT_TO_RESULT honestly PASS (real shot tick 21 + pitch-contact ticks 18/47 within 60 ticks). Engine physics untouched; fixture geometry/timing only. Binding 10/10, audit PASS. Engine invariant caveat (ball.lastTouchRef same-tick unresolved) pre-existing in BATCH-4, disclosed honestly. Horizon v19 1/4.
+
 ## Iteration 128 — 2026-08-24
 
 - objective_id: SMALL-SIDED-MILESTONE-RERUN-2

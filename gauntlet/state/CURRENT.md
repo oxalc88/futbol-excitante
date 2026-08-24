@@ -8,9 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
+next_objective_id: DUEL-REJECTION-FIXTURE
+
 best_known:
-  commit: 5a9742c
-  note: "SMALL-SIDED-MILESTONE-RERUN-2 accepted (milestone FAIL honest: 6/8 PASS). Horizon v18 EXHAUSTED (3/3). Milestone bundle generated."
+  commit: 39c0486
+  note: "SHOT-RESULT-RESOLUTION-FIXTURE accepted — SHOT_TO_RESULT now honestly PASS (real shot+pitch-contact). Horizon v19 1/4."
 
 active_candidate: null
 builder_in_use: null
@@ -134,17 +136,18 @@ accepted:
   - EVALUATOR-ISRELEVANT-FIX
   - SMALL-SIDED-SITUATIONS-BATCH-4
   - SMALL-SIDED-MILESTONE-RERUN-2
+  - SHOT-RESULT-RESOLUTION-FIXTURE
 
 blocked: []
 
-selection_note: "Horizon v18 EXHAUSTED (3/3). MILESTONE-RERUN-2 accepted: SMALL_SIDED_SHAPE milestone FAIL honest (6/8 PASS; SHOT_TO_RESULT/PHYSICAL_DUEL fixture-limited). Milestone bundle generated. Strategic reassessment pending. No PES claim."
+selection_note: "Horizon v19 1/4: SHOT-RESULT-RESOLUTION-FIXTURE accepted — new driven fixture makes SHOT_TO_RESULT honest PASS (shot + pitch-contact). Next: DUEL-REJECTION-FIXTURE. No PES claim."
 ```
 ## Last accepted objective
 
-SMALL-SIDED-MILESTONE-RERUN-2 — Re-ran SMALL_SIDED_SHAPE milestone:evaluate with corrected BATCH-4 evidence after EVALUATOR-ISRELEVANT-FIX. Honest milestone verdict: FAIL (milestone_playtest_failed), 6/8 situations PASS; SHOT_TO_RESULT and PHYSICAL_DUEL remain FAIL because the extended fixture lacks pitch-contact / input-rejection events. 103/103 milestone-contract tests pass. Milestone bundle generated.
+SHOT-RESULT-RESOLUTION-FIXTURE — New driven fixture (3v3-situation-driven-shot-resolution.v1.json) makes SHOT_TO_RESULT honestly evaluable: real `shot` (tick 21) + real `pitch-contact` (ticks 18, 47) within 60 ticks, engine physics untouched (fixture geometry/timing only). Binding test 10/10, audit PASS, engine invariant caveat (ball.lastTouchRef same-tick references) pre-existing and disclosed. Horizon v19 1/4.
 
 - builder: builder-structured / qwen3.6
 - critic: critic / deepseek-v4-flash — ACCEPT
 - integration: integration-reviewer / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-24T20:36:36Z); deterministic audit PASS
-- Candidate: 5a9742c
+- Evidence: durable acceptance manifest + record (2026-08-24T21:13:32Z); deterministic audit PASS
+- Candidate: 39c0486
