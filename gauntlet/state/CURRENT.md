@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: DUEL-REJECTION-FIXTURE
+next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-5
 
 best_known:
-  commit: 39c0486
-  note: "SHOT-RESULT-RESOLUTION-FIXTURE accepted — SHOT_TO_RESULT now honestly PASS (real shot+pitch-contact). Horizon v19 1/4."
+  commit: 81e4aa1
+  note: "DUEL-REJECTION-FIXTURE accepted — PHYSICAL_DUEL now honestly PASS (player-player-contact + input-rejection). Horizon v19 2/4."
 
 active_candidate: null
 builder_in_use: null
@@ -137,17 +137,18 @@ accepted:
   - SMALL-SIDED-SITUATIONS-BATCH-4
   - SMALL-SIDED-MILESTONE-RERUN-2
   - SHOT-RESULT-RESOLUTION-FIXTURE
+  - DUEL-REJECTION-FIXTURE
 
 blocked: []
 
-selection_note: "Horizon v19 1/4: SHOT-RESULT-RESOLUTION-FIXTURE accepted — new driven fixture makes SHOT_TO_RESULT honest PASS (shot + pitch-contact). Next: DUEL-REJECTION-FIXTURE. No PES claim."
+selection_note: "Horizon v19 2/4: SHOT-RESULT-RESOLUTION-FIXTURE and DUEL-REJECTION-FIXTURE accepted. Next: SMALL-SIDED-SITUATIONS-BATCH-5 (needs both fixture objectives). No PES claim."
 ```
 ## Last accepted objective
 
-SHOT-RESULT-RESOLUTION-FIXTURE — New driven fixture (3v3-situation-driven-shot-resolution.v1.json) makes SHOT_TO_RESULT honestly evaluable: real `shot` (tick 21) + real `pitch-contact` (ticks 18, 47) within 60 ticks, engine physics untouched (fixture geometry/timing only). Binding test 10/10, audit PASS, engine invariant caveat (ball.lastTouchRef same-tick references) pre-existing and disclosed. Horizon v19 1/4.
+DUEL-REJECTION-FIXTURE — New driven fixture (3v3-situation-driven-duel-rejection.v1.json) makes PHYSICAL_DUEL honestly evaluable: real `player-player-contact` + `input-rejection` (duplicate/conflicting input frames at the contact tick). Input-system.ts resolveInputs now buffers duplicate frames and emits `input-rejection` (first-frame-per-tick-slot policy) instead of throwing. DOM-free core preserved. Binding test 10/10, audit PASS. Horizon v19 2/4.
 
 - builder: builder-structured / qwen3.6
 - critic: critic / deepseek-v4-flash — ACCEPT
 - integration: integration-reviewer / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-24T21:13:32Z); deterministic audit PASS
-- Candidate: 39c0486
+- Evidence: durable acceptance manifest + record (2026-08-24T22:32:16Z); deterministic audit PASS
+- Candidate: 81e4aa1

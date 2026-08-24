@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 130 — 2026-08-24
+
+- objective_id: DUEL-REJECTION-FIXTURE
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 81e4aa1 candidate(DUEL-REJECTION-FIXTURE)
+- notes: New driven fixture makes PHYSICAL_DUEL honestly PASS. input-system resolveInputs now buffers duplicate frames and emits input-rejection (first-frame-per-tick-slot) instead of throwing. DOM-free core preserved; 30 unit tests pass (create.test negative tests flipped, input-system new test). Engine physics untouched; fixture/timing + input resolution only. Horizon v19 2/4.
+
 ## Iteration 129 — 2026-08-24
 
 - objective_id: SHOT-RESULT-RESOLUTION-FIXTURE

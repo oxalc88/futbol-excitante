@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "DUEL-REJECTION-FIXTURE",
+  "accepted_at": "2026-08-24T22:32:16.075Z",
+  "candidate_commit": "81e4aa1",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/DUEL-REJECTION-FIXTURE/audit.json",
+      "sha256": "86244b1a64b9e0823106ccd9d74d40b46e675837048170c5409ac1af6ef0d088",
+      "git_blob": "fb49cda571371d5f4bf20904b96ae3f22141f78a",
+      "candidate_commit": "81e4aa1",
+      "bytes": 2680,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "PHYSICAL_DUEL now PASS via real player-player-contact + input-rejection",
+      "engine change: duplicates emit input-rejection, first frame per tick+slot applied; oracle intact",
+      "BOOTSTRAP-05/06 tests updated; 1406 affected tests pass; core typecheck back to 2 pre-existing errors"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "verdict": "ACCEPT",
+      "model": "deepseek-v4-flash",
+      "agent": "critic"
+    },
+    "integration": {
+      "verdict": "ACCEPT",
+      "model": "deepseek-v4-flash",
+      "agent": "integration-reviewer"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-24/2026-08-24T22-32-16-075Z-DUEL-REJECTION-FIXTURE-acceptance.json"
+}
