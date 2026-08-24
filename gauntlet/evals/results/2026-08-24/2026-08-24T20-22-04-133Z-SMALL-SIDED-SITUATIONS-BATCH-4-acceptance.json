@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-24T20:22:04.133Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-SITUATIONS-BATCH-4",
+  "candidate_commit": "8708068",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "verdict": "ACCEPT",
+    "model": "deepseek-v4-flash",
+    "agent": "critic"
+  },
+  "integration": {
+    "verdict": "ACCEPT",
+    "model": "deepseek-v4-flash",
+    "agent": "integration-reviewer"
+  },
+  "evidence_class": "HEADLESS",
+  "metrics": [
+    "6/6 eval test files pass (142 tests)",
+    "PASS_RECEPTION and SUPPORT_AND_PASSING_LANES now PASS with second-touch indicative",
+    "SHOT_TO_RESULT/PHYSICAL_DUEL remain honest FAIL (pitch-contact/input-rejection absent)"
+  ]
+}

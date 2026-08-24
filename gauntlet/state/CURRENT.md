@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-SITUATIONS-BATCH-4
+next_objective_id: SMALL-SIDED-MILESTONE-RERUN-2
 
 best_known:
-  commit: a93ce09
-  note: "EVALUATOR-ISRELEVANT-FIX accepted. isRelevantEvent() now recognizes indicative_event_kinds (second-touch etc.). Horizon v18 1/3."
+  commit: 8708068
+  note: "SMALL-SIDED-SITUATIONS-BATCH-4 accepted (6 PASS, 2 FAIL honest). Horizon v18 2/3."
 
 active_candidate: null
 builder_in_use: null
@@ -134,17 +134,18 @@ accepted:
   - SMALL-SIDED-SITUATIONS-BATCH-3
   - SMALL-SIDED-MILESTONE-RERUN
   - EVALUATOR-ISRELEVANT-FIX
+  - SMALL-SIDED-SITUATIONS-BATCH-4
 
 blocked: []
 
-selection_note: "Horizon v18 1/3: EVALUATOR-ISRELEVANT-FIX accepted — isRelevantEvent now includes indicative_event_kinds so second-touch is recognized as indicative. Next: SMALL-SIDED-SITUATIONS-BATCH-4 rerun. No PES claim."
+selection_note: "Horizon v18 2/3: SMALL-SIDED-SITUATIONS-BATCH-4 accepted — 6 PASS / 2 FAIL honest (SHOT_TO_RESULT, PHYSICAL_DUEL lack fixture events). Next: SMALL-SIDED-MILESTONE-RERUN-2. No PES claim."
 ```
 ## Last accepted objective
 
-EVALUATOR-ISRELEVANT-FIX — Fixed situation-mapping isRelevantEvent() to include each situation's indicative_event_kinds, so second-touch and other indicative kinds reach computeSituationVerdict. Evaluator fix; batch evidence regenerated; former FAILs for PASS_RECEPTION, SUPPORT_AND_PASSING_LANES, and transition situations now honest PASS where indicative events exist.
+SMALL-SIDED-SITUATIONS-BATCH-4 — Materialized situation evaluator evidence batch for the extended driven fixture (3v3-situation-driven-extended.v1.json) after the isRelevantEvent indicative-kinds fix. Honest verdicts: 6 PASS (PASS_RECEPTION, SUPPORT_AND_PASSING_LANES, SETTLED_ATTACK_VS_DEFENCE, 3 transitions, COORDINATED_PRESS), 2 FAIL (SHOT_TO_RESULT, PHYSICAL_DUEL — fixture lacks pitch-contact/input-rejection). 142/142 objective tests pass.
 
 - builder: builder-structured / qwen3.6
 - critic: critic / deepseek-v4-flash — ACCEPT
 - integration: integration-reviewer / deepseek-v4-flash — ACCEPT
-- Evidence: durable acceptance manifest + record (2026-08-24T19:59:15Z); deterministic audit PASS
-- Candidate: a93ce09
+- Evidence: durable acceptance manifest + record (2026-08-24T20:22:04Z); deterministic audit PASS
+- Candidate: 8708068

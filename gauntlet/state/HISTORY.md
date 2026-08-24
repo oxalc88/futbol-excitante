@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 127 — 2026-08-24
+
+- objective_id: SMALL-SIDED-SITUATIONS-BATCH-4
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 8708068 candidate(SMALL-SIDED-SITUATIONS-BATCH-4)
+- notes: Evidence batch on extended driven fixture after isRelevantEvent indicative fix. 6 PASS (PASS_RECEPTION, SUPPORT_AND_PASSING_LANES, SETTLED_ATTACK_VS_DEFENCE, ATTACK/DEFENCE transitions, COORDINATED_PRESS), 2 FAIL honest (SHOT_TO_RESULT/PHYSICAL_DUEL lack pitch-contact/input-rejection in fixture). 142/142 objective tests pass; byte-identity binding. RESULT.md had two minor prose nits (shot tick, second-touch count) — non-blocking, artifacts authoritative. Horizon v18 2/3.
+
 ## Iteration 126 — 2026-08-24
 
 - objective_id: EVALUATOR-ISRELEVANT-FIX

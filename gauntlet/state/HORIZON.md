@@ -9,7 +9,7 @@ horizon_id: "event-diversity-through-evaluator-fix"
 created_from_commit: 8393a8199a3107f26573e9a0d134687595d9b587
 created_at: 2026-08-23
 reason: "Horizon v17 milestone FAILED (7/8 FAIL) because second-touch events from extended fixtures are not recognized as indicative for PASS_RECEPTION / SUPPORT_AND_PASSING_LANES — the evaluator's isRelevantEvent() function does not include second-touch in the indicative_event_kinds. New horizon first fixes the evaluator mapping to include second-touch, then re-runs batch evidence and milestone."
-current_index: 1
+current_index: 2
 objectives:
   - id: EVALUATOR-ISRELEVANT-FIX
     status: accepted
@@ -17,7 +17,7 @@ objectives:
     builder: builder-structured
     prerequisite: null
   - id: SMALL-SIDED-SITUATIONS-BATCH-4
-    status: pending
+    status: accepted
     reason: "Re-run situation evaluator on extended fixtures after evaluator fix. Verify PASS_RECEPTION and SUPPORT_AND_PASSING_LANES now PASS where second-touch was emitted."
     builder: builder-structured
     prerequisite: EVALUATOR-ISRELEVANT-FIX

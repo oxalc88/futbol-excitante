@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SMALL-SIDED-SITUATIONS-BATCH-4",
+  "accepted_at": "2026-08-24T20:22:04.133Z",
+  "candidate_commit": "8708068",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-4/audit.json",
+      "sha256": "8c25903ed5f453ff2921af624facf8e520e653a90e114307ee239a4101ac1b95",
+      "git_blob": "70fcb60e6c7e87187a906b18a37520fbdeca5f2c",
+      "candidate_commit": "8708068",
+      "bytes": 2688,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "6/6 eval test files pass (142 tests)",
+      "PASS_RECEPTION and SUPPORT_AND_PASSING_LANES now PASS with second-touch indicative",
+      "SHOT_TO_RESULT/PHYSICAL_DUEL remain honest FAIL (pitch-contact/input-rejection absent)"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "verdict": "ACCEPT",
+      "model": "deepseek-v4-flash",
+      "agent": "critic"
+    },
+    "integration": {
+      "verdict": "ACCEPT",
+      "model": "deepseek-v4-flash",
+      "agent": "integration-reviewer"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-24/2026-08-24T20-22-04-133Z-SMALL-SIDED-SITUATIONS-BATCH-4-acceptance.json"
+}
