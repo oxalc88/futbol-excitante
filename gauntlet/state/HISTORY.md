@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 140 — 2026-08-25
+
+- objective_id: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (after RETRY, resolved)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: cc43094 candidate(SMALL-SIDED-ACTION-EVENT-OBSERVABILITY)
+- notes: Closed the SMALL_SIDED_SHAPE milestone's disclosed action_recognition readability-dimension gap with event-centered DYNAMIC_VISUAL evidence: discrete pass (tick 2), shot (tick 36), and goal (tick 442) action events in the coherent 3v3 press match captured as before/event/after semantic frames (9 PNGs all unique SHA-256; sequence.json 5 labeled event frames; trajectory.json 600 per-tick hashes + event log). Observability evidence only — NOT a numeric readability PASS, no invented rubric. Fixed render/screenshot sync bug: added gl.finish() GPU flush in test-bridge renderFrame() (additive, safe, no football-outcome change) + dropped the non-observable player-ball-contact kind (tick-1 state identical to tick-0). Critic RETRY once on stale tick-0 duplicate frames, resolved; final ACCEPT (8 browser + 27 binding + 31 scanner + 19 team-shape + 14 press-support tests). Integration ACCEPT: 67 browser neighbors + 35 neighbor bindings green; additive shared changes (test-bridge gl.finish, json-modules.d.ts). Audit re-run with required flags after a bare-run FAIL artifact. Milestone manifest + prior evidence preserved. No milestone PASS / readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v21 4/6.
+
 ## Iteration 139 — 2026-08-25
 
 - objective_id: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH

@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
+next_objective_id: SMALL-SIDED-5V5-HUMAN-VS-CPU
 
 best_known:
-  commit: eaa79ab
-  note: "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH accepted — cover+support mechanisms + headless team-decision injection fix, evidenced on a moving-ball press scenario (6/8 situations present); critic ACCEPT after 2 RETRYs (discriminating guard proven); integration ACCEPT (broad neighbor green). Horizon v21 3/6."
+  commit: cc43094
+  note: "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY accepted — event-centered pass/shot/goal frames close the disclosed action_recognition dimension gap (gl.finish() render-sync fix); critic ACCEPT after RETRY on stale-frame bug; integration ACCEPT. Horizon v21 4/6."
 
 active_candidate: null
 builder_in_use: null
@@ -147,13 +147,23 @@ accepted:
   - SMALL-SIDED-MATCH-SITUATION-SCANNER
   - SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
   - SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
+  - SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
 
 blocked: []
 
-selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 3/6: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH accepted — cover+support mechanisms in cpu-adapter plus the previously-missing headless team-decision injection fix, evidenced on a new moving-ball press scenario (3v3-press-scenario, ball displacement ~15m, 6/8 situations present via scanner); critic RETRY x2 on honesty-guard discrimination then ACCEPT (mechanism-activation-counter guard fails when mechanism stashed, 492 activations when present); integration ACCEPT (411 CPU + 323 eval + 40 browser neighbor tests green, injection byte-identical to browser bridge, additivity confirmed; pre-existing non-candidate browser failure player-indicator INDICATOR-002 flagged for next horizon). Next: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY (close the disclosed action_recognition gap in a mixed human/CPU match). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
+selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 4/6: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY accepted — event-centered DYNAMIC_VISUAL frames at discrete pass (tick 2), shot (tick 36), and goal (tick 442) events in the coherent 3v3 press match close the milestone's disclosed action_recognition readability-dimension gap (observability evidence only, not a numeric readability PASS); gl.finish() GPU-flush added to test-bridge renderFrame() to fix stale-canvas captures (critic RETRY once, resolved; 9/9 unique frames); integration ACCEPT (67 browser + 35 neighbor bindings green, additive shared changes). Next: SMALL-SIDED-5V5-HUMAN-VS-CPU (full 5v5 human-vs-CPU mode). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
+SMALL-SIDED-ACTION-EVENT-OBSERVABILITY — Closed the SMALL_SIDED_SHAPE milestone's disclosed action_recognition readability-dimension gap with event-centered DYNAMIC_VISUAL evidence: discrete pass (tick 2), shot (tick 36), and goal (tick 442) action events in the coherent 3v3 press match are captured as before/event/after semantic frames (9 PNGs, all unique SHA-256; sequence.json with 5 labeled event frames; trajectory.json 600 per-tick hashes + event log; browser-cases.json). This is observability evidence for reviewer/perceptual readability judgment — NOT a numeric readability PASS (VISUAL_SPEC defers thresholds), no invented rubric. Fixed a render/screenshot sync bug by adding gl.finish() GPU flush in the test-bridge renderFrame() (additive, safe, no football-outcome change) and dropped the non-observable player-ball-contact kind (tick-1 state identical to tick-0). Critic RETRY once on stale tick-0 duplicate frames, resolved; final critic ACCEPT (8 browser + 27 binding + 31 scanner + 19 team-shape + 14 press-support tests). Integration ACCEPT (67 browser neighbors + 35 neighbor bindings green). Audit re-run with required flags after a bare-run FAIL artifact. Milestone manifest + prior evidence preserved. No SMALL_SIDED_SHAPE PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v21 4/6.
+
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (after RETRY on stale-frame capture bug, resolved)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-25T19:39:45Z); deterministic audit PASS
+- Candidate: cc43094
+
+Previously accepted:
 SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH — Deepened coordinated press (cover player behind the presser with lateral offset) and off-ball support positioning (support-distance discipline) in genuine small-sided play, plus fixed the previously-missing team-decision injection in the headless match runner (mirrors the browser bridge; this was why CPU-only matches previously showed no coordinated behavior). New 3v3-press-scenario fixture (team-b attacks team-a's third → DEFEND/PRESSING activates) with a genuinely moving ball (~15m displacement, pass/shot/contact/goal events) and evidence on it: MULTI_TICK trajectory.json (600 ticks, per-tick per-team press/cover/support geometry, deterministic) with the situation scanner localizing 6/8 situations present. Critic RETRY x2 on honesty-guard discrimination then ACCEPT: the new mechanism-activation-counter guard (getCoverMechanismActivations / resetMechanismCounters) fails when the mechanism is stashed and asserts 492 real cover activations when present; trajectory representativeness and report integrity fixed. Integration ACCEPT: 411 CPU + 323 eval + 40 browser neighbor tests green; injection byte-identical to the browser bridge; additivity confirmed (accepted evidence unchanged when mechanisms inactive). Pre-existing (non-candidate) browser failure flagged: player-indicator INDICATOR-002. No SMALL_SIDED_SHAPE PASS / readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim; provisional constants labeled. Horizon v21 3/6.
 
 - builder: builder-gameplay / mimo-v2.5

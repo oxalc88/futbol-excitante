@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY",
+  "accepted_at": "2026-08-25T19:39:45.133Z",
+  "candidate_commit": "cc43094",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/goal-after.png",
+        "sha256": "f063af672e119f31a5edab79933d76fdfa1349f7f494e2c6e113ec487775df5f",
+        "git_blob": "95bc0ee929442e6286adb826390d1c31420c06eb",
+        "candidate_commit": "cc43094",
+        "bytes": 7747,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/goal-before.png",
+        "sha256": "598ea951ed82c1c8ab61aba48e4a839e332eb85994a6afbdbef9d83b22c928e1",
+        "git_blob": "1251475c7c055d6184e1b5b85c60299f1e1cdafa",
+        "candidate_commit": "cc43094",
+        "bytes": 7792,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/goal-event.png",
+        "sha256": "14c1d05041ecdd843082432712426e44ed015631e17b072d5dc913416f071bd2",
+        "git_blob": "9ce2cb0fa31e7893683b6fa0e266f8bcbda0c870",
+        "candidate_commit": "cc43094",
+        "bytes": 7848,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/pass-after.png",
+        "sha256": "40cfb2797b8bbec8e6573917b1ccf64cfd80374701663d006dd0e048425610df",
+        "git_blob": "8d8ca278299ff76d9a3608abe4253ad1795f19c8",
+        "candidate_commit": "cc43094",
+        "bytes": 7370,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/pass-before.png",
+        "sha256": "966e715ec2572b56a7b63889dc45a8f41320f1f5b1e2861acab69289fa936f41",
+        "git_blob": "d3f181137e313a038133b2c1c7db588bb51a7fc8",
+        "candidate_commit": "cc43094",
+        "bytes": 7276,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/pass-event.png",
+        "sha256": "a6a683574aac1ff7c65d6f8d1c5b27c501a8e207c7cbba6371a622d9f7f00040",
+        "git_blob": "ead71deca676a1feb24b1b6356003ea8e671203d",
+        "candidate_commit": "cc43094",
+        "bytes": 7293,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/shot-after.png",
+        "sha256": "4c41fad32c1f9a1fc98d795f3fb8d69674f2800ba365b444c6f1f8a4c0c18109",
+        "git_blob": "2f2bbed1c7bbac94106310abeeff851dfce609db",
+        "candidate_commit": "cc43094",
+        "bytes": 8413,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/shot-before.png",
+        "sha256": "c7492f820cf2afacf44cdf5f99bd49d465f4e3933b036183659e704b6997448f",
+        "git_blob": "6fe8076cde5288cf86eb2e7aa71200955a63af18",
+        "candidate_commit": "cc43094",
+        "bytes": 7622,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/shot-event.png",
+        "sha256": "7f610fd2831839883d47ec57f0a14555d04b4ed820731af3899fffd2a69aa7e0",
+        "git_blob": "f01fc6da897d5ea861ef5026efeee166ce0d4e1c",
+        "candidate_commit": "cc43094",
+        "bytes": 7889,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY",
+        "event_frames": [
+          {
+            "eventKind": "pass",
+            "eventTick": 2,
+            "beforeTick": 0,
+            "afterTick": 14
+          },
+          {
+            "eventKind": "shot",
+            "eventTick": 36,
+            "beforeTick": 24,
+            "afterTick": 48
+          },
+          {
+            "eventKind": "goal",
+            "eventTick": 442,
+            "beforeTick": 430,
+            "afterTick": 454
+          }
+        ],
+        "frames": [
+          {
+            "label": "pass-before",
+            "path": "pass-before.png",
+            "tick": 0,
+            "eventKind": "pass",
+            "eventTick": 2,
+            "note": "Before pass at tick 2: ball at initial position, players approaching"
+          },
+          {
+            "label": "pass-event",
+            "path": "pass-event.png",
+            "tick": 2,
+            "eventKind": "pass",
+            "eventTick": 2,
+            "note": "Pass event at tick 2: Player player-4 directed pass — ball begins moving"
+          },
+          {
+            "label": "shot-before",
+            "path": "shot-before.png",
+            "tick": 24,
+            "eventKind": "shot",
+            "eventTick": 36,
+            "note": "Before shot at tick 36: ball in active play"
+          },
+          {
+            "label": "shot-event",
+            "path": "shot-event.png",
+            "tick": 36,
+            "eventKind": "shot",
+            "eventTick": 36,
+            "note": "Shot event at tick 36: Player player-4 directed shot — shot action"
+          },
+          {
+            "label": "goal-event",
+            "path": "goal-event.png",
+            "tick": 442,
+            "eventKind": "goal",
+            "eventTick": 442,
+            "note": "Goal event at tick 442: Goal — shot results in goal"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/sequence.json",
+        "sha256": "d2237ac18fa976237febdbfdcf712ae1d7fa82df2117783f0c8fb43fef22d60a",
+        "git_blob": "af1fe3a38e36afdfc2a47416a559bb9a6369ee62",
+        "candidate_commit": "cc43094",
+        "bytes": 1558,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/trajectory.json",
+      "sha256": "03b8550ceacfaae75f94bdb245619a1a81b603726af2ce5b21f4efadfd15d267",
+      "git_blob": "66c9cb532548bd9a9aa8f88b72bb77f1055603bd",
+      "candidate_commit": "cc43094",
+      "bytes": 63965,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/audit.json",
+      "sha256": "dfa8d1a4645b363d343ba2478a491db2c7157b20de888698e16e2ad052c13d92",
+      "git_blob": "d84e7baf70140756e7b67200d3225027509de53f",
+      "candidate_commit": "cc43094",
+      "bytes": 2652,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-25/2026-08-25T19-39-45-133Z-SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-acceptance.json"
+}
