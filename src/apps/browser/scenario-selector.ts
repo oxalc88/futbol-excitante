@@ -30,6 +30,7 @@ import { FOUNDATION_SCENARIO_3V3 } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_5V5 } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_HUMAN_VS_CPU_3V3 } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V3 } from "./foundation-scenario.js";
+import { FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5 } from "./foundation-scenario.js";
 
 /**
  * Select a scenario from the URL search string.
@@ -66,6 +67,10 @@ export function selectBrowserScenario(search: string): ScenarioDefinition {
 
   if (mode === "human-vs-ai-5v3") {
     return FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V3;
+  }
+
+  if (mode === "human-vs-ai-5v5") {
+    return FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5;
   }
 
   if (mode === "2v2-ai") {

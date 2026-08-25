@@ -19,6 +19,7 @@ import scenario3v3Json from "@pes/eval/scenarios/3v3-fixture.v1.json";
 import scenario5v5Json from "@pes/eval/scenarios/5v5-fixture-v1.json";
 import humanVsCpu3v3Json from "@pes/eval/scenarios/human-vs-cpu-3v3.v1.json";
 import humanVsCpu5v3Json from "@pes/eval/scenarios/human-vs-cpu-5v3.v1.json";
+import humanVsCpu5v5Json from "@pes/eval/scenarios/5v5-human-vs-cpu.v1.json";
 
 /**
  * The foundation scenario — identical fixture used by the headless
@@ -112,3 +113,14 @@ export const FOUNDATION_SCENARIO_HUMAN_VS_CPU_3V3: ScenarioDefinition =
  */
 export const FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V3: ScenarioDefinition =
   humanVsCpu5v3Json as unknown as ScenarioDefinition;
+
+/**
+ * Human-vs-CPU 5v5 scenario — 10 players (5 per team), slot-1 is keyboard-controlled
+ * (HUMAN) for player-1 on team-a, slots 2–10 are AI_FALLBACK.
+ * Provides a standalone 5v5 small-sided match with one human player controlling
+ * team-a via keyboard + Tab switching, and 4 CPU teammates + 5 CPU opponents.
+ * Loaded from the versioned JSON at eval/scenarios/5v5-human-vs-cpu.v1.json.
+ * Duration is 5400 ticks (90 seconds at 60 Hz).
+ */
+export const FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5: ScenarioDefinition =
+  humanVsCpu5v5Json as unknown as ScenarioDefinition;

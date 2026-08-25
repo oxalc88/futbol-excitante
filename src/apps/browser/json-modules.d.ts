@@ -40,3 +40,8 @@ declare module "@pes/eval/scenarios/3v3-press-scenario.v1.json" {
   const value: Record<string, unknown>;
   export default value;
 }
+
+declare module "@pes/eval/scenarios/5v5-human-vs-cpu.v1.json" {
+  const value: Record<string, unknown>;
+  export default value;
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "objective_id": "SMALL-SIDED-5V5-HUMAN-VS-CPU",
+  "frames": [
+    {
+      "label": "before",
+      "path": "frame-before.png",
+      "tick": 0,
+      "note": "Initial 5v5 human-vs-CPU state — 10 players at formation positions, ball at center"
+    },
+    {
+      "label": "human-input",
+      "path": "frame-human-input.png",
+      "tick": 30,
+      "note": "Human keyboard input drives slot-1 player forward — active control visible"
+    },
+    {
+      "label": "cpu-play",
+      "path": "frame-cpu-play.png",
+      "tick": 120,
+      "note": "Extended CPU play — teammates and opponents actively moving, match underway"
+    },
+    {
+      "label": "switch",
+      "path": "frame-switch.png",
+      "tick": 150,
+      "note": "Tab switch — human cycles controlled player to next teammate on team-a"
+    },
+    {
+      "label": "continuity",
+      "path": "frame-continuity.png",
+      "tick": 270,
+      "note": "Continued match play after switch — 5v5 match in progress with coordinated teams"
+    }
+  ]
+}
