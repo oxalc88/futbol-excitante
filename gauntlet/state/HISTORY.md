@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 134 — 2026-08-25
+
+- objective_id: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 5491739 candidate(SMALL-SIDED-VISUAL-READABILITY-EVIDENCE)
+- notes: Materialized 24 event-centered DYNAMIC_VISUAL semantic frames (before/event/after) demonstrating the SMALL_SIDED_SHAPE milestone's 8 visual_readability_dimensions are observable in deterministic 3v3 CPU-vs-CPU browser render, mapped to required situations. Observability evidence for reviewer/perceptual readability judgment — NOT a numeric readability PASS (VISUAL_SPEC defers thresholds). Deterministic audit PASS except screenshot-SHA uniqueness REVIEW_REQUIRED; bounded semantic audit (aux/gemma4) resolved VALID — two frames byte-identical to BROWSER-SMALL-SIDED-001-CASE (tick 180/360) due to byte-determinism at identical match states, semantic mapping honest. 3/3 browser + 7/7 binding tests; 101 neighboring core tests pass; only adapter-only test-bridge rendererConfig change (presentation, no football outcome impact). action_recognition honestly NEEDS_PERCEPTUAL_REVIEW (CPU-only adapter emits no discrete kick/pass/shot) — disclosed, not fabricated. No PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v20 2/4.
+
 ## Iteration 133 — 2026-08-24
 
 - objective_id: SMALL-SIDED-EXIT-PREREQ-IDENTITY

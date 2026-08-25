@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-EXIT-PREREQ-IDENTITY
-usage_aggregates_through: SMALL-SIDED-EXIT-PREREQ-IDENTITY
-clock_aggregates_through: SMALL-SIDED-EXIT-PREREQ-IDENTITY
-model_evaluation_through: SMALL-SIDED-EXIT-PREREQ-IDENTITY
+last_tracked_objective: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
+usage_aggregates_through: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
+clock_aggregates_through: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
+model_evaluation_through: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -202,6 +202,9 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-SITUATIONS-BATCH-5 | accepted | ~18m | 9m | 6m | 3.5m | 0.5m | n/a | n/a |
 | SMALL-SIDED-MILESTONE-RERUN-3 | accepted | ~20m | 3m | 8.5m | 2m | 0.5m | n/a | n/a |
 | SMALL-SIDED-EXIT-PREREQ-IDENTITY | accepted | ~14m | 6m | 3.5m | 6m | 0.5m | n/a | n/a |
+| SMALL-SIDED-VISUAL-READABILITY-EVIDENCE | accepted | ~12m | n/a\* | 3.8m | 3.2m | 0.7m | n/a | n/a |
+
+\* Builder (mimo-v2.5) produced the evidence in a prior session before this continuation pickup; its step time is not re-measured here. Reviewer/commit phases measured from this session's subagents.
 
 Typical accepted step: 20–40 minutes and 3–12M processed prompt tokens.
 Median accepted step: about 28 minutes. Cost spikes are critic retry loops,
@@ -479,6 +482,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-SITUATIONS-BATCH-5 | qwen3.6 | M | Medium — consolidate batch-5 evidence 8/8 PASS (HEADLESS) | 0 | A | 8/8 honest PASS; source_fixture provenance; byte-identity; 161 tests |
 | SMALL-SIDED-MILESTONE-RERUN-3 | qwen3.6 | M | Medium — milestone re-run with 8/8 evidence (HEADLESS) | 0 | A | SMALL_SIDED_SHAPE PASS; critic-gated; finale by orchestrator |
 | SMALL-SIDED-EXIT-PREREQ-IDENTITY | qwen3.6 | M | Medium — milestone record exit-prereq identity correction (HEADLESS) | 0 | A | corrected to MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS; PASS preserved |
+| SMALL-SIDED-VISUAL-READABILITY-EVIDENCE | mimo-v2.5 | M | Medium — materialize 8-dimension visual-readability evidence (DYNAMIC_VISUAL) | 0 | A | 24 event-centered frames; observability evidence only; SHA-reuse resolved VALID |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -681,6 +685,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-MILESTONE-RERUN-3 | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | composition clean; 174 tests/6 suites; PASS record coherent; bundle supersede deferred |
 | SMALL-SIDED-EXIT-PREREQ-IDENTITY | critic (deepseek-v4-flash) | base flash | ACCEPT | genuine identity correction; both team prereqs accepted; PASS preserved |
 | SMALL-SIDED-EXIT-PREREQ-IDENTITY | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 75/75 tests; bundle coherent (13 runs); no source/contract change |
+| SMALL-SIDED-VISUAL-READABILITY-EVIDENCE | critic (deepseek-v4-flash) | base flash | ACCEPT | evidence solid 8/8 dims; action_recognition NEEDS_PERCEPTUAL_REVIEW honest disclosure; byte-SHA reuse valid; no overclaims |
+| SMALL-SIDED-VISUAL-READABILITY-EVIDENCE | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | composition clean; 101 neighboring core tests pass; adapter-only test-bridge change (presentation) |
 
 ### Builder scoreboard
 
@@ -689,7 +695,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 80 | 57 | 10 | 3 | 3 | 2 | 74% | ~0.42 | ~31m |
-| mimo-v2.5 | 33 | 20 | 11 | 2 | 0 | 0 | 61% | ~0.45 | ~33m |
+| mimo-v2.5 | 34 | 21 | 11 | 2 | 0 | 0 | 62% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
+next_objective_id: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
 
 best_known:
-  commit: 0ec1ac35
-  note: "SMALL-SIDED-EXIT-PREREQ-IDENTITY accepted — milestone record exit-prereq identity corrected to MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS; PASS preserved. Horizon v20 1/4."
+  commit: 5491739
+  note: "SMALL-SIDED-VISUAL-READABILITY-EVIDENCE accepted — 24 event-centered DYNAMIC_VISUAL frames (8 milestone readability dimensions) materialized; critic + integration ACCEPT; SHA-reuse bounded audit VALID. Horizon v20 2/4."
 
 active_candidate: null
 builder_in_use: null
@@ -141,13 +141,23 @@ accepted:
   - SMALL-SIDED-SITUATIONS-BATCH-5
   - SMALL-SIDED-MILESTONE-RERUN-3
   - SMALL-SIDED-EXIT-PREREQ-IDENTITY
+  - SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
 
 blocked: []
 
-selection_note: "Horizon v20 1/4: SMALL-SIDED-EXIT-PREREQ-IDENTITY accepted — milestone record exit-prereq identity corrected to profile (MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS), PASS preserved, bundle regenerated. Next: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE. GK/regulation/full-match deferred; no PROMOTION overclaim."
+selection_note: "Horizon v20 2/4: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE accepted — 24 event-centered DYNAMIC_VISUAL semantic frames demonstrating the 8 SMALL_SIDED_SHAPE milestone visual_readability_dimensions are observable in 3v3 play; critic + integration ACCEPT; bounded screenshot-SHA-reuse semantic audit VALID (two frames byte-duplicate BROWSER-SMALL-SIDED-001-CASE due to deterministic identical match states, semantic mapping honest); action_recognition honestly NEEDS_PERCEPTUAL_REVIEW (CPU-only scenario emits no discrete kick/pass/shot actions — disclosed, not PASS). No numeric readability PASS / no PES fidelity / no PROMOTION overclaim. Next: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN. GK/regulation/full-match deferred."
 ```
 ## Last accepted objective
 
+SMALL-SIDED-VISUAL-READABILITY-EVIDENCE — Materialized 24 event-centered DYNAMIC_VISUAL semantic frames (3 per dimension, before→event→after) demonstrating the SMALL_SIDED_SHAPE milestone's 8 visual_readability_dimensions are observable in deterministic 3v3 CPU-vs-CPU browser render. Mapped to required situations (PASS_RECEPTION, PHYSICAL_DUEL, SETTLED_ATTACK_VS_DEFENCE, ATTACK_TO_DEFENCE_TRANSITION, SHOT_TO_RESULT, SUPPORT_AND_PASSING_LANES, COORDINATED_PRESS, DEFENCE_TO_ATTACK_TRANSITION). This is observability evidence for reviewer/perceptual readability judgment — NOT a numeric readability PASS (VISUAL_SPEC defers thresholds). Bounded screenshot-SHA-reuse semantic audit (aux) returned VALID: two frames byte-identically match BROWSER-SMALL-SIDED-001-CASE frames due to byte-determinism at identical match states (tick 180, 360), with honest semantic mapping. Critic + integration ACCEPT. action_recognition honestly NEEDS_PERCEPTUAL_REVIEW (CPU-only adapter emits no discrete kick/pass/shot — disclosed known gap, not fabricated). Horizon v20 2/4.
+
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-25T11:04:22Z); deterministic audit PASS (screenshot-SHA REVIEW_REQUIRED resolved VALID by bounded semantic audit)
+- Candidate: 5491739
+
+Previously accepted:
 SMALL-SIDED-EXIT-PREREQ-IDENTITY — Corrected a coherence defect in the durable SMALL_SIDED_SHAPE milestone PASS record: exit_prerequisite_accepted now lists the profile's declared exit prerequisites (MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS from eval/contracts/profiles.ts) instead of the PLAYABLE_1V1 names (MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON). Milestone verdict preserved as PASS (both team prereqs genuinely accepted as evidence objectives). Bundle regenerated with corrected record as latest (13 playtest runs, immutability respected). Binding test locks exit-prereq identity to profile. Horizon v20 1/4.
 
 - builder: builder-structured / qwen3.6

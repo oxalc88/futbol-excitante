@@ -1,0 +1,36 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-25T11:04:22.531Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-VISUAL-READABILITY-EVIDENCE",
+  "candidate_commit": "54917394f40cfe4f178cff6e62dcc65d3d5f52c6",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "semantic_audit": {
+    "verdict": "VALID",
+    "finding": "EVIDENCE_DUPLICATE_SHA",
+    "reason": "Two frames byte-duplicate BROWSER-SMALL-SIDED-001-CASE due to byte-determinism at matching match states (tick 180, 360); semantic mapping honest for facing_orientation and silhouette_stability."
+  },
+  "critic": {
+    "agent": "critic",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "metrics": []
+}
