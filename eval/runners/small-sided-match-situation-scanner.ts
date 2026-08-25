@@ -40,7 +40,7 @@ import {
   type SituationEvidenceRequirement,
 } from "../contracts/situation-mapping.js";
 
-import { computeSituationVerdict } from "./small-sided-situation-evaluator.js";
+import { computeSituationVerdict } from "./small-sided-situation-verdict.js";
 
 // ---------------------------------------------------------------------------
 // Default configuration
