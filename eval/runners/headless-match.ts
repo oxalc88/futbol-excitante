@@ -20,6 +20,7 @@ import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { deepClone } from "../../src/simulation/world/clone.js";
 import type { WorldState } from "../../src/contracts/state.js";
 import { createCpuAdapter, buildCpuObservation, type CpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
+import { computeTeamDecision } from "../../src/adapters/input-browser/team-decision-profile.js";
 import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
 import type { SimulationObserver } from "../../src/simulation/telemetry/observer.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
@@ -585,6 +586,22 @@ export function runHeadlessMatch(
     const tick = sim.tick;
     const frames: import("../../src/contracts/input.js").InputFrame[] = [];
 
+    // Compute one team decision per team per tick, then inject into
+    // all CPU observations for that team.  This mirrors the browser
+    // test-bridge wiring and activates coordinated defensive behaviors
+    // (pressing, covering, marking, defensive line coordination).
+    const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
+    for (const { teamId } of slotCpus) {
+      if (!teamDecisions.has(teamId)) {
+        const teamObs = buildTeamCpuObservation(fullObs, teamId);
+        const cpuGoals = scoreAccum[teamId] ?? 0;
+        const opponentTeamId = teamId === "team-a" ? "team-b" : "team-a";
+        const opponentGoals = scoreAccum[opponentTeamId] ?? 0;
+        teamObs.scoreDifferential = cpuGoals - opponentGoals;
+        teamDecisions.set(teamId, computeTeamDecision(teamObs, teamId));
+      }
+    }
+
     for (const { adapter, controlSlot, teamId, controlledPlayerId } of slotCpus) {
       const teamObs = buildTeamCpuObservation(fullObs, teamId);
       // Inject score differential for score-aware AI.
@@ -592,6 +609,8 @@ export function runHeadlessMatch(
       const opponentTeamId = teamId === "team-a" ? "team-b" : "team-a";
       const opponentGoals = scoreAccum[opponentTeamId] ?? 0;
       teamObs.scoreDifferential = cpuGoals - opponentGoals;
+      // Inject the precomputed team decision for coordinated behavior.
+      teamObs.teamDecision = teamDecisions.get(teamId);
 
       const frame = adapter.sample(tick, teamObs);
       frame.controlSlot = controlSlot;

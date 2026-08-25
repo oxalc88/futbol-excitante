@@ -47,6 +47,46 @@ export type { TeamDecision, DefensiveSubMode } from "./team-decision-profile.js"
 export { computeTeamDecision, getBallZone, teamHasPossession } from "./team-decision-profile.js";
 
 // ---------------------------------------------------------------------------
+// Mechanism activation tracking (SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH)
+// ---------------------------------------------------------------------------
+
+/**
+ * Module-level counter incremented every time the cover mechanism or
+ * support mechanism code path actually executes in ANY adapter instance.
+ * Used by honesty guard tests to prove the mechanisms are exercised.
+ *
+ * Reset to 0 by `resetMechanismCounters()`.
+ * Read via `getMechanismActivationCount()`.
+ */
+let _coverMechanismActivations = 0;
+let _supportMechanismActivations = 0;
+
+/**
+ * Get the total cover mechanism activation count across all adapter instances.
+ * Increments when the cover player code path runs (defense mode, cover assigned).
+ */
+export function getCoverMechanismActivations(): number {
+  return _coverMechanismActivations;
+}
+
+/**
+ * Get the total support mechanism activation count across all adapter instances.
+ * Increments when the off-ball support adjustment runs (possession, support active).
+ */
+export function getSupportMechanismActivations(): number {
+  return _supportMechanismActivations;
+}
+
+/**
+ * Reset all mechanism activation counters to 0.
+ * Call before each test run for clean measurement.
+ */
+export function resetMechanismCounters(): void {
+  _coverMechanismActivations = 0;
+  _supportMechanismActivations = 0;
+}
+
+// ---------------------------------------------------------------------------
 // Difficulty configuration (BROWSER-DIFFICULTY-SETTING, provisional)
 // ---------------------------------------------------------------------------
 
@@ -967,6 +1007,76 @@ const COVER_SHADOW_STRENGTH = 0.4;
  * Provisional — not a measured PES 2017 value.
  */
 const LINE_WEIGHT = 0.35;
+
+// ---------------------------------------------------------------------------
+// Cover player constants (SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH, provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Distance (metres) behind the presser at which the cover defender
+ * positions.  The cover sits between the presser and own goal,
+ * blocking the through lane.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const COVER_DISTANCE_BEHIND_PRESSER = 6;
+
+/**
+ * Lateral offset (metres) for the cover defender relative to the
+ * ball-to-presser line.  Signed offset placed between the presser
+ * and the most threatening opponent.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const COVER_LATERAL_OFFSET = 3;
+
+/**
+ * Weight (0–1) blending the cover player's own chase direction with
+ * the computed cover position.  At 1 the cover goes exactly to the
+ * computed position; at 0 the cover chases normally.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const COVER_BLEND_WEIGHT = 0.7;
+
+/**
+ * Maximum distance (metres) at which a defender is considered for
+ * the cover assignment.  Beyond this range the cover mechanism
+ * does not activate (falls back to zone marking).
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const COVER_ACTIVATION_RANGE = 20;
+
+// ---------------------------------------------------------------------------
+// Off-ball support constants (SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH, provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Minimum distance (metres) that off-ball attacking players should
+ * maintain from the ball carrier.  Prevents collapsing onto the ball.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const SUPPORT_MIN_DISTANCE = 6;
+
+/**
+ * Maximum distance (metres) that off-ball attackers should maintain
+ * from the ball carrier.  Beyond this they drift closer to maintain
+ * passing-lane viability.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const SUPPORT_MAX_DISTANCE = 18;
+
+/**
+ * Weight (0–1) blending the support position with the default
+ * forward-run behavior.  Higher values enforce support spacing
+ * more strongly.
+ *
+ * Provisional — not a measured PES 2017 value.
+ */
+const SUPPORT_BLEND_WEIGHT = 0.5;
 
 // ---------------------------------------------------------------------------
 // Defensive organization helpers (provisional)
@@ -2121,6 +2231,92 @@ export function createCpuAdapter(): CpuAdapter {
           }
         }
 
+        // --- Cover player: second-closest non-presser positions behind presser ---
+        // When defensive coordination is active, the second-closest team
+        // player (defender or midfielder) to the ball positions behind
+        // the presser (nearest-to-ball) to create a press-cover pair
+        // with role separation.  This prevents all players from
+        // converging on the ball simultaneously.
+        if (isDefensiveMode && cpuTeamId &&
+            (cpuPlayer.formationRole === "defender" || cpuPlayer.formationRole === "midfielder") &&
+            !isNearestToBall) {
+          // Find the nearest-to-ball teammate (the presser) and the second-nearest.
+          let nearestDist = Infinity;
+          let nearestId = "";
+          let secondNearestDist = Infinity;
+          for (const p of observation.players) {
+            if (p.teamId !== cpuTeamId) continue;
+            // Skip attackers — they stay forward for support.
+            if (p.formationRole === "attacker") continue;
+            const pdx = ball.position.x - p.groundPosition.x;
+            const pdy = ball.position.y - p.groundPosition.y;
+            const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+            if (pdist < nearestDist) {
+              secondNearestDist = nearestDist;
+              nearestDist = pdist;
+              nearestId = p.playerId;
+            } else if (pdist < secondNearestDist) {
+              secondNearestDist = pdist;
+            }
+          }
+          // This player is the cover if they are the second-closest
+          // non-attacker teammate and within COVER_ACTIVATION_RANGE.
+          if (observation.controlledPlayerId !== nearestId &&
+              secondNearestDist < COVER_ACTIVATION_RANGE) {
+            // Find the presser's position.
+            const presserPlayer = observation.players.find(
+              (p) => p.playerId === nearestId,
+            );
+            if (presserPlayer) {
+              const presserX = presserPlayer.groundPosition.x;
+              const presserY = presserPlayer.groundPosition.y;
+              // Direction from ball to presser.
+              const bpDx = presserX - ball.position.x;
+              const bpDy = presserY - ball.position.y;
+              const bpLen = Math.sqrt(bpDx * bpDx + bpDy * bpDy);
+              if (bpLen > 0.001) {
+                const bpNx = bpDx / bpLen;
+                const bpNy = bpDy / bpLen;
+                // Cover position: behind the presser (toward own goal) with lateral offset.
+                // The lateral offset is perpendicular to the ball→presser line,
+                // toward the most threatening opponent.
+                const threatening = findMostThreateningOpponent(observation, cpuTeamId);
+                let lateralSign = 1;
+                if (threatening) {
+                  const perpX = -bpNy;
+                  const perpY = bpNx;
+                  const toThreatX = threatening.position.x - presserX;
+                  const toThreatY = threatening.position.y - presserY;
+                  lateralSign = (toThreatX * perpX + toThreatY * perpY) >= 0 ? 1 : -1;
+                }
+                // Cover target: behind the presser (opposite ball→presser direction)
+                // + lateral offset.
+                const coverX = presserX + (-bpNx) * COVER_DISTANCE_BEHIND_PRESSER +
+                  (-bpNy) * COVER_LATERAL_OFFSET * lateralSign;
+                const coverY = presserY + (-bpNy) * COVER_DISTANCE_BEHIND_PRESSER +
+                  (bpNx) * COVER_LATERAL_OFFSET * lateralSign;
+                // Blend cover position with current chase direction.
+                const coverDx = coverX - playerX;
+                const coverDy = coverY - playerY;
+                const coverDist = Math.sqrt(coverDx * coverDx + coverDy * coverDy);
+                if (coverDist > 0.001) {
+                  const coverUnit = Math.min(coverDist, 1);
+                  const coverMoveX = (coverDx / coverDist) * coverUnit;
+                  const coverMoveY = (coverDy / coverDist) * coverUnit;
+                  // Override chase target with cover position (blended).
+                  chaseTargetX = coverX;
+                  chaseTargetY = coverY;
+                  effectiveDistToTarget = coverDist;
+                  moveX = moveX * (1 - COVER_BLEND_WEIGHT) + coverMoveX * COVER_BLEND_WEIGHT;
+                  moveY = moveY * (1 - COVER_BLEND_WEIGHT) + coverMoveY * COVER_BLEND_WEIGHT;
+                  // Track mechanism activation for honesty guard.
+                  _coverMechanismActivations++;
+                }
+              }
+            }
+          }
+        }
+
         // --- Default chase direction toward target ---
         if (effectiveDistToTarget > 0.001) {
           const distUnit = Math.min(effectiveDistToTarget, 1);
@@ -2281,6 +2477,83 @@ export function createCpuAdapter(): CpuAdapter {
               const distUnit = Math.min(runDist, 1);
               moveX = (runDx / runDist) * distUnit;
               moveY = 0;
+            }
+          }
+        }
+
+        // --- Support structure: maintain distances from ball carrier ---
+        // Off-ball attacking players (attackers/midfielders) adjust their
+        // position to stay within SUPPORT_MIN..MAX distance of the ball
+        // carrier and position in passing-lane-adjacent positions rather
+        // than collapsing onto the ball.  This creates observable support
+        // geometry without breaking the team shape.
+        if (cpuTeamId && teamHasPossession(observation, cpuTeamId) &&
+            !state.hasPossession && !isNearestToBall && distToBall > FIRST_TOUCH_RANGE) {
+          const role = cpuPlayer.formationRole;
+          if (role === "attacker" || role === "midfielder") {
+            // Find the ball carrier (nearest teammate to the ball).
+            let carrierX = ball.position.x;
+            let carrierY = ball.position.y;
+            let carrierDist = Infinity;
+            for (const p of observation.players) {
+              if (p.teamId !== cpuTeamId) continue;
+              const pdx = ball.position.x - p.groundPosition.x;
+              const pdy = ball.position.y - p.groundPosition.y;
+              const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+              if (pdist < carrierDist) {
+                carrierDist = pdist;
+                carrierX = p.groundPosition.x;
+                carrierY = p.groundPosition.y;
+              }
+            }
+
+            const toCarrierDx = carrierX - playerX;
+            const toCarrierDy = carrierY - playerY;
+            const toCarrierDist = Math.sqrt(
+              toCarrierDx * toCarrierDx + toCarrierDy * toCarrierDy,
+            );
+
+            if (toCarrierDist > 0.001) {
+              // Direction from this player toward the carrier.
+              const toCarrierNx = toCarrierDx / toCarrierDist;
+              const toCarrierNy = toCarrierDy / toCarrierDist;
+
+              // Perpendicular to carrier direction (passing-lane offset).
+              const perpX = -toCarrierNy;
+              const perpY = toCarrierNx;
+
+              let supportMoveX = 0;
+              let supportMoveY = 0;
+
+              if (toCarrierDist < SUPPORT_MIN_DISTANCE) {
+                // Too close — push laterally away from carrier.
+                // Choose lateral direction based on player's position
+                // relative to ball-to-goal line.
+                const attackingX = cpuTeamId === "team-b" ? -1 : 1;
+                const lateralDot = perpX * attackingX;
+                const lateralSign = lateralDot >= 0 ? 1 : -1;
+                supportMoveX = -toCarrierNx * 0.5 + perpX * lateralSign * 0.8;
+                supportMoveY = -toCarrierNy * 0.5 + perpY * lateralSign * 0.8;
+              } else if (toCarrierDist > SUPPORT_MAX_DISTANCE) {
+                // Too far — drift toward carrier to maintain passing viability.
+                supportMoveX = toCarrierNx * 0.4;
+                supportMoveY = toCarrierNy * 0.4;
+              }
+              // else: in the sweet spot — no support adjustment needed.
+
+              // Blend support adjustment with existing movement.
+              const sLen = Math.sqrt(
+                supportMoveX * supportMoveX + supportMoveY * supportMoveY,
+              );
+              if (sLen > 0.001) {
+                const sUnit = Math.min(sLen, 1);
+                supportMoveX = (supportMoveX / sLen) * sUnit;
+                supportMoveY = (supportMoveY / sLen) * sUnit;
+                moveX = moveX * (1 - SUPPORT_BLEND_WEIGHT) + supportMoveX * SUPPORT_BLEND_WEIGHT;
+                moveY = moveY * (1 - SUPPORT_BLEND_WEIGHT) + supportMoveY * SUPPORT_BLEND_WEIGHT;
+                // Track mechanism activation for honesty guard.
+                _supportMechanismActivations++;
+              }
             }
           }
         }
