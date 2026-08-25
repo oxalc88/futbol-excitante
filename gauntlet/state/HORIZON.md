@@ -3,46 +3,41 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 21
+horizon_version: 22
 status: ACTIVE
-horizon_id: "small-sided-playable-coherence-and-team-depth"
-created_from_commit: b7d8e67
+horizon_id: "continuous-match-closure-and-small-sided-hardening"
+created_from_commit: da8803b
 created_at: 2026-08-25
-reason: "Horizon v20 (EXHAUSTED 4/4) delivered SMALL_SIDED_SHAPE honesty, visibility, and executability: 8/8 situations PASS on resolved driven fixtures, 8 visual-readability dimensions evidenced (DYNAMIC_VISUAL), BROWSER path re-attested, and team exit prereqs (MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS) made executable. Reassessment at exhaustion finds the milestone is honest but fixture-sourced: the situations are proven on purpose-built driven fixtures, not localized from a coherent continuous playable match (all are final_match_required), and the action_recognition readability dimension is honestly NEEDS_PERCEPTUAL_REVIEW because the CPU-only fixture emits no discrete kick/pass/shot. v21 ties the milestone situations and team behaviours to a coherent human-playable small-sided browser match, closes the disclosed action-observability evidence gap, and adds remaining small-sided team/playable depth (incl. full 5v5 human-vs-CPU). Boundary: goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs; NO invented perceptual rubric or PES envelopes; NO PROMOTION-tier verdict (policies not executable)."
-current_index: 6
+reason: "Horizon v21 (EXHAUSTED 6/6) delivered a coherent human-playable small-sided ladder (2v2/3v3/5v5, human-vs-CPU and CPU-vs-CPU) plus an executable continuous-match situation scanner. Reassessment at exhaustion surfaces three disclosed open gaps rather than new breadth: (a) coherent-match situation closure is partial — only 6/8 situations localize organically from continuous play (SHOT_TO_RESULT and PHYSICAL_DUEL stay insufficient_context, so the milestone remains largely fixture-sourced); (b) the action_recognition readability dimension stays honestly NEEDS_PERCEPTUAL_REVIEW with no human-driven discrete-action observability; (c) the flagship 5v5 human-vs-CPU mode is reachable only by URL and absent from the browser setup menu, and the flashy indicator/player-switch baseline failures (INDICATOR-002, SWITCH-004/005/006) stem from the legacy switch path double-switching now that the core natively resolves SWITCH_PLAYER_BIT. v22 closes these gaps within small-sided bounds: deepen coherent continuous play so duels/shot-results localize organically, add safe human-driven action observability (no invented perceptual rubric), reconcile the switch/indicator path to the core-native single-switch contract, complete the in-browser ladder menu, and fold the deepened evidence into the milestone bundle. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
+current_index: 0
 objectives:
-  - id: SMALL-SIDED-MATCH-SITUATION-SCANNER
-    status: accepted
-    reason: "Extend the small-sided situation evaluator/mapping (eval/contracts/situation-mapping.ts + eval/runners/small-sided-situation-evaluator.ts) to locate the 8 milestone situations organically inside a single continuous small-sided match (ai 3v3/5v5) from its event+telemetry stream, instead of purpose-built driven fixtures — the deterministic machine backbone that grounds the milestone in a coherent playable match. HEADLESS."
+  - id: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
+    status: pending
+    reason: "Deepen coherent continuous small-sided play so SHOT_TO_RESULT and PHYSICAL_DUEL localize organically from a single match instead of only purpose-built fixtures: genuine 1v1 pressing duels (a defender contests the ball carrier with real player-player contact and the ball at feet) and real shot attempts that reach a goal/ball-out-of-play during coherent 3v3/5v5 CPU-vs-CPU or human-vs-CPU matches. Target scanning 8/8 situations present from continuous play, honestly disclosed if any remain insufficient_context. Behaviour is evidenced by per-tick trajectory geometry (duel/contact/shot/goal windows) and browser event-centered frames. MULTI_TICK."
+    builder: builder-gameplay
+    prerequisite: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
+  - id: SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY
+    status: pending
+    reason: "Close the disclosed action_recognition readability-observability gap safely with human-driven discrete actions in the 5v5 human-vs-CPU browser match: when the human presses PASS/SHOT (J/L), capture event-centered before/event/after frames bound to the exact input tick and the input frame that caused the event — observability evidence for reviewer/perceptual judgment only. This is NOT a readability PASS and NO rubric is invented; because the CPU adapter emits no discrete input-tagged kick/pass/shot, human-driven input makes the action-to-visual binding observable for the first time. DYNAMIC_VISUAL."
+    builder: builder-gameplay
+    prerequisite: SMALL-SIDED-5V5-HUMAN-VS-CPU
+  - id: BROWSER-SWITCH-INDICATOR-BASELINE-FIX
+    status: pending
+    reason: "Scoped bugfix for the pre-existing baseline failures surfaced in v21 (player-indicator INDICATOR-002; player-switch SWITCH-004/005/006): the simulation core now natively resolves SWITCH_PLAYER_BIT inside sim.step() (emitting slot-switch events), but the legacy browser test helpers and main.ts's real-time loop still call setControlledPlayer manually, so a single Tab keypress switches twice. Reconcile the legacy tests and the browser UI path to the core-native single-switch contract and confirm the controlled-player marker follows the switch (the renderer already repositions it per frame). Discriminating guard: the switch/indicator assertions must fail when the core's SWITCH_PLAYER_BIT processing is stashed, must not mask other baseline behaviour (SWITCH-001/002/003 and INDICATOR-001/003/004/005 keep their semantics; neighbor browser suites stay green), and the deterministic simulation core must remain unchanged. BROWSER_VISIBLE."
+    builder: builder-gameplay
+    prerequisite: BROWSER-PLAYER-SWITCH
+  - id: SMALL-SIDED-LADDER-MENU-COMPLETION
+    status: pending
+    reason: "Complete the in-browser setup-menu ladder: the accepted full 5v5 human-vs-CPU mode (and the 3v3 human-vs-CPU mode) are reachable only by URL (?mode=human-vs-ai-5v5 / human-vs-ai-3v3) and absent from the MATCH_MODES registry in main.ts and the hardcoded mode-select options in index.html. Add the missing entries/options so the full small-sided ladder (1v1/2v2/3v3/5v5, human-vs-CPU and CPU-vs-CPU) is selectable from the browser setup menu. Guard: a binding/browser test that fails when a menu entry is removed and asserts menu-to-scenario-selector parity for every ladder mode, plus a DYNAMIC_VISUAL screenshot of the completed menu and a launched match. BROWSER_VISIBLE."
+    builder: builder-gameplay
+    prerequisite: SMALL-SIDED-5V5-HUMAN-VS-CPU
+  - id: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
+    status: pending
+    reason: "Re-run the situation scanner and SMALL_SIDED_SHAPE milestone reducer on the deepened coherent matches, updating the coherent_match_sources block to reflect the deepened organic localization — SHOT_TO_RESULT and PHYSICAL_DUEL present where genuinely observed, and human-driven action observability added where applicable — honestly disclosed if still partial. Evidence-bundle only, no gameplay change; the durable bundle advances toward 15 runs with improved final_match_required closure. BOOKKEEPING."
     builder: builder-structured
-    prerequisite: SMALL-SIDED-SITUATION-EVALUATOR
-  - id: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
-    status: accepted
-    reason: "Materialize the integrated playable small-sided match playtest running the resolved situations through the scanner on coherent CPU-vs-CPU and human-vs-CPU 3v3/5v5 matches, producing per-situation event-centered DYNAMIC_VISUAL evidence that ties SMALL_SIDED_SHAPE to the actual browseable experience (final_match_required) rather than isolated lab fixtures. DYNAMIC_VISUAL."
-    builder: builder-gameplay
-    prerequisite: SMALL-SIDED-MATCH-SITUATION-SCANNER
-  - id: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
-    status: accepted
-    reason: "Deepen COORDINATED_PRESS (press+cover responsibilities) and SUPPORT_AND_PASSING_LANES (support without abandoning structure) in genuine small-sided play beyond the lab fixtures — remaining team/tactics depth within small-sided, not crossing GK/regulation; evidenced by team-geometry trajectories. MULTI_TICK."
-    builder: builder-gameplay
-    prerequisite: CPU-DEFENSIVE-ORGANIZATION
-  - id: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
-    status: accepted
-    reason: "Close the disclosed action_recognition gap in the milestone bundle by capturing event-centered frames at discrete pass/shot/contact events in a mixed human/CPU small-sided match so the action_recognition readability dimension is observable — honest observability evidence, NOT an invented perceptual rubric. DYNAMIC_VISUAL."
-    builder: builder-gameplay
-    prerequisite: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
-  - id: SMALL-SIDED-5V5-HUMAN-VS-CPU
-    status: accepted
-    reason: "Complete the playable small-sided ladder with a full 5v5 human-vs-CPU match mode (currently only 5v3 human-vs-CPU and 5v5 AI exist) — an observable browser capability deepening small-sided playability without crossing GK/regulation. DYNAMIC_VISUAL."
-    builder: builder-gameplay
-    prerequisite: BROWSER-5V5-MATCH
-  - id: SMALL-SIDED-PLAYTEST-RE-RUN
-    status: accepted
-    reason: "Re-run the SMALL_SIDED_SHAPE milestone reducer adding the coherent-match situation evidence as a supplementary source beside the driven fixtures, preserving the honest PASS while strengthening the final_match_required/integrated_playtest closure; evidence-bundle only, no gameplay change. BOOKKEEPING."
-    builder: builder-structured
-    prerequisite: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
-observable_progress_target: "A coherent human-playable small-sided match (3v3 & 5v5, human-vs-CPU and CPU-vs-CPU) in the browser where the 8 SMALL_SIDED_SHAPE situations and team behaviours (press/support/transitions) are demonstrable from one continuous match with event-centered evidence, and full 5v5 human-vs-CPU is playable. NO GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity work; NO PROMOTION overclaim."
-last_invalidation_reason: "Horizon v20 EXHAUSTED 4/4: SMALL_SIDED_SHAPE honesty, visibility, and executability delivered. Reassessment surfaced that the milestone PASS is fixture-sourced (not localized from a coherent continuous playable match; all situations final_match_required) and action_recognition remains honestly NEEDS_PERCEPTUAL_REVIEW. Boundary: GK/regulation/full-match deferred."
+    prerequisite: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
+observable_progress_target: "A coherent, browser-playable small-sided match (3v3/5v5, human-vs-CPU and CPU-vs-CPU) that visibly plays out genuine attacking build-up, 1v1 duels, and shots reaching goal so the situation scanner localizes SHOT_TO_RESULT and PHYSICAL_DUEL organically from one continuous match (target 8/8 localizable, honestly disclosed if partial); human-driven discrete pass/shot actions are observable as event-centered frames bound to their input tick; Tab player-switching works once per keypress with the controlled-player marker following correctly in the live browser; and the full small-sided ladder (1v1/2v2/3v3/5v5, human-vs-CPU and CPU-vs-CPU) is selectable from the browser setup menu. NO GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity/PROMOTION work."
+last_invalidation_reason: "Horizon v21 EXHAUSTED 6/6: coherent small-sided playable ladder + continuous-match situation scanner delivered. Reassessment found three disclosed open gaps — coherent-match situation closure partial (SHOT_TO_RESULT/PHYSICAL_DUEL insufficient_context, 6/8 localizable), action_recognition readability needing human-driven observability, and pre-existing baseline browser failures plus the flagship 5v5 human-vs-CPU mode missing from the setup menu. GK/regulation/full-match/perceptual-rubric still deferred."
 replan_if:
   - objective_blocked
   - architectural_invalidation

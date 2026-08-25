@@ -8,9 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
+next_objective_id: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
+
 best_known:
   commit: da8803b
-  note: "SMALL-SIDED-PLAYTEST-RE-RUN accepted — SMALL_SIDED_SHAPE milestone reducer re-run adding coherent-match situation evidence as a supplementary source beside the driven fixtures; honest PASS preserved; bundle 14 runs / 13 sources. Horizon v21 COMPLETE 6/6. Horizon v22 (continuous-match-closure-and-small-sided-hardening) to be established in a follow-up commit."
+  note: "SMALL-SIDED-PLAYTEST-RE-RUN accepted — SMALL_SIDED_SHAPE milestone reducer re-run adding coherent-match situation evidence as a supplementary source beside the driven fixtures; honest PASS preserved; bundle 14 runs / 13 sources. Horizon v21 COMPLETE 6/6. Horizon v22 ACTIVE (continuous-match-closure-and-small-sided-hardening)."
 
 active_candidate: null
 builder_in_use: null
@@ -151,7 +153,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) COMPLETE 6/6: SMALL-SIDED-PLAYTEST-RE-RUN accepted — SMALL_SIDED_SHAPE milestone reducer re-run adding the Horizon v21 coherent-match situation evidence as a supplementary source beside the driven fixtures (BATCH-5 remains the decisive 8/8 PASS source), preserving the honest PASS while strengthening final_match_required / integrated_playtest closure; new playtest run 2026-08-25T20-49-57-668Z (milestone_verdict PASS) with an honest coherent_match_sources block (PRESS 6/8, INTEGRATED 0/3/5, 5V5 633 events/361 ticks, all disclosed as measured); durable bundle regenerated to 14 runs / 13 sources (old preserved as manifest-superseded); zero source change; critic ACCEPT first pass; integration ACCEPT first pass. Horizon v22 (continuous-match-closure-and-small-sided-hardening) to be established in the next commit: close coherent-match situation closure (SHOT_TO_RESULT/PHYSICAL_DUEL), human-driven action observability, switch/indicator baseline fix, ladder menu completion, coherent evidence re-run — first objective SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE (builder-gameplay). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
+selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) COMPLETE 6/6: SMALL-SIDED-PLAYTEST-RE-RUN accepted — SMALL_SIDED_SHAPE milestone reducer re-run adding the Horizon v21 coherent-match situation evidence as a supplementary source beside the driven fixtures (BATCH-5 remains the decisive 8/8 PASS source), preserving the honest PASS while strengthening final_match_required / integrated_playtest closure; new playtest run 2026-08-25T20-49-57-668Z (milestone_verdict PASS) with an honest coherent_match_sources block (PRESS 6/8, INTEGRATED 0/3/5, 5V5 633 events/361 ticks, all disclosed as measured); durable bundle regenerated to 14 runs / 13 sources (old preserved as manifest-superseded); zero source change; critic ACCEPT first pass; integration ACCEPT first pass. Horizon v22 ACTIVE (continuous-match-closure-and-small-sided-hardening): close coherent-match situation closure (SHOT_TO_RESULT/PHYSICAL_DUEL), human-driven action observability, switch/indicator baseline fix, ladder menu completion, coherent evidence re-run. Next: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE (builder-gameplay). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
