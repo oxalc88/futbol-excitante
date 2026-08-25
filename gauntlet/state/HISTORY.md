@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 136 — 2026-08-25
+
+- objective_id: SMALL-SIDED-PROFILE-REDUCER-EXTENSION
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 0e2cba3 candidate(SMALL-SIDED-PROFILE-REDUCER-EXTENSION)
+- notes: Added executable small-sided milestone profile reducer (eval/runners/small-sided-profile-reducer.ts) wiring MUTANT_TEAM_PASS (runMutantTeamEval) and TEAM_SHAPE_SUITE_PASS (runTeamShapeEval) into a machine path; honest milestoneVerdict mapping (PASS only on genuine PASS; unknown prereqs NOT_EVALUATED; throws INVALID_RUN), no theatrical always-PASS. Strictly exit-prereq executability/audit-only honesty, NOT §2.3/§8 PROMOTION-tier. 24 new verification tests + 268 neighboring/regression tests pass (playable-evaluator 42, mutant-team 34, team-shape 19, EXIT-PREREQ-IDENTITY-binding 20, etc.); playable-evaluator.ts untouched; durable SMALL_SIDED_SHAPE milestone manifest preserved. HEADLESS audit PASS. Horizon v20 EXHAUSTED (4/4) — strategic reassessment next.
+
 ## Iteration 135 — 2026-08-25
 
 - objective_id: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN

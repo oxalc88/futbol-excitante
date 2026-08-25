@@ -8,11 +8,9 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-PROFILE-REDUCER-EXTENSION
-
 best_known:
-  commit: 8b2675f
-  note: "BROWSER-SMALL-SIDED-001-COHERENCE-RERUN accepted — browser/headless hash correspondence + determinism re-attested across the three resolved driven fixtures (extended, shot-resolution, duel-rejection); critic + integration ACCEPT; audit PASS. Horizon v20 3/4."
+  commit: 0e2cba3
+  note: "SMALL-SIDED-PROFILE-REDUCER-EXTENSION accepted — executable small-sided profile reducer wiring MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS exit prereqs; critic + integration ACCEPT; audit PASS. Horizon v20 COMPLETE 4/4."
 
 active_candidate: null
 builder_in_use: null
@@ -143,13 +141,23 @@ accepted:
   - SMALL-SIDED-EXIT-PREREQ-IDENTITY
   - SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
   - BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
+  - SMALL-SIDED-PROFILE-REDUCER-EXTENSION
 
 blocked: []
 
-selection_note: "Horizon v20 3/4: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN accepted — browser/headless hash correspondence + determinism re-attested across the three resolved driven fixtures (extended, shot-resolution, duel-rejection) that produced the 8/8 SMALL_SIDED_SHAPE situation PASS; only new browser/scripts/evidence files, no core gameplay change, original BROWSER-SMALL-SIDED-001-CASE evidence preserved; critic + integration ACCEPT, deterministic audit PASS. Next: SMALL-SIDED-PROFILE-REDUCER-EXTENSION (executable team-exit prereq reducer). GK/regulation/full-match deferred; no PROMOTION overclaim."
+selection_note: "Horizon v20 COMPLETE 4/4: SMALL-SIDED-PROFILE-REDUCER-EXTENSION accepted — executable small-sided profile reducer wiring MUTANT_TEAM_PASS (runMutantTeamEval) and TEAM_SHAPE_SUITE_PASS (runTeamShapeEval) into a machine path, honest milestoneVerdict mapping, unknown prereqs NOT_EVALUATED, no theatrical always-PASS; strictly exit-prereq executability/audit-only, NOT a §2.3/§8 PROMOTION-tier verdict; playable-evaluator.ts untouched, 24 new + 268 regression tests pass, milestone SMALL_SIDED_SHAPE manifest preserved. Horizon v20 EXHAUSTED — strategic reassessment next. GK/regulation/full-match deferred; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
+SMALL-SIDED-PROFILE-REDUCER-EXTENSION — Added an executable small-sided milestone profile reducer (eval/runners/small-sided-profile-reducer.ts) wiring SMALL_SIDED_SHAPE_PROFILE's exit prerequisites MUTANT_TEAM_PASS (runMutantTeamEval → milestoneVerdict) and TEAM_SHAPE_SUITE_PASS (runTeamShapeEval → milestoneVerdict) into a machine-executable path, replacing the hardcoded 1v1-only handling. Honest milestoneVerdict mapping (PASS only on genuine PASS; unknown prereqs NOT_EVALUATED; throws INVALID_RUN) — no theatrical always-PASS. Framed strictly as exit-prereq executability / audit-only honesty, NOT a §2.3/§8 PROMOTION-tier verdict. 24 new verification tests + 268 neighboring/regression tests pass; playable-evaluator.ts untouched; durable SMALL_SIDED_SHAPE milestone manifest preserved. Horizon v20 COMPLETE 4/4.
+
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-25T12:07:24Z); deterministic audit PASS
+- Candidate: 0e2cba3
+
+Previously accepted:
 BROWSER-SMALL-SIDED-001-COHERENCE-RERUN — Re-attested the BROWSER-SMALL-SIDED-001 browser case (browser/headless hash correspondence + determinism) across the three resolved driven fixture scenarios (3v3-situation-driven-extended, shot-resolution, duel-rejection) that produced the 8/8 SMALL_SIDED_SHAPE situation PASS, proving the milestone's BROWSER execution path is coherent with the fixture/engine changes underlying the PASS. DYNAMIC_VISUAL evidence: trajectory.json (3 scenarios × 60 ticks), 4 semantic frames + sequence.json, 27/27 browser tests, 16/16 binding tests, 254 neighboring tests pass. Only new browser/scripts/evidence files; original BROWSER-SMALL-SIDED-001-CASE evidence preserved. Coherence/observability evidence — not a milestone PASS, no numeric readability PASS, no PES fidelity, no FOUNDATION_LAB_PASS, no PROMOTION verdict. Horizon v20 3/4.
 
 - builder: builder-gameplay / mimo-v2.5

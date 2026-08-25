@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
-usage_aggregates_through: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
-clock_aggregates_through: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
-model_evaluation_through: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
+last_tracked_objective: SMALL-SIDED-PROFILE-REDUCER-EXTENSION
+usage_aggregates_through: SMALL-SIDED-PROFILE-REDUCER-EXTENSION
+clock_aggregates_through: SMALL-SIDED-PROFILE-REDUCER-EXTENSION
+model_evaluation_through: SMALL-SIDED-PROFILE-REDUCER-EXTENSION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -204,6 +204,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-EXIT-PREREQ-IDENTITY | accepted | ~14m | 6m | 3.5m | 6m | 0.5m | n/a | n/a |
 | SMALL-SIDED-VISUAL-READABILITY-EVIDENCE | accepted | ~12m | n/a\* | 3.8m | 3.2m | 0.7m | n/a | n/a |
 | BROWSER-SMALL-SIDED-001-COHERENCE-RERUN | accepted | ~29m | 19m | 3m | 6.2m | 0.5m | n/a | n/a |
+| SMALL-SIDED-PROFILE-REDUCER-EXTENSION | accepted | ~16m | 4.7m | 2.5m | 9.6m | 0.4m | n/a | n/a |
 
 \* Builder (mimo-v2.5) produced the evidence in a prior session before this continuation pickup; its step time is not re-measured here. Reviewer/commit phases measured from this session's subagents. BROWSER-SMALL-SIDED-001-COHERENCE-RERUN builder ran in this continuation session.
 
@@ -485,6 +486,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-EXIT-PREREQ-IDENTITY | qwen3.6 | M | Medium — milestone record exit-prereq identity correction (HEADLESS) | 0 | A | corrected to MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS; PASS preserved |
 | SMALL-SIDED-VISUAL-READABILITY-EVIDENCE | mimo-v2.5 | M | Medium — materialize 8-dimension visual-readability evidence (DYNAMIC_VISUAL) | 0 | A | 24 event-centered frames; observability evidence only; SHA-reuse resolved VALID |
 | BROWSER-SMALL-SIDED-001-COHERENCE-RERUN | mimo-v2.5 | M | Medium — re-attest browser coherence on resolved fixtures (DYNAMIC_VISUAL) | 0 | A | browser/headless hash correspondence across 3 driven fixtures; 27+16+254 tests |
+| SMALL-SIDED-PROFILE-REDUCER-EXTENSION | qwen3.6 | M | Medium — executable small-sided team-exit prereq reducer (HEADLESS) | 0 | A | honest milestoneVerdict wiring; 24+268 tests; no PROMOTION overclaim |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -691,6 +693,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-VISUAL-READABILITY-EVIDENCE | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | composition clean; 101 neighboring core tests pass; adapter-only test-bridge change (presentation) |
 | BROWSER-SMALL-SIDED-001-COHERENCE-RERUN | critic (deepseek-v4-flash) | base flash | ACCEPT | hashes recomputed, matching; 27/27 browser + 16/16 binding; original 001 evidence preserved; no overclaims |
 | BROWSER-SMALL-SIDED-001-COHERENCE-RERUN | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 254 neighboring tests pass; no core gameplay change; evidence honest |
+| SMALL-SIDED-PROFILE-REDUCER-EXTENSION | critic (deepseek-v4-flash) | base flash | ACCEPT | 24/24 new + 95 regression tests; honest milestoneVerdict mapping; playable-evaluator untouched; no overclaim |
+| SMALL-SIDED-PROFILE-REDUCER-EXTENSION | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 268 tests pass; milestone manifest preserved; oracle integrity fine |
 
 ### Builder scoreboard
 
@@ -698,7 +702,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 80 | 57 | 10 | 3 | 3 | 2 | 74% | ~0.42 | ~31m |
+| qwen3.6 | 81 | 58 | 10 | 3 | 3 | 2 | 74% | ~0.42 | ~31m |
 | mimo-v2.5 | 35 | 22 | 11 | 2 | 0 | 0 | 63% | ~0.45 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
