@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
-usage_aggregates_through: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
-clock_aggregates_through: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
-model_evaluation_through: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+last_tracked_objective: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
+usage_aggregates_through: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
+clock_aggregates_through: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
+model_evaluation_through: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -209,6 +209,9 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH | accepted | ~80m | 52m\* | 3m | 14m | 0.4m | n/a | n/a |
 
 \* MiMo builder time includes the integration-REJECT fix cycle (verdict-module refactor regression fixed).
+| SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH | accepted | ~150m\*\* | 105m | 25m | 22m | 0.5m | n/a | n/a |
+
+\*\* MiMo builder time includes two critic RETRY cycles (honesty-guard discrimination + report integrity) + the integration-REJECT-adjacent fix work; reviewer time includes deep neighbor verification.
 
 \* Builder (mimo-v2.5) produced the evidence in a prior session before this continuation pickup; its step time is not re-measured here. Reviewer/commit phases measured from this session's subagents. BROWSER-SMALL-SIDED-001-COHERENCE-RERUN builder ran in this continuation session.
 
@@ -493,6 +496,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-PROFILE-REDUCER-EXTENSION | qwen3.6 | M | Medium — executable small-sided team-exit prereq reducer (HEADLESS) | 0 | A | honest milestoneVerdict wiring; 24+268 tests; no PROMOTION overclaim |
 | SMALL-SIDED-MATCH-SITUATION-SCANNER | qwen3.6 | M | Medium — continuous-match small-sided situation scanner (HEADLESS) | 1 | B | RETRY on test-suite flakiness (hook timeout); fixed; honest not_observed; backward compatible |
 | SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH | mimo-v2.5 | M | Medium — integrated small-sided playtest match via scanner (DYNAMIC_VISUAL) | 1 | B | honest negative result; verdict-module refactor REJECT fixed; 27+31+134+46 tests |
+| SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH | mimo-v2.5 | M | Medium — press and support depth + headless team-decision fix (MULTI_TICK) | 2 | B | RETRY x2 (honesty guard); discriminating counter guard; 14+83 tests |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -705,6 +709,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-MATCH-SITUATION-SCANNER | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 161 neighborhood tests; no src change; backward compatible; milestone manifest intact |
 | SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH | critic (deepseek-v4-flash) | base flash | ACCEPT | honest 0 present / 3 not_observed / 5 insufficient_context; pure verdict module; SHA-reuse VALID |
 | SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH | integration-reviewer (deepseek-v4-flash) | base flash | REJECT→ACCEPT | REJECT: refactor left computeSituationVerdict unbound (24 failing tests). Fixed via local import; re-run 27/27+31/31+134/134+46 green |
+| SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH | critic (deepseek-v4-flash) | base flash | RETRY→ACCEPT | RETRY x2: guard non-discriminating (tests pass with code stashed). Fixed via mechanism-activation-counter guard (fails when stashed; 492 activations). ACCEPT |
+| SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 411 CPU + 323 eval + 40 browser neighbors green; injection byte-identical to bridge; additivity confirmed |
 
 ### Builder scoreboard
 
@@ -713,7 +719,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 82 | 58 | 11 | 3 | 3 | 2 | 74% | ~0.43 | ~31m |
-| mimo-v2.5 | 36 | 22 | 12 | 2 | 0 | 0 | 62% | ~0.47 | ~33m |
+| mimo-v2.5 | 37 | 22 | 13 | 2 | 0 | 0 | 62% | ~0.50 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

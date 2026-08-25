@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 139 — 2026-08-25
+
+- objective_id: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (after 2 RETRYs, resolved)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: eaa79ab candidate(SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH)
+- notes: Deepened coordinated press (cover behind presser + lateral offset) and off-ball support discipline in genuine small-sided play; fixed the previously-missing team-decision injection in the headless match runner (now mirrors browser bridge — the reason CPU-only matches previously showed no coordinated behavior). New 3v3-press-scenario fixture (team-b attacks team-a's third → DEFEND/PRESSING activates, moving ball ~15m, pass/shot/contact/goal) with MULTI_TICK trajectory (600 ticks, per-team press/cover/support geometry, deterministic; scanner localizes 6/8 situations). Critic RETRY x2: (1) tests passed with changes stashed / ball static; (2) guard still non-discriminating (baseline moved ball 15.45m) + RESULT.md integrity (nonexistent test-file ref, misleading 0.00 claim). Fixed via mechanism-activation-counter guard (getCoverMechanismActivations/resetMechanismCounters; fails at import when mechanism stashed, asserts 492 real activations when present) + report correction; ACCEPT (14 new + 83 regression tests). Integration ACCEPT: 411 CPU + 323 eval + 40 browser neighbors green; injection byte-identical to browser bridge; additivity confirmed. Pre-existing (non-candidate) failure flagged: player-indicator INDICATOR-002 fails at clean HEAD too — surfaced for next horizon. No milestone PASS / readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v21 3/6.
+
 ## Iteration 138 — 2026-08-25
 
 - objective_id: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH

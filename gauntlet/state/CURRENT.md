@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
+next_objective_id: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
 
 best_known:
-  commit: 85564d1
-  note: "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH accepted — coherent CPU-vs-CPU 3v3 match run through the situation scanner (honest 0 present / 3 not_observed / 5 insufficient_context); pure verdict module extracted; integration REJECT caught evaluator regression (value re-export unbound local), fixed; critic + integration ACCEPT. Horizon v21 2/6."
+  commit: eaa79ab
+  note: "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH accepted — cover+support mechanisms + headless team-decision injection fix, evidenced on a moving-ball press scenario (6/8 situations present); critic ACCEPT after 2 RETRYs (discriminating guard proven); integration ACCEPT (broad neighbor green). Horizon v21 3/6."
 
 active_candidate: null
 builder_in_use: null
@@ -146,13 +146,23 @@ accepted:
   - SMALL-SIDED-PROFILE-REDUCER-EXTENSION
   - SMALL-SIDED-MATCH-SITUATION-SCANNER
   - SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+  - SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
 
 blocked: []
 
-selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 2/6: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH accepted — coherent CPU-vs-CPU 3v3 match run through the accepted situation scanner as an integrated playtest (trajectory + 5 semantic frames + browser/headless coherence); honest outcome: 0 present / 3 not_observed / 5 insufficient_context because the CPU-only match produces only player-player-contact events (ball settled — disclosed); pure verdict module extracted for browser compatibility; integration REJECT caught a backward-compat regression (computeSituationVerdict left unbound by value re-export, 24 failing tests), fixed with local import (27/27 evaluator, 31/31 scanner, 134/134 BATCH, 46 more browser/node green); one frame SHA byte-match resolved VALID by bounded semantic audit. Next: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH. GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
+selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 3/6: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH accepted — cover+support mechanisms in cpu-adapter plus the previously-missing headless team-decision injection fix, evidenced on a new moving-ball press scenario (3v3-press-scenario, ball displacement ~15m, 6/8 situations present via scanner); critic RETRY x2 on honesty-guard discrimination then ACCEPT (mechanism-activation-counter guard fails when mechanism stashed, 492 activations when present); integration ACCEPT (411 CPU + 323 eval + 40 browser neighbor tests green, injection byte-identical to browser bridge, additivity confirmed; pre-existing non-candidate browser failure player-indicator INDICATOR-002 flagged for next horizon). Next: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY (close the disclosed action_recognition gap in a mixed human/CPU match). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
+SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH — Deepened coordinated press (cover player behind the presser with lateral offset) and off-ball support positioning (support-distance discipline) in genuine small-sided play, plus fixed the previously-missing team-decision injection in the headless match runner (mirrors the browser bridge; this was why CPU-only matches previously showed no coordinated behavior). New 3v3-press-scenario fixture (team-b attacks team-a's third → DEFEND/PRESSING activates) with a genuinely moving ball (~15m displacement, pass/shot/contact/goal events) and evidence on it: MULTI_TICK trajectory.json (600 ticks, per-tick per-team press/cover/support geometry, deterministic) with the situation scanner localizing 6/8 situations present. Critic RETRY x2 on honesty-guard discrimination then ACCEPT: the new mechanism-activation-counter guard (getCoverMechanismActivations / resetMechanismCounters) fails when the mechanism is stashed and asserts 492 real cover activations when present; trajectory representativeness and report integrity fixed. Integration ACCEPT: 411 CPU + 323 eval + 40 browser neighbor tests green; injection byte-identical to the browser bridge; additivity confirmed (accepted evidence unchanged when mechanisms inactive). Pre-existing (non-candidate) browser failure flagged: player-indicator INDICATOR-002. No SMALL_SIDED_SHAPE PASS / readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim; provisional constants labeled. Horizon v21 3/6.
+
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (after 2 RETRYs on honesty-guard discrimination, resolved)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-25T18:03:28Z); deterministic audit PASS
+- Candidate: eaa79ab
+
+Previously accepted:
 SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH — Materialized an integrated playable small-sided match playtest: a coherent CPU-vs-CPU 3v3 match (360 ticks, browser+headless hash-correspondent) run through the accepted continuous-match situation scanner, with per-situation localization and DYNAMIC_VISUAL evidence (trajectory.json 360 hashes + scan localizations, 5 semantic frames + sequence.json, browser-cases.json). Honest outcome: 0 present / 3 not_observed (PASS_RECEPTION, SHOT_TO_RESULT, SUPPORT_AND_PASSING_LANES) / 5 insufficient_context, because the CPU-only match produces only player-player-contact events and the ball stays settled — disclosed; no forced presence. Extracted a pure verdict module (eval/runners/small-sided-situation-verdict.ts) for browser compatibility; backward-compat refactor of the accepted scanner/evaluator. Integration reviewer REJECTed once: the refactor left computeSituationVerdict bound only as a value re-export (no local binding), breaking runSituationEvaluator (24 failing tests) — fixed with a local import; re-verified 27/27 evaluator, 31/31 scanner, 134/134 BATCH, 13/13 browser playtest, 19/19 binding, 10/10 + 27/27 accepted browser cases. One frame SHA byte-match resolved VALID by the bounded semantic audit. No SMALL_SIDED_SHAPE PASS / readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v21 2/6.
 
 - builder: builder-gameplay / mimo-v2.5
