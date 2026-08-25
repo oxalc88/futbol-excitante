@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 138 — 2026-08-25
+
+- objective_id: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (after REJECT, resolved)
+- result: accepted
+- commits: 85564d1 candidate(SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH)
+- notes: Integrated playable small-sided match playtest: coherent CPU-vs-CPU 3v3 match (360 ticks, browser/headless hash-correspondent) run through the accepted continuous-match situation scanner with DYNAMIC_VISUAL evidence (trajectory.json 360 hashes + scan localizations, 5 semantic frames + sequence.json, browser-cases.json). Honest outcome: 0 present / 3 not_observed / 5 insufficient_context — CPU-only match produces only player-player-contact events, ball stays settled (disclosed, no forced presence). Extracted pure verdict module (small-sided-situation-verdict.ts) for browser compatibility. Integration reviewer REJECT once: backward-compat refactor left computeSituationVerdict bound only as a value re-export (no local binding), breaking runSituationEvaluator (24 failing tests across evaluator/scanner-backward-compat/BATCH-1); fixed with local import; re-verified 27/27 evaluator, 31/31 scanner, 134/134 BATCH, 13/13 browser playtest, 19/19 binding, 10/10 + 27/27 accepted browser cases. One frame SHA byte-match (frame-before.png) resolved VALID by bounded semantic audit (tick-0 determinism). No SMALL_SIDED_SHAPE PASS / readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Capture-hygiene advisory (page.screenshot direct to docs/screenshots) documented in known_gaps. Horizon v21 2/6.
+
 ## Iteration 137 — 2026-08-25
 
 - objective_id: SMALL-SIDED-MATCH-SITUATION-SCANNER

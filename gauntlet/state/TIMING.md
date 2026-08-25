@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-MATCH-SITUATION-SCANNER
-usage_aggregates_through: SMALL-SIDED-MATCH-SITUATION-SCANNER
-clock_aggregates_through: SMALL-SIDED-MATCH-SITUATION-SCANNER
-model_evaluation_through: SMALL-SIDED-MATCH-SITUATION-SCANNER
+last_tracked_objective: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+usage_aggregates_through: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+clock_aggregates_through: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+model_evaluation_through: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -206,6 +206,9 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | BROWSER-SMALL-SIDED-001-COHERENCE-RERUN | accepted | ~29m | 19m | 3m | 6.2m | 0.5m | n/a | n/a |
 | SMALL-SIDED-PROFILE-REDUCER-EXTENSION | accepted | ~16m | 4.7m | 2.5m | 9.6m | 0.4m | n/a | n/a |
 | SMALL-SIDED-MATCH-SITUATION-SCANNER | accepted | ~42m | 16m | 14m | 12m | 0.4m | n/a | n/a |
+| SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH | accepted | ~80m | 52m\* | 3m | 14m | 0.4m | n/a | n/a |
+
+\* MiMo builder time includes the integration-REJECT fix cycle (verdict-module refactor regression fixed).
 
 \* Builder (mimo-v2.5) produced the evidence in a prior session before this continuation pickup; its step time is not re-measured here. Reviewer/commit phases measured from this session's subagents. BROWSER-SMALL-SIDED-001-COHERENCE-RERUN builder ran in this continuation session.
 
@@ -489,6 +492,7 @@ on an H task is the interesting result.
 | BROWSER-SMALL-SIDED-001-COHERENCE-RERUN | mimo-v2.5 | M | Medium — re-attest browser coherence on resolved fixtures (DYNAMIC_VISUAL) | 0 | A | browser/headless hash correspondence across 3 driven fixtures; 27+16+254 tests |
 | SMALL-SIDED-PROFILE-REDUCER-EXTENSION | qwen3.6 | M | Medium — executable small-sided team-exit prereq reducer (HEADLESS) | 0 | A | honest milestoneVerdict wiring; 24+268 tests; no PROMOTION overclaim |
 | SMALL-SIDED-MATCH-SITUATION-SCANNER | qwen3.6 | M | Medium — continuous-match small-sided situation scanner (HEADLESS) | 1 | B | RETRY on test-suite flakiness (hook timeout); fixed; honest not_observed; backward compatible |
+| SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH | mimo-v2.5 | M | Medium — integrated small-sided playtest match via scanner (DYNAMIC_VISUAL) | 1 | B | honest negative result; verdict-module refactor REJECT fixed; 27+31+134+46 tests |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -699,6 +703,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-PROFILE-REDUCER-EXTENSION | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 268 tests pass; milestone manifest preserved; oracle integrity fine |
 | SMALL-SIDED-MATCH-SITUATION-SCANNER | critic (deepseek-v4-flash) | base flash | RETRY→ACCEPT | RETRY: mandatory suite flaky under parallel load (hook timeout, 7/31 skipped). Fixed (60s hook timeouts). ACCEPT: 31/31 reproducible x2; 116/116 regressions |
 | SMALL-SIDED-MATCH-SITUATION-SCANNER | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 161 neighborhood tests; no src change; backward compatible; milestone manifest intact |
+| SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH | critic (deepseek-v4-flash) | base flash | ACCEPT | honest 0 present / 3 not_observed / 5 insufficient_context; pure verdict module; SHA-reuse VALID |
+| SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH | integration-reviewer (deepseek-v4-flash) | base flash | REJECT→ACCEPT | REJECT: refactor left computeSituationVerdict unbound (24 failing tests). Fixed via local import; re-run 27/27+31/31+134/134+46 green |
 
 ### Builder scoreboard
 
@@ -707,7 +713,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 82 | 58 | 11 | 3 | 3 | 2 | 74% | ~0.43 | ~31m |
-| mimo-v2.5 | 35 | 22 | 11 | 2 | 0 | 0 | 63% | ~0.45 | ~33m |
+| mimo-v2.5 | 36 | 22 | 12 | 2 | 0 | 0 | 62% | ~0.47 | ~33m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

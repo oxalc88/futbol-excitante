@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+next_objective_id: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
 
 best_known:
-  commit: a013790
-  note: "SMALL-SIDED-MATCH-SITUATION-SCANNER accepted — continuous-match situation scanner localizes the 8 SMALL_SIDED_SHAPE situations organically from a coherent match's event+telemetry stream (backward-compatible with driven fixtures); critic ACCEPT after RETRY on test-hook flakiness (fixed, 31/31 reproducible); integration ACCEPT. Horizon v21 1/6."
+  commit: 85564d1
+  note: "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH accepted — coherent CPU-vs-CPU 3v3 match run through the situation scanner (honest 0 present / 3 not_observed / 5 insufficient_context); pure verdict module extracted; integration REJECT caught evaluator regression (value re-export unbound local), fixed; critic + integration ACCEPT. Horizon v21 2/6."
 
 active_candidate: null
 builder_in_use: null
@@ -145,13 +145,23 @@ accepted:
   - BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
   - SMALL-SIDED-PROFILE-REDUCER-EXTENSION
   - SMALL-SIDED-MATCH-SITUATION-SCANNER
+  - SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
 
 blocked: []
 
-selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 2/6: SMALL-SIDED-MATCH-SITUATION-SCANNER accepted — continuous-match situation scanner localizes the 8 milestone situations organically from a coherent small-sided match's event+telemetry stream (reuses isRelevantEvent/computeSituationVerdict unchanged; AI-vs-AI runs honestly report not_observed — no forced presence); critic first RETRY on mandatory-suite flakiness (beforeAll hook timeout skipped 7/31 under parallel load), fixed with explicit 60s hook timeouts; final critic ACCEPT (31/31 reproducible x2, 116/116 regressions), integration ACCEPT (161 tests). Next: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH (tie milestone situations to the actual browseable match). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
+selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 2/6: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH accepted — coherent CPU-vs-CPU 3v3 match run through the accepted situation scanner as an integrated playtest (trajectory + 5 semantic frames + browser/headless coherence); honest outcome: 0 present / 3 not_observed / 5 insufficient_context because the CPU-only match produces only player-player-contact events (ball settled — disclosed); pure verdict module extracted for browser compatibility; integration REJECT caught a backward-compat regression (computeSituationVerdict left unbound by value re-export, 24 failing tests), fixed with local import (27/27 evaluator, 31/31 scanner, 134/134 BATCH, 46 more browser/node green); one frame SHA byte-match resolved VALID by bounded semantic audit. Next: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH. GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
+SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH — Materialized an integrated playable small-sided match playtest: a coherent CPU-vs-CPU 3v3 match (360 ticks, browser+headless hash-correspondent) run through the accepted continuous-match situation scanner, with per-situation localization and DYNAMIC_VISUAL evidence (trajectory.json 360 hashes + scan localizations, 5 semantic frames + sequence.json, browser-cases.json). Honest outcome: 0 present / 3 not_observed (PASS_RECEPTION, SHOT_TO_RESULT, SUPPORT_AND_PASSING_LANES) / 5 insufficient_context, because the CPU-only match produces only player-player-contact events and the ball stays settled — disclosed; no forced presence. Extracted a pure verdict module (eval/runners/small-sided-situation-verdict.ts) for browser compatibility; backward-compat refactor of the accepted scanner/evaluator. Integration reviewer REJECTed once: the refactor left computeSituationVerdict bound only as a value re-export (no local binding), breaking runSituationEvaluator (24 failing tests) — fixed with a local import; re-verified 27/27 evaluator, 31/31 scanner, 134/134 BATCH, 13/13 browser playtest, 19/19 binding, 10/10 + 27/27 accepted browser cases. One frame SHA byte-match resolved VALID by the bounded semantic audit. No SMALL_SIDED_SHAPE PASS / readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v21 2/6.
+
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (after REJECT on evaluator backward-compat regression, fixed)
+- Evidence: durable acceptance manifest + record (2026-08-25T14:50:06Z); deterministic audit REVIEW_REQUIRED resolved VALID by bounded semantic audit
+- Candidate: 85564d1
+
+Previously accepted:
 SMALL-SIDED-MATCH-SITUATION-SCANNER — Added an executable continuous-match situation scanner (eval/runners/small-sided-match-situation-scanner.ts) that localizes the 8 SMALL_SIDED_SHAPE milestone situations organically inside a single coherent small-sided match's event + telemetry stream (tick windows/clusters per situation), instead of only in purpose-built driven fixtures. Reuses isRelevantEvent/filterEventsForSituation/computeSituationVerdict unchanged — backward-compatible, driven-fixture evaluators and BATCH evidence stay valid. Honest presence: present only on genuine composition-satisfying clusters; AI-vs-AI continuous matches (0 events) report all 8 as not_observed; missing context is insufficient_context. No theatrical always-PASS. Critic first RETRY: mandatory scanner suite not reproducibly green under parallel execution (beforeAll hook timeout skipped 7/31); fixed with explicit 60s hook timeouts on heavy fixture hooks + dead-code cleanup; final critic ACCEPT (31/31 reproducible x2, 27+89 regressions), integration ACCEPT (161 neighborhood tests). HEADLESS audit PASS. A milestone machine backbone — no gameplay feel claims. Horizon v21 1/6.
 
 - builder: builder-structured / qwen3.6

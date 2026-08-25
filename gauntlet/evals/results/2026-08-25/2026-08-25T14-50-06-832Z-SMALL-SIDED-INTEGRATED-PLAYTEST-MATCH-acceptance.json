@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-25T14:50:06.832Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH",
+  "candidate_commit": "85564d1",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "semantic_audit": {
+    "verdict": "VALID",
+    "finding": "EVIDENCE_DUPLICATE_SHA",
+    "reason": "One frame (frame-before.png) byte-duplicates BROWSER-SMALL-SIDED-001-CASE/frame-before.png due to byte-determinism at identical tick-0 initial 3v3 state; other 4 frames byte-distinct; semantically honest. Deterministic audit aggregate REVIEW_REQUIRED resolved VALID by bounded semantic audit."
+  },
+  "critic": {
+    "agent": "critic",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "metrics": [],
+  "fix_notes": "Integration reviewer first REJECT: backward-compat refactor left computeSituationVerdict unbound locally in small-sided-situation-evaluator.ts (value re-export only) breaking runSituationEvaluator (24 failing tests). Fixed with local import; re-verified 27/27 evaluator, 31/31 scanner, 134/134 BATCH, 13/13 browser, 19/19 binding, 10/10+27/27 browser cases."
+}
