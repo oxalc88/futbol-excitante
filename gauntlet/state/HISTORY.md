@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 133 — 2026-08-24
+
+- objective_id: SMALL-SIDED-EXIT-PREREQ-IDENTITY
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 0ec1ac3 candidate(SMALL-SIDED-EXIT-PREREQ-IDENTITY)
+- notes: Corrected coherence defect in durable SMALL_SIDED_SHAPE milestone PASS record. exit_prerequisite_accepted now lists profile exit prerequisites (MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS from profiles.ts) instead of 1v1 names (MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON). Milestone verdict preserved PASS (both team prereqs genuinely accepted). Bundle regenerated with corrected record latest (13 playtest runs, 7 NOT_EVALUATED → 3 FAIL → 1 NEEDS_PERCEPTUAL_REVIEW → 2 PASS). Binding locks identity to profile. 20 binding + 55 regression tests. Horizon v20 1/4.
+
 ## Iteration 132 — 2026-08-24
 
 - objective_id: SMALL-SIDED-MILESTONE-RERUN-3

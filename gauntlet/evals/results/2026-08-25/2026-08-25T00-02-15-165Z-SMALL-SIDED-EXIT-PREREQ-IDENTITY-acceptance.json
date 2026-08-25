@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-25T00:02:15.165Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-EXIT-PREREQ-IDENTITY",
+  "candidate_commit": "0ec1ac3d9b14c1aad8338ff93dc0fcc96c0625a8",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6",
+    "result": "PASS",
+    "notes": "Corrected milestone record exit-prereq identity to MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS; PASS preserved; 20+55 tests"
+  },
+  "critic": {
+    "verdict": "ACCEPT",
+    "model": "deepseek-v4-flash",
+    "agent": "critic",
+    "notes": "genuine identity correction; both team prereqs accepted evidence; verdict preserved; scope clean"
+  },
+  "integration": {
+    "verdict": "ACCEPT",
+    "model": "deepseek-v4-flash",
+    "agent": "integration-reviewer",
+    "notes": "75/75 tests; bundle coherent; 13 playtest runs preserved; no source/contract change"
+  },
+  "deterministic_audit": {
+    "status": "PASS",
+    "evidence_class": "HEADLESS"
+  },
+  "evidence_class": "HEADLESS",
+  "metrics": [
+    "milestone exit-prereq identity corrected to profile (MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS)",
+    "milestone PASS preserved",
+    "20 binding + 55 regression tests",
+    "bundle regenerated with 13 playtest runs"
+  ]
+}

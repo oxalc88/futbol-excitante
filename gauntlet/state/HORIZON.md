@@ -9,10 +9,10 @@ horizon_id: "small-sided-milestone-honesty-and-visibility"
 created_from_commit: 567c1a2320d6dae7a331e56bf2ea686571870f09
 created_at: 2026-08-24
 reason: "Horizon v19 achieved the first honest SMALL_SIDED_SHAPE milestone PASS (8/8 situations, critic ACCEPT). Reassessment finds three honesty/visibility gaps that the PASS record left open and one executability gap: (1) the durable milestone PASS record lists exit_prerequisite_accepted as the PLAYABLE_1V1 identities (MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON) instead of the SMALL_SIDED_SHAPE profile's declared exit prereqs (MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS) — the profile reducer only checks the boolean so this identity mismatch passed silently, a coherence defect worth correcting honestly; (2) the milestone's 8 visual_readability_dimensions (ball_readability_under_congestion, team_classification, facing_orientation, action_recognition, contact_comprehension, team_shape_readability, camera_readability, silhouette_stability) have zero executable evidence mapping — the natural observable browser-facing completion of the milestone bundle; (3) the required BROWSER-SMALL-SIDED-001 browser execution path predates the fixture/engine changes (shot-resolution, duel-rejection) that produced the 8/8 PASS, so its browser/headless coherence against the resolved fixtures is unvalidated; (4) no executable small-sided profile reducer wires the team exit prereqs (mutant-team.ts, team-shape-evaluator.ts) into a machine path (playable-evaluator.ts hardcodes only 1v1 exits). Boundary: goalkeepers, regulation rules, and full-match ecology remain deferred; no PROMOTION-tier verdict is claimed because §8/§11 policies are not executable."
-current_index: 0
+current_index: 1
 objectives:
   - id: SMALL-SIDED-EXIT-PREREQ-IDENTITY
-    status: pending
+    status: accepted
     reason: "Correct the durable SMALL_SIDED_SHAPE milestone PASS record's exit_prerequisite_accepted identity from the PLAYABLE_1V1 names (MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON) to the profile's declared exit prerequisites (MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS, from eval/contracts/profiles.ts SMALL_SIDED_SHAPE_PROFILE). Re-run milestone:evaluate with the corrected input, regenerate the milestone record + bundle, and add a binding assertion locking the exit-prereq identity to the profile. Both team prereqs already exist and pass as evidence objectives (MUTANT_TEAM_PASS-EVIDENCE, TEAM-SHAPE-SUITE-PASS-EVIDENCE). Honesty/coherence; no new gameplay."
     builder: builder-structured
     prerequisite: null
@@ -45,7 +45,7 @@ replan_if:
 
 ## Completed horizons
 
-Horizon v20 (small-sided-milestone-honesty-and-visibility) — ACTIVE.
+Horizon v20 (small-sided-milestone-honesty-and-visibility) — ACTIVE 1/4: SMALL-SIDED-EXIT-PREREQ-IDENTITY accepted (milestone record exit-prereq identity corrected; PASS preserved).
 Horizon v19 (small-sided-milestone-completion) — EXHAUSTED: 4/4 accepted. SHOT/DUEL fixture objectives closed the two FAIL gaps; BATCH-5 consolidated 8/8 situation PASS; MILESTONE-RERUN-3 achieved SMALL_SIDED_SHAPE honest PASS (critic ACCEPT) with milestone bundle superseded (history: 8 NOT_EVALUATED → 3 FAIL → NEEDS_PERCEPTUAL_REVIEW → PASS).
 Horizon v18 (event-diversity-through-evaluator-fix) — EXHAUSTED: 3/3 accepted. isRelevantEvent indicative fix applied; BATCH-4 6 PASS/2 FAIL; milestone FAIL honest (6/8); bundle generated.
 Horizon v17 (driven-fixture-event-extension) — EXHAUSTED: 3/3 accepted. Milestone FAILED (7/8 FAIL).

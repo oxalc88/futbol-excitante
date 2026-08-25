@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-EXIT-PREREQ-IDENTITY
+next_objective_id: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
 
 best_known:
-  commit: 567c1a20
-  note: "SMALL_SIDED_SHAPE milestone honest PASS achieved and durable (Horizon v19 EXHAUSTED 4/4). Horizon v20 ACTIVE: milestone exit-prereq identity correction, visual-readability evidence, browser-path coherence, profile reducer extension."
+  commit: 0ec1ac35
+  note: "SMALL-SIDED-EXIT-PREREQ-IDENTITY accepted — milestone record exit-prereq identity corrected to MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS; PASS preserved. Horizon v20 1/4."
 
 active_candidate: null
 builder_in_use: null
@@ -140,12 +140,21 @@ accepted:
   - DUEL-REJECTION-FIXTURE
   - SMALL-SIDED-SITUATIONS-BATCH-5
   - SMALL-SIDED-MILESTONE-RERUN-3
+  - SMALL-SIDED-EXIT-PREREQ-IDENTITY
 
 blocked: []
 
-selection_note: "Horizon v20 ACTIVE 0/4: SMALL-SIDED-EXIT-PREREQ-IDENTITY (correct milestone record exit-prereq identity to profile MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS). Reassessment at v19 exhaustion found milestone-record exit-prereq identity gap, unevidenced visual-readability dimensions, stale browser-path coherence, and no executable team-exit reducer. GK/regulation/full-match deferred; no PROMOTION overclaim."
+selection_note: "Horizon v20 1/4: SMALL-SIDED-EXIT-PREREQ-IDENTITY accepted — milestone record exit-prereq identity corrected to profile (MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS), PASS preserved, bundle regenerated. Next: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE. GK/regulation/full-match deferred; no PROMOTION overclaim."
 ```
 ## Last accepted objective
+
+SMALL-SIDED-EXIT-PREREQ-IDENTITY — Corrected a coherence defect in the durable SMALL_SIDED_SHAPE milestone PASS record: exit_prerequisite_accepted now lists the profile's declared exit prerequisites (MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS from eval/contracts/profiles.ts) instead of the PLAYABLE_1V1 names (MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON). Milestone verdict preserved as PASS (both team prereqs genuinely accepted as evidence objectives). Bundle regenerated with corrected record as latest (13 playtest runs, immutability respected). Binding test locks exit-prereq identity to profile. Horizon v20 1/4.
+
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-25T00:02:15Z); deterministic audit PASS
+- Candidate: 0ec1ac35
 
 SMALL-SIDED-MILESTONE-RERUN-3 — SMALL_SIDED_SHAPE milestone honest PASS: 8/8 required situations PASS from BATCH-5 consolidated evidence (extended + shot-resolution + duel-rejection fixtures), entry/exit prereqs accepted, independent critic (deepseek-v4-flash) ACCEPT recorded in the reducer input. Durable playtest record 2026-08-24T23-18-30-040Z (milestone_verdict_ready/PASS); pre-critic NEEDS_PERCEPTUAL_REVIEW record retained as honest history. Milestone bundle superseded with full playtest history (12 runs: 8 NOT_EVALUATED → 3 FAIL → 1 NEEDS_PERCEPTUAL_REVIEW → PASS). Horizon v19 complete 4/4.
 
