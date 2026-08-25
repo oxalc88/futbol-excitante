@@ -23,7 +23,7 @@ page.on('pageerror', (err) => consoleLines.push(`[pageerror] ${err.message}`));
 await page.goto(url, { waitUntil: 'networkidle' });
 
 const modeSelect = page.locator('#mode-select');
-if (await modeSelect.count()) {
+if (await modeSelect.count() && await modeSelect.isVisible()) {
   await modeSelect.selectOption('ai-match-5v5');
 }
 const startButton = page.locator('#start-button');
@@ -44,6 +44,7 @@ const summary = await page.evaluate(() => ({
   scoreB: document.querySelector('#scoreboard-score-b')?.textContent ?? null,
   clock: document.querySelector('#scoreboard-clock')?.textContent ?? null,
   mode: document.querySelector('#mode-select')?.value ?? null,
+  setupMenuDisplay: getComputedStyle(document.querySelector('#setup-menu')).display,
   title: document.title,
 }));
 
