@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 141 — 2026-08-25
+
+- objective_id: SMALL-SIDED-5V5-HUMAN-VS-CPU
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 6785393 candidate(SMALL-SIDED-5V5-HUMAN-VS-CPU)
+- notes: Completed the playable small-sided ladder with a full 5v5 human-vs-CPU match mode: new deterministic scenario eval/scenarios/5v5-human-vs-cpu.v1.json (10 players, 5 per team; slot-1 HUMAN on team-a controlling player-1 via keyboard, Tab switching cycles all 5 teammates; slots 2-10 AI_FALLBACK) wired additively into scenario-selector.ts / foundation-scenario.ts / json-modules.d.ts. DYNAMIC_VISUAL evidence: trajectory.json (361 per-tick hashes, 633 events), browser-cases.json (BROWSER-5V5-HUMAN-VS-CPU passed), sequence.json with 5 semantic frames (before → human-input → cpu-play → switch → continuity), 5 distinct non-blank PNGs. 20 browser tests (structure, hash correspondence browser/headless, human input displacement, Tab player-switching across teammates, CPU advance, screenshot validity) + 20 binding tests pass; neighbor suites 5v5-ai 8/8, human-vs-cpu-5v3 9/9, 3v3-human 8/8, 1v1-control 8/8, small-sided browser cases green. Critic ACCEPT first pass; integration ACCEPT (pre-existing player-indicator INDICATOR-002 / player-switch SWITCH-004-006 failures unchanged vs baseline, non-candidate). No GK/regulation/full-match, no PES fidelity / FOUNDATION_LAB_PASS / PROMOTION / milestone PASS overclaim. Horizon v21 5/6.
+
 ## Iteration 140 — 2026-08-25
 
 - objective_id: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY

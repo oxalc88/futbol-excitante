@@ -9,7 +9,7 @@ horizon_id: "small-sided-playable-coherence-and-team-depth"
 created_from_commit: b7d8e67
 created_at: 2026-08-25
 reason: "Horizon v20 (EXHAUSTED 4/4) delivered SMALL_SIDED_SHAPE honesty, visibility, and executability: 8/8 situations PASS on resolved driven fixtures, 8 visual-readability dimensions evidenced (DYNAMIC_VISUAL), BROWSER path re-attested, and team exit prereqs (MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS) made executable. Reassessment at exhaustion finds the milestone is honest but fixture-sourced: the situations are proven on purpose-built driven fixtures, not localized from a coherent continuous playable match (all are final_match_required), and the action_recognition readability dimension is honestly NEEDS_PERCEPTUAL_REVIEW because the CPU-only fixture emits no discrete kick/pass/shot. v21 ties the milestone situations and team behaviours to a coherent human-playable small-sided browser match, closes the disclosed action-observability evidence gap, and adds remaining small-sided team/playable depth (incl. full 5v5 human-vs-CPU). Boundary: goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs; NO invented perceptual rubric or PES envelopes; NO PROMOTION-tier verdict (policies not executable)."
-current_index: 4
+current_index: 5
 objectives:
   - id: SMALL-SIDED-MATCH-SITUATION-SCANNER
     status: accepted
@@ -32,7 +32,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
   - id: SMALL-SIDED-5V5-HUMAN-VS-CPU
-    status: pending
+    status: accepted
     reason: "Complete the playable small-sided ladder with a full 5v5 human-vs-CPU match mode (currently only 5v3 human-vs-CPU and 5v5 AI exist) — an observable browser capability deepening small-sided playability without crossing GK/regulation. DYNAMIC_VISUAL."
     builder: builder-gameplay
     prerequisite: BROWSER-5V5-MATCH

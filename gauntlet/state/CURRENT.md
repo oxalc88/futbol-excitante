@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-5V5-HUMAN-VS-CPU
+next_objective_id: SMALL-SIDED-PLAYTEST-RE-RUN
 
 best_known:
-  commit: cc43094
-  note: "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY accepted — event-centered pass/shot/goal frames close the disclosed action_recognition dimension gap (gl.finish() render-sync fix); critic ACCEPT after RETRY on stale-frame bug; integration ACCEPT. Horizon v21 4/6."
+  commit: 6785393
+  note: "SMALL-SIDED-5V5-HUMAN-VS-CPU accepted — full 5v5 human-vs-CPU match mode (10 players, slot-1 keyboard + Tab switch) wired into scenario routing; critic ACCEPT first pass; integration ACCEPT. Horizon v21 5/6."
 
 active_candidate: null
 builder_in_use: null
@@ -148,13 +148,23 @@ accepted:
   - SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
   - SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
   - SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
+  - SMALL-SIDED-5V5-HUMAN-VS-CPU
 
 blocked: []
 
-selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 4/6: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY accepted — event-centered DYNAMIC_VISUAL frames at discrete pass (tick 2), shot (tick 36), and goal (tick 442) events in the coherent 3v3 press match close the milestone's disclosed action_recognition readability-dimension gap (observability evidence only, not a numeric readability PASS); gl.finish() GPU-flush added to test-bridge renderFrame() to fix stale-canvas captures (critic RETRY once, resolved; 9/9 unique frames); integration ACCEPT (67 browser + 35 neighbor bindings green, additive shared changes). Next: SMALL-SIDED-5V5-HUMAN-VS-CPU (full 5v5 human-vs-CPU mode). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
+selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 5/6: SMALL-SIDED-5V5-HUMAN-VS-CPU accepted — full 5v5 human-vs-CPU match mode (10 players, 5 per team; slot-1 HUMAN keyboard with Tab switching across teammates, CPU opponents) wired into scenario-selector/foundation-scenario (additive) with new deterministic scenario, DYNAMIC_VISUAL evidence (361-tick trajectory, 5 event-centered frames: before/human-input/cpu-play/switch/continuity, distinct PNGs), 20 browser + 20 binding tests; critic ACCEPT first pass; integration ACCEPT (all neighbor browser suites green; pre-existing player-indicator/player-switch baseline failures unchanged). Next: SMALL-SIDED-PLAYTEST-RE-RUN (milestone reducer re-run adding coherent-match situation evidence; BOOKKEEPING). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
+SMALL-SIDED-5V5-HUMAN-VS-CPU — Completed the playable small-sided ladder with a full 5v5 human-vs-CPU match mode: new deterministic scenario eval/scenarios/5v5-human-vs-cpu.v1.json (10 players, 5 per team; slot-1 HUMAN on team-a controlling player-1 via keyboard, Tab switching cycles all 5 teammates; slots 2-10 AI_FALLBACK) wired additively into scenario-selector.ts / foundation-scenario.ts / json-modules.d.ts. DYNAMIC_VISUAL evidence: trajectory.json (361 per-tick hashes, 633 events), browser-cases.json (BROWSER-5V5-HUMAN-VS-CPU passed), sequence.json with 5 semantic frames (before → human-input → cpu-play → switch → continuity), 5 distinct non-blank PNGs. 20 browser tests (structure, hash correspondence browser/headless, human input displacement, Tab player-switching across teammates, CPU advance, screenshot validity) + 20 binding tests pass; neighbors 5v5-ai 8/8, human-vs-cpu-5v3 9/9, 3v3-human 8/8, 1v1-control 8/8, small-sided browser cases all green. Critic ACCEPT first pass (15 criteria); integration ACCEPT (8 neighbor suites green; pre-existing player-indicator INDICATOR-002 / player-switch SWITCH-004-006 failures unchanged vs baseline, non-candidate). No GK/regulation/full-match, no PES fidelity / FOUNDATION_LAB_PASS / PROMOTION / milestone PASS overclaim. Horizon v21 5/6.
+
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-25T20:31:07Z); deterministic audit PASS
+- Candidate: 6785393
+
+Previously accepted:
 SMALL-SIDED-ACTION-EVENT-OBSERVABILITY — Closed the SMALL_SIDED_SHAPE milestone's disclosed action_recognition readability-dimension gap with event-centered DYNAMIC_VISUAL evidence: discrete pass (tick 2), shot (tick 36), and goal (tick 442) action events in the coherent 3v3 press match are captured as before/event/after semantic frames (9 PNGs, all unique SHA-256; sequence.json with 5 labeled event frames; trajectory.json 600 per-tick hashes + event log; browser-cases.json). This is observability evidence for reviewer/perceptual readability judgment — NOT a numeric readability PASS (VISUAL_SPEC defers thresholds), no invented rubric. Fixed a render/screenshot sync bug by adding gl.finish() GPU flush in the test-bridge renderFrame() (additive, safe, no football-outcome change) and dropped the non-observable player-ball-contact kind (tick-1 state identical to tick-0). Critic RETRY once on stale tick-0 duplicate frames, resolved; final critic ACCEPT (8 browser + 27 binding + 31 scanner + 19 team-shape + 14 press-support tests). Integration ACCEPT (67 browser neighbors + 35 neighbor bindings green). Audit re-run with required flags after a bare-run FAIL artifact. Milestone manifest + prior evidence preserved. No SMALL_SIDED_SHAPE PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v21 4/6.
 
 - builder: builder-gameplay / mimo-v2.5

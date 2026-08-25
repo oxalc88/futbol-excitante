@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
-usage_aggregates_through: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
-clock_aggregates_through: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
-model_evaluation_through: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
+last_tracked_objective: SMALL-SIDED-5V5-HUMAN-VS-CPU
+usage_aggregates_through: SMALL-SIDED-5V5-HUMAN-VS-CPU
+clock_aggregates_through: SMALL-SIDED-5V5-HUMAN-VS-CPU
+model_evaluation_through: SMALL-SIDED-5V5-HUMAN-VS-CPU
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -215,6 +215,9 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-ACTION-EVENT-OBSERVABILITY | accepted | ~75m | 50m | 9m | 15m | 0.4m | n/a | n/a |
 
 \*\*\* MiMo builder time includes the critic-RETRY fix cycle (render-screenshot sync gl.finish() + re-capture).
+| SMALL-SIDED-5V5-HUMAN-VS-CPU | accepted | ~40m | 26m | 5m | 7m | 0.5m | n/a | n/a |
+
+\*\*\*\* Clean first-pass step: critic ACCEPT first pass, integration ACCEPT first pass; no retry loops.
 
 \* Builder (mimo-v2.5) produced the evidence in a prior session before this continuation pickup; its step time is not re-measured here. Reviewer/commit phases measured from this session's subagents. BROWSER-SMALL-SIDED-001-COHERENCE-RERUN builder ran in this continuation session.
 
@@ -501,6 +504,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH | mimo-v2.5 | M | Medium — integrated small-sided playtest match via scanner (DYNAMIC_VISUAL) | 1 | B | honest negative result; verdict-module refactor REJECT fixed; 27+31+134+46 tests |
 | SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH | mimo-v2.5 | M | Medium — press and support depth + headless team-decision fix (MULTI_TICK) | 2 | B | RETRY x2 (honesty guard); discriminating counter guard; 14+83 tests |
 | SMALL-SIDED-ACTION-EVENT-OBSERVABILITY | mimo-v2.5 | M | Medium — action event observability (DYNAMIC_VISUAL) | 1 | B | event-centered pass/shot/goal frames; gl.finish() sync fix; 8+27+31+19+14 tests |
+| SMALL-SIDED-5V5-HUMAN-VS-CPU | mimo-v2.5 | M | Medium — full 5v5 human-vs-CPU mode (DYNAMIC_VISUAL) | 0 | A | 20 browser + 20 binding tests; Tab switching + human input displacement; 5 distinct frames; first-pass clean |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -717,6 +721,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 411 CPU + 323 eval + 40 browser neighbors green; injection byte-identical to bridge; additivity confirmed |
 | SMALL-SIDED-ACTION-EVENT-OBSERVABILITY | critic (deepseek-v4-flash) | base flash | RETRY→ACCEPT | RETRY: 4/12 PNGs stale tick-0 dups (render-screenshot sync). Fixed via gl.finish() + drop non-observable contact kind; re-capture 9 unique frames. ACCEPT |
 | SMALL-SIDED-ACTION-EVENT-OBSERVABILITY | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 67 browser + 35 neighbor bindings green; additive shared changes (gl.finish, type decl) |
+| SMALL-SIDED-5V5-HUMAN-VS-CPU | critic (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; 20 browser + 20 binding; browser/headless hash correspondence; 5 distinct PNGs; no overclaims |
+| SMALL-SIDED-5V5-HUMAN-VS-CPU | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 8 neighbor browser suites green (5v5-ai 8/8, 5v3 9/9, 3v3-human 8/8, 1v1-control 8/8); pre-existing player-indicator/player-switch baseline failures unchanged |
 
 ### Builder scoreboard
 
@@ -725,7 +731,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 82 | 58 | 11 | 3 | 3 | 2 | 74% | ~0.43 | ~31m |
-| mimo-v2.5 | 38 | 22 | 14 | 2 | 0 | 0 | 62% | ~0.51 | ~34m |
+| mimo-v2.5 | 39 | 23 | 14 | 2 | 0 | 0 | 59% | ~0.46 | ~34m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

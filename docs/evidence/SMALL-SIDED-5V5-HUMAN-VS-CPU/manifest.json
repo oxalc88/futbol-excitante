@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SMALL-SIDED-5V5-HUMAN-VS-CPU",
+  "accepted_at": "2026-08-25T20:31:07.900Z",
+  "candidate_commit": "6785393",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-before.png",
+        "sha256": "656684314c9327bd9326fa7a21fbe3a5f2ac727e9ba395829821d3a6d2a1af89",
+        "git_blob": "b12eead12031a6c71290905e6a6d54f7edd1eaa8",
+        "candidate_commit": "6785393",
+        "bytes": 7479,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-continuity.png",
+        "sha256": "a82902298d55633ab04b5aafb9c049e24b9b93b5d21135295bc7c39f3f1bd1be",
+        "git_blob": "6c09e3b62e292e8bad7307f9c84d924e12005697",
+        "candidate_commit": "6785393",
+        "bytes": 7423,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-cpu-play.png",
+        "sha256": "031df0c42b1544b00ca6489482e2737e29b8b704b7ea5fe0022a425e1a0c8c0d",
+        "git_blob": "6a87aedba20527428f7d399c9ca0154d47f70aa1",
+        "candidate_commit": "6785393",
+        "bytes": 7972,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-human-input.png",
+        "sha256": "d24f3b84f0bf0fbd75ba7f4aa41c8adb56093e9e89a07ac39ed7fecb1f54f3ee",
+        "git_blob": "71345ea5d1c03b205c67745c726f206a4b9c1f64",
+        "candidate_commit": "6785393",
+        "bytes": 7549,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-switch.png",
+        "sha256": "d6c4030e4b600f3bc7c6a86addcae842d8890681f1f54913cb1b006e7d79a871",
+        "git_blob": "ea2dfce4db3300e3f35a0a1c3fec4d1b26d65505",
+        "candidate_commit": "6785393",
+        "bytes": 7880,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "SMALL-SIDED-5V5-HUMAN-VS-CPU",
+        "frames": [
+          {
+            "label": "before",
+            "path": "frame-before.png",
+            "tick": 0,
+            "note": "Initial 5v5 human-vs-CPU state — 10 players at formation positions, ball at center"
+          },
+          {
+            "label": "human-input",
+            "path": "frame-human-input.png",
+            "tick": 30,
+            "note": "Human keyboard input drives slot-1 player forward — active control visible"
+          },
+          {
+            "label": "cpu-play",
+            "path": "frame-cpu-play.png",
+            "tick": 120,
+            "note": "Extended CPU play — teammates and opponents actively moving, match underway"
+          },
+          {
+            "label": "switch",
+            "path": "frame-switch.png",
+            "tick": 150,
+            "note": "Tab switch — human cycles controlled player to next teammate on team-a"
+          },
+          {
+            "label": "continuity",
+            "path": "frame-continuity.png",
+            "tick": 270,
+            "note": "Continued match play after switch — 5v5 match in progress with coordinated teams"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/sequence.json",
+        "sha256": "736417b628e661d5df63137ae05888c9451601eeaf55e3d7f8c94cfc81ce56c2",
+        "git_blob": "ae4f46573cabd918d3709313fd3a9660f99809f2",
+        "candidate_commit": "6785393",
+        "bytes": 1043,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/SMALL-SIDED-5V5-HUMAN-VS-CPU/trajectory.json",
+      "sha256": "ddca57572cd33b32cf9b74b0431b9a4edb2f7e9423e6b5493aa3687fb3427250",
+      "git_blob": "47edeb9d38af12989ac02394619ced638f768c9f",
+      "candidate_commit": "6785393",
+      "bytes": 130009,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-5V5-HUMAN-VS-CPU/audit.json",
+      "sha256": "9b8532015042310e10a01f3972f77805299d69eb657fc73974842b74990990be",
+      "git_blob": "e90ceaf7f1d7bdfd26fa0a99162d8c2d9a731055",
+      "candidate_commit": "6785393",
+      "bytes": 2642,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-25/2026-08-25T20-31-07-900Z-SMALL-SIDED-5V5-HUMAN-VS-CPU-acceptance.json"
+}

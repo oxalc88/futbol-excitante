@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-25T20:31:07.900Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-5V5-HUMAN-VS-CPU",
+  "candidate_commit": "6785393",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "semantic_audit": null,
+  "critic": {
+    "agent": "critic",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "metrics": [],
+  "retry_notes": "No retries. Critic ACCEPT first pass (15 criteria PASS); integration ACCEPT (8 neighbor browser suites green; pre-existing player-indicator INDICATOR-002 / player-switch SWITCH-004-006 failures unchanged vs baseline)."
+}
