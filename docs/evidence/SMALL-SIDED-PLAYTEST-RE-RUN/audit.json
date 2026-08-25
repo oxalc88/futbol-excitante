@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
   "gauntlet_version": "0.9.4",
-  "generated_at": "2026-08-24T23:56:01.733Z",
-  "objective_id": "SMALL-SIDED-EXIT-PREREQ-IDENTITY",
+  "generated_at": "2026-08-25T20:56:11.207Z",
+  "objective_id": "SMALL-SIDED-PLAYTEST-RE-RUN",
   "candidate_commit": null,
-  "evidence_class": "HEADLESS",
+  "evidence_class": "BOOKKEEPING",
   "status": "PASS",
   "checks": [
     {
       "name": "tests result",
-      "status": "PASS",
+      "status": "NOT_APPLICABLE",
       "owner": "builder"
     },
     {

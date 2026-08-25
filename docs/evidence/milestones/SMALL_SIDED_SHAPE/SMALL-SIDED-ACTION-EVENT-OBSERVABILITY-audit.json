@@ -1,10 +1,10 @@
 {
   "schema_version": 2,
   "gauntlet_version": "0.9.4",
-  "generated_at": "2026-08-24T23:56:01.733Z",
-  "objective_id": "SMALL-SIDED-EXIT-PREREQ-IDENTITY",
+  "generated_at": "2026-08-25T19:37:30.068Z",
+  "objective_id": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY",
   "candidate_commit": null,
-  "evidence_class": "HEADLESS",
+  "evidence_class": "DYNAMIC_VISUAL",
   "status": "PASS",
   "checks": [
     {
@@ -14,22 +14,22 @@
     },
     {
       "name": "required screenshot exists",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {
       "name": "semantic visual sequence",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {
       "name": "required trajectory exists",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {
       "name": "integration test result",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {
@@ -39,7 +39,7 @@
     },
     {
       "name": "screenshot SHA uniqueness",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {

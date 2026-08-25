@@ -1,10 +1,10 @@
 {
   "schema_version": 2,
   "gauntlet_version": "0.9.4",
-  "generated_at": "2026-08-24T23:56:01.733Z",
-  "objective_id": "SMALL-SIDED-EXIT-PREREQ-IDENTITY",
+  "generated_at": "2026-08-25T17:27:00.393Z",
+  "objective_id": "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH",
   "candidate_commit": null,
-  "evidence_class": "HEADLESS",
+  "evidence_class": "MULTI_TICK",
   "status": "PASS",
   "checks": [
     {
@@ -24,12 +24,12 @@
     },
     {
       "name": "required trajectory exists",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {
       "name": "integration test result",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {

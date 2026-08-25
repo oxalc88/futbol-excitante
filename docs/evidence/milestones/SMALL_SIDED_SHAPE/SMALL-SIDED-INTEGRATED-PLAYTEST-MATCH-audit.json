@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "gauntlet_version": "0.9.4",
-  "generated_at": "2026-08-24T23:56:01.733Z",
-  "objective_id": "SMALL-SIDED-EXIT-PREREQ-IDENTITY",
+  "generated_at": "2026-08-25T14:43:21.732Z",
+  "objective_id": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH",
   "candidate_commit": null,
-  "evidence_class": "HEADLESS",
-  "status": "PASS",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "status": "REVIEW_REQUIRED",
   "checks": [
     {
       "name": "tests result",
@@ -14,22 +14,22 @@
     },
     {
       "name": "required screenshot exists",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {
       "name": "semantic visual sequence",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {
       "name": "required trajectory exists",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {
       "name": "integration test result",
-      "status": "NOT_APPLICABLE",
+      "status": "PASS",
       "owner": "builder"
     },
     {
@@ -39,8 +39,9 @@
     },
     {
       "name": "screenshot SHA uniqueness",
-      "status": "NOT_APPLICABLE",
-      "owner": "builder"
+      "status": "REVIEW_REQUIRED",
+      "owner": "semantic",
+      "detail": "[{\"current\":\"frame-before.png\",\"other\":\"BROWSER-SMALL-SIDED-001-CASE/frame-before.png\",\"sha256\":\"3397dd65d3aeecc635359c1f298eb6c467fcbd476cb4c3e2fdafb79ecb93ae1f\"}]"
     },
     {
       "name": "CURRENT accepted list contains latest accepted",

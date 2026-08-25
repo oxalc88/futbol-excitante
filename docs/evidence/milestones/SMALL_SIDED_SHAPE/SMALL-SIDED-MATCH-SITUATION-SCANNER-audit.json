@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "gauntlet_version": "0.9.4",
-  "generated_at": "2026-08-24T23:56:01.733Z",
-  "objective_id": "SMALL-SIDED-EXIT-PREREQ-IDENTITY",
+  "generated_at": "2026-08-25T12:56:44.366Z",
+  "objective_id": "SMALL-SIDED-MATCH-SITUATION-SCANNER",
   "candidate_commit": null,
   "evidence_class": "HEADLESS",
   "status": "PASS",

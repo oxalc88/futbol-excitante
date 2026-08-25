@@ -2,7 +2,7 @@
   "schema_version": 2,
   "record_type": "milestone_evidence_bundle",
   "milestone_id": "SMALL_SIDED_SHAPE",
-  "generated_at": "2026-08-25T20:51:51.969Z",
+  "generated_at": "2026-08-24T23:43:37.976Z",
   "gameplay_situation_registry_version": "gameplay-situations-v1",
   "applicable_gameplay_situations": [
     {
@@ -283,21 +283,16 @@
       "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-24T23-42-32-931Z.json",
       "generated_at": "2026-08-24T23:42:32.931Z",
       "milestone_verdict": "PASS"
-    },
-    {
-      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-25T20-49-57-668Z.json",
-      "generated_at": "2026-08-25T20:49:57.668Z",
-      "milestone_verdict": "PASS"
     }
   ],
   "latest_playtest_result": {
-    "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-25T20-49-57-668Z.json",
+    "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-24T23-42-32-931Z.json",
     "result": {
       "schema_version": 1,
       "record_type": "milestone_playtest_result",
       "milestone_id": "SMALL_SIDED_SHAPE",
       "playtest_plan_version": "small-sided-shape-playtest-v1",
-      "generated_at": "2026-08-25T20:49:57.668Z",
+      "generated_at": "2026-08-24T23:42:32.931Z",
       "required_situations": [
         "PASS_RECEPTION",
         "SHOT_TO_RESULT",
@@ -322,31 +317,9 @@
       "exit_prerequisites_pass": true,
       "critic_verdict": "ACCEPT",
       "evidence": {
-        "accumulated_horizon": "v21",
+        "accumulated_horizon": "v20",
         "batch_sources": [
-          "BATCH-5 (consolidated 8/8 PASS on resolved driven fixtures: extended + shot-resolution + duel-rejection)"
-        ],
-        "coherent_match_sources": [
-          {
-            "objective_id": "SMALL-SIDED-MATCH-SITUATION-SCANNER",
-            "note": "Executable continuous-match localizer; honest not_observed/insufficient_context — provides the machinery for coherent-match situation localization but produced no present situations in its initial run."
-          },
-          {
-            "objective_id": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH",
-            "note": "Coherent CPU-vs-CPU 3v3 playable match via scanner; 0 present / 3 not_observed / 5 insufficient_context — disclosed honestly; situational coverage was insufficient for the 8 required situations."
-          },
-          {
-            "objective_id": "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH",
-            "note": "Coherent 3v3 press match; trajectory scanner localized 6/8 situations present — strongest coherent-match evidence source; 2 situations (SHOT_TO_RESULT, PHYSICAL_DUEL) not observed due to event density in continuous play."
-          },
-          {
-            "objective_id": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY",
-            "note": "Event-centered pass/shot/goal frames in coherent play — confirms event observability pipeline works end-to-end; situational coverage contributes to closure but does not independently drive situation outcomes."
-          },
-          {
-            "objective_id": "SMALL-SIDED-5V5-HUMAN-VS-CPU",
-            "note": "Full 5v5 human-vs-CPU playable match; 361-tick trajectory, 633 events — demonstrates coherent-play ecology at 5v5 scale; situational localization not exhaustively measured but contributes to integrated_playtest closure."
-          }
+          "BATCH-5 (consolidated 8/8 PASS on resolved fixtures: extended + shot-resolution + duel-rejection)"
         ],
         "entry_prerequisite_accepted": [
           "PLAYABLE_1V1_PASS",
@@ -357,7 +330,7 @@
           "TEAM_SHAPE_SUITE_PASS"
         ],
         "browser_case": "BROWSER-SMALL-SIDED-001 materialized",
-        "remark": "The 8/8 situation PASS is derived from the driven fixtures (primary/decisive source: BATCH-5). The coherent-match evidence is supplementary, strengthening the final_match_required / integrated_playtest closure (situations additionally demonstrable from coherent continuous playable matches, including human-vs-CPU). Per-situation coherent-match presence is disclosed exactly as measured: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH localized 6/8 present; SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH had 0 present / 3 not_observed / 5 insufficient_context; SMALL-SIDED-5V5-HUMAN-VS-CPU provides 633 events across 361 ticks of coherent play. No situation outcome is derived from coherent-match evidence alone — all 8/8 PASS remain from the driven fixtures."
+        "remark": "Identity correction objective: RERUN-3 had recorded the 1v1 exit identities (MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON); corrected to the SMALL_SIDED_SHAPE profile's declared team exit prerequisites (MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS). Both team prereqs accepted as evidence objectives (MUTANT-TEAM-PASS-EVIDENCE, TEAM-SHAPE-SUITE-PASS-EVIDENCE). 8/8 PASS + prereqs + critic ACCEPT → milestone_verdict PASS."
       },
       "decision": "milestone_verdict_ready",
       "milestone_verdict": "PASS",
@@ -619,8 +592,8 @@
     },
     {
       "objective_id": "SMALL-SIDED-EXIT-PREREQ-IDENTITY",
-      "candidate_commit": "0ec1ac3d9b14c1aad8338ff93dc0fcc96c0625a8",
-      "accepted_at": "2026-08-25T00:02:15.165Z",
+      "candidate_commit": null,
+      "accepted_at": "2026-08-24T23:42:32.931Z",
       "evidence_class": "HEADLESS",
       "source_manifest": "docs/evidence/SMALL-SIDED-EXIT-PREREQ-IDENTITY/manifest.json",
       "copied": [
@@ -631,10 +604,9 @@
         }
       ],
       "metrics": [
-        "milestone exit-prereq identity corrected to profile (MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS)",
-        "milestone PASS preserved",
-        "20 binding + 55 regression tests",
-        "bundle regenerated with 13 playtest runs"
+        "exit_prerequisite_accepted corrected from 1v1 identities to SMALL_SIDED_SHAPE profile team exit prereqs",
+        "MUTANT_TEAM_PASS + TEAM_SHAPE_SUITE_PASS match SMALL_SIDED_SHAPE_PROFILE.exit_prerequisites",
+        "milestone_verdict PASS preserved (bookkeeping correction only)"
       ],
       "reviews": {
         "deterministic_audit": {
@@ -646,312 +618,13 @@
           "verdict": "ACCEPT",
           "model": "deepseek-v4-flash",
           "agent": "critic",
-          "notes": "genuine identity correction; both team prereqs accepted evidence; verdict preserved; scope clean"
+          "notes": "identity correction verified; exit_prerequisite_accepted now matches SMALL_SIDED_SHAPE_PROFILE; milestone_verdict unchanged"
         },
         "integration": {
           "verdict": "ACCEPT",
           "model": "deepseek-v4-flash",
           "agent": "integration-reviewer",
-          "notes": "75/75 tests; bundle coherent; 13 playtest runs preserved; no source/contract change"
-        }
-      }
-    },
-    {
-      "objective_id": "SMALL-SIDED-MATCH-SITUATION-SCANNER",
-      "candidate_commit": "a013790",
-      "accepted_at": "2026-08-25T13:16:27.237Z",
-      "evidence_class": "HEADLESS",
-      "source_manifest": "docs/evidence/SMALL-SIDED-MATCH-SITUATION-SCANNER/manifest.json",
-      "copied": [
-        {
-          "kind": "audit",
-          "source": "docs/evidence/SMALL-SIDED-MATCH-SITUATION-SCANNER/audit.json",
-          "target": "SMALL-SIDED-MATCH-SITUATION-SCANNER-audit.json"
-        }
-      ],
-      "metrics": [],
-      "reviews": {
-        "deterministic_audit": {
-          "status": "PASS"
-        },
-        "semantic_audit": null,
-        "critic": {
-          "agent": "critic",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
-        },
-        "integration": {
-          "agent": "integration-reviewer",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
-        }
-      }
-    },
-    {
-      "objective_id": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH",
-      "candidate_commit": "85564d1",
-      "accepted_at": "2026-08-25T14:50:06.832Z",
-      "evidence_class": "DYNAMIC_VISUAL",
-      "source_manifest": "docs/evidence/SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH/manifest.json",
-      "copied": [
-        {
-          "kind": "screenshot-1",
-          "source": "docs/screenshots/SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH/frame-before.png",
-          "target": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH-screenshot-1.png"
-        },
-        {
-          "kind": "screenshot-2",
-          "source": "docs/screenshots/SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH/frame-early-play.png",
-          "target": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH-screenshot-2.png"
-        },
-        {
-          "kind": "screenshot-3",
-          "source": "docs/screenshots/SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH/frame-final.png",
-          "target": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH-screenshot-3.png"
-        },
-        {
-          "kind": "screenshot-4",
-          "source": "docs/screenshots/SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH/frame-late-match.png",
-          "target": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH-screenshot-4.png"
-        },
-        {
-          "kind": "screenshot-5",
-          "source": "docs/screenshots/SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH/frame-mid-match.png",
-          "target": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH-screenshot-5.png"
-        },
-        {
-          "kind": "sequence",
-          "source": "docs/screenshots/SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH/sequence.json",
-          "target": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH-sequence.json"
-        },
-        {
-          "kind": "trajectory",
-          "source": "docs/evidence/SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH/trajectory.json",
-          "target": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH-trajectory.json"
-        },
-        {
-          "kind": "audit",
-          "source": "docs/evidence/SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH/audit.json",
-          "target": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH-audit.json"
-        }
-      ],
-      "metrics": [],
-      "reviews": {
-        "deterministic_audit": {
-          "status": "PASS"
-        },
-        "semantic_audit": {
-          "verdict": "VALID",
-          "finding": "EVIDENCE_DUPLICATE_SHA",
-          "reason": "One frame (frame-before.png) byte-duplicates BROWSER-SMALL-SIDED-001-CASE/frame-before.png due to byte-determinism at identical tick-0 initial 3v3 state; other 4 frames byte-distinct; semantically honest. Deterministic audit aggregate REVIEW_REQUIRED resolved VALID by bounded semantic audit."
-        },
-        "critic": {
-          "agent": "critic",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
-        },
-        "integration": {
-          "agent": "integration-reviewer",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
-        }
-      }
-    },
-    {
-      "objective_id": "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH",
-      "candidate_commit": "eaa79ab",
-      "accepted_at": "2026-08-25T18:03:28.371Z",
-      "evidence_class": "MULTI_TICK",
-      "source_manifest": "docs/evidence/SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH/manifest.json",
-      "copied": [
-        {
-          "kind": "trajectory",
-          "source": "docs/evidence/SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH/trajectory.json",
-          "target": "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH-trajectory.json"
-        },
-        {
-          "kind": "audit",
-          "source": "docs/evidence/SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH/audit.json",
-          "target": "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH-audit.json"
-        }
-      ],
-      "metrics": [],
-      "reviews": {
-        "deterministic_audit": {
-          "status": "PASS"
-        },
-        "semantic_audit": null,
-        "critic": {
-          "agent": "critic",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
-        },
-        "integration": {
-          "agent": "integration-reviewer",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
-        }
-      }
-    },
-    {
-      "objective_id": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY",
-      "candidate_commit": "cc43094",
-      "accepted_at": "2026-08-25T19:39:45.133Z",
-      "evidence_class": "DYNAMIC_VISUAL",
-      "source_manifest": "docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/manifest.json",
-      "copied": [
-        {
-          "kind": "screenshot-1",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/goal-after.png",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-screenshot-1.png"
-        },
-        {
-          "kind": "screenshot-2",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/goal-before.png",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-screenshot-2.png"
-        },
-        {
-          "kind": "screenshot-3",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/goal-event.png",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-screenshot-3.png"
-        },
-        {
-          "kind": "screenshot-4",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/pass-after.png",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-screenshot-4.png"
-        },
-        {
-          "kind": "screenshot-5",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/pass-before.png",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-screenshot-5.png"
-        },
-        {
-          "kind": "screenshot-6",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/pass-event.png",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-screenshot-6.png"
-        },
-        {
-          "kind": "screenshot-7",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/shot-after.png",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-screenshot-7.png"
-        },
-        {
-          "kind": "screenshot-8",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/shot-before.png",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-screenshot-8.png"
-        },
-        {
-          "kind": "screenshot-9",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/shot-event.png",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-screenshot-9.png"
-        },
-        {
-          "kind": "sequence",
-          "source": "docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/sequence.json",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-sequence.json"
-        },
-        {
-          "kind": "trajectory",
-          "source": "docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/trajectory.json",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-trajectory.json"
-        },
-        {
-          "kind": "audit",
-          "source": "docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/audit.json",
-          "target": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-audit.json"
-        }
-      ],
-      "metrics": [],
-      "reviews": {
-        "deterministic_audit": {
-          "status": "PASS"
-        },
-        "semantic_audit": null,
-        "critic": {
-          "agent": "critic",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
-        },
-        "integration": {
-          "agent": "integration-reviewer",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
-        }
-      }
-    },
-    {
-      "objective_id": "SMALL-SIDED-5V5-HUMAN-VS-CPU",
-      "candidate_commit": "6785393",
-      "accepted_at": "2026-08-25T20:31:07.900Z",
-      "evidence_class": "DYNAMIC_VISUAL",
-      "source_manifest": "docs/evidence/SMALL-SIDED-5V5-HUMAN-VS-CPU/manifest.json",
-      "copied": [
-        {
-          "kind": "screenshot-1",
-          "source": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-before.png",
-          "target": "SMALL-SIDED-5V5-HUMAN-VS-CPU-screenshot-1.png"
-        },
-        {
-          "kind": "screenshot-2",
-          "source": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-continuity.png",
-          "target": "SMALL-SIDED-5V5-HUMAN-VS-CPU-screenshot-2.png"
-        },
-        {
-          "kind": "screenshot-3",
-          "source": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-cpu-play.png",
-          "target": "SMALL-SIDED-5V5-HUMAN-VS-CPU-screenshot-3.png"
-        },
-        {
-          "kind": "screenshot-4",
-          "source": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-human-input.png",
-          "target": "SMALL-SIDED-5V5-HUMAN-VS-CPU-screenshot-4.png"
-        },
-        {
-          "kind": "screenshot-5",
-          "source": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/frame-switch.png",
-          "target": "SMALL-SIDED-5V5-HUMAN-VS-CPU-screenshot-5.png"
-        },
-        {
-          "kind": "sequence",
-          "source": "docs/screenshots/SMALL-SIDED-5V5-HUMAN-VS-CPU/sequence.json",
-          "target": "SMALL-SIDED-5V5-HUMAN-VS-CPU-sequence.json"
-        },
-        {
-          "kind": "trajectory",
-          "source": "docs/evidence/SMALL-SIDED-5V5-HUMAN-VS-CPU/trajectory.json",
-          "target": "SMALL-SIDED-5V5-HUMAN-VS-CPU-trajectory.json"
-        },
-        {
-          "kind": "audit",
-          "source": "docs/evidence/SMALL-SIDED-5V5-HUMAN-VS-CPU/audit.json",
-          "target": "SMALL-SIDED-5V5-HUMAN-VS-CPU-audit.json"
-        }
-      ],
-      "metrics": [],
-      "reviews": {
-        "deterministic_audit": {
-          "status": "PASS"
-        },
-        "semantic_audit": null,
-        "critic": {
-          "agent": "critic",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
-        },
-        "integration": {
-          "agent": "integration-reviewer",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT",
-          "required_fixes": []
+          "notes": "bundle composition clean; corrected record is latest playtest"
         }
       }
     }

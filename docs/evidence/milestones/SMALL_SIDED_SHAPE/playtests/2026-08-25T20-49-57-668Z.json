@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "record_type": "milestone_playtest_result",
+  "milestone_id": "SMALL_SIDED_SHAPE",
+  "playtest_plan_version": "small-sided-shape-playtest-v1",
+  "generated_at": "2026-08-25T20:49:57.668Z",
+  "required_situations": [
+    "PASS_RECEPTION",
+    "SHOT_TO_RESULT",
+    "PHYSICAL_DUEL",
+    "SUPPORT_AND_PASSING_LANES",
+    "SETTLED_ATTACK_VS_DEFENCE",
+    "ATTACK_TO_DEFENCE_TRANSITION",
+    "DEFENCE_TO_ATTACK_TRANSITION",
+    "COORDINATED_PRESS"
+  ],
+  "situation_outcomes": {
+    "PASS_RECEPTION": "PASS",
+    "SHOT_TO_RESULT": "PASS",
+    "PHYSICAL_DUEL": "PASS",
+    "SUPPORT_AND_PASSING_LANES": "PASS",
+    "SETTLED_ATTACK_VS_DEFENCE": "PASS",
+    "ATTACK_TO_DEFENCE_TRANSITION": "PASS",
+    "DEFENCE_TO_ATTACK_TRANSITION": "PASS",
+    "COORDINATED_PRESS": "PASS"
+  },
+  "entry_prerequisites_pass": true,
+  "exit_prerequisites_pass": true,
+  "critic_verdict": "ACCEPT",
+  "evidence": {
+    "accumulated_horizon": "v21",
+    "batch_sources": [
+      "BATCH-5 (consolidated 8/8 PASS on resolved driven fixtures: extended + shot-resolution + duel-rejection)"
+    ],
+    "coherent_match_sources": [
+      {
+        "objective_id": "SMALL-SIDED-MATCH-SITUATION-SCANNER",
+        "note": "Executable continuous-match localizer; honest not_observed/insufficient_context — provides the machinery for coherent-match situation localization but produced no present situations in its initial run."
+      },
+      {
+        "objective_id": "SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH",
+        "note": "Coherent CPU-vs-CPU 3v3 playable match via scanner; 0 present / 3 not_observed / 5 insufficient_context — disclosed honestly; situational coverage was insufficient for the 8 required situations."
+      },
+      {
+        "objective_id": "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH",
+        "note": "Coherent 3v3 press match; trajectory scanner localized 6/8 situations present — strongest coherent-match evidence source; 2 situations (SHOT_TO_RESULT, PHYSICAL_DUEL) not observed due to event density in continuous play."
+      },
+      {
+        "objective_id": "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY",
+        "note": "Event-centered pass/shot/goal frames in coherent play — confirms event observability pipeline works end-to-end; situational coverage contributes to closure but does not independently drive situation outcomes."
+      },
+      {
+        "objective_id": "SMALL-SIDED-5V5-HUMAN-VS-CPU",
+        "note": "Full 5v5 human-vs-CPU playable match; 361-tick trajectory, 633 events — demonstrates coherent-play ecology at 5v5 scale; situational localization not exhaustively measured but contributes to integrated_playtest closure."
+      }
+    ],
+    "entry_prerequisite_accepted": [
+      "PLAYABLE_1V1_PASS",
+      "TEAM_DECISION_PROFILE"
+    ],
+    "exit_prerequisite_accepted": [
+      "MUTANT_TEAM_PASS",
+      "TEAM_SHAPE_SUITE_PASS"
+    ],
+    "browser_case": "BROWSER-SMALL-SIDED-001 materialized",
+    "remark": "The 8/8 situation PASS is derived from the driven fixtures (primary/decisive source: BATCH-5). The coherent-match evidence is supplementary, strengthening the final_match_required / integrated_playtest closure (situations additionally demonstrable from coherent continuous playable matches, including human-vs-CPU). Per-situation coherent-match presence is disclosed exactly as measured: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH localized 6/8 present; SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH had 0 present / 3 not_observed / 5 insufficient_context; SMALL-SIDED-5V5-HUMAN-VS-CPU provides 633 events across 361 ticks of coherent play. No situation outcome is derived from coherent-match evidence alone — all 8/8 PASS remain from the driven fixtures."
+  },
+  "decision": "milestone_verdict_ready",
+  "milestone_verdict": "PASS",
+  "failure_class": null
+}
