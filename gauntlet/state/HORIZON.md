@@ -9,10 +9,10 @@ horizon_id: "small-sided-playable-coherence-and-team-depth"
 created_from_commit: b7d8e67
 created_at: 2026-08-25
 reason: "Horizon v20 (EXHAUSTED 4/4) delivered SMALL_SIDED_SHAPE honesty, visibility, and executability: 8/8 situations PASS on resolved driven fixtures, 8 visual-readability dimensions evidenced (DYNAMIC_VISUAL), BROWSER path re-attested, and team exit prereqs (MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS) made executable. Reassessment at exhaustion finds the milestone is honest but fixture-sourced: the situations are proven on purpose-built driven fixtures, not localized from a coherent continuous playable match (all are final_match_required), and the action_recognition readability dimension is honestly NEEDS_PERCEPTUAL_REVIEW because the CPU-only fixture emits no discrete kick/pass/shot. v21 ties the milestone situations and team behaviours to a coherent human-playable small-sided browser match, closes the disclosed action-observability evidence gap, and adds remaining small-sided team/playable depth (incl. full 5v5 human-vs-CPU). Boundary: goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs; NO invented perceptual rubric or PES envelopes; NO PROMOTION-tier verdict (policies not executable)."
-current_index: 0
+current_index: 1
 objectives:
   - id: SMALL-SIDED-MATCH-SITUATION-SCANNER
-    status: pending
+    status: accepted
     reason: "Extend the small-sided situation evaluator/mapping (eval/contracts/situation-mapping.ts + eval/runners/small-sided-situation-evaluator.ts) to locate the 8 milestone situations organically inside a single continuous small-sided match (ai 3v3/5v5) from its event+telemetry stream, instead of purpose-built driven fixtures — the deterministic machine backbone that grounds the milestone in a coherent playable match. HEADLESS."
     builder: builder-structured
     prerequisite: SMALL-SIDED-SITUATION-EVALUATOR

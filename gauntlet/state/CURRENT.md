@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-MATCH-SITUATION-SCANNER
+next_objective_id: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
 
 best_known:
-  commit: b7d8e67
-  note: "Horizon v21 established (small-sided-playable-coherence-and-team-depth) after v20 EXHAUSTED 4/4. Reassessment: SMALL_SIDED_SHAPE PASS is fixture-sourced; v21 localizes the 8 situations in a coherent human-playable small-sided match, closes the action_recognition observability gap, deepens press/support, and adds 5v5 human-vs-CPU. Next: SMALL-SIDED-MATCH-SITUATION-SCANNER (builder-structured)."
+  commit: a013790
+  note: "SMALL-SIDED-MATCH-SITUATION-SCANNER accepted — continuous-match situation scanner localizes the 8 SMALL_SIDED_SHAPE situations organically from a coherent match's event+telemetry stream (backward-compatible with driven fixtures); critic ACCEPT after RETRY on test-hook flakiness (fixed, 31/31 reproducible); integration ACCEPT. Horizon v21 1/6."
 
 active_candidate: null
 builder_in_use: null
@@ -144,13 +144,23 @@ accepted:
   - SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
   - BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
   - SMALL-SIDED-PROFILE-REDUCER-EXTENSION
+  - SMALL-SIDED-MATCH-SITUATION-SCANNER
 
 blocked: []
 
-selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 1/6, established after v20 EXHAUSTED. Goal: tie SMALL_SIDED_SHAPE's 8 situations and team behaviours to a coherent human-playable small-sided browser match (scanner localizes situations in a continuous match; integrated playtest ties milestone to a real match; press/support depth; action-observability gap closure; 5v5 human-vs-CPU; milestone re-run with coherent-match evidence). GK/regulation/full-match deferred; no invented perceptual rubric/PES envelopes; no PROMOTION overclaim. Next: SMALL-SIDED-MATCH-SITUATION-SCANNER."
+selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 2/6: SMALL-SIDED-MATCH-SITUATION-SCANNER accepted — continuous-match situation scanner localizes the 8 milestone situations organically from a coherent small-sided match's event+telemetry stream (reuses isRelevantEvent/computeSituationVerdict unchanged; AI-vs-AI runs honestly report not_observed — no forced presence); critic first RETRY on mandatory-suite flakiness (beforeAll hook timeout skipped 7/31 under parallel load), fixed with explicit 60s hook timeouts; final critic ACCEPT (31/31 reproducible x2, 116/116 regressions), integration ACCEPT (161 tests). Next: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH (tie milestone situations to the actual browseable match). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
+SMALL-SIDED-MATCH-SITUATION-SCANNER — Added an executable continuous-match situation scanner (eval/runners/small-sided-match-situation-scanner.ts) that localizes the 8 SMALL_SIDED_SHAPE milestone situations organically inside a single coherent small-sided match's event + telemetry stream (tick windows/clusters per situation), instead of only in purpose-built driven fixtures. Reuses isRelevantEvent/filterEventsForSituation/computeSituationVerdict unchanged — backward-compatible, driven-fixture evaluators and BATCH evidence stay valid. Honest presence: present only on genuine composition-satisfying clusters; AI-vs-AI continuous matches (0 events) report all 8 as not_observed; missing context is insufficient_context. No theatrical always-PASS. Critic first RETRY: mandatory scanner suite not reproducibly green under parallel execution (beforeAll hook timeout skipped 7/31); fixed with explicit 60s hook timeouts on heavy fixture hooks + dead-code cleanup; final critic ACCEPT (31/31 reproducible x2, 27+89 regressions), integration ACCEPT (161 neighborhood tests). HEADLESS audit PASS. A milestone machine backbone — no gameplay feel claims. Horizon v21 1/6.
+
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (after RETRY on test-suite flakiness, resolved)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-25T13:16:27Z); deterministic audit PASS
+- Candidate: a013790
+
+Previously accepted:
 SMALL-SIDED-PROFILE-REDUCER-EXTENSION — Added an executable small-sided milestone profile reducer (eval/runners/small-sided-profile-reducer.ts) wiring SMALL_SIDED_SHAPE_PROFILE's exit prerequisites MUTANT_TEAM_PASS (runMutantTeamEval → milestoneVerdict) and TEAM_SHAPE_SUITE_PASS (runTeamShapeEval → milestoneVerdict) into a machine-executable path, replacing the hardcoded 1v1-only handling. Honest milestoneVerdict mapping (PASS only on genuine PASS; unknown prereqs NOT_EVALUATED; throws INVALID_RUN) — no theatrical always-PASS. Framed strictly as exit-prereq executability / audit-only honesty, NOT a §2.3/§8 PROMOTION-tier verdict. 24 new verification tests + 268 neighboring/regression tests pass; playable-evaluator.ts untouched; durable SMALL_SIDED_SHAPE milestone manifest preserved. Horizon v20 COMPLETE 4/4.
 
 - builder: builder-structured / qwen3.6

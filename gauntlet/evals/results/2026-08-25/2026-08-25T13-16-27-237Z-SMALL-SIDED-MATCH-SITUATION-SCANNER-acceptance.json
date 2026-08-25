@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-25T13:16:27.237Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-MATCH-SITUATION-SCANNER",
+  "candidate_commit": "a013790",
+  "evidence_class": "HEADLESS",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "qwen3.6"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "semantic_audit": null,
+  "critic": {
+    "agent": "critic",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "metrics": [],
+  "retry_notes": "Critic first RETRY: mandatory scanner suite not reproducible under parallel execution (beforeAll hook timeout, 7/31 skipped). Builder fixed with 60s hook timeouts on heavy fixture hooks + dead-code cleanup; critic re-verified 31/31 reproducible x2, 116/116 regressions -> ACCEPT."
+}

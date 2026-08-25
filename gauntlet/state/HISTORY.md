@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 137 — 2026-08-25
+
+- objective_id: SMALL-SIDED-MATCH-SITUATION-SCANNER
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (after RETRY, resolved)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: a013790 candidate(SMALL-SIDED-MATCH-SITUATION-SCANNER)
+- notes: Continuous-match situation scanner (eval/runners/small-sided-match-situation-scanner.ts) localizes the 8 SMALL_SIDED_SHAPE milestone situations organically inside a single coherent small-sided match's event + telemetry stream (tick windows/clusters), instead of only purpose-built driven fixtures. Reuses isRelevantEvent/filterEventsForSituation/computeSituationVerdict unchanged (backward compatible; evaluator 27 + BATCH bindings 89 still green). Honest presence: AI-vs-AI continuous matches (0 events) report all 8 not_observed; present only on genuine composition clusters; insufficient_context when context is missing. No theatrical always-PASS. Critic first RETRY: mandatory suite not reproducibly green under parallel execution (beforeAll hook timeout skipped 7/31); fixed with explicit 60s hook timeouts on all heavy fixture hooks + dead-code cleanup; final critic ACCEPT (31/31 reproducible x2, 116/116 regressions), integration ACCEPT (161 neighborhood tests; no src change; milestone manifest intact). HEADLESS audit PASS. No milestone PASS / readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v21 1/6.
+
 ## Iteration 136 — 2026-08-25
 
 - objective_id: SMALL-SIDED-PROFILE-REDUCER-EXTENSION
