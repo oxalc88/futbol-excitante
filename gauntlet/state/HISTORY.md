@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 135 — 2026-08-25
+
+- objective_id: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 8b2675f candidate(BROWSER-SMALL-SIDED-001-COHERENCE-RERUN)
+- notes: Re-attested BROWSER-SMALL-SIDED-001 browser/headless hash correspondence + determinism across the three resolved driven fixtures (extended, shot-resolution, duel-rejection) underlying the 8/8 SMALL_SIDED_SHAPE situation PASS. DYNAMIC_VISUAL: trajectory.json (3 scenarios × 60 ticks), 4 semantic frames + sequence.json; hashes recomputed and matching. 27/27 browser + 16/16 binding + 254 neighboring tests pass. Only new browser/scripts/evidence files; no core gameplay change; original BROWSER-SMALL-SIDED-001-CASE evidence preserved. Deterministic audit PASS (no semantic audit needed). No milestone PASS / readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v20 3/4.
+
 ## Iteration 134 — 2026-08-25
 
 - objective_id: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE

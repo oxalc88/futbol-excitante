@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
+next_objective_id: SMALL-SIDED-PROFILE-REDUCER-EXTENSION
 
 best_known:
-  commit: 5491739
-  note: "SMALL-SIDED-VISUAL-READABILITY-EVIDENCE accepted — 24 event-centered DYNAMIC_VISUAL frames (8 milestone readability dimensions) materialized; critic + integration ACCEPT; SHA-reuse bounded audit VALID. Horizon v20 2/4."
+  commit: 8b2675f
+  note: "BROWSER-SMALL-SIDED-001-COHERENCE-RERUN accepted — browser/headless hash correspondence + determinism re-attested across the three resolved driven fixtures (extended, shot-resolution, duel-rejection); critic + integration ACCEPT; audit PASS. Horizon v20 3/4."
 
 active_candidate: null
 builder_in_use: null
@@ -142,13 +142,23 @@ accepted:
   - SMALL-SIDED-MILESTONE-RERUN-3
   - SMALL-SIDED-EXIT-PREREQ-IDENTITY
   - SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
+  - BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
 
 blocked: []
 
-selection_note: "Horizon v20 2/4: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE accepted — 24 event-centered DYNAMIC_VISUAL semantic frames demonstrating the 8 SMALL_SIDED_SHAPE milestone visual_readability_dimensions are observable in 3v3 play; critic + integration ACCEPT; bounded screenshot-SHA-reuse semantic audit VALID (two frames byte-duplicate BROWSER-SMALL-SIDED-001-CASE due to deterministic identical match states, semantic mapping honest); action_recognition honestly NEEDS_PERCEPTUAL_REVIEW (CPU-only scenario emits no discrete kick/pass/shot actions — disclosed, not PASS). No numeric readability PASS / no PES fidelity / no PROMOTION overclaim. Next: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN. GK/regulation/full-match deferred."
+selection_note: "Horizon v20 3/4: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN accepted — browser/headless hash correspondence + determinism re-attested across the three resolved driven fixtures (extended, shot-resolution, duel-rejection) that produced the 8/8 SMALL_SIDED_SHAPE situation PASS; only new browser/scripts/evidence files, no core gameplay change, original BROWSER-SMALL-SIDED-001-CASE evidence preserved; critic + integration ACCEPT, deterministic audit PASS. Next: SMALL-SIDED-PROFILE-REDUCER-EXTENSION (executable team-exit prereq reducer). GK/regulation/full-match deferred; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
+BROWSER-SMALL-SIDED-001-COHERENCE-RERUN — Re-attested the BROWSER-SMALL-SIDED-001 browser case (browser/headless hash correspondence + determinism) across the three resolved driven fixture scenarios (3v3-situation-driven-extended, shot-resolution, duel-rejection) that produced the 8/8 SMALL_SIDED_SHAPE situation PASS, proving the milestone's BROWSER execution path is coherent with the fixture/engine changes underlying the PASS. DYNAMIC_VISUAL evidence: trajectory.json (3 scenarios × 60 ticks), 4 semantic frames + sequence.json, 27/27 browser tests, 16/16 binding tests, 254 neighboring tests pass. Only new browser/scripts/evidence files; original BROWSER-SMALL-SIDED-001-CASE evidence preserved. Coherence/observability evidence — not a milestone PASS, no numeric readability PASS, no PES fidelity, no FOUNDATION_LAB_PASS, no PROMOTION verdict. Horizon v20 3/4.
+
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- Evidence: durable acceptance manifest + record (2026-08-25T11:43:46Z); deterministic audit PASS
+- Candidate: 8b2675f
+
+Previously accepted:
 SMALL-SIDED-VISUAL-READABILITY-EVIDENCE — Materialized 24 event-centered DYNAMIC_VISUAL semantic frames (3 per dimension, before→event→after) demonstrating the SMALL_SIDED_SHAPE milestone's 8 visual_readability_dimensions are observable in deterministic 3v3 CPU-vs-CPU browser render. Mapped to required situations (PASS_RECEPTION, PHYSICAL_DUEL, SETTLED_ATTACK_VS_DEFENCE, ATTACK_TO_DEFENCE_TRANSITION, SHOT_TO_RESULT, SUPPORT_AND_PASSING_LANES, COORDINATED_PRESS, DEFENCE_TO_ATTACK_TRANSITION). This is observability evidence for reviewer/perceptual readability judgment — NOT a numeric readability PASS (VISUAL_SPEC defers thresholds). Bounded screenshot-SHA-reuse semantic audit (aux) returned VALID: two frames byte-identically match BROWSER-SMALL-SIDED-001-CASE frames due to byte-determinism at identical match states (tick 180, 360), with honest semantic mapping. Critic + integration ACCEPT. action_recognition honestly NEEDS_PERCEPTUAL_REVIEW (CPU-only adapter emits no discrete kick/pass/shot — disclosed known gap, not fabricated). Horizon v20 2/4.
 
 - builder: builder-gameplay / mimo-v2.5
