@@ -35,3 +35,8 @@ declare module "@pes/eval/scenarios/2v2-with-keyboard.v1.json" {
   const value: Record<string, unknown>;
   export default value;
 }
+
+declare module "@pes/eval/scenarios/3v3-press-scenario.v1.json" {
+  const value: Record<string, unknown>;
+  export default value;
+}

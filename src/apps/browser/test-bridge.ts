@@ -323,6 +323,14 @@ export function createTestBridge(
         { numerator: 0, denominator: 1 },
       );
       session.render();
+      // Flush the GPU pipeline so the canvas reflects the current tick
+      // before any subsequent screenshot or readPixels call.
+      try {
+        const gl = session.getRenderer().getContext();
+        gl.finish();
+      } catch {
+        /* WebGL context unavailable — no-op */
+      }
     },
 
     getSimulation(): Simulation {

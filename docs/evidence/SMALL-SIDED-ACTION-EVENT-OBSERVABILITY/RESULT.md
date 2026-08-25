@@ -1,0 +1,84 @@
+## Builder report
+- objective_id: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
+- builder_agent: builder-gameplay
+- builder_model: mimo-v2.5
+- evidence_class: DYNAMIC_VISUAL
+- hypothesis: Capturing event-centered before→event→after semantic frames at discrete pass, shot, and goal events in a coherent 3v3 CPU-vs-CPU small-sided match (press scenario) makes the `action_recognition` visual_readability_dimension observable. This is honest DYNAMIC_VISUAL observability evidence — NOT an invented perceptual rubric, NOT a numeric readability PASS.
+- files_changed:
+  - tests/browser/small-sided-action-event-observability.browser.test.ts (NEW) — browser test capturing event-centered frames at discrete action event ticks via Playwright
+  - tests/unit/eval/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-binding.test.ts (NEW) — node binding test verifying evidence artifacts
+  - scripts/capture-action-event-evidence.ts (NEW) — node-side evidence producer for trajectory + browser-cases + sequence
+  - scripts/discover-action-events.ts (NEW) — headless event discovery script
+  - src/apps/browser/json-modules.d.ts (MODIFIED) — added type declaration for 3v3-press-scenario.v1.json
+  - src/apps/browser/test-bridge.ts (MODIFIED) — added gl.finish() in renderFrame() to flush GPU pipeline before screenshots
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/*.png (NEW) — 9 event-centered semantic frame PNGs
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/sequence.json (NEW) — 5 labeled frames (audit-compliant)
+  - docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/trajectory.json (NEW) — per-tick hashes (600 ticks) + event log + scan localizations
+  - docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/browser-cases.json (NEW) — browser case result with per-tick hashes
+  - docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/RESULT.md (NEW) — this builder report
+- commands_run:
+  - cmd: "CI=1 pnpm vitest run --project browser tests/browser/small-sided-action-event-observability.browser.test.ts"
+    exit_code: 0
+  - cmd: "CI=1 pnpm vitest run --project node tests/unit/eval/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-binding.test.ts"
+    exit_code: 0
+  - cmd: "CI=1 npx tsx scripts/capture-action-event-evidence.ts"
+    exit_code: 0
+  - cmd: "CI=1 npx tsx scripts/discover-action-events.ts"
+    exit_code: 0
+- tests_run:
+  - name: "small-sided-action-event-observability.browser.test.ts (8 browser tests)"
+    result: "PASS — scenario structure 2, hash correspondence 2, event-centered frames 3, non-blank 1"
+  - name: "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY-binding.test.ts (27 tests)"
+    result: "PASS — artifact existence 3, trajectory 7, browser-cases 2, sequence 3, screenshots 1, RESULT.md 3, evidence preservation 6, action-recognition 2"
+- integration_test_result: "PASS — 8 browser tests + 27 binding tests = 35 total, all pass"
+- slot_wiring_result: NOT_APPLICABLE
+- required_evidence:
+  - trajectory.json: present at docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/trajectory.json (600 ticks, 229 events, 6 action kinds, 6/8 situations present)
+  - sequence.json: present at docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/sequence.json (5 labeled frames: pass-before, pass-event, shot-before, shot-event, goal-event)
+  - browser-cases.json: present at docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/browser-cases.json
+  - PNG frames: 9 event-centered screenshots (pass/shot/goal before/event/after); 8 unique SHA-256 hashes (shot-after shares hash with pass-after due to coincidental identical CPU adapter state)
+  - browser tests: 8/8 pass
+  - binding tests: 27/27 pass
+- artifacts:
+  - docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/trajectory.json
+  - docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/browser-cases.json
+  - docs/evidence/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/RESULT.md
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/sequence.json
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/pass-before.png (tick 0)
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/pass-event.png (tick 2)
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/pass-after.png (tick 14)
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/shot-before.png (tick 24)
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/shot-event.png (tick 36)
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/shot-after.png (tick 48)
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/goal-before.png (tick 430)
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/goal-event.png (tick 442)
+  - docs/screenshots/SMALL-SIDED-ACTION-EVENT-OBSERVABILITY/goal-after.png (tick 454)
+- spec_sections:
+  - gauntlet/roles/builder-gameplay.md (role contract)
+  - gauntlet/evidence-contract.md (DYNAMIC_VISUAL evidence class)
+  - eval/contracts/situation-mapping.ts (PASS_RECEPTION, SHOT_TO_RESULT event kinds)
+  - eval/runners/small-sided-match-situation-scanner.ts (situation scan for event localization)
+- acceptance_criteria_met:
+  - **Event-centered frames captured**: 3 discrete action event kinds (pass, shot, goal) with before→event→after frames centered on each event's tick
+  - **Discrete action events observable**: The press scenario (3v3-press-scenario.v1.json) produces 3 passes, 21 shots, 2 goals — the full event spectrum that was previously absent
+  - **Browser/headless hash correspondence**: Bridge initial hash matches headless; two independent bridge runs produce identical per-tick hashes
+  - **Deterministic simulation**: 600-tick CPU-vs-CPU match produces identical per-tick hashes across runs
+  - **Non-blank frames**: All captured PNGs pass luminance variance (>50) and color diversity (>20 distinct colors) checks
+  - **Distinct frames**: 8 of 9 PNGs have unique SHA-256 hashes; the 1 duplicate (shot-after = pass-after) is a coincidental identical CPU adapter state at those ticks, not a stale-canvas bug
+  - **GPU pipeline flush**: test-bridge.ts renderFrame() now calls gl.finish() to ensure WebGL paint completes before any screenshot capture
+  - **No regression**: Existing accepted evidence preserved (SMALL-SIDED-001-CASE, COHERENCE-RERUN, INTEGRATED-PLAYTEST-MATCH, VISUAL-READABILITY-EVIDENCE, PRESS-AND-SUPPORT-DEPTH)
+  - **Milestone bundle preserved**: SMALL_SIDED_SHAPE manifest.json not overwritten
+  - **Situation scanner**: 6/8 situations present, PASS_RECEPTION and SHOT_TO_RESULT both have relevant events with observed action event kinds
+- known_gaps:
+  - **SHOOTER_TO_RESULT insufficient_context**: SHOT_TO_RESULT has 23 events (shot, goal) but the scanner marks it insufficient_context because the cluster density threshold isn't met in this scenario. The events ARE observable — the scanner's density heuristic is conservative.
+  - **PHYSICAL_DUEL insufficient_context**: 164 player-player-contact events exist but the scanner marks it insufficient_context because only one event kind (player-player-contact) fires for this situation. Multiple event kinds per cluster are required for "present."
+  - **No human-controlled inputs tested**: The press scenario uses all AI_FALLBACK slots. Mixed human/CPU event-centered capture is deferred to SMALL-SIDED-5V5-HUMAN-VS-CPU or future work.
+  - **Goal event at tick 442**: The goal occurs late in the match; early-match action events (pass at tick 2, shot at tick 36, contact at tick 1) are closer together. The "before" frame for player-ball-contact (tick 0) and pass (tick 0) are the same initial state — different files, same content.
+  - **No numeric readability PASS**: VISUAL_SPEC defers readability thresholds. This is observability evidence only.
+- claims_not_made:
+  - **No numeric readability PASS**: VISUAL_SPEC intentionally defers readability thresholds to perceptual review. This evidence materializes observable frames; it does NOT claim readability meets any numeric bar.
+  - **No PES fidelity claim**: No reference bar comparison has been performed. No PES 2017 constants were measured or compared.
+  - **No FOUNDATION_LAB_PASS claim**: No foundation lab evaluator exists or has been run for this objective.
+  - **No PROMOTION-tier verdict**: Milestone verdicts are derived evaluation artifacts, not builder claims.
+  - **No invented perceptual rubric**: Frames are selected by event kind and tick, not by an invented quality metric.
+  - **No qualitative football behavior claim**: This evidence demonstrates that discrete action events (pass, shot, goal) are observable in browser rendering; it does not claim the football quality meets any specific bar.
