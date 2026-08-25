@@ -9,7 +9,7 @@ horizon_id: "small-sided-playable-coherence-and-team-depth"
 created_from_commit: b7d8e67
 created_at: 2026-08-25
 reason: "Horizon v20 (EXHAUSTED 4/4) delivered SMALL_SIDED_SHAPE honesty, visibility, and executability: 8/8 situations PASS on resolved driven fixtures, 8 visual-readability dimensions evidenced (DYNAMIC_VISUAL), BROWSER path re-attested, and team exit prereqs (MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS) made executable. Reassessment at exhaustion finds the milestone is honest but fixture-sourced: the situations are proven on purpose-built driven fixtures, not localized from a coherent continuous playable match (all are final_match_required), and the action_recognition readability dimension is honestly NEEDS_PERCEPTUAL_REVIEW because the CPU-only fixture emits no discrete kick/pass/shot. v21 ties the milestone situations and team behaviours to a coherent human-playable small-sided browser match, closes the disclosed action-observability evidence gap, and adds remaining small-sided team/playable depth (incl. full 5v5 human-vs-CPU). Boundary: goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs; NO invented perceptual rubric or PES envelopes; NO PROMOTION-tier verdict (policies not executable)."
-current_index: 5
+current_index: 6
 objectives:
   - id: SMALL-SIDED-MATCH-SITUATION-SCANNER
     status: accepted
@@ -37,7 +37,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: BROWSER-5V5-MATCH
   - id: SMALL-SIDED-PLAYTEST-RE-RUN
-    status: pending
+    status: accepted
     reason: "Re-run the SMALL_SIDED_SHAPE milestone reducer adding the coherent-match situation evidence as a supplementary source beside the driven fixtures, preserving the honest PASS while strengthening the final_match_required/integrated_playtest closure; evidence-bundle only, no gameplay change. BOOKKEEPING."
     builder: builder-structured
     prerequisite: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
@@ -55,6 +55,7 @@ replan_if:
 
 ## Completed horizons
 
+Horizon v21 (small-sided-playable-coherence-and-team-depth) — EXHAUSTED 6/6: SMALL-SIDED-MATCH-SITUATION-SCANNER accepted (executable continuous-match situation scanner; honestly not_observed/insufficient_context). SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH accepted (coherent CPU-vs-CPU 3v3 playable match via scanner; honest 0 present / 3 not_observed / 5 insufficient_context). SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH accepted (coordinated press/cover + support depth in coherent 3v3 play; scanner localizes 6/8; headless team-decision injection fixed). SMALL-SIDED-ACTION-EVENT-OBSERVABILITY accepted (event-centered pass/shot/goal DYNAMIC_VISUAL frames). SMALL-SIDED-5V5-HUMAN-VS-CPU accepted (full 5v5 human-vs-CPU match mode; 361-tick trajectory, 633 events; critic + integration ACCEPT first pass). SMALL-SIDED-PLAYTEST-RE-RUN accepted (milestone reducer re-run with coherent-match evidence as supplementary source beside the driven fixtures; honest PASS preserved; bundle 14 runs / 13 source objectives).
 Horizon v20 (small-sided-milestone-honesty-and-visibility) — EXHAUSTED 4/4: SMALL-SIDED-EXIT-PREREQ-IDENTITY accepted (milestone record exit-prereq identity corrected to MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS; PASS preserved). SMALL-SIDED-VISUAL-READABILITY-EVIDENCE accepted (24 event-centered DYNAMIC_VISUAL frames for the 8 readability dimensions; critic + integration ACCEPT; SHA-reuse resolved VALID). BROWSER-SMALL-SIDED-001-COHERENCE-RERUN accepted (browser/headless hash correspondence re-attested across the three resolved driven fixtures; critic + integration ACCEPT; audit PASS). SMALL-SIDED-PROFILE-REDUCER-EXTENSION accepted (executable team-exit prereq reducer wiring MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS; critic + integration ACCEPT; audit PASS).
 Horizon v19 (small-sided-milestone-completion) — EXHAUSTED: 4/4 accepted. SHOT/DUEL fixture objectives closed the two FAIL gaps; BATCH-5 consolidated 8/8 situation PASS; MILESTONE-RERUN-3 achieved SMALL_SIDED_SHAPE honest PASS (critic ACCEPT) with milestone bundle superseded (history: 8 NOT_EVALUATED → 3 FAIL → NEEDS_PERCEPTUAL_REVIEW → PASS).
 Horizon v18 (event-diversity-through-evaluator-fix) — EXHAUSTED: 3/3 accepted. isRelevantEvent indicative fix applied; BATCH-4 6 PASS/2 FAIL; milestone FAIL honest (6/8); bundle generated.

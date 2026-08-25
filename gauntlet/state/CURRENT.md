@@ -8,11 +8,9 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-PLAYTEST-RE-RUN
-
 best_known:
-  commit: 6785393
-  note: "SMALL-SIDED-5V5-HUMAN-VS-CPU accepted — full 5v5 human-vs-CPU match mode (10 players, slot-1 keyboard + Tab switch) wired into scenario routing; critic ACCEPT first pass; integration ACCEPT. Horizon v21 5/6."
+  commit: da8803b
+  note: "SMALL-SIDED-PLAYTEST-RE-RUN accepted — SMALL_SIDED_SHAPE milestone reducer re-run adding coherent-match situation evidence as a supplementary source beside the driven fixtures; honest PASS preserved; bundle 14 runs / 13 sources. Horizon v21 COMPLETE 6/6. Horizon v22 (continuous-match-closure-and-small-sided-hardening) to be established in a follow-up commit."
 
 active_candidate: null
 builder_in_use: null
@@ -149,13 +147,23 @@ accepted:
   - SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
   - SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
   - SMALL-SIDED-5V5-HUMAN-VS-CPU
+  - SMALL-SIDED-PLAYTEST-RE-RUN
 
 blocked: []
 
-selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 5/6: SMALL-SIDED-5V5-HUMAN-VS-CPU accepted — full 5v5 human-vs-CPU match mode (10 players, 5 per team; slot-1 HUMAN keyboard with Tab switching across teammates, CPU opponents) wired into scenario-selector/foundation-scenario (additive) with new deterministic scenario, DYNAMIC_VISUAL evidence (361-tick trajectory, 5 event-centered frames: before/human-input/cpu-play/switch/continuity, distinct PNGs), 20 browser + 20 binding tests; critic ACCEPT first pass; integration ACCEPT (all neighbor browser suites green; pre-existing player-indicator/player-switch baseline failures unchanged). Next: SMALL-SIDED-PLAYTEST-RE-RUN (milestone reducer re-run adding coherent-match situation evidence; BOOKKEEPING). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
+selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) COMPLETE 6/6: SMALL-SIDED-PLAYTEST-RE-RUN accepted — SMALL_SIDED_SHAPE milestone reducer re-run adding the Horizon v21 coherent-match situation evidence as a supplementary source beside the driven fixtures (BATCH-5 remains the decisive 8/8 PASS source), preserving the honest PASS while strengthening final_match_required / integrated_playtest closure; new playtest run 2026-08-25T20-49-57-668Z (milestone_verdict PASS) with an honest coherent_match_sources block (PRESS 6/8, INTEGRATED 0/3/5, 5V5 633 events/361 ticks, all disclosed as measured); durable bundle regenerated to 14 runs / 13 sources (old preserved as manifest-superseded); zero source change; critic ACCEPT first pass; integration ACCEPT first pass. Horizon v22 (continuous-match-closure-and-small-sided-hardening) to be established in the next commit: close coherent-match situation closure (SHOT_TO_RESULT/PHYSICAL_DUEL), human-driven action observability, switch/indicator baseline fix, ladder menu completion, coherent evidence re-run — first objective SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE (builder-gameplay). GK/regulation/full-match deferred; no invented rubric/PES envelopes; no PROMOTION overclaim."
 ```
 ## Last accepted objective
 
+SMALL-SIDED-PLAYTEST-RE-RUN — Re-ran the SMALL_SIDED_SHAPE milestone reducer adding the Horizon v21 coherent-match situation evidence as a supplementary source beside the driven fixtures (BATCH-5 remains the decisive 8/8 PASS source), preserving the honest PASS while strengthening final_match_required / integrated_playtest closure. New playtest run 2026-08-25T20-49-57-668Z (milestone_verdict PASS, decision milestone_verdict_ready) with an honest coherent_match_sources block (5 accepted objectives: SCANNER, INTEGRATED-PLAYTEST-MATCH, PRESS-AND-SUPPORT-DEPTH, ACTION-EVENT-OBSERVABILITY, 5V5-HUMAN-VS-CPU; PRESS 6/8 present, INTEGRATED 0 present / 3 not_observed / 5 insufficient_context, 5V5 633 events / 361 ticks — all disclosed exactly as measured, no forced presence). Durable bundle regenerated to 14 playtest runs / 13 source objectives (8 original + 5 coherent-match); old bundle preserved as manifest-superseded-2026-08-24T23-43-37Z.json. Evidence-bundle only — zero src/eval/test/contract/spec change; single benign derived-copy refresh (EXIT-PREREQ-IDENTITY-audit.json now byte-matching its durable source). 129/129 neighbor + reducer binding tests pass. Critic ACCEPT first pass (independently re-ran the scanner confirming 6/8 + 2 insufficient_context); integration ACCEPT first pass (39 docs-only paths, no type regression — errors pre-existing). claims_not_made hold (no PROMOTION / PES fidelity / FOUNDATION_LAB_PASS / invented rubric / new milestone PASS beyond the pre-existing honest one). Horizon v21 COMPLETE 6/6.
+
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (first pass)
+- Evidence: durable acceptance manifest + record (2026-08-25T21:22:28Z); deterministic audit PASS
+- Candidate: da8803b
+
+Previously accepted:
 SMALL-SIDED-5V5-HUMAN-VS-CPU — Completed the playable small-sided ladder with a full 5v5 human-vs-CPU match mode: new deterministic scenario eval/scenarios/5v5-human-vs-cpu.v1.json (10 players, 5 per team; slot-1 HUMAN on team-a controlling player-1 via keyboard, Tab switching cycles all 5 teammates; slots 2-10 AI_FALLBACK) wired additively into scenario-selector.ts / foundation-scenario.ts / json-modules.d.ts. DYNAMIC_VISUAL evidence: trajectory.json (361 per-tick hashes, 633 events), browser-cases.json (BROWSER-5V5-HUMAN-VS-CPU passed), sequence.json with 5 semantic frames (before → human-input → cpu-play → switch → continuity), 5 distinct non-blank PNGs. 20 browser tests (structure, hash correspondence browser/headless, human input displacement, Tab player-switching across teammates, CPU advance, screenshot validity) + 20 binding tests pass; neighbors 5v5-ai 8/8, human-vs-cpu-5v3 9/9, 3v3-human 8/8, 1v1-control 8/8, small-sided browser cases all green. Critic ACCEPT first pass (15 criteria); integration ACCEPT (8 neighbor suites green; pre-existing player-indicator INDICATOR-002 / player-switch SWITCH-004-006 failures unchanged vs baseline, non-candidate). No GK/regulation/full-match, no PES fidelity / FOUNDATION_LAB_PASS / PROMOTION / milestone PASS overclaim. Horizon v21 5/6.
 
 - builder: builder-gameplay / mimo-v2.5

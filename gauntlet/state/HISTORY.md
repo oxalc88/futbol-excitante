@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 142 — 2026-08-25
+
+- objective_id: SMALL-SIDED-PLAYTEST-RE-RUN
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: da8803b candidate(SMALL-SIDED-PLAYTEST-RE-RUN)
+- notes: Re-ran the SMALL_SIDED_SHAPE milestone reducer adding the Horizon v21 coherent-match situation evidence as a supplementary source beside the driven fixtures (BATCH-5 remains the decisive 8/8 PASS source), preserving the honest PASS while strengthening final_match_required / integrated_playtest closure. New playtest run 2026-08-25T20-49-57-668Z (milestone_verdict PASS, decision milestone_verdict_ready) with an honest coherent_match_sources block (5 accepted objectives): PRESS-AND-SUPPORT 6/8 present (SHOT_TO_RESULT / PHYSICAL_DUEL insufficient_context), INTEGRATED-PLAYTEST 0 present / 3 not_observed / 5 insufficient_context, 5V5-HUMAN 633 events / 361 ticks — all disclosed exactly as measured, no forced presence; no situation outcome derived from coherent-match evidence alone. Durable bundle regenerated to 14 playtest runs / 13 source objectives (8 original + 5 coherent-match); old bundle preserved as manifest-superseded-2026-08-24T23-43-37Z.json. Evidence-bundle only — zero src/eval/test/contract/spec change; single benign derived-copy refresh (SMALL-SIDED-EXIT-PREREQ-IDENTITY-audit.json now byte-matching its durable source). Critic ACCEPT first pass (independently re-ran the scanner, confirming 6/8 + 2 insufficient_context); integration ACCEPT first pass (39 docs-only paths, 129/129 neighbor + reducer binding tests, typecheck errors all pre-existing). claims_not_made hold (no PROMOTION / PES fidelity / FOUNDATION_LAB_PASS / invented perceptual rubric / new milestone PASS beyond the pre-existing honest one). Horizon v21 COMPLETE 6/6.
+
 ## Iteration 141 — 2026-08-25
 
 - objective_id: SMALL-SIDED-5V5-HUMAN-VS-CPU
