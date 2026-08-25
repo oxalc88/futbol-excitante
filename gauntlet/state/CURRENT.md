@@ -8,9 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
+next_objective_id: SMALL-SIDED-MATCH-SITUATION-SCANNER
+
 best_known:
-  commit: 0e2cba3
-  note: "SMALL-SIDED-PROFILE-REDUCER-EXTENSION accepted — executable small-sided profile reducer wiring MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS exit prereqs; critic + integration ACCEPT; audit PASS. Horizon v20 COMPLETE 4/4."
+  commit: b7d8e67
+  note: "Horizon v21 established (small-sided-playable-coherence-and-team-depth) after v20 EXHAUSTED 4/4. Reassessment: SMALL_SIDED_SHAPE PASS is fixture-sourced; v21 localizes the 8 situations in a coherent human-playable small-sided match, closes the action_recognition observability gap, deepens press/support, and adds 5v5 human-vs-CPU. Next: SMALL-SIDED-MATCH-SITUATION-SCANNER (builder-structured)."
 
 active_candidate: null
 builder_in_use: null
@@ -145,7 +147,7 @@ accepted:
 
 blocked: []
 
-selection_note: "Horizon v20 COMPLETE 4/4: SMALL-SIDED-PROFILE-REDUCER-EXTENSION accepted — executable small-sided profile reducer wiring MUTANT_TEAM_PASS (runMutantTeamEval) and TEAM_SHAPE_SUITE_PASS (runTeamShapeEval) into a machine path, honest milestoneVerdict mapping, unknown prereqs NOT_EVALUATED, no theatrical always-PASS; strictly exit-prereq executability/audit-only, NOT a §2.3/§8 PROMOTION-tier verdict; playable-evaluator.ts untouched, 24 new + 268 regression tests pass, milestone SMALL_SIDED_SHAPE manifest preserved. Horizon v20 EXHAUSTED — strategic reassessment next. GK/regulation/full-match deferred; no PROMOTION overclaim."
+selection_note: "Horizon v21 (small-sided-playable-coherence-and-team-depth) 1/6, established after v20 EXHAUSTED. Goal: tie SMALL_SIDED_SHAPE's 8 situations and team behaviours to a coherent human-playable small-sided browser match (scanner localizes situations in a continuous match; integrated playtest ties milestone to a real match; press/support depth; action-observability gap closure; 5v5 human-vs-CPU; milestone re-run with coherent-match evidence). GK/regulation/full-match deferred; no invented perceptual rubric/PES envelopes; no PROMOTION overclaim. Next: SMALL-SIDED-MATCH-SITUATION-SCANNER."
 ```
 ## Last accepted objective
 

@@ -3,36 +3,46 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 20
-status: EXHAUSTED
-horizon_id: "small-sided-milestone-honesty-and-visibility"
-created_from_commit: 567c1a2320d6dae7a331e56bf2ea686571870f09
-created_at: 2026-08-24
-reason: "Horizon v19 achieved the first honest SMALL_SIDED_SHAPE milestone PASS (8/8 situations, critic ACCEPT). Reassessment finds three honesty/visibility gaps that the PASS record left open and one executability gap: (1) the durable milestone PASS record lists exit_prerequisite_accepted as the PLAYABLE_1V1 identities (MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON) instead of the SMALL_SIDED_SHAPE profile's declared exit prereqs (MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS) — the profile reducer only checks the boolean so this identity mismatch passed silently, a coherence defect worth correcting honestly; (2) the milestone's 8 visual_readability_dimensions (ball_readability_under_congestion, team_classification, facing_orientation, action_recognition, contact_comprehension, team_shape_readability, camera_readability, silhouette_stability) have zero executable evidence mapping — the natural observable browser-facing completion of the milestone bundle; (3) the required BROWSER-SMALL-SIDED-001 browser execution path predates the fixture/engine changes (shot-resolution, duel-rejection) that produced the 8/8 PASS, so its browser/headless coherence against the resolved fixtures is unvalidated; (4) no executable small-sided profile reducer wires the team exit prereqs (mutant-team.ts, team-shape-evaluator.ts) into a machine path (playable-evaluator.ts hardcodes only 1v1 exits). Boundary: goalkeepers, regulation rules, and full-match ecology remain deferred; no PROMOTION-tier verdict is claimed because §8/§11 policies are not executable."
-current_index: 4
+horizon_version: 21
+status: ACTIVE
+horizon_id: "small-sided-playable-coherence-and-team-depth"
+created_from_commit: b7d8e67
+created_at: 2026-08-25
+reason: "Horizon v20 (EXHAUSTED 4/4) delivered SMALL_SIDED_SHAPE honesty, visibility, and executability: 8/8 situations PASS on resolved driven fixtures, 8 visual-readability dimensions evidenced (DYNAMIC_VISUAL), BROWSER path re-attested, and team exit prereqs (MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS) made executable. Reassessment at exhaustion finds the milestone is honest but fixture-sourced: the situations are proven on purpose-built driven fixtures, not localized from a coherent continuous playable match (all are final_match_required), and the action_recognition readability dimension is honestly NEEDS_PERCEPTUAL_REVIEW because the CPU-only fixture emits no discrete kick/pass/shot. v21 ties the milestone situations and team behaviours to a coherent human-playable small-sided browser match, closes the disclosed action-observability evidence gap, and adds remaining small-sided team/playable depth (incl. full 5v5 human-vs-CPU). Boundary: goalkeepers, regulation rules, and full-match ecology remain deferred until their dedicated specs; NO invented perceptual rubric or PES envelopes; NO PROMOTION-tier verdict (policies not executable)."
+current_index: 0
 objectives:
-  - id: SMALL-SIDED-EXIT-PREREQ-IDENTITY
-    status: accepted
-    reason: "Correct the durable SMALL_SIDED_SHAPE milestone PASS record's exit_prerequisite_accepted identity from the PLAYABLE_1V1 names (MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON) to the profile's declared exit prerequisites (MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS, from eval/contracts/profiles.ts SMALL_SIDED_SHAPE_PROFILE). Re-run milestone:evaluate with the corrected input, regenerate the milestone record + bundle, and add a binding assertion locking the exit-prereq identity to the profile. Both team prereqs already exist and pass as evidence objectives (MUTANT_TEAM_PASS-EVIDENCE, TEAM-SHAPE-SUITE-PASS-EVIDENCE). Honesty/coherence; no new gameplay."
+  - id: SMALL-SIDED-MATCH-SITUATION-SCANNER
+    status: pending
+    reason: "Extend the small-sided situation evaluator/mapping (eval/contracts/situation-mapping.ts + eval/runners/small-sided-situation-evaluator.ts) to locate the 8 milestone situations organically inside a single continuous small-sided match (ai 3v3/5v5) from its event+telemetry stream, instead of purpose-built driven fixtures — the deterministic machine backbone that grounds the milestone in a coherent playable match. HEADLESS."
     builder: builder-structured
-    prerequisite: null
-  - id: SMALL-SIDED-VISUAL-READABILITY-EVIDENCE
-    status: accepted
-    reason: "Materialize event-centered DYNAMIC_VISUAL semantic frame sequences demonstrating the milestone's 8 visual_readability_dimensions are observable in small-sided play, mapped to the required situations. Honest evidence materialization for reviewer/perceptual readability judgment — NOT a numeric readability PASS (VISUAL_SPEC defers thresholds). Browser-facing completion of the milestone bundle; non-blank, distinct, situation-tied frames."
+    prerequisite: SMALL-SIDED-SITUATION-EVALUATOR
+  - id: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+    status: pending
+    reason: "Materialize the integrated playable small-sided match playtest running the resolved situations through the scanner on coherent CPU-vs-CPU and human-vs-CPU 3v3/5v5 matches, producing per-situation event-centered DYNAMIC_VISUAL evidence that ties SMALL_SIDED_SHAPE to the actual browseable experience (final_match_required) rather than isolated lab fixtures. DYNAMIC_VISUAL."
     builder: builder-gameplay
-    prerequisite: [BROWSER-SMALL-SIDED-001-CASE, SMALL-SIDED-SITUATIONS-BATCH-5]
-  - id: BROWSER-SMALL-SIDED-001-COHERENCE-RERUN
-    status: accepted
-    reason: "Re-attest the BROWSER-SMALL-SIDED-001 browser case (browser+headless hash correspondence) on the resolved fixtures (shot-resolution + duel-rejection + extended) that produced the 8/8 situation PASS, so the milestone's required BROWSER execution path is proven coherent with the fixture/engine changes underlying the PASS. Evidence class BROWSER_VISUAL/DYNAMIC_VISUAL."
+    prerequisite: SMALL-SIDED-MATCH-SITUATION-SCANNER
+  - id: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
+    status: pending
+    reason: "Deepen COORDINATED_PRESS (press+cover responsibilities) and SUPPORT_AND_PASSING_LANES (support without abandoning structure) in genuine small-sided play beyond the lab fixtures — remaining team/tactics depth within small-sided, not crossing GK/regulation; evidenced by team-geometry trajectories. MULTI_TICK."
     builder: builder-gameplay
-    prerequisite: [SHOT-RESULT-RESOLUTION-FIXTURE, DUEL-REJECTION-FIXTURE]
-  - id: SMALL-SIDED-PROFILE-REDUCER-EXTENSION
-    status: accepted
-    reason: "Add an executable small-sided milestone profile reducer (or extend the exit-prereq handler) wiring the SMALL_SIDED exit prerequisites MUTANT_TEAM_PASS (mutant-team.ts) and TEAM_SHAPE_SUITE_PASS (team-shape-evaluator.ts) into a machine path, replacing playable-evaluator.ts's hardcoded 1v1-only handling. Framed strictly as exit-prereq executability, NOT a §2.3/§8 PROMOTION-tier verdict (those policies/reference campaign are not executable). Audit-only honesty objective."
+    prerequisite: CPU-DEFENSIVE-ORGANIZATION
+  - id: SMALL-SIDED-ACTION-EVENT-OBSERVABILITY
+    status: pending
+    reason: "Close the disclosed action_recognition gap in the milestone bundle by capturing event-centered frames at discrete pass/shot/contact events in a mixed human/CPU small-sided match so the action_recognition readability dimension is observable — honest observability evidence, NOT an invented perceptual rubric. DYNAMIC_VISUAL."
+    builder: builder-gameplay
+    prerequisite: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+  - id: SMALL-SIDED-5V5-HUMAN-VS-CPU
+    status: pending
+    reason: "Complete the playable small-sided ladder with a full 5v5 human-vs-CPU match mode (currently only 5v3 human-vs-CPU and 5v5 AI exist) — an observable browser capability deepening small-sided playability without crossing GK/regulation. DYNAMIC_VISUAL."
+    builder: builder-gameplay
+    prerequisite: BROWSER-5V5-MATCH
+  - id: SMALL-SIDED-PLAYTEST-RE-RUN
+    status: pending
+    reason: "Re-run the SMALL_SIDED_SHAPE milestone reducer adding the coherent-match situation evidence as a supplementary source beside the driven fixtures, preserving the honest PASS while strengthening the final_match_required/integrated_playtest closure; evidence-bundle only, no gameplay change. BOOKKEEPING."
     builder: builder-structured
-    prerequisite: SMALL-SIDED-EXIT-PREREQ-IDENTITY
-observable_progress_target: "SMALL_SIDED_SHAPE milestone record is honest (correct exit-prereq identity) and its browser/visual dimension is evidenced (8 visual_readability_dimensions with event-centered DYNAMIC_VISUAL sequences, browser path re-attested on resolved fixtures). NO regulation/goalkeeper/full-match work; NO PROMOTION-overclaim."
-last_invalidation_reason: "Horizon v20 EXHAUSTED 4/4: exit-prereq-identity corrected, 8 visual-readability dimensions evidenced (DYNAMIC_VISUAL), BROWSER path re-attested on resolved fixtures, and team-exit reducer made executable. SMALL_SIDED_SHAPE milestone now honestly PASS with observable browser/visual evidence and executable exit prereqs. Boundary: goalkeepers/regulation/full-match remain deferred."
+    prerequisite: SMALL-SIDED-INTEGRATED-PLAYTEST-MATCH
+observable_progress_target: "A coherent human-playable small-sided match (3v3 & 5v5, human-vs-CPU and CPU-vs-CPU) in the browser where the 8 SMALL_SIDED_SHAPE situations and team behaviours (press/support/transitions) are demonstrable from one continuous match with event-centered evidence, and full 5v5 human-vs-CPU is playable. NO GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity work; NO PROMOTION overclaim."
+last_invalidation_reason: "Horizon v20 EXHAUSTED 4/4: SMALL_SIDED_SHAPE honesty, visibility, and executability delivered. Reassessment surfaced that the milestone PASS is fixture-sourced (not localized from a coherent continuous playable match; all situations final_match_required) and action_recognition remains honestly NEEDS_PERCEPTUAL_REVIEW. Boundary: GK/regulation/full-match deferred."
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -45,7 +55,7 @@ replan_if:
 
 ## Completed horizons
 
-Horizon v20 (small-sided-milestone-honesty-and-visibility) — EXHAUSTED 4/4: SMALL-SIDED-EXIT-PREREQ-IDENTITY accepted (milestone record exit-prereq identity corrected; PASS preserved). SMALL-SIDED-VISUAL-READABILITY-EVIDENCE accepted (24 event-centered DYNAMIC_VISUAL frames for the 8 readability dimensions; critic + integration ACCEPT; SHA-reuse resolved VALID). BROWSER-SMALL-SIDED-001-COHERENCE-RERUN accepted (browser/headless hash correspondence re-attested across the three resolved driven fixtures; critic + integration ACCEPT; audit PASS). SMALL-SIDED-PROFILE-REDUCER-EXTENSION accepted (executable team-exit prereq reducer; critic + integration ACCEPT; audit PASS).
+Horizon v20 (small-sided-milestone-honesty-and-visibility) — EXHAUSTED 4/4: SMALL-SIDED-EXIT-PREREQ-IDENTITY accepted (milestone record exit-prereq identity corrected to MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS; PASS preserved). SMALL-SIDED-VISUAL-READABILITY-EVIDENCE accepted (24 event-centered DYNAMIC_VISUAL frames for the 8 readability dimensions; critic + integration ACCEPT; SHA-reuse resolved VALID). BROWSER-SMALL-SIDED-001-COHERENCE-RERUN accepted (browser/headless hash correspondence re-attested across the three resolved driven fixtures; critic + integration ACCEPT; audit PASS). SMALL-SIDED-PROFILE-REDUCER-EXTENSION accepted (executable team-exit prereq reducer wiring MUTANT_TEAM_PASS/TEAM_SHAPE_SUITE_PASS; critic + integration ACCEPT; audit PASS).
 Horizon v19 (small-sided-milestone-completion) — EXHAUSTED: 4/4 accepted. SHOT/DUEL fixture objectives closed the two FAIL gaps; BATCH-5 consolidated 8/8 situation PASS; MILESTONE-RERUN-3 achieved SMALL_SIDED_SHAPE honest PASS (critic ACCEPT) with milestone bundle superseded (history: 8 NOT_EVALUATED → 3 FAIL → NEEDS_PERCEPTUAL_REVIEW → PASS).
 Horizon v18 (event-diversity-through-evaluator-fix) — EXHAUSTED: 3/3 accepted. isRelevantEvent indicative fix applied; BATCH-4 6 PASS/2 FAIL; milestone FAIL honest (6/8); bundle generated.
 Horizon v17 (driven-fixture-event-extension) — EXHAUSTED: 3/3 accepted. Milestone FAILED (7/8 FAIL).
