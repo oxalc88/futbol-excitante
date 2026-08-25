@@ -139,12 +139,18 @@ export interface TestBridge {
  * @param scenario - Optional scenario to load instead of the default
  *   foundation scenario.  When omitted, the bridge uses
  *   `FOUNDATION_SCENARIO`.
+ * @param difficulty - Optional difficulty level for CPU adapters.
+ * @param rendererConfig - Optional renderer config override.  When omitted,
+ *   the bridge uses DEFAULT_RENDERER_CONFIG (camera position (0,30,40),
+ *   fov 50).  Passing a custom config changes only the presentation layer
+ *   (camera, colours, etc.) and does NOT affect football outcomes.
  * @returns A TestBridge instance.
  */
 export function createTestBridge(
   container: HTMLElement,
   scenario?: import("../../contracts/scenario.js").ScenarioDefinition,
   difficulty?: DifficultyLevel,
+  rendererConfig?: import("../../adapters/renderer-three/renderer.js").RendererConfig,
 ): TestBridge {
   let sim: Simulation;
   let session: PresentationSession;
@@ -155,7 +161,7 @@ export function createTestBridge(
   function initSimulation(): void {
     const world = createWorld({ scenario: scenario ?? FOUNDATION_SCENARIO });
     sim = createSimulation(world);
-    session = createPresentationSession(container);
+    session = createPresentationSession(container, rendererConfig);
   }
 
   // Initialize on creation.

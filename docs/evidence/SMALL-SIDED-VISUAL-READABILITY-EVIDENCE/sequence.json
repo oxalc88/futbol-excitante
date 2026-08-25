@@ -1,0 +1,360 @@
+{
+  "schema_version": 1,
+  "objective_id": "SMALL-SIDED-VISUAL-READABILITY-EVIDENCE",
+  "dimensions": [
+    {
+      "dimension": "ball_readability_under_congestion",
+      "event_centered_sequence": [
+        {
+          "label": "before",
+          "path": "ball_readability_under_congestion-before.png",
+          "tick": 109,
+          "note": "Ball at center, two teams converging from opposite sides"
+        },
+        {
+          "label": "event",
+          "path": "ball_readability_under_congestion-event.png",
+          "tick": 121,
+          "note": "player-player-contact: opposing players collide near ball at center"
+        },
+        {
+          "label": "after",
+          "path": "ball_readability_under_congestion-after.png",
+          "tick": 136,
+          "note": "Post-contact: players spread slightly, ball still amid congestion"
+        }
+      ]
+    },
+    {
+      "dimension": "team_classification",
+      "event_centered_sequence": [
+        {
+          "label": "before",
+          "path": "team_classification-before.png",
+          "tick": 120,
+          "note": "Both teams visible near center: Team A (blue 0x2266cc) at x in [-7.2, -0.3], Team B (red 0xcc3333) at x in [0.3, 7.2]"
+        },
+        {
+          "label": "event",
+          "path": "team_classification-event.png",
+          "tick": 125,
+          "note": "Both teams converging further, kit differentiation clear with distinct colors on screen"
+        },
+        {
+          "label": "after",
+          "path": "team_classification-after.png",
+          "tick": 140,
+          "note": "Teams continuing convergence, both kit colors visible in the congested center area"
+        }
+      ]
+    },
+    {
+      "dimension": "facing_orientation",
+      "event_centered_sequence": [
+        {
+          "label": "before",
+          "path": "facing_orientation-before.png",
+          "tick": 168,
+          "note": "Players converging toward ball cluster, varied headings becoming discernible"
+        },
+        {
+          "label": "event",
+          "path": "facing_orientation-event.png",
+          "tick": 180,
+          "note": "player-player-contact: 6 players in tight cluster with varied body headings (range 0.0-2.4 rad); some face toward ball origin, others face away — individual facing discernible under congestion"
+        },
+        {
+          "label": "after",
+          "path": "facing_orientation-after.png",
+          "tick": 195,
+          "note": "Post-contact: players reorienting, diverging headings visible as they separate"
+        }
+      ]
+    },
+    {
+      "dimension": "action_recognition",
+      "event_centered_sequence": [
+        {
+          "label": "before",
+          "path": "action_recognition-before.png",
+          "tick": 588,
+          "note": "Directional player positioning visible; CPU adapter produces no discrete kick actions in this run"
+        },
+        {
+          "label": "event",
+          "path": "action_recognition-event.png",
+          "tick": 600,
+          "note": "Attacking-side players oriented toward opponent half with directional placement (Team A spread 11.6m vs Team B 4.7m); action recognizability limited to directional posture since no discrete kick events occur"
+        },
+        {
+          "label": "after",
+          "path": "action_recognition-after.png",
+          "tick": 615,
+          "note": "Continued directional positioning; player positions reflect accumulated movement rather than discrete action outcome"
+        }
+      ]
+    },
+    {
+      "dimension": "contact_comprehension",
+      "event_centered_sequence": [
+        {
+          "label": "before",
+          "path": "contact_comprehension-before.png",
+          "tick": 228,
+          "note": "Opposing players approaching each other near ball"
+        },
+        {
+          "label": "event",
+          "path": "contact_comprehension-event.png",
+          "tick": 240,
+          "note": "player-player-contact: tightest congestion, opposing pairs at 0.46m distance"
+        },
+        {
+          "label": "after",
+          "path": "contact_comprehension-after.png",
+          "tick": 255,
+          "note": "Post-contact separation, player positions show displacement from collision"
+        }
+      ]
+    },
+    {
+      "dimension": "team_shape_readability",
+      "event_centered_sequence": [
+        {
+          "label": "before",
+          "path": "team_shape_readability-before.png",
+          "tick": 408,
+          "note": "Team A advancing with spread formation, Team B retreating"
+        },
+        {
+          "label": "event",
+          "path": "team_shape_readability-event.png",
+          "tick": 420,
+          "note": "Established attacking shape: Team A spread 7m, Team B compact 3.6m"
+        },
+        {
+          "label": "after",
+          "path": "team_shape_readability-after.png",
+          "tick": 432,
+          "note": "Team shape maintained, attacking progression continues"
+        }
+      ]
+    },
+    {
+      "dimension": "camera_readability",
+      "event_centered_sequence": [
+        {
+          "label": "before",
+          "path": "camera_readability-before.png",
+          "tick": 288,
+          "note": "Static camera view centered on ball position (ball at origin throughout run); center circle and pitch markings visible"
+        },
+        {
+          "label": "event",
+          "path": "camera_readability-event.png",
+          "tick": 300,
+          "note": "Static camera view centered on the ball position (ball at origin throughout the run); full pitch context (center circle, halfway line) is consistently visible and the play remains in frame"
+        },
+        {
+          "label": "after",
+          "path": "camera_readability-after.png",
+          "tick": 312,
+          "note": "Static camera maintains consistent field of view; readable pitch context throughout"
+        }
+      ]
+    },
+    {
+      "dimension": "silhouette_stability",
+      "event_centered_sequence": [
+        {
+          "label": "before",
+          "path": "silhouette_stability-before.png",
+          "tick": 348,
+          "note": "Players in continuous movement, silhouettes remain steady"
+        },
+        {
+          "label": "event",
+          "path": "silhouette_stability-event.png",
+          "tick": 360,
+          "note": "Player silhouettes stable and distinct during team spread phase"
+        },
+        {
+          "label": "after",
+          "path": "silhouette_stability-after.png",
+          "tick": 375,
+          "note": "Silhouettes persist as players continue movement"
+        }
+      ]
+    }
+  ],
+  "frames": [
+    {
+      "dimension": "ball_readability_under_congestion",
+      "label": "before",
+      "path": "ball_readability_under_congestion-before.png",
+      "tick": 109,
+      "note": "Ball at center, two teams converging from opposite sides"
+    },
+    {
+      "dimension": "ball_readability_under_congestion",
+      "label": "event",
+      "path": "ball_readability_under_congestion-event.png",
+      "tick": 121,
+      "note": "player-player-contact: opposing players collide near ball at center"
+    },
+    {
+      "dimension": "ball_readability_under_congestion",
+      "label": "after",
+      "path": "ball_readability_under_congestion-after.png",
+      "tick": 136,
+      "note": "Post-contact: players spread slightly, ball still amid congestion"
+    },
+    {
+      "dimension": "team_classification",
+      "label": "before",
+      "path": "team_classification-before.png",
+      "tick": 120,
+      "note": "Both teams visible near center: Team A (blue 0x2266cc) at x in [-7.2, -0.3], Team B (red 0xcc3333) at x in [0.3, 7.2]"
+    },
+    {
+      "dimension": "team_classification",
+      "label": "event",
+      "path": "team_classification-event.png",
+      "tick": 125,
+      "note": "Both teams converging further, kit differentiation clear with distinct colors on screen"
+    },
+    {
+      "dimension": "team_classification",
+      "label": "after",
+      "path": "team_classification-after.png",
+      "tick": 140,
+      "note": "Teams continuing convergence, both kit colors visible in the congested center area"
+    },
+    {
+      "dimension": "facing_orientation",
+      "label": "before",
+      "path": "facing_orientation-before.png",
+      "tick": 168,
+      "note": "Players converging toward ball cluster, varied headings becoming discernible"
+    },
+    {
+      "dimension": "facing_orientation",
+      "label": "event",
+      "path": "facing_orientation-event.png",
+      "tick": 180,
+      "note": "player-player-contact: 6 players in tight cluster with varied body headings (range 0.0-2.4 rad); some face toward ball origin, others face away — individual facing discernible under congestion"
+    },
+    {
+      "dimension": "facing_orientation",
+      "label": "after",
+      "path": "facing_orientation-after.png",
+      "tick": 195,
+      "note": "Post-contact: players reorienting, diverging headings visible as they separate"
+    },
+    {
+      "dimension": "action_recognition",
+      "label": "before",
+      "path": "action_recognition-before.png",
+      "tick": 588,
+      "note": "Directional player positioning visible; CPU adapter produces no discrete kick actions in this run"
+    },
+    {
+      "dimension": "action_recognition",
+      "label": "event",
+      "path": "action_recognition-event.png",
+      "tick": 600,
+      "note": "Attacking-side players oriented toward opponent half with directional placement (Team A spread 11.6m vs Team B 4.7m); action recognizability limited to directional posture since no discrete kick events occur"
+    },
+    {
+      "dimension": "action_recognition",
+      "label": "after",
+      "path": "action_recognition-after.png",
+      "tick": 615,
+      "note": "Continued directional positioning; player positions reflect accumulated movement rather than discrete action outcome"
+    },
+    {
+      "dimension": "contact_comprehension",
+      "label": "before",
+      "path": "contact_comprehension-before.png",
+      "tick": 228,
+      "note": "Opposing players approaching each other near ball"
+    },
+    {
+      "dimension": "contact_comprehension",
+      "label": "event",
+      "path": "contact_comprehension-event.png",
+      "tick": 240,
+      "note": "player-player-contact: tightest congestion, opposing pairs at 0.46m distance"
+    },
+    {
+      "dimension": "contact_comprehension",
+      "label": "after",
+      "path": "contact_comprehension-after.png",
+      "tick": 255,
+      "note": "Post-contact separation, player positions show displacement from collision"
+    },
+    {
+      "dimension": "team_shape_readability",
+      "label": "before",
+      "path": "team_shape_readability-before.png",
+      "tick": 408,
+      "note": "Team A advancing with spread formation, Team B retreating"
+    },
+    {
+      "dimension": "team_shape_readability",
+      "label": "event",
+      "path": "team_shape_readability-event.png",
+      "tick": 420,
+      "note": "Established attacking shape: Team A spread 7m, Team B compact 3.6m"
+    },
+    {
+      "dimension": "team_shape_readability",
+      "label": "after",
+      "path": "team_shape_readability-after.png",
+      "tick": 432,
+      "note": "Team shape maintained, attacking progression continues"
+    },
+    {
+      "dimension": "camera_readability",
+      "label": "before",
+      "path": "camera_readability-before.png",
+      "tick": 288,
+      "note": "Static camera view centered on ball position (ball at origin throughout run); center circle and pitch markings visible"
+    },
+    {
+      "dimension": "camera_readability",
+      "label": "event",
+      "path": "camera_readability-event.png",
+      "tick": 300,
+      "note": "Static camera view centered on the ball position (ball at origin throughout the run); full pitch context (center circle, halfway line) is consistently visible and the play remains in frame"
+    },
+    {
+      "dimension": "camera_readability",
+      "label": "after",
+      "path": "camera_readability-after.png",
+      "tick": 312,
+      "note": "Static camera maintains consistent field of view; readable pitch context throughout"
+    },
+    {
+      "dimension": "silhouette_stability",
+      "label": "before",
+      "path": "silhouette_stability-before.png",
+      "tick": 348,
+      "note": "Players in continuous movement, silhouettes remain steady"
+    },
+    {
+      "dimension": "silhouette_stability",
+      "label": "event",
+      "path": "silhouette_stability-event.png",
+      "tick": 360,
+      "note": "Player silhouettes stable and distinct during team spread phase"
+    },
+    {
+      "dimension": "silhouette_stability",
+      "label": "after",
+      "path": "silhouette_stability-after.png",
+      "tick": 375,
+      "note": "Silhouettes persist as players continue movement"
+    }
+  ]
+}

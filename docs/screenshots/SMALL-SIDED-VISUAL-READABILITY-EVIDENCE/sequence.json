@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "objective_id": "SMALL-SIDED-VISUAL-READABILITY-EVIDENCE",
+  "frames": [
+    {
+      "label": "initial",
+      "path": "ball_readability_under_congestion-before.png",
+      "tick": 109,
+      "note": "Initial 3v3 state: two teams converging from opposite sides, ball at center"
+    },
+    {
+      "label": "contact",
+      "path": "ball_readability_under_congestion-event.png",
+      "tick": 121,
+      "note": "player-player-contact: opposing players collide near ball at center; ball amid congestion"
+    },
+    {
+      "label": "team-spread",
+      "path": "team_classification-event.png",
+      "tick": 125,
+      "note": "Both teams visible: Team A (blue) and Team B (red) converging further, kit differentiation clear"
+    },
+    {
+      "label": "cluster",
+      "path": "facing_orientation-event.png",
+      "tick": 180,
+      "note": "player-player-contact: all 6 players in a tight cluster with varied body headings"
+    }
+  ]
+}
