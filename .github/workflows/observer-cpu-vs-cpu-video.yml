@@ -1,0 +1,59 @@
+name: Observer CPU-vs-CPU Video
+
+on:
+  push:
+    branches:
+      - observer/cpu-vs-cpu-video-20260825
+    paths:
+      - '.github/workflows/observer-cpu-vs-cpu-video.yml'
+      - 'scripts/observer-capture-cpu-vs-cpu-video.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: 'true'
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Start Vite
+        run: |
+          pnpm exec vite --host 127.0.0.1 > /tmp/vite.log 2>&1 &
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:5173/src/apps/browser/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/vite.log
+          exit 1
+      - name: Capture 5v5 CPU-vs-CPU video
+        run: node scripts/observer-capture-cpu-vs-cpu-video.mjs
+        env:
+          OBSERVER_DURATION_MS: '60000'
+          OBSERVER_OUT_DIR: artifacts/observer-cpu-vs-cpu-video
+      - name: Show evidence summary
+        if: always()
+        run: |
+          find artifacts/observer-cpu-vs-cpu-video -maxdepth 1 -type f -printf '%f %s bytes\n' || true
+          cat artifacts/observer-cpu-vs-cpu-video/summary.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: observer-cpu-vs-cpu-video
+          path: artifacts/observer-cpu-vs-cpu-video/
+          if-no-files-found: warn
+          retention-days: 14
