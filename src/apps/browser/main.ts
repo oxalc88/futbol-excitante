@@ -26,9 +26,7 @@ import {
 import { selectBrowserScenario } from "./scenario-selector.js";
 import type { ScenarioDefinition } from "../../contracts/scenario.js";
 import type { InputFrame } from "../../contracts/input.js";
-import { SWITCH_PLAYER_BIT } from "../../contracts/input.js";
 import type { Simulation } from "../../simulation/loop/simulation.js";
-import { computeExplicitSwitchTarget } from "../../simulation/input/input-system.js";
 import { createCpuAdapter, buildCpuObservation } from "../../adapters/input-browser/cpu-adapter.js";
 import type { DifficultyLevel } from "../../adapters/input-browser/cpu-adapter.js";
 import { computeTeamDecision } from "../../adapters/input-browser/team-decision-profile.js";
@@ -446,18 +444,8 @@ function startMatch(
   const sim: Simulation = createSimulation(world);
 
   // -------------------------------------------------------------------
-  // Player switching helpers
+  // Player switching — handled natively by sim.step() via SWITCH_PLAYER_BIT
   // -------------------------------------------------------------------
-
-  function nextEligiblePlayer(controlSlot: string): string | null {
-    const liveState = sim.snapshot();
-    return computeExplicitSwitchTarget(
-      controlSlot,
-      liveState.controlAssignments,
-      liveState.players,
-      "NEXT",
-    );
-  }
 
   // Track keyboard adapters (empty in AI-vs-AI mode).
   type AdapterEntry = { adapter: KeyboardAdapter; config: { controlSlot: string } };
@@ -566,14 +554,7 @@ function startMatch(
         ({ adapter }) => adapter.sample(sim.tick),
       );
 
-      // Player switching
-      if (adapters.length > 0) {
-        const humanFrame = allFrames[0];
-        if (humanFrame && (humanFrame.pressedButtons & SWITCH_PLAYER_BIT) !== 0) {
-          const nextId = nextEligiblePlayer(humanFrame.controlSlot);
-          if (nextId) sim.setControlledPlayer(humanFrame.controlSlot, nextId);
-        }
-      }
+      // Player switching is handled natively by sim.step() via SWITCH_PLAYER_BIT.
 
       // CPU frames
       if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5 || IS_HUMAN_VS_CPU_5V3) {

@@ -90,17 +90,6 @@ function runWithCpu(
       adapter: createCpuAdapter(),
     }));
 
-  const humanSlotEntries = Object.entries(scenario.controlAssignments)
-    .filter(([, assignment]) => assignment.mode === "HUMAN")
-    .map(([controlSlot, assignment]) => {
-      const teamId = assignment.teamId;
-      const teammates = scenario.players
-        .filter((p) => p.teamId === teamId)
-        .map((p) => p.playerId)
-        .sort();
-      return { controlSlot, teammates };
-    });
-
   for (let tick = 0; tick < ticks; tick++) {
     const snapshot = sim.snapshot();
     const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
@@ -129,21 +118,6 @@ function runWithCpu(
 
     if (extraFrames) {
       frames.push(...extraFrames(sim.tick));
-    }
-
-    // Detect player-switch from HUMAN frames (mirrors main.ts logic).
-    for (const frame of frames) {
-      if ((frame.pressedButtons & SWITCH_PLAYER_BIT) !== 0) {
-        const entry = humanSlotEntries.find((e) => e.controlSlot === frame.controlSlot);
-        if (entry && entry.teammates.length > 1) {
-          const currentId = snapshot.controlAssignments[frame.controlSlot]?.controlledPlayerId;
-          const idx = entry.teammates.indexOf(currentId ?? "");
-          if (idx >= 0) {
-            const nextId = entry.teammates[(idx + 1) % entry.teammates.length];
-            sim.setControlledPlayer(frame.controlSlot, nextId);
-          }
-        }
-      }
     }
 
     bridge.injectInputs(frames);
@@ -353,5 +327,86 @@ describe("INDICATOR-005: indicator absent in pure AI mode", () => {
     const marker = findMarkerInScene(scene);
     expect(marker).not.toBeNull();
     expect(marker!.visible).toBe(false);
+  });
+});
+
+// ===========================================================================
+// INDICATOR-GUARD: marker follows core-native switch; negative control fails
+// ===========================================================================
+
+describe("INDICATOR-GUARD: marker follows core switch, negative control fails", () => {
+  let bridge: TestBridge;
+
+  afterEach(() => {
+    try { bridge?.getPresentationSession().dispose(); } catch { /* already disposed */ }
+  });
+
+  it("marker is above the switched player after core processes SWITCH_PLAYER_BIT", async () => {
+    bridge = createTestBridge(container, FOUNDATION_SCENARIO_HUMAN_VS_CPU);
+    await bridge.reset();
+    const sim = bridge.getSimulation();
+
+    // Initial: player-1 is controlled.
+    expect(sim.snapshot().controlAssignments["slot-1"].controlledPlayerId).toBe("player-1");
+
+    // Inject SWITCH_PLAYER_BIT frame — core handles the switch in step().
+    const frame: InputFrame = {
+      tick: sim.tick,
+      sourceId: "keyboard",
+      controlSlot: "slot-1",
+      moveX: 0, moveY: 0, sprint: 0,
+      heldButtons: 0,
+      pressedButtons: SWITCH_PLAYER_BIT,
+      releasedButtons: 0,
+    };
+    bridge.injectInputs([frame]);
+    sim.step();
+
+    // Core switched to player-2.
+    expect(sim.snapshot().controlAssignments["slot-1"].controlledPlayerId).toBe("player-2");
+
+    // Render and verify marker is above the NEW player.
+    bridge.renderFrame();
+    const scene = bridge.getScene();
+    const marker = findMarkerInScene(scene);
+    expect(marker).not.toBeNull();
+    expect(marker!.visible).toBe(true);
+
+    // Presentation confirms isControlled on player-2 only.
+    const presentation = sim.presentation();
+    const controlled = presentation.players.filter((p) => p.isControlled);
+    expect(controlled.length).toBe(1);
+    expect(controlled[0].playerId).toBe("player-2");
+  });
+
+  it("negative control: without SWITCH_PLAYER_BIT, marker stays on original player", async () => {
+    bridge = createTestBridge(container, FOUNDATION_SCENARIO_HUMAN_VS_CPU);
+    await bridge.reset();
+    const sim = bridge.getSimulation();
+
+    expect(sim.snapshot().controlAssignments["slot-1"].controlledPlayerId).toBe("player-1");
+
+    // Inject a frame WITHOUT SWITCH_PLAYER_BIT (simulates stashed core path).
+    const frame: InputFrame = {
+      tick: sim.tick,
+      sourceId: "keyboard",
+      controlSlot: "slot-1",
+      moveX: 0, moveY: 0, sprint: 0,
+      heldButtons: 0,
+      pressedButtons: 0,
+      releasedButtons: 0,
+    };
+    bridge.injectInputs([frame]);
+    sim.step();
+
+    // Player should NOT have switched.
+    expect(sim.snapshot().controlAssignments["slot-1"].controlledPlayerId).toBe("player-1");
+
+    // Render and verify marker is still above original player.
+    bridge.renderFrame();
+    const presentation = sim.presentation();
+    const controlled = presentation.players.filter((p) => p.isControlled);
+    expect(controlled.length).toBe(1);
+    expect(controlled[0].playerId).toBe("player-1");
   });
 });

@@ -78,9 +78,11 @@ function switchFrame(
  * Run N ticks with CPU controllers for non-HUMAN slots,
  * plus optional extra frames injected per tick.
  *
- * Also applies the same player-switch detection logic that main.ts uses:
- * if a HUMAN slot's frame has SWITCH_PLAYER_BIT in pressedButtons,
- * the simulation's setControlledPlayer is called.
+ * Player switching is handled exclusively by the simulation core:
+ * a HUMAN slot's frame carrying SWITCH_PLAYER_BIT in pressedButtons is
+ * resolved natively inside sim.step() (mutating the controlled player and
+ * emitting a slot-switch event). This helper does NOT call
+ * setControlledPlayer manually — doing so would double-switch per Tab.
  */
 function runWithCpu(
   bridge: TestBridge,
@@ -97,18 +99,6 @@ function runWithCpu(
       controlledPlayerId: assignment.controlledPlayerId,
       adapter: createCpuAdapter(),
     }));
-
-  // Pre-compute eligible teammates for each HUMAN slot (mirrors main.ts nextEligiblePlayer).
-  const humanSlotEntries = Object.entries(scenario.controlAssignments)
-    .filter(([, assignment]) => assignment.mode === "HUMAN")
-    .map(([controlSlot, assignment]) => {
-      const teamId = assignment.teamId;
-      const teammates = scenario.players
-        .filter((p) => p.teamId === teamId)
-        .map((p) => p.playerId)
-        .sort();
-      return { controlSlot, teammates };
-    });
 
   for (let tick = 0; tick < ticks; tick++) {
     const snapshot = sim.snapshot();
@@ -138,21 +128,6 @@ function runWithCpu(
 
     if (extraFrames) {
       frames.push(...extraFrames(sim.tick));
-    }
-
-    // Detect player-switch from HUMAN frames (mirrors main.ts logic).
-    for (const frame of frames) {
-      if ((frame.pressedButtons & SWITCH_PLAYER_BIT) !== 0) {
-        const entry = humanSlotEntries.find((e) => e.controlSlot === frame.controlSlot);
-        if (entry && entry.teammates.length > 1) {
-          const currentId = snapshot.controlAssignments[frame.controlSlot]?.controlledPlayerId;
-          const idx = entry.teammates.indexOf(currentId ?? "");
-          if (idx >= 0) {
-            const nextId = entry.teammates[(idx + 1) % entry.teammates.length];
-            sim.setControlledPlayer(frame.controlSlot, nextId);
-          }
-        }
-      }
     }
 
     bridge.injectInputs(frames);
@@ -365,5 +340,81 @@ describe("SWITCH-006: player switch is deterministic", () => {
 
     expect(hash1).toBe(hash2);
     expect(player1).toBe(player2);
+  });
+});
+
+// ===========================================================================
+// SWITCH-GUARD: core-native switch must fire; negative control must fail
+// ===========================================================================
+
+describe("SWITCH-GUARD: core-native switch fires, negative control fails", () => {
+  let bridge: TestBridge;
+
+  afterEach(() => {
+    try { bridge?.getPresentationSession().dispose(); } catch { /* already disposed */ }
+  });
+
+  it("single Tab press causes exactly one switch via core step (no manual setControlledPlayer)", async () => {
+    bridge = createTestBridge(container, FOUNDATION_SCENARIO_HUMAN_VS_CPU);
+    await bridge.reset();
+    const sim = bridge.getSimulation();
+
+    // Verify initial state.
+    expect(sim.snapshot().controlAssignments["slot-1"].controlledPlayerId).toBe("player-1");
+
+    // Inject a SWITCH_PLAYER_BIT frame — NO manual setControlledPlayer call.
+    // The core must handle this in step().
+    const frame: InputFrame = {
+      tick: sim.tick,
+      sourceId: "keyboard",
+      controlSlot: "slot-1",
+      moveX: 0, moveY: 0, sprint: 0,
+      heldButtons: 0,
+      pressedButtons: SWITCH_PLAYER_BIT,
+      releasedButtons: 0,
+    };
+    bridge.injectInputs([frame]);
+    const result = sim.step();
+
+    // Core switched exactly once.
+    expect(sim.snapshot().controlAssignments["slot-1"].controlledPlayerId).toBe("player-2");
+
+    // A slot-switch event was emitted by the core.
+    const switchEvents = result.events.filter((e) => e.kind === "slot-switch");
+    expect(switchEvents.length).toBe(1);
+    expect(switchEvents[0].payload).toMatchObject({
+      controlSlot: "slot-1",
+      fromPlayer: "player-1",
+      toPlayer: "player-2",
+    });
+  });
+
+  it("negative control: no SWITCH_PLAYER_BIT → no switch (simulates stashed core path)", async () => {
+    bridge = createTestBridge(container, FOUNDATION_SCENARIO_HUMAN_VS_CPU);
+    await bridge.reset();
+    const sim = bridge.getSimulation();
+
+    expect(sim.snapshot().controlAssignments["slot-1"].controlledPlayerId).toBe("player-1");
+
+    // Inject a frame WITHOUT SWITCH_PLAYER_BIT (simulates what happens if
+    // the core's SWITCH_PLAYER_BIT processing is stashed/removed).
+    const frame: InputFrame = {
+      tick: sim.tick,
+      sourceId: "keyboard",
+      controlSlot: "slot-1",
+      moveX: 0, moveY: 0, sprint: 0,
+      heldButtons: 0,
+      pressedButtons: 0,  // No SWITCH_PLAYER_BIT
+      releasedButtons: 0,
+    };
+    bridge.injectInputs([frame]);
+    const result = sim.step();
+
+    // Player should NOT have switched.
+    expect(sim.snapshot().controlAssignments["slot-1"].controlledPlayerId).toBe("player-1");
+
+    // No slot-switch event.
+    const switchEvents = result.events.filter((e) => e.kind === "slot-switch");
+    expect(switchEvents.length).toBe(0);
   });
 });
