@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 143 — 2026-08-26
+
+- objective_id: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (after 2 RETRYs, resolved)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (after 3 REJECTs, resolved)
+- result: accepted
+- commits: b72ad12 candidate(SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE)
+- notes: Closed Horizon v22 1/5 with organic continuous-match duel/shot closure: new coherent 5v5 CPU-vs-CPU fixture (eval/scenarios/5v5-continuous-play.v1.json, 600 ticks) scanned in-match with MULTI_TICK evidence — 437 events, 1 pitch-contact, 22 shots; SHOT_TO_RESULT localizes organically and 7/8 situations are present from continuous play with 1 insufficient_context (PHYSICAL_DUEL, orchestrator-approved partial closure; honest, no fabricated presence). Root-caused the ground↔airborne micro-jitter regime oscillation in ball-system.ts (POST_BOUNCE_ABSORB_THRESHOLD / MIN_LIFT_OFF_VELOCITY + ground-roll z-clamp; pitch-contact flood 511→1, 2v2-scoring ~52s→~30s) and added the buildTeamCpuObservation passthrough to headless-match.ts. Critic RETRY x2: (1) the ball-system change invalidated BATCH-1/2/3 evidence that was omitted from the reported totals — regenerated all affected suites + reducer re-run; (2) the persisted trajectory was from the intermediate engine (494 vs 437 events, 524/600 hash matches) with stale RESULT.md — regenerated on the final engine and reconciled (600/600 reproducible). Integration REJECT x3: (1) 2v2-scoring 31/34 timeouts (pitch-contact flood) + EXIT-PREREQ-IDENTITY playtest record lacked entry/exit prereq fields; (2) 2v2-scoring exit 1 under the default vitest forks pool (onTaskUpdate RPC timeout, file-level worker serialization); (3) one combined long-test file still blocked a single worker — final fix splits long tests into per-file tests (34/34 exit 0, twice). Both reviewers ACCEPT at b72ad12; deterministic audit PASS; milestone bundle 16 runs / 14 sources. No milestone PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v22 1/5.
+
 ## Iteration 142 — 2026-08-25
 
 - objective_id: SMALL-SIDED-PLAYTEST-RE-RUN

@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.4",
+  "persisted_at": "2026-08-26T06:30:13.326Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE",
+  "candidate_commit": "b72ad12",
+  "evidence_class": "MULTI_TICK",
+  "builder": {
+    "agent": "builder-gameplay",
+    "model": "mimo-v2.5"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "semantic_audit": null,
+  "critic": {
+    "agent": "critic",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "integration": {
+    "agent": "integration-reviewer",
+    "model": "deepseek-v4-flash",
+    "verdict": "ACCEPT",
+    "required_fixes": []
+  },
+  "metrics": [],
+  "retry_notes": "Two critic RETRY loops + two integration REJECT loops, all resolved. (1) Critic RETRY: ball-system change invalidated un-regenerated BATCH-1-RERUN/2-RERUN/3 evidence — regenerated all affected suites (later reverted to byte-identical HEAD after the oscillation fix) + milestone reducer re-run + orchestrator sign-off for PHYSICAL_DUEL partial closure. (2) Integration REJECT: 2v2-scoring suite timed out + EXIT-PREREQ-IDENTITY record lacked prereq fields — root-caused the pitch-contact oscillation in ball-system.ts (MIN_LIFT_OFF_VELOCITY=0.5, POST_BOUNCE_ABSORB_THRESHOLD=1.0, ground-roll vz clamp; 511→1 pitch-contacts, ~52s→~30s), corrected the milestone record with entry/exit_prerequisite_accepted. (3) Critic RETRY: persisted trajectory was from the intermediate engine — regenerated on the final engine (437 events, 7/0/1 scan, 600/600 reproducible). (4) Integration REJECT: 2v2 long tests exited 1 under default vitest forks pool (RPC window) — split into three one-test-per-file workers; 34/34 exit 0, twice. Final: critic ACCEPT + integration ACCEPT at b72ad12; SHOT_TO_RESULT closes organically (7/8 present); PHYSICAL_DUEL honestly insufficient_context with orchestrator-approved partial closure (input-rejection indicative structurally unreachable in organic CPU-vs-CPU play; milestone retains driven-fixture PASS)."
+}

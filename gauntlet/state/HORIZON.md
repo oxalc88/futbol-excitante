@@ -9,10 +9,10 @@ horizon_id: "continuous-match-closure-and-small-sided-hardening"
 created_from_commit: da8803b
 created_at: 2026-08-25
 reason: "Horizon v21 (EXHAUSTED 6/6) delivered a coherent human-playable small-sided ladder (2v2/3v3/5v5, human-vs-CPU and CPU-vs-CPU) plus an executable continuous-match situation scanner. Reassessment at exhaustion surfaces three disclosed open gaps rather than new breadth: (a) coherent-match situation closure is partial — only 6/8 situations localize organically from continuous play (SHOT_TO_RESULT and PHYSICAL_DUEL stay insufficient_context, so the milestone remains largely fixture-sourced); (b) the action_recognition readability dimension stays honestly NEEDS_PERCEPTUAL_REVIEW with no human-driven discrete-action observability; (c) the flagship 5v5 human-vs-CPU mode is reachable only by URL and absent from the browser setup menu, and the flashy indicator/player-switch baseline failures (INDICATOR-002, SWITCH-004/005/006) stem from the legacy switch path double-switching now that the core natively resolves SWITCH_PLAYER_BIT. v22 closes these gaps within small-sided bounds: deepen coherent continuous play so duels/shot-results localize organically, add safe human-driven action observability (no invented perceptual rubric), reconcile the switch/indicator path to the core-native single-switch contract, complete the in-browser ladder menu, and fold the deepened evidence into the milestone bundle. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
-current_index: 0
+current_index: 1
 objectives:
   - id: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
-    status: pending
+    status: accepted
     reason: "Deepen coherent continuous small-sided play so SHOT_TO_RESULT and PHYSICAL_DUEL localize organically from a single match instead of only purpose-built fixtures: genuine 1v1 pressing duels (a defender contests the ball carrier with real player-player contact and the ball at feet) and real shot attempts that reach a goal/ball-out-of-play during coherent 3v3/5v5 CPU-vs-CPU or human-vs-CPU matches. Target scanning 8/8 situations present from continuous play, honestly disclosed if any remain insufficient_context. Behaviour is evidenced by per-tick trajectory geometry (duel/contact/shot/goal windows) and browser event-centered frames. MULTI_TICK."
     builder: builder-gameplay
     prerequisite: SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH
