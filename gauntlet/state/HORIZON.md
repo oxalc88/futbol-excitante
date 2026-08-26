@@ -9,7 +9,7 @@ horizon_id: "continuous-match-closure-and-small-sided-hardening"
 created_from_commit: da8803b
 created_at: 2026-08-25
 reason: "Horizon v21 (EXHAUSTED 6/6) delivered a coherent human-playable small-sided ladder (2v2/3v3/5v5, human-vs-CPU and CPU-vs-CPU) plus an executable continuous-match situation scanner. Reassessment at exhaustion surfaces three disclosed open gaps rather than new breadth: (a) coherent-match situation closure is partial — only 6/8 situations localize organically from continuous play (SHOT_TO_RESULT and PHYSICAL_DUEL stay insufficient_context, so the milestone remains largely fixture-sourced); (b) the action_recognition readability dimension stays honestly NEEDS_PERCEPTUAL_REVIEW with no human-driven discrete-action observability; (c) the flagship 5v5 human-vs-CPU mode is reachable only by URL and absent from the browser setup menu, and the flashy indicator/player-switch baseline failures (INDICATOR-002, SWITCH-004/005/006) stem from the legacy switch path double-switching now that the core natively resolves SWITCH_PLAYER_BIT. v22 closes these gaps within small-sided bounds: deepen coherent continuous play so duels/shot-results localize organically, add safe human-driven action observability (no invented perceptual rubric), reconcile the switch/indicator path to the core-native single-switch contract, complete the in-browser ladder menu, and fold the deepened evidence into the milestone bundle. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
-current_index: 3
+current_index: 4
 objectives:
   - id: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
     status: accepted
@@ -27,12 +27,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: BROWSER-PLAYER-SWITCH
   - id: SMALL-SIDED-LADDER-MENU-COMPLETION
-    status: pending
-    reason: "Scoped bugfix for the pre-existing baseline failures surfaced in v21 (player-indicator INDICATOR-002; player-switch SWITCH-004/005/006): the simulation core now natively resolves SWITCH_PLAYER_BIT inside sim.step() (emitting slot-switch events), but the legacy browser test helpers and main.ts's real-time loop still call setControlledPlayer manually, so a single Tab keypress switches twice. Reconcile the legacy tests and the browser UI path to the core-native single-switch contract and confirm the controlled-player marker follows the switch (the renderer already repositions it per frame). Discriminating guard: the switch/indicator assertions must fail when the core's SWITCH_PLAYER_BIT processing is stashed, must not mask other baseline behaviour (SWITCH-001/002/003 and INDICATOR-001/003/004/005 keep their semantics; neighbor browser suites stay green), and the deterministic simulation core must remain unchanged. BROWSER_VISIBLE."
-    builder: builder-gameplay
-    prerequisite: BROWSER-PLAYER-SWITCH
-  - id: SMALL-SIDED-LADDER-MENU-COMPLETION
-    status: pending
+    status: accepted
     reason: "Complete the in-browser setup-menu ladder: the accepted full 5v5 human-vs-CPU mode (and the 3v3 human-vs-CPU mode) are reachable only by URL (?mode=human-vs-ai-5v5 / human-vs-ai-3v3) and absent from the MATCH_MODES registry in main.ts and the hardcoded mode-select options in index.html. Add the missing entries/options so the full small-sided ladder (1v1/2v2/3v3/5v5, human-vs-CPU and CPU-vs-CPU) is selectable from the browser setup menu. Guard: a binding/browser test that fails when a menu entry is removed and asserts menu-to-scenario-selector parity for every ladder mode, plus a DYNAMIC_VISUAL screenshot of the completed menu and a launched match. BROWSER_VISIBLE."
     builder: builder-gameplay
     prerequisite: SMALL-SIDED-5V5-HUMAN-VS-CPU

@@ -2,7 +2,7 @@
   "schema_version": 2,
   "record_type": "milestone_evidence_bundle",
   "milestone_id": "SMALL_SIDED_SHAPE",
-  "generated_at": "2026-08-26T13:35:28.145Z",
+  "generated_at": "2026-08-26T11:55:49.495Z",
   "gameplay_situation_registry_version": "gameplay-situations-v1",
   "applicable_gameplay_situations": [
     {
@@ -1068,52 +1068,6 @@
           "kind": "audit",
           "source": "docs/evidence/BROWSER-SWITCH-INDICATOR-BASELINE-FIX/audit.json",
           "target": "BROWSER-SWITCH-INDICATOR-BASELINE-FIX-audit.json"
-        }
-      ],
-      "metrics": [],
-      "reviews": {
-        "deterministic_audit": {
-          "status": "PASS"
-        },
-        "semantic_audit": null,
-        "critic": {
-          "agent": "critic",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT"
-        },
-        "integration": {
-          "agent": "integration-reviewer",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT"
-        }
-      }
-    },
-    {
-      "objective_id": "SMALL-SIDED-LADDER-MENU-COMPLETION",
-      "candidate_commit": "13fda05",
-      "accepted_at": "2026-08-26T13:35:12.076Z",
-      "evidence_class": "BROWSER_VISIBLE",
-      "source_manifest": "docs/evidence/SMALL-SIDED-LADDER-MENU-COMPLETION/manifest.json",
-      "copied": [
-        {
-          "kind": "screenshot-1",
-          "source": "docs/screenshots/SMALL-SIDED-LADDER-MENU-COMPLETION/match-3v3-human-vs-cpu.png",
-          "target": "SMALL-SIDED-LADDER-MENU-COMPLETION-screenshot-1.png"
-        },
-        {
-          "kind": "screenshot-2",
-          "source": "docs/screenshots/SMALL-SIDED-LADDER-MENU-COMPLETION/match-5v5-human-vs-cpu.png",
-          "target": "SMALL-SIDED-LADDER-MENU-COMPLETION-screenshot-2.png"
-        },
-        {
-          "kind": "screenshot-3",
-          "source": "docs/screenshots/SMALL-SIDED-LADDER-MENU-COMPLETION/menu-full-ladder.png",
-          "target": "SMALL-SIDED-LADDER-MENU-COMPLETION-screenshot-3.png"
-        },
-        {
-          "kind": "audit",
-          "source": "docs/evidence/SMALL-SIDED-LADDER-MENU-COMPLETION/audit.json",
-          "target": "SMALL-SIDED-LADDER-MENU-COMPLETION-audit.json"
         }
       ],
       "metrics": [],

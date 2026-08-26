@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 146 — 2026-08-26
+
+- objective_id: SMALL-SIDED-LADDER-MENU-COMPLETION
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: 13fda05 candidate(SMALL-SIDED-LADDER-MENU-COMPLETION)
+- notes: Completed the in-browser setup-menu ladder: the URL-only 5v5/3v3 human-vs-CPU modes are now selectable from the menu, with the full small-sided ladder exposed (9 options: 1v1/2v2/3v3/5v5 × human-vs-CPU and CPU-vs-CPU + preserved 5v3). Menu option → MATCH_MODES modeId → scenario-selector mode → scenario parity enforced by a 9-test guard (negative controls + discriminating failure naming removed modes); new eval/scenarios/human-vs-cpu-1v1.v1.json (slot-1 HUMAN / slot-2 AI_FALLBACK), FOUNDATION_SCENARIO_HUMAN_VS_CPU_1V1 export, human-vs-ai-5v5/3v3/1v1 wired through both human-adapter and CPU-frame branches of startMatch; 'human-vs-ai' relabeled 2v2, 'ai-match' relabeled 1v1. BROWSER_VISIBLE evidence: 3 byte-distinct screenshots (completed menu + launched 5v5 + launched 3v3 human-vs-CPU), browser-cases passed, audit PASS, claims_not_made (no rubric/PES/PROMOTION). Core byte-identical; no switch regression (v22-3 core-native SWITCH_PLAYER_BIT sole mechanism). 327 tests green (parity 9/9, screenshots 4/4, 107 core units, 85 integration, 27 architecture, 95 browser neighbors); v22-2 human-action-readability passes 10/10 in isolation (~266s vs 120s shared budget — NOT a regression); pre-existing typecheck (simulation.ts slot-switch union) + 3 pre-existing integration failures reproduce on pristine HEAD (non-candidate). Critic ACCEPT first pass (surfaced a duplicate HORIZON objective id — copy-pasted wrong reason removed by orchestrator; ids now unique); integration ACCEPT first pass. Builder session hit an infra API error once mid-work (HTTP 400, ~7.3M token context); resumed via a fresh subagent that verified/finished the partial work. Milestone bundle superseded to 16 runs / 17 sources. No PROMOTION / PES fidelity / FOUNDATION_LAB_PASS / invented rubric overclaim. Horizon v22 4/5.
+
 ## Iteration 145 — 2026-08-26
 
 - objective_id: BROWSER-SWITCH-INDICATOR-BASELINE-FIX
