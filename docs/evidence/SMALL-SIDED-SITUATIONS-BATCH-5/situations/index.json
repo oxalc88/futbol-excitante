@@ -1,32 +1,34 @@
 {
   "objective_id": "SMALL-SIDED-SITUATIONS-BATCH-5",
-  "fixtureName": "consolidated (3 fixtures)",
-  "scenarioId": "multiple",
+  "passRate": "8/8",
+  "passCount": 8,
+  "situationCount": 8,
   "totalTicks": 60,
   "seed": 42,
-  "finalStateHash": "fnv1a64-v1:consolidated",
-  "hasInvariantFailures": true,
-  "situationCount": 8,
-  "passCount": 8,
-  "passRate": "8/8",
+  "finalStateHash": "fnv1a64-v1:f75ef7cb99e0345b",
+  "sources": [
+    {
+      "fixture": "3v3-situation-driven-extended.v1.json",
+      "situationCount": 6,
+      "passCount": 6
+    },
+    {
+      "fixture": "3v3-situation-driven-shot-resolution.v1.json",
+      "situationCount": 1,
+      "passCount": 1
+    },
+    {
+      "fixture": "3v3-situation-driven-duel-rejection.v1.json",
+      "situationCount": 1,
+      "passCount": 1
+    }
+  ],
   "situations": [
     {
       "situation_id": "PASS_RECEPTION",
       "verdict": "PASS",
       "relevant_event_count": 6,
       "source_fixture": "3v3-situation-driven-extended.v1.json"
-    },
-    {
-      "situation_id": "SHOT_TO_RESULT",
-      "verdict": "PASS",
-      "relevant_event_count": 3,
-      "source_fixture": "3v3-situation-driven-shot-resolution.v1.json"
-    },
-    {
-      "situation_id": "PHYSICAL_DUEL",
-      "verdict": "PASS",
-      "relevant_event_count": 7,
-      "source_fixture": "3v3-situation-driven-duel-rejection.v1.json"
     },
     {
       "situation_id": "SUPPORT_AND_PASSING_LANES",
@@ -57,20 +59,18 @@
       "verdict": "PASS",
       "relevant_event_count": 10,
       "source_fixture": "3v3-situation-driven-extended.v1.json"
-    }
-  ],
-  "sources": [
-    {
-      "fixture": "3v3-situation-driven-extended.v1.json",
-      "contribution": "6 PASS: PASS_RECEPTION, SUPPORT_AND_PASSING_LANES, SETTLED_ATTACK_VS_DEFENCE, ATTACK_TO_DEFENCE_TRANSITION, DEFENCE_TO_ATTACK_TRANSITION, COORDINATED_PRESS"
     },
     {
-      "fixture": "3v3-situation-driven-shot-resolution.v1.json",
-      "contribution": "1 PASS: SHOT_TO_RESULT"
+      "situation_id": "SHOT_TO_RESULT",
+      "verdict": "PASS",
+      "relevant_event_count": 3,
+      "source_fixture": "3v3-situation-driven-shot-resolution.v1.json"
     },
     {
-      "fixture": "3v3-situation-driven-duel-rejection.v1.json",
-      "contribution": "1 PASS: PHYSICAL_DUEL"
+      "situation_id": "PHYSICAL_DUEL",
+      "verdict": "PASS",
+      "relevant_event_count": 7,
+      "source_fixture": "3v3-situation-driven-duel-rejection.v1.json"
     }
   ]
 }

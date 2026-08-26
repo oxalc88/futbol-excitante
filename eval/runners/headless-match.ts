@@ -343,6 +343,7 @@ function buildTeamCpuObservation(
     pitchWidth: number;
   },
   teamId: string,
+  controlledPlayerId?: string,
 ): CpuObservation {
   // Filter and reorder: controlled team's player first.
   const teamPlayers = fullObs.players.filter(
@@ -353,13 +354,17 @@ function buildTeamCpuObservation(
   );
   const orderedPlayers = [...teamPlayers, ...otherPlayers];
 
-  return {
+  const result: CpuObservation = {
     players: orderedPlayers,
     ball: { ...fullObs.ball },
     pitchLength: fullObs.pitchLength,
     pitchWidth: fullObs.pitchWidth,
     cpuTeamId: teamId,
   };
+  if (controlledPlayerId) {
+    result.controlledPlayerId = controlledPlayerId;
+  }
+  return result;
 }
 
 /**
@@ -603,7 +608,7 @@ export function runHeadlessMatch(
     }
 
     for (const { adapter, controlSlot, teamId, controlledPlayerId } of slotCpus) {
-      const teamObs = buildTeamCpuObservation(fullObs, teamId);
+      const teamObs = buildTeamCpuObservation(fullObs, teamId, controlledPlayerId);
       // Inject score differential for score-aware AI.
       const cpuGoals = scoreAccum[teamId] ?? 0;
       const opponentTeamId = teamId === "team-a" ? "team-b" : "team-a";

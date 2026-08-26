@@ -353,14 +353,13 @@ describe("BATCH-1-RERUN binding: verdict rationale", () => {
     expect(eventKinds.has("second-touch")).toBe(false);
   });
 
-  it("SHOT_TO_RESULT: FAIL — required 'shot' present, goal/ball-out-of-play absent, indicative 'pitch-contact' absent", () => {
+  it("SHOT_TO_RESULT: FAIL — required 'shot' present, but indicative 'pitch-contact' absent in driven fixture (horizontal shots on ground)", () => {
     const artifact = JSON.parse(
       readFileSync(join(BATCH_1_RERUN_DIR, "SHOT_TO_RESULT.json"), "utf-8"),
     ) as SituationEvidenceArtifact;
 
     expect(artifact.verdict).toBe("FAIL");
     const eventKinds = new Set(artifact.relevant_events.map((e) => e.kind));
-    // "shot" is required (some check passes); "goal" and "ball-out-of-play" are also required but may be absent
     expect(eventKinds.has("shot")).toBe(true);
     expect(eventKinds.has("pitch-contact")).toBe(false);
   });

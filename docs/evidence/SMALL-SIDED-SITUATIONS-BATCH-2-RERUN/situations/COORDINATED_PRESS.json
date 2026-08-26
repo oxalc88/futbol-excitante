@@ -3310,6 +3310,12 @@
       "id": "input-neutral-fallback-slot-1",
       "kind": "scheduler",
       "label": "Slot slot-1: exceeded max consecutive missing → neutral"
+    },
+    {
+      "tick": 23,
+      "id": "ball-pitch-contact-23-17",
+      "kind": "pitch-contact",
+      "label": "Ball pitch contact"
     }
   ],
   "all_observations": [
@@ -3403,7 +3409,7 @@
     },
     {
       "tick": 23,
-      "event_count": 0
+      "event_count": 1
     },
     {
       "tick": 24,
@@ -3619,7 +3625,7 @@
     },
     {
       "tick": 2,
-      "hash": "fnv1a64-v1:24262a514e6a6853",
+      "hash": "fnv1a64-v1:200a1e6d0b15fc20",
       "players": [
         {
           "playerId": "player-1",
@@ -3672,16 +3678,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 0.19999666666666668,
           "y": 0,
-          "z": 0.11
+          "z": 0.13727454541666667
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 3,
-      "hash": "fnv1a64-v1:9d8aef511a35a7cc",
+      "hash": "fnv1a64-v1:08f511cfe0d72381",
       "players": [
         {
           "playerId": "player-1",
@@ -3734,16 +3740,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 0.39999000005555563,
           "y": 0,
-          "z": 0.11
+          "z": 0.16182368167424305
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 4,
-      "hash": "fnv1a64-v1:054cd8401d1085e0",
+      "hash": "fnv1a64-v1:08da26c14b3f95a2",
       "players": [
         {
           "playerId": "player-1",
@@ -3796,16 +3802,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 0.5999800002222214,
           "y": 0,
-          "z": 0.11
+          "z": 0.18364745419621514
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 5,
-      "hash": "fnv1a64-v1:a58f06b0779c74d4",
+      "hash": "fnv1a64-v1:fee7482e47f14f81",
       "players": [
         {
           "playerId": "player-1",
@@ -3858,16 +3864,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 0.7999666672222177,
           "y": 0,
-          "z": 0.11
+          "z": 0.20274590840531187
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 6,
-      "hash": "fnv1a64-v1:14f1a7c8475a4aee",
+      "hash": "fnv1a64-v1:3d4c54b8fb0c3791",
       "players": [
         {
           "playerId": "player-1",
@@ -3920,16 +3926,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 0.9999500011110973,
           "y": 0,
-          "z": 0.11
+          "z": 0.2191190897235051
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 7,
-      "hash": "fnv1a64-v1:e8a5662ee61f4c74",
+      "hash": "fnv1a64-v1:027acb91c43564bb",
       "players": [
         {
           "playerId": "player-1",
@@ -3982,16 +3988,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 1.1999300019444121,
           "y": 0,
-          "z": 0.11
+          "z": 0.23276704357200972
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 8,
-      "hash": "fnv1a64-v1:71d469e4fbe7e7a0",
+      "hash": "fnv1a64-v1:263607b6e1a81bc8",
       "players": [
         {
           "playerId": "player-1",
@@ -4044,16 +4050,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 1.399906669777713,
           "y": 0,
-          "z": 0.11
+          "z": 0.2436898153712835
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 9,
-      "hash": "fnv1a64-v1:605140bcdb2f89a1",
+      "hash": "fnv1a64-v1:d13dbec18b5dc183",
       "players": [
         {
           "playerId": "player-1",
@@ -4106,16 +4112,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 1.59988000466655,
           "y": 0,
-          "z": 0.11
+          "z": 0.2518874505410273
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 10,
-      "hash": "fnv1a64-v1:93e3e41736572f74",
+      "hash": "fnv1a64-v1:c49a80756fab61b0",
       "players": [
         {
           "playerId": "player-1",
@@ -4168,16 +4174,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 1.7998500066664722,
           "y": 0,
-          "z": 0.11
+          "z": 0.25735999450018493
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 11,
-      "hash": "fnv1a64-v1:c16dcc16772ce255",
+      "hash": "fnv1a64-v1:71eaebbbb0e5a2a5",
       "players": [
         {
           "playerId": "player-1",
@@ -4230,16 +4236,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 1.9998166758330278,
           "y": 0,
-          "z": 0.11
+          "z": 0.2601074926669433
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 12,
-      "hash": "fnv1a64-v1:abc35a7022b3530b",
+      "hash": "fnv1a64-v1:07317ebbcbbdf62c",
       "players": [
         {
           "playerId": "player-1",
@@ -4292,16 +4298,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 2.1997800122217637,
           "y": 0,
-          "z": 0.11
+          "z": 0.26012999045873214
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 13,
-      "hash": "fnv1a64-v1:1a17b797c4fce31e",
+      "hash": "fnv1a64-v1:46b865bd3bebc409",
       "players": [
         {
           "playerId": "player-1",
@@ -4354,16 +4360,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 2.3997400158882267,
           "y": 0,
-          "z": 0.11
+          "z": 0.2574275332922245
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 14,
-      "hash": "fnv1a64-v1:7acfc966fc26474c",
+      "hash": "fnv1a64-v1:f34c1e2b0f195f55",
       "players": [
         {
           "playerId": "player-1",
@@ -4416,16 +4422,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 2.599696686887962,
           "y": 0,
-          "z": 0.11
+          "z": 0.2520001665833363
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 15,
-      "hash": "fnv1a64-v1:3fb9ed31ad6062cb",
+      "hash": "fnv1a64-v1:2ac9cc19e80c534d",
       "players": [
         {
           "playerId": "player-1",
@@ -4478,16 +4484,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 2.7996500252765135,
           "y": 0,
-          "z": 0.11
+          "z": 0.24384793574722657
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 16,
-      "hash": "fnv1a64-v1:be5a14e736284b21",
+      "hash": "fnv1a64-v1:28e689823054fe16",
       "players": [
         {
           "playerId": "player-1",
@@ -4540,16 +4546,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 2.9996000311094257,
           "y": 0,
-          "z": 0.11
+          "z": 0.23297088619829745
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 17,
-      "hash": "fnv1a64-v1:8e4e12daa52f2027",
+      "hash": "fnv1a64-v1:a773759fb3996342",
       "players": [
         {
           "playerId": "player-1",
@@ -4602,16 +4608,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 3.1995467044422408,
           "y": 0,
-          "z": 0.11
+          "z": 0.21936906335019415
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 18,
-      "hash": "fnv1a64-v1:925ec54c32e63c5a",
+      "hash": "fnv1a64-v1:0e79b3f542e9b981",
       "players": [
         {
           "playerId": "player-1",
@@ -4664,16 +4670,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 3.3994900453305,
           "y": 0,
-          "z": 0.11
+          "z": 0.20304251261580497
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 19,
-      "hash": "fnv1a64-v1:e9e8c4ef85b39362",
+      "hash": "fnv1a64-v1:b23b2e2dcabcd04c",
       "players": [
         {
           "playerId": "player-1",
@@ -4726,16 +4732,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 3.5994300538297446,
           "y": 0,
-          "z": 0.11
+          "z": 0.18399127940726137
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 20,
-      "hash": "fnv1a64-v1:e6227776bd365a72",
+      "hash": "fnv1a64-v1:e7d564b48d267ae1",
       "players": [
         {
           "playerId": "player-1",
@@ -4788,16 +4794,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 3.799366729995514,
           "y": 0,
-          "z": 0.11
+          "z": 0.1622154091359379
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 21,
-      "hash": "fnv1a64-v1:607a255d91d0912d",
+      "hash": "fnv1a64-v1:f7df1b7f38b58f64",
       "players": [
         {
           "playerId": "player-1",
@@ -4850,16 +4856,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 3.9993000738833473,
           "y": 0,
-          "z": 0.11
+          "z": 0.1377149472124523
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 22,
-      "hash": "fnv1a64-v1:33ef9c1fa798389b",
+      "hash": "fnv1a64-v1:384ffcb1b486f00a",
       "players": [
         {
           "playerId": "player-1",
@@ -4912,16 +4918,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 4.199230085548782,
           "y": 0,
-          "z": 0.11
+          "z": 0.11048993904666543
         },
-        "regime": "settled"
+        "regime": "airborne"
       }
     },
     {
       "tick": 23,
-      "hash": "fnv1a64-v1:5d0b12744aa48e8d",
+      "hash": "fnv1a64-v1:7775e97f44a29447",
       "players": [
         {
           "playerId": "player-1",
@@ -4974,16 +4980,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 4.584092172896932,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 24,
-      "hash": "fnv1a64-v1:e5a6343c02a09f7f",
+      "hash": "fnv1a64-v1:26ec23da42eafa44",
       "players": [
         {
           "playerId": "player-1",
@@ -5036,16 +5042,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 4.772261564227555,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 25,
-      "hash": "fnv1a64-v1:9f85e52865fa0851",
+      "hash": "fnv1a64-v1:6223a6e1082889ef",
       "players": [
         {
           "playerId": "player-1",
@@ -5098,16 +5104,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 4.956667567731564,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 26,
-      "hash": "fnv1a64-v1:ba726cb432cb652d",
+      "hash": "fnv1a64-v1:ef12b433a4cc4012",
       "players": [
         {
           "playerId": "player-1",
@@ -5160,16 +5166,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 5.1373854511654935,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 27,
-      "hash": "fnv1a64-v1:65813d48a8eff4b4",
+      "hash": "fnv1a64-v1:0dcf7387f16cb94c",
       "players": [
         {
           "playerId": "player-1",
@@ -5222,16 +5228,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 5.314488976930744,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 28,
-      "hash": "fnv1a64-v1:3d374887c7a819e2",
+      "hash": "fnv1a64-v1:e741374e346e8a6f",
       "players": [
         {
           "playerId": "player-1",
@@ -5284,16 +5290,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 5.48805043218069,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 29,
-      "hash": "fnv1a64-v1:e864f4161b0247d4",
+      "hash": "fnv1a64-v1:13f717b0a2ebcfd4",
       "players": [
         {
           "playerId": "player-1",
@@ -5346,16 +5352,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 5.658140658325637,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 30,
-      "hash": "fnv1a64-v1:6642a903b5a4e3ac",
+      "hash": "fnv1a64-v1:351b8decab46aeb0",
       "players": [
         {
           "playerId": "player-1",
@@ -5408,16 +5414,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 5.824829079947685,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 31,
-      "hash": "fnv1a64-v1:ef955b5e5b4093bb",
+      "hash": "fnv1a64-v1:49fdb58b7a8ab15a",
       "players": [
         {
           "playerId": "player-1",
@@ -5470,16 +5476,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 5.9881837331372925,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 32,
-      "hash": "fnv1a64-v1:06bebd01f6ca4efb",
+      "hash": "fnv1a64-v1:931e7940f54a136d",
       "players": [
         {
           "playerId": "player-1",
@@ -5532,16 +5538,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 6.148271293263107,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 33,
-      "hash": "fnv1a64-v1:dc1d443a7097bdc3",
+      "hash": "fnv1a64-v1:1c3d662f9ae68123",
       "players": [
         {
           "playerId": "player-1",
@@ -5594,16 +5600,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 6.305157102186406,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 34,
-      "hash": "fnv1a64-v1:e6497d74dcdb5fd3",
+      "hash": "fnv1a64-v1:eeffea39773a344c",
       "players": [
         {
           "playerId": "player-1",
@@ -5656,16 +5662,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 6.458905194931239,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 35,
-      "hash": "fnv1a64-v1:d83a6df92e0c233b",
+      "hash": "fnv1a64-v1:d7f1f8e74ece6644",
       "players": [
         {
           "playerId": "player-1",
@@ -5718,16 +5724,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 6.609578325821174,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 36,
-      "hash": "fnv1a64-v1:2fdef646d67d18eb",
+      "hash": "fnv1a64-v1:9f074221a1d28399",
       "players": [
         {
           "playerId": "player-1",
@@ -5780,16 +5786,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 6.757237994093312,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 37,
-      "hash": "fnv1a64-v1:1f5ed8e8db9eb6f3",
+      "hash": "fnv1a64-v1:0bf004294ef72395",
       "players": [
         {
           "playerId": "player-1",
@@ -5842,16 +5848,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 6.901944469000006,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 38,
-      "hash": "fnv1a64-v1:b4677979392309f3",
+      "hash": "fnv1a64-v1:9df530cbd79b249b",
       "players": [
         {
           "playerId": "player-1",
@@ -5904,16 +5910,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 7.0437568144085665,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 39,
-      "hash": "fnv1a64-v1:0d4e38efedf70d8b",
+      "hash": "fnv1a64-v1:d3b2c7261714c837",
       "players": [
         {
           "playerId": "player-1",
@@ -5966,16 +5972,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 7.182732912908956,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 40,
-      "hash": "fnv1a64-v1:368365fc6c6e9500",
+      "hash": "fnv1a64-v1:9282080970b497cd",
       "players": [
         {
           "playerId": "player-1",
@@ -6028,16 +6034,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 7.318929489439338,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 41,
-      "hash": "fnv1a64-v1:3b49fd7717e8baa5",
+      "hash": "fnv1a64-v1:2e914f420a47156c",
       "players": [
         {
           "playerId": "player-1",
@@ -6090,16 +6096,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 7.452402134439112,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 42,
-      "hash": "fnv1a64-v1:885225c3a0c4a741",
+      "hash": "fnv1a64-v1:1af0231ec2c77acc",
       "players": [
         {
           "playerId": "player-1",
@@ -6152,16 +6158,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 7.58320532653889,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 43,
-      "hash": "fnv1a64-v1:1630c24e122ed545",
+      "hash": "fnv1a64-v1:6af47b43132917cc",
       "players": [
         {
           "playerId": "player-1",
@@ -6214,16 +6220,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 7.711392454796672,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 44,
-      "hash": "fnv1a64-v1:3bea966ece730471",
+      "hash": "fnv1a64-v1:153910e1bba334fa",
       "players": [
         {
           "playerId": "player-1",
@@ -6276,16 +6282,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 7.8370158404893,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 45,
-      "hash": "fnv1a64-v1:56faa0c8a6e1b7fd",
+      "hash": "fnv1a64-v1:6a19180eecdd7f6a",
       "players": [
         {
           "playerId": "player-1",
@@ -6338,16 +6344,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 7.960126758468074,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 46,
-      "hash": "fnv1a64-v1:5e38b89e6052c321",
+      "hash": "fnv1a64-v1:905668d8577424a0",
       "players": [
         {
           "playerId": "player-1",
@@ -6400,16 +6406,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 8.080775458087274,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 47,
-      "hash": "fnv1a64-v1:51eab58f26649ccd",
+      "hash": "fnv1a64-v1:18a26048b3419395",
       "players": [
         {
           "playerId": "player-1",
@@ -6462,16 +6468,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 8.19901118371409,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 48,
-      "hash": "fnv1a64-v1:662f690f932d64d1",
+      "hash": "fnv1a64-v1:2ec32d42011d1243",
       "players": [
         {
           "playerId": "player-1",
@@ -6524,16 +6530,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 8.31488219482837,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 49,
-      "hash": "fnv1a64-v1:186ae5cb19c70145",
+      "hash": "fnv1a64-v1:36f72ecced0f8e2a",
       "players": [
         {
           "playerId": "player-1",
@@ -6586,16 +6592,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 8.428435785720362,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 50,
-      "hash": "fnv1a64-v1:2d27885f81da2964",
+      "hash": "fnv1a64-v1:af39b7ae30497aac",
       "players": [
         {
           "playerId": "player-1",
@@ -6648,16 +6654,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 8.539718304794516,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 51,
-      "hash": "fnv1a64-v1:526da766768adc93",
+      "hash": "fnv1a64-v1:ab6ad2446e199ef1",
       "players": [
         {
           "playerId": "player-1",
@@ -6710,16 +6716,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 8.648775173487186,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 52,
-      "hash": "fnv1a64-v1:5fbdc6d45de766c3",
+      "hash": "fnv1a64-v1:c4c35dbbe740fbb3",
       "players": [
         {
           "playerId": "player-1",
@@ -6772,16 +6778,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 8.755650904806004,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 53,
-      "hash": "fnv1a64-v1:222c02abf7d9d8f3",
+      "hash": "fnv1a64-v1:bec54db8f0b83cf9",
       "players": [
         {
           "playerId": "player-1",
@@ -6834,16 +6840,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 8.860389121498445,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 54,
-      "hash": "fnv1a64-v1:806eb69434a73f93",
+      "hash": "fnv1a64-v1:208a321d9f7cd7dc",
       "players": [
         {
           "playerId": "player-1",
@@ -6896,16 +6902,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 8.963032573857037,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 55,
-      "hash": "fnv1a64-v1:c1ea8a75d1d9657b",
+      "hash": "fnv1a64-v1:e2536efc49bf1ff2",
       "players": [
         {
           "playerId": "player-1",
@@ -6958,16 +6964,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 9.063623157168456,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 56,
-      "hash": "fnv1a64-v1:7c9cbfc3b9f2c65b",
+      "hash": "fnv1a64-v1:8d8bdca083fa084b",
       "players": [
         {
           "playerId": "player-1",
@@ -7020,16 +7026,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 9.162201928813648,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 57,
-      "hash": "fnv1a64-v1:5a317606a878827b",
+      "hash": "fnv1a64-v1:ff61669458b26200",
       "players": [
         {
           "playerId": "player-1",
@@ -7082,16 +7088,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 9.258809125025936,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 58,
-      "hash": "fnv1a64-v1:84940ec4712c4b5b",
+      "hash": "fnv1a64-v1:963d9ec4794e3e96",
       "players": [
         {
           "playerId": "player-1",
@@ -7144,16 +7150,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 9.353484177313977,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 59,
-      "hash": "fnv1a64-v1:9c8540e41ae507a3",
+      "hash": "fnv1a64-v1:d8015956202a7f99",
       "players": [
         {
           "playerId": "player-1",
@@ -7206,16 +7212,16 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 9.446265728556257,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     },
     {
       "tick": 60,
-      "hash": "fnv1a64-v1:2103fe8e4dae3134",
+      "hash": "fnv1a64-v1:9e662378d5ccacc1",
       "players": [
         {
           "playerId": "player-1",
@@ -7268,11 +7274,11 @@
       ],
       "ball": {
         "position": {
-          "x": 0,
+          "x": 9.537191648773693,
           "y": 0,
           "z": 0.11
         },
-        "regime": "settled"
+        "regime": "ground-roll"
       }
     }
   ],

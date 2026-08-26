@@ -4,7 +4,7 @@
   "totalTicks": 60,
   "seed": 42,
   "hasInvariantFailures": true,
-  "finalStateHash": "fnv1a64-v1:2103fe8e4dae3134",
+  "finalStateHash": "fnv1a64-v1:9e662378d5ccacc1",
   "situationCount": 8,
   "situations": [
     {
@@ -14,8 +14,8 @@
     },
     {
       "situation_id": "SHOT_TO_RESULT",
-      "verdict": "FAIL",
-      "relevant_event_count": 1
+      "verdict": "PASS",
+      "relevant_event_count": 2
     },
     {
       "situation_id": "PHYSICAL_DUEL",

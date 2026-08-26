@@ -15,6 +15,10 @@
  *  8. GOAL-2V2-008: Determinism — same goals in same order produce same result.
  *  9. GOAL-2V2-009: Team-a goal vs team-b goal events differ correctly.
  *
+ * Long-running 1000-tick tests (GOAL-2V2-006 multiple-goals, GOAL-2V2-007
+ * fulltime/phase-history) are in 2v2-scoring-long.test.ts to avoid vitest
+ * onTaskUpdate RPC timeout under the default forks pool.
+ *
  * No Math.random, Date, DOM, or Node I/O in the simulation core.
  * Node I/O is allowed here in tests (for assertions).
  */
@@ -28,126 +32,7 @@ import {
   type MatchGoalEvent,
   type MatchScore,
 } from "../../eval/runners/headless-match.js";
-
-// ---------------------------------------------------------------------------
-// Helper: Create a 2v2 scenario with a ball shot toward a specific goal
-// ---------------------------------------------------------------------------
-
-/**
- * Build a 2v2 scenario where a ball is shot toward a goal.
- *
- * @param goalIndex - 0 for +x goal (team-a), 1 for -x goal (team-b).
- * @param durationTicks - optional custom duration (default 200 ticks).
- * @returns a fully-formed 2v2 scenario definition.
- */
-function buildForcedGoal2v2Scenario(
-  goalIndex: 0 | 1,
-  durationTicks = 200,
-): HeadlessMatchConfig["scenario"] {
-  const vx = goalIndex === 0 ? 30 : -30;
-  const startX = goalIndex === 0 ? 40 : -40;
-
-  return {
-    id: `2v2-forced-goal-${goalIndex}-v1`,
-    version: "1.0.0",
-    family: "2v2-scoring",
-    durationTicks,
-    seed: 42,
-    prngAlgorithmId: "mulberry32-v1",
-    schemaVersion: "state-v1",
-    simulationVersion: "sim-v1",
-    configVersion: "foundation-config-v1",
-    profile: "SMALL_SIDED",
-    pitchLength: 105,
-    pitchWidth: 68,
-    safetyBounds: {
-      maxX: 52.5,
-      maxY: 34,
-      minZ: -0.5,
-      maxZ: 20,
-    },
-    players: [
-      {
-        playerId: "player-1",
-        teamId: "team-a",
-        groundPosition: { x: -15, y: 0 },
-        linearVelocity: { x: 0, y: 0 },
-        desiredVelocity: { x: 0, y: 0 },
-        bodyHeading: 0,
-        desiredHeading: 0,
-        archetypeId: "archetype-burst-v1",
-      },
-      {
-        playerId: "player-2",
-        teamId: "team-a",
-        groundPosition: { x: -10, y: -12 },
-        linearVelocity: { x: 0, y: 0 },
-        desiredVelocity: { x: 0, y: 0 },
-        bodyHeading: 0,
-        desiredHeading: 0,
-        archetypeId: "archetype-steady-v1",
-      },
-      {
-        playerId: "player-3",
-        teamId: "team-b",
-        groundPosition: { x: 15, y: 0 },
-        linearVelocity: { x: 0, y: 0 },
-        desiredVelocity: { x: 0, y: 0 },
-        bodyHeading: 3.141592653589793,
-        desiredHeading: 3.141592653589793,
-        archetypeId: "archetype-burst-v1",
-      },
-      {
-        playerId: "player-4",
-        teamId: "team-b",
-        groundPosition: { x: 10, y: 12 },
-        linearVelocity: { x: 0, y: 0 },
-        desiredVelocity: { x: 0, y: 0 },
-        bodyHeading: 3.141592653589793,
-        desiredHeading: 3.141592653589793,
-        archetypeId: "archetype-steady-v1",
-      },
-    ],
-    ball: {
-      position: { x: startX, y: 0, z: 0.11 },
-      linearVelocity: { x: vx, y: 0, z: 0 },
-      angularVelocity: { x: 0, y: 0, z: 0 },
-      regime: "ground-roll",
-    },
-    controlAssignments: {
-      "slot-1": {
-        controlSlot: "slot-1",
-        teamId: "team-a",
-        controlledPlayerId: "player-1",
-        mode: "AI_FALLBACK",
-      },
-      "slot-2": {
-        controlSlot: "slot-2",
-        teamId: "team-b",
-        controlledPlayerId: "player-3",
-        mode: "AI_FALLBACK",
-      },
-      "slot-3": {
-        controlSlot: "slot-3",
-        teamId: "team-a",
-        controlledPlayerId: "player-2",
-        mode: "AI_FALLBACK",
-      },
-      "slot-4": {
-        controlSlot: "slot-4",
-        teamId: "team-b",
-        controlledPlayerId: "player-4",
-        mode: "AI_FALLBACK",
-      },
-    },
-    missingInputPolicy: "REPEAT_HELD_WITH_ZERO_EDGES",
-    maxConsecutiveMissing: 3,
-    inputProgram: {},
-    scheduledEvents: {},
-    observationWindows: [{ startTick: 0, endTick: durationTicks }],
-    requestedMetrics: [],
-  };
-}
+import { buildForcedGoal2v2Scenario } from "./2v2-scoring-helpers.js";
 
 // ---------------------------------------------------------------------------
 // 1. GOAL-2V2-001: Goal fires when ball enters goal zone
@@ -330,19 +215,8 @@ describe("GOAL-2V2-006: multiple goals", () => {
     expect(result.matchPhase).not.toBe("kickoff");
   });
 
-  // long 1000-tick free-play fixture; needs >5s budget (can reach ~11s under load)
-  it("multiple goals accumulate in score", () => {
-    // Use a longer match to allow multiple goal scenarios.
-    const scenario = buildForcedGoal2v2Scenario(0, 1000);
-    const result = runHeadlessMatch({ scenario });
-
-    const teamAGoals = result.score["team-a"] ?? 0;
-    const teamBGoals = result.score["team-b"] ?? 0;
-
-    // At least some goals should be scored by team-a in this setup.
-    // (Ball starts near +x and is shot toward +52.5)
-    expect(teamAGoals + teamBGoals).toBeGreaterThanOrEqual(1);
-  }, 15_000);
+  // Long 1000-tick tests (multiple-goals, fulltime, phase-history) are in
+  // 2v2-scoring-long.test.ts to avoid vitest onTaskUpdate RPC timeout.
 
   it("no goals before first goal event is processed", () => {
     const scenario = buildForcedGoal2v2Scenario(0);
@@ -373,16 +247,8 @@ describe("GOAL-2V2-006: multiple goals", () => {
 // ---------------------------------------------------------------------------
 
 describe("GOAL-2V2-007: full-time detection", () => {
-  // long 1000-tick free-play fixture; needs >5s budget
-  it("long match reaches fulltime", () => {
-    // Run a match that's long enough to test full-time detection
-    // (uses 1000 ticks instead of 5400 for performance).
-    const scenario = buildForcedGoal2v2Scenario(0, 1000);
-    const result = runHeadlessMatch({ scenario, maxTicks: 1000 });
-
-    expect(result.matchPhase).toBe("fulltime");
-    expect(result.elapsedTicks).toBe(1000);
-  }, 10_000);
+  // Long 1000-tick tests (long match, phase history) are in
+  // 2v2-scoring-long.test.ts to avoid vitest onTaskUpdate RPC timeout.
 
   it("fulltime fires regardless of goals scored", () => {
     const scenario = buildForcedGoal2v2Scenario(0, 500);
@@ -390,19 +256,6 @@ describe("GOAL-2V2-007: full-time detection", () => {
 
     expect(result.matchPhase).toBe("fulltime");
   });
-
-  // long 1000-tick free-play fixture; needs >5s budget
-  it("phase history includes halftime and fulltime for long match", () => {
-    const scenario = buildForcedGoal2v2Scenario(0, 1000);
-    const result = runHeadlessMatch({ scenario, maxTicks: 1000 });
-
-    const phases = result.phaseHistory.map((p) => p.phase);
-    expect(phases).toContain("first-half");
-    expect(phases).toContain("halftime");
-    expect(phases).toContain("second-half");
-    // The final phase should be fulltime (or kickoff if a goal fired on last tick).
-    expect(phases.includes("fulltime") || phases[phases.length - 1] === "fulltime").toBe(true);
-  }, 10_000);
 
   it("goal-triggered kickoff phase does not prevent fulltime", () => {
     const scenario = buildForcedGoal2v2Scenario(0, 200);

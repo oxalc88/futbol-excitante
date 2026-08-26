@@ -80,8 +80,27 @@ const GROUND_SETTLE_SPEED = 0.01;
 /** Threshold below which vertical bounce velocity is absorbed. */
 const BOUNCE_THRESHOLD = 0.05;
 
+/**
+ * Post-bounce regime threshold: if |vz| after bounce is below this,
+ * absorb into ground-roll instead of staying airborne. This prevents
+ * the ground↔airborne oscillation where a weak post-bounce velocity
+ * (e.g., vz = 0.55 from restitution) causes the ball to re-enter
+ * the airborne branch every tick, flooding pitch-contact events.
+ * Genuine shot lift-offs have vz ≫ this threshold.
+ */
+const POST_BOUNCE_ABSORB_THRESHOLD = 1.0;
+
 /** Maximum swept-test iterations per tick (safety limit). */
 const MAX_SWEPT_ITERATIONS = 4;
+
+/**
+ * Minimum vertical velocity required to lift a grounded ball into
+ * airborne regime. Prevents micro-jitter oscillation where floating-point
+ * noise (vz ~ 1e-10) on a grounded ball repeatedly triggers the
+ * ground→airborne transition, flooding pitch-contact events.
+ * Real shots produce vz ≥ 5 m/s; this threshold is well below that.
+ */
+const MIN_LIFT_OFF_VELOCITY = 0.5;
 
 // -- Goal geometry (hard-coded pitch constants) -------------------------------
 
@@ -209,6 +228,16 @@ export function stepBall(
     if (ball.regime !== "airborne" && !isGrounded) {
       ball.regime = "airborne";
     }
+    // Allow ground-roll or settled → airborne transition when vertical velocity
+    // is positive and exceeds the minimum lift-off threshold (e.g., after a shot
+    // or bounce lifts the ball from the ground). The threshold prevents
+    // micro-jitter oscillation where floating-point noise fires repeatedly.
+    if (
+      (ball.regime === "ground-roll" || ball.regime === "settled") &&
+      ball.linearVelocity.z > MIN_LIFT_OFF_VELOCITY
+    ) {
+      ball.regime = "airborne";
+    }
 
     if (ball.regime === "airborne" || ball.regime === "bouncing") {
       // -- Free-flight phase -----------------------------------------------
@@ -294,7 +323,9 @@ export function stepBall(
         }
 
         // Determine regime after impact.
-        if (Math.abs(ball.linearVelocity.z) > BOUNCE_THRESHOLD) {
+        // Use POST_BOUNCE_ABSORB_THRESHOLD to prevent weak post-bounce
+        // velocities from re-entering the airborne branch (oscillation fix).
+        if (Math.abs(ball.linearVelocity.z) > POST_BOUNCE_ABSORB_THRESHOLD) {
           ball.regime = "airborne";
         } else {
           // Absorbed: settle vertical velocity.
@@ -385,6 +416,12 @@ export function stepBall(
         ball.angularVelocity.y = 0;
         ball.angularVelocity.z = 0;
         ball.regime = "settled";
+      } else {
+        // Clamp any residual vertical velocity to zero on ground roll.
+        // Without this, post-bounce micro-jitter (vz tiny-positive while
+        // z ≈ radius) can re-enter the airborne branch and emit a
+        // pitch-contact every tick, flooding the event stream.
+        ball.linearVelocity.z = 0;
       }
 
       remaining = 0;

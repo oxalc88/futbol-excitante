@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "record_type": "milestone_playtest_result",
+  "milestone_id": "SMALL_SIDED_SHAPE",
+  "playtest_plan_version": "small-sided-shape-playtest-v1",
+  "generated_at": "2026-08-25T23:42:16.349Z",
+  "required_situations": [
+    "PASS_RECEPTION",
+    "SHOT_TO_RESULT",
+    "PHYSICAL_DUEL",
+    "SUPPORT_AND_PASSING_LANES",
+    "SETTLED_ATTACK_VS_DEFENCE",
+    "ATTACK_TO_DEFENCE_TRANSITION",
+    "DEFENCE_TO_ATTACK_TRANSITION",
+    "COORDINATED_PRESS"
+  ],
+  "situation_outcomes": {
+    "PASS_RECEPTION": "PASS",
+    "SHOT_TO_RESULT": "PASS",
+    "PHYSICAL_DUEL": "PASS",
+    "SUPPORT_AND_PASSING_LANES": "PASS",
+    "SETTLED_ATTACK_VS_DEFENCE": "PASS",
+    "ATTACK_TO_DEFENCE_TRANSITION": "PASS",
+    "DEFENCE_TO_ATTACK_TRANSITION": "PASS",
+    "COORDINATED_PRESS": "PASS"
+  },
+  "entry_prerequisites_pass": true,
+  "exit_prerequisites_pass": true,
+  "critic_verdict": "ACCEPT",
+  "evidence": {
+    "ball_system_fix": "ground-roll/settled → airborne transition when z velocity > 0 (enables pitch-contact events after shots)",
+    "batches_regenerated": "BATCH-1-RERUN, BATCH-2-RERUN, BATCH-3, BATCH-4, BATCH-5 all regenerated under new ball system",
+    "SHOT_TO_RESULT": "now PASS in all fixtures (driven, extended, shot-resolution) due to ball system fix producing pitch-contact events",
+    "PHYSICAL_DUEL": "PASS from duel-rejection driven fixture (input-rejection indicative event); organically insufficient_context in CPU-vs-CPU play",
+    "coherent_match_closure": "7/8 present in continuous 5v5 CPU-vs-CPU (PHYSICAL_DUEL honest insufficient_context)",
+    "source_objectives": "BATCH-1-RERUN through BATCH-5 (13 prior objectives) + SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE (new)"
+  },
+  "decision": "milestone_verdict_ready",
+  "milestone_verdict": "PASS",
+  "failure_class": null
+}

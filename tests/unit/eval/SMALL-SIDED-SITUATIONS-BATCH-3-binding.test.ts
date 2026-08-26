@@ -12,7 +12,7 @@
  *  3. A fresh run to a temp directory produces byte-identical artifacts.
  *  4. Honest verdicts match expectations:
  *     - PASS_RECEPTION: PASS (required + indicative second-touch present)
- *     - SHOT_TO_RESULT: FAIL (shot present, pitch-contact absent)
+ *     - SHOT_TO_RESULT: FAIL (shot present, but indicative pitch-contact absent in driven fixture)
  *     - PHYSICAL_DUEL: FAIL (player-player-contact present, input-rejection absent)
  *     - SUPPORT_AND_PASSING_LANES: PASS (required + indicative second-touch present)
  *     - SETTLED_ATTACK_VS_DEFENCE: PASS (all required + indicative shot)

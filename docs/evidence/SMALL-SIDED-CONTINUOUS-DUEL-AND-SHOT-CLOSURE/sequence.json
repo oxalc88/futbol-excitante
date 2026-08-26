@@ -1,0 +1,3065 @@
+{
+  "objectiveId": "SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE",
+  "evidenceClass": "MULTI_TICK",
+  "events": [
+    {
+      "id": "player-ball-contact-1-1",
+      "tick": 1,
+      "sequence": 1,
+      "kind": "player-ball-contact",
+      "label": "Player player-1 first-touch contact"
+    },
+    {
+      "id": "shot-2-2",
+      "tick": 2,
+      "sequence": 2,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "shot-12-3",
+      "tick": 12,
+      "sequence": 3,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-30-4",
+      "tick": 30,
+      "sequence": 4,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-31-5",
+      "tick": 31,
+      "sequence": 5,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-32-6",
+      "tick": 32,
+      "sequence": 6,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-ball-contact-32-7",
+      "tick": 32,
+      "sequence": 7,
+      "kind": "player-ball-contact",
+      "label": "Player player-6 first-touch contact"
+    },
+    {
+      "id": "player-player-contact-33-8",
+      "tick": 33,
+      "sequence": 8,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "pass-33-9",
+      "tick": 33,
+      "sequence": 9,
+      "kind": "pass",
+      "label": "Player player-6 directed pass"
+    },
+    {
+      "id": "player-player-contact-34-10",
+      "tick": 34,
+      "sequence": 10,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-35-11",
+      "tick": 35,
+      "sequence": 11,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-36-12",
+      "tick": 36,
+      "sequence": 12,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-37-13",
+      "tick": 37,
+      "sequence": 13,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-38-14",
+      "tick": 38,
+      "sequence": 14,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-39-15",
+      "tick": 39,
+      "sequence": 15,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "shot-39-16",
+      "tick": 39,
+      "sequence": 16,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-40-17",
+      "tick": 40,
+      "sequence": 17,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-41-18",
+      "tick": 41,
+      "sequence": 18,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-42-19",
+      "tick": 42,
+      "sequence": 19,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-43-20",
+      "tick": 43,
+      "sequence": 20,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-44-21",
+      "tick": 44,
+      "sequence": 21,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-45-22",
+      "tick": 45,
+      "sequence": 22,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "shot-45-23",
+      "tick": 45,
+      "sequence": 23,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-46-24",
+      "tick": 46,
+      "sequence": 24,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-47-25",
+      "tick": 47,
+      "sequence": 25,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-48-26",
+      "tick": 48,
+      "sequence": 26,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-49-27",
+      "tick": 49,
+      "sequence": 27,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-50-28",
+      "tick": 50,
+      "sequence": 28,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-51-29",
+      "tick": 51,
+      "sequence": 29,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "shot-51-30",
+      "tick": 51,
+      "sequence": 30,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-52-31",
+      "tick": 52,
+      "sequence": 31,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-53-32",
+      "tick": 53,
+      "sequence": 32,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-54-33",
+      "tick": 54,
+      "sequence": 33,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-55-34",
+      "tick": 55,
+      "sequence": 34,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-56-35",
+      "tick": 56,
+      "sequence": 35,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-57-36",
+      "tick": 57,
+      "sequence": 36,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "shot-57-37",
+      "tick": 57,
+      "sequence": 37,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-58-38",
+      "tick": 58,
+      "sequence": 38,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-59-39",
+      "tick": 59,
+      "sequence": 39,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-60-40",
+      "tick": 60,
+      "sequence": 40,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-61-41",
+      "tick": 61,
+      "sequence": 41,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-62-42",
+      "tick": 62,
+      "sequence": 42,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-ball-contact-62-43",
+      "tick": 62,
+      "sequence": 43,
+      "kind": "player-ball-contact",
+      "label": "Player player-10 first-touch contact"
+    },
+    {
+      "id": "player-player-contact-63-44",
+      "tick": 63,
+      "sequence": 44,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "pass-63-45",
+      "tick": 63,
+      "sequence": 45,
+      "kind": "pass",
+      "label": "Player player-10 directed pass"
+    },
+    {
+      "id": "player-player-contact-64-46",
+      "tick": 64,
+      "sequence": 46,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "second-touch-64-47",
+      "tick": 64,
+      "sequence": 47,
+      "kind": "second-touch",
+      "label": "Player player-10 second-touch turn"
+    },
+    {
+      "id": "player-player-contact-65-48",
+      "tick": 65,
+      "sequence": 48,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-66-49",
+      "tick": 66,
+      "sequence": 49,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-67-50",
+      "tick": 67,
+      "sequence": 50,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-68-51",
+      "tick": 68,
+      "sequence": 51,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "second-touch-68-52",
+      "tick": 68,
+      "sequence": 52,
+      "kind": "second-touch",
+      "label": "Player player-10 second-touch turn"
+    },
+    {
+      "id": "player-player-contact-69-53",
+      "tick": 69,
+      "sequence": 53,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-70-54",
+      "tick": 70,
+      "sequence": 54,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-71-55",
+      "tick": 71,
+      "sequence": 55,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-72-56",
+      "tick": 72,
+      "sequence": 56,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "second-touch-72-57",
+      "tick": 72,
+      "sequence": 57,
+      "kind": "second-touch",
+      "label": "Player player-10 second-touch turn"
+    },
+    {
+      "id": "player-player-contact-73-58",
+      "tick": 73,
+      "sequence": 58,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-74-59",
+      "tick": 74,
+      "sequence": 59,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "player-player-contact-75-60",
+      "tick": 75,
+      "sequence": 60,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-6"
+    },
+    {
+      "id": "second-touch-76-61",
+      "tick": 76,
+      "sequence": 61,
+      "kind": "second-touch",
+      "label": "Player player-10 second-touch turn"
+    },
+    {
+      "id": "second-touch-80-62",
+      "tick": 80,
+      "sequence": 62,
+      "kind": "second-touch",
+      "label": "Player player-10 second-touch turn"
+    },
+    {
+      "id": "shot-81-63",
+      "tick": 81,
+      "sequence": 63,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "second-touch-84-64",
+      "tick": 84,
+      "sequence": 64,
+      "kind": "second-touch",
+      "label": "Player player-10 second-touch turn"
+    },
+    {
+      "id": "shot-87-65",
+      "tick": 87,
+      "sequence": 65,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-135-66",
+      "tick": 135,
+      "sequence": 66,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-136-67",
+      "tick": 136,
+      "sequence": 67,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-137-68",
+      "tick": 137,
+      "sequence": 68,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-138-69",
+      "tick": 138,
+      "sequence": 69,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-139-70",
+      "tick": 139,
+      "sequence": 70,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-ball-contact-139-71",
+      "tick": 139,
+      "sequence": 71,
+      "kind": "player-ball-contact",
+      "label": "Player player-1 first-touch contact"
+    },
+    {
+      "id": "player-player-contact-140-72",
+      "tick": 140,
+      "sequence": 72,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "shot-140-73",
+      "tick": 140,
+      "sequence": 73,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-141-74",
+      "tick": 141,
+      "sequence": 74,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-154-75",
+      "tick": 154,
+      "sequence": 75,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-6 and player-9"
+    },
+    {
+      "id": "player-player-contact-155-76",
+      "tick": 155,
+      "sequence": 76,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-6 and player-9"
+    },
+    {
+      "id": "player-player-contact-156-77",
+      "tick": 156,
+      "sequence": 77,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-6 and player-9"
+    },
+    {
+      "id": "player-player-contact-157-78",
+      "tick": 157,
+      "sequence": 78,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-6 and player-9"
+    },
+    {
+      "id": "player-player-contact-158-79",
+      "tick": 158,
+      "sequence": 79,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-6 and player-9"
+    },
+    {
+      "id": "player-player-contact-159-80",
+      "tick": 159,
+      "sequence": 80,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-6 and player-9"
+    },
+    {
+      "id": "player-player-contact-166-81",
+      "tick": 166,
+      "sequence": 81,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-ball-contact-166-82",
+      "tick": 166,
+      "sequence": 82,
+      "kind": "player-ball-contact",
+      "label": "Player player-1 first-touch contact"
+    },
+    {
+      "id": "player-player-contact-167-83",
+      "tick": 167,
+      "sequence": 83,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "shot-167-84",
+      "tick": 167,
+      "sequence": 84,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "second-touch-167-85",
+      "tick": 167,
+      "sequence": 85,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "player-player-contact-168-86",
+      "tick": 168,
+      "sequence": 86,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-169-87",
+      "tick": 169,
+      "sequence": 87,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-170-88",
+      "tick": 170,
+      "sequence": 88,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-171-89",
+      "tick": 171,
+      "sequence": 89,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-172-90",
+      "tick": 172,
+      "sequence": 90,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-173-91",
+      "tick": 173,
+      "sequence": 91,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-174-92",
+      "tick": 174,
+      "sequence": 92,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-175-93",
+      "tick": 175,
+      "sequence": 93,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-176-94",
+      "tick": 176,
+      "sequence": 94,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-177-95",
+      "tick": 177,
+      "sequence": 95,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-178-96",
+      "tick": 178,
+      "sequence": 96,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-179-97",
+      "tick": 179,
+      "sequence": 97,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-179-98",
+      "tick": 179,
+      "sequence": 98,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-180-99",
+      "tick": 180,
+      "sequence": 99,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-180-100",
+      "tick": 180,
+      "sequence": 100,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-181-101",
+      "tick": 181,
+      "sequence": 101,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-181-102",
+      "tick": 181,
+      "sequence": 102,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-182-103",
+      "tick": 182,
+      "sequence": 103,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-182-104",
+      "tick": 182,
+      "sequence": 104,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-183-105",
+      "tick": 183,
+      "sequence": 105,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-183-106",
+      "tick": 183,
+      "sequence": 106,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-184-107",
+      "tick": 184,
+      "sequence": 107,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-184-108",
+      "tick": 184,
+      "sequence": 108,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-185-109",
+      "tick": 185,
+      "sequence": 109,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-185-110",
+      "tick": 185,
+      "sequence": 110,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-186-111",
+      "tick": 186,
+      "sequence": 111,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-player-contact-187-112",
+      "tick": 187,
+      "sequence": 112,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-6"
+    },
+    {
+      "id": "player-ball-contact-197-113",
+      "tick": 197,
+      "sequence": 113,
+      "kind": "player-ball-contact",
+      "label": "Player player-1 first-touch contact"
+    },
+    {
+      "id": "shot-198-114",
+      "tick": 198,
+      "sequence": 114,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-221-115",
+      "tick": 221,
+      "sequence": 115,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-222-116",
+      "tick": 222,
+      "sequence": 116,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-223-117",
+      "tick": 223,
+      "sequence": 117,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-224-118",
+      "tick": 224,
+      "sequence": 118,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-225-119",
+      "tick": 225,
+      "sequence": 119,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-ball-contact-225-120",
+      "tick": 225,
+      "sequence": 120,
+      "kind": "player-ball-contact",
+      "label": "Player player-1 first-touch contact"
+    },
+    {
+      "id": "player-player-contact-226-121",
+      "tick": 226,
+      "sequence": 121,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "shot-226-122",
+      "tick": 226,
+      "sequence": 122,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-227-123",
+      "tick": 227,
+      "sequence": 123,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-228-124",
+      "tick": 228,
+      "sequence": 124,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-229-125",
+      "tick": 229,
+      "sequence": 125,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-230-126",
+      "tick": 230,
+      "sequence": 126,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-231-127",
+      "tick": 231,
+      "sequence": 127,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-232-128",
+      "tick": 232,
+      "sequence": 128,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-233-129",
+      "tick": 233,
+      "sequence": 129,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-234-130",
+      "tick": 234,
+      "sequence": 130,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-235-131",
+      "tick": 235,
+      "sequence": 131,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-236-132",
+      "tick": 236,
+      "sequence": 132,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-237-133",
+      "tick": 237,
+      "sequence": 133,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-238-134",
+      "tick": 238,
+      "sequence": 134,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-239-135",
+      "tick": 239,
+      "sequence": 135,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-240-136",
+      "tick": 240,
+      "sequence": 136,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-ball-contact-252-137",
+      "tick": 252,
+      "sequence": 137,
+      "kind": "player-ball-contact",
+      "label": "Player player-1 first-touch contact"
+    },
+    {
+      "id": "shot-253-138",
+      "tick": 253,
+      "sequence": 138,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "second-touch-253-139",
+      "tick": 253,
+      "sequence": 139,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "player-ball-contact-275-140",
+      "tick": 275,
+      "sequence": 140,
+      "kind": "player-ball-contact",
+      "label": "Player player-1 first-touch contact"
+    },
+    {
+      "id": "shot-276-141",
+      "tick": 276,
+      "sequence": 141,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "second-touch-276-142",
+      "tick": 276,
+      "sequence": 142,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "second-touch-280-143",
+      "tick": 280,
+      "sequence": 143,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "player-player-contact-283-144",
+      "tick": 283,
+      "sequence": 144,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-284-145",
+      "tick": 284,
+      "sequence": 145,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-ball-contact-284-146",
+      "tick": 284,
+      "sequence": 146,
+      "kind": "player-ball-contact",
+      "label": "Player player-9 first-touch contact"
+    },
+    {
+      "id": "second-touch-284-147",
+      "tick": 284,
+      "sequence": 147,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "player-player-contact-285-148",
+      "tick": 285,
+      "sequence": 148,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "shot-285-149",
+      "tick": 285,
+      "sequence": 149,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "player-player-contact-286-150",
+      "tick": 286,
+      "sequence": 150,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-287-151",
+      "tick": 287,
+      "sequence": 151,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "player-player-contact-288-152",
+      "tick": 288,
+      "sequence": 152,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "second-touch-288-153",
+      "tick": 288,
+      "sequence": 153,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "player-player-contact-292-154",
+      "tick": 292,
+      "sequence": 154,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-293-155",
+      "tick": 293,
+      "sequence": 155,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-294-156",
+      "tick": 294,
+      "sequence": 156,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-295-157",
+      "tick": 295,
+      "sequence": 157,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-298-158",
+      "tick": 298,
+      "sequence": 158,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "player-player-contact-299-159",
+      "tick": 299,
+      "sequence": 159,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "player-player-contact-300-160",
+      "tick": 300,
+      "sequence": 160,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "player-player-contact-301-161",
+      "tick": 301,
+      "sequence": 161,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "player-player-contact-302-162",
+      "tick": 302,
+      "sequence": 162,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "player-player-contact-303-163",
+      "tick": 303,
+      "sequence": 163,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "player-player-contact-304-164",
+      "tick": 304,
+      "sequence": 164,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "player-player-contact-305-165",
+      "tick": 305,
+      "sequence": 165,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "player-ball-contact-305-166",
+      "tick": 305,
+      "sequence": 166,
+      "kind": "player-ball-contact",
+      "label": "Player player-1 first-touch contact"
+    },
+    {
+      "id": "player-player-contact-306-167",
+      "tick": 306,
+      "sequence": 167,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "shot-306-168",
+      "tick": 306,
+      "sequence": 168,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "second-touch-306-169",
+      "tick": 306,
+      "sequence": 169,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "player-player-contact-307-170",
+      "tick": 307,
+      "sequence": 170,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-10"
+    },
+    {
+      "id": "second-touch-310-171",
+      "tick": 310,
+      "sequence": 171,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "shot-312-172",
+      "tick": 312,
+      "sequence": 172,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "shot-320-173",
+      "tick": 320,
+      "sequence": 173,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "second-touch-320-174",
+      "tick": 320,
+      "sequence": 174,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "second-touch-324-175",
+      "tick": 324,
+      "sequence": 175,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "shot-326-176",
+      "tick": 326,
+      "sequence": 176,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "shot-334-177",
+      "tick": 334,
+      "sequence": 177,
+      "kind": "shot",
+      "label": "Player player-1 directed shot"
+    },
+    {
+      "id": "second-touch-334-178",
+      "tick": 334,
+      "sequence": 178,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "ball-goal-334-179",
+      "tick": 334,
+      "sequence": 179,
+      "kind": "goal",
+      "label": "Goal"
+    },
+    {
+      "id": "player-player-contact-345-180",
+      "tick": 345,
+      "sequence": 180,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-346-181",
+      "tick": 346,
+      "sequence": 181,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-347-182",
+      "tick": 347,
+      "sequence": 182,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-348-183",
+      "tick": 348,
+      "sequence": 183,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "ball-goal-post-contact-355-184",
+      "tick": 355,
+      "sequence": 184,
+      "kind": "goal-post-contact",
+      "label": "Ball post-right contact"
+    },
+    {
+      "id": "player-ball-contact-408-185",
+      "tick": 408,
+      "sequence": 185,
+      "kind": "player-ball-contact",
+      "label": "Player player-1 first-touch contact"
+    },
+    {
+      "id": "pass-409-186",
+      "tick": 409,
+      "sequence": 186,
+      "kind": "pass",
+      "label": "Player player-1 directed pass"
+    },
+    {
+      "id": "second-touch-410-187",
+      "tick": 410,
+      "sequence": 187,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "second-touch-414-188",
+      "tick": 414,
+      "sequence": 188,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "shot-415-189",
+      "tick": 415,
+      "sequence": 189,
+      "kind": "shot",
+      "label": "Player player-9 directed shot"
+    },
+    {
+      "id": "player-player-contact-418-190",
+      "tick": 418,
+      "sequence": 190,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "second-touch-418-191",
+      "tick": 418,
+      "sequence": 191,
+      "kind": "second-touch",
+      "label": "Player player-1 second-touch turn"
+    },
+    {
+      "id": "player-player-contact-419-192",
+      "tick": 419,
+      "sequence": 192,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-1 and player-9"
+    },
+    {
+      "id": "ball-out-of-play-419-193",
+      "tick": 419,
+      "sequence": 193,
+      "kind": "ball-out-of-play",
+      "label": "Ball out of play over goal line"
+    },
+    {
+      "id": "player-player-contact-420-194",
+      "tick": 420,
+      "sequence": 194,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "player-player-contact-421-195",
+      "tick": 421,
+      "sequence": 195,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "player-player-contact-422-196",
+      "tick": 422,
+      "sequence": 196,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "player-player-contact-423-197",
+      "tick": 423,
+      "sequence": 197,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "player-player-contact-424-198",
+      "tick": 424,
+      "sequence": 198,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "player-player-contact-425-199",
+      "tick": 425,
+      "sequence": 199,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "player-player-contact-485-200",
+      "tick": 485,
+      "sequence": 200,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-7 and player-9"
+    },
+    {
+      "id": "player-player-contact-486-201",
+      "tick": 486,
+      "sequence": 201,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-7 and player-9"
+    },
+    {
+      "id": "player-player-contact-487-202",
+      "tick": 487,
+      "sequence": 202,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-7 and player-9"
+    },
+    {
+      "id": "player-player-contact-488-203",
+      "tick": 488,
+      "sequence": 203,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-7 and player-9"
+    },
+    {
+      "id": "player-player-contact-492-204",
+      "tick": 492,
+      "sequence": 204,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "player-player-contact-493-205",
+      "tick": 493,
+      "sequence": 205,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "player-player-contact-494-206",
+      "tick": 494,
+      "sequence": 206,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "player-player-contact-495-207",
+      "tick": 495,
+      "sequence": 207,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-6"
+    },
+    {
+      "id": "shot-504-208",
+      "tick": 504,
+      "sequence": 208,
+      "kind": "shot",
+      "label": "Player player-8 directed shot"
+    },
+    {
+      "id": "player-player-contact-514-209",
+      "tick": 514,
+      "sequence": 209,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-515-210",
+      "tick": 515,
+      "sequence": 210,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-516-211",
+      "tick": 516,
+      "sequence": 211,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-517-212",
+      "tick": 517,
+      "sequence": 212,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-518-213",
+      "tick": 518,
+      "sequence": 213,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-518-214",
+      "tick": 518,
+      "sequence": 214,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-519-215",
+      "tick": 519,
+      "sequence": 215,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-519-216",
+      "tick": 519,
+      "sequence": 216,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-520-217",
+      "tick": 520,
+      "sequence": 217,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-520-218",
+      "tick": 520,
+      "sequence": 218,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-521-219",
+      "tick": 521,
+      "sequence": 219,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-521-220",
+      "tick": 521,
+      "sequence": 220,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-522-221",
+      "tick": 522,
+      "sequence": 221,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-522-222",
+      "tick": 522,
+      "sequence": 222,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-523-223",
+      "tick": 523,
+      "sequence": 223,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-524-224",
+      "tick": 524,
+      "sequence": 224,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-525-225",
+      "tick": 525,
+      "sequence": 225,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "ball-pitch-contact-525-226",
+      "tick": 525,
+      "sequence": 226,
+      "kind": "pitch-contact",
+      "label": "Ball pitch contact"
+    },
+    {
+      "id": "player-player-contact-526-227",
+      "tick": 526,
+      "sequence": 227,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-527-228",
+      "tick": 527,
+      "sequence": 228,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-528-229",
+      "tick": 528,
+      "sequence": 229,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-529-230",
+      "tick": 529,
+      "sequence": 230,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-530-231",
+      "tick": 530,
+      "sequence": 231,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-531-232",
+      "tick": 531,
+      "sequence": 232,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-532-233",
+      "tick": 532,
+      "sequence": 233,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-533-234",
+      "tick": 533,
+      "sequence": 234,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-534-235",
+      "tick": 534,
+      "sequence": 235,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-535-236",
+      "tick": 535,
+      "sequence": 236,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-536-237",
+      "tick": 536,
+      "sequence": 237,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-537-238",
+      "tick": 537,
+      "sequence": 238,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-538-239",
+      "tick": 538,
+      "sequence": 239,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-539-240",
+      "tick": 539,
+      "sequence": 240,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-540-241",
+      "tick": 540,
+      "sequence": 241,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-540-242",
+      "tick": 540,
+      "sequence": 242,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-541-243",
+      "tick": 541,
+      "sequence": 243,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-541-244",
+      "tick": 541,
+      "sequence": 244,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-542-245",
+      "tick": 542,
+      "sequence": 245,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-542-246",
+      "tick": 542,
+      "sequence": 246,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-543-247",
+      "tick": 543,
+      "sequence": 247,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-543-248",
+      "tick": 543,
+      "sequence": 248,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-544-249",
+      "tick": 544,
+      "sequence": 249,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-544-250",
+      "tick": 544,
+      "sequence": 250,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-545-251",
+      "tick": 545,
+      "sequence": 251,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-545-252",
+      "tick": 545,
+      "sequence": 252,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-546-253",
+      "tick": 546,
+      "sequence": 253,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-546-254",
+      "tick": 546,
+      "sequence": 254,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-547-255",
+      "tick": 547,
+      "sequence": 255,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-547-256",
+      "tick": 547,
+      "sequence": 256,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-548-257",
+      "tick": 548,
+      "sequence": 257,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-548-258",
+      "tick": 548,
+      "sequence": 258,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-549-259",
+      "tick": 549,
+      "sequence": 259,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-549-260",
+      "tick": 549,
+      "sequence": 260,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-550-261",
+      "tick": 550,
+      "sequence": 261,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-550-262",
+      "tick": 550,
+      "sequence": 262,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-551-263",
+      "tick": 551,
+      "sequence": 263,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-5"
+    },
+    {
+      "id": "player-player-contact-551-264",
+      "tick": 551,
+      "sequence": 264,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-552-265",
+      "tick": 552,
+      "sequence": 265,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-552-266",
+      "tick": 552,
+      "sequence": 266,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-553-267",
+      "tick": 553,
+      "sequence": 267,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-553-268",
+      "tick": 553,
+      "sequence": 268,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-554-269",
+      "tick": 554,
+      "sequence": 269,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-554-270",
+      "tick": 554,
+      "sequence": 270,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-555-271",
+      "tick": 555,
+      "sequence": 271,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-555-272",
+      "tick": 555,
+      "sequence": 272,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-556-273",
+      "tick": 556,
+      "sequence": 273,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-556-274",
+      "tick": 556,
+      "sequence": 274,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-557-275",
+      "tick": 557,
+      "sequence": 275,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-557-276",
+      "tick": 557,
+      "sequence": 276,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-558-277",
+      "tick": 558,
+      "sequence": 277,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-558-278",
+      "tick": 558,
+      "sequence": 278,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-559-279",
+      "tick": 559,
+      "sequence": 279,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-559-280",
+      "tick": 559,
+      "sequence": 280,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-560-281",
+      "tick": 560,
+      "sequence": 281,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-560-282",
+      "tick": 560,
+      "sequence": 282,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-560-283",
+      "tick": 560,
+      "sequence": 283,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-9"
+    },
+    {
+      "id": "player-player-contact-561-284",
+      "tick": 561,
+      "sequence": 284,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-561-285",
+      "tick": 561,
+      "sequence": 285,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-561-286",
+      "tick": 561,
+      "sequence": 286,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-562-287",
+      "tick": 562,
+      "sequence": 287,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-562-288",
+      "tick": 562,
+      "sequence": 288,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-562-289",
+      "tick": 562,
+      "sequence": 289,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-563-290",
+      "tick": 563,
+      "sequence": 290,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-563-291",
+      "tick": 563,
+      "sequence": 291,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-563-292",
+      "tick": 563,
+      "sequence": 292,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-564-293",
+      "tick": 564,
+      "sequence": 293,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-564-294",
+      "tick": 564,
+      "sequence": 294,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-564-295",
+      "tick": 564,
+      "sequence": 295,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-565-296",
+      "tick": 565,
+      "sequence": 296,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-565-297",
+      "tick": 565,
+      "sequence": 297,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-565-298",
+      "tick": 565,
+      "sequence": 298,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-565-299",
+      "tick": 565,
+      "sequence": 299,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-6"
+    },
+    {
+      "id": "player-player-contact-566-300",
+      "tick": 566,
+      "sequence": 300,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-566-301",
+      "tick": 566,
+      "sequence": 301,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-566-302",
+      "tick": 566,
+      "sequence": 302,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-567-303",
+      "tick": 567,
+      "sequence": 303,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-567-304",
+      "tick": 567,
+      "sequence": 304,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-567-305",
+      "tick": 567,
+      "sequence": 305,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-568-306",
+      "tick": 568,
+      "sequence": 306,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-568-307",
+      "tick": 568,
+      "sequence": 307,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-568-308",
+      "tick": 568,
+      "sequence": 308,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-569-309",
+      "tick": 569,
+      "sequence": 309,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-569-310",
+      "tick": 569,
+      "sequence": 310,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-569-311",
+      "tick": 569,
+      "sequence": 311,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-570-312",
+      "tick": 570,
+      "sequence": 312,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-570-313",
+      "tick": 570,
+      "sequence": 313,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-570-314",
+      "tick": 570,
+      "sequence": 314,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-571-315",
+      "tick": 571,
+      "sequence": 315,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-571-316",
+      "tick": 571,
+      "sequence": 316,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-571-317",
+      "tick": 571,
+      "sequence": 317,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-572-318",
+      "tick": 572,
+      "sequence": 318,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-572-319",
+      "tick": 572,
+      "sequence": 319,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-572-320",
+      "tick": 572,
+      "sequence": 320,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-572-321",
+      "tick": 572,
+      "sequence": 321,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-573-322",
+      "tick": 573,
+      "sequence": 322,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-573-323",
+      "tick": 573,
+      "sequence": 323,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-573-324",
+      "tick": 573,
+      "sequence": 324,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-573-325",
+      "tick": 573,
+      "sequence": 325,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-574-326",
+      "tick": 574,
+      "sequence": 326,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-574-327",
+      "tick": 574,
+      "sequence": 327,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-574-328",
+      "tick": 574,
+      "sequence": 328,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-574-329",
+      "tick": 574,
+      "sequence": 329,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-575-330",
+      "tick": 575,
+      "sequence": 330,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-575-331",
+      "tick": 575,
+      "sequence": 331,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-575-332",
+      "tick": 575,
+      "sequence": 332,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-575-333",
+      "tick": 575,
+      "sequence": 333,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-575-334",
+      "tick": 575,
+      "sequence": 334,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-8 and player-9"
+    },
+    {
+      "id": "player-player-contact-576-335",
+      "tick": 576,
+      "sequence": 335,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-576-336",
+      "tick": 576,
+      "sequence": 336,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-576-337",
+      "tick": 576,
+      "sequence": 337,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-576-338",
+      "tick": 576,
+      "sequence": 338,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-576-339",
+      "tick": 576,
+      "sequence": 339,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-8 and player-9"
+    },
+    {
+      "id": "player-player-contact-577-340",
+      "tick": 577,
+      "sequence": 340,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-577-341",
+      "tick": 577,
+      "sequence": 341,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-577-342",
+      "tick": 577,
+      "sequence": 342,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-577-343",
+      "tick": 577,
+      "sequence": 343,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-577-344",
+      "tick": 577,
+      "sequence": 344,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-8 and player-9"
+    },
+    {
+      "id": "player-player-contact-578-345",
+      "tick": 578,
+      "sequence": 345,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-578-346",
+      "tick": 578,
+      "sequence": 346,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-4"
+    },
+    {
+      "id": "player-player-contact-578-347",
+      "tick": 578,
+      "sequence": 347,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-578-348",
+      "tick": 578,
+      "sequence": 348,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-578-349",
+      "tick": 578,
+      "sequence": 349,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-8 and player-9"
+    },
+    {
+      "id": "player-player-contact-579-350",
+      "tick": 579,
+      "sequence": 350,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-579-351",
+      "tick": 579,
+      "sequence": 351,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-579-352",
+      "tick": 579,
+      "sequence": 352,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-579-353",
+      "tick": 579,
+      "sequence": 353,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-8 and player-9"
+    },
+    {
+      "id": "player-player-contact-580-354",
+      "tick": 580,
+      "sequence": 354,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-580-355",
+      "tick": 580,
+      "sequence": 355,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-580-356",
+      "tick": 580,
+      "sequence": 356,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-580-357",
+      "tick": 580,
+      "sequence": 357,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-8 and player-9"
+    },
+    {
+      "id": "player-player-contact-581-358",
+      "tick": 581,
+      "sequence": 358,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-581-359",
+      "tick": 581,
+      "sequence": 359,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-581-360",
+      "tick": 581,
+      "sequence": 360,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-581-361",
+      "tick": 581,
+      "sequence": 361,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-8 and player-9"
+    },
+    {
+      "id": "player-player-contact-582-362",
+      "tick": 582,
+      "sequence": 362,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-582-363",
+      "tick": 582,
+      "sequence": 363,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-582-364",
+      "tick": 582,
+      "sequence": 364,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-582-365",
+      "tick": 582,
+      "sequence": 365,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-8 and player-9"
+    },
+    {
+      "id": "player-player-contact-583-366",
+      "tick": 583,
+      "sequence": 366,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-583-367",
+      "tick": 583,
+      "sequence": 367,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-583-368",
+      "tick": 583,
+      "sequence": 368,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-584-369",
+      "tick": 584,
+      "sequence": 369,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-584-370",
+      "tick": 584,
+      "sequence": 370,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-584-371",
+      "tick": 584,
+      "sequence": 371,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-584-372",
+      "tick": 584,
+      "sequence": 372,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-585-373",
+      "tick": 585,
+      "sequence": 373,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-585-374",
+      "tick": 585,
+      "sequence": 374,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-585-375",
+      "tick": 585,
+      "sequence": 375,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-585-376",
+      "tick": 585,
+      "sequence": 376,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-585-377",
+      "tick": 585,
+      "sequence": 377,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-8"
+    },
+    {
+      "id": "player-player-contact-586-378",
+      "tick": 586,
+      "sequence": 378,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-586-379",
+      "tick": 586,
+      "sequence": 379,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-586-380",
+      "tick": 586,
+      "sequence": 380,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-586-381",
+      "tick": 586,
+      "sequence": 381,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-586-382",
+      "tick": 586,
+      "sequence": 382,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-8"
+    },
+    {
+      "id": "player-player-contact-587-383",
+      "tick": 587,
+      "sequence": 383,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-587-384",
+      "tick": 587,
+      "sequence": 384,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-587-385",
+      "tick": 587,
+      "sequence": 385,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-587-386",
+      "tick": 587,
+      "sequence": 386,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-587-387",
+      "tick": 587,
+      "sequence": 387,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-8"
+    },
+    {
+      "id": "player-player-contact-588-388",
+      "tick": 588,
+      "sequence": 388,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-588-389",
+      "tick": 588,
+      "sequence": 389,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-588-390",
+      "tick": 588,
+      "sequence": 390,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-588-391",
+      "tick": 588,
+      "sequence": 391,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-588-392",
+      "tick": 588,
+      "sequence": 392,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-8"
+    },
+    {
+      "id": "player-player-contact-589-393",
+      "tick": 589,
+      "sequence": 393,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-589-394",
+      "tick": 589,
+      "sequence": 394,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-589-395",
+      "tick": 589,
+      "sequence": 395,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-589-396",
+      "tick": 589,
+      "sequence": 396,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-589-397",
+      "tick": 589,
+      "sequence": 397,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-8"
+    },
+    {
+      "id": "player-player-contact-590-398",
+      "tick": 590,
+      "sequence": 398,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-590-399",
+      "tick": 590,
+      "sequence": 399,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-590-400",
+      "tick": 590,
+      "sequence": 400,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-590-401",
+      "tick": 590,
+      "sequence": 401,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-590-402",
+      "tick": 590,
+      "sequence": 402,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-8"
+    },
+    {
+      "id": "player-player-contact-591-403",
+      "tick": 591,
+      "sequence": 403,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-591-404",
+      "tick": 591,
+      "sequence": 404,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-591-405",
+      "tick": 591,
+      "sequence": 405,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-591-406",
+      "tick": 591,
+      "sequence": 406,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-4 and player-8"
+    },
+    {
+      "id": "player-player-contact-592-407",
+      "tick": 592,
+      "sequence": 407,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-592-408",
+      "tick": 592,
+      "sequence": 408,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-592-409",
+      "tick": 592,
+      "sequence": 409,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-593-410",
+      "tick": 593,
+      "sequence": 410,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-593-411",
+      "tick": 593,
+      "sequence": 411,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-593-412",
+      "tick": 593,
+      "sequence": 412,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-593-413",
+      "tick": 593,
+      "sequence": 413,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-594-414",
+      "tick": 594,
+      "sequence": 414,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-594-415",
+      "tick": 594,
+      "sequence": 415,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-594-416",
+      "tick": 594,
+      "sequence": 416,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-594-417",
+      "tick": 594,
+      "sequence": 417,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-595-418",
+      "tick": 595,
+      "sequence": 418,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-595-419",
+      "tick": 595,
+      "sequence": 419,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-595-420",
+      "tick": 595,
+      "sequence": 420,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-595-421",
+      "tick": 595,
+      "sequence": 421,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-596-422",
+      "tick": 596,
+      "sequence": 422,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-596-423",
+      "tick": 596,
+      "sequence": 423,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-596-424",
+      "tick": 596,
+      "sequence": 424,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-596-425",
+      "tick": 596,
+      "sequence": 425,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-3 and player-4"
+    },
+    {
+      "id": "player-player-contact-597-426",
+      "tick": 597,
+      "sequence": 426,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-597-427",
+      "tick": 597,
+      "sequence": 427,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-597-428",
+      "tick": 597,
+      "sequence": 428,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-598-429",
+      "tick": 598,
+      "sequence": 429,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-598-430",
+      "tick": 598,
+      "sequence": 430,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-598-431",
+      "tick": 598,
+      "sequence": 431,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-599-432",
+      "tick": 599,
+      "sequence": 432,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-599-433",
+      "tick": 599,
+      "sequence": 433,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-599-434",
+      "tick": 599,
+      "sequence": 434,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    },
+    {
+      "id": "player-player-contact-600-435",
+      "tick": 600,
+      "sequence": 435,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-3"
+    },
+    {
+      "id": "player-player-contact-600-436",
+      "tick": 600,
+      "sequence": 436,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-8"
+    },
+    {
+      "id": "player-player-contact-600-437",
+      "tick": 600,
+      "sequence": 437,
+      "kind": "player-player-contact",
+      "label": "Player-player contact between player-10 and player-9"
+    }
+  ]
+}

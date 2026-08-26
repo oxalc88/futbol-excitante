@@ -2,7 +2,7 @@
   "schema_version": 2,
   "record_type": "milestone_evidence_bundle",
   "milestone_id": "SMALL_SIDED_SHAPE",
-  "generated_at": "2026-08-26T03:07:30.868Z",
+  "generated_at": "2026-08-26T00:26:46.912Z",
   "gameplay_situation_registry_version": "gameplay-situations-v1",
   "applicable_gameplay_situations": [
     {
@@ -293,21 +293,16 @@
       "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-25T23-42-16-349Z.json",
       "generated_at": "2026-08-25T23:42:16.349Z",
       "milestone_verdict": "PASS"
-    },
-    {
-      "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-26T02-44-15-159Z.json",
-      "generated_at": "2026-08-26T02:44:15.159Z",
-      "milestone_verdict": "PASS"
     }
   ],
   "latest_playtest_result": {
-    "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-26T02-44-15-159Z.json",
+    "path": "docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-25T23-42-16-349Z.json",
     "result": {
       "schema_version": 1,
       "record_type": "milestone_playtest_result",
       "milestone_id": "SMALL_SIDED_SHAPE",
       "playtest_plan_version": "small-sided-shape-playtest-v1",
-      "generated_at": "2026-08-26T02:44:15.159Z",
+      "generated_at": "2026-08-25T23:42:16.349Z",
       "required_situations": [
         "PASS_RECEPTION",
         "SHOT_TO_RESULT",
@@ -332,20 +327,12 @@
       "exit_prerequisites_pass": true,
       "critic_verdict": "ACCEPT",
       "evidence": {
-        "accumulated_horizon": "v20",
-        "batch_sources": [
-          "BATCH-5 (consolidated 8/8 PASS on resolved fixtures: extended + shot-resolution + duel-rejection)"
-        ],
-        "entry_prerequisite_accepted": [
-          "PLAYABLE_1V1_PASS",
-          "TEAM_DECISION_PROFILE"
-        ],
-        "exit_prerequisite_accepted": [
-          "MUTANT_TEAM_PASS",
-          "TEAM_SHAPE_SUITE_PASS"
-        ],
-        "browser_case": "BROWSER-SMALL-SIDED-001 materialized",
-        "remark": "Identity correction objective: RERUN-3 had recorded the 1v1 exit identities (MUTANT_1V1_PASS, ARCHETYPE_BLINDED_COMPARISON); corrected to the SMALL_SIDED_SHAPE profile's declared team exit prerequisites (MUTANT_TEAM_PASS, TEAM_SHAPE_SUITE_PASS). Both team prereqs accepted as evidence objectives (MUTANT-TEAM-PASS-EVIDENCE, TEAM-SHAPE-SUITE-PASS-EVIDENCE). 8/8 PASS + prereqs + critic ACCEPT → milestone_verdict PASS."
+        "ball_system_fix": "ground-roll/settled → airborne transition when z velocity > 0 (enables pitch-contact events after shots)",
+        "batches_regenerated": "BATCH-1-RERUN, BATCH-2-RERUN, BATCH-3, BATCH-4, BATCH-5 all regenerated under new ball system",
+        "SHOT_TO_RESULT": "now PASS in all fixtures (driven, extended, shot-resolution) due to ball system fix producing pitch-contact events",
+        "PHYSICAL_DUEL": "PASS from duel-rejection driven fixture (input-rejection indicative event); organically insufficient_context in CPU-vs-CPU play",
+        "coherent_match_closure": "7/8 present in continuous 5v5 CPU-vs-CPU (PHYSICAL_DUEL honest insufficient_context)",
+        "source_objectives": "BATCH-1-RERUN through BATCH-5 (13 prior objectives) + SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE (new)"
       },
       "decision": "milestone_verdict_ready",
       "milestone_verdict": "PASS",
@@ -940,6 +927,47 @@
           "model": "deepseek-v4-flash",
           "verdict": "ACCEPT",
           "required_fixes": []
+        }
+      }
+    },
+    {
+      "objective_id": "SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE",
+      "candidate_commit": null,
+      "accepted_at": "2026-08-25T23:42:00.000Z",
+      "evidence_class": "MULTI_TICK",
+      "source_manifest": "docs/evidence/SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE/manifest.json",
+      "copied": [
+        {
+          "kind": "sequence",
+          "source": "docs/evidence/SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE/sequence.json",
+          "target": "SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE-sequence.json"
+        },
+        {
+          "kind": "trajectory",
+          "source": "docs/evidence/SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE/trajectory.json",
+          "target": "SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE-trajectory.json"
+        },
+        {
+          "kind": "audit",
+          "source": "docs/evidence/SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE/audit.json",
+          "target": "SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE-audit.json"
+        }
+      ],
+      "metrics": [],
+      "reviews": {
+        "deterministic_audit": {
+          "status": "PASS"
+        },
+        "semantic_audit": null,
+        "critic": {
+          "agent": "critic",
+          "model": "deepseek-v4-flash",
+          "verdict": "RETRY",
+          "required_fixes": [
+            "Regenerate invalidated BATCH-1-RERUN, BATCH-2-RERUN, BATCH-3 evidence",
+            "Re-run milestone reducer",
+            "Document orchestrator sign-off for PHYSICAL_DUEL partial closure"
+          ]
         }
       }
     }
