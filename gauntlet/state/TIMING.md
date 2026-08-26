@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
-usage_aggregates_through: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
-clock_aggregates_through: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
-model_evaluation_through: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE
+last_tracked_objective: SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY
+usage_aggregates_through: SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY
+clock_aggregates_through: SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY
+model_evaluation_through: SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -224,6 +224,9 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE | accepted | ~470m\*\*\*\*\*\*\* | 213m | 73m | 180m | ~4m | n/a | n/a |
 
 \*\*\*\*\*\*\*\* MiMo builder time includes 2 critic-RETRY fix rounds (invalidated BATCH evidence after the oscillation fix; intermediate-engine trajectory persisted) + 3 integration-REJECT fix rounds (pitch-contact flood perf, forks-pool onTaskUpdate timeout, three-file long-test split); reviewer times include those loops (critic 2 RETRYs → ACCEPT, integration 3 REJECTs → ACCEPT).
+| SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY | accepted | ~190m\*\*\*\*\*\*\*\*\* | 132m | 82m | 19m | 1m | n/a | n/a |
+
+\*\*\*\*\*\*\*\*\*\* MiMo builder time includes 3 fix rounds (stale-capture recapture; carve-out/orphan/vacuous-bindings cleanup; capture-tick reconciliation + shared single-source-of-truth offsets module); critic time includes 3 RETRY loops (stale 3-way byte-identical frames; leftover carve-out + orphan + vacuous assertions; tick-metadata drift) then final ACCEPT; orchestrator applied the final doc-only comment fix directly (stale "6 frames"/shot-before comments in the capture test). Integration ACCEPT first pass. Reviewer times from subagent meta.json.
 
 \* Builder (mimo-v2.5) produced the evidence in a prior session before this continuation pickup; its step time is not re-measured here. Reviewer/commit phases measured from this session's subagents. BROWSER-SMALL-SIDED-001-COHERENCE-RERUN builder ran in this continuation session.
 
@@ -513,6 +516,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-5V5-HUMAN-VS-CPU | mimo-v2.5 | M | Medium — full 5v5 human-vs-CPU mode (DYNAMIC_VISUAL) | 0 | A | 20 browser + 20 binding tests; Tab switching + human input displacement; 5 distinct frames; first-pass clean |
 | SMALL-SIDED-PLAYTEST-RE-RUN | qwen3.6 | L | Low — milestone reducer re-run, evidence-bundle only (BOOKKEEPING) | 0 | A | coherent-match supplementary evidence; bundle supersede (14 runs / 13 sources); 129 tests; first-pass clean |
 | SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE | mimo-v2.5 | M | Medium — continuous-match duel/shot closure + ball-system oscillation fix (MULTI_TICK) | 2 | C | RETRY x2 (invalidated BATCH evidence; intermediate-engine trajectory); integration REJECT x3 (pitch-contact flood perf, forks-pool onTaskUpdate timeout, long-test split); 7/8 organic presence; PHYSICAL_DUEL insufficient_context honest |
+| SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY | mimo-v2.5 | M | Medium — human-driven action observability, DYNAMIC_VISUAL frames bound to input tick | 3 | D | RETRY x3 (stale 3-way byte-identical frames; leftover carve-out + orphan + vacuous bindings; tick-metadata drift); shared single-source-of-truth offsets; integration first-pass ACCEPT |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -735,6 +739,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-PLAYTEST-RE-RUN | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | 39 docs-only paths, zero source change; bundle 14 runs / 13 sources coherent; superseded manifest byte-identical; no neighbor regression; typecheck pre-existing |
 | SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE | critic (deepseek-v4-flash) | base flash | RETRY→ACCEPT | RETRY x2: (1) ball-system oscillation fix invalidated BATCH-1/2/3 evidence omitted from the reported totals — regenerated + reducer re-run; (2) persisted trajectory from the intermediate engine (494 vs 437 events) + stale RESULT.md — regenerated on final engine, 600/600 hashes reproducible. ACCEPT |
 | SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE | integration-reviewer (deepseek-v4-flash) | base flash | REJECT→ACCEPT | REJECT x3: (1) 2v2-scoring 31/34 timeouts (pitch-contact flood 511) + EXIT-PREREQ-IDENTITY playtest record entry/exit prereq fields; (2) 2v2-scoring exit 1 under default forks pool (onTaskUpdate); (3) single long test file still blocked one worker. Fixed: regime-threshold fix (511→1 contacts), record correction, three-file long-test split (34/34 exit 0, twice). ACCEPT |
+| SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY | critic (deepseek-v4-flash) | base flash | RETRY→ACCEPT | RETRY x3: (1) 3 PNGs byte-identical (843cf468 triple-hash) = stale capture — recaptured all pairwise unique; (2) leftover toBeLessThanOrEqual(1) carve-out at line 328 + orphaned shot-before.png + vacuous PASS_BIT/SHOT_BIT assertions — removed, synced, non-vacuous; (3) tick-metadata drift (producer event−20/+20 vs capture) — reconciled to shared formula + consistency guard. ACCEPT |
+| SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; 457 unit + 47 browser neighbors exit 0; zero src/contracts/spec change; typecheck 2 pre-existing errors non-candidate; neighbor-browser screenshot rewrites restored to baseline |
 
 ### Builder scoreboard
 
@@ -743,7 +749,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | qwen3.6 | 83 | 59 | 11 | 3 | 3 | 2 | 71% | ~0.42 | ~31m |
-| mimo-v2.5 | 40 | 23 | 14 | 3 | 0 | 0 | 58% | ~0.50 | ~45m |
+| mimo-v2.5 | 41 | 23 | 14 | 3 | 1 | 0 | 56% | ~0.56 | ~49m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:
 

@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 144 — 2026-08-26
+
+- objective_id: SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (after 3 RETRYs, resolved)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: cbd1878 candidate(SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY)
+- notes: Closed the action_recognition readability-observability gap with human-driven discrete actions in the 5v5 human-vs-CPU browser match: PASS (J) / SHOT (L) event-centered before/event/after DYNAMIC_VISUAL frames byte-bound to the exact input tick and input frame (pass event 257 ← input 256 PASS_BIT=2; shot event 287 ← input 286 SHOT_BIT=4; same-tick policy documented). Evidence: trajectory.json (287 hashes, event_log pass-257-489/shot-287-622 with pressedButtons+inputTick, input_bindings), browser-cases.json, RESULT.md (claims_not_made: observability only, NO readability PASS / rubric), 5 PNGs pairwise-unique SHA-256 + sequence.json (ticks 247/257/269/287/299). Single-source-of-truth frame-tick offsets (eval/scenarios/frame-tick-offsets.ts) imported by capture + binding tests; binding guard requires pairwise-unique hashes with NO carve-out and non-vacuous PASS_BIT/SHOT_BIT assertions (tamper negative controls). Critic RETRY x3: (1) stale capture — 3 frames byte-identical (843cf468) → recapture all unique; (2) leftover toBeLessThanOrEqual(1) carve-out at line 328 + orphaned shot-before.png + vacuous binding assertions → removed/synced/non-vacuous; (3) tick-metadata drift (producer −20/+20 vs capture −1/+12) → reconciled to one shared formula with a consistency guard. Integration ACCEPT first pass (457 unit + 47 browser neighbors exit 0; zero src/contracts/spec change; typecheck 2 pre-existing errors in simulation.ts non-candidate; neighbor-browser screenshot rewrites restored). Milestone bundle superseded to 16 runs / 15 sources. No readability PASS / PES fidelity / FOUNDATION_LAB_PASS / PROMOTION overclaim. Horizon v22 2/5.
+
 ## Iteration 143 — 2026-08-26
 
 - objective_id: SMALL-SIDED-CONTINUOUS-DUEL-AND-SHOT-CLOSURE

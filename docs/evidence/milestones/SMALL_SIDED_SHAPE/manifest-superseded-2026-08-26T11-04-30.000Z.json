@@ -2,7 +2,7 @@
   "schema_version": 2,
   "record_type": "milestone_evidence_bundle",
   "milestone_id": "SMALL_SIDED_SHAPE",
-  "generated_at": "2026-08-26T11:04:33.129Z",
+  "generated_at": "2026-08-26T06:30:47.953Z",
   "gameplay_situation_registry_version": "gameplay-situations-v1",
   "applicable_gameplay_situations": [
     {
@@ -978,72 +978,6 @@
           "model": "deepseek-v4-flash",
           "verdict": "ACCEPT",
           "required_fixes": []
-        }
-      }
-    },
-    {
-      "objective_id": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY",
-      "candidate_commit": "cbd1878edce68149faebdf403779e3210c14f1b6",
-      "accepted_at": "2026-08-26T11:03:25.852Z",
-      "evidence_class": "DYNAMIC_VISUAL",
-      "source_manifest": "docs/evidence/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/manifest.json",
-      "copied": [
-        {
-          "kind": "screenshot-1",
-          "source": "docs/screenshots/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/pass-after.png",
-          "target": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY-screenshot-1.png"
-        },
-        {
-          "kind": "screenshot-2",
-          "source": "docs/screenshots/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/pass-before.png",
-          "target": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY-screenshot-2.png"
-        },
-        {
-          "kind": "screenshot-3",
-          "source": "docs/screenshots/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/pass-event.png",
-          "target": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY-screenshot-3.png"
-        },
-        {
-          "kind": "screenshot-4",
-          "source": "docs/screenshots/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/shot-after.png",
-          "target": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY-screenshot-4.png"
-        },
-        {
-          "kind": "screenshot-5",
-          "source": "docs/screenshots/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/shot-event.png",
-          "target": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY-screenshot-5.png"
-        },
-        {
-          "kind": "sequence",
-          "source": "docs/screenshots/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/sequence.json",
-          "target": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY-sequence.json"
-        },
-        {
-          "kind": "trajectory",
-          "source": "docs/evidence/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/trajectory.json",
-          "target": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY-trajectory.json"
-        },
-        {
-          "kind": "audit",
-          "source": "docs/evidence/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/audit.json",
-          "target": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY-audit.json"
-        }
-      ],
-      "metrics": [],
-      "reviews": {
-        "deterministic_audit": {
-          "status": "PASS"
-        },
-        "semantic_audit": null,
-        "critic": {
-          "agent": "critic",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT"
-        },
-        "integration": {
-          "agent": "integration-reviewer",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT"
         }
       }
     }
