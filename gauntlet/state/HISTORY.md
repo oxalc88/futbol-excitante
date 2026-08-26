@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 145 — 2026-08-26
+
+- objective_id: BROWSER-SWITCH-INDICATOR-BASELINE-FIX
+- builder: builder-gameplay / mimo-v2.5
+- critic: critic / deepseek-v4-flash — ACCEPT (after 1 RETRY, resolved)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: c607e56 candidate(BROWSER-SWITCH-INDICATOR-BASELINE-FIX)
+- notes: Scoped bugfix closing the v21 pre-existing baseline failures (player-indicator INDICATOR-002; player-switch SWITCH-004/005/006). Root cause confirmed: the core natively resolves SWITCH_PLAYER_BIT inside sim.step() (simulation.ts, mutating controlAssignments + emitting slot-switch), but main.ts's real-time loop and the legacy runWithCpu test helpers still called setControlledPlayer manually — a single Tab double-switched (2-player wrap-around / 3-player advance-by-2). Fix: removed the legacy manual-switch block from main.ts (−21 lines, incl. unused SWITCH_PLAYER_BIT/computeExplicitSwitchTarget imports) and de-switched both test helpers, leaving the core-native path the SOLE switch mechanism; the controlled-player marker follows (renderer repositions per frame). Deterministic core byte-identical (git diff src/simulation/ empty). Discriminating guards: SWITCH-GUARD + INDICATOR-GUARD positive (single Tab → exactly one slot-switch event + player change; marker follows) with negative controls (no bit → no switch/event, simulates stashed core); semantics of previously-passing SWITCH-001/002/003 + INDICATOR-001/003/004/005 preserved. BROWSER_VISIBLE evidence: 2 byte-distinct 800×600 screenshots (unique SHA-256, sanity ALL_PASS), browser-cases passed case, audit PASS, RESULT.md claims_not_made. Test matrix: player-switch 8/8, player-indicator 7/7, capture 1/1, 150 browser neighbors (incl. v22-2 human-action-readability 10, 5v3 9, 3v3-human 5) + 232 core units, all exit 0. Critic RETRY x1: stale JSDoc in player-switch runWithCpu claiming the removed manual-switch detection ran — fixed comment-only; ACCEPT. Integration ACCEPT first pass (no oracle weakened; remaining setControlledPlayer callers legitimate core-API uses). Milestone bundle superseded to 16 runs / 16 sources. No PROMOTION / PES fidelity / FOUNDATION_LAB_PASS / invented rubric overclaim. Horizon v22 3/5.
+
 ## Iteration 144 — 2026-08-26
 
 - objective_id: SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "BROWSER-SWITCH-INDICATOR-BASELINE-FIX",
+  "accepted_at": "2026-08-26T11:55:40.129Z",
+  "candidate_commit": "c607e56213f13788d087a4cf535d4ba91ef19706",
+  "evidence_class": "BROWSER_VISIBLE",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/BROWSER-SWITCH-INDICATOR-BASELINE-FIX/frame-post-switch.png",
+        "sha256": "21b2e07854b82170f11c9aef1d7c11a713bd96fee893fd83931742b7ec938f21",
+        "git_blob": "2baeee6d78d2a06a49cfb6ccdf95c95dbcef1a69",
+        "candidate_commit": "c607e56213f13788d087a4cf535d4ba91ef19706",
+        "bytes": 21641,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/BROWSER-SWITCH-INDICATOR-BASELINE-FIX/frame-pre-switch.png",
+        "sha256": "5bec78f50723f0edc215acda3ef79f1886750dd7e9a71c8901995d67a15b7fb8",
+        "git_blob": "df78fa70ba2165201f4347d18010f2677f4dd745",
+        "candidate_commit": "c607e56213f13788d087a4cf535d4ba91ef19706",
+        "bytes": 21713,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/BROWSER-SWITCH-INDICATOR-BASELINE-FIX/audit.json",
+      "sha256": "700f23991242b8605965523b1911e3bd2259754be095728edc1ff30fe32b500c",
+      "git_blob": "6ee9e81413b8a6511bfd6056063b803027902e3c",
+      "candidate_commit": "c607e56213f13788d087a4cf535d4ba91ef19706",
+      "bytes": 2682,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-26/2026-08-26T11-55-40-129Z-BROWSER-SWITCH-INDICATOR-BASELINE-FIX-acceptance.json"
+}

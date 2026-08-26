@@ -2,7 +2,7 @@
   "schema_version": 2,
   "record_type": "milestone_evidence_bundle",
   "milestone_id": "SMALL_SIDED_SHAPE",
-  "generated_at": "2026-08-26T11:55:49.495Z",
+  "generated_at": "2026-08-26T11:04:33.129Z",
   "gameplay_situation_registry_version": "gameplay-situations-v1",
   "applicable_gameplay_situations": [
     {
@@ -1027,47 +1027,6 @@
           "kind": "audit",
           "source": "docs/evidence/SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY/audit.json",
           "target": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY-audit.json"
-        }
-      ],
-      "metrics": [],
-      "reviews": {
-        "deterministic_audit": {
-          "status": "PASS"
-        },
-        "semantic_audit": null,
-        "critic": {
-          "agent": "critic",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT"
-        },
-        "integration": {
-          "agent": "integration-reviewer",
-          "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT"
-        }
-      }
-    },
-    {
-      "objective_id": "BROWSER-SWITCH-INDICATOR-BASELINE-FIX",
-      "candidate_commit": "c607e56213f13788d087a4cf535d4ba91ef19706",
-      "accepted_at": "2026-08-26T11:55:40.129Z",
-      "evidence_class": "BROWSER_VISIBLE",
-      "source_manifest": "docs/evidence/BROWSER-SWITCH-INDICATOR-BASELINE-FIX/manifest.json",
-      "copied": [
-        {
-          "kind": "screenshot-1",
-          "source": "docs/screenshots/BROWSER-SWITCH-INDICATOR-BASELINE-FIX/frame-post-switch.png",
-          "target": "BROWSER-SWITCH-INDICATOR-BASELINE-FIX-screenshot-1.png"
-        },
-        {
-          "kind": "screenshot-2",
-          "source": "docs/screenshots/BROWSER-SWITCH-INDICATOR-BASELINE-FIX/frame-pre-switch.png",
-          "target": "BROWSER-SWITCH-INDICATOR-BASELINE-FIX-screenshot-2.png"
-        },
-        {
-          "kind": "audit",
-          "source": "docs/evidence/BROWSER-SWITCH-INDICATOR-BASELINE-FIX/audit.json",
-          "target": "BROWSER-SWITCH-INDICATOR-BASELINE-FIX-audit.json"
         }
       ],
       "metrics": [],
