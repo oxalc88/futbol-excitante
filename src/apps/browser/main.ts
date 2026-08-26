@@ -59,15 +59,20 @@ import {
   FOUNDATION_SCENARIO_HUMAN_VS_CPU,
   FOUNDATION_SCENARIO_HUMAN_VS_CPU_3V3,
   FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V3,
+  FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5,
+  FOUNDATION_SCENARIO_HUMAN_VS_CPU_1V1,
 } from "./foundation-scenario.js";
 
 const MATCH_MODES: MatchModeEntry[] = [
   { modeId: "ai-match-5v5",     scenario: FOUNDATION_SCENARIO_5V5,             urlMode: "ai-match-5v5",     hint: "5v5 AI Match — fully autonomous" },
+  { modeId: "human-vs-ai-5v5",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5, urlMode: "human-vs-ai-5v5",  hint: "5v5 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
   { modeId: "human-vs-ai-5v3",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V3, urlMode: "human-vs-ai-5v3",  hint: "5v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
   { modeId: "ai-match-3v3",     scenario: FOUNDATION_SCENARIO_3V3,             urlMode: "ai-match-3v3",     hint: "3v3 AI Match — fully autonomous" },
-  { modeId: "human-vs-ai",      scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU,    urlMode: "human-vs-ai",       hint: "Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
+  { modeId: "human-vs-ai-3v3",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_3V3, urlMode: "human-vs-ai-3v3",  hint: "3v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
+  { modeId: "human-vs-ai",      scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU,    urlMode: "human-vs-ai",       hint: "2v2 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
   { modeId: "2v2-ai",           scenario: FOUNDATION_SCENARIO_2V2,             urlMode: "2v2-ai",            hint: "2v2 AI Match — fully autonomous" },
-  { modeId: "ai-match",         scenario: FOUNDATION_SCENARIO_AI_VS_AI,        urlMode: "ai-match",          hint: "AI-vs-AI Match — fully autonomous" },
+  { modeId: "human-vs-ai-1v1",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_1V1, urlMode: "human-vs-ai-1v1",  hint: "1v1 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
+  { modeId: "ai-match",         scenario: FOUNDATION_SCENARIO_AI_VS_AI,        urlMode: "ai-match",          hint: "1v1 AI Match — fully autonomous" },
 ];
 
 /**
@@ -425,6 +430,9 @@ function startMatch(
   const IS_AI_MATCH_3V3 = urlMode === "ai-match-3v3";
   const IS_AI_MATCH_5V5 = urlMode === "ai-match-5v5";
   const IS_HUMAN_VS_CPU_5V3 = urlMode === "human-vs-ai-5v3";
+  const IS_HUMAN_VS_CPU_3V3 = urlMode === "human-vs-ai-3v3";
+  const IS_HUMAN_VS_CPU_5V5 = urlMode === "human-vs-ai-5v5";
+  const IS_HUMAN_VS_CPU_1V1 = urlMode === "human-vs-ai-1v1";
 
   const HALF_DURATION_TICKS = Math.floor(scenario.durationTicks / 2);
 
@@ -473,7 +481,7 @@ function startMatch(
         controlledPlayerId: assignment.controlledPlayerId ?? "",
       });
     }
-  } else if (IS_HUMAN_VS_CPU || IS_2V2 || IS_HUMAN_VS_CPU_5V3) {
+  } else if (IS_HUMAN_VS_CPU || IS_2V2 || IS_HUMAN_VS_CPU_5V3 || IS_HUMAN_VS_CPU_3V3 || IS_HUMAN_VS_CPU_5V5 || IS_HUMAN_VS_CPU_1V1) {
     for (const [slotId, assignment] of Object.entries(scenario.controlAssignments)) {
       if (assignment.mode === "HUMAN") {
         const isFirstHuman = adapters.length === 0;
@@ -557,7 +565,7 @@ function startMatch(
       // Player switching is handled natively by sim.step() via SWITCH_PLAYER_BIT.
 
       // CPU frames
-      if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5 || IS_HUMAN_VS_CPU_5V3) {
+      if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5 || IS_HUMAN_VS_CPU_5V3 || IS_HUMAN_VS_CPU_3V3 || IS_HUMAN_VS_CPU_5V5 || IS_HUMAN_VS_CPU_1V1) {
         const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
         const snapshot = sim.snapshot();
         for (const { teamId: tid, controlledPlayerId } of cpuSlots) {
@@ -729,13 +737,16 @@ function getScenarioFromUrl(): { scenario: ScenarioDefinition; urlMode: string; 
 
   // Map URL mode to a display hint.
   const hintMap: Record<string, string> = {
-    "ai-match": "AI-vs-AI Match — fully autonomous",
+    "ai-match": "1v1 AI Match — fully autonomous",
     "2v2-ai": "2v2 AI Match — fully autonomous",
-    "human-vs-ai": "Human vs CPU — WASD + Shift to sprint, Tab to switch player",
+    "human-vs-ai": "2v2 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
     "2v2": "2v2 Match — Arrow keys + Space to sprint",
     "ai-match-3v3": "3v3 AI Match — fully autonomous",
     "ai-match-5v5": "5v5 AI Match — fully autonomous",
     "human-vs-ai-5v3": "5v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
+    "human-vs-ai-3v3": "3v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
+    "human-vs-ai-5v5": "5v5 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
+    "human-vs-ai-1v1": "1v1 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
   };
 
   return { scenario, urlMode, hint: hintMap[urlMode] ?? "", difficulty };

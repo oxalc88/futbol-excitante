@@ -12,6 +12,7 @@
  *  - `?mode=human-vs-ai`           → returns the human-vs-CPU scenario (slot-1 keyboard, rest CPU)
  *  - `?mode=human-vs-ai-3v3`       → returns the 3v3 human-vs-CPU scenario (slot-1 keyboard, slots 2-6 CPU)
  *  - `?mode=human-vs-ai-5v3`       → returns the 5v3 human-vs-CPU scenario (slot-1 keyboard, slots 2-10 CPU)
+ *  - `?mode=human-vs-ai-1v1`       → returns the 1v1 human-vs-CPU scenario (slot-1 keyboard, slot-2 CPU)
  *  - `?mode=2v2`                   → returns the 2v2 keyboard scenario (slot-1 keyboard, slots 2-4 CPU)
  *  - `?scenario=two-player`        → returns the two-player duel scenario
  *  - `?slots=2` (alias)            → same as above
@@ -31,6 +32,7 @@ import { FOUNDATION_SCENARIO_5V5 } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_HUMAN_VS_CPU_3V3 } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V3 } from "./foundation-scenario.js";
 import { FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5 } from "./foundation-scenario.js";
+import { FOUNDATION_SCENARIO_HUMAN_VS_CPU_1V1 } from "./foundation-scenario.js";
 
 /**
  * Select a scenario from the URL search string.
@@ -71,6 +73,10 @@ export function selectBrowserScenario(search: string): ScenarioDefinition {
 
   if (mode === "human-vs-ai-5v5") {
     return FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5;
+  }
+
+  if (mode === "human-vs-ai-1v1") {
+    return FOUNDATION_SCENARIO_HUMAN_VS_CPU_1V1;
   }
 
   if (mode === "2v2-ai") {

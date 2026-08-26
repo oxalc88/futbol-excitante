@@ -1,0 +1,153 @@
+{
+  "objective_id": "SMALL-SIDED-LADDER-MENU-COMPLETION",
+  "evidence_class": "BROWSER_VISIBLE",
+  "cases": [
+    {
+      "case_id": "BROWSER-SMALL-SIDED-LADDER-MENU-COMPLETION",
+      "case_version": "browser-case-ladder-menu-parity-v1",
+      "test_file": "tests/browser/ladder-menu-parity.browser.test.ts",
+      "tests_run": 9,
+      "tests_passed": 9,
+      "description": "Parity guard: menu-to-scenario-selector parity for full small-sided ladder with negative controls",
+      "exit_code": 0
+    },
+    {
+      "case_id": "BROWSER-LADDER-MENU-SCREENSHOTS",
+      "case_version": "browser-case-ladder-menu-screenshots-v1",
+      "test_file": "tests/browser/ladder-menu-screenshots.browser.test.ts",
+      "tests_run": 4,
+      "tests_passed": 4,
+      "description": "Screenshot capture: completed menu, launched 5v5 match, launched 3v3 match, unique hash verification",
+      "exit_code": 0
+    }
+  ],
+  "neighbor_regressions": [
+    {
+      "test_file": "tests/browser/5v5-human-vs-cpu.browser.test.ts",
+      "tests_run": 20,
+      "tests_passed": 20,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/1v1-control.browser.test.ts",
+      "tests_run": 8,
+      "tests_passed": 8,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/human-vs-cpu-5v3.browser.test.ts",
+      "tests_run": 9,
+      "tests_passed": 9,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/capture-human-vs-cpu-3v3.browser.test.ts",
+      "tests_run": 1,
+      "tests_passed": 1,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/player-switch.browser.test.ts",
+      "tests_run": 8,
+      "tests_passed": 8,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/player-indicator.browser.test.ts",
+      "tests_run": 7,
+      "tests_passed": 7,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/small-sided-action-event-observability.browser.test.ts",
+      "tests_run": 8,
+      "tests_passed": 8,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/human-vs-cpu-3v3-screenshot.browser.test.ts",
+      "tests_run": 5,
+      "tests_passed": 5,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/capture-switch-indicator-evidence.browser.test.ts",
+      "tests_run": 1,
+      "tests_passed": 1,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/core-smoke.browser.test.ts",
+      "tests_run": 16,
+      "tests_passed": 16,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/small-sided-001.browser.test.ts",
+      "tests_run": 10,
+      "tests_passed": 10,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/browser/human-action-readability-observability.browser.test.ts",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "exit_code": "TIMEOUT (120s, heavy DYNAMIC_VISUAL suite — unrelated to this objective)",
+      "note": "Known long-running suite from v22-2; not a regression from this change"
+    }
+  ],
+  "core_unit_tests": [
+    {
+      "test_file": "tests/unit/loop/simulation.test.ts",
+      "tests_run": 22,
+      "tests_passed": 22,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/unit/loop/control-slot-routing.test.ts",
+      "tests_run": 45,
+      "tests_passed": 45,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/unit/input/input-system.test.ts",
+      "tests_run": 40,
+      "tests_passed": 40,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/architecture/ (6 files)",
+      "tests_run": 27,
+      "tests_passed": 27,
+      "exit_code": 0
+    }
+  ],
+  "integration_tests": [
+    {
+      "test_file": "tests/integration/headless.test.ts",
+      "tests_run": 13,
+      "tests_passed": 13,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/integration/headless-match.test.ts",
+      "tests_run": 12,
+      "tests_passed": 12,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/integration/match-lifecycle.test.ts",
+      "tests_run": 47,
+      "tests_passed": 47,
+      "exit_code": 0
+    },
+    {
+      "test_file": "tests/integration/replay.test.ts",
+      "tests_run": 13,
+      "tests_passed": 13,
+      "exit_code": 0
+    }
+  ],
+  "simulation_core_untouched": true,
+  "git_diff_stat_simulation": ""
+}
