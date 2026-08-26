@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "objective_id": "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY",
+  "frames": [
+    {
+      "label": "pass-before",
+      "path": "pass-before.png",
+      "tick": 247,
+      "eventKind": "pass",
+      "eventTick": 257,
+      "inputTick": 256,
+      "inputBits": 2,
+      "note": "Before human-driven pass at tick 257: PASS_BIT (J key) pressed at input tick 256"
+    },
+    {
+      "label": "pass-event",
+      "path": "pass-event.png",
+      "tick": 257,
+      "eventKind": "pass",
+      "eventTick": 257,
+      "inputTick": 256,
+      "inputBits": 2,
+      "note": "Pass event at tick 257: caused by PASS_BIT (J key) pressed at input tick 256 — same-tick policy"
+    },
+    {
+      "label": "pass-after",
+      "path": "pass-after.png",
+      "tick": 269,
+      "eventKind": "pass",
+      "eventTick": 257,
+      "inputTick": 256,
+      "inputBits": 2,
+      "note": "After human-driven pass at tick 257: ball has been kicked away"
+    },
+    {
+      "label": "shot-event",
+      "path": "shot-event.png",
+      "tick": 287,
+      "eventKind": "shot",
+      "eventTick": 287,
+      "inputTick": 286,
+      "inputBits": 4,
+      "note": "Shot event at tick 287: caused by SHOT_BIT (L key) pressed at input tick 286 — same-tick policy"
+    },
+    {
+      "label": "shot-after",
+      "path": "shot-after.png",
+      "tick": 299,
+      "eventKind": "shot",
+      "eventTick": 287,
+      "inputTick": 286,
+      "inputBits": 4,
+      "note": "After human-driven shot at tick 287: ball has been kicked toward goal"
+    }
+  ]
+}
