@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SMALL-SIDED-COHERENT-EVIDENCE-RERUN",
+  "accepted_at": "2026-08-26T14:00:00.000Z",
+  "candidate_commit": null,
+  "evidence_class": "BOOKKEEPING",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-COHERENT-EVIDENCE-RERUN/audit.json",
+      "sha256": "",
+      "git_blob": "",
+      "candidate_commit": null,
+      "bytes": 0,
+      "committed_with_candidate": false
+    },
+    "video": null,
+    "metrics": [
+      "Situation scanner re-run on 5v5-continuous-play.v1.json (600 ticks): 7 present, 0 not_observed, 1 insufficient_context (PHYSICAL_DUEL)",
+      "Situation scanner re-run on 3v3-press-scenario.v1.json (600 ticks): 7 present, 0 not_observed, 1 insufficient_context (PHYSICAL_DUEL)",
+      "New playtest record generated with updated coherent_match_sources block",
+      "Milestone verifier PASS preserved (driven-fixture BATCH-5 8/8 remains decisive source)",
+      "Bundle superseded with 18 source objectives"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT",
+      "required_fixes": []
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-26/2026-08-26T14-00-00-000Z-SMALL-SIDED-COHERENT-EVIDENCE-RERUN-acceptance.json"
+}
