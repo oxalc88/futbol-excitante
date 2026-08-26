@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 147 — 2026-08-26
+
+- objective_id: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
+- builder: builder-structured / qwen3.6
+- critic: critic / deepseek-v4-flash — ACCEPT (first pass)
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT (first pass)
+- result: accepted
+- commits: b7397ff candidate(SMALL-SIDED-COHERENT-EVIDENCE-RERUN)
+- notes: BOOKKEEPING closure of Horizon v22 (5/5 — horizon COMPLETE). Re-ran the situation scanner + SMALL_SIDED_SHAPE milestone reducer on the deepened coherent matches: both the 600-tick 5v5-continuous-play match (437 events) and the 3v3 press match (320 events) scan 7 present / 0 not_observed / 1 insufficient_context (PHYSICAL_DUEL — genuine; the critic independently reproduced the numbers byte-identically). coherent_match_sources updated honestly: SHOT_TO_RESULT present organically, PHYSICAL_DUEL disclosed insufficient_context, v22-2 human-driven action observability noted as observability evidence (NOT a situation presence). Milestone PASS preserved honestly (BATCH-5 8/8 decisive; reducer overallVerdict PASS from real evaluators; MUTANT_TEAM_PASS + TEAM_SHAPE_SUITE_PASS exit prereqs pass). Evidence-bundle only — git diff src/ eval/scenarios/ specs/ eval/runners/ EMPTY. New playtest record 2026-08-26T14-00-00.000Z (milestone_verdict PASS, coherent_match_sources block); bundle superseded to 17 runs / 18 sources (superseded 13-44-13 preserves 17/16 byte-identically; rebuilt after persist so the v22-5 source entry carries the authoritative candidate b7397ff; interim 18-source state preserved as superseded 14-20-30). New binding test 8/8 + 109 neighbor/evaluator tests exit 0; audit PASS; claims_not_made (no NEW milestone PASS beyond the pre-existing honest one). RESULT.md superseded-manifest filename refs corrected (13-44-13). Critic ACCEPT first pass (independent scanner re-run); integration ACCEPT first pass (zero source change holds, bundle coherent, no evaluator weakened). No PROMOTION / PES fidelity / FOUNDATION_LAB_PASS / invented rubric overclaim. Horizon v22 COMPLETE 5/5 — strategic reassessment next.
+
 ## Iteration 146 — 2026-08-26
 
 - objective_id: SMALL-SIDED-LADDER-MENU-COMPLETION

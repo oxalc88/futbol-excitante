@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-LADDER-MENU-COMPLETION
-usage_aggregates_through: SMALL-SIDED-LADDER-MENU-COMPLETION
-clock_aggregates_through: SMALL-SIDED-LADDER-MENU-COMPLETION
-model_evaluation_through: SMALL-SIDED-LADDER-MENU-COMPLETION
+last_tracked_objective: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
+usage_aggregates_through: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
+clock_aggregates_through: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
+model_evaluation_through: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -233,6 +233,9 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-LADDER-MENU-COMPLETION | accepted | ~90m\*\*\*\*\*\*\*\*\*\*\*\*\* | 52m\*\*\*\*\*\*\*\*\*\*\*\*\*\* | 18m | 18m | ~1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\* MiMo builder phase = 26m (infra-killed by an API 400 at ~7.3M-token context, partial work preserved) + 26m fresh-session completion (verified + finished the partial work + evidence). Clean first pass: critic ACCEPT first pass, integration ACCEPT first pass. Reviewer/commit times from subagent meta.json.
+| SMALL-SIDED-COHERENT-EVIDENCE-RERUN | accepted | ~32m\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* | 9m | 10m | 11m | ~1m | n/a | n/a |
+
+\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* BOOKKEEPING evidence-bundle step (no source change). Clean first pass: critic ACCEPT first pass (independent scanner re-run byte-identical), integration ACCEPT first pass. Bundle rebuilt after persist (corrected v22-5 entry) → interim superseded manifest preserved. Reviewer/commit times from subagent meta.json.
 
 \* Builder (mimo-v2.5) produced the evidence in a prior session before this continuation pickup; its step time is not re-measured here. Reviewer/commit phases measured from this session's subagents. BROWSER-SMALL-SIDED-001-COHERENCE-RERUN builder ran in this continuation session.
 
@@ -525,6 +528,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY | mimo-v2.5 | M | Medium — human-driven action observability, DYNAMIC_VISUAL frames bound to input tick | 3 | D | RETRY x3 (stale 3-way byte-identical frames; leftover carve-out + orphan + vacuous bindings; tick-metadata drift); shared single-source-of-truth offsets; integration first-pass ACCEPT |
 | BROWSER-SWITCH-INDICATOR-BASELINE-FIX | mimo-v2.5 | M | Medium — reconcile legacy double-switch to core-native single-switch contract | 1 | B | RETRY x1 (stale JSDoc claiming the removed manual switch); comment-only fix; integration first-pass ACCEPT; core untouched |
 | SMALL-SIDED-LADDER-MENU-COMPLETION | mimo-v2.5 | M | Medium — complete in-browser setup-menu ladder + parity guard (BROWSER_VISIBLE) | 0 | A | first pass clean; 9-option ladder (1v1/2v2/3v3/5v5 × HvC + CvC + 5v3); parity guard 9/9 + negative controls; new 1v1 scenario; integration first-pass ACCEPT |
+| SMALL-SIDED-COHERENT-EVIDENCE-RERUN | qwen3.6 | L | Low — milestone reducer re-run, evidence-bundle only (BOOKKEEPING) | 0 | A | scanner re-run 7/0/1 on both coherent matches; coherent_match_sources updated honestly; PASS preserved via BATCH-5 8/8; bundle 18 sources/17 runs; first-pass clean |
 | PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
 
 ### Reviewer route and catches
@@ -753,6 +757,8 @@ on an H task is the interesting result.
 | BROWSER-SWITCH-INDICATOR-BASELINE-FIX | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; 150 browser neighbors + 232 core units exit 0; core byte-identical; remaining setControlledPlayer callers legitimate core-API; RESULT.md neighbor counts corrected by orchestrator (stale 7→20 etc.) |
 | SMALL-SIDED-LADDER-MENU-COMPLETION | critic (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; 9/9 parity + 4/4 screenshots + 327 tests; ladder parity across 3 layers; core untouched; no switch regression; dup HORIZON id flagged (orchestrator fixed); human-action TIMEOUT proven pre-existing (~266s vs 120s budget) |
 | SMALL-SIDED-LADDER-MENU-COMPLETION | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; ladder parity + no switch regression; 327 tests green; v22-2 suite 10/10 in isolation (not a regression); pre-existing typecheck + 3 integration failures reproduced on pristine HEAD (non-candidate) |
+| SMALL-SIDED-COHERENT-EVIDENCE-RERUN | critic (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; independent scanner re-run reproduces 7/0/1 (437/320 events) byte-identically; reducer PASS from real evaluators (BATCH-5 8/8); bundle 18/17 coherent; zero source change |
+| SMALL-SIDED-COHERENT-EVIDENCE-RERUN | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; zero source change holds (src/eval/scenarios/specs/runners empty); bundle source_manifests resolve; superseded byte-identical to prior state; 109 tests green |
 
 ### Builder scoreboard
 
@@ -760,7 +766,7 @@ Only **accepted** objectives. In-flight TOUCH-ACTIONS is excluded.
 
 | Builder | n | A | B | C | D | R | First-pass % | Mean critic loops | Mean step time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| qwen3.6 | 83 | 59 | 11 | 3 | 3 | 2 | 71% | ~0.42 | ~31m |
+| qwen3.6 | 84 | 60 | 11 | 3 | 3 | 2 | 71% | ~0.42 | ~31m |
 | mimo-v2.5 | 43 | 24 | 15 | 3 | 1 | 0 | 56% | ~0.54 | ~49m |
 
 Weighted by difficulty (L=1, M=2, H=3, VH=4), counting A=4 … D=1, R=0.5:

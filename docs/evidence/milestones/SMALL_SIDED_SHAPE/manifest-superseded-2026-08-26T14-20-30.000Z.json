@@ -2,7 +2,7 @@
   "schema_version": 2,
   "record_type": "milestone_evidence_bundle",
   "milestone_id": "SMALL_SIDED_SHAPE",
-  "generated_at": "2026-08-26T14:20:30.649Z",
+  "generated_at": "2026-08-26T13:44:19.084Z",
   "gameplay_situation_registry_version": "gameplay-situations-v1",
   "applicable_gameplay_situations": [
     {
@@ -1355,8 +1355,8 @@
     },
     {
       "objective_id": "SMALL-SIDED-COHERENT-EVIDENCE-RERUN",
-      "candidate_commit": "b7397ff46ed935922adc56a683c3446b32bee457",
-      "accepted_at": "2026-08-26T14:19:34.604Z",
+      "candidate_commit": null,
+      "accepted_at": "2026-08-26T14:00:00.000Z",
       "evidence_class": "BOOKKEEPING",
       "source_manifest": "docs/evidence/SMALL-SIDED-COHERENT-EVIDENCE-RERUN/manifest.json",
       "copied": [
@@ -1366,7 +1366,13 @@
           "target": "SMALL-SIDED-COHERENT-EVIDENCE-RERUN-audit.json"
         }
       ],
-      "metrics": [],
+      "metrics": [
+        "Situation scanner re-run on 5v5-continuous-play.v1.json (600 ticks): 7 present, 0 not_observed, 1 insufficient_context (PHYSICAL_DUEL)",
+        "Situation scanner re-run on 3v3-press-scenario.v1.json (600 ticks): 7 present, 0 not_observed, 1 insufficient_context (PHYSICAL_DUEL)",
+        "New playtest record generated with updated coherent_match_sources block",
+        "Milestone verifier PASS preserved (driven-fixture BATCH-5 8/8 remains decisive source)",
+        "Bundle superseded with 18 source objectives"
+      ],
       "reviews": {
         "deterministic_audit": {
           "status": "PASS"
@@ -1375,12 +1381,14 @@
         "critic": {
           "agent": "critic",
           "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT"
+          "verdict": "ACCEPT",
+          "required_fixes": []
         },
         "integration": {
           "agent": "integration-reviewer",
           "model": "deepseek-v4-flash",
-          "verdict": "ACCEPT"
+          "verdict": "ACCEPT",
+          "required_fixes": []
         }
       }
     }
