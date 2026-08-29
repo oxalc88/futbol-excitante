@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
-usage_aggregates_through: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
-clock_aggregates_through: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
-model_evaluation_through: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
+last_tracked_objective: CORE-EVENT-TYPE-UNION-FIX
+usage_aggregates_through: CORE-EVENT-TYPE-UNION-FIX
+clock_aggregates_through: CORE-EVENT-TYPE-UNION-FIX
+model_evaluation_through: CORE-EVENT-TYPE-UNION-FIX
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -236,6 +236,9 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | SMALL-SIDED-COHERENT-EVIDENCE-RERUN | accepted | ~32m\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* | 9m | 10m | 11m | ~1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* BOOKKEEPING evidence-bundle step (no source change). Clean first pass: critic ACCEPT first pass (independent scanner re-run byte-identical), integration ACCEPT first pass. Bundle rebuilt after persist (corrected v22-5 entry) → interim superseded manifest preserved. Reviewer/commit times from subagent meta.json.
+| CORE-EVENT-TYPE-UNION-FIX | accepted | ~96m\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* | 76m | 16m | 18m | ~1m | n/a | n/a |
+
+\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
 \* Builder (mimo-v2.5) produced the evidence in a prior session before this continuation pickup; its step time is not re-measured here. Reviewer/commit phases measured from this session's subagents. BROWSER-SMALL-SIDED-001-COHERENCE-RERUN builder ran in this continuation session.
 
@@ -529,7 +532,7 @@ on an H task is the interesting result.
 | BROWSER-SWITCH-INDICATOR-BASELINE-FIX | mimo-v2.5 | M | Medium — reconcile legacy double-switch to core-native single-switch contract | 1 | B | RETRY x1 (stale JSDoc claiming the removed manual switch); comment-only fix; integration first-pass ACCEPT; core untouched |
 | SMALL-SIDED-LADDER-MENU-COMPLETION | mimo-v2.5 | M | Medium — complete in-browser setup-menu ladder + parity guard (BROWSER_VISIBLE) | 0 | A | first pass clean; 9-option ladder (1v1/2v2/3v3/5v5 × HvC + CvC + 5v3); parity guard 9/9 + negative controls; new 1v1 scenario; integration first-pass ACCEPT |
 | SMALL-SIDED-COHERENT-EVIDENCE-RERUN | qwen3.6 | L | Low — milestone reducer re-run, evidence-bundle only (BOOKKEEPING) | 0 | A | scanner re-run 7/0/1 on both coherent matches; coherent_match_sources updated honestly; PASS preserved via BATCH-5 8/8; bundle 18 sources/17 runs; first-pass clean |
-| PLAYABLE-1V1-PROFILE-EVALUATION | critic-mimo (mimo-v2.5) | 0731 unavailable, flash unavailable, qwen blocked (same model as builder), mimo fallback | ACCEPT | 47 tests, 554 eval, INVALID_RUN verdict correct, architecture verified |
+| CORE-EVENT-TYPE-UNION-FIX | deepseek-v4-flash | L | Low — typecheck repair, type-only (HEADLESS) | 0 | A | union fix + 10 eval/runners type-drift repairs; typecheck exit 0 core/node/browser; ~1100 tests + byte-identity gates; first-pass clean |
 
 ### Reviewer route and catches
 
@@ -759,6 +762,8 @@ on an H task is the interesting result.
 | SMALL-SIDED-LADDER-MENU-COMPLETION | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; ladder parity + no switch regression; 327 tests green; v22-2 suite 10/10 in isolation (not a regression); pre-existing typecheck + 3 integration failures reproduced on pristine HEAD (non-candidate) |
 | SMALL-SIDED-COHERENT-EVIDENCE-RERUN | critic (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; independent scanner re-run reproduces 7/0/1 (437/320 events) byte-identically; reducer PASS from real evaluators (BATCH-5 8/8); bundle 18/17 coherent; zero source change |
 | SMALL-SIDED-COHERENT-EVIDENCE-RERUN | integration-reviewer (deepseek-v4-flash) | base flash | ACCEPT | first pass clean; zero source change holds (src/eval/scenarios/specs/runners empty); bundle source_manifests resolve; superseded byte-identical to prior state; 109 tests green |
+| CORE-EVENT-TYPE-UNION-FIX | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; independent HEAD-worktree reproduction of all 12 baseline type errors (2 union TS2322 + 10 eval/runners); typecheck exit 0 core/node/browser; binding discrimination re-proven both directions; byte-identical runner outputs (team-shape dd65…, capability-design 2860… pre/post equal); no overclaim |
+| CORE-EVENT-TYPE-UNION-FIX | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 562 tests independently executed; composition clean (union + 8 eval/runners type-only only); never-emitted `evidence` type-member removal matches byte-verified TEAM_SHAPE artifact; no oracle weakened; typecheck exit 0; 6 known pre-existing failures unchanged; critic verified ran |
 
 ### Builder scoreboard
 

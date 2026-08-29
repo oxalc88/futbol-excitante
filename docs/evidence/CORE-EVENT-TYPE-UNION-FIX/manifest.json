@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "CORE-EVENT-TYPE-UNION-FIX",
+  "accepted_at": "2026-08-29T22:46:08.357Z",
+  "candidate_commit": "96dc1b50ea92b3052cc7dcc71fe75b10cc2c311a",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/CORE-EVENT-TYPE-UNION-FIX/audit.json",
+      "sha256": "01c608b77b374023d35816fb6310a0869995ada30ad8b98417a4abe874b49dbe",
+      "git_blob": "434cb4ee0ef1d3eff8f7d1d507045eb5846ec5b9",
+      "candidate_commit": "96dc1b50ea92b3052cc7dcc71fe75b10cc2c311a",
+      "bytes": 2683,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "typecheck exit 0 core/node/browser",
+      "binding 7/7",
+      "1100+ eval/usuite regression green",
+      "6 pre-existing failures unchanged pre-existing"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "checks": 20,
+      "fail": 0
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-29/2026-08-29T22-46-08-357Z-CORE-EVENT-TYPE-UNION-FIX-acceptance.json"
+}

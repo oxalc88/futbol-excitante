@@ -14,6 +14,16 @@ Append one record per finished iteration. Do not rewrite earlier records.
 - notes:
 -->
 
+## Iteration 148 — 2026-08-29
+
+- objective_id: CORE-EVENT-TYPE-UNION-FIX
+- builder: builder-structured / deepseek-v4-flash
+- critic: critic / glm5.3-flash — ACCEPT (first pass)
+- integration: integration-reviewer / glm5.3-flash — ACCEPT (first pass)
+- result: accepted
+- commits: 96dc1b5 candidate(CORE-EVENT-TYPE-UNION-FIX)
+- notes: Repaired ALL pre-existing typecheck defects so `pnpm run typecheck` exits 0 across core/node/browser with zero runtime behavior change (Horizon v23 1/5). Baseline carried 12 masked type errors at HEAD: 2 TS2322 (src/simulation/loop/simulation.ts emits "slot-switch"/"slot-wiring-violation" but the SimulationEvent.kind union in src/contracts/scenario.ts lacked both) + 10 pre-existing type-drift errors in eval/runners/* hidden by the && short-circuit. Fix: additive union extension + minimal type-level repairs (scanner clusterGap→clusterGapTicks rename with zero override callers; team-shape criteria `evidence` type-member removed to match the byte-verified accepted artifact; profile-reducer MilestoneProfile import-path; situation-verdict Set<string>; capability-design override profile type). New binding test 7/7 (compile-guard + runtime slot-switch/slot-wiring-violation emissions with negative controls + determinism). typecheck exit 0 independently reproduced by critic + integration; ~1100 suite tests green incl. BATCH-1/3/4/5 byte-identity gates; accepted evidence byte-identical (`git diff HEAD -- docs/` empty); six known pre-existing test-all failures unchanged in untouched files; CAPABILITY_DESIGN_PROFILE eval.json drift disclosed pre-existing (runner output proven identical before/after type-only repairs). audit PASS (HEADLESS). Critic ACCEPT first pass (independent HEAD-worktree reproduction of the 12 baseline errors; binding discrimination both directions; byte-identical runner outputs); integration ACCEPT first pass (562 tests independently executed; composition clean; critic verified ran, models differ). No milestone PASS / PES fidelity / FOUNDATION_LAB_PASS / invented references / PROMOTION overclaim. Horizon v23 1/5.
+
 ## Iteration 147 — 2026-08-26
 
 - objective_id: SMALL-SIDED-COHERENT-EVIDENCE-RERUN
