@@ -36,7 +36,7 @@ export function computeSituationVerdict(
   }
 
   // Collect distinct event kinds from relevant events.
-  const eventKinds = new Set(relevantEvents.map((e) => e.kind));
+  const eventKinds: Set<string> = new Set(relevantEvents.map((e) => e.kind));
 
   // Check if at least one required kind is present.
   const hasRequired = requirement.required_event_kinds.some((k) => eventKinds.has(k));

@@ -27,8 +27,8 @@ import {
 } from "./team-shape-eval-runner.js";
 import {
   SMALL_SIDED_SHAPE_PROFILE,
-  type MilestoneProfile,
 } from "../contracts/profiles.js";
+import type { MilestoneProfile } from "../contracts/types.js";
 
 // ---------------------------------------------------------------------------
 // Public types

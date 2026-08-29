@@ -22,7 +22,7 @@ export interface SimulationEvent {
   tick: number;
   /** Sequence within the tick for total ordering. */
   sequence: number;
-  /** Event category: scenario / pitch-contact / rule / input-rejection / invariant */
+  /** Event category: scenario / pitch-contact / rule / input-rejection / invariant / observability */
   kind:
     | "scenario-start"
     | "scenario-stop"
@@ -46,7 +46,9 @@ export interface SimulationEvent {
     | "rule"
     | "input-rejection"
     | "invariant"
-    | "scheduler";
+    | "slot-wiring-violation"
+    | "scheduler"
+    | "slot-switch";
   /** Human-readable label. */
   label: string;
   /** Typed payload — schema depends on kind. */

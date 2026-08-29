@@ -557,7 +557,7 @@ export function evaluatePlayable1v1(
   // --- 5. Browser case validation -----------------------------------------
   // For BROWSER-1V1-CONTROL-001, the evidence was captured from the two-player
   // scenario, not the profile scenario. Use the caller-provided scenario.
-  let perCaseHeadless: Record<string, { initialHash: string; perTickHashes: string[] } | undefined> = {};
+  let perCaseHeadless: Record<string, { initialHash: string; perTickHashes: string[] }> = {};
   if (twoPlayerScenario) {
     perCaseHeadless["BROWSER-1V1-CONTROL-001"] = generateHeadlessReferenceHashes(twoPlayerScenario);
   }

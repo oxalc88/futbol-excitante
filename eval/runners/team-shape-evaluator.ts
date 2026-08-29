@@ -29,7 +29,7 @@ import { fileURLToPath } from "node:url";
 
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { InvariantResult } from "../../src/contracts/telemetry.js";
-import type { CriterionClass, EvaluationOutcome } from "../../src/contracts/types.js";
+import type { CriterionClass, EvaluationOutcome, EvaluationCriterion } from "../contracts/types.js";
 
 import { evaluate } from "./evaluate.js";
 // Import wire.ts to register all built-in oracles in the protected registry.
@@ -37,10 +37,7 @@ import { evaluate } from "./evaluate.js";
 import "../oracles/wire.js";
 import { executeOracle } from "../oracles/oracle-registry.js";
 import { TEAM_SUITE } from "../contracts/suites.js";
-import {
-  COMMON_CRITERIA,
-  type EvaluationCriterion,
-} from "../contracts/common-criteria.js";
+import { COMMON_CRITERIA } from "../contracts/common-criteria.js";
 import { checkFiniteNumber } from "../invariants/finite.js";
 import { checkEventReferences } from "../invariants/references.js";
 import { checkBounds, type SafetyBounds } from "../invariants/bounds.js";
@@ -61,7 +58,6 @@ export interface TeamShapeTestResult {
     criterion_id: string;
     class: CriterionClass;
     outcome: EvaluationOutcome;
-    evidence: string[];
   }>;
   /** Overall test outcome. */
   overall: EvaluationOutcome;

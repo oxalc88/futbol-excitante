@@ -281,7 +281,7 @@ export function scanMatch(
 ): MatchSituationScanResult {
   const {
     windowTicks = DEFAULT_WINDOW_TICKS,
-    clusterGap = DEFAULT_CLUSTER_GAP,
+    clusterGapTicks = DEFAULT_CLUSTER_GAP,
     minEventsForContext = MIN_EVENTS_FOR_CONTEXT,
     minKindsForPresence = MIN_KINDS_FOR_PRESENCE,
   } = options ?? {};
@@ -325,7 +325,7 @@ export function scanMatch(
     const windows = groupIntoWindows(relevantEvents, windowTicks);
 
     // Group windows into clusters.
-    const clusters = groupIntoClusters(windows, clusterGap);
+    const clusters = groupIntoClusters(windows, clusterGapTicks);
 
     // Compute verdict per cluster using existing logic.
     for (const cluster of clusters) {

@@ -42,7 +42,6 @@ export interface TeamShapeEvalResult {
       criterion_id: string;
       class: string;
       outcome: string;
-      evidence: string[];
     }>;
     overall: string;
   }>;

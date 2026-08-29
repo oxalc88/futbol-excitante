@@ -194,7 +194,7 @@ export { computeSituationVerdict };
 /**
  * Extract team geometry from observations.
  */
-function extractTeamGeometry(observations: TelemetryObservation[]): TrajectoryEntry["team_geometry"] {
+function extractTeamGeometry(observations: TelemetryObservation[]): SituationEvidenceArtifact["team_geometry"] {
   return observations.map((obs) => ({
     tick: obs.tick,
     players: obs.players.map((p) => ({

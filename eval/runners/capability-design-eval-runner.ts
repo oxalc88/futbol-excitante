@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 
 import { evaluateCapabilityDesign } from "./evaluate-capability-design.js";
 import type { CapabilityDesignEvaluationResult } from "./evaluate-capability-design.js";
+import type { CapabilityDesignProfile } from "../contracts/capability-design.js";
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -34,9 +35,9 @@ export function runAndPersist(
   profileOverride?: string,
 ): CapabilityDesignEvaluationResult {
   // Load profile override if provided.
-  let profile: CapabilityDesignEvaluationResult | undefined = undefined;
+  let profile: CapabilityDesignProfile | undefined = undefined;
   if (profileOverride) {
-    const parsed = JSON.parse(profileOverride) as CapabilityDesignEvaluationResult;
+    const parsed = JSON.parse(profileOverride) as CapabilityDesignProfile;
     profile = parsed;
   }
 
