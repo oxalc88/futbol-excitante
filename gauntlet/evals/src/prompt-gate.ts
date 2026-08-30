@@ -13,7 +13,7 @@ const RULES: GateRule[] = [
   { name: "continue entrypoint requires explicit allowed stop reason", file: ".grok/skills/gauntlet-continue/SKILL.md", mustContain: ["`allowed_stop_reason`", "Tests passing", "execute that action instead of stopping"] },
   { name: "normal test capture is isolated from durable evidence", file: "package.json", mustContain: ["GAUNTLET_EVIDENCE_CAPTURE=1", "__EVIDENCE__:", "gauntlet:candidate-scope"] },
   { name: "routine eval results are ephemeral by default", file: "gauntlet/evals/src/write-result.ts", mustContain: ["GAUNTLET_EVAL_DURABLE", "test-results/gauntlet-evals", "gauntlet/evals/results"] },
-  { name: "acceptance persistence rejects blank screenshots", file: "gauntlet/evals/src/persist-acceptance.ts", mustContain: ["assertScreenshotSanity", "manifest.evidence.screenshots"] },
+  { name: "acceptance persistence rejects blank screenshots", file: "gauntlet/evals/src/persist-acceptance.ts", mustContain: ["assertScreenshotSanity", "manifestEvidence?.screenshots"] },
   { name: "candidate snapshot has mechanical scope gate", file: ".grok/agents/git-committer.md", mustContain: ["gauntlet:candidate-scope", "expected candidate scope", "docs/screenshots/capture"] },
   { name: "full suite checks worktree and accepted evidence hygiene", file: "scripts/ci/run-validation.mjs", mustContain: ["FULL-SUITE-WORKTREE-HYGIENE", "ACCEPTED-EVIDENCE-IMMUTABLE", "preexisting dirty content/status changed during suite"] },
   { name: "main gauntlet entrypoint uses deterministic-first critic-always pipeline", file: "gauntlet/PROMPT.md", mustContain: ["gauntlet/principles.md", "pnpm run gauntlet:audit", "REVIEW_REQUIRED", "The critic is mandatory", "GAUNTLET_ACCEPTANCE_JSON", "pnpm run gauntlet:eval:state"] },
