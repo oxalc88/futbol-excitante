@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "SMALL-SIDED-ORGANIC-DUEL-CLOSURE",
+  "accepted_at": "2026-08-30T17:03:57.667Z",
+  "candidate_commit": "43fa34d",
+  "evidence_class": "BOOKKEEPING",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-ORGANIC-DUEL-CLOSURE/audit.json",
+      "sha256": "94d1ea030ec2b2a500c935fbb14d37b7d84c264d3aa234201982a4d847aa923b",
+      "git_blob": "65c3258a4f2d1d60d801cefc7b366883cf3d398d",
+      "candidate_commit": "43fa34d",
+      "bytes": 2703,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "mimo-v2.5",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-30/2026-08-30T17-03-57-667Z-SMALL-SIDED-ORGANIC-DUEL-CLOSURE-acceptance.json"
+}
