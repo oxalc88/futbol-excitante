@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "CPU-DEFENSIVE-TACKLE",
+  "accepted_at": "2026-08-30T16:06:09.515Z",
+  "candidate_commit": "569da80",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/CPU-DEFENSIVE-TACKLE/cpu-tack-active.png",
+        "sha256": "be9085b6f1738b58da0e359aa57d6f58eddb011beb6e15322724aba3b4c44a8f",
+        "git_blob": "4e44691483b9e58c905604ec816c1e695fc8951b",
+        "candidate_commit": "569da80",
+        "bytes": 23491,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CPU-DEFENSIVE-TACKLE/cpu-tack-before.png",
+        "sha256": "23faeff9929966e446c391fe10bff4e497a6d84e762faff937378bb4e0d13afe",
+        "git_blob": "40638aacbf5f247fc2a90414a248396861f1f3ed",
+        "candidate_commit": "569da80",
+        "bytes": 23885,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CPU-DEFENSIVE-TACKLE/cpu-tack-commit.png",
+        "sha256": "3ca934b3416ee0a39d938bf070f374a33ab7404046061b55c175b8402c954a6e",
+        "git_blob": "5049f5e9a80e5f27205de8e6a0e45f696bfa5039",
+        "candidate_commit": "569da80",
+        "bytes": 23727,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CPU-DEFENSIVE-TACKLE/cpu-tack-outcome.png",
+        "sha256": "c3792d8333160c34ae2f8412c05b3aa98e5eda28e23c137d28b540567b9f6b00",
+        "git_blob": "d43633f136edb277a832a562330a9b0ae88f21a5",
+        "candidate_commit": "569da80",
+        "bytes": 23461,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CPU-DEFENSIVE-TACKLE/cpu-tack-recovery.png",
+        "sha256": "a91d522cea7e36aa2bde32ce6518777c7f51a0955194de785a8b74b5ee6ad9af",
+        "git_blob": "5efc8b43bec702e8ae6f0fb9e7a274a7561d2b38",
+        "candidate_commit": "569da80",
+        "bytes": 23207,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "CPU-DEFENSIVE-TACKLE",
+        "evidence_class": "MULTI_TICK",
+        "semantic_order": "approach → CPU commit → active window → contact/outcome → recovery",
+        "durable_capture": true,
+        "scenario": "3v3-press-scenario-v1",
+        "cpu_attempt": {
+          "player_id": "player-4",
+          "team_id": "team-b",
+          "kind": "standing",
+          "start_tick": 92,
+          "active_window": [
+            94,
+            97
+          ],
+          "contact_tick": 94,
+          "recover_tick": 98,
+          "release_tick": 110,
+          "reach": 1.6
+        },
+        "reproduction": {
+          "capture_test": "tests/browser/cpu-tackle-screenshot-capture.browser.test.ts",
+          "wiring": "src/apps/browser/main.ts per-slot CPU composition root with CpuObservation.cpuDefensiveTackle",
+          "scenario_path": "eval/scenarios/3v3-press-scenario.v1.json",
+          "play_ticks": 400,
+          "pinned_trajectory": "docs/evidence/CPU-DEFENSIVE-TACKLE/trajectory.json"
+        },
+        "cross_runtime_note": "Ticks are the Chromium run's own. The pinned Node trajectory in docs/evidence/CPU-DEFENSIVE-TACKLE/trajectory.json records the same attempt structure; per-tick hashes are not comparable across runtimes (known pinned-runtime gap).",
+        "frames": [
+          {
+            "index": 1,
+            "label": "cpu-tack-before",
+            "tick": 78,
+            "description": "Approach: the CPU presser is closing on the opposing carrier and has committed to nothing yet",
+            "path": "cpu-tack-before.png",
+            "sha256": "23faeff9929966e446c391fe10bff4e497a6d84e762faff937378bb4e0d13afe"
+          },
+          {
+            "index": 2,
+            "label": "cpu-tack-commit",
+            "tick": 92,
+            "description": "CPU commit: the team-decision profile authorised this standing tackle (prepare; reaction latency 3 ticks)",
+            "path": "cpu-tack-commit.png",
+            "sha256": "3ca934b3416ee0a39d938bf070f374a33ab7404046061b55c175b8402c954a6e"
+          },
+          {
+            "index": 3,
+            "label": "cpu-tack-active",
+            "tick": 94,
+            "description": "Active window opens at commit + 2: finite reach 1.6 m contact becomes eligible in the committed cone",
+            "path": "cpu-tack-active.png",
+            "sha256": "be9085b6f1738b58da0e359aa57d6f58eddb011beb6e15322724aba3b4c44a8f"
+          },
+          {
+            "index": 4,
+            "label": "cpu-tack-outcome",
+            "tick": 96,
+            "description": "Outcome: active-window tackle contact resolved (velocity-only deflection / separation impulse) and play continues past the beaten carrier",
+            "path": "cpu-tack-outcome.png",
+            "sha256": "c3792d8333160c34ae2f8412c05b3aa98e5eda28e23c137d28b540567b9f6b00"
+          },
+          {
+            "index": 5,
+            "label": "cpu-tack-recovery",
+            "tick": 102,
+            "description": "Recovery: the committed body is still capped and locked out, so the challenge cannot be instantly re-tried",
+            "path": "cpu-tack-recovery.png",
+            "sha256": "a91d522cea7e36aa2bde32ce6518777c7f51a0955194de785a8b74b5ee6ad9af"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/CPU-DEFENSIVE-TACKLE/sequence.json",
+        "sha256": "758acee188a55dcb967114d126e6daa3184bae064fe480b892390e56fe07cc0f",
+        "git_blob": "17fab5ec8691c831aadc837a0b9c73ff72ec106a",
+        "candidate_commit": "569da80",
+        "bytes": 2878,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/CPU-DEFENSIVE-TACKLE/trajectory.json",
+      "sha256": "c527d7b699f4101529042a16baeb85a3943447aa20703a794741243ee30d01c0",
+      "git_blob": "b19b7c9c262ddb55ac7a78757f7db2bc4cba0bfb",
+      "candidate_commit": "569da80",
+      "bytes": 309280,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/CPU-DEFENSIVE-TACKLE/audit.json",
+      "sha256": "800199420f65d2ce7af6582d9683d0479ae144bc768a33115939866515e2e6b4",
+      "git_blob": "7229acb5e617df2136b0b1dafd795e3d00e3655d",
+      "candidate_commit": "569da80",
+      "bytes": 2650,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-30/2026-08-30T16-06-09-515Z-CPU-DEFENSIVE-TACKLE-acceptance.json"
+}

@@ -7,10 +7,10 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-08-24T21:15:00Z
 tracking_contract_version: 1
-last_tracked_objective: HUMAN-DEFENSIVE-DUEL-CONTROL
-usage_aggregates_through: HUMAN-DEFENSIVE-DUEL-CONTROL
-clock_aggregates_through: HUMAN-DEFENSIVE-DUEL-CONTROL
-model_evaluation_through: HUMAN-DEFENSIVE-DUEL-CONTROL
+last_tracked_objective: CPU-DEFENSIVE-TACKLE
+usage_aggregates_through: CPU-DEFENSIVE-TACKLE
+clock_aggregates_through: CPU-DEFENSIVE-TACKLE
+model_evaluation_through: CPU-DEFENSIVE-TACKLE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -238,6 +238,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* BOOKKEEPING evidence-bundle step (no source change). Clean first pass: critic ACCEPT first pass (independent scanner re-run byte-identical), integration ACCEPT first pass. Bundle rebuilt after persist (corrected v22-5 entry) → interim superseded manifest preserved. Reviewer/commit times from subagent meta.json.
 | CORE-EVENT-TYPE-UNION-FIX | accepted | ~96m\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* | 76m | 16m | 18m | ~1m | n/a | n/a |
 | HUMAN-DEFENSIVE-DUEL-CONTROL | accepted | ~4h* | 3h | 23m | 1h | ~10m | ~30M est. | n/a |
+| CPU-DEFENSIVE-TACKLE | accepted | ~4.5h | 4h | 16m | 14m | ~30m | ~30M est. | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -536,6 +537,7 @@ on an H task is the interesting result.
 | CORE-EVENT-TYPE-UNION-FIX | deepseek-v4-flash | L | Low — typecheck repair, type-only (HEADLESS) | 0 | A | union fix + 10 eval/runners type-drift repairs; typecheck exit 0 core/node/browser; ~1100 tests + byte-identity gates; first-pass clean |
 
 | HUMAN-DEFENSIVE-DUEL-CONTROL | qwen3.8-flash (mimo-v2.5 original; qwen3.6 mid-flight) | M | Medium — original builder mimo-v2.5 (initial tackle system); qwen3.8-flash (caption correction, tests, evidence reconciliation). 247 tests green, typecheck exit 0, audit PASS, FOUNDATION_LAB_PASS eval.json supersession |
+| CPU-DEFENSIVE-TACKLE | qwen3.8-flash | M | Medium — CPU defensive tackle committed to team-decision profile; no omniscience, geometric/temporal justification, commitment binding; 99 tests green, typecheck exit 0, audit PASS, critic first pass |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -767,7 +769,9 @@ on an H task is the interesting result.
 | CORE-EVENT-TYPE-UNION-FIX | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; independent HEAD-worktree reproduction of all 12 baseline type errors (2 union TS2322 + 10 eval/runners); typecheck exit 0 core/node/browser; binding discrimination re-proven both directions; byte-identical runner outputs (team-shape dd65…, capability-design 2860… pre/post equal); no overclaim |
 | CORE-EVENT-TYPE-UNION-FIX | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 562 tests independently executed; composition clean (union + 8 eval/runners type-only only); never-emitted `evidence` type-member removal matches byte-verified TEAM_SHAPE artifact; no oracle weakened; typecheck exit 0; 6 known pre-existing failures unchanged; critic verified ran |
 | HUMAN-DEFENSIVE-DUEL-CONTROL | integration-reviewer (deepseek-v4-flash) | deepseek-v4-flash | ACCEPT | regression repaired (foundation-lab-binding 8/8); composition clean; no evaluator weakened; 247 tests green, typecheck exit 0, audit PASS |
+| CPU-DEFENSIVE-TACKLE | integration-reviewer (deepseek-v4-flash) | deepseek-v4-flash | ACCEPT | composition clean; no evaluator weakened; 99 tests green, typecheck exit 0, audit PASS |
 | HUMAN-DEFENSIVE-DUEL-CONTROL | critic (deepseek-v4-flash) | deepseek-v4-flash | ACCEPT | first pass clean (critic); second pass after RETRY fix: caption corrected, evidence reproducible, all substantive criteria PASS; post-repair integration ACCEPT; 247 tests green, typecheck exit 0, audit PASS, FOUNDATION_LAB_PASS eval.json supersession |
+| CPU-DEFENSIVE-TACKLE | critic (deepseek-v4-flash) | deepseek-v4-flash | ACCEPT | first pass clean; all substantive criteria PASS (omniscience-free, reachability guard, commitment binding, organic integration, honest scanner); RESULT.md fix applied post-retry |
 
 ### Builder scoreboard
 

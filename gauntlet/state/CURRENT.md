@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: CPU-DEFENSIVE-TACKLE
+next_objective_id: SMALL-SIDED-ORGANIC-DUEL-CLOSURE
 
 best_known:
-  commit: dc40fd2
-  note: "HUMAN-DEFENSIVE-DUEL-CONTROL accepted (Horizon v23 2/5) — human standing+sliding tackle actions with prepare-active-recover phases, finite reach, active-window contact, recovery lock-out, velocity-only effects, browser keys U/I. Evidence: trajectory.json (121 hashes, 8 tackle-phase events, lockout rejection, 352 contacts), 5 semantic PNG frames (sequence.json, 205x460, event-centered on tick 43). 247 tests green. REGRESSION_REPAIR: FOUNDATION_LAB_PASS eval.json superseded (registrySetId 24b5341e, PASS preserved). Critic + integration ACCEPT."
+  commit: 569da80
+  note: "CPU-DEFENSIVE-TACKLE accepted (Horizon v23 3/5) — CPU defensive tackle committed to team-decision profile (no omniscience, geometric/temporal justification, commitment binding). PHYSICAL_DUEL honest disclosure (insufficient_context). 99 tests green, typecheck exit 0, audit PASS. Critic + integration ACCEPT."
 active_candidate: null
 builder_in_use: null
 critic_in_use: null
@@ -156,13 +156,14 @@ accepted:
   - SMALL-SIDED-COHERENT-EVIDENCE-RERUN
   - CORE-EVENT-TYPE-UNION-FIX
   - HUMAN-DEFENSIVE-DUEL-CONTROL
+  - CPU-DEFENSIVE-TACKLE
 
 blocked: []
 
 selection_note: "Horizon v23 (defensive-duels-and-organic-duel-closure) ACTIVE 0/5 — created 2026-08-29 after horizon v22 exhaustion (5/5) and verified remote durability of the final acceptance commit 421f98f (origin/main contains it; push d653ce3..421f98f). Reassessment selected five objectives within small-sided bounds: (1) CORE-EVENT-TYPE-UNION-FIX — repair ALL pre-existing typecheck defects so `pnpm run typecheck` exits 0: the slot-switch / slot-wiring-violation kinds missing from the SimulationEvent.kind union in src/contracts/scenario.ts (2 TS2322, masked at baseline by the && short-circuit), plus the 10 further masked pre-existing node-project errors in eval/runners/* (type-drift repairs, zero runtime change); (2) HUMAN-DEFENSIVE-DUEL-CONTROL — human standing+sliding tackles as ordered prepare-active-recover phases (finite reach, active-window contact, recovery cost, no teleport/permanent collider), new input bits bound to browser keys, executable TACK-ST/SL-001-PHASE HARD_INVARIANT criteria in the duels evaluator, event-centered DYNAMIC_VISUAL+MULTI_TICK evidence, making the input-rejection duel kind organically observable vs a CPU presser; (3) CPU-DEFENSIVE-TACKLE — same action system consumed by team-decision profile (commitment/risk/recovery, no omniscience, reachability guard), organic tackle events in coherent CPU-vs-CPU play, scanner PHYSICAL_DUEL advancement (honest); (4) SMALL-SIDED-ORGANIC-DUEL-CLOSURE — BOOKKEEPING scanner+reducer re-run updating coherent_match_sources honestly and superseding the milestone bundle; (5) BROWSER-DEFENSIVE-CONTROLS-LEGEND — controls legend + parity guard, BROWSER_VISIBLE. Horizon v23 1/5 accepted (CORE-EVENT-TYPE-UNION-FIX, candidate 96dc1b5, critic+integration ACCEPT) — next objective: HUMAN-DEFENSIVE-DUEL-CONTROL (builder-gameplay). GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
 ```
 ## Last accepted objective
-
+CPU-DEFENSIVE-TACKLE — CPU defensive tackle committed to team-decision profile (no omniscience, geometric/temporal justification, commitment binding). PHYSICAL_DUEL honest disclosure (insufficient_context). 99 tests green, typecheck exit 0, audit PASS. Critic + integration ACCEPT first pass. Horizon v23 3/5.
 HUMAN-DEFENSIVE-DUEL-CONTROL — Human standing + sliding tackle actions with prepare-active-recover phases, finite reach, active-window contact, recovery lock-out, velocity-only effects, browser keys U/I. Evidence: trajectory.json (121 hashes, 8 tackle-phase events, lockout rejection, 352 contacts), 5 semantic PNG frames (sequence.json, 205x460, event-centered on tick 43). 247 tests green, typecheck exit 0, audit PASS. REGRESSION_REPAIR: FOUNDATION_LAB_PASS eval.json superseded (registrySetId 24b5341e, PASS preserved). Critic + integration ACCEPT first pass.
 
 - builder: builder-structured / deepseek-v4-flash

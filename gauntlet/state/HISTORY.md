@@ -3396,3 +3396,13 @@ All 3 objectives of horizon v17 accepted. Milestone did not pass — honest eval
 - result: accepted
 - commits: dc40fd2 candidate(HUMAN-DEFENSIVE-DUEL-CONTROL)
 - notes: Human standing + sliding tackle actions with ordered prepare→active→recover phases, finite reach, active-window-only contact, recovery lock-out, velocity-only effects. Browser keys U/I. 247 tests green, typecheck exit 0, audit PASS. REGRESSION_REPAIR: FOUNDATION_LAB_PASS eval.json superseded (registrySetId 24b5341e, PASS preserved). Critic + integration ACCEPT first pass. Horizon v23 2/5.
+
+## Iteration — 2026-08-30
+
+- objective_id: CPU-DEFENSIVE-TACKLE
+- builder: builder-gameplay / qwen3.8-flash
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: 569da80 candidate(CPU-DEFENSIVE-TACKLE)
+- notes: CPU defensive tackle committed to team-decision profile (no omniscience, geometric/temporal justification, commitment binding, PHYSICAL_DUEL honest disclosure insufficient_context). 99 tests green, typecheck exit 0, audit PASS. Critic + integration ACCEPT first pass. Horizon v23 3/5.
