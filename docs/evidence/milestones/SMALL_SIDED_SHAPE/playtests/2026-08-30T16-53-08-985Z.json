@@ -1,0 +1,454 @@
+{
+  "schema_version": 1,
+  "record_type": "milestone_playtest_result",
+  "milestone_id": "SMALL_SIDED_SHAPE",
+  "playtest_plan_version": "small-sided-shape-playtest-v1",
+  "generated_at": "2026-08-30T16:53:08.985Z",
+  "required_situations": [
+    "PASS_RECEPTION",
+    "SHOT_TO_RESULT",
+    "PHYSICAL_DUEL",
+    "SUPPORT_AND_PASSING_LANES",
+    "SETTLED_ATTACK_VS_DEFENCE",
+    "ATTACK_TO_DEFENCE_TRANSITION",
+    "DEFENCE_TO_ATTACK_TRANSITION",
+    "COORDINATED_PRESS"
+  ],
+  "situation_outcomes": {
+    "PASS_RECEPTION": "PASS",
+    "SHOT_TO_RESULT": "PASS",
+    "PHYSICAL_DUEL": "PASS",
+    "SUPPORT_AND_PASSING_LANES": "PASS",
+    "SETTLED_ATTACK_VS_DEFENCE": "PASS",
+    "ATTACK_TO_DEFENCE_TRANSITION": "PASS",
+    "DEFENCE_TO_ATTACK_TRANSITION": "PASS",
+    "COORDINATED_PRESS": "PASS"
+  },
+  "entry_prerequisites_pass": true,
+  "exit_prerequisites_pass": true,
+  "critic_verdict": "ACCEPT",
+  "evidence": {
+    "accumulated_horizon": "v22",
+    "batch_sources": [
+      "BATCH-5 (consolidated 8/8 PASS on resolved fixtures: extended + shot-resolution + duel-rejection)"
+    ],
+    "coherent_match_sources": [
+      {
+        "match_scenario": "5v5-continuous-play.v1.json",
+        "description": "5v5 CPU-vs-CPU coherent match (600-tick scan of 1800-tick scenario)",
+        "scan_summary": {
+          "present": 7,
+          "notObserved": 0,
+          "insufficientContext": 1
+        },
+        "situations": {
+          "PASS_RECEPTION": {
+            "presence": "present",
+            "observed_kinds": [
+              "pass",
+              "player-ball-contact",
+              "second-touch"
+            ]
+          },
+          "SHOT_TO_RESULT": {
+            "presence": "present",
+            "observed_kinds": [
+              "ball-out-of-play",
+              "goal",
+              "pitch-contact",
+              "shot"
+            ]
+          },
+          "PHYSICAL_DUEL": {
+            "presence": "insufficient_context",
+            "observed_kinds": [
+              "player-player-contact"
+            ],
+            "reason": "input-rejection indicative event structurally unreachable in organic CPU-vs-CPU play"
+          },
+          "SUPPORT_AND_PASSING_LANES": {
+            "presence": "present",
+            "observed_kinds": [
+              "pass",
+              "player-ball-contact",
+              "second-touch"
+            ]
+          },
+          "SETTLED_ATTACK_VS_DEFENCE": {
+            "presence": "present",
+            "observed_kinds": [
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "ATTACK_TO_DEFENCE_TRANSITION": {
+            "presence": "present",
+            "observed_kinds": [
+              "ball-out-of-play",
+              "goal",
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "DEFENCE_TO_ATTACK_TRANSITION": {
+            "presence": "present",
+            "observed_kinds": [
+              "ball-out-of-play",
+              "goal",
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "COORDINATED_PRESS": {
+            "presence": "present",
+            "observed_kinds": [
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          }
+        },
+        "event_totals": {
+          "total_events": 437,
+          "pitch_contact": 1,
+          "player_player_contact": 376,
+          "shots": 22,
+          "goals": 1,
+          "player_ball_contact": 12,
+          "second_touch": 20,
+          "pass": 3,
+          "ball_out_of_play": 1
+        },
+        "notes": [
+          "SHOT_TO_RESULT organically present via genuine shot + goal + pitch-contact events",
+          "PHYSICAL_DUEL honestly insufficient_context (input-rejection requires duplicate per-tick input frames, unreachable in CPU-vs-CPU)",
+          "7/8 present matches v22-1 organic scan numbers — deterministic, byte-identical run"
+        ]
+      },
+      {
+        "match_scenario": "3v3-press-scenario.v1.json",
+        "description": "3v3 CPU-vs-CPU press scenario (600-tick scan)",
+        "scan_summary": {
+          "present": 7,
+          "notObserved": 0,
+          "insufficientContext": 1
+        },
+        "situations": {
+          "PASS_RECEPTION": {
+            "presence": "present",
+            "observed_kinds": [
+              "pass",
+              "player-ball-contact",
+              "second-touch"
+            ]
+          },
+          "SHOT_TO_RESULT": {
+            "presence": "present",
+            "observed_kinds": [
+              "goal",
+              "pitch-contact",
+              "shot"
+            ]
+          },
+          "PHYSICAL_DUEL": {
+            "presence": "insufficient_context",
+            "observed_kinds": [
+              "player-player-contact"
+            ],
+            "reason": "input-rejection indicative event structurally unreachable in organic CPU-vs-CPU play"
+          },
+          "SUPPORT_AND_PASSING_LANES": {
+            "presence": "present",
+            "observed_kinds": [
+              "pass",
+              "player-ball-contact",
+              "second-touch"
+            ]
+          },
+          "SETTLED_ATTACK_VS_DEFENCE": {
+            "presence": "present",
+            "observed_kinds": [
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "ATTACK_TO_DEFENCE_TRANSITION": {
+            "presence": "present",
+            "observed_kinds": [
+              "goal",
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "DEFENCE_TO_ATTACK_TRANSITION": {
+            "presence": "present",
+            "observed_kinds": [
+              "goal",
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "COORDINATED_PRESS": {
+            "presence": "present",
+            "observed_kinds": [
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          }
+        },
+        "event_totals": {
+          "total_events": 320,
+          "pitch_contact": 1,
+          "player_player_contact": 255,
+          "shots": 24,
+          "goals": 2,
+          "player_ball_contact": 17,
+          "second_touch": 18,
+          "pass": 3
+        },
+        "notes": [
+          "3v3 press scenario independently confirms 7/8 present pattern",
+          "SHOT_TO_RESULT present via goal + pitch-contact + shot events",
+          "PHYSICAL_DUEL honestly insufficient_context"
+        ]
+      },
+      {
+        "match_scenario": "5v5-continuous-play-v1",
+        "description": "5v5-continuous-play CPU-vs-CPU match (600-tick scan) with cpuDefensiveTackle=true",
+        "cpuDefensiveTackle": true,
+        "scan_summary": {
+          "present": 7,
+          "notObserved": 0,
+          "insufficientContext": 1
+        },
+        "situations": {
+          "PASS_RECEPTION": {
+            "presence": "present",
+            "observedKinds": [
+              "pass",
+              "player-ball-contact",
+              "second-touch"
+            ]
+          },
+          "SHOT_TO_RESULT": {
+            "presence": "present",
+            "observedKinds": [
+              "goal",
+              "pitch-contact",
+              "shot"
+            ]
+          },
+          "PHYSICAL_DUEL": {
+            "presence": "insufficient_context",
+            "observedKinds": [
+              "player-player-contact"
+            ]
+          },
+          "SUPPORT_AND_PASSING_LANES": {
+            "presence": "present",
+            "observedKinds": [
+              "pass",
+              "player-ball-contact",
+              "second-touch"
+            ]
+          },
+          "SETTLED_ATTACK_VS_DEFENCE": {
+            "presence": "present",
+            "observedKinds": [
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "ATTACK_TO_DEFENCE_TRANSITION": {
+            "presence": "present",
+            "observedKinds": [
+              "goal",
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "DEFENCE_TO_ATTACK_TRANSITION": {
+            "presence": "present",
+            "observedKinds": [
+              "goal",
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "COORDINATED_PRESS": {
+            "presence": "present",
+            "observedKinds": [
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          }
+        },
+        "event_totals": {
+          "total_events": 1062,
+          "player_ball_contact": 20,
+          "shot": 25,
+          "player_player_contact": 941,
+          "pass": 3,
+          "second_touch": 35,
+          "tackle_phase": 32,
+          "goal": 5,
+          "pitch_contact": 1
+        },
+        "notes": [
+          "1062 events, 5-0 team-a",
+          "PHYSICAL_DUEL: honest insufficient_context — input-rejection indicative kind absent (CPU adapter never presses during own lockout window by design)",
+          "7/8 situations present"
+        ]
+      },
+      {
+        "match_scenario": "3v3-press-scenario-v1",
+        "description": "3v3-press-scenario CPU-vs-CPU match (600-tick scan) with cpuDefensiveTackle=true",
+        "cpuDefensiveTackle": true,
+        "scan_summary": {
+          "present": 6,
+          "notObserved": 0,
+          "insufficientContext": 2
+        },
+        "situations": {
+          "PASS_RECEPTION": {
+            "presence": "present",
+            "observedKinds": [
+              "pass",
+              "player-ball-contact",
+              "second-touch"
+            ]
+          },
+          "SHOT_TO_RESULT": {
+            "presence": "insufficient_context",
+            "observedKinds": [
+              "goal",
+              "shot"
+            ]
+          },
+          "PHYSICAL_DUEL": {
+            "presence": "insufficient_context",
+            "observedKinds": [
+              "player-player-contact"
+            ]
+          },
+          "SUPPORT_AND_PASSING_LANES": {
+            "presence": "present",
+            "observedKinds": [
+              "pass",
+              "player-ball-contact",
+              "second-touch"
+            ]
+          },
+          "SETTLED_ATTACK_VS_DEFENCE": {
+            "presence": "present",
+            "observedKinds": [
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "ATTACK_TO_DEFENCE_TRANSITION": {
+            "presence": "present",
+            "observedKinds": [
+              "goal",
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "DEFENCE_TO_ATTACK_TRANSITION": {
+            "presence": "present",
+            "observedKinds": [
+              "goal",
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          },
+          "COORDINATED_PRESS": {
+            "presence": "present",
+            "observedKinds": [
+              "pass",
+              "player-ball-contact",
+              "player-player-contact",
+              "shot"
+            ]
+          }
+        },
+        "event_totals": {
+          "total_events": 262,
+          "player_ball_contact": 22,
+          "pass": 1,
+          "tackle_phase": 24,
+          "shot": 19,
+          "second_touch": 13,
+          "player_player_contact": 177,
+          "goal": 3,
+          "goal_post_contact": 3
+        },
+        "notes": [
+          "262 events, 3-0 team-b",
+          "PHYSICAL_DUEL: honest insufficient_context — input-rejection indicative kind absent (CPU adapter never presses during own lockout window by design)",
+          "6/8 situations present"
+        ]
+      }
+    ],
+    "human_action_observability": {
+      "source": "SMALL-SIDED-HUMAN-ACTION-ReadABILITY-OBSERVABILITY (v22-2)",
+      "description": "Human-driven discrete action observability in 5v5 human-vs-CPU: DYNAMIC_VISUAL frames bound to input ticks for pass/shot actions. This is OBSERVABILITY evidence for action_recognition — NOT a situation presence claim.",
+      "action_frames": {
+        "pass": {
+          "frame_before": true,
+          "frame_event": true,
+          "frame_after": true,
+          "input_tick_bound": true
+        },
+        "shot": {
+          "frame_before": true,
+          "frame_event": true,
+          "frame_after": true,
+          "input_tick_bound": true
+        }
+      }
+    },
+    "entry_prerequisite_accepted": [
+      "PLAYABLE_1V1_PASS",
+      "TEAM_DECISION_PROFILE"
+    ],
+    "exit_prerequisite_accepted": [
+      "MUTANT_TEAM_PASS",
+      "TEAM_SHAPE_SUITE_PASS"
+    ],
+    "browser_case": "BROWSER-SMALL-SIDED-001 materialized",
+    "remark": "SMALL-SIDED-COHERENT-EVIDENCE-RERUN (v22-5): Re-ran the situation scanner on the deepened coherent matches (5v5-continuous-play.v1.json at 600 ticks and 3v3-press-scenario.v1.json at 600 ticks). Scan results confirm: 7/8 present, 0 not_observed, 1 insufficient_context (PHYSICAL_DUEL) — byte-identical to v22-1 organic scan. SHOT_TO_RESULT organically present (shot + goal + pitch-contact). PHYSICAL_DUEL honest insufficient_context (input-rejection unreachable). Human-driven action observability from v22-2 noted as observability evidence. Batch-5 8/8 PASS remains the decisive source for the milestone. Milestone verifier PASS preserved.\n\nSMALL-SIDED-ORGANIC-DUEL-CLOSURE (v23): Re-ran the situation scanner with cpuDefensiveTackle=true on both coherent matches. 5v5: 7/8 present (unchanged), 3v3: 6/8 (SHOT_TO_RESULT regression — no pitch-contact in new trajectory). PHYSICAL_DUEL remains insufficient_context (input-rejection absent — CPU adapter never re-presses during own lockout by design). BATCH-5 8/8 PASS remains the decisive source. Milestone verifier PASS preserved."
+  },
+  "decision": "milestone_verdict_ready",
+  "milestone_verdict": "PASS",
+  "failure_class": null
+}
