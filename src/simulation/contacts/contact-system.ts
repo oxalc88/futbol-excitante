@@ -312,6 +312,12 @@ export interface ContactStepResult {
  * @param closeControlConfig - Close-control coefficient set (default: FOUNDATION_CLOSE_CONTROL_V1).
  * @param dribbleCooldowns - Mutable per-player cooldown map (keyed by playerId, value is last dribble-touch tick).
  * @param dribbleStates - Mutable per-player dribble state map for second-touch mechanics.
+ * @param suppressedActionPlayerIds - Players whose ball action is denied this
+ *   tick by the tackle action system (their own commitment, or an opponent's
+ *   duel contest). They are excluded from contact eligibility. Empty by
+ *   default, so non-tackle runs behave exactly as before.
+ * @param ballAlreadyTouched - True when a tackle already played the ball this
+ *   tick; the one-touch-per-tick rule then leaves the ball alone.
  * @returns Contact events and whether a touch occurred.
  */
 export function stepContacts(
@@ -327,10 +333,18 @@ export function stepContacts(
   closeControlConfig: CloseControlConfig = FOUNDATION_CLOSE_CONTROL_V1,
   dribbleCooldowns: Map<string, number> = new Map(),
   dribbleStates: Map<string, DribbleState> = new Map(),
+  suppressedActionPlayerIds: ReadonlySet<string> = new Set<string>(),
+  ballAlreadyTouched = false,
 ): ContactStepResult {
   const events: SimulationEvent[] = [];
   const radius = config.contactRadius.value;
   const maxApproach = config.maxApproachSpeed.value;
+
+  // A tackle already played the ball this tick: the one-touch-per-tick rule
+  // leaves ball state to the tackle until the next tick.
+  if (ballAlreadyTouched) {
+    return { events, touched: false };
+  }
 
   // Build a lookup: controlSlot → InputFrame for this tick.
   const frameBySlot = new Map<string, InputFrame>();
@@ -359,6 +373,10 @@ export function stepContacts(
   for (const player of players) {
     const frame = frameByPlayerId.get(player.playerId);
     if (!frame) continue;
+
+    // A tackle denied this player's ball action this tick (their own
+    // commitment, or an opponent's duel contest).
+    if (suppressedActionPlayerIds.has(player.playerId)) continue;
 
     // Check SHOT_BIT first (highest priority).
     const hasShotBit = (frame.pressedButtons & SHOT_BIT) !== 0;

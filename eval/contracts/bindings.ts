@@ -582,16 +582,20 @@ export const BINDING_DUELS_PHY_PC_001: TestImplementationBinding = makeTestBindi
 
 /**
  * TACK-ST-001 — standing tackle.
- * Tackles not implemented → UNKNOWN and REGRESSION → NOT_EVALUATED.
+ * TACK-ST-001-PHASE is bound to the protected tackle-phase-evidence-standing
+ * oracle (HARD_INVARIANT → PASS with genuine ordered-phase evidence, FAIL when
+ * the action system is absent). TACK-ST-001-CAUSAL (UNKNOWN) and
+ * TACK-ST-001-REG (REGRESSION) stay unbound → NOT_EVALUATED.
  */
 export const BINDING_DUELS_TACK_ST_001: TestImplementationBinding = makeTestBindingWith(
   "TACK-ST-001",
   ["scn-duels-tack-st-001-v1"],
   ["player-speed"],
-  ["finite-number", "event-references"],
+  ["finite-number", "event-references", "tackle-phase-evidence-standing"],
   ["obs-per-tick-v1"],
   ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
   {
+    "TACK-ST-001-PHASE": ["tackle-phase-evidence-standing"],
     "TACK-ST-001-CAUSAL": [],
     "TACK-ST-001-REG": [],
   },
@@ -599,16 +603,19 @@ export const BINDING_DUELS_TACK_ST_001: TestImplementationBinding = makeTestBind
 
 /**
  * TACK-SL-001 — sliding tackle.
- * Tackles not implemented → UNKNOWN and REGRESSION → NOT_EVALUATED.
+ * TACK-SL-001-PHASE is bound to the protected tackle-phase-evidence-slide
+ * oracle (same contract as the standing tackle for the slide windows).
+ * CAUSAL / REG stay unbound → NOT_EVALUATED.
  */
 export const BINDING_DUELS_TACK_SL_001: TestImplementationBinding = makeTestBindingWith(
   "TACK-SL-001",
   ["scn-duels-tack-sl-001-v1"],
   ["player-speed"],
-  ["finite-number", "event-references"],
+  ["finite-number", "event-references", "tackle-phase-evidence-slide"],
   ["obs-per-tick-v1"],
   ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
   {
+    "TACK-SL-001-PHASE": ["tackle-phase-evidence-slide"],
     "TACK-SL-001-CAUSAL": [],
     "TACK-SL-001-REG": [],
   },

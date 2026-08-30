@@ -263,6 +263,68 @@ export const FOUNDATION_CLOSE_CONTROL_V1 = {
   minPlayerSpeed: { value: 0.3, unit: "m/s", note: "provisional minimum player speed for direction-based dribble" },
 } as const;
 
+// -- Defensive tackle actions (provisional) -----------------------------------
+
+/**
+ * Provisional standing / sliding tackle coefficients.
+ *
+ * Every value is provisional — hand-tuned for laboratory testing only.
+ * No PES 2017 calibration claim is made, and no measured reference envelope
+ * exists for these numbers (`BLOCKED_MISSING_REFERENCE` for any PES target).
+ *
+ * A tackle is an ordered commit: prepare → active → recover. Contact with the
+ * ball or an opposing player is geometrically eligible ONLY inside the
+ * explicit active window declared here, and only within `standingReach` /
+ * `slideReach`. There is no permanent or omnidirectional tackle collider. The
+ * recovery window both restricts movement (recovery cost) and blocks an
+ * instant re-tackle. Nothing here assigns a position: the ball stays an
+ * independent 3D entity and bodies keep integrating through velocity.
+ */
+export const FOUNDATION_TACKLE_V1 = {
+  id: "foundation-tackle-v1",
+  label: "provisional",
+  /** Planar reach (metres) of a standing tackle during its active window. */
+  standingReach: { value: 1.6, unit: "m", note: "provisional standing tackle reach" },
+  /** Planar reach (metres) of a sliding tackle during its active window. */
+  slideReach: { value: 2.8, unit: "m", note: "provisional sliding tackle reach" },
+  /** Ticks between the input tick and the opening of the standing active window. */
+  standingPrepareTicks: { value: 2, unit: "ticks", note: "provisional standing prepare window" },
+  /** Ticks the standing tackle's contact-eligible active window stays open. */
+  standingActiveTicks: { value: 4, unit: "ticks", note: "provisional standing active window" },
+  /** Ticks of restricted movement after the standing active window closes. */
+  standingRecoverTicks: { value: 12, unit: "ticks", note: "provisional standing recovery window" },
+  /** Ticks between the input tick and the opening of the sliding active window. */
+  slidePrepareTicks: { value: 3, unit: "ticks", note: "provisional slide prepare window" },
+  /** Ticks the sliding tackle's contact-eligible active window stays open. */
+  slideActiveTicks: { value: 9, unit: "ticks", note: "provisional slide active window" },
+  /** Ticks of restricted movement after the sliding active window closes. */
+  slideRecoverTicks: { value: 26, unit: "ticks", note: "provisional slide recovery window" },
+  /** Fraction of max speed available while preparing a tackle (commitment). */
+  prepareSpeedFactor: { value: 0.55, note: "provisional speed cap factor during prepare [0..1]" },
+  /** Fraction of max speed available during the active window. */
+  activeSpeedFactor: { value: 0.8, note: "provisional speed cap factor during active window [0..1]" },
+  /** Fraction of max speed available during recovery — the recovery cost. */
+  recoverySpeedFactor: { value: 0.25, note: "provisional speed cap factor during recovery [0..1]" },
+  /** Forward body speed (m/s) the sliding lunge sustains during its active window. */
+  slideLungeSpeed: { value: 5.0, unit: "m/s", note: "provisional slide lunge speed" },
+  /** Horizontal speed (m/s) given to the ball when an active-window tackle wins it. */
+  ballDeflectionSpeed: { value: 7.5, unit: "m/s", note: "provisional tackle ball deflection speed" },
+  /** Vertical component applied to a tackled ball as a fraction of deflection speed. */
+  ballDeflectionLift: { value: 0.06, note: "provisional upward fraction on tackle deflection" },
+  /** Speed (m/s) pushed into the dispossessed carrier along the contact normal. */
+  carrierImpulseSpeed: { value: 1.4, unit: "m/s", note: "provisional duel separation impulse" },
+  /**
+   * Minimum dot product between the committed tackle direction and the
+   * direction to the target for contact to be geometrically eligible.
+   * `0` is a forward hemisphere (±90° half-angle) around the direction the
+   * body committed to at the input tick — never an omnidirectional collider.
+   */
+  contactConeMinCos: { value: 0, note: "provisional forward contact cone cosine" },
+} as const;
+
+/** Tackle configuration type. */
+export type TackleConfig = typeof FOUNDATION_TACKLE_V1;
+
 // -- Player-player contact (provisional) --------------------------------------
 
 /**

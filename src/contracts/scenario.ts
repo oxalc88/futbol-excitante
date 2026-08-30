@@ -38,6 +38,7 @@ export interface SimulationEvent {
     | "goal-kick-executed"
     | "player-ball-contact"
     | "player-player-contact"
+    | "tackle-phase"
     | "second-touch"
     | "pass"
     | "lofted-pass"

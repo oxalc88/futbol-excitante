@@ -77,6 +77,30 @@ export const LOFTED_PASS_BIT = 1 << 4;
 export const THROUGH_BALL_BIT = 1 << 5;
 
 /**
+ * STANDING_TACKLE_BIT: standing defensive tackle. The player commits to an
+ * ordered prepare → active → recover phase machine; ball/opponent contact is
+ * eligible only inside the explicit active window and only within the
+ * versioned finite reach. Recovery blocks an instant re-tackle.
+ *
+ * Executed by `src/simulation/contacts/tackle-system.ts` at the contact
+ * stage of the simulation loop — the same action system serves every
+ * control slot (device, AI, replay, test).
+ *
+ * Provisional — not a PES 2017 calibration claim.
+ */
+export const STANDING_TACKLE_BIT = 1 << 6;
+
+/**
+ * SLIDE_TACKLE_BIT: sliding defensive tackle. Same ordered phase machine as
+ * the standing tackle with a longer, committed lunge: the active window is
+ * wider, the recovery is longer, and the body travels under its own versioned
+ * lunge speed. Contact outside the active window is never eligible.
+ *
+ * Provisional — not a PES 2017 calibration claim.
+ */
+export const SLIDE_TACKLE_BIT = 1 << 7;
+
+/**
  * A tick-indexed input frame from any source (keyboard, gamepad, replay, AI, test).
  *
  * sourceId is provenance only — it must never affect gameplay outcomes,

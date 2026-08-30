@@ -635,20 +635,187 @@ export const SCENARIO_DUELS_PHY_PC_001 = makeScenarioStub(
   { test_focus: "physical-contact-variation" },
 );
 
-export const SCENARIO_DUELS_TACK_ST_001 = makeScenarioStub(
+/**
+ * Tick-indexed input program for a tackle-phase scenario.
+ *
+ * Slot-1 (the defender) presses a defensive action bit on `attemptTick` and
+ * again inside that action's lock-out window (`lockoutTicks`), which is what
+ * makes "recovery prevents an instant re-tackle" observable. Slot-2 (the
+ * carrier) requests a ball action on `contestTick` so a won duel can deny it.
+ * Geometry is otherwise static, so the versioned phase windows — not steering
+ * noise — decide the outcome.
+ */
+function makeTackleInputProgram(
+  durationTicks: number,
+  tackleBit: number,
+  attemptTick: number,
+  lockoutTicks: number[],
+  contestTick: number,
+): Record<
+  number,
+  {
+    tick: number;
+    sourceId: string;
+    controlSlot: string;
+    moveX: number;
+    moveY: number;
+    sprint: number;
+    heldButtons: number;
+    pressedButtons: number;
+    releasedButtons: number;
+  }[]
+> {
+  const program: Record<
+    number,
+    {
+      tick: number;
+      sourceId: string;
+      controlSlot: string;
+      moveX: number;
+      moveY: number;
+      sprint: number;
+      heldButtons: number;
+      pressedButtons: number;
+      releasedButtons: number;
+    }[]
+  > = {};
+  for (let t = 0; t < durationTicks; t++) {
+    const defenderBits =
+      t === attemptTick || lockoutTicks.includes(t) ? tackleBit : 0;
+    program[t] = [
+      {
+        tick: t,
+        sourceId: "eval-input",
+        controlSlot: "slot-1",
+        moveX: 0,
+        moveY: 0,
+        sprint: 0,
+        heldButtons: defenderBits,
+        pressedButtons: defenderBits,
+        releasedButtons: 0,
+      },
+      {
+        tick: t,
+        sourceId: "eval-input",
+        controlSlot: "slot-2",
+        moveX: 0,
+        moveY: 0,
+        sprint: 0,
+        heldButtons: t >= contestTick ? 1 : 0, // FIRST_TOUCH_BIT
+        pressedButtons: t === contestTick ? 2 : 0, // PASS_BIT
+        releasedButtons: 0,
+      },
+    ];
+  }
+  return program;
+}
+
+/**
+ * Create a two-player tackle-phase scenario: a defender within reach of an
+ * opposing carrier, with the ball held between them.
+ */
+function makeTackleScenarioStub(
+  scenarioId: string,
+  durationTicks: number,
+  tackleBit: number,
+  attemptTick: number,
+  lockoutTicks: number[],
+  contestTick: number,
+  testFocus: string,
+): ScenarioDefinition {
+  return {
+    scenario_id: scenarioId,
+    scenario_version: "scenario-v1",
+    capability_requirements: ["PLAYER_DUELS"],
+    duration_ticks: durationTicks,
+    seed_policy: { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+    initial_state_schema: "state-v1",
+    initial_state: {
+      players: [
+        {
+          playerId: "player-a",
+          teamId: "team-A",
+          groundPosition: { x: 0, y: 0 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 0,
+          desiredHeading: 0,
+        },
+        {
+          playerId: "player-b",
+          teamId: "team-B",
+          groundPosition: { x: 1.4, y: 0 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 3.141592653589793,
+          desiredHeading: 3.141592653589793,
+        },
+      ],
+      ball: {
+        position: { x: 0.7, y: 0, z: 0.11 },
+        linearVelocity: { x: 0, y: 0, z: 0 },
+        angularVelocity: { x: 0, y: 0, z: 0 },
+        regime: "ground-roll",
+      },
+    },
+    config_refs: {
+      foundation: "foundation-locomotion-v1",
+      tackle: "foundation-tackle-v1",
+      test_focus: testFocus,
+    },
+    input_program: {
+      schema_id: "input-frame-v1",
+      schema_version: "schema-input-v1",
+      value: makeTackleInputProgram(
+        durationTicks,
+        tackleBit,
+        attemptTick,
+        lockoutTicks,
+        contestTick,
+      ),
+    },
+    scheduled_events: [],
+    observation_windows: [
+      {
+        window_id: "full-run-v1",
+        start: { kind: "ABSOLUTE_TICK", tick: 0, offset_ticks: 0, missing_boundary_behavior: "INVALID_RUN" },
+        end: { kind: "SCENARIO_END", offset_ticks: 0, missing_boundary_behavior: "INVALID_RUN" },
+        boundary_inclusion: "CLOSED",
+        discontinuity_policy: "OBSERVE",
+      },
+    ],
+    requested_observation_ids: ["obs-per-tick-v1"],
+  };
+}
+
+/**
+ * Standing-tackle phase scenario: STANDING_TACKLE_BIT committed on input tick
+ * 10 and re-pressed inside the lock-out window (ticks 12 and 20), with the
+ * carrier requesting a pass on the duel tick.
+ */
+export const SCENARIO_DUELS_TACK_ST_001 = makeTackleScenarioStub(
   "scn-duels-tack-st-001-v1",
   60,
-  ["PLAYER_DUELS"],
-  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
-  { test_focus: "standing-tackle" },
+  1 << 6, // STANDING_TACKLE_BIT
+  10,
+  [12, 20],
+  12,
+  "standing-tackle",
 );
 
-export const SCENARIO_DUELS_TACK_SL_001 = makeScenarioStub(
+/**
+ * Sliding-tackle phase scenario: SLIDE_TACKLE_BIT committed on input tick 10
+ * with the same static geometry and re-pressed inside the longer slide
+ * lock-out window (ticks 14 and 30).
+ */
+export const SCENARIO_DUELS_TACK_SL_001 = makeTackleScenarioStub(
   "scn-duels-tack-sl-001-v1",
   60,
-  ["PLAYER_DUELS"],
-  { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
-  { test_focus: "sliding-tackle" },
+  1 << 7, // SLIDE_TACKLE_BIT
+  10,
+  [14, 30],
+  13,
+  "sliding-tackle",
 );
 
 export const SCENARIO_DUELS_TACK_ANG_001 = makeScenarioStub(

@@ -164,6 +164,19 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "player-contact-evidence",
     oracle_version: "oracle-player-contact-v1",
   },
+  // TACK-*-PHASE use the protected tackle-phase-evidence oracles: ordered
+  // prepare→active→recover phases, active-window-only finite-reach contact,
+  // recovery lock-out and velocity-only (no teleport) effects. With ≥2 players
+  // and no tackle evidence they FAIL rather than staying NOT_EVALUATED, so a
+  // stashed tackle action system turns the duels suite red.
+  "TACK-ST-001-PHASE": {
+    oracle_id: "tackle-phase-evidence-standing",
+    oracle_version: "oracle-tackle-phase-v1",
+  },
+  "TACK-SL-001-PHASE": {
+    oracle_id: "tackle-phase-evidence-slide",
+    oracle_version: "oracle-tackle-phase-v1",
+  },
 };
 
 // ---------------------------------------------------------------------------

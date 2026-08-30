@@ -582,7 +582,8 @@ describe("KEYBOARD-CONFIG-001: default configuration", () => {
   });
 
   it("DEFAULT_KEYBOARD_CONFIG has action buttons", () => {
-    expect(DEFAULT_KEYBOARD_CONFIG.buttons.length).toBe(4);
+    // 4 original + 2 tackle buttons = 6.
+    expect(DEFAULT_KEYBOARD_CONFIG.buttons.length).toBe(6);
   });
 
   it("KeyJ maps to PASS_BIT (actionBit 1)", () => {

@@ -65,7 +65,7 @@ import {
 
 const MATCH_MODES: MatchModeEntry[] = [
   { modeId: "ai-match-5v5",     scenario: FOUNDATION_SCENARIO_5V5,             urlMode: "ai-match-5v5",     hint: "5v5 AI Match — fully autonomous" },
-  { modeId: "human-vs-ai-5v5",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5, urlMode: "human-vs-ai-5v5",  hint: "5v5 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
+  { modeId: "human-vs-ai-5v5",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5, urlMode: "human-vs-ai-5v5",  hint: "5v5 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle" },
   { modeId: "human-vs-ai-5v3",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V3, urlMode: "human-vs-ai-5v3",  hint: "5v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
   { modeId: "ai-match-3v3",     scenario: FOUNDATION_SCENARIO_3V3,             urlMode: "ai-match-3v3",     hint: "3v3 AI Match — fully autonomous" },
   { modeId: "human-vs-ai-3v3",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_3V3, urlMode: "human-vs-ai-3v3",  hint: "3v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },

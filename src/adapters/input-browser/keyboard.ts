@@ -90,9 +90,11 @@ export interface KeyboardButtonModifier {
  * Default keyboard configuration for the bootstrap.
  *
  * Uses WASD for movement and Shift for sprint.
- * Action bits: bit 0 = first-touch, bit 1 = pass, bit 2 = shot, bit 3 = switch player.
+ * Action bits: bit 0 = first-touch, bit 1 = pass, bit 2 = shot, bit 3 = switch player,
+ * bit 6 = standing tackle, bit 7 = slide tackle.
  * Tab is edge-triggered for player switching (press, not hold).
  * E+J produces LOFTED_PASS_BIT (bit 4) instead of PASS_BIT (bit 1).
+ * Q+J produces THROUGH_BALL_BIT (bit 5) instead of PASS_BIT (bit 1).
  */
 export const DEFAULT_KEYBOARD_CONFIG: KeyboardAdapterConfig = {
   controlSlot: "slot-1",
@@ -104,6 +106,8 @@ export const DEFAULT_KEYBOARD_CONFIG: KeyboardAdapterConfig = {
     { key: "KeyJ", actionBit: 1 }, // pass
     { key: "KeyL", actionBit: 2 }, // shot
     { key: "Tab", actionBit: 3 }, // switch player (edge-triggered)
+    { key: "KeyU", actionBit: 6 }, // standing tackle (edge-triggered commit)
+    { key: "KeyI", actionBit: 7 }, // slide tackle (edge-triggered commit)
   ],
   buttonModifiers: [
     { modifierKey: "KeyE", targetActionBit: 1, modifiedActionBit: 4 }, // E+J → lofted pass

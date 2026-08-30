@@ -9,5 +9,23 @@ export * from "./loop/simulation.js";
 export * from "./ball/ball-system.js";
 export * from "./contacts/contact-system.js";
 export * from "./contacts/second-touch-system.js";
+export {
+  BALL_ACTION_BITS,
+  activeWindow,
+  isTackling,
+  releaseTick,
+  replayTackleEvent,
+  stepTackle,
+  tacklePhase,
+  tackleWindows,
+} from "./contacts/tackle-system.js";
+export type {
+  TackleConfig,
+  TackleKind,
+  TacklePhase,
+  TackleState,
+  TackleStepResult,
+  TackleWindows,
+} from "./contacts/tackle-system.js";
 export * from "./player-contact/player-contact-system.js";
 export * from "./telemetry/observer.js";

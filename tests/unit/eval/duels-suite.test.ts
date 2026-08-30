@@ -32,6 +32,11 @@ import { evaluate } from "../../../eval/runners/evaluate.js";
 import { evaluateSuite } from "../../../eval/runners/foundation-evaluator.js";
 import { evaluatePlayable1v1 } from "../../../eval/runners/playable-evaluator.js";
 import { loadRegistrySet } from "../../../eval/contracts/loader.js";
+import {
+  STANDING_TACKLE_BIT,
+  SLIDE_TACKLE_BIT,
+} from "../../../src/contracts/input.js";
+import type { InputFrame } from "../../../src/contracts/input.js";
 import { makeInputFrame, makeTelemetryObservation } from "../contracts.fixture.js";
 
 // Two-player duel scenario (JSON file).
@@ -84,6 +89,37 @@ function runDuelsSuite(
     { controlSlot: "slot-2", moveX: -1 },
   ]);
 
+  const evalResult = evaluate({ scenario: modified });
+  return evaluateSuite("duels", evalResult.observations);
+}
+
+/**
+ * Run the duels suite over the two-player duel fixture with one defensive
+ * tackle bit pressed on slot-1 at tick 5, steering toward the opponent so the
+ * commit is directional. This is the positive control for the TACK-*-PHASE
+ * oracles: the same fixture with no press makes them FAIL.
+ */
+function runDuelsSuiteWithTacklePress(buttonBit: number): ReturnType<typeof evaluateSuite> {
+  const scenario = loadTwoPlayerDuelFixture();
+  const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+  const durationTicks = 60;
+  modified.durationTicks = durationTicks;
+  const program: Record<number, InputFrame[]> = {};
+  for (let t = 0; t < durationTicks; t++) {
+    const pressing = t === 5;
+    program[t] = [
+      makeInputFrame(t, "slot-1", {
+        sourceId: "eval-input",
+        moveX: 1,
+        moveY: 0,
+        sprint: 1,
+        heldButtons: pressing ? buttonBit : 0,
+        pressedButtons: pressing ? buttonBit : 0,
+      }),
+      makeInputFrame(t, "slot-2", { sourceId: "eval-input" }),
+    ];
+  }
+  modified.inputProgram = program;
   const evalResult = evaluate({ scenario: modified });
   return evaluateSuite("duels", evalResult.observations);
 }
@@ -458,10 +494,10 @@ describe("PHY-STR/PHY-BC/PHY-PC: no implemented oracles", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 5. TACK-* and INT-*: all NOT_EVALUATED
+// 5. TACK-* and INT-*: CAUSAL/REG → NOT_EVALUATED; PHASE → see below
 // ---------------------------------------------------------------------------
 
-describe("TACK-*/INT-*: unimplemented → NOT_EVALUATED", () => {
+describe("TACK-*/INT-*: CAUSAL/REG unimplemented → NOT_EVALUATED", () => {
   function findCriterion(testId: string, criterionId: string) {
     const result = runDuelsSuite();
     const test = result.tests.find((t) => t.test_id === testId);
@@ -507,6 +543,118 @@ describe("TACK-*/INT-*: unimplemented → NOT_EVALUATED", () => {
     expect(c).toBeDefined();
     expect(c!.class).toBe("UNKNOWN");
     expect(c!.outcome).toBe("NOT_EVALUATED");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 5b. TACK-*-PHASE: HARD_INVARIANT with protected oracles
+// ---------------------------------------------------------------------------
+
+describe("TACK-*-PHASE: HARD_INVARIANT criteria", () => {
+  function findCriterion(testId: string, criterionId: string) {
+    const result = runDuelsSuite();
+    const test = result.tests.find((t) => t.test_id === testId);
+    expect(test).toBeDefined();
+    return test!.criteria.find((c) => c.criterion_id === criterionId);
+  }
+
+  it("TACK-ST-001-PHASE is HARD_INVARIANT class", () => {
+    const c = findCriterion("TACK-ST-001", "TACK-ST-001-PHASE");
+    expect(c).toBeDefined();
+    expect(c!.class).toBe("HARD_INVARIANT");
+  });
+
+  it("TACK-SL-001-PHASE is HARD_INVARIANT class", () => {
+    const c = findCriterion("TACK-SL-001", "TACK-SL-001-PHASE");
+    expect(c).toBeDefined();
+    expect(c!.class).toBe("HARD_INVARIANT");
+  });
+
+  it("TACK-ST-001-PHASE is NOT_EVALUATED on single-player fixture (oracle returns empty)", () => {
+    const c = findCriterion("TACK-ST-001", "TACK-ST-001-PHASE");
+    expect(c).toBeDefined();
+    expect(c!.outcome).toBe("NOT_EVALUATED");
+  });
+
+  it("TACK-SL-001-PHASE is NOT_EVALUATED on single-player fixture (oracle returns empty)", () => {
+    const c = findCriterion("TACK-SL-001", "TACK-SL-001-PHASE");
+    expect(c).toBeDefined();
+    expect(c!.outcome).toBe("NOT_EVALUATED");
+  });
+
+  it("TACK-ST-001-PHASE FAILs on two-player scenario with no tackle events", () => {
+    const scenario = loadTwoPlayerDuelFixture();
+    const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+    modified.durationTicks = 60;
+    // Two players, no tackle bits pressed → oracle FAILs when ≥2 players.
+    const noTackleProgram: Record<
+      number,
+      { tick: number; sourceId: string; controlSlot: string; moveX: number; moveY: number; sprint: number; heldButtons: number; pressedButtons: number; releasedButtons: number }[]
+    > = {};
+    for (let t = 0; t < 60; t++) {
+      noTackleProgram[t] = [
+        { tick: t, sourceId: "eval-input", controlSlot: "slot-1", moveX: 0, moveY: 0, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+        { tick: t, sourceId: "eval-input", controlSlot: "slot-2", moveX: 0, moveY: 0, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+      ];
+    }
+    modified.inputProgram = noTackleProgram;
+    const evalResult = evaluate({ scenario: modified });
+    const result = evaluateSuite("duels", evalResult.observations);
+    const tackSt = result.tests.find((t) => t.test_id === "TACK-ST-001");
+    expect(tackSt).toBeDefined();
+    const c = tackSt!.criteria.find((cr) => cr.criterion_id === "TACK-ST-001-PHASE");
+    expect(c).toBeDefined();
+    expect(c!.class).toBe("HARD_INVARIANT");
+    // With ≥2 players and zero standing-tackle evidence → FAIL.
+    expect(c!.outcome).toBe("FAIL");
+  });
+
+  it("TACK-SL-001-PHASE FAILs on two-player scenario with no tackle events", () => {
+    const scenario = loadTwoPlayerDuelFixture();
+    const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+    modified.durationTicks = 60;
+    const noTackleProgram: Record<
+      number,
+      { tick: number; sourceId: string; controlSlot: string; moveX: number; moveY: number; sprint: number; heldButtons: number; pressedButtons: number; releasedButtons: number }[]
+    > = {};
+    for (let t = 0; t < 60; t++) {
+      noTackleProgram[t] = [
+        { tick: t, sourceId: "eval-input", controlSlot: "slot-1", moveX: 0, moveY: 0, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+        { tick: t, sourceId: "eval-input", controlSlot: "slot-2", moveX: 0, moveY: 0, sprint: 0, heldButtons: 0, pressedButtons: 0, releasedButtons: 0 },
+      ];
+    }
+    modified.inputProgram = noTackleProgram;
+    const evalResult = evaluate({ scenario: modified });
+    const result = evaluateSuite("duels", evalResult.observations);
+    const tackSl = result.tests.find((t) => t.test_id === "TACK-SL-001");
+    expect(tackSl).toBeDefined();
+    const c = tackSl!.criteria.find((cr) => cr.criterion_id === "TACK-SL-001-PHASE");
+    expect(c).toBeDefined();
+    expect(c!.class).toBe("HARD_INVARIANT");
+    expect(c!.outcome).toBe("FAIL");
+  });
+
+  // Positive path: the same two-player fixture, but with the defensive bit
+  // actually pressed, must turn the protected oracle green. Without these the
+  // suite would only prove the oracle can fail.
+  it("TACK-ST-001-PHASE PASSes on a standing-tackle input program", () => {
+    const result = runDuelsSuiteWithTacklePress(STANDING_TACKLE_BIT);
+    const tackSt = result.tests.find((t) => t.test_id === "TACK-ST-001");
+    expect(tackSt).toBeDefined();
+    const c = tackSt!.criteria.find((cr) => cr.criterion_id === "TACK-ST-001-PHASE");
+    expect(c).toBeDefined();
+    expect(c!.class).toBe("HARD_INVARIANT");
+    expect(c!.outcome).toBe("PASS");
+  });
+
+  it("TACK-SL-001-PHASE PASSes on a slide-tackle input program", () => {
+    const result = runDuelsSuiteWithTacklePress(SLIDE_TACKLE_BIT);
+    const tackSl = result.tests.find((t) => t.test_id === "TACK-SL-001");
+    expect(tackSl).toBeDefined();
+    const c = tackSl!.criteria.find((cr) => cr.criterion_id === "TACK-SL-001-PHASE");
+    expect(c).toBeDefined();
+    expect(c!.class).toBe("HARD_INVARIANT");
+    expect(c!.outcome).toBe("PASS");
   });
 });
 

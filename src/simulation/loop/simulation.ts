@@ -68,11 +68,14 @@ import { stepContacts } from "../contacts/contact-system.js";
 import { stepPlayerContacts } from "../player-contact/player-contact-system.js";
 import { stepDribble } from "../contacts/second-touch-system.js";
 import type { DribbleState } from "../contacts/second-touch-system.js";
+import { stepTackle, replayTackleEvent } from "../contacts/tackle-system.js";
+import type { TackleState } from "../contacts/tackle-system.js";
 import {
   FOUNDATION_LOCOMOTION_V1,
   FOUNDATION_BALL_V1,
   FOUNDATION_CLOSE_CONTROL_V1,
   FOUNDATION_PLAYER_CONTACT_V1,
+  FOUNDATION_TACKLE_V1,
   FOUNDATION_CONFIG,
   TRANSIENT_ACCEL_LOCOMOTION_V1,
 } from "../config/foundation.js";
@@ -278,6 +281,15 @@ export function createSimulation(
   // Per-player dribble state for second-touch mechanics.
   // Lives in the simulation closure; does not affect world state or hashing.
   const dribbleStates: Map<string, DribbleState> = new Map();
+
+  // Per-player tackle bookkeeping (ordered prepare/active/recover phases).
+  // Lives in the simulation closure; only its world effects and ordered
+  // events reach canonical state / hashes.
+  const tackleStates: Map<string, TackleState> = new Map();
+
+  // Sustainable max speed of the effective locomotion config, recorded by the
+  // locomotion stage so the tackle commitment caps use the same authority.
+  let activeMaxSpeed: number = FOUNDATION_LOCOMOTION_V1.maxSpeed.value;
 
   // Shot config override (used by capability evaluation for low vs high exitSpeed).
   // Lives in the closure; does not affect world state or hashing.
@@ -1165,6 +1177,7 @@ export function createSimulation(
       }
     }
     stepLocomotion(state.players, dt, locoConfig);
+    activeMaxSpeed = locoConfig.maxSpeed.value;
   }
 
   /**
@@ -1214,6 +1227,35 @@ export function createSimulation(
   }
 
   /**
+   * Stage: defensive tackle action system.
+   *
+   * Runs AFTER player-player contact resolution and BEFORE player-ball
+   * contact resolution: standing / sliding tackles advance their ordered
+   * prepare → active → recover phases, resolve contact only inside the
+   * explicit active window, and report which players' ball actions are
+   * denied this tick (their own commitment, or an opponent's duel contest).
+   */
+  function tackleStage(
+    framesForTick: InputFrame[],
+  ): { events: SimulationEvent[]; suppressedPlayerIds: Set<string>; ballTouched: boolean } {
+    const counter = { value: eventCounter };
+    const result = stepTackle(
+      state.players,
+      state.ball,
+      tackleStates,
+      framesForTick,
+      state.controlAssignments,
+      FOUNDATION_TACKLE_V1,
+      counter,
+      state.tick,
+      dribbleStates,
+      activeMaxSpeed,
+    );
+    eventCounter = counter.value;
+    return result;
+  }
+
+  /**
    * Stage: player-ball contact detection and resolution.
    *
    * Runs AFTER locomotion (players at tick-advanced positions) and
@@ -1221,8 +1263,17 @@ export function createSimulation(
    * Detects proximity + FIRST_TOUCH/PASS/SHOT input, applies impulse
    * to ball, emits ordered player-ball-contact/pass/shot events,
    * and updates lastTouchRef.
+   *
+   * @param suppressedActionPlayerIds - Players whose ball action is denied by
+   *   this tick's tackle activity (excluded from contact eligibility).
+   * @param ballAlreadyTouched - True when a tackle already played the ball
+   *   this tick; the contact stage keeps its one-touch-per-tick rule.
    */
-  function contactDetectionStage(framesForTick: InputFrame[]): SimulationEvent[] {
+  function contactDetectionStage(
+    framesForTick: InputFrame[],
+    suppressedActionPlayerIds: ReadonlySet<string> = new Set<string>(),
+    ballAlreadyTouched = false,
+  ): SimulationEvent[] {
     const counter = { value: eventCounter };
     const { events } = stepContacts(
       state.players,
@@ -1237,6 +1288,8 @@ export function createSimulation(
       FOUNDATION_CLOSE_CONTROL_V1,
       dribbleCooldowns,
       dribbleStates,
+      suppressedActionPlayerIds,
+      ballAlreadyTouched,
     );
     eventCounter = counter.value;
     return events;
@@ -1296,6 +1349,12 @@ export function createSimulation(
           p.linearVelocity.x * p.linearVelocity.x +
             p.linearVelocity.y * p.linearVelocity.y,
         );
+        // Presentation-visible tackle phase facts. The action system's tick
+        // bookkeeping stays closure-held; only this derived label is exposed.
+        const tackle = tackleStates.get(p.playerId);
+        const actionState = tackle
+          ? `tackle-${tackle.kind}-${tackle.phase}`
+          : null;
         return {
           playerId: p.playerId,
           teamId: p.teamId,
@@ -1304,7 +1363,7 @@ export function createSimulation(
           speed,
           locomotionPhase: "idle",
           isControlled: controlledPlayerIds.has(p.playerId),
-          actionState: null,
+          actionState,
           contactState: null,
           archetypeId: p.archetypeId,
         };
@@ -1543,8 +1602,21 @@ export function createSimulation(
         state.events = [...state.events, ev];
       }
 
+      // 4.3. Defensive tackle actions (ordered prepare/active/recover phases;
+      // contact eligible only inside the explicit active window). Runs before
+      // ball contacts so a won tackle can deny the contested ball action.
+      const tackleResult = tackleStage(currentFrames);
+      const tackleEvents = tackleResult.events;
+      for (const ev of tackleEvents) {
+        state.events = [...state.events, ev];
+      }
+
       // 4.5. Player-ball contact detection (after locomotion, before ball integration)
-      const contactEvents = contactDetectionStage(currentFrames);
+      const contactEvents = contactDetectionStage(
+        currentFrames,
+        tackleResult.suppressedPlayerIds,
+        tackleResult.ballTouched,
+      );
       for (const ev of contactEvents) {
         state.events = [...state.events, ev];
       }
@@ -1574,7 +1646,7 @@ export function createSimulation(
 
       // 6. Invariant validation
       const invariantsOk = validateInvariants();
-      const allStepEvents = [...oldTickEvents, ...schedEvents, ...playerContactEvents, ...contactEvents, ...dribbleEvents, ...ballEvents];
+      const allStepEvents = [...oldTickEvents, ...schedEvents, ...playerContactEvents, ...tackleEvents, ...contactEvents, ...dribbleEvents, ...ballEvents];
 
       // ------------------------------------------------------------------
       // Match phase processing (MATCH-SET-PIECE)
@@ -1840,6 +1912,12 @@ export function createSimulation(
             ds.active = false;
           }
         }
+      }
+      // Rebuild tackle phase bookkeeping from the ordered tackle events so a
+      // restored checkpoint continues exactly like a continuous run.
+      tackleStates.clear();
+      for (const ev of state.events) {
+        replayTackleEvent(tackleStates, ev);
       }
       // Re-derive eventCounter from state.events max sequence.
       let maxSeq = 0;

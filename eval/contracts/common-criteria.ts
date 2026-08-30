@@ -365,6 +365,42 @@ export const TACK_SL_001_REG: EvaluationCriterion = {
 };
 
 /**
+ * TACK-ST-001-PHASE — standing tackle ordered-phase invariant.
+ * Class: HARD_INVARIANT.
+ *
+ * Executable through the protected `tackle-phase-evidence-standing` oracle:
+ * every standing attempt must show ordered prepare → active → recover phases,
+ * contact only inside the explicit active window, finite reach, a recovery
+ * lock-out that blocks an instant re-tackle, and velocity-only (never
+ * position-assigning) effects. A run with two or more players and no standing
+ * tackle evidence FAILS — it is never silently NOT_EVALUATED.
+ */
+export const TACK_ST_001_PHASE: EvaluationCriterion = {
+  criterion_id: "TACK-ST-001-PHASE",
+  class: "HARD_INVARIANT",
+  rule:
+    "Standing tackles execute ordered prepare→active→recover phases with finite " +
+    "reach; contact is eligible only inside the explicit active window; recovery " +
+    "blocks an instant re-tackle; no entity is teleported.",
+};
+
+/**
+ * TACK-SL-001-PHASE — sliding tackle ordered-phase invariant.
+ * Class: HARD_INVARIANT.
+ *
+ * Same executable contract as TACK-ST-001-PHASE for the sliding action,
+ * through the protected `tackle-phase-evidence-slide` oracle.
+ */
+export const TACK_SL_001_PHASE: EvaluationCriterion = {
+  criterion_id: "TACK-SL-001-PHASE",
+  class: "HARD_INVARIANT",
+  rule:
+    "Sliding tackles execute ordered prepare→active→recover phases with finite " +
+    "reach; contact is eligible only inside the explicit active window; recovery " +
+    "blocks an instant re-tackle; no entity is teleported.",
+};
+
+/**
  * TACK-ANG-001-CAUSAL — tackle angle causal isolation.
  * Class: UNKNOWN.  Tackles not implemented → NOT_EVALUATED.
  */
@@ -463,8 +499,10 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [PHY_PC_001_REG.criterion_id]: PHY_PC_001_REG,
   [TACK_ST_001_CAUSAL.criterion_id]: TACK_ST_001_CAUSAL,
   [TACK_ST_001_REG.criterion_id]: TACK_ST_001_REG,
+  [TACK_ST_001_PHASE.criterion_id]: TACK_ST_001_PHASE,
   [TACK_SL_001_CAUSAL.criterion_id]: TACK_SL_001_CAUSAL,
   [TACK_SL_001_REG.criterion_id]: TACK_SL_001_REG,
+  [TACK_SL_001_PHASE.criterion_id]: TACK_SL_001_PHASE,
   [TACK_ANG_001_CAUSAL.criterion_id]: TACK_ANG_001_CAUSAL,
   [TACK_ANG_001_REG.criterion_id]: TACK_ANG_001_REG,
   [INT_PASS_001_CAUSAL.criterion_id]: INT_PASS_001_CAUSAL,

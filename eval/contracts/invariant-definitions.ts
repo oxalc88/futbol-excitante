@@ -92,6 +92,40 @@ export const INV_PLAYER_CONTACT: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+/**
+ * Standing tackle ordered-phase invariant: checks that standing tackle
+ * attempts produce ordered prepare→active→recover phases with finite reach,
+ * active-window-only contact, recovery lock-out, and velocity-only effects.
+ * FAIL when ≥2 players present but no standing tackle evidence.
+ */
+export const INV_TACKLE_PHASE_STANDING: InvariantDefinition = {
+  invariant_id: "tackle-phase-evidence-standing",
+  invariant_version: "invariant-tackle-phase-v1",
+  input_observation_ids: ["obs-per-tick-v1"],
+  oracle_id: "protected-evaluator-v1",
+  oracle_version: "oracle-protected-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
+ * Sliding tackle ordered-phase invariant: same contract as standing for
+ * the sliding action kind.
+ */
+export const INV_TACKLE_PHASE_SLIDE: InvariantDefinition = {
+  invariant_id: "tackle-phase-evidence-slide",
+  invariant_version: "invariant-tackle-phase-v1",
+  input_observation_ids: ["obs-per-tick-v1"],
+  oracle_id: "protected-evaluator-v1",
+  oracle_version: "oracle-protected-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 /** All registered invariant definitions keyed by invariant_id. */
 export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FINITE.invariant_id]: INV_FINITE,
@@ -100,6 +134,8 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_BOUNDS.invariant_id]: INV_BOUNDS,
   [INV_BALL_CONTINUITY.invariant_id]: INV_BALL_CONTINUITY,
   [INV_PLAYER_CONTACT.invariant_id]: INV_PLAYER_CONTACT,
+  [INV_TACKLE_PHASE_STANDING.invariant_id]: INV_TACKLE_PHASE_STANDING,
+  [INV_TACKLE_PHASE_SLIDE.invariant_id]: INV_TACKLE_PHASE_SLIDE,
 };
 
 /**
