@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.4",
+  "objective_id": "HUMAN-DEFENSIVE-DUEL-CONTROL",
+  "accepted_at": "2026-08-30T07:18:37.492Z",
+  "candidate_commit": "dc40fd2",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/HUMAN-DEFENSIVE-DUEL-CONTROL/tack-active.png",
+        "sha256": "7996f2555b464d98cba8f11574ae7a103dc34a7a956cc63151aeec418838de73",
+        "git_blob": "3afd70c2117109ed3d51fc2649922ae12610315a",
+        "candidate_commit": "dc40fd2",
+        "bytes": 4392,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-DEFENSIVE-DUEL-CONTROL/tack-before.png",
+        "sha256": "1a7664f5d1704d9b8de0083fc24508e1db310e0b51ffd141879a6458f3733df5",
+        "git_blob": "2a4bb390e8192df475623e69023c425f3c1c2815",
+        "candidate_commit": "dc40fd2",
+        "bytes": 4235,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-DEFENSIVE-DUEL-CONTROL/tack-contact.png",
+        "sha256": "b04756c5d3f84e9e21918dc55fe19fb18123ce5ec30e9c89f7b8e937ca096fe3",
+        "git_blob": "a1764426ec1797f388958b3d03f26086ad59a289",
+        "candidate_commit": "dc40fd2",
+        "bytes": 4362,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-DEFENSIVE-DUEL-CONTROL/tack-input.png",
+        "sha256": "41738ab45eeb9555a6c9d45bd1a288ac2d1fd848be1964d13d239af1b6bb86b2",
+        "git_blob": "bb747067d1ba37c575ff44bf73f366f0a84520b8",
+        "candidate_commit": "dc40fd2",
+        "bytes": 4343,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-DEFENSIVE-DUEL-CONTROL/tack-recovery.png",
+        "sha256": "db4e3cb5b3faece922afab7e7cd38a0850c8c123ac3b45e355a3fc993f0790f9",
+        "git_blob": "1ecb405bda167f7776d9ba2fcecb07383a4afc70",
+        "candidate_commit": "dc40fd2",
+        "bytes": 4310,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "HUMAN-DEFENSIVE-DUEL-CONTROL",
+        "evidence_class": "DYNAMIC_VISUAL",
+        "description": "Event-centered semantic sequence for defensive tackle action",
+        "standing_tackle_input_tick": 43,
+        "reproduction": {
+          "capture_test": "tests/browser/duel-control-screenshot-capture.browser.test.ts",
+          "driver": "eval/runners/defensive-duel-driver.ts",
+          "scenario": "eval/scenarios/proximate-5v5.ts (5v5-human-vs-cpu-v1, human team proximate)",
+          "trajectory": "docs/evidence/HUMAN-DEFENSIVE-DUEL-CONTROL/trajectory.json"
+        },
+        "frames": [
+          {
+            "index": 1,
+            "label": "tack-before",
+            "tick": 35,
+            "description": "Pre-commitment: human defender steers toward the CPU carrier",
+            "path": "tack-before.png",
+            "sha256": "1a7664f5d1704d9b8de0083fc24508e1db310e0b51ffd141879a6458f3733df5"
+          },
+          {
+            "index": 2,
+            "label": "tack-input",
+            "tick": 43,
+            "description": "Tackle input tick: STANDING_TACKLE_BIT pressed, phase machine enters prepare",
+            "path": "tack-input.png",
+            "sha256": "41738ab45eeb9555a6c9d45bd1a288ac2d1fd848be1964d13d239af1b6bb86b2"
+          },
+          {
+            "index": 3,
+            "label": "tack-active",
+            "tick": 46,
+            "description": "Active window opens: finite-reach contact eligible in forward cone",
+            "path": "tack-active.png",
+            "sha256": "7996f2555b464d98cba8f11574ae7a103dc34a7a956cc63151aeec418838de73"
+          },
+          {
+            "index": 4,
+            "label": "tack-contact",
+            "tick": 47,
+            "description": "Tackle contact: standing tackle's active-window duel contact on the CPU carrier (player-player contact + velocity-only separation impulse); the follow-up tackle press is rejected by the recovery lock-out and the ball is untouched at this tick",
+            "path": "tack-contact.png",
+            "sha256": "b04756c5d3f84e9e21918dc55fe19fb18123ce5ec30e9c89f7b8e937ca096fe3"
+          },
+          {
+            "index": 5,
+            "label": "tack-recovery",
+            "tick": 57,
+            "description": "Recovery window: body speed capped, lock-out prevents instant re-tackle",
+            "path": "tack-recovery.png",
+            "sha256": "db4e3cb5b3faece922afab7e7cd38a0850c8c123ac3b45e355a3fc993f0790f9"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/HUMAN-DEFENSIVE-DUEL-CONTROL/sequence.json",
+        "sha256": "a3ea633010a38d2a290e715688e2a76f82118dde6d8b3430685db3600a50956e",
+        "git_blob": "6e83558091fa7858bdc7b977158a622757987bbc",
+        "candidate_commit": "dc40fd2",
+        "bytes": 2207,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/HUMAN-DEFENSIVE-DUEL-CONTROL/trajectory.json",
+      "sha256": "444284feb0d5f21a4acb45cd2c7445a6d4a7af41b921db253efb7e77dc911a73",
+      "git_blob": "e89c3a9a87100d27332a4b8d06ef37782a1ae385",
+      "candidate_commit": "dc40fd2",
+      "bytes": 56056,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/HUMAN-DEFENSIVE-DUEL-CONTROL/audit.json",
+      "sha256": "58f40a5a57f4487bdfb4bdfced39d38cc6de89a18a43b0056840111bc341257a",
+      "git_blob": "3858fdb3cc84022b99e3db3438d592a8403e56e7",
+      "candidate_commit": "dc40fd2",
+      "bytes": 2642,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "deepseek-v4-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-08-30/2026-08-30T07-18-37-492Z-HUMAN-DEFENSIVE-DUEL-CONTROL-acceptance.json"
+}

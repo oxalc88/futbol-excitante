@@ -9,7 +9,7 @@ horizon_id: "defensive-duels-and-organic-duel-closure"
 created_from_commit: 421f98f
 created_at: 2026-08-29
 reason: "Horizon v22 (EXHAUSTED 5/5, remote-durable at 421f98f) closed coherent-match situation localization to 7/8 organically (SHOT_TO_RESULT organic via the 600-tick 5v5 continuous match), leaving PHYSICAL_DUEL as the single disclosed insufficient_context — its indicative kind (input-rejection) is structurally unreachable in organic CPU-vs-CPU play — and no formal tackle actions exist anywhere (TACK-ST-001/TACK-SL-001 stay NOT_EVALUATED UNKNOWN/REGRESSION in the duels suite). A second repaired defect: the pre-existing typecheck failure in src/simulation/loop/simulation.ts (emitted event kinds \"slot-switch\"/\"slot-wiring-violation\" missing from the SimulationEvent.kind union in src/contracts/scenario.ts → 2 TS2322 errors) keeps `pnpm run typecheck`/`test-all` red and masks new type errors. v23 closes both within small-sided bounds: repair the event-kind union; add human standing+sliding tackle actions (ordered prepare-active-recover phases, finite reach/active contact window, recovery cost, no teleport/permanent collider) with browser keys and executable TACK-* HARD_INVARIANT phase criteria in the duels evaluator; extend the team decision profile with CPU defensive tackle commitment (same locomotion/contact model, no omniscience); re-run the situation scanner + SMALL_SIDED_SHAPE reducer on the deepened matches for honest organic PHYSICAL_DUEL closure; and surface a browser controls legend covering the defensive actions. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
-current_index: 1
+current_index: 2
 objectives:
   - id: CORE-EVENT-TYPE-UNION-FIX
     status: accepted
@@ -17,7 +17,7 @@ objectives:
     builder: builder-structured
     prerequisite: ""
   - id: HUMAN-DEFENSIVE-DUEL-CONTROL
-    status: pending
+    status: accepted
     reason: "Add human standing and sliding tackle actions to the playable control stack: new input bits (STANDING_TACKLE_BIT, SLIDE_TACKLE_BIT) bound to browser keys, executed as ordered prepare-active-recover phases with finite reach, contact eligible only inside an explicit active window (no permanent/omnidirectional collider), recovery that prevents instant re-tackle, and no teleport; provisional constants (reach, active-window, recovery, deflection energy) stay labeled unmeasured provisional config. Bind TACK-ST-001-PHASE and TACK-SL-001-PHASE HARD_INVARIANT criteria executably in the duels evaluator (HEADLESS+BROWSER), failing when the action system is stashed. In the coherent 5v5 human-vs-CPU match a human defender tackling the CPU carrier — and a CPU presser contesting a human carrier (human input-rejection) — makes genuine 1v1 duels, including the input-rejection kind, observable organically. Event-centered DYNAMIC_VISUAL + MULTI_TICK evidence (tackle-input tick → active/contact → recovery consequence). No invented PES thresholds, no perceptual rubric."
     builder: builder-gameplay
     prerequisite: CAPABILITY-PHYSICAL-CONTACT

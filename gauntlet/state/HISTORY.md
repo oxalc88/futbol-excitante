@@ -3386,3 +3386,13 @@ All 3 objectives of horizon v17 accepted. Milestone did not pass — honest eval
 - result: accepted
 - commits: 36a2b82 candidate(SMALL-SIDED-SITUATIONS-BATCH-3)
 - notes: Extended fixture: 1 PASS, 7 FAIL. second-touch present but evaluator's isRelevantEvent filtering hides it from indicative kinds — honestly documented. 79/79 regression tests pass. Horizon v17 2/3.
+
+## Iteration — 2026-08-30
+
+- objective_id: HUMAN-DEFENSIVE-DUEL-CONTROL
+- builder: builder-gameplay / qwen3.8-flash
+- critic: critic / deepseek-v4-flash — ACCEPT
+- integration: integration-reviewer / deepseek-v4-flash — ACCEPT
+- result: accepted
+- commits: dc40fd2 candidate(HUMAN-DEFENSIVE-DUEL-CONTROL)
+- notes: Human standing + sliding tackle actions with ordered prepare→active→recover phases, finite reach, active-window-only contact, recovery lock-out, velocity-only effects. Browser keys U/I. 247 tests green, typecheck exit 0, audit PASS. REGRESSION_REPAIR: FOUNDATION_LAB_PASS eval.json superseded (registrySetId 24b5341e, PASS preserved). Critic + integration ACCEPT first pass. Horizon v23 2/5.

@@ -8,12 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: HUMAN-DEFENSIVE-DUEL-CONTROL
+next_objective_id: CPU-DEFENSIVE-TACKLE
 
 best_known:
-  commit: 96dc1b5
-  note: "CORE-EVENT-TYPE-UNION-FIX accepted (Horizon v23 1/5) — repaired 12 pre-existing masked typecheck defects so `pnpm run typecheck` exits 0 across core/node/browser with zero runtime behavior change (2 slot-switch/slot-wiring-violation union TS2322 + 10 eval/runners type-drift errors); binding test 7/7 + ~1100 suite tests + byte-identity gates green; audit PASS; critic + integration ACCEPT; candidate 96dc1b5."
-
+  commit: dc40fd2
+  note: "HUMAN-DEFENSIVE-DUEL-CONTROL accepted (Horizon v23 2/5) — human standing+sliding tackle actions with prepare-active-recover phases, finite reach, active-window contact, recovery lock-out, velocity-only effects, browser keys U/I. Evidence: trajectory.json (121 hashes, 8 tackle-phase events, lockout rejection, 352 contacts), 5 semantic PNG frames (sequence.json, 205x460, event-centered on tick 43). 247 tests green. REGRESSION_REPAIR: FOUNDATION_LAB_PASS eval.json superseded (registrySetId 24b5341e, PASS preserved). Critic + integration ACCEPT."
 active_candidate: null
 builder_in_use: null
 critic_in_use: null
@@ -156,6 +155,7 @@ accepted:
   - SMALL-SIDED-LADDER-MENU-COMPLETION
   - SMALL-SIDED-COHERENT-EVIDENCE-RERUN
   - CORE-EVENT-TYPE-UNION-FIX
+  - HUMAN-DEFENSIVE-DUEL-CONTROL
 
 blocked: []
 
@@ -163,7 +163,7 @@ selection_note: "Horizon v23 (defensive-duels-and-organic-duel-closure) ACTIVE 0
 ```
 ## Last accepted objective
 
-CORE-EVENT-TYPE-UNION-FIX — Repaired ALL pre-existing typecheck defects so `pnpm run typecheck` leaves 0 across core/node/browser (Horizon v23 1/5, zero runtime behavior change). The baseline carried 12 masked type errors at HEAD: (a) `src/simulation/loop/simulation.ts` emits `kind: "slot-switch"` and `kind: "slot-wiring-violation"` but the `SimulationEvent.kind` union in `src/contracts/scenario.ts` lacked both (2 TS2322 at the emit sites), and (b) 10 further pre-existing type-drift errors in `eval/runners/*` (capability-design-eval-runner, playable-evaluator, small-sided-match-situation-scanner, small-sided-profile-reducer, small-sided-situation-evaluator, small-sided-situation-verdict, team-shape-evaluator, team-shape-eval-runner) that the `&&` short-circuit hid because tsconfig.core failed first. Fix: additive union extension (no runtime change) + minimal type-level repairs aligned to the current contracts (e.g. scanner `clusterGap`→`clusterGapTicks` binding rename with zero override callers proven by repo-wide grep; team-shape criteria `evidence` type-member removed to match the byte-verified accepted artifact; profile-reducer `MilestoneProfile` import-path correction; situation-verdict `Set<string>`; capability-design override profile type). New binding test (7/7) compile-guards the union membership + runtime-verifies slot-switch (SWITCH_PLAYER_BIT) and slot-wiring-violation (public setControlledPlayer) emissions with negative controls and determinism. `pnpm run typecheck` exit 0 reproduced independently by critic + integration; ~1100 suite/es tests green (control-slot-routing 45, input-system 40, simulation 22, scanner 31, profile-reducer 24, team-shape 19+21, capability-design 14+12, situation-evaluator 27, BATCH-1/1-RERUN/3/4/5 byte-identity gates 155, playable-evaluator 130, browser player-switch/indicator 15, duels 31, plus event-kind suites); accepted evidence byte-identical and untouched (`git diff HEAD -- docs/` empty). audit PASS (20/20, HEADLESS). The six known pre-existing test-all failures (difficulty-capture, MATCH-SET-PIECE-003, compare-foundation x2, nondeterminism-canary x2) remain unchanged pre-existing in untouched files; the CAPABILITY_DESIGN_PROFILE eval.json byte-drift is disclosed pre-existing (capability-design runner output proven identical before/after the type-only repairs). Critic ACCEPT first pass (independent HEAD-worktree reproduction of the 12 baseline errors; typecheck exit 0; binding discrimination both directions; byte-identical runner outputs); integration ACCEPT first pass (562 tests independently executed; composition clean; no evaluator/oracle weakened; critic actually ran, models differ). Candidate 96dc1b5. Horizon v23 1/5.
+HUMAN-DEFENSIVE-DUEL-CONTROL — Human standing + sliding tackle actions with prepare-active-recover phases, finite reach, active-window contact, recovery lock-out, velocity-only effects, browser keys U/I. Evidence: trajectory.json (121 hashes, 8 tackle-phase events, lockout rejection, 352 contacts), 5 semantic PNG frames (sequence.json, 205x460, event-centered on tick 43). 247 tests green, typecheck exit 0, audit PASS. REGRESSION_REPAIR: FOUNDATION_LAB_PASS eval.json superseded (registrySetId 24b5341e, PASS preserved). Critic + integration ACCEPT first pass.
 
 - builder: builder-structured / deepseek-v4-flash
 - critic: critic / glm5.3-flash — ACCEPT (first pass)
