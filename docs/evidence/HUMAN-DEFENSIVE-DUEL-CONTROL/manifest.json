@@ -5,6 +5,7 @@
   "accepted_at": "2026-08-30T07:18:37.492Z",
   "candidate_commit": "dc40fd2",
   "evidence_class": "DYNAMIC_VISUAL",
+  "builder_models": ["mimo-v2.5", "qwen3.8-flash", "qwen3.6"],
   "evidence": {
     "screenshots": [
       {

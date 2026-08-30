@@ -535,7 +535,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-COHERENT-EVIDENCE-RERUN | qwen3.6 | L | Low — milestone reducer re-run, evidence-bundle only (BOOKKEEPING) | 0 | A | scanner re-run 7/0/1 on both coherent matches; coherent_match_sources updated honestly; PASS preserved via BATCH-5 8/8; bundle 18 sources/17 runs; first-pass clean |
 | CORE-EVENT-TYPE-UNION-FIX | deepseek-v4-flash | L | Low — typecheck repair, type-only (HEADLESS) | 0 | A | union fix + 10 eval/runners type-drift repairs; typecheck exit 0 core/node/browser; ~1100 tests + byte-identity gates; first-pass clean |
 
-| HUMAN-DEFENSIVE-DUEL-CONTROL | qwen3.8-flash | M | Medium — human standing+sliding tackle actions, browser keys U/I, DYNAMIC_VISUAL evidence (HEADLESS+BROWSER) | 0 | A | tackle-system phase machine, oracle, bindings, 247 tests green, typecheck exit 0, audit PASS, FOUNDATION_LAB_PASS eval.json supersession |
+| HUMAN-DEFENSIVE-DUEL-CONTROL | qwen3.8-flash (mimo-v2.5 original; qwen3.6 mid-flight) | M | Medium — original builder mimo-v2.5 (initial tackle system); qwen3.8-flash (caption correction, tests, evidence reconciliation). 247 tests green, typecheck exit 0, audit PASS, FOUNDATION_LAB_PASS eval.json supersession |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |

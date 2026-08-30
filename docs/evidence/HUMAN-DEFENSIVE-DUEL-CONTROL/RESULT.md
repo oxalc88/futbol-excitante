@@ -1,7 +1,8 @@
 ## Builder report
 - objective_id: HUMAN-DEFENSIVE-DUEL-CONTROL
 - builder_agent: builder-gameplay
-- builder_model: MiMo
+- builder_model_original: mimo-v2.5 (original deliverable)
+- builder_model_fix: qwen3.8-flash (caption correction, positive-path tests, capture test reconciliation, evidence regeneration)
 - evidence_class: DYNAMIC_VISUAL + MULTI_TICK
 - hypothesis: Human standing + sliding tackle actions added to the playable control stack with ordered prepare→active→recover phases, finite-reach active-window-only contact, recovery lock-out preventing instant re-tackle, velocity-only effects (no teleport), and full additivity when bits 6/7 are not pressed.
 - files_changed:
