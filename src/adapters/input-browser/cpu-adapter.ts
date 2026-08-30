@@ -36,15 +36,38 @@
  *  - OFFBALL_FORWARD_PUSH_BASE, ATTACK_PHASE_FORWARD_MULTIPLIER_*
  *  - CYCLING_HALF_PERIOD, CYCLING_AMPLITUDE
  *  - PRESS_RADIUS, MARKING_DISTANCE, PRESS_STRENGTH
+ *  - CPU defensive-tackle decision thresholds: FOUNDATION_CPU_TACKLE_V1
  */
 
 import type { InputFrame } from "../../contracts/input.js";
-import { FIRST_TOUCH_BIT, PASS_BIT, SHOT_BIT } from "../../contracts/input.js";
+import {
+  FIRST_TOUCH_BIT,
+  PASS_BIT,
+  SHOT_BIT,
+  STANDING_TACKLE_BIT,
+  SLIDE_TACKLE_BIT,
+} from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
+import {
+  FOUNDATION_CPU_TACKLE_V1,
+  FOUNDATION_TACKLE_V1,
+} from "../../simulation/config/foundation.js";
 import { teamHasPossession } from "./team-decision-profile.js";
 import type { TeamDecision } from "./team-decision-profile.js";
-export type { TeamDecision, DefensiveSubMode } from "./team-decision-profile.js";
-export { computeTeamDecision, getBallZone, teamHasPossession } from "./team-decision-profile.js";
+export type {
+  TeamDecision,
+  DefensiveSubMode,
+  CpuTackleCommit,
+  CpuTackleKind,
+  CpuTackleEvaluation,
+  TackleWithheldReason,
+} from "./team-decision-profile.js";
+export {
+  computeTeamDecision,
+  getBallZone,
+  teamHasPossession,
+  evaluateCpuTackleCommit,
+} from "./team-decision-profile.js";
 
 // ---------------------------------------------------------------------------
 // Mechanism activation tracking (SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH)
@@ -60,6 +83,15 @@ export { computeTeamDecision, getBallZone, teamHasPossession } from "./team-deci
  */
 let _coverMechanismActivations = 0;
 let _supportMechanismActivations = 0;
+
+/**
+ * Module-level counter incremented every time a CPU adapter actually presses a
+ * defensive tackle bit (CPU-DEFENSIVE-TACKLE). Read by the reachability guard:
+ * stash the tackle press path and the counter stays 0 while the match still
+ * runs, which is what proves the observed CPU tackles come from this decision
+ * path rather than from a scripted input.
+ */
+let _cpuTackleCommits = 0;
 
 /**
  * Get the total cover mechanism activation count across all adapter instances.
@@ -78,12 +110,21 @@ export function getSupportMechanismActivations(): number {
 }
 
 /**
+ * Total number of defensive tackle presses actually issued by CPU adapters
+ * (CPU-DEFENSIVE-TACKLE reachability guard).
+ */
+export function getCpuTackleCommitActivations(): number {
+  return _cpuTackleCommits;
+}
+
+/**
  * Reset all mechanism activation counters to 0.
  * Call before each test run for clean measurement.
  */
 export function resetMechanismCounters(): void {
   _coverMechanismActivations = 0;
   _supportMechanismActivations = 0;
+  _cpuTackleCommits = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -316,6 +357,25 @@ export interface CpuObservation {
    * Provisional — not a measured PES 2017 concept.
    */
   difficulty?: DifficultyLevel;
+
+  // -----------------------------------------------------------------
+  // Defensive tackle authority (CPU-DEFENSIVE-TACKLE)
+  // -----------------------------------------------------------------
+
+  /**
+   * Whether this CPU slot's controller exposes the defensive tackle buttons at
+   * all — the same bits a human reaches through the keyboard bindings. It is an
+   * input-device capability, not a knowledge advantage: with the flag absent or
+   * false the adapter emits exactly the frames it emitted before CPU tackling
+   * existed (byte-identical), which is the tackle-free control shape the
+   * strictly-additive baselines pin. With it true the adapter may press
+   * STANDING_TACKLE_BIT / SLIDE_TACKLE_BIT when, and only when, the shared
+   * team authorisation (`teamDecision.tackleCommit`) names this player and the
+   * observed geometry justifies the commit.
+   *
+   * Provisional — not a measured PES 2017 concept.
+   */
+  cpuDefensiveTackle?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -506,6 +566,21 @@ interface CpuInternalState {
   fatigueTicks: number;
   /** The last observed currentHalf, used to detect half transitions for reset. */
   lastCurrentHalf: number;
+
+  // --- Defensive tackle commitment (CPU-DEFENSIVE-TACKLE) ---
+  /**
+   * Consecutive ticks the team's tackle authorisation has named this player.
+   * The press only becomes legal once it reaches the provisional reaction
+   * latency, so the CPU never acts on the first tick the geometry appears.
+   */
+  tackleHoldTicks: number;
+  /**
+   * Tick at which this body's own tackle attempt is released. Self-knowledge of
+   * the action's prepare→active→recover commitment (the same versioned windows
+   * the tackle system executes), used to avoid spamming presses into the
+   * lock-out window. 0 while no attempt is outstanding.
+   */
+  tackleReleaseTick: number;
 }
 
 /**
@@ -1747,6 +1822,8 @@ export function createCpuAdapter(): CpuAdapter {
     isOverlapping: false,
     fatigueTicks: 0,
     lastCurrentHalf: 1,
+    tackleHoldTicks: 0,
+    tackleReleaseTick: -1,
   };
 
   return {
@@ -2637,6 +2714,56 @@ export function createCpuAdapter(): CpuAdapter {
         heldButtons |= (!ballInRange || inCooldown)
           ? 0
           : FIRST_TOUCH_BIT;
+
+        // ----------------------------------------------------------------
+        // Defensive tackle commitment (CPU-DEFENSIVE-TACKLE)
+        // ----------------------------------------------------------------
+        // The authorisation is the shared per-team signal computed from the
+        // observation; this slot acts on it only when its own controller
+        // exposes the defensive buttons (the same bits a human reaches through
+        // the keyboard bindings). Nothing outside the observation is read, and
+        // the press is the adapter's only effect — the action system owns the
+        // resulting commitment, contact window and recovery cost.
+        const tackleCommit = observation.cpuDefensiveTackle
+          ? observation.teamDecision?.tackleCommit ?? null
+          : null;
+        const authorised =
+          tackleCommit !== null &&
+          observation.controlledPlayerId !== undefined &&
+          tackleCommit.playerId === observation.controlledPlayerId;
+        state.tackleHoldTicks = authorised ? state.tackleHoldTicks + 1 : 0;
+
+        // Gathering a loose ball beats lunging at it: the tick this body wins a
+        // first touch, the tackle press is dropped instead of trading the touch
+        // for a self-denial.
+        const takingTouch = (pressedButtons & FIRST_TOUCH_BIT) !== 0;
+        // Self-knowledge of the attempt's own declared windows: the action
+        // system releases on startTick + prepare + active + recover, and a
+        // press before then is only ever a lock-out rejection. The recommit is
+        // held to strictly after the release tick, so the CPU never re-presses
+        // on the tick the body comes off the ground.
+        const ownAttemptReleased = tick > state.tackleReleaseTick;
+        if (
+          authorised &&
+          ownAttemptReleased &&
+          !takingTouch &&
+          state.tackleHoldTicks >= FOUNDATION_CPU_TACKLE_V1.reactionTicks.value
+        ) {
+          const standing = tackleCommit!.kind === "standing";
+          const bits = standing ? STANDING_TACKLE_BIT : SLIDE_TACKLE_BIT;
+          pressedButtons |= bits;
+          heldButtons |= bits;
+          const commitmentTicks = standing
+            ? FOUNDATION_TACKLE_V1.standingPrepareTicks.value +
+              FOUNDATION_TACKLE_V1.standingActiveTicks.value +
+              FOUNDATION_TACKLE_V1.standingRecoverTicks.value
+            : FOUNDATION_TACKLE_V1.slidePrepareTicks.value +
+              FOUNDATION_TACKLE_V1.slideActiveTicks.value +
+              FOUNDATION_TACKLE_V1.slideRecoverTicks.value;
+          state.tackleReleaseTick = tick + commitmentTicks;
+          state.tackleHoldTicks = 0;
+          _cpuTackleCommits++;
+        }
       }
 
       // Track shot firing for cooldown state update.
@@ -2690,6 +2817,8 @@ export function createCpuAdapter(): CpuAdapter {
       state.isOverlapping = false;
       state.fatigueTicks = 0;
       state.lastCurrentHalf = 1;
+      state.tackleHoldTicks = 0;
+      state.tackleReleaseTick = -1;
     },
   };
 }

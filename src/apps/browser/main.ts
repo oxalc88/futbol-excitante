@@ -580,6 +580,9 @@ function startMatch(
           const obs = buildCpuObservation(snapshot, tid, controlledPlayerId);
           obs.difficulty = difficulty;
           obs.teamDecision = teamDecisions.get(tid);
+          // This CPU controller exposes the defensive tackle buttons, exactly as
+          // the human keyboard binding does (CPU-DEFENSIVE-TACKLE).
+          obs.cpuDefensiveTackle = true;
           const cpuFrame = cpuAd.sample(sim.tick, obs);
           cpuFrame.controlSlot = controlSlot;
           allFrames.push(cpuFrame);
@@ -587,6 +590,7 @@ function startMatch(
       } else if (cpuAdapter) {
         const obs = buildCpuObservation(sim.snapshot(), cpuTeamId, cpuControlledPlayerId);
         obs.difficulty = difficulty;
+        obs.cpuDefensiveTackle = true;
         const cpuFrame = cpuAdapter.sample(sim.tick, obs);
         allFrames.push(cpuFrame);
       }

@@ -1,0 +1,70 @@
+## Builder report
+- objective_id: CPU-DEFENSIVE-TACKLE
+- builder_agent: builder-gameplay
+- builder_model: qwen3.8-flash
+- evidence_class: MULTI_TICK
+- hypothesis: CPU defenders commit to standing/sliding tackles through the accepted team-decision profile, using the same action system as human tackles — no omniscience (only CpuObservation fields), geometric/temporal justification, commitment binding (recovery cost), organic 3v3/5v5 CPU-vs-CPU play with genuine tackle duels and ball-competition outcomes, reachability guard (stashing decision → zero presses), and honest PHYSICAL_DUEL disclosure via the accepted situation scanner.
+- files_changed:
+  - src/simulation/config/foundation.ts (FOUNDATION_CPU_TACKLE_V1 — new provisional config)
+  - src/adapters/input-browser/team-decision-profile.ts (evaluateCpuTackleCommit added to team-decision profile; TeamDecision gains tackleCommit/tackleWithheld)
+  - src/adapters/input-browser/cpu-adapter.ts (CpuObservation.cpuDefensiveTackle capability flag; adapter press counter; self-hold recommit avoidance)
+  - src/apps/browser/main.ts (every CPU slot gets defensive tackle buttons)
+  - eval/runners/headless-match.ts (cpuDefensiveTackle config toggle, default false for backward compat)
+  - eval/runners/cpu-tackle-match.ts (NEW — runCpuTackleMatch with attempt reconstruction)
+  - scripts/capture-cpu-defensive-tackle-evidence.ts (NEW — trajectory producer)
+  - tests/unit/cpu-adapter/cpu-defensive-tackle.test.ts (NEW — 21 tests)
+  - tests/unit/eval/CPU-DEFENSIVE-TACKLE-binding.test.ts (NEW — 16 tests)
+  - tests/browser/cpu-tackle-screenshot-capture.browser.test.ts (NEW — browser capture)
+  - eval/scenarios/frame-tick-offsets.ts (TACK offset imports)
+  - package.json (capture-cpu-tackle-evidence + capture-cpu-tackle-frames commands)
+- commands_run:
+  - `pnpm run typecheck`: exit_code 0 (core + node + browser)
+  - `npx vitest run tests/unit/eval/duels-suite.test.ts tests/unit/eval/HUMAN-DEFENSIVE-DUEL-CONTROL-binding.test.ts tests/unit/eval/no-tackle-additivity.test.ts tests/unit/cpu-adapter/cpu-defensive-tackle.test.ts tests/unit/eval/CPU-DEFENSIVE-TACKLE-binding.test.ts --testTimeout 120000`: exit_code 0 (99 passed)
+  - `npx vitest run --project node tests/unit/cpu tests/unit/cpu-adapter tests/unit/contacts tests/unit/scenario`: exit_code 0 (38 files, 844 tests)
+  - `npx vitest run --project browser tests/browser/cpu-tackle-screenshot-capture.browser.test.ts tests/browser/5v5-ai-match.browser.test.ts tests/browser/human-vs-cpu-5v3.browser.test.ts`: exit_code 0 (19 tests)
+  - `pnpm run gauntlet:audit -- --objective CPU-DEFENSIVE-TACKLE --class MULTI_TICK --tests-pass true --integration-test-pass true`: exit_code 0 (all checks PASS)
+  - `pnpm run build`: exit_code 0
+  - `pnpm run sim-smoke`: exit_code 0
+- tests_run:
+  - cpu-defensive-tackle.test.ts: 21 passed (commit justification, standing-preferred, slide-last-resort, one-tackler-per-tick, purity/observation-only, adapter press/latency/no-repress-in-commitment)
+  - CPU-DEFENSIVE-TACKLE-binding.test.ts: 16 passed (organic attempts, ball-competition, protected criteria PASS on CPU, declared-window conformance, reachability guard FAIL, scanner honesty)
+  - 3v3-situation-driven + situation-fixtures: 91 passed (scanner localization)
+  - browser capture: 2 passed (event-centered 5-frame capture)
+  - duels-suite.test.ts: 39 passed (pre-existing, untouched)
+  - HUMAN-DEFENSIVE-DUEL-CONTROL-binding.test.ts: 18 passed (pre-existing, untouched)
+  - no-tackle-additivity.test.ts: 5 passed (byte-identical with cpuDefensiveTackle off)
+- integration_test_result: PASS (binding test proves organic CPU attempts in 3v3/5v5 CPU-vs-CPU, ball-competition outcomes, reachability guard, commitment binding, protected criteria PASS on CPU-only)
+- slot_wiring_result: NOT_APPLICABLE (slot→player fidelity still pinned; every recorded attempt traces to a tackle bit on that control slot's committed InputFrame via cpuIssued; press records carry controlSlot)
+- required_evidence:
+  - docs/evidence/CPU-DEFENSIVE-TACKLE/trajectory.json (304 KB: 3 pinned runs — 2 hash-bound 600-tick runs + 1 extended 1800-tick run; per-tick state hashes; attempt records with declared windows, contacts, outcomes, recovery cost; press log; PHYSICAL_DUEL scan with honest disclosure)
+  - docs/screenshots/CPU-DEFENSIVE-TACKLE/sequence.json (5 labeled semantic frames with pairwise-unique SHA-256)
+  - docs/screenshots/CPU-DEFENSIVE-TACKLE/cpu-tack-{before,commit,active,outcome,recovery}.png (real browser-rendered 800×600 PNGs via WIP_SECTION capture; 5v5 CPU-vs-CPU match, event-centered on CPU player-4 standing tackle)
+  - docs/evidence/CPU-DEFENSIVE-TACKLE/audit.json (audit PASS)
+- spec_sections:
+  - src/simulation/config/foundation.ts (FOUNDATION_CPU_TACKLE_V1)
+  - src/adapters/input-browser/team-decision-profile.ts (evaluateCpuTackleCommit)
+  - src/adapters/input-browser/cpu-adapter.ts (CpuObservation.cpuDefensiveTackle)
+  - tests/unit/cpu-adapter/cpu-defensive-tackle.test.ts
+  - tests/unit/eval/CPU-DEFENSIVE-TACKLE-binding.test.ts
+  - docs/evidence/CPU-DEFENSIVE-TACKLE/trajectory.json
+- acceptance_criteria_met:
+  - CPU defenders commit standing/sliding tackles only under geometric/temporal justification via the same locomotion/contact model (same action system as human tackles)
+  - No omniscience: decision consumes only CpuObservation fields; source guards forbid simulation world state imports; unobserved extras provably change nothing; reaction latency + committed-cover projection prevent instant/privileged commits
+  - Commitment binds: full prepare→active→recover→release paid, no re-commit before release (strictly after), recovery speed cap observed, ground conceded on beaten duels
+  - Integrated into coherent 3v3/5v5 CPU-vs-CPU continuous play with organic tackle actions and ball-competition outcomes
+  - Reachability HARD_INVARIANT guard: tackle-free control shape yields zero tackles/contacts/presses and turns protected criteria FAIL; adapter press counter is 0 on control
+  - MULTI_TICK trajectory with per-tick phases/contact/outcome; provisional parameters versioned and labelled with BLOCKED_MISSING_REFERENCE
+  - Protected TACK-ST-001-PHASE and TACK-SL-001-PHASE PASS on CPU-only observations
+  - PHYSICAL_DUEL scanner honest disclosure: insufficient_context (required kind produced by genuine CPU duels; indicative input-rejection still needs human)
+- known_gaps:
+  - PHYSICAL_DUEL remains insufficient_context: the required kind (player-player-contact from tackle duels) is now produced; the indicative kind (input-rejection) is 0 in all pinned CPU-vs-CPU runs — organic closure of the input-rejection kind still requires a human input (or coincident CPU ball-action press). Left for horizon 4/5.
+  - No zero-contact CPU miss was observed in the pinned windows (a justifiable commit normally wins or contests the ball); missed-challenge cost is evidenced by beaten duels (duel-contact-only, duelWon: false) that pay the full recovery window and concede ground.
+  - Activation is an explicit input-device flag (CpuObservation.cpuDefensiveTackle, absent ⇒ byte-identical legacy frames). On in browser composition root and pinned runs; off in previously accepted CPU-vs-CPU baselines (no-tackle-additivity 340/300-tick runs, the HUMAN negative control).
+  - Screenshot directory: evidence at docs/screenshots/CPU-DEFENSIVE-TACKLE/ (objective-id path). Chromium render ticks are not hash-comparable to the Node-pinned trajectory (known pinned-runtime gap).
+  - 5v5 shows no missed tackles; 3v3 does. 3v3 extended (1800 ticks) records attempts without state hashes — supplementary; the two 600-tick hash-bound runs remain the binding ones.
+- claims_not_made:
+  - No PES 2017 fidelity, calibration or measured envelope for any CPU tackle threshold
+  - No FOUNDATION_LAB_PASS, milestone or regression PASS claim
+  - No claim that PHYSICAL_DUEL is organically present (honestly disclosed insufficient_context)
+  - No claim that pinned-runtime determinism is closed
+  - No claim that the CPU ever "reads" hidden possession/tackle state — it presses bits and the action system decides contact

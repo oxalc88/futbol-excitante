@@ -325,6 +325,80 @@ export const FOUNDATION_TACKLE_V1 = {
 /** Tackle configuration type. */
 export type TackleConfig = typeof FOUNDATION_TACKLE_V1;
 
+/**
+ * Provisional CPU defensive-tackle decision coefficients.
+ *
+ * Every value is provisional — hand-tuned for laboratory testing only.
+ * No PES 2017 calibration claim is made and no measured reference envelope
+ * exists for these numbers (`BLOCKED_MISSING_REFERENCE` for any PES target).
+ *
+ * These are decision thresholds for a CPU defender reading its own
+ * observation: how long the geometry must hold before the CPU is allowed to
+ * react, how much slack inside the action's reach a commit still needs, and
+ * when an opponent is close enough to the ball for the challenge to be a duel
+ * rather than a lunge at loose leather. The action geometry itself — reach,
+ * phase windows, forward contact cone, slide lunge speed — is never duplicated
+ * here: the decision reads `FOUNDATION_TACKLE_V1`, the same versioned
+ * declaration the tackle system executes, so a CPU can only ever commit to
+ * what its own body can actually do.
+ */
+export const FOUNDATION_CPU_TACKLE_V1 = {
+  id: "foundation-cpu-tackle-v1",
+  label: "provisional",
+  /**
+   * Consecutive ticks the commit geometry must stay satisfied before a CPU is
+   * allowed to press a tackle bit. Provisional perception/reaction latency:
+   * without it a CPU would act on the exact tick the geometry first appears.
+   */
+  reactionTicks: { value: 3, unit: "ticks", note: "provisional CPU defensive reaction latency" },
+  /**
+   * Metres of slack kept inside the action's declared reach when predicting the
+   * target position, so a commit is never balanced on the reach boundary.
+   */
+  commitMargin: { value: 0.3, unit: "m", note: "provisional in-reach safety margin" },
+  /**
+   * Planar distance (metres) within which the nearest opposing player counts as
+   * the ball's carrier for a contested challenge. Provisional; matches the
+   * order of the observation-level possession radius, not a measured value.
+   */
+  carrierContestDistance: { value: 2.5, unit: "m", note: "provisional ball-carrier contest radius" },
+  /**
+   * Whether a CPU may commit the long-recovery slide anywhere, or only as a
+   * last resort inside its own third. Provisional risk gate: the slide costs
+   * `slideRecoverTicks` of capped movement, so committing it in the opponent's
+   * third would open the return lane for no defensive benefit.
+   */
+  slideOwnThirdOnly: { value: true, note: "provisional risk gate on the long slide recovery" },
+  /**
+   * Speed (m/s) at which the defender→ball gap must be growing before a CPU
+   * trades the cheap standing challenge for the long-recovery slide. If the
+   * gap is not opening, running on and standing-tackling later is the
+   * temporally justified choice, so the slide stays a stretch for a carrier
+   * that is getting away.
+   */
+  slideEscapeSpeed: {
+    value: 0.5,
+    unit: "m/s",
+    note: "provisional gap-opening rate that justifies the slide commitment",
+  },
+  /**
+   * Roles allowed to commit a defensive tackle. Provisional team-role policy:
+   * attackers stay forward and are not given the defensive commit.
+   */
+  committingRoles: {
+    value: ["defender", "midfielder"] as ReadonlyArray<"defender" | "midfielder">,
+    note: "provisional role gate for defensive tackle commitment",
+  },
+  /**
+   * Body speed (m/s) below which a stationary defender orients its commit from
+   * `bodyHeading` instead of its velocity direction. Provisional epsilon.
+   */
+  orientationSpeedEpsilon: { value: 0.1, unit: "m/s", note: "provisional still-orientation threshold" },
+} as const;
+
+/** CPU defensive-tackle configuration type. */
+export type CpuTackleConfig = typeof FOUNDATION_CPU_TACKLE_V1;
+
 // -- Player-player contact (provisional) --------------------------------------
 
 /**

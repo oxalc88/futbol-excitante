@@ -111,6 +111,13 @@ export interface HeadlessMatchConfig {
    * profiles, false for LABORATORY profile.
    */
   autoGoalReset?: boolean;
+  /**
+   * Give every CPU slot the defensive tackle buttons (CPU-DEFENSIVE-TACKLE).
+   * Same semantics as the browser composition root: it is an input-device
+   * capability, not extra knowledge. Default false, which reproduces the
+   * tackle-free control shape the strictly-additive baselines pin.
+   */
+  cpuDefensiveTackle?: boolean;
 }
 
 /**
@@ -436,6 +443,7 @@ export function runHeadlessMatch(
     observer,
     goalTeamMapping = DEFAULT_GOAL_TEAM_MAPPING,
     autoGoalReset,
+    cpuDefensiveTackle = false,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
 
@@ -616,6 +624,10 @@ export function runHeadlessMatch(
       teamObs.scoreDifferential = cpuGoals - opponentGoals;
       // Inject the precomputed team decision for coordinated behavior.
       teamObs.teamDecision = teamDecisions.get(teamId);
+      // CPU-DEFENSIVE-TACKLE: give the slot's controller the tackle buttons.
+      if (cpuDefensiveTackle) {
+        teamObs.cpuDefensiveTackle = true;
+      }
 
       const frame = adapter.sample(tick, teamObs);
       frame.controlSlot = controlSlot;

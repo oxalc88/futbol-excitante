@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "objective_id": "CPU-DEFENSIVE-TACKLE",
+  "evidence_class": "MULTI_TICK",
+  "semantic_order": "approach → CPU commit → active window → contact/outcome → recovery",
+  "durable_capture": true,
+  "scenario": "3v3-press-scenario-v1",
+  "cpu_attempt": {
+    "player_id": "player-4",
+    "team_id": "team-b",
+    "kind": "standing",
+    "start_tick": 92,
+    "active_window": [
+      94,
+      97
+    ],
+    "contact_tick": 94,
+    "recover_tick": 98,
+    "release_tick": 110,
+    "reach": 1.6
+  },
+  "reproduction": {
+    "capture_test": "tests/browser/cpu-tackle-screenshot-capture.browser.test.ts",
+    "wiring": "src/apps/browser/main.ts per-slot CPU composition root with CpuObservation.cpuDefensiveTackle",
+    "scenario_path": "eval/scenarios/3v3-press-scenario.v1.json",
+    "play_ticks": 400,
+    "pinned_trajectory": "docs/evidence/CPU-DEFENSIVE-TACKLE/trajectory.json"
+  },
+  "cross_runtime_note": "Ticks are the Chromium run's own. The pinned Node trajectory in docs/evidence/CPU-DEFENSIVE-TACKLE/trajectory.json records the same attempt structure; per-tick hashes are not comparable across runtimes (known pinned-runtime gap).",
+  "frames": [
+    {
+      "index": 1,
+      "label": "cpu-tack-before",
+      "tick": 78,
+      "description": "Approach: the CPU presser is closing on the opposing carrier and has committed to nothing yet",
+      "path": "cpu-tack-before.png",
+      "sha256": "23faeff9929966e446c391fe10bff4e497a6d84e762faff937378bb4e0d13afe"
+    },
+    {
+      "index": 2,
+      "label": "cpu-tack-commit",
+      "tick": 92,
+      "description": "CPU commit: the team-decision profile authorised this standing tackle (prepare; reaction latency 3 ticks)",
+      "path": "cpu-tack-commit.png",
+      "sha256": "3ca934b3416ee0a39d938bf070f374a33ab7404046061b55c175b8402c954a6e"
+    },
+    {
+      "index": 3,
+      "label": "cpu-tack-active",
+      "tick": 94,
+      "description": "Active window opens at commit + 2: finite reach 1.6 m contact becomes eligible in the committed cone",
+      "path": "cpu-tack-active.png",
+      "sha256": "be9085b6f1738b58da0e359aa57d6f58eddb011beb6e15322724aba3b4c44a8f"
+    },
+    {
+      "index": 4,
+      "label": "cpu-tack-outcome",
+      "tick": 96,
+      "description": "Outcome: active-window tackle contact resolved (velocity-only deflection / separation impulse) and play continues past the beaten carrier",
+      "path": "cpu-tack-outcome.png",
+      "sha256": "c3792d8333160c34ae2f8412c05b3aa98e5eda28e23c137d28b540567b9f6b00"
+    },
+    {
+      "index": 5,
+      "label": "cpu-tack-recovery",
+      "tick": 102,
+      "description": "Recovery: the committed body is still capped and locked out, so the challenge cannot be instantly re-tried",
+      "path": "cpu-tack-recovery.png",
+      "sha256": "a91d522cea7e36aa2bde32ce6518777c7f51a0955194de785a8b74b5ee6ad9af"
+    }
+  ]
+}
