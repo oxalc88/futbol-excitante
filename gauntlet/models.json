@@ -1,5 +1,5 @@
 {
-  "version": "gauntlet-models-v6",
+  "version": "gauntlet-models-v7",
   "notes": "Role names describe responsibilities; model selection is routing. Keep this file aligned with the agent model declarations used by the Gauntlet. See gauntlet/README.md.",
   "roles": {
     "orchestrator": {
