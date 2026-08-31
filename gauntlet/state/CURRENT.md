@@ -8,11 +8,11 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: SMALL-SIDED-ORGANIC-DUEL-CLOSURE
+next_objective_id: BROWSER-DEFENSIVE-CONTROLS-LEGEND
 
 best_known:
-  commit: 569da80
-  note: "CPU-DEFENSIVE-TACKLE accepted (Horizon v23 3/5) — CPU defensive tackle committed to team-decision profile (no omniscience, geometric/temporal justification, commitment binding). PHYSICAL_DUEL honest disclosure (insufficient_context). 99 tests green, typecheck exit 0, audit PASS. Critic + integration ACCEPT."
+  commit: 7697bd3
+  note: "SMALL-SIDED-ORGANIC-DUEL-CLOSURE accepted (Horizon v23 4/5) — BOOKKEEPING: re-scanned 5v5/3v3 with CPU tackle live. PHYSICAL_DUEL honest insufficient_context. BATCH-5 decisive → milestone PASS preserved. Bundle fully repaired (playtest materialized, source_objectives corrected, latest_playtest_result updated). 185 suites pass, typecheck 0, build 0. CRITIC: ACCEPT first pass (independent mimo-v2.5)."
 active_candidate: null
 builder_in_use: null
 critic_in_use: null
@@ -157,20 +157,21 @@ accepted:
   - CORE-EVENT-TYPE-UNION-FIX
   - HUMAN-DEFENSIVE-DUEL-CONTROL
   - CPU-DEFENSIVE-TACKLE
+  - SMALL-SIDED-ORGANIC-DUEL-CLOSURE
 
 blocked: []
 
 selection_note: "Horizon v23 (defensive-duels-and-organic-duel-closure) ACTIVE 0/5 — created 2026-08-29 after horizon v22 exhaustion (5/5) and verified remote durability of the final acceptance commit 421f98f (origin/main contains it; push d653ce3..421f98f). Reassessment selected five objectives within small-sided bounds: (1) CORE-EVENT-TYPE-UNION-FIX — repair ALL pre-existing typecheck defects so `pnpm run typecheck` exits 0: the slot-switch / slot-wiring-violation kinds missing from the SimulationEvent.kind union in src/contracts/scenario.ts (2 TS2322, masked at baseline by the && short-circuit), plus the 10 further masked pre-existing node-project errors in eval/runners/* (type-drift repairs, zero runtime change); (2) HUMAN-DEFENSIVE-DUEL-CONTROL — human standing+sliding tackles as ordered prepare-active-recover phases (finite reach, active-window contact, recovery cost, no teleport/permanent collider), new input bits bound to browser keys, executable TACK-ST/SL-001-PHASE HARD_INVARIANT criteria in the duels evaluator, event-centered DYNAMIC_VISUAL+MULTI_TICK evidence, making the input-rejection duel kind organically observable vs a CPU presser; (3) CPU-DEFENSIVE-TACKLE — same action system consumed by team-decision profile (commitment/risk/recovery, no omniscience, reachability guard), organic tackle events in coherent CPU-vs-CPU play, scanner PHYSICAL_DUEL advancement (honest); (4) SMALL-SIDED-ORGANIC-DUEL-CLOSURE — BOOKKEEPING scanner+reducer re-run updating coherent_match_sources honestly and superseding the milestone bundle; (5) BROWSER-DEFENSIVE-CONTROLS-LEGEND — controls legend + parity guard, BROWSER_VISIBLE. Horizon v23 1/5 accepted (CORE-EVENT-TYPE-UNION-FIX, candidate 96dc1b5, critic+integration ACCEPT) — next objective: HUMAN-DEFENSIVE-DUEL-CONTROL (builder-gameplay). GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
 ```
 ## Last accepted objective
-CPU-DEFENSIVE-TACKLE — CPU defensive tackle committed to team-decision profile (no omniscience, geometric/temporal justification, commitment binding). PHYSICAL_DUEL honest disclosure (insufficient_context). 99 tests green, typecheck exit 0, audit PASS. Critic + integration ACCEPT first pass. Horizon v23 3/5.
+SMALL-SIDED-ORGANIC-DUEL-CLOSURE — BOOKKEEPING: re-scanned 5v5/3v3 with CPU tackle active. PHYSICAL_DUEL honest insufficient_context. BATCH-5 decisive → milestone PASS preserved. Bundle fully repaired (playtest materialized, source_objectives corrected, latest_playtest_result updated). 185 suites pass, typecheck 0, build 0. CRITIC: ACCEPT first pass (independent mimo-v2.5). INTEGRATION: ACCEPT first pass. Horizon v23 4/5.
 HUMAN-DEFENSIVE-DUEL-CONTROL — Human standing + sliding tackle actions with prepare-active-recover phases, finite reach, active-window contact, recovery lock-out, velocity-only effects, browser keys U/I. Evidence: trajectory.json (121 hashes, 8 tackle-phase events, lockout rejection, 352 contacts), 5 semantic PNG frames (sequence.json, 205x460, event-centered on tick 43). 247 tests green, typecheck exit 0, audit PASS. REGRESSION_REPAIR: FOUNDATION_LAB_PASS eval.json superseded (registrySetId 24b5341e, PASS preserved). Critic + integration ACCEPT first pass.
 
 - builder: builder-structured / deepseek-v4-flash
-- critic: critic / glm5.3-flash — ACCEPT (first pass)
-- integration: integration-reviewer / glm5.3-flash — ACCEPT (first pass)
-- Evidence: durable acceptance manifest + record (2026-08-29T22:46:08Z); deterministic audit PASS
-- Candidate: 96dc1b5
+- critic: critic / mimo-v2.5 — ACCEPT (first pass)
+- integration: integration-reviewer / mimo-v2.5 — ACCEPT (first pass)
+- Evidence: durable acceptance manifest + record (2026-08-30T17:03:57Z); deterministic audit PASS
+- Candidate: 7697bd3
 
 Previously accepted:
 SMALL-SIDED-COHERENT-EVIDENCE-RERUN — BOOKKEEPING closure of the deepened coherent evidence (Horizon v22 5/5, horizon COMPLETE). Re-ran the accepted situation scanner + SMALL_SIDED_SHAPE milestone reducer on the deepened coherent matches and updated the coherent_match_sources block honestly: both the 600-tick 5v5-continuous-play match (437 events) and the 3v3 press match (320 events) scan 7 present / 0 not_observed / 1 insufficient_context (PHYSICAL_DUEL — genuine, input-rejection structurally unreachable in organic CPU-vs-CPU play; critic independently reproduced the numbers byte-identically). SHOT_TO_RESULT present organically (ball-out-of-play/goal/pitch-contact/shot); human-driven action observability from v22-2 (DYNAMIC_VISUAL) noted in evidence.human_action_observability as OBSERVABILITY evidence for action_recognition — explicitly NOT a situation presence claim. SMALL_SIDED_SHAPE milestone PASS preserved honestly: BATCH-5 8/8 driven fixtures remain the decisive source; reducer overallVerdict PASS from real evaluators (no overrides); MUTANT_TEAM_PASS + TEAM_SHAPE_SUITE_PASS exit prereqs pass; entry prereqs pass. Evidence-bundle only — `git diff --stat src/ eval/scenarios/ specs/ eval/runners/` EMPTY (zero gameplay/source change; the entire delta is evidence + a binding test + the regenerated bundle). New playtest record docs/evidence/milestones/SMALL_SIDED_SHAPE/playtests/2026-08-26T14-00-00.000Z.json (milestone_verdict PASS, decision milestone_verdict_ready, honest coherent_match_sources block with per-match scan_summary + per-situation presence maps). Milestone bundle superseded to 17 runs / 18 sources (superseded manifest 13-44-13 preserves the prior 17-source/16-playtest state byte-identically; rebuilt after persist so the v22-5 source entry carries the authoritative candidate b7397ff + accepted_at; final superseded manifest 14-20-30 preserves the interim 18-source state). New binding test (SMALL-SIDED-COHERENT-EVIDENCE-RERUN-binding 8/8) locks the record structure; 109 neighbor/evaluator tests exit 0 (PROFILE-REDUCER 24, BATCH-5 19, CONTINUOUS-DUEL 7, EXIT-PREREQ 20, SCANNER 31, +8). audit PASS (BOOKKEEPING); RESULT.md claims_not_made (no NEW milestone PASS beyond the pre-existing honest one; no PROMOTION / PES fidelity / FOUNDATION_LAB_PASS / invented rubric; superseded-manifest filename refs corrected to the actual 13-44-13 file). Critic ACCEPT first pass (independent scanner re-run byte-identical + reducer verified from real evaluators); integration ACCEPT first pass (zero source change holds, bundle 18/17 coherent, no evaluator/scanner/reducer weakened). Horizon v22 COMPLETE 5/5 — strategic reassessment next.

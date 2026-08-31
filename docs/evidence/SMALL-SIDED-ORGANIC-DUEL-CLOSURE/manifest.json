@@ -3,7 +3,7 @@
   "gauntlet_version": "0.9.4",
   "objective_id": "SMALL-SIDED-ORGANIC-DUEL-CLOSURE",
   "accepted_at": "2026-08-30T17:03:57.667Z",
-  "candidate_commit": "43fa34d",
+  "candidate_commit": "7697bd3",
   "evidence_class": "BOOKKEEPING",
   "evidence": {
     "screenshots": [],
@@ -13,7 +13,7 @@
       "path": "docs/evidence/SMALL-SIDED-ORGANIC-DUEL-CLOSURE/audit.json",
       "sha256": "94d1ea030ec2b2a500c935fbb14d37b7d84c264d3aa234201982a4d847aa923b",
       "git_blob": "65c3258a4f2d1d60d801cefc7b366883cf3d398d",
-      "candidate_commit": "43fa34d",
+      "candidate_commit": "7697bd3",
       "bytes": 2703,
       "committed_with_candidate": true
     },
