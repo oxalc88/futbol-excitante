@@ -220,11 +220,11 @@ Unattended Gauntlet is the intended mode.
 ## Change model routing later
 
 1. Edit `gauntlet/models.json` and increment its routing-generation version when the effective mapping changes.
-2. Change the matching `.grok/agents/<name>.md` frontmatter model in the same change.
+2. Change the matching `.grok/agents/<name>.md` frontmatter model in the same change, for every route declared in `gauntlet/models.json` — optional primary routes included.
 3. Add/remove fallback wrappers only when the fallback actually uses a different model/route.
 4. Keep shared role behavior in `gauntlet/roles/**` / `gauntlet/PROMPT.md`.
 5. Update capability declarations only from observed/provider-backed facts; unknown capability stays unknown.
-6. Update `gauntlet/VERSION.json` when routing behavior changes after a published Gauntlet release.
+6. Update `gauntlet/VERSION.json` when routing behavior changes after a published Gauntlet release, and advance the version needles pinned in the `semver system version is declared` check in `gauntlet/evals/src/prompt-gate.ts`.
 7. Run `pnpm run gauntlet:eval` and Maintenance PR CI.
 8. Record release/routing changes in the Gauntlet release notes/changelog.
 

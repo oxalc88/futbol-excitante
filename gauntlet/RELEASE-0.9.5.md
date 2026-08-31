@@ -10,14 +10,15 @@ Patch release over 0.9.4 that makes the effective post-0.9.4 model routing expli
 - `builder-gameplay` uses `qwen3.8-flash`;
 - primary `critic` uses `glm5.3-flash`;
 - primary `integration-reviewer` uses `glm5.3-flash`;
-- documents the optional `orchestrator-glm` route;
+- aligns the optional `orchestrator-glm` wrapper with its declared `glm5.3-flash` route and corrects its duplicated `name: orchestrator` frontmatter;
 - keeps Qwen/MiMo reviewer fallbacks and Gemma git-committer routing unchanged.
 
 ## Version clarity
 
 - `gauntlet/VERSION.json` is the canonical Gauntlet system SemVer;
 - persisted `gauntlet_version: gauntlet-loop-v1` in `gauntlet/state/CURRENT.md` is explicitly documented as a loop/state protocol identifier, not system SemVer;
-- historical state and timing records may preserve deprecated model IDs as provenance, but executable routing and launch instructions must not use `deepseek-v4-flash-0731`.
+- historical state and timing records may preserve deprecated model IDs as provenance, but executable routing and launch instructions must not use `deepseek-v4-flash-0731`;
+- the version needles pinned in the `semver system version is declared` prompt-gate check advance to `0.9.5`/`0.9.4`, because that check reads `gauntlet/VERSION.json` literally and would otherwise fail on the bump.
 
 ## Maintenance rule
 
