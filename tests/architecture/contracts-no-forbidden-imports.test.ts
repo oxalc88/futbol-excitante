@@ -21,6 +21,26 @@ function stripComments(src: string): string {
     .replace(/\/\/.*$/gm, "");          // single-line
 }
 
+/** Blank out static string/template contents, keeping `${...}` interpolations visible. */
+function maskStringLiterals(src: string): string {
+  return src
+    .replace(/`(?:[^`\\]|\\.)*`/g, (template) => {
+      const expressions: string[] = [];
+      template.replace(/\$\{([^{}]*)\}/g, (_match, inner: string) => {
+        expressions.push(inner);
+        return " ";
+      });
+      return expressions.join(" ");
+    })
+    .replace(/"(?:[^"\\\n]|\\.)*"/g, '""')
+    .replace(/'(?:[^'\\\n]|\\.)*'/g, "''");
+}
+
+// Module-specifier patterns must see literal text; bare global names must not see prose.
+function scanText(pattern: RegExp, code: string, codeWithoutProse: string): string {
+  return pattern.source.includes('"') || pattern.source.includes("'") ? code : codeWithoutProse;
+}
+
 // Collect all .ts files under src/contracts and src/simulation/{config,world}
 function collectTsFiles(baseDir: string): string[] {
   const files: string[] = [];
@@ -63,9 +83,10 @@ describe("ARCH-CONTRACTS-001: contracts compile without forbidden types", () => 
 
     const violations: string[] = [];
     for (const file of files) {
-      const content = stripComments(readFileSync(file, "utf-8"));
+      const code = stripComments(readFileSync(file, "utf-8"));
+      const codeWithoutProse = maskStringLiterals(code);
       for (const pat of forbiddenPatterns) {
-        if (pat.test(content)) {
+        if (pat.test(scanText(pat, code, codeWithoutProse))) {
           violations.push(`${file}: matched ${pat.source}`);
         }
       }
@@ -92,9 +113,10 @@ describe("ARCH-CONTRACTS-001: contracts compile without forbidden types", () => 
 
     const violations: string[] = [];
     for (const file of files) {
-      const content = stripComments(readFileSync(file, "utf-8"));
+      const code = stripComments(readFileSync(file, "utf-8"));
+      const codeWithoutProse = maskStringLiterals(code);
       for (const pat of forbiddenPatterns) {
-        if (pat.test(content)) {
+        if (pat.test(scanText(pat, code, codeWithoutProse))) {
           violations.push(`${file}: matched ${pat.source}`);
         }
       }
@@ -115,9 +137,10 @@ describe("ARCH-CONTRACTS-002: contracts are free of forbidden globals", () => {
     const forbidden = [/\bwindow\b/, /\bdocument\b/, /\bprocess\b/, /\bBuffer\b/];
     const violations: string[] = [];
     for (const file of files) {
-      const content = stripComments(readFileSync(file, "utf-8"));
+      const code = stripComments(readFileSync(file, "utf-8"));
+      const codeWithoutProse = maskStringLiterals(code);
       for (const pat of forbidden) {
-        if (pat.test(content)) {
+        if (pat.test(scanText(pat, code, codeWithoutProse))) {
           violations.push(`${file}: matched ${pat.source}`);
         }
       }
