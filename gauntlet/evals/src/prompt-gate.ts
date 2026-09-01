@@ -81,6 +81,28 @@ async function modelRoutingCheck(repoRoot: string): Promise<PromptGateResult> {
   return { name: "agent frontmatter models match models.json routing", pass: failures.length === 0, detail: failures.length ? failures.join("; ") : undefined };
 }
 
+// opencode.json routes the same roles for the opencode runtime; it must track models.json.
+async function opencodeRoutingCheck(repoRoot: string): Promise<PromptGateResult> {
+  const failures: string[] = [];
+  try {
+    const config = JSON.parse(await readFile(path.join(repoRoot, "gauntlet/models.json"), "utf8")) as { roles?: Record<string, { agent?: string; model?: string; provider?: string }> };
+    const opencode = JSON.parse(await readFile(path.join(repoRoot, "opencode.json"), "utf8")) as { agent?: Record<string, { model?: string }>; provider?: Record<string, { models?: Record<string, { status?: string }> }> };
+    for (const [role, route] of Object.entries(config.roles ?? {})) {
+      if (!route.agent || !route.model) continue;
+      const expected = `${route.provider ?? "nan"}/${route.model}`;
+      const actual = opencode.agent?.[route.agent]?.model;
+      if (actual !== expected) failures.push(`${role}: models.json=${expected}, opencode.json=${actual ?? "missing"}`);
+    }
+    const deprecated = new Set(Object.entries(opencode.provider?.nan?.models ?? {}).filter(([, model]) => model.status === "deprecated").map(([id]) => `nan/${id}`));
+    for (const [name, agent] of Object.entries(opencode.agent ?? {})) {
+      if (agent?.model && deprecated.has(agent.model)) failures.push(`${name} routes to deprecated ${agent.model}`);
+    }
+  } catch {
+    failures.push("opencode.json or gauntlet/models.json is missing");
+  }
+  return { name: "opencode.json agent routing matches models.json", pass: failures.length === 0, detail: failures.length ? failures.join("; ") : undefined };
+}
+
 export async function runPromptGate(repoRoot: string): Promise<PromptGateResult[]> {
   const results: PromptGateResult[] = [];
   for (const rule of RULES) {
@@ -90,5 +112,6 @@ export async function runPromptGate(repoRoot: string): Promise<PromptGateResult[
   }
   results.push(await roleWrapperCheck(repoRoot));
   results.push(await modelRoutingCheck(repoRoot));
+  results.push(await opencodeRoutingCheck(repoRoot));
   return results;
 }
