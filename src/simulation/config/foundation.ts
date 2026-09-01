@@ -302,7 +302,7 @@ export const FOUNDATION_TACKLE_V1 = {
   /** Fraction of max speed available while preparing a tackle (commitment). */
   prepareSpeedFactor: { value: 0.55, note: "provisional speed cap factor during prepare [0..1]" },
   /** Fraction of max speed available during the active window. */
-  activeSpeedFactor: { value: 0.8, note: "provisional speed cap factor during active window [0..1]" },
+  activeSpeedFactor: { value: 0.8, note: "provisional speed cap factor during the active contact interval [0..1]" },
   /** Fraction of max speed available during recovery — the recovery cost. */
   recoverySpeedFactor: { value: 0.25, note: "provisional speed cap factor during recovery [0..1]" },
   /** Forward body speed (m/s) the sliding lunge sustains during its active window. */
