@@ -421,7 +421,7 @@ export function stepTackle(
     const tackler = players.find((p) => p.playerId === playerId);
     if (!tackler) continue;
 
-    const window = activeWindow(state, config);
+    const contactWindow = activeWindow(state, config);
     const reach = tackleWindows(state.kind, config).reach;
 
     // Ball reachability: finite reach plus the committed forward cone.
@@ -541,7 +541,7 @@ export function stepTackle(
         kind: "player-player-contact",
         label:
           `Tackle duel: ${tackler.playerId} ${contactKind} contacts ${opponent.playerId} ` +
-          `in active window ${window.startTick}–${window.endTick}`,
+          `in active window ${contactWindow.startTick}–${contactWindow.endTick}`,
         payload: {
           playerIdA: tackler.playerId,
           playerIdB: opponent.playerId,
@@ -550,8 +550,8 @@ export function stepTackle(
           contactType: contactKind,
           tacklePhase: "active",
           attemptStartTick: state.startTick,
-          activeWindowStartTick: window.startTick,
-          activeWindowEndTick: window.endTick,
+          activeWindowStartTick: contactWindow.startTick,
+          activeWindowEndTick: contactWindow.endTick,
           reach,
           planarDistance: opponentDistance,
           committedDirection: { x: state.dirX, y: state.dirY },
@@ -582,8 +582,8 @@ export function stepTackle(
           planarDistance: ballDistance,
           reach,
           attemptStartTick: state.startTick,
-          activeWindowStartTick: window.startTick,
-          activeWindowEndTick: window.endTick,
+          activeWindowStartTick: contactWindow.startTick,
+          activeWindowEndTick: contactWindow.endTick,
         },
       });
       ball.lastTouchRef = touchId;
@@ -672,7 +672,7 @@ function phaseEvent(
   contactMade: boolean,
 ): SimulationEvent {
   const windows = tackleWindows(state.kind, config);
-  const window = activeWindow(state, config);
+  const contactWindow = activeWindow(state, config);
   eventCounter.value++;
   return {
     id: `tackle-phase-${tick}-${eventCounter.value}`,
@@ -693,8 +693,8 @@ function phaseEvent(
       activeTicks: windows.activeTicks,
       recoverTicks: windows.recoverTicks,
       reach: windows.reach,
-      activeWindowStartTick: window.startTick,
-      activeWindowEndTick: window.endTick,
+      activeWindowStartTick: contactWindow.startTick,
+      activeWindowEndTick: contactWindow.endTick,
       releaseTick: releaseTick(state, config),
     },
   };
