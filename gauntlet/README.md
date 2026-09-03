@@ -14,15 +14,17 @@ All Gauntlet agents, skills, routing, deterministic evals, and contracts live in
 
 `gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-Current candidate: **0.9.5** over 0.9.4.
+Current candidate: **0.9.6** over 0.9.5.
 
-0.9.5 does not change gameplay. It reconciles the post-0.9.4 model-routing change with runtime wrappers and documentation, and versions that routing as `gauntlet-models-v7`.
+0.9.6 does not change gameplay or model assignments. It makes the three orchestrator entry points equivalent for persisted-work continuation, fixes the GLM route, and synchronizes agent-role documentation with `gauntlet-models-v7`.
 
 `gauntlet/state/CURRENT.md` uses `gauntlet_version: gauntlet-loop-v1` as the persisted loop/state protocol identifier; it is not the Gauntlet system SemVer. The canonical release version remains `gauntlet/VERSION.json`.
 
-## Launch
+## Launch and continuation
 
-From the repository root:
+All three user-facing entry points continue the same persisted Gauntlet work and preserve the same horizon, evidence, review, acceptance, publication, and timing rules. Choose the entry point by the parent orchestrator model you want to use. Optional trailing text is a focus/priority hint only.
+
+### Grok 4.6
 
 ```bash
 export NAN_API_KEY=...
@@ -32,16 +34,34 @@ grok --agent orchestrator --always-approve
 Then:
 
 ```text
-/gauntlet
+/gauntlet [optional focus]
 ```
 
-When the Grok 4.6 parent reaches the configured SuperGrok handoff threshold, continue with:
+### DeepSeek Flash
 
 ```bash
 grok --agent orchestrator-deepseek --model deepseek-v4-flash --reasoning-effort high --always-approve
 ```
 
-then `/gauntlet-continue`.
+Then:
+
+```text
+/gauntlet-continue [optional focus]
+```
+
+The Grok 4.6 quota handoff still points to this DeepSeek continuation route, but the route is also valid as a direct continuation entry point when DeepSeek is the available parent model.
+
+### GLM 5.3 Flash
+
+```bash
+grok --agent orchestrator-glm --model glm5.3-flash --reasoning-effort high --always-approve
+```
+
+Then:
+
+```text
+/gcont [optional focus]
+```
 
 There is no deprecated DeepSeek `0731` snapshot fallback in current Gauntlet routing. Historical state/timing records may retain an exact old model ID as provenance, but executable routing and launch instructions must use current model IDs.
 
@@ -64,8 +84,8 @@ Two deterministic checks protect this split: wrappers must reference an existing
 | Agent | Kind | Model | Job |
 |---|---|---|---|
 | `orchestrator` | primary | `grok-4.6` | canonical orchestration; hands off at the configured weekly threshold |
-| `orchestrator-deepseek` | overflow primary | `deepseek-v4-flash` | resumes from persisted handoff/state |
-| `orchestrator-glm` | optional primary | `glm5.3-flash` | optional GLM orchestration entry point |
+| `orchestrator-deepseek` | continuation primary | `deepseek-v4-flash` | resumes the same persisted Gauntlet work with DeepSeek |
+| `orchestrator-glm` | continuation primary | `glm5.3-flash` | resumes the same persisted Gauntlet work with GLM |
 | `builder-structured` | subagent | `deepseek-v4-flash` | toolchain, contracts, determinism, evaluators, tests, structured TypeScript |
 | `builder-gameplay` | subagent | `qwen3.8-flash` | gameplay, ball/control/team behavior, presentation-facing integration |
 | `critic` | subagent | `glm5.3-flash` | primary independent qualitative critic |
@@ -163,7 +183,7 @@ Deterministic and bounded semantic audits may invalidate or request more evidenc
 
 ## Timing bookkeeping
 
-`gauntlet/state/TIMING.md` is acceptance persistence. 0.9.5 requires all four tracking markers to reach the latest accepted objective:
+`gauntlet/state/TIMING.md` is acceptance persistence. 0.9.6 requires all four tracking markers to reach the latest accepted objective:
 
 ```yaml
 last_tracked_objective: <objective-id>
@@ -173,6 +193,8 @@ clock_aggregates_through: <objective-id>
 ```
 
 The global Clock/session aggregates must be refreshed when their source rows change. Advancing the other markers while leaving old global totals is a state-audit failure owned by the orchestrator, not a gameplay regression. See `gauntlet/timing-contract.md`.
+
+Timing/model statistics remain separated by exact model ID and role so work performed under Grok, DeepSeek, and GLM orchestration can be compared without changing the Gauntlet workflow.
 
 ## Evidence and observability
 

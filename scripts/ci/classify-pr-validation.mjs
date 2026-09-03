@@ -10,11 +10,21 @@ const baseChecks = byId(base);
 const headChecks = byId(head);
 const classifications = [];
 
+function normalizedSummary(check) {
+  return [...(check?.summary ?? [])].sort();
+}
+
+function sameFailure(baseCheck, headCheck) {
+  if (baseCheck?.status !== "FAIL" || headCheck.status !== "FAIL") return false;
+  if (baseCheck.signature === headCheck.signature) return true;
+  return JSON.stringify(normalizedSummary(baseCheck)) === JSON.stringify(normalizedSummary(headCheck));
+}
+
 for (const [checkId, headCheck] of headChecks) {
   const baseCheck = baseChecks.get(checkId);
   let classification;
   if (headCheck.status === "PASS") classification = baseCheck?.status === "FAIL" ? "IMPROVED" : "PASS";
-  else if (baseCheck?.status === "FAIL" && baseCheck.signature === headCheck.signature) classification = "PREEXISTING_REGRESSION";
+  else if (sameFailure(baseCheck, headCheck)) classification = "PREEXISTING_REGRESSION";
   else classification = "PR_REGRESSION";
   classifications.push({
     check_id: checkId,

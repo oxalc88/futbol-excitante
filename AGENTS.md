@@ -50,12 +50,14 @@ Do not skip the architecture boundaries to jump to 11v11, tactics, polished art,
 
 ## Gauntlet roles
 
-- `orchestrator` (Grok 4.6) follows the canonical orchestration contract in `gauntlet/PROMPT.md`; its wrapper only adds the ≥89% SuperGrok weekly handoff to `orchestrator-deepseek`.
-- `orchestrator-deepseek` follows the same canonical contract; its wrapper only adds overflow pickup/resume semantics.
-- `builder-structured` implements structured/tooling/contracts/deterministic/evaluator/test objectives. Current route: Qwen.
-- `builder-gameplay` implements gameplay/ball/control/team-behavior/presentation-facing gameplay objectives. Current route: MiMo.
-- `critic` and its model fallbacks share `gauntlet/roles/critic.md`. Never review with the same model that implemented the candidate.
-- `integration-reviewer` and its current-Flash fallback share `gauntlet/roles/integration-reviewer.md`.
+- `orchestrator` (Grok 4.6), `orchestrator-deepseek` (DeepSeek Flash), and `orchestrator-glm` (GLM 5.3 Flash) follow the same canonical orchestration contract in `gauntlet/PROMPT.md` and continue the same persisted Gauntlet work. The selected entry point changes the parent orchestrator model, not the workflow.
+- `orchestrator` additionally owns the ≥89% SuperGrok weekly handoff trigger.
+- `builder-structured` implements structured/tooling/contracts/deterministic/evaluator/test objectives. Current route: `deepseek-v4-flash`.
+- `builder-gameplay` implements gameplay/ball/control/team-behavior/presentation-facing gameplay objectives. Current route: `qwen3.8-flash`.
+- `critic` and its model fallbacks share `gauntlet/roles/critic.md`. Current primary route: `glm5.3-flash`. Never review with the same model that implemented the candidate.
+- `integration-reviewer` and its fallbacks share `gauntlet/roles/integration-reviewer.md`. Current primary route: `glm5.3-flash`.
 - The orchestrator records acceptance only after critic ACCEPT, integration ACCEPT, durable provenance/persistence, and the state audit required by the current Gauntlet contract.
 - `aux` does cheap summaries/bounded semantic audit only.
 - `git-committer` (`gemma4`) makes atomic commits. Orchestrators/builders do not commit.
+
+Timing and token statistics must preserve the exact model ID and role so equivalent Gauntlet work can be compared across orchestrator models.

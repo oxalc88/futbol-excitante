@@ -21,7 +21,7 @@
       "reasoning_effort": "high",
       "fallback": [],
       "capabilities": { "image_input": false },
-      "constraint": "Overflow pickup only. Same canonical orchestrator contract with runtime-specific pickup semantics. Critic independence is versus the builder, not this agent. Keep timing output separated by exact model ID and role."
+      "constraint": "Continuation orchestrator using the same canonical Gauntlet contract and persisted state. Critic independence is versus the builder, not this agent. Keep timing output separated by exact model ID and role."
     },
     "orchestrator_glm": {
       "agent": "orchestrator-glm",
@@ -32,7 +32,7 @@
       "reasoning_effort": "high",
       "fallback": [],
       "capabilities": { "image_input": true },
-      "constraint": "Optional GLM orchestration entry point. The Grok orchestrator remains the default primary orchestrator."
+      "constraint": "Continuation orchestrator using the same canonical Gauntlet contract and persisted state. Keep timing output separated by exact model ID and role."
     },
     "builder_structured": {
       "agent": "builder-structured",
