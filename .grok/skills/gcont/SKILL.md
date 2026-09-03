@@ -1,9 +1,9 @@
 ---
-name: gauntlet-continue
-description: Resume the PES Simulator Gauntlet from persisted CURRENT/HANDOFF/HORIZON state on the DeepSeek orchestrator.
+name: gcont
+description: Resume the PES Simulator Gauntlet from persisted CURRENT/HANDOFF/HORIZON state on the GLM orchestrator.
 user-invocable: true
 disable-model-invocation: true
-model: deepseek-v4-flash
+model: glm5.3-flash
 argument-hint: optional focus, e.g. finish PLAYABLE-DUELS-SUITE only
 ---
 
@@ -11,7 +11,7 @@ Resume from persisted `HANDOFF.md`/`CURRENT.md`/`HORIZON.md`; do not start over.
 
 Before any other status prose, print one compact startup line using the version read from `gauntlet/VERSION.json`:
 
-`Gauntlet <version> · orchestrator-deepseek · deepseek-v4-flash`
+`Gauntlet <version> · orchestrator-glm · glm5.3-flash`
 
 Fetch `origin/gauntlet-regressions` and inspect OPEN regression records before ordinary objective selection. CI is the deterministic detector/classifier; reproduce the named check against current `main` before prioritizing repair. Never edit or resolve inbox records yourself.
 

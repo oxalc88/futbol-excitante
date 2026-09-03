@@ -7,9 +7,9 @@ model: grok-4.6
 argument-hint: optional focus, e.g. continue from BOOTSTRAP-07 only
 ---
 
-Start the PES Simulator Gauntlet Loop now. Do not implement gameplay yourself.
+Start or resume the PES Simulator Gauntlet Loop now. Do not implement gameplay yourself.
 
-Read `gauntlet/PROMPT.md`, `gauntlet/principles.md`, `gauntlet/VERSION.json`, `gauntlet/observability-contract.md`, `gauntlet/regression-inbox-contract.md`, `CURRENT.md`, and `HORIZON.md`. Follow the validated rolling horizon and existing model routing.
+Read `gauntlet/PROMPT.md`, `gauntlet/principles.md`, `gauntlet/VERSION.json`, `gauntlet/observability-contract.md`, `gauntlet/regression-inbox-contract.md`, `gauntlet/state/HANDOFF.md`, `gauntlet/state/CURRENT.md`, and `gauntlet/state/HORIZON.md`. Follow the validated rolling horizon and existing model routing.
 
 Before any other status prose, print one compact startup line using the version read from `gauntlet/VERSION.json`:
 
