@@ -1,10 +1,10 @@
 {
-  "version": "0.9.4",
+  "version": "0.9.5",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.9.3",
+  "previous_system_version": "0.9.4",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
-  "baseline_commit": "dca55e52ac75320aa8ca4ab2f70daf3763a69f45",
+  "baseline_commit": "d13e48c4bd295c2af022d49990eb05822c3649db",
   "includes": [
     "prompts",
     "agents",
@@ -33,6 +33,7 @@
     "candidate-scope-isolation",
     "ephemeral-eval-lifecycle",
     "model-capability-routing",
-    "timing-aggregate-consistency"
+    "timing-aggregate-consistency",
+    "routing-wrapper-consistency"
   ]
 }

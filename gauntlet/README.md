@@ -14,9 +14,11 @@ All Gauntlet agents, skills, routing, deterministic evals, and contracts live in
 
 `gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-Current candidate: **0.9.4** over 0.9.3.
+Current candidate: **0.9.5** over 0.9.4.
 
-0.9.4 does not change gameplay. It updates model routing and strengthens timing-bookkeeping consistency.
+0.9.5 does not change gameplay. It reconciles the post-0.9.4 model-routing change with runtime wrappers and documentation, and versions that routing as `gauntlet-models-v7`.
+
+`gauntlet/state/CURRENT.md` uses `gauntlet_version: gauntlet-loop-v1` as the persisted loop/state protocol identifier; it is not the Gauntlet system SemVer. The canonical release version remains `gauntlet/VERSION.json`.
 
 ## Launch
 
@@ -41,7 +43,7 @@ grok --agent orchestrator-deepseek --model deepseek-v4-flash --reasoning-effort 
 
 then `/gauntlet-continue`.
 
-There is no deprecated DeepSeek snapshot fallback in 0.9.4.
+There is no deprecated DeepSeek `0731` snapshot fallback in current Gauntlet routing. Historical state/timing records may retain an exact old model ID as provenance, but executable routing and launch instructions must use current model IDs.
 
 ## Canonical role contracts
 
@@ -63,12 +65,13 @@ Two deterministic checks protect this split: wrappers must reference an existing
 |---|---|---|---|
 | `orchestrator` | primary | `grok-4.6` | canonical orchestration; hands off at the configured weekly threshold |
 | `orchestrator-deepseek` | overflow primary | `deepseek-v4-flash` | resumes from persisted handoff/state |
-| `builder-structured` | subagent | `qwen3.6` | toolchain, contracts, determinism, evaluators, tests, structured TypeScript |
-| `builder-gameplay` | subagent | `mimo-v2.5` | gameplay, ball/control/team behavior, presentation-facing integration |
-| `critic` | subagent | `deepseek-v4-flash` | primary independent qualitative critic |
+| `orchestrator-glm` | optional primary | `glm5.3-flash` | optional GLM orchestration entry point |
+| `builder-structured` | subagent | `deepseek-v4-flash` | toolchain, contracts, determinism, evaluators, tests, structured TypeScript |
+| `builder-gameplay` | subagent | `qwen3.8-flash` | gameplay, ball/control/team behavior, presentation-facing integration |
+| `critic` | subagent | `glm5.3-flash` | primary independent qualitative critic |
 | `critic-qwen` | fallback critic | `qwen3.6` | independent critic fallback |
 | `critic-mimo` | fallback critic | `mimo-v2.5` | independent critic fallback |
-| `integration-reviewer` | subagent | `deepseek-v4-flash` | primary integration/neighbouring-regression review |
+| `integration-reviewer` | subagent | `glm5.3-flash` | primary integration/neighbouring-regression review |
 | `integration-reviewer-qwen` | fallback integration | `qwen3.6` | independent integration fallback |
 | `integration-reviewer-mimo` | fallback integration | `mimo-v2.5` | independent integration fallback |
 | `aux` | subagent | `gemma4` | cheap summaries and bounded semantic audit |
@@ -81,19 +84,21 @@ Exact IDs and fallback ordering live in `gauntlet/models.json`.
 Current registered model IDs used by the Gauntlet are:
 
 - `deepseek-v4-flash`
+- `qwen3.8-flash`
+- `glm5.3-flash`
 - `qwen3.6`
 - `mimo-v2.5`
 - `gemma4`
 - `grok-4.6` for the parent orchestrator
 
-`deepseek-v4-flash-0731` is deprecated and is not part of current Gauntlet routing.
+`deepseek-v4-flash-0731` is deprecated and is not part of current executable Gauntlet routing.
 
 Primary reviewer routing:
 
 | Role | Primary | Fallbacks |
 |---|---|---|
-| Critic | `critic` / `deepseek-v4-flash` | `critic-qwen`, then `critic-mimo` |
-| Integration reviewer | `integration-reviewer` / `deepseek-v4-flash` | `integration-reviewer-qwen`, then `integration-reviewer-mimo` |
+| Critic | `critic` / `glm5.3-flash` | `critic-qwen`, then `critic-mimo` |
+| Integration reviewer | `integration-reviewer` / `glm5.3-flash` | `integration-reviewer-qwen`, then `integration-reviewer-mimo` |
 | Cheap auxiliary | `gemma4` | `qwen3.6` |
 | Git committer | `gemma4` | `qwen3.6` |
 
@@ -158,7 +163,7 @@ Deterministic and bounded semantic audits may invalidate or request more evidenc
 
 ## Timing bookkeeping
 
-`gauntlet/state/TIMING.md` is acceptance persistence. 0.9.4 requires all four tracking markers to reach the latest accepted objective:
+`gauntlet/state/TIMING.md` is acceptance persistence. 0.9.5 requires all four tracking markers to reach the latest accepted objective:
 
 ```yaml
 last_tracked_objective: <objective-id>
@@ -192,13 +197,14 @@ Unattended Gauntlet is the intended mode.
 
 ## Change model routing later
 
-1. Edit `gauntlet/models.json`.
-2. Change the matching `.grok/agents/<name>.md` frontmatter model.
+1. Edit `gauntlet/models.json` and increment its routing-generation version when the effective mapping changes.
+2. Change the matching `.grok/agents/<name>.md` frontmatter model in the same change.
 3. Add/remove fallback wrappers only when the fallback actually uses a different model/route.
 4. Keep shared role behavior in `gauntlet/roles/**` / `gauntlet/PROMPT.md`.
 5. Update capability declarations only from observed/provider-backed facts; unknown capability stays unknown.
-6. Run `pnpm run gauntlet:eval` and Maintenance PR CI.
-7. Record release/routing changes in the Gauntlet release notes/changelog.
+6. Update `gauntlet/VERSION.json` when routing behavior changes after a published Gauntlet release.
+7. Run `pnpm run gauntlet:eval` and Maintenance PR CI.
+8. Record release/routing changes in the Gauntlet release notes/changelog.
 
 Authoritative product specs remain:
 
