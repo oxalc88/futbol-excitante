@@ -2,9 +2,17 @@
  * @module tests/unit/eval/SMALL-SIDED-SITUATIONS-BATCH-5-binding.test.ts
  *
  * Evidence-binding test: proves that the consolidated batch-5 evidence
- * (`docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-5/situations/`) is byte-identical
- * to fresh evaluator runs on the source fixtures that produced each situation's
- * PASS verdict.
+ * (`docs/evidence/SMALL-SIDED-SITUATIONS-BATCH-5/situations/`) stays
+ * byte-identical to its pinned before-state and that fresh evaluator runs on
+ * the source fixtures that produced each situation's PASS verdict reproduce the
+ * pinned post-fix bytes and the same verdicts.
+ *
+ * The per-situation pins are two-arm since BALL-SETTLED-REGIME-FIX
+ * (`ball-settled-regime-v2`): a settled ball struck by a touch or ground pass
+ * now integrates that impulse instead of freezing, which moved the trajectory of
+ * every affected fixture. The durable accepted artifacts are immutable and are
+ * asserted unchanged; SHOT_TO_RESULT keeps equal accepted/live digests because
+ * its fixture never plays a settled ball.
  *
  * BATCH-5 consolidates 8/8 PASS from 3 fixtures:
  * - PASS_RECEPTION, SUPPORT_AND_PASSING_LANES, SETTLED_ATTACK_VS_DEFENCE,
@@ -17,8 +25,9 @@
  *  1. All eight situation artifacts and index.json exist in batch-5.
  *  2. Each artifact's verdict is PASS and consistent with index.json.
  *  3. Each artifact's `source_fixture` field matches the expected fixture.
- *  4. Fresh evaluator runs on each source fixture produce byte-identical
- *     per-situation artifacts (determinism + honesty).
+ *  4. Fresh evaluator runs on each source fixture reproduce the pinned
+ *     per-situation bytes, the accepted PASS verdict and the accepted relevant
+ *     events (determinism + honesty).
  *  5. Consolidated verdict is 8/8 PASS.
  *  6. Index.json metadata reflects consolidated run.
  *  7. Per-situation PASS is attributed to its real source fixture.
@@ -36,6 +45,11 @@ import {
   type SituationEvidenceArtifact,
 } from "../../../eval/runners/small-sided-situation-evaluator.js";
 import { MAPPED_SITUATION_IDS } from "../../../eval/contracts/situation-mapping.js";
+import {
+  digestArtifact,
+  digestTrajectoryChain,
+  type SituationPin,
+} from "./situation-run-pin-binding.js";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -246,63 +260,145 @@ describe("BATCH-5 binding: source_fixture provenance", () => {
 // ---------------------------------------------------------------------------
 
 describe("BATCH-5 binding: byte-identical re-run per fixture", () => {
-  /** Run fresh evaluator on a fixture and compare per-situation artifacts */
+  /**
+   * Two-arm pins. `accepted` is the digest of the durable artifact's core
+   * content (everything except the `source_fixture` provenance field) — the
+   * immutable before-state, asserted never rewritten. `live` is the digest of the
+   * run reproduced from the current tree, re-captured after
+   * BALL-SETTLED-REGIME-FIX; its prior value equalled the corresponding
+   * `accepted` digest — see git history of this file. SHOT_TO_RESULT keeps equal
+   * arms: that fixture's ball is never settled when it is played, so the fix
+   * leaves its bytes untouched.
+   */
+  const BATCH_5_SITUATION_PINS: Record<string, SituationPin> = {
+    PASS_RECEPTION: {
+      accepted: "5a3607c4cb3f52d6412a1ebf9ab88659a670a57622ed56f829d54390b0cd5186",
+      live: "e84e82ecc5b0bce786d11c199de08f311ea1169a0ea005d7748d272c9ae7b85f",
+    },
+    SUPPORT_AND_PASSING_LANES: {
+      accepted: "082210cec3115dae1abac55f5f6fadac58354d0b7757cb7ccccf62e96287a2a4",
+      live: "e325a36e5f398264c0af22b116e1ab3ba77ce1eb53de141dbd588447b2fc59cd",
+    },
+    SETTLED_ATTACK_VS_DEFENCE: {
+      accepted: "7c34b2bfb0cdcbdbaa5aaa7b9e0d6d7c9079ee40bec4f0bb6abd36588e4138e9",
+      live: "0fc3d839440488b4832e6d8b07bc05eb9fd22603c9f2e9e7b3ec068ebf9908d1",
+    },
+    ATTACK_TO_DEFENCE_TRANSITION: {
+      accepted: "7311152cb115bf2df74a347c87b96e9d2853e240d1e4637d06b217aacc4443a2",
+      live: "93a9de3483e01cbb9538630c9a58551017226547a1058a06ca7634b59b09e0e6",
+    },
+    DEFENCE_TO_ATTACK_TRANSITION: {
+      accepted: "925173bfe2595fec1822d326822a84d2dc4eb14e353379cb0dcbee9eca52b267",
+      live: "0fd03b7f41977248baf47d8a926d09ec0c289461a0b141090d3c28ea5435e7e7",
+    },
+    COORDINATED_PRESS: {
+      accepted: "0dfc70f4f8640356eeeff61dff060ff51320fe6ae65d95379087f48bf7c63ed1",
+      live: "69cde80291c95effa48f1ca6c957f9934e445e7a773aa1dd712adb989d019db6",
+    },
+    SHOT_TO_RESULT: {
+      accepted: "e0afe1d2340c151d57daba3797517bfb85c870c47322c60b3be81a4abe5fa0df",
+      live: "e0afe1d2340c151d57daba3797517bfb85c870c47322c60b3be81a4abe5fa0df",
+    },
+    PHYSICAL_DUEL: {
+      accepted: "5ef9ba577cbbbe1923997952ef1732a8994a5d7f6e6764375a679d2a37e97c3d",
+      live: "2effaec8c3275f05dc509361c987a6857f6e5fd597a8473a80e5b937d87292d6",
+    },
+  };
+
+  const BATCH_5_TRAJECTORY_PINS: Record<string, SituationPin> = {
+    PASS_RECEPTION: {
+      accepted: "33948b7eb9d426a90e1a6678f40f2ab6b2a0b395c0b07277acee40f1696ace38",
+      live: "cc2dd1b0314df64b655533859a70a46a1de01765adcf32d79652a48bf59876a4",
+    },
+    SUPPORT_AND_PASSING_LANES: {
+      accepted: "33948b7eb9d426a90e1a6678f40f2ab6b2a0b395c0b07277acee40f1696ace38",
+      live: "cc2dd1b0314df64b655533859a70a46a1de01765adcf32d79652a48bf59876a4",
+    },
+    SETTLED_ATTACK_VS_DEFENCE: {
+      accepted: "33948b7eb9d426a90e1a6678f40f2ab6b2a0b395c0b07277acee40f1696ace38",
+      live: "cc2dd1b0314df64b655533859a70a46a1de01765adcf32d79652a48bf59876a4",
+    },
+    ATTACK_TO_DEFENCE_TRANSITION: {
+      accepted: "33948b7eb9d426a90e1a6678f40f2ab6b2a0b395c0b07277acee40f1696ace38",
+      live: "cc2dd1b0314df64b655533859a70a46a1de01765adcf32d79652a48bf59876a4",
+    },
+    DEFENCE_TO_ATTACK_TRANSITION: {
+      accepted: "33948b7eb9d426a90e1a6678f40f2ab6b2a0b395c0b07277acee40f1696ace38",
+      live: "cc2dd1b0314df64b655533859a70a46a1de01765adcf32d79652a48bf59876a4",
+    },
+    COORDINATED_PRESS: {
+      accepted: "33948b7eb9d426a90e1a6678f40f2ab6b2a0b395c0b07277acee40f1696ace38",
+      live: "cc2dd1b0314df64b655533859a70a46a1de01765adcf32d79652a48bf59876a4",
+    },
+    SHOT_TO_RESULT: {
+      accepted: "da9cafd4dc4355a241c1dc53533c885eac60a5886094a1f2141923dd7e39d4be",
+      live: "da9cafd4dc4355a241c1dc53533c885eac60a5886094a1f2141923dd7e39d4be",
+    },
+    PHYSICAL_DUEL: {
+      accepted: "4c0b6970dcfe6c409f19c13f635f2ac9d5444b30b7bf20a47c7e472194f9fa66",
+      live: "cb473a45bf73e65667e252490e20549d1bc239e3e5d8512576aa89c104e567db",
+    },
+  };
+
+  /** Run fresh evaluator on a fixture and check the pinned live artifacts. */
   function compareFixtureRun(fixtureName: string, expectedSits: string[]) {
     const tmpDir = tmpDirs[fixtureName];
 
     const result = runSituationEvaluator(fixtureName, tmpDir);
 
     for (const sitId of expectedSits) {
-      // Batch-5 artifacts include an extra `source_fixture` field.
-      // Compare the "core" artifact content (everything except source_fixture)
-      // to prove byte-identical evaluator output.
+      // Batch-5 artifacts include an extra `source_fixture` field, so the
+      // binding compares the artifact's core content.
       const batch5Raw = readFileSync(
         join(BATCH_5_DIR, `${sitId}.json`),
         "utf-8",
       );
-      const batch5Obj = JSON.parse(batch5Raw) as Record<string, unknown>;
-      const { source_fixture: _, ...batch5Core } = batch5Obj;
-
       const freshContent = readFileSync(
         join(tmpDir, `${sitId}.json`),
         "utf-8",
       );
-      const freshObj = JSON.parse(freshContent) as Record<string, unknown>;
-      const freshCore = JSON.parse(
-        JSON.stringify(freshObj),
-      ) as Record<string, unknown>;
 
       expect(
-        JSON.stringify(batch5Core),
-        `Artifact ${sitId} from ${fixtureName} must be byte-identical to batch-5 (core content)`,
-      ).toBe(JSON.stringify(freshCore));
+        digestArtifact(batch5Raw, true),
+        `accepted artifact ${sitId} must be unchanged`,
+      ).toBe(BATCH_5_SITUATION_PINS[sitId]!.accepted);
+      expect(
+        digestArtifact(freshContent, true),
+        `Artifact ${sitId} from ${fixtureName} must match the pinned live digest`,
+      ).toBe(BATCH_5_SITUATION_PINS[sitId]!.live);
 
-      // Also verify the fresh run artifact matches the batch-5 artifact shape
+      // The accepted honest verdict still reproduces from the live run.
+      const acceptedArtifact = JSON.parse(batch5Raw) as SituationEvidenceArtifact;
       const freshArtifact = JSON.parse(freshContent) as SituationEvidenceArtifact;
       expect(freshArtifact.situation_id).toBe(sitId);
       expect(freshArtifact.verdict).toBe("PASS");
+      expect(freshArtifact.verdict).toBe(acceptedArtifact.verdict);
+      expect(
+        freshArtifact.relevant_events.map((event) => event.kind).sort(),
+      ).toEqual(acceptedArtifact.relevant_events.map((event) => event.kind).sort());
     }
 
-    // Also verify trajectory hashes match
+    // Trajectory hash chains carry the same pins.
     for (const sitId of expectedSits) {
-      const batch5Raw = readFileSync(
-        join(BATCH_5_DIR, `${sitId}.json`),
-        "utf-8",
+      const acceptedText = readFileSync(join(BATCH_5_DIR, `${sitId}.json`), "utf-8");
+      const freshText = readFileSync(join(tmpDir, `${sitId}.json`), "utf-8");
+      const acceptedChain = (JSON.parse(acceptedText).trajectory as Array<{ hash: string }>).map(
+        (entry) => entry.hash,
       );
-      const batch5Artifact = JSON.parse(batch5Raw) as SituationEvidenceArtifact;
-      const freshContent = readFileSync(
-        join(tmpDir, `${sitId}.json`),
-        "utf-8",
+      const freshChain = (JSON.parse(freshText).trajectory as Array<{ hash: string }>).map(
+        (entry) => entry.hash,
       );
-      const freshArtifact = JSON.parse(freshContent) as SituationEvidenceArtifact;
 
-      expect(freshArtifact.trajectory.map((t) => t.hash)).toEqual(
-        batch5Artifact.trajectory.map((t) => t.hash),
+      expect(digestTrajectoryChain(acceptedText)).toBe(
+        BATCH_5_TRAJECTORY_PINS[sitId]!.accepted,
       );
+      expect(digestTrajectoryChain(freshText)).toBe(BATCH_5_TRAJECTORY_PINS[sitId]!.live);
+      expect(freshChain.length).toBe(acceptedChain.length);
+      expect(freshChain.length).toBeGreaterThan(0);
     }
   }
 
-  it("extended fixture produces byte-identical artifacts for its 6 situations", () => {
+  it("extended fixture produces the pinned artifacts for its 6 situations", () => {
     const extendedSits = FIXTURE_SITUATION_MAP["3v3-situation-driven-extended.v1.json"]!;
     compareFixtureRun("3v3-situation-driven-extended.v1.json", extendedSits);
   });
@@ -310,11 +406,29 @@ describe("BATCH-5 binding: byte-identical re-run per fixture", () => {
   it("shot-resolution fixture produces byte-identical artifact for SHOT_TO_RESULT", () => {
     const shotSits = FIXTURE_SITUATION_MAP["3v3-situation-driven-shot-resolution.v1.json"]!;
     compareFixtureRun("3v3-situation-driven-shot-resolution.v1.json", shotSits);
+    // Unmoved by the fix: its accepted and live digests are equal.
+    expect(BATCH_5_SITUATION_PINS["SHOT_TO_RESULT"]!.accepted).toBe(
+      BATCH_5_SITUATION_PINS["SHOT_TO_RESULT"]!.live,
+    );
   });
 
-  it("duel-rejection fixture produces byte-identical artifact for PHYSICAL_DUEL", () => {
+  it("duel-rejection fixture produces the pinned artifact for PHYSICAL_DUEL", () => {
     const duelSits = FIXTURE_SITUATION_MAP["3v3-situation-driven-duel-rejection.v1.json"]!;
     compareFixtureRun("3v3-situation-driven-duel-rejection.v1.json", duelSits);
+  });
+
+  it("two fresh runs of each source fixture are byte-identical to each other", () => {
+    for (const [fixtureName, sits] of Object.entries(FIXTURE_SITUATION_MAP)) {
+      runSituationEvaluator(fixtureName, tmpDirs[fixtureName]!);
+      const first = sits.map((sit) =>
+        digestArtifact(readFileSync(join(tmpDirs[fixtureName]!, `${sit}.json`), "utf-8"), true),
+      );
+      runSituationEvaluator(fixtureName, tmpDirs[fixtureName]!);
+      const second = sits.map((sit) =>
+        digestArtifact(readFileSync(join(tmpDirs[fixtureName]!, `${sit}.json`), "utf-8"), true),
+      );
+      expect(second).toEqual(first);
+    }
   });
 });
 

@@ -8,7 +8,9 @@
  * Verifies:
  *  1. All four target situation artifacts exist in batch-1-rerun.
  *  2. Each artifact's verdict and relevant_event_count match the index.
- *  3. A fresh run to a temp directory produces byte-identical artifacts.
+ *  3. The durable accepted artifacts stay byte-identical to their pinned before-state,
+ *     and a fresh run to a temp directory reproduces the pinned post-fix bytes
+ *     (re-captured after BALL-SETTLED-REGIME-FIX; see SITUATION_PINS below).
  *  4. Honest verdicts match expectations:
  *     - PASS: SETTLED_ATTACK_VS_DEFENCE (required + indicative present).
  *     - FAIL: the other 3 (required present, indicative absent).
@@ -31,6 +33,65 @@ import {
   MAPPED_SITUATION_IDS,
   SITUATION_EVIDENCE_REQUIREMENTS,
 } from "../../../eval/contracts/situation-mapping.js";
+import {
+  digestArtifact,
+  digestTrajectoryChain,
+  type SituationPin,
+} from "./situation-run-pin-binding.js";
+
+/**
+ * Two-arm pins for this binding.
+ *
+ * `accepted` is the digest of the durable artifact under docs/evidence — the
+ * immutable before-state, asserted here to prove the settled-regime fix never
+ * rewrote it. `live` is the digest of the run reproduced from the current tree,
+ * re-captured after BALL-SETTLED-REGIME-FIX; its prior value equalled the
+ * corresponding `accepted` digest — see git history of this file.
+ *
+ * The fix lets a settled ball integrate the impulse a touch or ground pass
+ * applies (before it, the ball carried the impulse and never moved), so every
+ * per-tick trajectory hash of this fixture moves from tick 1 on. The accepted
+ * verdict, relevant event kinds and relevant event counts are still asserted to
+ * reproduce from the live run, so the binding keeps proving gameplay.
+ */
+const BATCH_1_RERUN_SITUATION_PINS: Record<string, SituationPin> = {
+  PASS_RECEPTION: {
+    accepted: "088a7c9cec1fb0c4b2f3959d13bccc81c47bc70abc941cd50eb33ea7d0b64459",
+    live: "4c46b2b876c456f08500ea22f841906f46becd5028d45b3b0b0777102055c02f",
+  },
+  SHOT_TO_RESULT: {
+    accepted: "07e793c605ca7596499dc280e6a7e6cbe99e7d0b5376cd9574f3797217999b7c",
+    live: "e44ecfaaefc2d1c5e922c7e8e89675ecf2510d03d250e6789133692eeb31733a",
+  },
+  PHYSICAL_DUEL: {
+    accepted: "fda30beb842f93acefdb95d43bc03e836da838fddd2605c7739e47fc389a74e5",
+    live: "5b17359c34549514bbe03d18dc567d2326cd3e9c5749ee6c83772757fc6a4b16",
+  },
+  SUPPORT_AND_PASSING_LANES: {
+    accepted: "ca87c6b864a7ff0f1531870fd91e00251fc961461b32096754578c02646a1180",
+    live: "ca189034d545ffad7bbd49c30bdb45adf4936f50ef3f6e80038be2d19692abea",
+  },
+  SETTLED_ATTACK_VS_DEFENCE: {
+    accepted: "01698e2a1a4da435caed9d45329ea5c684a0660ceae9b4f13322a1cfe02ca697",
+    live: "0a377786be1e0ac53bd7f051b54babb807ee8292fc4b5e3b7f7604dc9e895b4c",
+  },
+};
+
+/** One shared trajectory chain per artifact: the fixture runs one match. */
+const BATCH_1_RERUN_TRAJECTORY_PINS: Record<string, SituationPin> = Object.fromEntries(
+  Object.keys(BATCH_1_RERUN_SITUATION_PINS).map((target) => [
+    target,
+    {
+      accepted: "d2805ac848ffeafd28c71b5983aa8b122fe88f64c60e7259f50c6245c90ecc06",
+      live: "ff0d09fb923b1057fc133be34e49dbe623eb16c6ad404d6120178b21c91efef9",
+    },
+  ]),
+);
+
+const BATCH_1_RERUN_INDEX_PIN: SituationPin = {
+  accepted: "a1479da4bc7760ef74ea15ad4b50c29bc7ececb6c8038e6949ed1ba9585efdf3",
+  live: "e0bae47f8bbcca99d48bdeb16e6c635fd5fdaa23a8638effcef2424d3e7cd1b8",
+};
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -189,7 +250,23 @@ describe("BATCH-1-RERUN binding: honest verdicts", () => {
 // ---------------------------------------------------------------------------
 
 describe("BATCH-1-RERUN binding: byte-identical re-run", () => {
-  it("a fresh run to temp dir produces byte-identical artifacts", () => {
+  it("the durable accepted artifacts are byte-identical to their pinned before-state", () => {
+    for (const target of [...BATCH_1_RERUN_TARGETS, "SETTLED_ATTACK_VS_DEFENCE"]) {
+      const acceptedContent = readFileSync(
+        join(BATCH_1_RERUN_DIR, `${target}.json`),
+        "utf-8",
+      );
+      expect(
+        digestArtifact(acceptedContent),
+        `accepted artifact ${target} must be unchanged`,
+      ).toBe(BATCH_1_RERUN_SITUATION_PINS[target]!.accepted);
+    }
+    expect(
+      digestArtifact(readFileSync(join(BATCH_1_RERUN_DIR, "index.json"), "utf-8")),
+    ).toBe(BATCH_1_RERUN_INDEX_PIN.accepted);
+  });
+
+  it("a fresh run to temp dir reproduces the pinned post-fix artifacts and verdicts", () => {
     // Run the evaluator to a temp dir.
     const result = runSituationEvaluator(
       "3v3-situation-driven.v1.json",
@@ -207,9 +284,18 @@ describe("BATCH-1-RERUN binding: byte-identical re-run", () => {
         "utf-8",
       );
 
-      expect(freshContent).toBe(rerunContent,
-        `Artifact ${target} from fresh run must match batch-1-rerun persisted artifact`,
-      );
+      expect(
+        digestArtifact(freshContent),
+        `Artifact ${target} from fresh run must match the pinned live digest`,
+      ).toBe(BATCH_1_RERUN_SITUATION_PINS[target]!.live);
+
+      // The accepted honest verdict and its relevant events still reproduce.
+      const acceptedArtifact = JSON.parse(rerunContent) as SituationEvidenceArtifact;
+      const freshArtifact = JSON.parse(freshContent) as SituationEvidenceArtifact;
+      expect(freshArtifact.verdict).toBe(acceptedArtifact.verdict);
+      expect(
+        freshArtifact.relevant_events.map((event) => event.kind).sort(),
+      ).toEqual(acceptedArtifact.relevant_events.map((event) => event.kind).sort());
 
       // Also verify verdict in fresh result.
       const artifact = result.situationArtifacts.find((a) => a.situation_id === target);
@@ -218,20 +304,16 @@ describe("BATCH-1-RERUN binding: byte-identical re-run", () => {
     }
 
     // Also compare SETTLED_ATTACK_VS_DEFENCE.
-    const settlementRerunContent = readFileSync(
-      join(BATCH_1_RERUN_DIR, "SETTLED_ATTACK_VS_DEFENCE.json"),
-      "utf-8",
-    );
     const settlementFreshContent = readFileSync(
       join(tmpDir, "SETTLED_ATTACK_VS_DEFENCE.json"),
       "utf-8",
     );
-    expect(settlementFreshContent).toBe(settlementRerunContent,
-      "SETTLED_ATTACK_VS_DEFENCE from fresh run must match batch-1-rerun",
+    expect(digestArtifact(settlementFreshContent)).toBe(
+      BATCH_1_RERUN_SITUATION_PINS["SETTLED_ATTACK_VS_DEFENCE"]!.live,
     );
   });
 
-  it("re-run produces identical index.json", () => {
+  it("re-run produces the pinned index.json and matches the accepted verdicts", () => {
     const rerunIndex = readFileSync(
       join(BATCH_1_RERUN_DIR, "index.json"),
       "utf-8",
@@ -245,25 +327,63 @@ describe("BATCH-1-RERUN binding: byte-identical re-run", () => {
       "utf-8",
     );
 
-    expect(freshIndex).toBe(rerunIndex);
+    expect(digestArtifact(rerunIndex)).toBe(BATCH_1_RERUN_INDEX_PIN.accepted);
+    expect(digestArtifact(freshIndex)).toBe(BATCH_1_RERUN_INDEX_PIN.live);
+
+    const acceptedEntries = JSON.parse(rerunIndex).situations as Array<{
+      situation_id: string;
+      verdict: string;
+      relevant_event_count: number;
+    }>;
+    const freshEntries = JSON.parse(freshIndex).situations as Array<{
+      situation_id: string;
+      verdict: string;
+      relevant_event_count: number;
+    }>;
+    expect(freshEntries.map((entry) => [entry.situation_id, entry.verdict])).toEqual(
+      acceptedEntries.map((entry) => [entry.situation_id, entry.verdict]),
+    );
+    expect(freshEntries.map((entry) => entry.relevant_event_count)).toEqual(
+      acceptedEntries.map((entry) => entry.relevant_event_count),
+    );
   });
 
-  it("re-run produces identical trajectory hashes", () => {
+  it("re-run produces the pinned trajectory hash chain over the same tick count", () => {
     runSituationEvaluator("3v3-situation-driven.v1.json", tmpDir);
 
     for (const target of BATCH_1_RERUN_TARGETS) {
-      const rerunArtifact = JSON.parse(
-        readFileSync(join(BATCH_1_RERUN_DIR, `${target}.json`), "utf-8"),
-      ) as SituationEvidenceArtifact;
-      const freshArtifact = JSON.parse(
-        readFileSync(join(tmpDir, `${target}.json`), "utf-8"),
-      ) as SituationEvidenceArtifact;
-
-      // Trajectory entries should have identical hashes.
-      expect(freshArtifact.trajectory.map((t) => t.hash)).toEqual(
-        rerunArtifact.trajectory.map((t) => t.hash),
+      const acceptedText = readFileSync(join(BATCH_1_RERUN_DIR, `${target}.json`), "utf-8");
+      const freshText = readFileSync(join(tmpDir, `${target}.json`), "utf-8");
+      const acceptedChain = (JSON.parse(acceptedText).trajectory as Array<{ hash: string }>).map(
+        (entry) => entry.hash,
       );
+      const freshChain = (JSON.parse(freshText).trajectory as Array<{ hash: string }>).map(
+        (entry) => entry.hash,
+      );
+
+      expect(digestTrajectoryChain(acceptedText)).toBe(
+        BATCH_1_RERUN_TRAJECTORY_PINS[target]!.accepted,
+      );
+      expect(digestTrajectoryChain(freshText)).toBe(
+        BATCH_1_RERUN_TRAJECTORY_PINS[target]!.live,
+      );
+      expect(freshChain.length).toBe(acceptedChain.length);
+      expect(freshChain.length).toBeGreaterThan(0);
     }
+  });
+
+  it("two fresh runs are byte-identical to each other", () => {
+    runSituationEvaluator("3v3-situation-driven.v1.json", tmpDir);
+    const first = BATCH_1_RERUN_TARGETS.map((target) =>
+      digestArtifact(readFileSync(join(tmpDir, `${target}.json`), "utf-8")),
+    );
+
+    runSituationEvaluator("3v3-situation-driven.v1.json", tmpDir);
+    const second = BATCH_1_RERUN_TARGETS.map((target) =>
+      digestArtifact(readFileSync(join(tmpDir, `${target}.json`), "utf-8")),
+    );
+
+    expect(second).toEqual(first);
   });
 });
 

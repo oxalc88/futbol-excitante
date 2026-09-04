@@ -6,6 +6,8 @@
  * Applies gravity, air drag, swept pitch-plane impact within a tick,
  * bounce/restitution, ground resistance that cannot reverse velocity,
  * spin decay, and a Magnus-style curve force from ball spin.
+ * A "settled" ball holds its position until an impulse is applied to it, at
+ * which point it re-enters the regime model (ball-settled-regime-v2).
  * Every ground impact emits an ordered pitch-contact
  * event with incoming and outgoing state references.
  *
@@ -101,6 +103,22 @@ const MAX_SWEPT_ITERATIONS = 4;
  * Real shots produce vz ≥ 5 m/s; this threshold is well below that.
  */
 const MIN_LIFT_OFF_VELOCITY = 0.5;
+
+/**
+ * Minimum speed of an impulse applied to a "settled" ball that puts it back
+ * into the regime model instead of leaving it frozen (ball-settled-regime-v2).
+ *
+ * First touch, ground pass, dribble touch and tackle deflection write
+ * ball.linearVelocity without touching ball.regime. A settled ball that is
+ * given such an impulse must integrate from it; a settled ball that was simply
+ * left alone still carries exactly zero velocity from the settle path below
+ * and must keep applying no physics.
+ *
+ * Provisional placeholder — not a measured PES value. Held equal to
+ * GROUND_SETTLE_SPEED so the wake threshold and the settle threshold are
+ * symmetric and a single impulse produces exactly one regime transition.
+ */
+const SETTLED_IMPULSE_WAKE_SPEED = GROUND_SETTLE_SPEED;
 
 // -- Goal geometry (hard-coded pitch constants) -------------------------------
 
@@ -237,6 +255,22 @@ export function stepBall(
       ball.linearVelocity.z > MIN_LIFT_OFF_VELOCITY
     ) {
       ball.regime = "airborne";
+    }
+    // Settled ball that received an impulse (ball-settled-regime-v2): re-enter
+    // the accepted regime model rather than skipping integration. Vertical
+    // speed above MIN_LIFT_OFF_VELOCITY already went airborne above, so
+    // everything reaching here is a ground-level impulse → ground-roll, which
+    // zeroes any sub-lift vertical velocity and settles again through the
+    // existing GROUND_SETTLE_SPEED check. One transition per impulse: the
+    // settle path leaves exactly zero velocity, so the wake cannot fire again
+    // on its own and re-open the ground↔airborne pitch-contact flood.
+    if (
+      ball.regime === "settled" &&
+      (horizontalSpeed(ball.linearVelocity.x, ball.linearVelocity.y) >=
+        SETTLED_IMPULSE_WAKE_SPEED ||
+        Math.abs(ball.linearVelocity.z) >= SETTLED_IMPULSE_WAKE_SPEED)
+    ) {
+      ball.regime = "ground-roll";
     }
 
     if (ball.regime === "airborne" || ball.regime === "bouncing") {
@@ -426,7 +460,9 @@ export function stepBall(
 
       remaining = 0;
     } else {
-      // "settled" — no physics.
+      // "settled" with no applied impulse — nothing to integrate. An impulse
+      // applied while settled is woken into a regime above
+      // (ball-settled-regime-v2).
       remaining = 0;
     }
   }

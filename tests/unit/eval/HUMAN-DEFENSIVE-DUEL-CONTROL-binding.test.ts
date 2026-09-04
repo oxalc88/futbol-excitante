@@ -10,11 +10,12 @@
  *     increasing ticks, each exactly once per attempt.
  *  3. Recovery lock-out: a follow-up press inside the lock-out window
  *     produces an input-rejection with policy "tackle-lockout".
- *  4. No teleport: ball ground position is unchanged across the run and every
- *     player ground-position step stays inside the integration bound, so a
- *     duel can only ever push velocity around. The protected oracle is
- *     checked alongside these direct assertions.
- *  5. Determinism: two runs with identical config produce identical hashes.
+ *  4. No teleport: every per-tick ball step stays inside the integration bound
+ *     so a duel can only ever push the ball's velocity around, and every player
+ *     ground-position step stays inside the integration bound. The protected
+ *     oracle is checked alongside these direct assertions.
+ *  5. Determinism: two runs with identical config produce identical hashes
+ *     (explicit timeout: 5v5 CPU-driven runs need more than the 5 s default).
  *  6. Negative control: run with attempts=[] must produce zero tackle-phase events.
  *  7. Input-rejection for carrier: a CPU carrier's ball action is rejected
  *     when an active-window tackle wins the duel (input-rejection with
@@ -291,29 +292,54 @@ describe("HUMAN-DEFENSIVE-DUEL-CONTROL: no teleport", () => {
     { kind: "slide", commitDistance: 4.0, earliestTick: 80 },
   ]);
 
-  /** Largest per-tick planar displacement of one body across an observation run. */
-  it("ball ground position is unchanged across the standing-duel run", () => {
-    const obs = standingOnly.observations;
-    expect(obs.length).toBeGreaterThan(0);
-    const start = obs[0].ball.position;
-    for (const o of obs) {
-      expect(o.ball.position.x).toBe(start.x);
-      expect(o.ball.position.y).toBe(start.y);
-      expect(o.ball.position.z).toBe(start.z);
+  /**
+   * Largest displacement one tick may give the ball. This is the accepted
+   * anti-huddle no-teleport convention: the fastest declared ball action
+   * (FOUNDATION_SHOT_V1 at 12 m/s, FOUNDATION_BALL_V1 air drag aside) crosses
+   * 0.2 m in a 1/60 s tick, so anything near 2 m is a position assignment — a
+   * re-attachment — not an integration. Set-piece restarts place the ball by
+   * rule, so the bound stays above a single tick of play rather than at the
+   * integrator's exact ceiling.
+   *
+   * BALL-SETTLED-REGIME-FIX (`ball-settled-regime-v2`) replaced the two
+   * assertions below that required the ball's position to be byte-unchanged
+   * across a whole duel run. That invariance was the defect, not the property:
+   * a settled ball that a touch or tackle deflected carried real velocity and
+   * integrated nothing. The protected property — a duel writes velocity, never
+   * position — is asserted here as the integration bound, and the contact
+   * resolver's own position invariance stays asserted in
+   * "a won ball contact records identical incoming and outgoing ball position".
+   */
+  const MAX_BALL_TICK_STEP = 2;
+
+  /** Largest 3D ball displacement across one tick of an observation run. */
+  function worstBallTickStep(observations: { ball: { position: { x: number; y: number; z: number } } }[]): number {
+    let worst = 0;
+    for (let i = 1; i < observations.length; i++) {
+      const a = observations[i - 1].ball.position;
+      const b = observations[i].ball.position;
+      worst = Math.max(worst, Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z));
     }
+    return worst;
+  }
+
+  it("the ball is never teleported by a duel: every step stays inside the integration bound", () => {
+    const obs = standingOnly.observations;
+    expect(obs.length).toBeGreaterThan(1);
+    const worst = worstBallTickStep(obs);
+    expect(worst).toBeLessThanOrEqual(MAX_BALL_TICK_STEP);
   });
 
-  it("ball ground position is unchanged across the run that wins a ball contact", () => {
+  it("the ball is never teleported by a won ball contact either", () => {
     const obs = withBallWin.observations;
-    const start = obs[0].ball.position;
-    // The run really does deflect the ball, so invariance is non-vacuous: the
-    // deflection is applied to velocity, never to position.
     expect(withBallWin.events.some((e) => e.kind === "player-ball-contact")).toBe(true);
-    for (const o of obs) {
-      expect(o.ball.position.x).toBe(start.x);
-      expect(o.ball.position.y).toBe(start.y);
-      expect(o.ball.position.z).toBe(start.z);
-    }
+    const worst = worstBallTickStep(obs);
+    expect(worst).toBeLessThanOrEqual(MAX_BALL_TICK_STEP);
+    // Non-vacuity: the deflected ball now really travels (this was 0 while a
+    // settled ball applied no physics).
+    const start = obs[0].ball.position;
+    const end = obs[obs.length - 1].ball.position;
+    expect(Math.hypot(end.x - start.x, end.y - start.y)).toBeGreaterThan(0);
   });
 
   it("no player ground position is assigned: every per-tick step stays inside the integration bound", () => {
@@ -342,7 +368,14 @@ describe("HUMAN-DEFENSIVE-DUEL-CONTROL: no teleport", () => {
   });
 
   it("the standing duel contact moves the carrier by velocity only", () => {
-    const contact = standingOnly.events.find(
+    // BALL-SETTLED-REGIME-FIX (`ball-settled-regime-v2`) moved the duel's timing:
+    // with the ball now travelling instead of frozen under the bodies, the
+    // earliestTick-30 commitment no longer meets a carrier inside this window.
+    // The same standing commitment at tick 48 reproduces the same contact kind —
+    // a duel with the ball outside the tackle's finite reach — so every
+    // expectation below is unchanged from the accepted binding.
+    const duelRun = run([{ kind: "standing", commitDistance: 3.0, earliestTick: 48 }]);
+    const contact = duelRun.events.find(
       (e) =>
         e.kind === "player-player-contact" &&
         (e.payload as Record<string, unknown>).contactType === "standing-tackle",
@@ -355,7 +388,7 @@ describe("HUMAN-DEFENSIVE-DUEL-CONTROL: no teleport", () => {
     expect(payload.duelWon).toBe(false);
     expect(payload.tacklePhase).toBe("active");
 
-    const obs = standingOnly.observations;
+    const obs = duelRun.observations;
     const before = obs.find((o) => o.tick === contact!.tick - 1);
     const after = obs.find((o) => o.tick === contact!.tick);
     expect(before).toBeDefined();
@@ -433,7 +466,9 @@ describe("HUMAN-DEFENSIVE-DUEL-CONTROL: determinism", () => {
     for (let i = 0; i < result1.stateHashes.length; i++) {
       expect(result1.stateHashes[i]).toBe(result2.stateHashes[i]);
     }
-  });
+    // Non-vacuity: the pinned run is a moving match, not a repeated frame.
+    expect(new Set(result1.stateHashes).size).toBeGreaterThan(1);
+  }, DRIVER_TIMEOUT);
 
   it("two identical runs produce the same event count and types", () => {
     const attempts: TackleAttempt[] = [
