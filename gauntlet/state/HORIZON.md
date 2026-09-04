@@ -9,7 +9,7 @@ horizon_id: "anti-huddle-organic-pass-and-node-gate"
 created_from_commit: d56ccad
 created_at: 2026-09-04
 reason: "Horizon v23 (EXHAUSTED 5/5, remote-durable at d56ccad) delivered the defensive-duel arc: typecheck gate green, human standing/sliding tackles (U/I), CPU tackle commitment, honest organic duel closure, and the controls legend with real-app BROWSER_VISIBLE evidence. Human-directed next gameplay priority: stop the 5v5 ball huddle — organic 5v5 play currently collapses into a clump around the ball. v24 (within small-sided bounds, no GK/regulation/full-match/PES envelopes): make only the nearest player per team chase the loose ball while all others hold fixed kickoff homes, freeze kickoff movement until first touch, then commit exactly one presser + cover so an organic pass can fire — proven by MULTI_TICK trajectory evidence over a coherent >=1800-tick (30 s at the 60 Hz sim tick) CPU-vs-CPU run, not an 8-tick fixture, plus browser DYNAMIC_VISUAL semantic frames of the same arc and a bookkeeping re-scan of the SMALL_SIDED_SHAPE coherent sources. Also: repair the 9 node-gate failures that reproduce at the last remote-durable acceptance a46718c (worktree-verified 2026-09-04: e.g. playable-1v1-re-evaluation expects registrySetId 24b5341e but the live registry set is d1a691b2 — stale durable eval artifacts vs live registries; nondeterminism-canary x2, match-set-piece, match-lifecycle determinism, compare-foundation x2, COHERENT-EVIDENCE-RERUN-binding, difficulty-capture) and enforce capture hygiene so ordinary suites never write docs/screenshots/**. Amended 2026-09-04 after the 5V5-KICKOFF-ANTI-HUDDLE acceptance: BALL-SETTLED-REGIME-FIX inserted (unsafe_due_to_new_defect — settled-ball regime applies no physics; blocks honest organic-pass visual evidence), and the browser-evidence / closure objectives now depend on it. Perceptual-rubric/networked work remains deferred."
-current_index: 1
+current_index: 2
 objectives:
   - id: 5V5-KICKOFF-ANTI-HUDDLE
     status: accepted
@@ -17,7 +17,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: ""
   - id: BALL-SETTLED-REGIME-FIX
-    status: pending
+    status: accepted
     reason: "Horizon amendment (unsafe_due_to_new_defect, disclosed by the accepted 5V5-KICKOFF-ANTI-HUDDLE candidate and confirmed by its evidence): once the ball regime is 'settled', stepBall applies no physics at all, so a first-touch or ground-pass impulse leaves velocity non-zero while the position never moves — kickoff/ground-pass windows show touch/pass events with zero ball travel (kickoff run ballTravelMetres 0 despite real touch/pass events), which dead-balls the browser 5v5 kickoff grind and blocks honest organic-pass visual evidence in the next objective. Fix in the simulation core (the one place this horizon touches the core): settled-regime balls must receive applied impulses (first touch, passes) per the accepted ball model, staying deterministic and byte-protecting the accepted ball-oscillation fix (MIN_LIFT_OFF_VELOCITY / POST_BOUNCE_ABSORB_THRESHOLD) that closed the pitch-contact flood — regenerate evidence for any legitimately changed accepted coherent-match pins honestly (they replay at the historical configuration). Executable guards: a settled ball receiving an impulse moves (position changes within ticks) and re-enters the accepted regimes; two-run determinism; no invented PES constants (provisional parameters labeled). No GK/regulation/full-match."
     builder: builder-gameplay
     prerequisite: 5V5-KICKOFF-ANTI-HUDDLE
