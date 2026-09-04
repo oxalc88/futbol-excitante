@@ -33,6 +33,7 @@ import { executeOracle } from "../../eval/oracles/oracle-registry.js";
 import "../../eval/oracles/wire.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { createWorld } from "../../src/simulation/world/create.js";
+import { runHeadless } from "../../src/apps/headless/run.js";
 import { makeInputFrame } from "../unit/contracts.fixture.js";
 
 // ---------------------------------------------------------------------------
@@ -301,6 +302,36 @@ describe("PRNG-order mutant: genuine mutation", () => {
     expect(cmp.status).toBe("delta_only");
     expect(cmp.conditionHashMatch).toBe(true);
     expect(cmp.earliestDivergenceTick).toBeUndefined();
+  });
+});
+
+// ===========================================================================
+// Input-schedule consistency guard
+// ===========================================================================
+// evaluate() must apply input frames for tick sim.tick (the headless
+// convention). A prior off-by-one (inputProgram[sim.tick + 1]) silently
+// dropped the tick-0 input frame and desynchronised evaluate() from every
+// other runner, which the PRNG-order mutant tests then flagged. This guard
+// pins the two entry points to the same per-tick hash stream so the drift
+// cannot return unnoticed.
+// ===========================================================================
+
+describe("Input-schedule consistency between evaluate() and runHeadless()", () => {
+  it("same input-driven scenario produces identical per-tick hashes in both runners", () => {
+    const scenario = loadFixture("foundation-move-and-roll.v1.json");
+    const modified = JSON.parse(JSON.stringify(scenario)) as ScenarioDefinition;
+    modified.inputProgram = buildInputProgram(10, "slot-1");
+    modified.durationTicks = 10;
+
+    const ev = evaluate({ scenario: modified });
+    const hl = runHeadless({ scenario: modified });
+
+    const hlHashes = new Map(hl.hashes.map((h) => [h.tick, h.hash]));
+    expect(ev.hashes.size).toBe(10);
+    expect(hlHashes.size).toBe(10);
+    for (const [tick, hash] of ev.hashes) {
+      expect(hlHashes.get(tick)).toBe(hash);
+    }
   });
 });
 

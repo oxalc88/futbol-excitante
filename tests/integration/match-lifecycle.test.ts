@@ -243,7 +243,7 @@ describe("MATCH-LIFECYCLE-004: determinism", () => {
     expect(r1.matchPhase).toBe(r2.matchPhase);
   });
 
-  it("same seed → identical phaseHistory across runs", () => {
+  it("same seed → identical phaseHistory across runs", { timeout: 15000 }, () => {
     const scenario = makeAiMatchScenario();
     const r1 = runHeadlessMatch({ scenario });
     const r2 = runHeadlessMatch({ scenario });

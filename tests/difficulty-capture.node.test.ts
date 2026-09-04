@@ -202,12 +202,11 @@ describe("DIFFICULTY-EVIDENCE: node-side durable capture", () => {
   });
 
   it("captures 2D canvas screenshot with difficulty HUD and writes to disk", async () => {
+    // Capture-hygiene (0.9.2+): ordinary regression suites must not write
+    // into docs/screenshots/**. This node-side capture writes ephemeral
+    // output under the ignored test-results/gauntlet-capture/ tree instead.
     const section = "BROWSER-DIFFICULTY-SETTING";
-    const outDir = join("docs", "screenshots", section);
-
-    if (existsSync(join("docs", "evidence", section, "manifest.json"))) {
-      throw new Error(`Accepted evidence is immutable: ${section} already has a manifest`);
-    }
+    const outDir = join("test-results", "gauntlet-capture", section);
 
     if (!existsSync(outDir)) {
       mkdirSync(outDir, { recursive: true });

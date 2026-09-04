@@ -115,7 +115,7 @@ describe("SMALL-SIDED-COHERENT-EVIDENCE-RERUN binding", () => {
   });
 
   // (e) Bundle manifest coherence
-  it("bundle manifest has 18 source objectives and latest playtest present", () => {
+  it("bundle manifest has 19 source objectives and latest playtest present", () => {
     const manifestPath = join(
       projectRoot,
       "docs/evidence/milestones/SMALL_SIDED_SHAPE/manifest.json",
@@ -124,12 +124,15 @@ describe("SMALL-SIDED-COHERENT-EVIDENCE-RERUN binding", () => {
 
     const manifest = JSON.parse(readFileSync(manifestPath, "utf-8")) as Record<string, unknown>;
     expect(manifest.milestone_id).toBe("SMALL_SIDED_SHAPE");
-    expect((manifest.source_objectives as Array<unknown>).length).toBe(18);
-    expect((manifest.playtest_runs as Array<unknown>).length).toBe(17);
+    // Superseded by the accepted SMALL_SIDED-ORGANIC-PASS-FLOW-CLOSURE
+    // (b253e42): the bundle grew from 18 sources / 17 runs to 19 sources /
+    // 19 runs, and it now supersedes the 2026-08-26 playtest record.
+    expect((manifest.source_objectives as Array<unknown>).length).toBe(19);
+    expect((manifest.playtest_runs as Array<unknown>).length).toBe(19);
 
-    // Latest playtest must be our new record
+    // Latest playtest must be our new record (superseding the 2026-08-26 one)
     const latestPath = manifest.latest_playtest_result.path as string;
-    expect(latestPath).toContain("2026-08-26T14-00-00.000Z");
+    expect(latestPath).toContain("2026-09-04T18-16-07-471Z");
 
     // Latest verdict must be PASS
     const latestVerdict = manifest.latest_playtest_result.result.milestone_verdict;
