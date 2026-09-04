@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "objective_id": "BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "semantic_order": "kickoff freeze -> first touch -> spread to homes -> one presser + cover -> organic pass",
+  "durable_capture": true,
+  "scenario": "5v5-fixture-v1",
+  "arc": {
+    "first_touch_tick": 18,
+    "kickoff_taker_id": "player-10",
+    "spread_tick": 23,
+    "press_tick": 55,
+    "pass_event": {
+      "tick": 122,
+      "kind": "pass",
+      "player_id": "player-3",
+      "team_id": "team-a"
+    },
+    "pass_ball_displacement_metres": 2.93
+  },
+  "reproduction": {
+    "capture_test": "tests/browser/anti-huddle-dynamic-evidence.browser.test.ts",
+    "wiring": "src/apps/browser/main.ts per-slot CPU composition root with CpuObservation.cpuAntiHuddle + cpuDefensiveTackle",
+    "scenario_path": "eval/scenarios/5v5-fixture-v1.json",
+    "play_ticks": 620,
+    "browser_trajectory": "docs/evidence/BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE/trajectory.json",
+    "engine_trajectory": "docs/evidence/5V5-KICKOFF-ANTI-HUDDLE/trajectory.json"
+  },
+  "cross_runtime_note": "Ticks and per-tick hashes are this Chromium run's own; the pinned Node artifacts for the same scenario (docs/evidence/5V5-KICKOFF-ANTI-HUDDLE and docs/evidence/BALL-SETTLED-REGIME-FIX) pin the same arc structure. Per-tick floats are not compared across runtimes (known pinned-runtime gap).",
+  "frames": [
+    {
+      "index": 1,
+      "label": "kickoff-freeze",
+      "tick": 10,
+      "semantic": "before",
+      "description": "Kickoff freeze: every body but the kick taker (player-10) holds its fixed kickoff home and the ball sits untouched on the centre spot",
+      "path": "kickoff-freeze.png",
+      "sha256": "fafe29b825e03307cea9d085b6cdd030a234e717019e5b13c1931e552cc6a7f3"
+    },
+    {
+      "index": 2,
+      "label": "first-touch",
+      "tick": 18,
+      "semantic": "event",
+      "description": "First touch: player-10 strikes the frozen kickoff ball, the freeze releases and the ball starts travelling",
+      "path": "first-touch.png",
+      "sha256": "7ee3cc68ea4d273f1e516d6f9883acd08223722ee8ca34240a0330cd4fd35a2b"
+    },
+    {
+      "index": 3,
+      "label": "spread-to-homes",
+      "tick": 23,
+      "semantic": "transition",
+      "description": "Spread to homes: the non-chasers still hold their kickoff homes while exactly one designated presser per team moves on the ball",
+      "path": "spread-to-homes.png",
+      "sha256": "7b9d1bf8663dd245247ce77ba23d7d13744f14f7370cd231596b0ea21e59df1d"
+    },
+    {
+      "index": 4,
+      "label": "press-and-cover",
+      "tick": 55,
+      "semantic": "result-press",
+      "description": "One presser + cover: a single designated presser closes on the moving ball with its cover behind it, nobody else converges",
+      "path": "press-and-cover.png",
+      "sha256": "dc91f261be441670e749d76c88747394d1bc1332983662f49838fdbf139a2ae9"
+    },
+    {
+      "index": 5,
+      "label": "organic-pass",
+      "tick": 182,
+      "semantic": "result-pass",
+      "description": "Organic pass: the CPU fired a pass from player-3 at tick 122; by this frame the ball has travelled 2.93 m since it was struck",
+      "path": "organic-pass.png",
+      "sha256": "68d3b51e3081bab6aba5140eb0f03258c5d443828ff3fc38c6436a4003407cec"
+    }
+  ]
+}
