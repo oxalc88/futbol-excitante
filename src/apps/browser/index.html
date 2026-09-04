@@ -49,6 +49,18 @@
           </select>
         </div>
 
+        <div class="setup-field" id="controls-legend-section">
+          <label>Controls</label>
+          <div id="controls-legend">
+            <table class="controls-legend-table">
+              <thead>
+                <tr><th>Action</th><th>Key</th></tr>
+              </thead>
+              <tbody id="controls-legend-body"></tbody>
+            </table>
+          </div>
+        </div>
+
         <button id="start-button" type="button">START MATCH</button>
       </div>
     </div>
@@ -73,7 +85,20 @@
       <div id="hash-display">Hash: —</div>
     </div>
     <div id="controls-hint">
-      WASD: Move | Shift: Sprint | K: First Touch | J: Pass | L: Shot | Space: Switch
+      <span id="controls-hint-text">WASD: Move | Shift: Sprint | K: First Touch | J: Pass | L: Shot | Tab: Switch | U: Standing Tackle | I: Slide Tackle</span>
+      <button id="controls-toggle" type="button" title="Toggle controls legend">?</button>
+    </div>
+    <div id="controls-overlay" class="hidden">
+      <div id="controls-overlay-card">
+        <h2>Controls</h2>
+        <table class="controls-legend-table">
+          <thead>
+            <tr><th>Action</th><th>Key</th></tr>
+          </thead>
+          <tbody id="controls-overlay-body"></tbody>
+        </table>
+        <button id="controls-overlay-close" type="button">Close</button>
+      </div>
     </div>
     <button id="back-to-menu" type="button">BACK TO MENU</button>
   </div>

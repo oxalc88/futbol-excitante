@@ -22,6 +22,7 @@
     "capture-cpu-tackle-evidence": "tsx scripts/capture-cpu-defensive-tackle-evidence.ts",
     "capture-cpu-tackle-frames": "WIP_SECTION=__EVIDENCE__:CPU-DEFENSIVE-TACKLE vitest run tests/browser/cpu-tackle-screenshot-capture.browser.test.ts --project browser",
     "capture-ai-video": "node scripts/capture-ai-match-video.mjs",
+    "capture-controls-legend": "node scripts/capture-controls-legend-screenshots.mjs",
     "gauntlet:audit": "tsx gauntlet/evals/src/gauntlet-audit.ts",
     "gauntlet:acceptance:persist": "tsx gauntlet/evals/src/persist-acceptance.ts",
     "gauntlet:acceptance:durability": "node scripts/ci/verify-acceptance-durability.mjs",

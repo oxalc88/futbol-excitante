@@ -30,6 +30,11 @@ import type { Simulation } from "../../simulation/loop/simulation.js";
 import { createCpuAdapter, buildCpuObservation } from "../../adapters/input-browser/cpu-adapter.js";
 import type { DifficultyLevel } from "../../adapters/input-browser/cpu-adapter.js";
 import { computeTeamDecision } from "../../adapters/input-browser/team-decision-profile.js";
+import {
+  closeControlsOverlay,
+  initControlsLegendUi,
+  setControlsHintText,
+} from "./controls-legend-ui.js";
 
 // ---------------------------------------------------------------------------
 // Match mode configuration (for setup menu)
@@ -66,12 +71,12 @@ import {
 const MATCH_MODES: MatchModeEntry[] = [
   { modeId: "ai-match-5v5",     scenario: FOUNDATION_SCENARIO_5V5,             urlMode: "ai-match-5v5",     hint: "5v5 AI Match — fully autonomous" },
   { modeId: "human-vs-ai-5v5",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5, urlMode: "human-vs-ai-5v5",  hint: "5v5 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle" },
-  { modeId: "human-vs-ai-5v3",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V3, urlMode: "human-vs-ai-5v3",  hint: "5v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
+  { modeId: "human-vs-ai-5v3",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V3, urlMode: "human-vs-ai-5v3",  hint: "5v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle" },
   { modeId: "ai-match-3v3",     scenario: FOUNDATION_SCENARIO_3V3,             urlMode: "ai-match-3v3",     hint: "3v3 AI Match — fully autonomous" },
-  { modeId: "human-vs-ai-3v3",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_3V3, urlMode: "human-vs-ai-3v3",  hint: "3v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
-  { modeId: "human-vs-ai",      scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU,    urlMode: "human-vs-ai",       hint: "2v2 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
+  { modeId: "human-vs-ai-3v3",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_3V3, urlMode: "human-vs-ai-3v3",  hint: "3v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle" },
+  { modeId: "human-vs-ai",      scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU,    urlMode: "human-vs-ai",       hint: "2v2 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle" },
   { modeId: "2v2-ai",           scenario: FOUNDATION_SCENARIO_2V2,             urlMode: "2v2-ai",            hint: "2v2 AI Match — fully autonomous" },
-  { modeId: "human-vs-ai-1v1",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_1V1, urlMode: "human-vs-ai-1v1",  hint: "1v1 Human vs CPU — WASD + Shift to sprint, Tab to switch player" },
+  { modeId: "human-vs-ai-1v1",  scenario: FOUNDATION_SCENARIO_HUMAN_VS_CPU_1V1, urlMode: "human-vs-ai-1v1",  hint: "1v1 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle" },
   { modeId: "ai-match",         scenario: FOUNDATION_SCENARIO_AI_VS_AI,        urlMode: "ai-match",          hint: "1v1 AI Match — fully autonomous" },
 ];
 
@@ -285,6 +290,12 @@ difficultyHud.textContent = "Difficulty: Medium";
 document.body.appendChild(difficultyHud);
 
 // ---------------------------------------------------------------------------
+// Controls legend — populated from the shared contract (see controls-legend-ui)
+// ---------------------------------------------------------------------------
+
+initControlsLegendUi(document);
+
+// ---------------------------------------------------------------------------
 // Match phase overlay (created once, reused across matches)
 // ---------------------------------------------------------------------------
 
@@ -384,6 +395,7 @@ function showSetupMenu(): void {
   if (hudEl) hudEl.classList.add("hidden");
   if (controlsHintEl) controlsHintEl.classList.add("hidden");
   if (backToMenuButton) backToMenuButton.classList.add("hidden");
+  closeControlsOverlay(document);
   statsPanel.style.display = "none";
   difficultyHud.style.display = "none";
 }
@@ -439,7 +451,7 @@ function startMatch(
   // Update display labels.
   if (scoreboardNameA) scoreboardNameA.textContent = teamALabel;
   if (scoreboardNameB) scoreboardNameB.textContent = teamBLabel;
-  if (controlsHintEl) controlsHintEl.textContent = controlsHint;
+  setControlsHintText(document, controlsHint);
 
   // Update difficulty HUD indicator.
   const difficultyLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
@@ -743,14 +755,14 @@ function getScenarioFromUrl(): { scenario: ScenarioDefinition; urlMode: string; 
   const hintMap: Record<string, string> = {
     "ai-match": "1v1 AI Match — fully autonomous",
     "2v2-ai": "2v2 AI Match — fully autonomous",
-    "human-vs-ai": "2v2 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
+    "human-vs-ai": "2v2 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle",
     "2v2": "2v2 Match — Arrow keys + Space to sprint",
     "ai-match-3v3": "3v3 AI Match — fully autonomous",
     "ai-match-5v5": "5v5 AI Match — fully autonomous",
-    "human-vs-ai-5v3": "5v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
-    "human-vs-ai-3v3": "3v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
-    "human-vs-ai-5v5": "5v5 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
-    "human-vs-ai-1v1": "1v1 Human vs CPU — WASD + Shift to sprint, Tab to switch player",
+    "human-vs-ai-5v3": "5v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle",
+    "human-vs-ai-3v3": "3v3 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle",
+    "human-vs-ai-5v5": "5v5 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle",
+    "human-vs-ai-1v1": "1v1 Human vs CPU — WASD + Shift to sprint, Tab to switch player, U standing tackle, I slide tackle",
   };
 
   return { scenario, urlMode, hint: hintMap[urlMode] ?? "", difficulty };
