@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "5V5-KICKOFF-ANTI-HUDDLE",
+  "accepted_at": "2026-09-04T10:07:36.673Z",
+  "candidate_commit": "47bb0db",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/5V5-KICKOFF-ANTI-HUDDLE/trajectory.json",
+      "sha256": "29105045e176547bba188e871370cc2aff39ebff04ba0b92ceb366a5e66de5af",
+      "git_blob": "1945959af584a4ae32b3d072231bb01431f062c6",
+      "candidate_commit": "47bb0db",
+      "bytes": 2419545,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/5V5-KICKOFF-ANTI-HUDDLE/audit.json",
+      "sha256": "3a25cad86d9015dbf0e7ead861b57a691bf13e66085eb78bc6005a0e476899ae",
+      "git_blob": "395a4bf670374b8f5288c3d4407eef9ae4c8e8e4",
+      "candidate_commit": "47bb0db",
+      "bytes": 2663,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-04/2026-09-04T10-07-36-673Z-5V5-KICKOFF-ANTI-HUDDLE-acceptance.json"
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-04T10:07:36.673Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "5V5-KICKOFF-ANTI-HUDDLE",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "47bb0db",
+  "builder": {
+    "builder": "builder-gameplay",
+    "model": "qwen3.8-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Stop the 5v5 ball huddle (human-directed, Horizon v24 1/6): kickoff freeze to first touch keyed on ball lastTouchRef (ticks 1-17, 0.000 m frozen-home displacement, single taker; first touch tick 18), nearest-only chase with others holding fixed scenario kickoff homes (max 2 same-team bodies within 5 m, huddleTicks 0 vs 352 stashed), one presser + cover via shared designatePresser (press+cover 3598 team-ticks, cover behind presser 1407), organic passes fire (11 pass events / 119.99 m ball travel in the 1800-tick/30 s flowing run; stashed control: 0 passes, 5-deep clump — discriminating). Behavior confined to adapter/team-decision layer; core+contracts byte-identical; stash-identity + pinned baselines reproduce accepted artifacts byte-for-byte; two-run determinism byte-identical. Evidence trajectory.json SHA-256 29105045e176547bba188e871370cc2aff39ebff04ba0b92ceb366a5e66de5af (3600 rows, 3 runs incl. stashed control). 21 unit + 16 integration tests; 10 neighbor tests updated to the directed contract with explicit cpuAntiHuddle:false arms; accepted pins at historical configuration; PRESS trajectory test converted read-only (pre-existing hygiene violation). Critic ACCEPT first pass (independent re-execution, identical hash chain); integration ACCEPT first pass (101 neighbor tests green). Audit PASS 20/20. Disclosed pre-existing core defect (settled-ball regime applies no physics) untouched — horizon amended with BALL-SETTLED-REGIME-FIX."
+}
