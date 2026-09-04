@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-04T16:49:34.421Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "candidate_commit": "16cffb3",
+  "builder": {
+    "builder": "builder-gameplay",
+    "model": "qwen3.8-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v24 3/6: browser-facing DYNAMIC_VISUAL evidence of the accepted anti-huddle arc in real Chromium (createTestBridge + real Three renderer via bridge.capture(), two-pass capture): 5 event-centered semantic frames + sequence.json — kickoff-freeze@10 (ball untouched on the centre spot, 9 bodies frozen at homes), first-touch@18 (taker player-10 strikes), spread-to-homes@23 (exactly one designated presser per team moving), press-and-cover@55 (covers player-4/player-9 behind at -10.418/-8.062 m), organic-pass@182 (pass by player-3 at tick 122, ball displaced 2.93 m — possible only after BALL-SETTLED-REGIME-FIX). Browser trajectory.json 620 committed ticks (SHA-256 748f864f116afe22464af19d1a2ffd3b8ab8a796e98d4692e8c01347a44fd071, per-tick hashes + per-team chaser/cover designation + event log, state_hash_of_hashes 9fe9451b…, replay_identical true, ball_travel 25.62 m; two independent durable passes byte-identical incl. all PNGs). Stashed control cpuAntiHuddle:false: no first touch, no arc, clump returns (5 bodies/5 m, 237 huddle ticks) — discriminating. Capture hygiene: durable writes gated on WIP_SECTION=__EVIDENCE__:BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE; ordinary run wrote only test-results. Video honestly NOT_PRODUCED (repository video tooling absent). Cross-runtime tick-1 hash difference disclosed with structure-level equality asserted. Critic ACCEPT first pass (viewed all 5 frames; pixel-diff proved kickoff→first-touch changes confined to the 19×13 px ball-strike region with frozen bodies pixel-identical; independent Chromium rerun reproduced the arc); integration ACCEPT first pass (SHA/tick verification; docs byte-identical after runs via 779-file SHA diff). Audit PASS 20/20 DYNAMIC_VISUAL. Zero gameplay change (git diff --stat src/ empty)."
+}

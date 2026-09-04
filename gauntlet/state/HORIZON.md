@@ -9,7 +9,7 @@ horizon_id: "anti-huddle-organic-pass-and-node-gate"
 created_from_commit: d56ccad
 created_at: 2026-09-04
 reason: "Horizon v23 (EXHAUSTED 5/5, remote-durable at d56ccad) delivered the defensive-duel arc: typecheck gate green, human standing/sliding tackles (U/I), CPU tackle commitment, honest organic duel closure, and the controls legend with real-app BROWSER_VISIBLE evidence. Human-directed next gameplay priority: stop the 5v5 ball huddle — organic 5v5 play currently collapses into a clump around the ball. v24 (within small-sided bounds, no GK/regulation/full-match/PES envelopes): make only the nearest player per team chase the loose ball while all others hold fixed kickoff homes, freeze kickoff movement until first touch, then commit exactly one presser + cover so an organic pass can fire — proven by MULTI_TICK trajectory evidence over a coherent >=1800-tick (30 s at the 60 Hz sim tick) CPU-vs-CPU run, not an 8-tick fixture, plus browser DYNAMIC_VISUAL semantic frames of the same arc and a bookkeeping re-scan of the SMALL_SIDED_SHAPE coherent sources. Also: repair the 9 node-gate failures that reproduce at the last remote-durable acceptance a46718c (worktree-verified 2026-09-04: e.g. playable-1v1-re-evaluation expects registrySetId 24b5341e but the live registry set is d1a691b2 — stale durable eval artifacts vs live registries; nondeterminism-canary x2, match-set-piece, match-lifecycle determinism, compare-foundation x2, COHERENT-EVIDENCE-RERUN-binding, difficulty-capture) and enforce capture hygiene so ordinary suites never write docs/screenshots/**. Amended 2026-09-04 after the 5V5-KICKOFF-ANTI-HUDDLE acceptance: BALL-SETTLED-REGIME-FIX inserted (unsafe_due_to_new_defect — settled-ball regime applies no physics; blocks honest organic-pass visual evidence), and the browser-evidence / closure objectives now depend on it. Perceptual-rubric/networked work remains deferred."
-current_index: 2
+current_index: 3
 objectives:
   - id: 5V5-KICKOFF-ANTI-HUDDLE
     status: accepted
@@ -22,7 +22,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: 5V5-KICKOFF-ANTI-HUDDLE
   - id: BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE
-    status: pending
+    status: accepted
     reason: "Browser-facing completion of the anti-huddle arc: DYNAMIC_VISUAL evidence of a coherent 5v5 match showing kickoff freeze -> first touch -> spread to homes -> one presser + cover -> organic pass, as 3-5 event-centered semantic frames + sequence.json captured from the running browser app (real-app capture pattern), with an optional 30 s organic clip via the repository video path (video is optional diagnostic evidence and never replaces the trajectory). Existing readable-playability evidence preserved; no new rubric."
     builder: builder-gameplay
     prerequisite: BALL-SETTLED-REGIME-FIX
