@@ -22,6 +22,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { commands } from "@vitest/browser/context";
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
@@ -43,8 +44,15 @@ import duelRejectionScenario from "../../eval/scenarios/3v3-situation-driven-due
 // ---------------------------------------------------------------------------
 
 const CASE_ID = "BROWSER-SMALL-SIDED-001-COHERENCE-RERUN";
-const SCREENSHOT_DIR =
-  "/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/screenshots/BROWSER-SMALL-SIDED-001-COHERENCE-RERUN";
+// Capture-hygiene (0.9.2+): ordinary regression runs must not write
+// docs/screenshots/**. Durable evidence is entered only through the explicit
+// evidence-mode capture.
+const OBJECTIVE_ID = "BROWSER-SMALL-SIDED-001-COHERENCE-RERUN";
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION === `__EVIDENCE__:${OBJECTIVE_ID}`;
+const SCREENSHOT_DIR = DURABLE_EVIDENCE
+  ? `docs/screenshots/${OBJECTIVE_ID}`
+  : `test-results/gauntlet-capture/${OBJECTIVE_ID}`;
 
 const SCENARIOS: Array<{
   name: string;
@@ -233,17 +241,39 @@ describe("BROWSER-SMALL-SIDED-001-COHERENCE-RERUN: semantic frame capture", () =
   it(
     "captures 4 semantic frames: before → first-input → mid-play → final",
     async () => {
-      const { page } = await import("@vitest/browser/context");
+      if (DURABLE_EVIDENCE) {
+        let manifestExists = false;
+        try {
+          await commands.readFile(
+            `docs/evidence/${OBJECTIVE_ID}/manifest.json`,
+            "utf-8",
+          );
+          manifestExists = true;
+        } catch {
+          // no manifest yet: durable capture for this candidate is allowed
+        }
+        if (manifestExists) {
+          throw new Error(
+            `Accepted evidence is immutable: docs/evidence/${OBJECTIVE_ID}/manifest.json exists`,
+          );
+        }
+      }
+
+      async function captureFrame(name: string): Promise<void> {
+        const cap = await bridge.capture();
+        const base64 = cap.screenshot.split(",")[1] ?? "";
+        if (!base64 || base64.length < 100) {
+          throw new Error(`renderer produced no PNG bytes for ${name}`);
+        }
+        await commands.writeFile(`${SCREENSHOT_DIR}/${name}`, base64, "base64");
+      }
 
       bridge = createTestBridge(container, scenario);
       await bridge.reset();
 
       // Frame 1: before — initial state (tick 0).
       bridge.renderFrame();
-      await page.screenshot({
-        path: `${SCREENSHOT_DIR}/frame-before.png`,
-        type: "png",
-      });
+      await captureFrame("frame-before.png");
       expect(bridge.getSimulation().presentation().players.length).toBe(6);
 
       // Drive to tick 15 (after inputs at tick 1 and tick 10).
@@ -260,10 +290,7 @@ describe("BROWSER-SMALL-SIDED-001-COHERENCE-RERUN: semantic frame capture", () =
 
       // Frame 2: first-input — after early inputs.
       bridge.renderFrame();
-      await page.screenshot({
-        path: `${SCREENSHOT_DIR}/frame-first-input.png`,
-        type: "png",
-      });
+      await captureFrame("frame-first-input.png");
       expect(bridge.getSimulation().tick).toBeGreaterThanOrEqual(15);
 
       // Drive to tick 40 (after inputs at ticks 17, 22).
@@ -280,10 +307,7 @@ describe("BROWSER-SMALL-SIDED-001-COHERENCE-RERUN: semantic frame capture", () =
 
       // Frame 3: mid-play — after movement inputs.
       bridge.renderFrame();
-      await page.screenshot({
-        path: `${SCREENSHOT_DIR}/frame-mid-play.png`,
-        type: "png",
-      });
+      await captureFrame("frame-mid-play.png");
       expect(bridge.getSimulation().tick).toBeGreaterThanOrEqual(40);
 
       // Drive remaining ticks to tick 60.
@@ -301,10 +325,7 @@ describe("BROWSER-SMALL-SIDED-001-COHERENCE-RERUN: semantic frame capture", () =
 
       // Frame 4: final — end state after shot input at tick 50.
       bridge.renderFrame();
-      await page.screenshot({
-        path: `${SCREENSHOT_DIR}/frame-final.png`,
-        type: "png",
-      });
+      await captureFrame("frame-final.png");
       expect(bridge.getSimulation().tick).toBe(scenario.durationTicks);
 
       // Verify 6 players still present.

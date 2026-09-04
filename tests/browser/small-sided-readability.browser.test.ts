@@ -13,6 +13,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { commands } from "@vitest/browser/context";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
 import { FOUNDATION_SCENARIO_3V3 } from "../../src/apps/browser/foundation-scenario.js";
 import { DEFAULT_RENDERER_CONFIG } from "../../src/adapters/renderer-three/renderer.js";
@@ -23,7 +24,15 @@ import type { RendererConfig } from "../../src/adapters/renderer-three/renderer.
 // Constants
 // ---------------------------------------------------------------------------
 
-const SCREENSHOT_DIR = "/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/screenshots/SMALL-SIDED-VISUAL-READABILITY-EVIDENCE";
+// Capture-hygiene (0.9.2+): ordinary regression runs must not write
+// docs/screenshots/**. Durable evidence is entered only through the explicit
+// evidence-mode capture (WIP_SECTION=__EVIDENCE__:SMALL-SIDED-VISUAL-READABILITY-EVIDENCE).
+const OBJECTIVE_ID = "SMALL-SIDED-VISUAL-READABILITY-EVIDENCE";
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION === `__EVIDENCE__:${OBJECTIVE_ID}`;
+const SCREENSHOT_DIR = DURABLE_EVIDENCE
+  ? `docs/screenshots/${OBJECTIVE_ID}`
+  : `test-results/gauntlet-capture/${OBJECTIVE_ID}`;
 
 /** Wider camera for team_classification: shows all 6 players in one frame. */
 const WIDE_CAMERA_CONFIG: RendererConfig = {
@@ -114,7 +123,35 @@ describe("SMALL-SIDED-VISUAL-READABILITY-EVIDENCE: 8-dimension capture", () => {
   it(
     "captures event-centered frames for all 8 visual readability dimensions",
     async () => {
-      const { page } = await import("@vitest/browser/context");
+      if (DURABLE_EVIDENCE) {
+        let manifestExists = false;
+        try {
+          await commands.readFile(
+            `docs/evidence/${OBJECTIVE_ID}/manifest.json`,
+            "utf-8",
+          );
+          manifestExists = true;
+        } catch {
+          // no manifest yet: durable capture for this candidate is allowed
+        }
+        if (manifestExists) {
+          throw new Error(
+            `Accepted evidence is immutable: docs/evidence/${OBJECTIVE_ID}/manifest.json exists`,
+          );
+        }
+      }
+
+      async function captureFrame(
+        b: TestBridge,
+        fileName: string,
+      ): Promise<void> {
+        const cap = await b.capture();
+        const base64 = cap.screenshot.split(",")[1] ?? "";
+        if (!base64 || base64.length < 100) {
+          throw new Error(`renderer produced no PNG bytes for ${fileName}`);
+        }
+        await commands.writeFile(`${SCREENSHOT_DIR}/${fileName}`, base64, "base64");
+      }
 
       // ---- Pass 1: 7 dimensions with DEFAULT camera --------------------
       const defaultCaptures = CAPTURE_PLAN.filter(
@@ -148,10 +185,7 @@ describe("SMALL-SIDED-VISUAL-READABILITY-EVIDENCE: 8-dimension capture", () => {
 
         bridge.renderFrame();
         const fileName = `${capture.dim}-${capture.label}.png`;
-        await page.screenshot({
-          path: `${SCREENSHOT_DIR}/${fileName}`,
-          type: "png",
-        });
+        await captureFrame(bridge, fileName);
         capturedFrames.push({
           dim: capture.dim,
           label: capture.label,
@@ -186,10 +220,7 @@ describe("SMALL-SIDED-VISUAL-READABILITY-EVIDENCE: 8-dimension capture", () => {
 
         wideBridge.renderFrame();
         const fileName = `${capture.dim}-${capture.label}.png`;
-        await page.screenshot({
-          path: `${SCREENSHOT_DIR}/${fileName}`,
-          type: "png",
-        });
+        await captureFrame(wideBridge, fileName);
         capturedFrames.push({
           dim: capture.dim,
           label: capture.label,

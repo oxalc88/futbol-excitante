@@ -24,6 +24,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { commands } from "@vitest/browser/context";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
 import { FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5 } from "../../src/apps/browser/foundation-scenario.js";
 import { createCpuAdapter, buildCpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
@@ -34,7 +35,14 @@ import type { TestBridge } from "../../src/apps/browser/test-bridge.js";
 import type { InputFrame } from "../../src/contracts/input.js";
 
 const OBJECTIVE_ID = "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY";
-const SCREENSHOT_DIR = `/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/screenshots/${OBJECTIVE_ID}`;
+// Capture-hygiene (0.9.2+): ordinary regression runs must not write
+// docs/screenshots/**. Durable evidence is entered only through the explicit
+// evidence-mode capture.
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION === `__EVIDENCE__:${OBJECTIVE_ID}`;
+const SCREENSHOT_DIR = DURABLE_EVIDENCE
+  ? `docs/screenshots/${OBJECTIVE_ID}`
+  : `test-results/gauntlet-capture/${OBJECTIVE_ID}`;
 const MAX_TICKS = 400;
 const PROXIMITY_THRESHOLD = 1.5;
 
@@ -147,11 +155,18 @@ async function capturePass(
   passTick: number,
   shotTick: number,
 ): Promise<string[]> {
-  const { page } = await import("@vitest/browser/context");
-
   const bridge = createTestBridge(container, FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5);
   await bridge.reset();
   const sim = bridge.getSimulation();
+
+  async function captureFrame(name: string): Promise<void> {
+    const cap = await bridge.capture();
+    const base64 = cap.screenshot.split(",")[1] ?? "";
+    if (!base64 || base64.length < 100) {
+      throw new Error(`renderer produced no PNG bytes for ${name}`);
+    }
+    await commands.writeFile(`${SCREENSHOT_DIR}/${name}`, base64, "base64");
+  }
 
   const cpuEntries = Object.entries(FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5.controlAssignments)
     .filter(([, a]) => a.mode !== "HUMAN")
@@ -245,7 +260,7 @@ async function capturePass(
     for (const t of targets) {
       if (sim.tick === t.tick && !captured.includes(t.label)) {
         bridge.renderFrame();
-        await page.screenshot({ path: `${SCREENSHOT_DIR}/${t.label}.png`, type: "png" });
+        await captureFrame(`${t.label}.png`);
         captured.push(t.label);
       }
     }
@@ -261,6 +276,24 @@ describe("human-action-readability: screenshot capture", () => {
   it(
     "captures 5 before→event→after PNGs with all unique SHA-256 hashes",
     async () => {
+      if (DURABLE_EVIDENCE) {
+        let manifestExists = false;
+        try {
+          await commands.readFile(
+            `docs/evidence/${OBJECTIVE_ID}/manifest.json`,
+            "utf-8",
+          );
+          manifestExists = true;
+        } catch {
+          // no manifest yet: durable capture for this candidate is allowed
+        }
+        if (manifestExists) {
+          throw new Error(
+            `Accepted evidence is immutable: docs/evidence/${OBJECTIVE_ID}/manifest.json exists`,
+          );
+        }
+      }
+
       // Pass 1: Discovery — find event ticks.
       const discoveryBridge = createTestBridge(container, FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5);
       await discoveryBridge.reset();

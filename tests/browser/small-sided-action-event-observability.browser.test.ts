@@ -18,6 +18,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { commands } from "@vitest/browser/context";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
 import { runHeadlessMatch } from "../../eval/runners/headless-match.js";
 import { scanMatchResult } from "../../eval/runners/small-sided-match-situation-scanner.js";
@@ -33,8 +34,17 @@ import type { SimulationEvent } from "../../src/contracts/scenario.js";
 const CASE_ID = "BROWSER-SMALL-SIDED-ACTION-EVENT-OBSERVABILITY";
 const CASE_VERSION = "browser-case-action-event-observability-v1";
 const OBJECTIVE_ID = "SMALL-SIDED-ACTION-EVENT-OBSERVABILITY";
-const SCREENSHOT_DIR = `/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/screenshots/${OBJECTIVE_ID}`;
-const EVIDENCE_DIR = `/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/evidence/${OBJECTIVE_ID}`;
+// Capture-hygiene (0.9.2+): ordinary regression runs must not write
+// docs/screenshots/**. Durable evidence is entered only through the explicit
+// evidence-mode capture (WIP_SECTION=__EVIDENCE__:SMALL-SIDED-ACTION-EVENT-OBSERVABILITY).
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION === `__EVIDENCE__:${OBJECTIVE_ID}`;
+const SCREENSHOT_DIR = DURABLE_EVIDENCE
+  ? `docs/screenshots/${OBJECTIVE_ID}`
+  : `test-results/gauntlet-capture/${OBJECTIVE_ID}`;
+const EVIDENCE_DIR = DURABLE_EVIDENCE
+  ? `docs/evidence/${OBJECTIVE_ID}`
+  : `test-results/gauntlet-capture/${OBJECTIVE_ID}`;
 
 const TOTAL_TICKS = 600;
 
@@ -205,7 +215,32 @@ describe("SMALL-SIDED-ACTION-EVENT-OBSERVABILITY: event-centered frames", () => 
   it(
     "captures before→event→after frames for discrete action events",
     async () => {
-      const { page } = await import("@vitest/browser/context");
+      if (DURABLE_EVIDENCE) {
+        let manifestExists = false;
+        try {
+          await commands.readFile(
+            `docs/evidence/${OBJECTIVE_ID}/manifest.json`,
+            "utf-8",
+          );
+          manifestExists = true;
+        } catch {
+          // no manifest yet: durable capture for this candidate is allowed
+        }
+        if (manifestExists) {
+          throw new Error(
+            `Accepted evidence is immutable: docs/evidence/${OBJECTIVE_ID}/manifest.json exists`,
+          );
+        }
+      }
+
+      async function captureFrame(name: string): Promise<void> {
+        const cap = await bridge.capture();
+        const base64 = cap.screenshot.split(",")[1] ?? "";
+        if (!base64 || base64.length < 100) {
+          throw new Error(`renderer produced no PNG bytes for ${name}`);
+        }
+        await commands.writeFile(`${SCREENSHOT_DIR}/${name}`, base64, "base64");
+      }
 
       // 1. Discover event ticks from a headless run.
       const discovery = runDiscovery();
@@ -235,10 +270,7 @@ describe("SMALL-SIDED-ACTION-EVENT-OBSERVABILITY: event-centered frames", () => 
           bridge.stepWithCpuControllers(remaining);
         }
         bridge.renderFrame();
-        await page.screenshot({
-          path: `${SCREENSHOT_DIR}/${ef.frameLabel}-before.png`,
-          type: "png",
-        });
+        await captureFrame(`${ef.frameLabel}-before.png`);
         capturedFrames.push({
           label: `${ef.frameLabel}-before`,
           tick: ef.beforeTick,
@@ -253,10 +285,7 @@ describe("SMALL-SIDED-ACTION-EVENT-OBSERVABILITY: event-centered frames", () => 
           bridge.stepWithCpuControllers(remaining);
         }
         bridge.renderFrame();
-        await page.screenshot({
-          path: `${SCREENSHOT_DIR}/${ef.frameLabel}-event.png`,
-          type: "png",
-        });
+        await captureFrame(`${ef.frameLabel}-event.png`);
         capturedFrames.push({
           label: `${ef.frameLabel}-event`,
           tick: ef.eventTick,
@@ -272,10 +301,7 @@ describe("SMALL-SIDED-ACTION-EVENT-OBSERVABILITY: event-centered frames", () => 
           bridge.stepWithCpuControllers(remaining);
         }
         bridge.renderFrame();
-        await page.screenshot({
-          path: `${SCREENSHOT_DIR}/${ef.frameLabel}-after.png`,
-          type: "png",
-        });
+        await captureFrame(`${ef.frameLabel}-after.png`);
         capturedFrames.push({
           label: `${ef.frameLabel}-after`,
           tick: ef.afterTick,

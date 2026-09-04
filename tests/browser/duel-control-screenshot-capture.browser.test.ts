@@ -55,9 +55,15 @@ import type { ScenarioDefinition, SimulationEvent } from "../../src/contracts/sc
 import type { InputFrame } from "../../src/contracts/input.js";
 
 const OBJECTIVE_ID = "HUMAN-DEFENSIVE-DUEL-CONTROL";
-/** Vitest browser `commands` paths resolve against the project root. */
-const SCREENSHOT_REL = `docs/screenshots/${OBJECTIVE_ID}`;
-const SCREENSHOT_DIR = `/home/ubuntu/projects/oxDeveloop/pes-simulator/${SCREENSHOT_REL}`;
+// Capture-hygiene (0.9.2+): ordinary regression runs must not write
+// docs/screenshots/**. Durable evidence is entered only through the explicit
+// evidence-mode capture (WIP_SECTION=__EVIDENCE__:HUMAN-DEFENSIVE-DUEL-CONTROL).
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION === `__EVIDENCE__:${OBJECTIVE_ID}`;
+const OUTPUT_ROOT = DURABLE_EVIDENCE ? "docs/screenshots" : "test-results/gauntlet-capture";
+/** Root-relative write path; `commands` resolve against the project root. */
+const SCREENSHOT_REL = `${OUTPUT_ROOT}/${OBJECTIVE_ID}`;
+const SCREENSHOT_DIR = SCREENSHOT_REL;
 const TRAJECTORY_REL = `docs/evidence/${OBJECTIVE_ID}/trajectory.json`;
 const SEQUENCE_REL = `${SCREENSHOT_REL}/sequence.json`;
 
@@ -194,7 +200,6 @@ async function capturePass(
   inputTick: number,
   cpuAntiHuddle = false,
 ): Promise<CaptureResult> {
-  const { page } = await import("@vitest/browser/context");
   const targets = frameTargets(inputTick);
   const lastTargetTick = Math.max(...targets.map((t) => t.tick));
   if (lastTargetTick >= program.humanInputs.length) {
@@ -267,7 +272,12 @@ async function capturePass(
     for (const target of targets) {
       if (sim.tick === target.tick && !captured.includes(target.label)) {
         bridge.renderFrame();
-        await page.screenshot({ path: `${SCREENSHOT_DIR}/${target.label}.png`, type: "png" });
+        const cap = await bridge.capture();
+        const base64 = cap.screenshot.split(",")[1] ?? "";
+        if (!base64 || base64.length < 100) {
+          throw new Error(`renderer produced no PNG bytes for ${target.label}`);
+        }
+        await commands.writeFile(`${SCREENSHOT_DIR}/${target.label}.png`, base64, "base64");
         captured.push(target.label);
       }
     }
@@ -301,6 +311,24 @@ describe("HUMAN-DEFENSIVE-DUEL-CONTROL: screenshot capture", () => {
   it(
     "reproduces the committed standing-tackle program and captures 5 event-centered PNGs",
     async () => {
+      if (DURABLE_EVIDENCE) {
+        let manifestExists = false;
+        try {
+          await commands.readFile(
+            `docs/evidence/${OBJECTIVE_ID}/manifest.json`,
+            "utf-8",
+          );
+          manifestExists = true;
+        } catch {
+          // no manifest yet: durable capture for this candidate is allowed
+        }
+        if (manifestExists) {
+          throw new Error(
+            `Accepted evidence is immutable: docs/evidence/${OBJECTIVE_ID}/manifest.json exists`,
+          );
+        }
+      }
+
       const trajectory = await readDurableTrajectory();
       expect(trajectory.total_ticks).toBe(DUEL_TICKS);
       const committedAttempt = standingAttempt(trajectory.tackle_attempts);

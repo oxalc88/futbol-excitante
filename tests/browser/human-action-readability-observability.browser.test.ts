@@ -21,6 +21,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { commands } from "@vitest/browser/context";
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
@@ -41,7 +42,14 @@ import type { SimulationEvent } from "../../src/contracts/scenario.js";
 // ---------------------------------------------------------------------------
 
 const OBJECTIVE_ID = "SMALL-SIDED-HUMAN-ACTION-READABILITY-OBSERVABILITY";
-const SCREENSHOT_DIR = `/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/screenshots/${OBJECTIVE_ID}`;
+// Capture-hygiene (0.9.2+): ordinary regression runs must not write
+// docs/screenshots/**. Durable evidence is entered only through the explicit
+// evidence-mode capture.
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION === `__EVIDENCE__:${OBJECTIVE_ID}`;
+const SCREENSHOT_DIR = DURABLE_EVIDENCE
+  ? `docs/screenshots/${OBJECTIVE_ID}`
+  : `test-results/gauntlet-capture/${OBJECTIVE_ID}`;
 const MAX_TICKS = 600;
 const PROXIMITY_THRESHOLD = 1.5;
 
@@ -353,7 +361,32 @@ describe("human-action-readability: DYNAMIC_VISUAL evidence", () => {
   it(
     "captures before→event→after frames for human-driven pass and shot events",
     async () => {
-      const { page } = await import("@vitest/browser/context");
+      if (DURABLE_EVIDENCE) {
+        let manifestExists = false;
+        try {
+          await commands.readFile(
+            `docs/evidence/${OBJECTIVE_ID}/manifest.json`,
+            "utf-8",
+          );
+          manifestExists = true;
+        } catch {
+          // no manifest yet: durable capture for this candidate is allowed
+        }
+        if (manifestExists) {
+          throw new Error(
+            `Accepted evidence is immutable: docs/evidence/${OBJECTIVE_ID}/manifest.json exists`,
+          );
+        }
+      }
+
+      async function captureFrame(name: string): Promise<void> {
+        const cap = await bridge.capture();
+        const base64 = cap.screenshot.split(",")[1] ?? "";
+        if (!base64 || base64.length < 100) {
+          throw new Error(`renderer produced no PNG bytes for ${name}`);
+        }
+        await commands.writeFile(`${SCREENSHOT_DIR}/${name}`, base64, "base64");
+      }
 
       // --- Phase 1: Discovery — find pass and shot event ticks. ---
       bridge = createTestBridge(container, FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5);
@@ -429,10 +462,7 @@ describe("human-action-readability: DYNAMIC_VISUAL evidence", () => {
           bridge.stepWithCpuControllers(Math.min(remaining, 30));
         }
         bridge.renderFrame();
-        await page.screenshot({
-          path: `${SCREENSHOT_DIR}/${ef.kind}-before.png`,
-          type: "png",
-        });
+        await captureFrame(`${ef.kind}-before.png`);
         capturedFrames.push({
           label: `${ef.kind}-before`,
           tick: beforeTick,
@@ -446,10 +476,7 @@ describe("human-action-readability: DYNAMIC_VISUAL evidence", () => {
           bridge.stepWithCpuControllers(Math.min(remaining, 30));
         }
         bridge.renderFrame();
-        await page.screenshot({
-          path: `${SCREENSHOT_DIR}/${ef.kind}-event.png`,
-          type: "png",
-        });
+        await captureFrame(`${ef.kind}-event.png`);
         capturedFrames.push({
           label: `${ef.kind}-event`,
           tick: ef.tick,
@@ -464,10 +491,7 @@ describe("human-action-readability: DYNAMIC_VISUAL evidence", () => {
           bridge.stepWithCpuControllers(Math.min(remaining, 30));
         }
         bridge.renderFrame();
-        await page.screenshot({
-          path: `${SCREENSHOT_DIR}/${ef.kind}-after.png`,
-          type: "png",
-        });
+        await captureFrame(`${ef.kind}-after.png`);
         capturedFrames.push({
           label: `${ef.kind}-after`,
           tick: afterTick,

@@ -21,6 +21,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { commands } from "@vitest/browser/context";
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
@@ -43,7 +44,14 @@ import type { InputFrame } from "../../src/contracts/input.js";
 const CASE_ID = "BROWSER-5V5-HUMAN-VS-CPU";
 const CASE_VERSION = "browser-case-5v5-human-vs-cpu-v1";
 const OBJECTIVE_ID = "SMALL-SIDED-5V5-HUMAN-VS-CPU";
-const SCREENSHOT_DIR = `/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/screenshots/${OBJECTIVE_ID}`;
+// Capture-hygiene (0.9.2+): ordinary regression runs must not write
+// docs/screenshots/**. Durable evidence is entered only through the explicit
+// evidence-mode capture (WIP_SECTION=__EVIDENCE__:SMALL-SIDED-5V5-HUMAN-VS-CPU).
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION === `__EVIDENCE__:${OBJECTIVE_ID}`;
+const SCREENSHOT_DIR = DURABLE_EVIDENCE
+  ? `docs/screenshots/${OBJECTIVE_ID}`
+  : `test-results/gauntlet-capture/${OBJECTIVE_ID}`;
 
 // ---------------------------------------------------------------------------
 // Headless helper
@@ -491,13 +499,38 @@ describe("5v5 human-vs-CPU DYNAMIC_VISUAL evidence", () => {
   it(
     "captures 5 semantic frames: before → human input → CPU play → switch → continuity",
     async () => {
-      const { page } = await import("@vitest/browser/context");
+      if (DURABLE_EVIDENCE) {
+        let manifestExists = false;
+        try {
+          await commands.readFile(
+            `docs/evidence/${OBJECTIVE_ID}/manifest.json`,
+            "utf-8",
+          );
+          manifestExists = true;
+        } catch {
+          // no manifest yet: durable capture for this candidate is allowed
+        }
+        if (manifestExists) {
+          throw new Error(
+            `Accepted evidence is immutable: docs/evidence/${OBJECTIVE_ID}/manifest.json exists`,
+          );
+        }
+      }
+
+      async function captureFrame(name: string): Promise<void> {
+        const cap = await bridge.capture();
+        const base64 = cap.screenshot.split(",")[1] ?? "";
+        if (!base64 || base64.length < 100) {
+          throw new Error(`renderer produced no PNG bytes for ${name}`);
+        }
+        await commands.writeFile(`${SCREENSHOT_DIR}/${name}`, base64, "base64");
+      }
 
       // Frame 1: before — initial state (tick 0).
       bridge = createTestBridge(container, FOUNDATION_SCENARIO_HUMAN_VS_CPU_5V5);
       await bridge.reset();
       bridge.renderFrame();
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/frame-before.png`, type: "png" });
+      await captureFrame("frame-before.png");
 
       expect(bridge.getSimulation().presentation().players.length).toBe(10);
 
@@ -527,13 +560,13 @@ describe("5v5 human-vs-CPU DYNAMIC_VISUAL evidence", () => {
         bridge.getSimulation().step();
       }
       bridge.renderFrame();
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/frame-human-input.png`, type: "png" });
+      await captureFrame("frame-human-input.png");
       expect(bridge.getSimulation().tick).toBeGreaterThanOrEqual(30);
 
       // Frame 3: CPU play — extended CPU-only play (tick 120).
       bridge.stepWithCpuControllers(90);
       bridge.renderFrame();
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/frame-cpu-play.png`, type: "png" });
+      await captureFrame("frame-cpu-play.png");
       expect(bridge.getSimulation().tick).toBeGreaterThanOrEqual(120);
 
       // Frame 4: switch — Tab press to switch controlled player (tick 150).
@@ -559,13 +592,13 @@ describe("5v5 human-vs-CPU DYNAMIC_VISUAL evidence", () => {
         if (remaining > 0) bridge.stepWithCpuControllers(remaining);
       }
       bridge.renderFrame();
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/frame-switch.png`, type: "png" });
+      await captureFrame("frame-switch.png");
       expect(bridge.getSimulation().tick).toBeGreaterThanOrEqual(150);
 
       // Frame 5: continuity — continued play after switch (tick 270).
       bridge.stepWithCpuControllers(120);
       bridge.renderFrame();
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/frame-continuity.png`, type: "png" });
+      await captureFrame("frame-continuity.png");
       expect(bridge.getSimulation().tick).toBeGreaterThanOrEqual(270);
 
       // Verify10 players still present.

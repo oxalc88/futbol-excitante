@@ -18,6 +18,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { commands } from "@vitest/browser/context";
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
@@ -32,7 +33,26 @@ import type { Simulation } from "../../src/simulation/loop/simulation.js";
 
 const CASE_ID = "BROWSER-SMALL-SIDED-001";
 const CASE_VERSION = "browser-case-small-sided-v1";
-const SCREENSHOT_DIR = "/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/screenshots/BROWSER-SMALL-SIDED-001-CASE";
+// Capture-hygiene (0.9.2+): ordinary regression runs must not write
+// docs/screenshots/**. Durable evidence is entered only through the explicit
+// evidence-mode capture (WIP_SECTION=__EVIDENCE__:BROWSER-SMALL-SIDED-001-CASE).
+const OBJECTIVE_ID = "BROWSER-SMALL-SIDED-001-CASE";
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION === `__EVIDENCE__:${OBJECTIVE_ID}`;
+const SCREENSHOT_DIR = DURABLE_EVIDENCE
+  ? `docs/screenshots/${OBJECTIVE_ID}`
+  : `test-results/gauntlet-capture/${OBJECTIVE_ID}`;
+
+async function assertEvidenceMutable(): Promise<void> {
+  try {
+    await commands.readFile(`docs/evidence/${OBJECTIVE_ID}/manifest.json`, "utf-8");
+  } catch {
+    return; // no manifest yet: durable capture for this candidate is allowed
+  }
+  throw new Error(
+    `Accepted evidence is immutable: docs/evidence/${OBJECTIVE_ID}/manifest.json exists`,
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Headless helper — same code path as the browser test bridge
@@ -229,13 +249,22 @@ describe("BROWSER-SMALL-SIDED-001: semantic frame capture", () => {
   it(
     "captures 4 semantic frames: before → kickoff → play → later",
     async () => {
-      const { page } = await import("@vitest/browser/context");
+      if (DURABLE_EVIDENCE) await assertEvidenceMutable();
+
+      async function captureFrame(name: string): Promise<void> {
+        const cap = await bridge.capture();
+        const base64 = cap.screenshot.split(",")[1] ?? "";
+        if (!base64 || base64.length < 100) {
+          throw new Error(`renderer produced no PNG bytes for ${name}`);
+        }
+        await commands.writeFile(`${SCREENSHOT_DIR}/${name}`, base64, "base64");
+      }
 
       // Frame 1: before — initial state (tick 0).
       bridge = createTestBridge(container, FOUNDATION_SCENARIO_3V3);
       await bridge.reset();
       bridge.renderFrame();
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/frame-before.png`, type: "png" });
+      await captureFrame("frame-before.png");
 
       // Verify 6 players at start.
       expect(bridge.getSimulation().presentation().players.length).toBe(6);
@@ -243,19 +272,19 @@ describe("BROWSER-SMALL-SIDED-001: semantic frame capture", () => {
       // Frame 2: kickoff — early CPU play (tick 60).
       bridge.stepWithCpuControllers(60);
       bridge.renderFrame();
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/frame-kickoff.png`, type: "png" });
+      await captureFrame("frame-kickoff.png");
       expect(bridge.getSimulation().tick).toBeGreaterThanOrEqual(60);
 
       // Frame 3: play — mid-game activity (tick 180).
       bridge.stepWithCpuControllers(120);
       bridge.renderFrame();
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/frame-play.png`, type: "png" });
+      await captureFrame("frame-play.png");
       expect(bridge.getSimulation().tick).toBeGreaterThanOrEqual(180);
 
       // Frame 4: later — extended play (tick 360).
       bridge.stepWithCpuControllers(180);
       bridge.renderFrame();
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/frame-later.png`, type: "png" });
+      await captureFrame("frame-later.png");
       expect(bridge.getSimulation().tick).toBeGreaterThanOrEqual(360);
 
       // Verify 6 players still present.

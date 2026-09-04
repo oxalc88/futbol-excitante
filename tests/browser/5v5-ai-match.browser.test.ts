@@ -18,6 +18,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { commands } from "@vitest/browser/context";
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { createTestBridge } from "../../src/apps/browser/test-bridge.js";
@@ -25,6 +26,27 @@ import { buildCaptureMeta } from "../../eval/capture-snapshot.js";
 import { FOUNDATION_SCENARIO_5V5 } from "../../src/apps/browser/foundation-scenario.js";
 import type { TestBridge } from "../../src/apps/browser/test-bridge.js";
 import type { Simulation } from "../../src/simulation/loop/simulation.js";
+
+// Capture-hygiene (0.9.2+): ordinary regression runs must not write
+// docs/screenshots/**. Durable evidence is entered only through the explicit
+// evidence-mode capture (WIP_SECTION=__EVIDENCE__:BROWSER-5V5-MATCH).
+const OBJECTIVE_ID = "BROWSER-5V5-MATCH";
+const RAW_SECTION = process.env.WIP_SECTION || "capture";
+const DURABLE_EVIDENCE = RAW_SECTION === `__EVIDENCE__:${OBJECTIVE_ID}`;
+const SCREENSHOT_DIR = DURABLE_EVIDENCE
+  ? `docs/screenshots/${OBJECTIVE_ID}`
+  : `test-results/gauntlet-capture/${OBJECTIVE_ID}`;
+
+async function assertEvidenceMutable(): Promise<void> {
+  try {
+    await commands.readFile(`docs/evidence/${OBJECTIVE_ID}/manifest.json`, "utf-8");
+  } catch {
+    return; // no manifest yet: durable capture for this candidate is allowed
+  }
+  throw new Error(
+    `Accepted evidence is immutable: docs/evidence/${OBJECTIVE_ID}/manifest.json exists`,
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Headless helper — same code path as the browser test bridge
@@ -250,12 +272,12 @@ describe("5v5 AI match screenshot capture", () => {
       buildCaptureMeta(capture, bridge.stateHash()),
     );
 
-    // Persist screenshot to disk via Playwright page.screenshot().
-    const { page } = await import("@vitest/browser/context");
-    await page.screenshot({
-      path: "/home/ubuntu/projects/oxDeveloop/pes-simulator/docs/screenshots/BROWSER-5V5-MATCH/frame-000.png",
-      type: "png",
-    });
+    // Persist screenshot to disk via the evidence gate: durable evidence is
+    // immutable and may only be written through the explicit evidence-mode
+    // capture; an ordinary run writes to ignored test-results/ instead.
+    if (DURABLE_EVIDENCE) await assertEvidenceMutable();
+    const pngBase64 = capture.screenshot.split(",")[1] ?? "";
+    await commands.writeFile(`${SCREENSHOT_DIR}/frame-000.png`, pngBase64, "base64");
   });
 
   it("screenshot is not fully black (luminance variance above threshold)", async () => {
