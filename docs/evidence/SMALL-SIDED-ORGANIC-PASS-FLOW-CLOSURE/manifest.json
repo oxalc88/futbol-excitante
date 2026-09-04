@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "SMALL-SIDED-ORGANIC-PASS-FLOW-CLOSURE",
+  "accepted_at": "2026-09-04T18:35:53.167Z",
+  "candidate_commit": "b253e42",
+  "evidence_class": "BOOKKEEPING",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/SMALL-SIDED-ORGANIC-PASS-FLOW-CLOSURE/audit.json",
+      "sha256": "a726e375a2138a4107cadcd0b67f82360d12f279a9f1f6aef161abd1ea99aa52",
+      "git_blob": "0ef95da1009425f081ba55bc2f640138ba66a7c7",
+      "candidate_commit": "b253e42",
+      "bytes": 2708,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-04/2026-09-04T18-35-53-167Z-SMALL-SIDED-ORGANIC-PASS-FLOW-CLOSURE-acceptance.json"
+}
