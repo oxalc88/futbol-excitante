@@ -27,7 +27,11 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { createWorld } from "../../../src/simulation/world/create.js";
 import { createSimulation } from "../../../src/simulation/loop/simulation.js";
 import { NO_OP_OBSERVER } from "../../../src/simulation/telemetry/observer.js";
-import { createCpuAdapter, buildCpuObservation } from "../../../src/adapters/input-browser/cpu-adapter.js";
+import {
+  assignChaseRoles,
+  buildCpuObservation,
+  createCpuAdapter,
+} from "../../../src/adapters/input-browser/cpu-adapter.js";
 import { FOUNDATION_SCENARIO_2V2 } from "../../../src/apps/browser/foundation-scenario.js";
 import type { InputFrame } from "../../../src/contracts/input.js";
 import type { Simulation } from "../../../src/simulation/loop/simulation.js";
@@ -140,7 +144,12 @@ describe("2V2-CPU-INDEPENDENCE-002: each adapter produces a frame", () => {
     }
   });
 
-  it("no adapter produces all-zero movement (all are chasing ball)", () => {
+  it("kickoff: only the designated taker moves; every other body is a real non-neutral-path frame", () => {
+    // Anti-huddle contract (5V5-KICKOFF-ANTI-HUDDLE, `anti-huddle-v1`): while the
+    // restart ball is untouched exactly one body closes on it and the rest hold
+    // their kickoff homes. Held frames are still produced by the defense branch
+    // (sprint = 1, no buttons), never by the neutral fallback for an unresolved
+    // player, so this keeps the original "no neutral fallbacks" intent.
     const frames: InputFrame[] = [];
     for (const { adapter, slot, teamId, controlledPlayerId } of adapters) {
       const obs = buildCpuObservation(sim.snapshot(), teamId, controlledPlayerId);
@@ -149,12 +158,34 @@ describe("2V2-CPU-INDEPENDENCE-002: each adapter produces a frame", () => {
       frames.push(frame);
     }
 
-    // Ball is at (0, 0.11) z. Players at (-15, 0), (15, 0), (-10, -12), (10, 12).
-    // All should have some movement toward the ball.
+    const takerId = assignChaseRoles(
+      buildCpuObservation(sim.snapshot(), "team-a", "player-1"),
+      "team-a",
+    ).kickoffTakerId;
+    expect(takerId).toBeTruthy();
+
+    const moving = frames.filter(
+      (f) => Math.abs(f.moveX) + Math.abs(f.moveY) > 0.01,
+    );
+    expect(moving).toHaveLength(1);
+    expect(moving[0].controlSlot).toBe(
+      Object.entries(FOUNDATION_SCENARIO_2V2.controlAssignments)
+        .find(([, a]) => a.controlledPlayerId === takerId)?.[0] ?? "",
+    );
+    // Every adapter produced a defended frame with the CPU sprint invariant.
     for (const f of frames) {
-      // At least one axis should have movement (they all start at distance from ball).
-      expect(Math.abs(f.moveX) + Math.abs(f.moveY)).toBeGreaterThan(0);
+      expect(f.sprint).toBe(1);
+      expect(Math.abs(f.moveX) + Math.abs(f.moveY)).toBeGreaterThanOrEqual(0);
     }
+    // Discriminating: stashed, all four charge the untouched ball.
+    const stashed = adapters.map(({ adapter, teamId, controlledPlayerId }) =>
+      adapter.sample(0, Object.assign(
+        buildCpuObservation(sim.snapshot(), teamId, controlledPlayerId),
+        { cpuAntiHuddle: false },
+      )));
+    expect(stashed.filter(
+      (f) => Math.abs(f.moveX) + Math.abs(f.moveY) > 0.01,
+    )).toHaveLength(4);
   });
 
   it("sprint = 1 on all frames (CPU always sprints)", () => {
@@ -193,7 +224,11 @@ describe("2V2-CPU-INDEPENDENCE-003: independent movement vectors", () => {
     }
   });
 
-  it("team-a players move differently from team-b players", () => {
+  it("each slot runs independently: the taker closes, the rest hold their homes", () => {
+    // Anti-huddle contract (5V5-KICKOFF-ANTI-HUDDLE): during the kickoff freeze
+    // only the kick taker leaves home; the rest stay put until the ball is in
+    // play. Per-slot independence is unchanged — every body is driven by its own
+    // adapter from its own observation.
     const world = createWorld({ scenario: FOUNDATION_SCENARIO_2V2 });
     const sim = createSimulation(world, NO_OP_OBSERVER);
 
@@ -218,25 +253,32 @@ describe("2V2-CPU-INDEPENDENCE-003: independent movement vectors", () => {
     const endPositions = new Map(
       sim.snapshot().players.map((p) => [p.playerId, { ...p.groundPosition }]),
     );
+    const takerId = assignChaseRoles(
+      buildCpuObservation(world, "team-a", "player-1"),
+      "team-a",
+    ).kickoffTakerId;
 
-    // Each player moved from its start position.
+    // Exactly the taker has left its kickoff home in the freeze window.
+    const displacement = (pid: string): number => {
+      const start = startPositions.get(pid)!;
+      const end = endPositions.get(pid)!;
+      return Math.abs(end.x - start.x) + Math.abs(end.y - start.y);
+    };
+    expect(takerId).toBeTruthy();
+    expect(displacement(takerId!)).toBeGreaterThan(0);
     for (const pid of ["player-1", "player-2", "player-3", "player-4"]) {
-      const start = startPositions.get(pid);
-      const end = endPositions.get(pid);
-      if (start && end) {
-        const dx = end.x - start.x;
-        const dy = end.y - start.y;
-        expect(Math.abs(dx) + Math.abs(dy)).toBeGreaterThan(0);
-      }
+      if (pid === takerId) continue;
+      expect(displacement(pid), `${pid} holds home until first touch`).toBe(0);
     }
   });
 
-  it("team-a players move towards positive-x goal, team-b towards negative-x", () => {
+  it("team-a pursues the positive-x goal, team-b the negative-x goal", () => {
+    // 200 ticks covers this match's kickoff freeze and its first touch, so the
+    // pursuing bodies are the taker (team-a) and team-b's presser once play opens.
     const world = createWorld({ scenario: FOUNDATION_SCENARIO_2V2 });
     const sim = createSimulation(world, NO_OP_OBSERVER);
 
-    // Run 30 ticks.
-    for (let tick = 1; tick <= 30; tick++) {
+    for (let tick = 1; tick <= 200; tick++) {
       const frames: InputFrame[] = [];
       for (const { adapter, slot, teamId, controlledPlayerId } of adapters) {
         const obs = buildCpuObservation(sim.snapshot(), teamId, controlledPlayerId);
@@ -248,27 +290,20 @@ describe("2V2-CPU-INDEPENDENCE-003: independent movement vectors", () => {
       sim.step();
     }
 
-    // Team-a players (player-1 at -15, player-2 at -10) should have moved
-    // in the +x direction (towards goal at x=52.5).
-    const p1 = sim.snapshot().players.find((p) => p.playerId === "player-1");
-    const p2 = sim.snapshot().players.find((p) => p.playerId === "player-2");
-    expect(p1).toBeDefined();
-    expect(p2).toBeDefined();
-    if (p1 && p2) {
-      expect(p1.groundPosition.x).toBeGreaterThan(-15); // moved right from -15
-      expect(p2.groundPosition.x).toBeGreaterThan(-10); // moved right from -10
-    }
+    const end = sim.snapshot();
+    expect(end.ball.lastTouchRef, "the match opened organically").not.toBeNull();
 
-    // Team-b players (player-3 at 15, player-4 at 10) should have moved
-    // in the -x direction (towards goal at x=-52.5).
-    const p3 = sim.snapshot().players.find((p) => p.playerId === "player-3");
-    const p4 = sim.snapshot().players.find((p) => p.playerId === "player-4");
-    expect(p3).toBeDefined();
-    expect(p4).toBeDefined();
-    if (p3 && p4) {
-      expect(p3.groundPosition.x).toBeLessThan(15); // moved left from 15
-      expect(p4.groundPosition.x).toBeLessThan(10); // moved left from 10
-    }
+    // Team-a pursuers moved in the +x direction (towards goal at x=52.5).
+    const p1 = end.players.find((p) => p.playerId === "player-1")!;
+    expect(p1.groundPosition.x).toBeGreaterThan(-15); // moved right from -15
+    // Team-b pursuers moved in the -x direction (towards goal at x=-52.5).
+    const p3 = end.players.find((p) => p.playerId === "player-3")!;
+    expect(p3.groundPosition.x).toBeLessThan(15); // moved left from 15
+    // The bodies that were never designated hold their kickoff homes.
+    const p2 = end.players.find((p) => p.playerId === "player-2")!;
+    const p4 = end.players.find((p) => p.playerId === "player-4")!;
+    expect(p2.groundPosition.x).toBeLessThanOrEqual(-10);
+    expect(p4.groundPosition.x).toBeGreaterThanOrEqual(10);
   });
 });
 
@@ -369,22 +404,48 @@ describe("2V2-CPU-INDEPENDENCE-005: full loop with CPU adapters", () => {
       expect(result.tick).toBe(tick);
     }
 
-    // After 60 ticks (1 second), all players should have moved.
+    // After 60 ticks — still inside this match's kickoff freeze window — only the
+    // kick taker has left its kickoff home (5V5-KICKOFF-ANTI-HUDDLE). Held bodies
+    // keep their shape until the ball is played.
     const startPositions = new Map([
       ["player-1", { x: -15, y: 0 }],
       ["player-2", { x: -10, y: -12 }],
       ["player-3", { x: 15, y: 0 }],
       ["player-4", { x: 10, y: 12 }],
     ]);
+    const takerId = assignChaseRoles(
+      buildCpuObservation(world, "team-a", "player-1"),
+      "team-a",
+    ).kickoffTakerId;
+    expect(takerId).toBeTruthy();
 
-    for (const player of sim.snapshot().players) {
-      const start = startPositions.get(player.playerId);
-      if (start) {
-        const dx = player.groundPosition.x - start.x;
-        const dy = player.groundPosition.y - start.y;
-        expect(Math.abs(dx) + Math.abs(dy)).toBeGreaterThan(0);
-      }
+    const displacementOf = (playerId: string): number => {
+      const player = sim.snapshot().players.find((p) => p.playerId === playerId)!;
+      const start = startPositions.get(playerId)!;
+      return Math.abs(player.groundPosition.x - start.x) +
+        Math.abs(player.groundPosition.y - start.y);
+    };
+    expect(displacementOf(takerId!)).toBeGreaterThan(0);
+    for (const playerId of [...startPositions.keys()]) {
+      if (playerId === takerId) continue;
+      expect(displacementOf(playerId), `${playerId} holds home`).toBe(0);
     }
+
+    // Then the match really opens and both teams' pursuit is slot-independent:
+    // by tick 200 the ball has been touched and team-b's presser has left home.
+    for (let tick = 61; tick <= 200; tick++) {
+      const allFrames: InputFrame[] = [];
+      for (const { adapter, controlSlot, teamId, controlledPlayerId } of cpuSlots) {
+        const obs = buildCpuObservation(sim.snapshot(), teamId, controlledPlayerId);
+        const cpuFrame = adapter.sample(tick, obs);
+        cpuFrame.controlSlot = controlSlot;
+        allFrames.push(cpuFrame);
+      }
+      sim.applyInputs(allFrames);
+      sim.step();
+    }
+    expect(sim.snapshot().ball.lastTouchRef).not.toBeNull();
+    expect(displacementOf("player-3")).toBeGreaterThan(0);
   });
 
   it("determinism: two independent runs with same scenario produce identical hash after N ticks", () => {

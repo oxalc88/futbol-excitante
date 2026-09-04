@@ -10,7 +10,10 @@
  *  - Shooting: press SHOT_BIT when in range and facing the goal,
  *    with distance-based thresholds.
  *  - Post-shot cooldown: suppress FIRST_TOUCH after shooting.
- *  - Chase-ball: default defense behavior when not in possession.
+ *  - Chase-ball: only the team's designated chaser converges on the ball;
+ *    every other field body holds its fixed kickoff home (anti-huddle).
+ *  - Kickoff freeze: non-chasing bodies hold home until the ball's
+ *    authoritative touch reference shows it has been played.
  *  - FIRST_TOUCH: press when within ~1.5 m of a slow ball (defense).
  *  - Always sprint (sprint = 1).
  *  - sourceId is "cpu" — pure provenance, never affects gameplay.
@@ -37,6 +40,8 @@
  *  - CYCLING_HALF_PERIOD, CYCLING_AMPLITUDE
  *  - PRESS_RADIUS, MARKING_DISTANCE, PRESS_STRENGTH
  *  - CPU defensive-tackle decision thresholds: FOUNDATION_CPU_TACKLE_V1
+ *  - Anti-huddle hold tolerances (anti-huddle-v1):
+ *    KICKOFF_FREEZE_HOME_TOLERANCE, CHASE_NEAREST_HOME_TOLERANCE
  */
 
 import type { InputFrame } from "../../contracts/input.js";
@@ -49,10 +54,15 @@ import {
 } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
 import {
+  FOUNDATION_CONTACT_V1,
   FOUNDATION_CPU_TACKLE_V1,
   FOUNDATION_TACKLE_V1,
 } from "../../simulation/config/foundation.js";
-import { teamHasPossession } from "./team-decision-profile.js";
+import {
+  designatePresser,
+  isAntiHuddleActive,
+  teamHasPossession,
+} from "./team-decision-profile.js";
 import type { TeamDecision } from "./team-decision-profile.js";
 export type {
   TeamDecision,
@@ -67,6 +77,8 @@ export {
   getBallZone,
   teamHasPossession,
   evaluateCpuTackleCommit,
+  isAntiHuddleActive,
+  designatePresser,
 } from "./team-decision-profile.js";
 
 // ---------------------------------------------------------------------------
@@ -83,6 +95,16 @@ export {
  */
 let _coverMechanismActivations = 0;
 let _supportMechanismActivations = 0;
+
+/**
+ * Module-level counters for the anti-huddle paths (5V5-KICKOFF-ANTI-HUDDLE):
+ * ticks on which a non-chasing CPU body was frozen to its kickoff home, and
+ * ticks on which a non-chasing CPU body was steered to its home instead of the
+ * ball. Stash either path and the counters stay 0 while the match still runs,
+ * which is what makes the discriminating guards below executable.
+ */
+let _kickoffFreezeActivations = 0;
+let _nearestOnlyChaseActivations = 0;
 
 /**
  * Module-level counter incremented every time a CPU adapter actually presses a
@@ -110,6 +132,22 @@ export function getSupportMechanismActivations(): number {
 }
 
 /**
+ * Ticks on which a CPU body was frozen to its kickoff home
+ * (5V5-KICKOFF-ANTI-HUDDLE reachability guard).
+ */
+export function getKickoffFreezeActivations(): number {
+  return _kickoffFreezeActivations;
+}
+
+/**
+ * Ticks on which a non-designated CPU body was steered to its formation home
+ * instead of the ball (5V5-KICKOFF-ANTI-HUDDLE reachability guard).
+ */
+export function getNearestOnlyChaseActivations(): number {
+  return _nearestOnlyChaseActivations;
+}
+
+/**
  * Total number of defensive tackle presses actually issued by CPU adapters
  * (CPU-DEFENSIVE-TACKLE reachability guard).
  */
@@ -125,6 +163,8 @@ export function resetMechanismCounters(): void {
   _coverMechanismActivations = 0;
   _supportMechanismActivations = 0;
   _cpuTackleCommits = 0;
+  _kickoffFreezeActivations = 0;
+  _nearestOnlyChaseActivations = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -268,6 +308,14 @@ export interface CpuObservation {
     position: { x: number; y: number; z: number };
     linearVelocity: { x: number; y: number; z: number };
     regime: string;
+    /**
+     * The ball's authoritative last-touch reference (`null` while no player has
+     * touched it since the last restart). Read directly from ball state — the
+     * same field the match loop already uses for possession attribution — so it
+     * is an observable signal, not privileged knowledge. Absent (undefined) in
+     * legacy synthetic fixtures, which then keep the pre-anti-huddle behavior.
+     */
+    lastTouchRef?: string | null;
   };
   /** Pitch dimensions (metres). */
   pitchLength: number;
@@ -376,6 +424,25 @@ export interface CpuObservation {
    * Provisional — not a measured PES 2017 concept.
    */
   cpuDefensiveTackle?: boolean;
+
+  // -----------------------------------------------------------------
+  // Anti-huddle team behavior (5V5-KICKOFF-ANTI-HUDDLE)
+  // -----------------------------------------------------------------
+
+  /**
+   * Kill switch for the anti-huddle team shape: kickoff freeze to fixed homes,
+   * nearest-only chasing of the ball, and the single-cover designation that goes
+   * with them. It is a configuration switch, not a knowledge advantage — it
+   * never widens what the observation exposes. When the flag is absent the
+   * behavior is active (any observation that carries the ball's authoritative
+   * touch reference, i.e. every real runtime wiring); when it is explicitly false
+   * the adapter emits exactly the frames it emitted before the objective existed
+   * — every non-possessing body chasing the ball — which is the huddle shape the
+   * discriminating guards stash back in.
+   *
+   * Provisional — not a measured PES 2017 concept.
+   */
+  cpuAntiHuddle?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -445,6 +512,7 @@ export function buildCpuObservation(
         z: world.ball.linearVelocity.z,
       },
       regime: world.ball.regime,
+      lastTouchRef: world.ball.lastTouchRef,
     },
     pitchLength,
     pitchWidth,
@@ -544,6 +612,13 @@ interface CpuInternalState {
   /** Consecutive ticks the CPU player has been displaced from formation.
    * Reset when the player is near their formation position. */
   formationDisplacementTicks: number;
+  /**
+   * Fixed kickoff home of this slot's body: the ground position it was first
+   * observed at, i.e. the scenario-defined start position of the match. It is
+   * captured once per match and never re-derived, so displaced bodies have a
+   * fixed point to hold (5V5-KICKOFF-ANTI-HUDDLE). null until first sample.
+   */
+  kickoffHome: { x: number; y: number } | null;
   /** Consecutive ticks the team has had possession while this player
    * does NOT have the ball.  Used for cycling off-ball movement. */
   possessionDuration: number;
@@ -1270,6 +1345,141 @@ const LOFT_PASS_DISTANCE_THRESHOLD = 15;
 const PASS_DEFENDER_MARKING_RADIUS = 5;
 
 // ---------------------------------------------------------------------------
+// Anti-huddle: kickoff homes, kickoff freeze, nearest-only chase (provisional)
+// ---------------------------------------------------------------------------
+
+/**
+ * Version id of the provisional anti-huddle parameter set, recorded in
+ * evidence so a tuned value can never be mistaken for a measured PES 2017 one.
+ */
+export const ANTI_HUDDLE_V1_ID = "anti-huddle-v1";
+
+/**
+ * Planar slack (metres) inside which a body frozen at its kickoff home issues
+ * no movement at all. Larger values leave the kickoff shape visibly still;
+ * smaller ones make a held body jitter as locomotion overshoots.
+ * Provisional placeholder — not a measured PES value.
+ */
+const KICKOFF_FREEZE_HOME_TOLERANCE = 0.75;
+
+/**
+ * Planar slack (metres) inside which a non-chasing body that has drifted back
+ * to its formation home stops steering, so holding shape does not jitter.
+ * Provisional placeholder — not a measured PES value.
+ */
+const CHASE_NEAREST_HOME_TOLERANCE = 0.75;
+
+/**
+ * The press/cover pair of a team, computed the way the accepted cover mechanism
+ * computes it: the presser is the nearest non-attacker to the ball, the cover is
+ * the second-nearest non-attacker.
+ *
+ * Exported so per-tick evidence records the assignment the adapter actually
+ * acts on instead of re-deriving it somewhere else.
+ */
+export function findPressCoverPair(
+  observation: CpuObservation,
+  teamId: string,
+): {
+  presserId: string | undefined;
+  presserDistance: number;
+  coverId: string | undefined;
+  coverDistance: number;
+} {
+  let presserId: string | undefined;
+  let presserDistance = Infinity;
+  let coverId: string | undefined;
+  let coverDistance = Infinity;
+  for (const p of observation.players) {
+    if (p.teamId !== teamId) continue;
+    // Attackers stay forward for support and never form the press pair.
+    if (p.formationRole === "attacker") continue;
+    const dx = observation.ball.position.x - p.groundPosition.x;
+    const dy = observation.ball.position.y - p.groundPosition.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < presserDistance) {
+      coverId = presserId;
+      coverDistance = presserDistance;
+      presserId = p.playerId;
+      presserDistance = dist;
+    } else if (dist < coverDistance) {
+      coverId = p.playerId;
+      coverDistance = dist;
+    }
+  }
+  return { presserId, presserDistance, coverId, coverDistance };
+}
+
+/**
+ * The single body allowed to break the kickoff freeze: the nearest player in
+ * the match to the untouched ball, i.e. the kick taker. Ties resolve by
+ * ascending playerId so the choice never depends on array order.
+ */
+function findKickoffTaker(observation: CpuObservation): string | undefined {
+  let bestId: string | undefined;
+  let bestDist = Infinity;
+  for (const p of observation.players) {
+    const dx = observation.ball.position.x - p.groundPosition.x;
+    const dy = observation.ball.position.y - p.groundPosition.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (
+      dist < bestDist ||
+      (dist === bestDist && bestId !== undefined && p.playerId < bestId)
+    ) {
+      bestDist = dist;
+      bestId = p.playerId;
+    }
+  }
+  return bestId;
+}
+
+/** Per-team, per-tick anti-huddle chase assignment. */
+export interface ChaseRoleAssignment {
+  /** The single body allowed to converge on the ball for this team. */
+  chaserPlayerId: string | undefined;
+  /** The second-closest non-attacker that screens behind the presser. */
+  coverPlayerId: string | undefined;
+  /** Whether the ball carries a touch reference (kickoff freeze is over). */
+  ballTouched: boolean;
+  /**
+   * The one body in the match allowed to break the kickoff freeze: the closest
+   * player of either team to the untouched ball — the kick taker. Ties resolve
+   * by ascending playerId, so every wiring that sees the same observation picks
+   * the same body.
+   */
+  kickoffTakerId: string | undefined;
+}
+
+/**
+ * Assign this tick's chase roles for one team: exactly one chaser — the shared
+ * press designation of `designatePresser`, i.e. the same body the accepted press
+ * block and tackle authorisation act on — and exactly one cover, the
+ * second-closest non-attacker.
+ *
+ * Pure function of the observation — the same information the accepted tackle
+ * authorisation already reads. Deterministic: same observation → same roles.
+ */
+export function assignChaseRoles(
+  observation: CpuObservation,
+  teamId: string,
+): ChaseRoleAssignment {
+  const ballTouched =
+    observation.ball.lastTouchRef !== undefined &&
+    observation.ball.lastTouchRef !== null;
+  const presser = designatePresser(observation, teamId);
+  return {
+    chaserPlayerId: presser.playerId,
+    // The press pair only forms once the ball is in play; the kick taker only
+    // matters while it is not. Each window needs one pass over the bodies.
+    coverPlayerId: ballTouched
+      ? findPressCoverPair(observation, teamId).coverId
+      : undefined,
+    ballTouched,
+    kickoffTakerId: ballTouched ? undefined : findKickoffTaker(observation),
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Role-aware formation pull (provisional PES 2017 values)
 // ---------------------------------------------------------------------------
 
@@ -1814,6 +2024,7 @@ export function createCpuAdapter(): CpuAdapter {
     shotCooldownRemaining: 0,
     isLoftedPass: false,
     formationDisplacementTicks: 0,
+    kickoffHome: null,
     possessionDuration: 0,
     activePassTick: -1,
     activePasserPosition: { x: 0, y: 0 },
@@ -1911,8 +2122,82 @@ export function createCpuAdapter(): CpuAdapter {
       // Is ball in FIRST_TOUCH range this tick?
       // Difficulty scales the reaction range: higher factor = reacts from farther.
       const effectiveFirstTouchRange = FIRST_TOUCH_RANGE * diffConfig.firstTouchRangeFactor;
+      // Under the anti-huddle the CPU reacts no wider than the radius the
+      // contact system itself declares eligible: a press issued between that
+      // radius and the adapter's reaction band can never land, and the body is
+      // then left chasing a ball it believes it owns. Legacy (non-runtime)
+      // observations keep the accepted range unchanged.
+      const antiHuddleActive = isAntiHuddleActive(observation);
+      const touchPressRange = antiHuddleActive
+        ? Math.min(effectiveFirstTouchRange, FOUNDATION_CONTACT_V1.contactRadius.value)
+        : effectiveFirstTouchRange;
       const ballInRange =
-        distToBall < effectiveFirstTouchRange && ballHSpeed < FIRST_TOUCH_SPEED_THRESHOLD;
+        distToBall < touchPressRange && ballHSpeed < FIRST_TOUCH_SPEED_THRESHOLD;
+
+      // ------------------------------------------------------------------
+      // Anti-huddle preamble (5V5-KICKOFF-ANTI-HUDDLE)
+      // ------------------------------------------------------------------
+      // The kickoff home is this body's fixed scenario start position, captured
+      // on the first sample of the match. Only the team's designated chaser —
+      // the shared press designation the accepted press and tackle machinery act
+      // on — may converge on the ball; every other field body holds that home.
+      // Until the ball carries a touch reference the hold is absolute for
+      // everyone but the kick taker (kickoff freeze), so the match cannot open
+      // with ten bodies on one ball; afterwards the same home is the anchor the
+      // press/cover/support mechanisms perturb around.
+      const cpuTeamId = observation.cpuTeamId;
+      const myPlayerId = observation.controlledPlayerId ?? cpuPlayer.playerId;
+      if (state.kickoffHome === null) {
+        state.kickoffHome = { x: playerX, y: playerY };
+      }
+      const kickoffHome = state.kickoffHome;
+      const chaseRoles = antiHuddleActive && cpuTeamId !== undefined
+        ? assignChaseRoles(observation, cpuTeamId)
+        : undefined;
+      const isDesignatedChaser = chaseRoles !== undefined &&
+        chaseRoles.chaserPlayerId !== undefined &&
+        chaseRoles.chaserPlayerId === myPlayerId;
+      // A body already inside touch range of the ball is exempt: it is at the
+      // ball, so playing it adds no converging player and a restart can still be
+      // taken without a scripted serve.
+      const atBallRange = antiHuddleActive && distToBall <= touchPressRange;
+      const homeDx = kickoffHome.x - playerX;
+      const homeDy = kickoffHome.y - playerY;
+      const homeDist = Math.sqrt(homeDx * homeDx + homeDy * homeDy);
+
+      // Kickoff freeze: while the ball carries no touch reference only the kick
+      // taker — the single closest body in the match to it — may close the
+      // distance. Two opposing bodies meeting an untouched ball lock each other
+      // outside contact range and the match never opens, so the freeze holds
+      // every other body at its fixed home until that first touch lands.
+      const ballUntouched = observation.ball.lastTouchRef === null;
+      const isKickoffTaker = ballUntouched && chaseRoles !== undefined &&
+        chaseRoles.kickoffTakerId === myPlayerId;
+      if (antiHuddleActive && !isKickoffTaker && !atBallRange && ballUntouched) {
+        // Hold the fixed home until the ball is first touched.
+        state.ballWasInRange = false;
+        state.hasPossession = false;
+        _kickoffFreezeActivations++;
+        const frozen = homeDist > KICKOFF_FREEZE_HOME_TOLERANCE;
+        return {
+          tick,
+          sourceId: "cpu",
+          controlSlot: "slot-cpu",
+          moveX: frozen ? (homeDx / homeDist) * Math.min(homeDist, 1) : 0,
+          moveY: frozen ? (homeDy / homeDist) * Math.min(homeDist, 1) : 0,
+          sprint: 1,
+          heldButtons: 0,
+          pressedButtons: 0,
+          releasedButtons: 0,
+        };
+      }
+
+      // Baseline for every non-chasing body once the freeze is over: hold the
+      // formation home instead of converging on the ball. The kick taker keeps
+      // its exemption only while the ball is still untouched — once it is played
+      // the team's own designated presser takes the chase over.
+      const holdsFormationHome = antiHuddleActive &&
+        !isDesignatedChaser && !atBallRange && !isKickoffTaker;
 
       // Update possession state:
       //   Gain: ball was in range on previous tick (confirming control).
@@ -1942,7 +2227,6 @@ export function createCpuAdapter(): CpuAdapter {
       // Reset per-tick lofted-pass flag.
       state.isLoftedPass = false;
 
-      const cpuTeamId = observation.cpuTeamId;
       const scoreDiff = observation.scoreDifferential;
       const urgency = getScoreUrgency(scoreDiff);
 
@@ -2222,6 +2506,25 @@ export function createCpuAdapter(): CpuAdapter {
         let chaseTargetY = ball.position.y;
         let effectiveDistToTarget = distToBall;
 
+        // --- Nearest-only chase (5V5-KICKOFF-ANTI-HUDDLE) ---
+        // Only the designated chaser's default target is the ball. Every other
+        // field body defaults to its fixed formation home, so defense spreads
+        // instead of collapsing; the marking, cover, support and pressing
+        // mechanisms below still get to redirect that baseline.
+        if (holdsFormationHome) {
+          _nearestOnlyChaseActivations++;
+          if (homeDist > CHASE_NEAREST_HOME_TOLERANCE) {
+            chaseTargetX = kickoffHome.x;
+            chaseTargetY = kickoffHome.y;
+            effectiveDistToTarget = homeDist;
+          } else {
+            // Already at home — hold still rather than jitter around it.
+            chaseTargetX = playerX;
+            chaseTargetY = playerY;
+            effectiveDistToTarget = 0;
+          }
+        }
+
         // Determine which zone the ball is in (used by press triggers).
         const ballZone = cpuTeamId
           ? determineZone(ball.position.x, observation.pitchLength, cpuTeamId)
@@ -2317,32 +2620,22 @@ export function createCpuAdapter(): CpuAdapter {
         if (isDefensiveMode && cpuTeamId &&
             (cpuPlayer.formationRole === "defender" || cpuPlayer.formationRole === "midfielder") &&
             !isNearestToBall) {
-          // Find the nearest-to-ball teammate (the presser) and the second-nearest.
-          let nearestDist = Infinity;
-          let nearestId = "";
-          let secondNearestDist = Infinity;
-          for (const p of observation.players) {
-            if (p.teamId !== cpuTeamId) continue;
-            // Skip attackers — they stay forward for support.
-            if (p.formationRole === "attacker") continue;
-            const pdx = ball.position.x - p.groundPosition.x;
-            const pdy = ball.position.y - p.groundPosition.y;
-            const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
-            if (pdist < nearestDist) {
-              secondNearestDist = nearestDist;
-              nearestDist = pdist;
-              nearestId = p.playerId;
-            } else if (pdist < secondNearestDist) {
-              secondNearestDist = pdist;
-            }
-          }
+          const pair = findPressCoverPair(observation, cpuTeamId);
+          // Under the anti-huddle only the second-closest non-attacker screens,
+          // so exactly one cover body forms behind the presser. Stashed, the
+          // accepted condition stands: any non-presser while the pair is in
+          // range.
+          const isCoverBody = antiHuddleActive
+            ? observation.controlledPlayerId === pair.coverId
+            : observation.controlledPlayerId !== pair.presserId;
           // This player is the cover if they are the second-closest
           // non-attacker teammate and within COVER_ACTIVATION_RANGE.
-          if (observation.controlledPlayerId !== nearestId &&
-              secondNearestDist < COVER_ACTIVATION_RANGE) {
+          if (isCoverBody &&
+              pair.coverDistance < COVER_ACTIVATION_RANGE &&
+              pair.presserId !== undefined) {
             // Find the presser's position.
             const presserPlayer = observation.players.find(
-              (p) => p.playerId === nearestId,
+              (p) => p.playerId === pair.presserId,
             );
             if (presserPlayer) {
               const presserX = presserPlayer.groundPosition.x;
@@ -2636,7 +2929,10 @@ export function createCpuAdapter(): CpuAdapter {
         }
 
         // --- Optional formation blend (only when formationPosition is set) ---
-        const formPos = observation.formationPosition;
+        // A body holding its formation home is anchored to that fixed point; the
+        // dynamic recovery anchor is only meaningful when this body is free to
+        // chase.
+        const formPos = holdsFormationHome ? kickoffHome : observation.formationPosition;
         if (formPos) {
           const fdx = formPos.x - playerX;
           const fdy = formPos.y - playerY;
@@ -2714,6 +3010,16 @@ export function createCpuAdapter(): CpuAdapter {
         heldButtons |= (!ballInRange || inCooldown)
           ? 0
           : FIRST_TOUCH_BIT;
+
+        // Restart re-arm (5V5-KICKOFF-ANTI-HUDDLE): while the ball carries no
+        // touch reference at all it is still the untouched restart ball, so a
+        // body that is inside the radius the contact system honours keeps
+        // issuing the edge instead of spending its one entering press on a tick
+        // the core could not execute. Past the first touch this path never runs.
+        if (antiHuddleActive && ball.lastTouchRef === null &&
+            distToBall <= touchPressRange && !inCooldown) {
+          pressedButtons |= FIRST_TOUCH_BIT;
+        }
 
         // ----------------------------------------------------------------
         // Defensive tackle commitment (CPU-DEFENSIVE-TACKLE)
@@ -2809,6 +3115,7 @@ export function createCpuAdapter(): CpuAdapter {
       state.shotCooldownRemaining = 0;
       state.isLoftedPass = false;
       state.formationDisplacementTicks = 0;
+      state.kickoffHome = null;
       state.possessionDuration = 0;
       state.activePassTick = -1;
       state.activePasserPosition = { x: 0, y: 0 };

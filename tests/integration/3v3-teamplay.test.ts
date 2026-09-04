@@ -22,13 +22,16 @@ import { describe, it, expect } from "vitest";
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import {
+  assignChaseRoles,
   buildCpuObservation,
   computeTeamDecision,
   createCpuAdapter,
+  designatePresser,
 } from "../../src/adapters/input-browser/cpu-adapter.js";
 import { hashFnv1a64 } from "../../src/simulation/determinism/hash.js";
 import { encodeCanonical } from "../../src/simulation/determinism/canonical.js";
 import { FOUNDATION_SCENARIO_3V3 } from "../../src/apps/browser/foundation-scenario.js";
+import type { InputFrame } from "../../src/contracts/input.js";
 
 // Module-level: slot keys for the 3v3 scenario.
 const slotKeys = Object.keys(FOUNDATION_SCENARIO_3V3.controlAssignments);
@@ -171,42 +174,76 @@ describe("3V3-TEAMPLAY-INTEGRATION-001: 100-tick simulation", () => {
 // ===========================================================================
 
 describe("3V3-TEAMPLAY-INTEGRATION-002: CPU adapters produce movement", () => {
-  it("all 6 CPU adapters produce non-neutral movement at tick 0", () => {
-    const world = createWorld({ scenario: FOUNDATION_SCENARIO_3V3 });
-    const adapters = slotKeys.map(() => createCpuAdapter());
-
-    for (let s = 0; s < slotKeys.length; s++) {
-      const slot = assignments[slotKeys[s]];
-      const frame = adapters[s].sample(
-        0,
-        buildCpuObservation(world, slot.teamId, slot.controlledPlayerId),
-      );
-
-      // At tick 0, ball is at (0, 0.11). All players should move toward it.
-      const hasMovement = Math.abs(frame.moveX) > 0.01 || Math.abs(frame.moveY) > 0.01;
-      expect(hasMovement, `slot-${s + 1} (${slot.controlledPlayerId}) should move`).toBe(true);
+  // Anti-huddle kickoff contract (5V5-KICKOFF-ANTI-HUDDLE, `anti-huddle-v1`):
+  // while the restart ball is untouched only the kick taker closes on it and the
+  // other bodies hold their fixed kickoff homes; once it is in play exactly one
+  // designated presser per team converges. Both tests below fail if the shape is
+  // stashed (all six charge) and fail if it over-converges (two per team).
+  function sampleAll(
+    world: ReturnType<typeof createWorld>,
+    touched: boolean,
+    antiHuddle = true,
+  ): Map<string, InputFrame> {
+    const frames = new Map<string, InputFrame>();
+    for (const key of slotKeys) {
+      const slot = assignments[key];
+      const obs = buildCpuObservation(world, slot.teamId, slot.controlledPlayerId);
+      if (touched) obs.ball.lastTouchRef = "kickoff-touch-0";
+      if (!antiHuddle) obs.cpuAntiHuddle = false;
+      frames.set(slot.controlledPlayerId ?? "", createCpuAdapter().sample(0, obs));
     }
+    return frames;
+  }
+
+  const isMoving = (frame: InputFrame | undefined): boolean =>
+    frame !== undefined && Math.abs(frame.moveX) + Math.abs(frame.moveY) > 0.01;
+
+  it("kickoff: only the designated kick taker closes on the untouched ball", () => {
+    const world = createWorld({ scenario: FOUNDATION_SCENARIO_3V3 });
+    const takerId = assignChaseRoles(
+      buildCpuObservation(world, "team-a", "player-1"),
+      "team-a",
+    ).kickoffTakerId;
+    const frames = sampleAll(world, false);
+    const movers = [...frames.entries()].filter(([, f]) => isMoving(f))
+      .map(([playerId]) => playerId);
+
+    expect(movers).toEqual([takerId]);
+    for (const [playerId, frame] of frames) {
+      if (playerId === takerId) continue;
+      expect(frame.moveX, `${playerId} holds its kickoff home`).toBe(0);
+      expect(frame.moveY, `${playerId} holds its kickoff home`).toBe(0);
+    }
+    // Discriminating: stashed, every one of the six charges the ball.
+    expect([...sampleAll(world, false, false).values()].filter(isMoving).length)
+      .toBe(6);
   });
 
-  it("team-a players move toward +x (opponent goal), team-b toward -x", () => {
+  it("in play: one presser per team converges, team-a toward +x, team-b toward -x", () => {
     const world = createWorld({ scenario: FOUNDATION_SCENARIO_3V3 });
-    const adapters = slotKeys.map(() => createCpuAdapter());
+    const frames = sampleAll(world, true);
 
-    for (let s = 0; s < slotKeys.length; s++) {
-      const slot = assignments[slotKeys[s]];
-      const frame = adapters[s].sample(
-        0,
-        buildCpuObservation(world, slot.teamId, slot.controlledPlayerId),
-      );
+    for (const teamId of ["team-a", "team-b"]) {
+      const obs = buildCpuObservation(world, teamId, "player-1");
+      obs.ball.lastTouchRef = "kickoff-touch-0";
+      const presserId = designatePresser(obs, teamId).playerId;
+      const teamPlayers = Object.values(assignments)
+        .filter((assignment) => assignment.teamId === teamId)
+        .map((assignment) => assignment.controlledPlayerId ?? "");
+      const movingOnTeam = teamPlayers.filter((playerId) =>
+        isMoving(frames.get(playerId) ?? undefined));
 
-      if (slot.teamId === "team-a") {
-        // Team A attacks +x, ball at center → should move +x
-        expect(frame.moveX).toBeGreaterThan(0);
+      expect(movingOnTeam).toEqual([presserId]);
+      const presserFrame = frames.get(presserId!)!;
+      if (teamId === "team-a") {
+        expect(presserFrame.moveX).toBeGreaterThan(0);
       } else {
-        // Team B attacks -x, ball at center → should move -x
-        expect(frame.moveX).toBeLessThan(0);
+        expect(presserFrame.moveX).toBeLessThan(0);
       }
     }
+    // Discriminating: stashed, both teammates of a pair close at once.
+    expect([...sampleAll(world, true, false).values()].filter(isMoving).length)
+      .toBe(6);
   });
 
   it("all 6 adapters produce sprint=1", () => {

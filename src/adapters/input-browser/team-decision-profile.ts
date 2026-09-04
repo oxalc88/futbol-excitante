@@ -29,6 +29,12 @@
  * fields the observation exposes. The adapter that receives it turns it into a
  * tick-indexed tackle press.
  *
+ * Anti-huddle (5V5-KICKOFF-ANTI-HUDDLE): with the shape live, the single
+ * designated presser above is also the only body of the team the CPU adapter
+ * lets converge on the ball, and it is chosen from the roles the defensive
+ * policy allows to press, so "one presser" and "one lawful tackler" stay one
+ * and the same body.
+ *
  * Lives in the adapter layer — no simulation core or contract changes.
  */
 
@@ -141,9 +147,14 @@ export interface TeamDecision {
   strategy: TeamStrategy;
   /** Defensive sub-mode for coordinated defender behavior. */
   defensiveSubMode: DefensiveSubMode;
-  /** Index of the teammate closest to the ball (within observation.players). */
+  /**
+   * The team's designated presser: the teammate closest to the ball, or — with
+   * the anti-huddle shape live — the closest teammate the defensive policy
+   * allows to press (see `designatePresser`). Either way exactly one body per
+   * team and tick, and the same body the CPU adapter chases with.
+   */
   nearestToBallPlayerId: string | undefined;
-  /** Distance from the nearest teammate to the ball (metres). */
+  /** Distance from the designated presser to the ball (metres). */
   nearestToBallDistance: number;
   /** Whether this team currently has ball possession. */
   hasPossession: boolean;
@@ -258,6 +269,73 @@ function findNearestToBall(
     }
   }
   return { playerId: bestId, distance: bestDist };
+}
+
+// ---------------------------------------------------------------------------
+// Anti-huddle activation and press designation (5V5-KICKOFF-ANTI-HUDDLE)
+// ---------------------------------------------------------------------------
+
+/**
+ * Whether the anti-huddle team shape is live for this observation.
+ *
+ * It activates on an observable precondition only: the observation carries the
+ * ball's authoritative touch reference, which every real runtime wiring does and
+ * no legacy synthetic fixture does. Those fixtures therefore keep the
+ * byte-identical behavior they pin. `cpuAntiHuddle: false` is the explicit kill
+ * switch the discriminating guards use to restore the chase-everything huddle.
+ *
+ * Deterministic pure function of the observation; the CPU adapter re-exports it
+ * so a single activation rule governs both sides.
+ */
+export function isAntiHuddleActive(observation: CpuObservation): boolean {
+  return observation.cpuAntiHuddle !== false &&
+    observation.ball.lastTouchRef !== undefined &&
+    observation.cpuTeamId !== undefined;
+}
+
+/**
+ * Designate the one body of `teamId` that presses and chases the ball this tick.
+ *
+ * Stashed, this is the accepted nearest-body-to-ball designation, unchanged.
+ * Live, it prefers the nearest teammate the accepted defensive policy allows to
+ * press — a role inside `FOUNDATION_CPU_TACKLE_V1.committingRoles`, with an
+ * unassigned role treated as eligible exactly as the accepted tackle gate does —
+ * so the single body that converges is also the single body that can lawfully
+ * win the duel, and the press block, the cover pair and the tackle
+ * authorisation all name the same player. A team with no eligible body keeps the
+ * accepted nearest-body designation, so a chaser always exists.
+ *
+ * Ties resolve by ascending playerId, so the choice never depends on the order
+ * players happen to appear in the observation.
+ */
+export function designatePresser(
+  observation: CpuObservation,
+  teamId: string,
+): { playerId: string | undefined; distance: number } {
+  const nearest = findNearestToBall(observation, teamId);
+  if (!isAntiHuddleActive(observation)) return nearest;
+
+  const allowed: ReadonlyArray<string> = FOUNDATION_CPU_TACKLE_V1.committingRoles.value;
+  let bestId: string | undefined;
+  let bestDist = Number.POSITIVE_INFINITY;
+  for (const p of observation.players) {
+    if (p.teamId !== teamId) continue;
+    if (p.formationRole !== undefined && !allowed.includes(p.formationRole)) continue;
+    const dist = planarDistance(
+      p.groundPosition.x,
+      p.groundPosition.y,
+      observation.ball.position.x,
+      observation.ball.position.y,
+    );
+    if (
+      dist < bestDist ||
+      (dist === bestDist && bestId !== undefined && p.playerId < bestId)
+    ) {
+      bestDist = dist;
+      bestId = p.playerId;
+    }
+  }
+  return bestId === undefined ? nearest : { playerId: bestId, distance: bestDist };
 }
 
 // ---------------------------------------------------------------------------
@@ -597,7 +675,7 @@ export function computeTeamDecision(
   observation: CpuObservation,
   teamId: string,
 ): TeamDecision {
-  const nearest = findNearestToBall(observation, teamId);
+  const nearest = designatePresser(observation, teamId);
   const ballZone = getBallZone(
     observation.ball.position.x,
     observation.pitchLength,

@@ -1,18 +1,26 @@
 /**
  * @module tests/unit/eval/SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH-2-trajectory
  *
- * Generates team-geometry trajectory evidence for the MULTI_TICK
- * evidence class.  Runs a 3v3 match, extracts per-tick geometry,
- * and writes trajectory.json.
+ * Team-geometry trajectory evidence for the accepted
+ * SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH MULTI_TICK claim.
  *
- * Also generates the match events + observations for scanner analysis.
+ * This test is READ-ONLY over durable evidence (capture hygiene 0.9.2+): the
+ * accepted `docs/evidence/**` artifact is asserted, never rewritten, and the
+ * digest check below fails if an ordinary run mutates it. The live 3v3 match is
+ * derived into ignored `test-results/gauntlet-capture/**` and compared on the
+ * same geometry invariants.
  *
- * No Math.random, Date, DOM, or Node I/O in simulation core.
- * Node I/O is allowed here (evidence writing).
+ * The live window runs at the historical CPU configuration — this accepted
+ * trajectory was produced before the anti-huddle team shape (anti-huddle-v1),
+ * pinned via cpuAntiHuddle:false to preserve the historical configuration
+ * byte-for-byte.
+ *
+ * Node I/O is allowed here (evidence reading, ephemeral capture).
  */
 
-import { describe, it } from "vitest";
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { describe, it, expect } from "vitest";
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -24,6 +32,9 @@ import type { HeadlessMatchResult } from "../../../eval/runners/headless-match.j
 const __testDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = join(__testDir, "../../..");
 const evidenceDir = join(projectRoot, "docs/evidence/SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH");
+const trajectoryPath = join(evidenceDir, "trajectory.json");
+/** Ordinary-run output belongs under ignored test-results, never docs/. */
+const ephemeralDir = join(projectRoot, "test-results/gauntlet-capture/SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH");
 
 function load3v3Scenario(): ScenarioDefinition {
   const p = join(projectRoot, "eval/scenarios/3v3-press-scenario.v1.json");
@@ -128,37 +139,104 @@ function extractTrajectory(
   return ticks;
 }
 
-describe("SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH: trajectory generation", () => {
-  it("generates trajectory.json from 3v3 match", () => {
-    const scenario = load3v3Scenario();
-    const roleMap = buildRoleMap(scenario);
-    const result = runHeadlessMatch({ scenario, maxTicks: 600 });
-    const trajectory = extractTrajectory(result, roleMap);
-    const scan = scanMatchResult(result.events, result.observations);
+/** The geometry invariants the accepted evidence claims, as a reusable check. */
+interface AcceptedTrajectory {
+  objectiveId: string;
+  evidenceClass: string;
+  scenario: { id: string; version: string; seed: number; durationTicks: number };
+  match: { events: number; observations: number; score: Record<string, number> };
+  situationScan: Record<string, number>;
+  trajectory: TrajectoryTick[];
+}
 
-    mkdirSync(evidenceDir, { recursive: true });
+function expectPressCoverSupportGeometry(
+  artifact: AcceptedTrajectory,
+  label: string,
+): void {
+  expect(artifact.objectiveId, label).toBe("SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH");
+  expect(artifact.evidenceClass, label).toBe("MULTI_TICK");
+  expect(artifact.scenario.id, label).toBe("3v3-press-scenario-v1");
+  expect(artifact.trajectory.length, `${label}: tick rows`).toBe(600);
 
-    const output = {
-      objectiveId: "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH",
-      evidenceClass: "MULTI_TICK",
-      scenario: {
-        id: scenario.id,
-        version: scenario.version,
-        seed: scenario.seed,
-        durationTicks: 600,
-      },
-      match: {
-        events: result.events.length,
-        observations: result.observations.length,
-        score: result.score,
-      },
-      situationScan: scan.summary,
-      trajectory,
-    };
+  let teamTicks = 0;
+  let withPresser = 0;
+  let withCover = 0;
+  let withSupport = 0;
+  for (const tick of artifact.trajectory) {
+    for (const teamId of ["team-a", "team-b"]) {
+      const team = tick.teams[teamId];
+      if (!team) continue;
+      teamTicks++;
+      if (team.presserId !== "") withPresser++;
+      if (team.coverId !== "" && team.coverId !== team.presserId) withCover++;
+      if (team.supportCount > 0) withSupport++;
+      // Every recorded team-tick has a finite presser/cover pair geometry.
+      expect(Number.isFinite(team.presserDistanceToBall), `${label} tick ${tick.tick}`).toBe(true);
+    }
+  }
+  // Press-and-support depth was observed on every tick of the window.
+  expect(teamTicks, label).toBe(1200);
+  expect(withPresser, label).toBe(1200);
+  expect(withCover, label).toBe(1200);
+  expect(withSupport, label).toBe(1200);
+}
 
-    writeFileSync(
-      join(evidenceDir, "trajectory.json"),
-      JSON.stringify(output, null, 2),
-    );
-  }, 120000);
+function digestOf(path: string): string {
+  return createHash("sha256").update(readFileSync(path)).digest("hex");
+}
+
+describe("SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH: trajectory evidence", () => {
+  it("the accepted trajectory holds the press/cover/support geometry invariants", () => {
+    const accepted = JSON.parse(readFileSync(trajectoryPath, "utf-8")) as AcceptedTrajectory;
+    expectPressCoverSupportGeometry(accepted, "accepted evidence");
+    expect(accepted.match.observations).toBe(600);
+    expect(accepted.situationScan.present).toBeGreaterThanOrEqual(0);
+  });
+
+  it(
+    "derives the same geometry live into ephemeral test-results without touching durable evidence",
+    () => {
+      const before = digestOf(trajectoryPath);
+
+      const scenario = load3v3Scenario();
+      const roleMap = buildRoleMap(scenario);
+      // Accepted trajectory predates anti-huddle-v1 → replay the historical
+      // CPU configuration byte-for-byte.
+      const result = runHeadlessMatch({
+        scenario,
+        maxTicks: 600,
+        cpuAntiHuddle: false,
+      });
+      const derived = {
+        objectiveId: "SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH",
+        evidenceClass: "MULTI_TICK",
+        scenario: {
+          id: scenario.id,
+          version: scenario.version,
+          seed: scenario.seed,
+          durationTicks: 600,
+        },
+        match: {
+          events: result.events.length,
+          observations: result.observations.length,
+          score: result.score,
+        },
+        situationScan: scanMatchResult(result.events, result.observations).summary,
+        trajectory: extractTrajectory(result, roleMap),
+      } satisfies AcceptedTrajectory;
+
+      expectPressCoverSupportGeometry(derived, "live derivation");
+      // The derivation reproduces the accepted window's shape.
+      expect(derived.match.observations).toBe(600);
+
+      // Ephemeral output only: docs/evidence/** stays byte-identical.
+      mkdirSync(ephemeralDir, { recursive: true });
+      writeFileSync(
+        join(ephemeralDir, "trajectory.derived.json"),
+        JSON.stringify(derived, null, 2),
+      );
+      expect(digestOf(trajectoryPath), "ordinary runs must not mutate accepted evidence").toBe(before);
+    },
+    120000,
+  );
 });

@@ -122,6 +122,12 @@ export interface CpuTackleMatchConfig {
   maxTicks: number;
   /** Give the CPU slots the tackle buttons. Default true. */
   cpuDefensiveTackle?: boolean;
+  /**
+   * Anti-huddle team shape (5V5-KICKOFF-ANTI-HUDDLE). Default true. Accepted
+   * evidence captured before `anti-huddle-v1` replays with `false` so its
+   * historical CPU configuration is reproduced byte-for-byte.
+   */
+  cpuAntiHuddle?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -202,6 +208,7 @@ export function runCpuTackleMatch(
     scenario: config.scenario,
     maxTicks: config.maxTicks,
     cpuDefensiveTackle,
+    cpuAntiHuddle: config.cpuAntiHuddle ?? true,
   });
 
   const { events, observations } = match;

@@ -183,11 +183,16 @@ interface CaptureResult {
 /**
  * Drive the browser composition root over the driver's own tick-indexed human
  * program, so every captured frame comes from the run the trajectory recorded.
+ *
+ * The CPU slots run at the historical (pre anti-huddle-v1) configuration — the
+ * same switch the program was produced with — so the accepted tick-43 duel
+ * reproduces instead of being re-pinned.
  */
 async function capturePass(
   scenario: ScenarioDefinition,
   program: DefensiveDuelResult,
   inputTick: number,
+  cpuAntiHuddle = false,
 ): Promise<CaptureResult> {
   const { page } = await import("@vitest/browser/context");
   const targets = frameTargets(inputTick);
@@ -213,19 +218,20 @@ async function capturePass(
     const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
     for (const entry of cpus) {
       if (!teamDecisions.has(entry.teamId)) {
-        teamDecisions.set(
+        const teamObs = buildCpuObservation(
+          snapshot,
           entry.teamId,
-          computeTeamDecision(
-            buildCpuObservation(snapshot, entry.teamId, entry.controlledPlayerId),
-            entry.teamId,
-          ),
+          entry.controlledPlayerId,
         );
+        teamObs.cpuAntiHuddle = cpuAntiHuddle;
+        teamDecisions.set(entry.teamId, computeTeamDecision(teamObs, entry.teamId));
       }
     }
 
     const frames: InputFrame[] = cpus.map((entry) => {
       const observation = buildCpuObservation(snapshot, entry.teamId, entry.controlledPlayerId);
       observation.teamDecision = teamDecisions.get(entry.teamId);
+      observation.cpuAntiHuddle = cpuAntiHuddle;
       const frame = entry.adapter.sample(sim.tick, observation);
       frame.controlSlot = entry.controlSlot;
       return frame;
@@ -304,6 +310,9 @@ describe("HUMAN-DEFENSIVE-DUEL-CONTROL: screenshot capture", () => {
         scenario,
         maxTicks: DUEL_TICKS,
         attempts: DUEL_ATTEMPTS,
+        // Accepted tick-43 program predates anti-huddle-v1 → pinned to the
+        // historical CPU configuration byte-for-byte (capturePass mirrors it).
+        cpuAntiHuddle: false,
       });
 
       // The driver program is the committed trajectory's program.

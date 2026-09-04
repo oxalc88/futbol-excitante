@@ -77,6 +77,14 @@ interface Fixture {
   three: CpuTackleMatchResult;
   threeControl: CpuTackleMatchResult;
   five: CpuTackleMatchResult;
+  /**
+   * Accepted-trajectory replays at the historical configuration: this pinned
+   * trajectory was produced before the anti-huddle team shape (anti-huddle-v1),
+   * so its reproduction is pinned via cpuAntiHuddle:false to preserve the
+   * historical configuration byte-for-byte rather than re-pin the artifact.
+   */
+  pinnedThree: CpuTackleMatchResult;
+  pinnedFive: CpuTackleMatchResult;
   threeSuite: ReturnType<typeof evaluateSuite>;
   threeControlSuite: ReturnType<typeof evaluateSuite>;
   /** Tackle presses each run's CPU adapters reported issuing. */
@@ -125,10 +133,31 @@ beforeAll(async () => {
   const fivePresses = getCpuTackleCommitActivations();
   resetMechanismCounters();
 
+  // Accepted-trajectory replays at the historical configuration (pre
+  // anti-huddle-v1): pinned hashes/attempts/scanner reads are reproduced from
+  // these, while every mechanism claim above stays on the live shape.
+  const pinnedThree = trimToCompleteAttempts(
+    runCpuTackleMatch({
+      scenario: loadScenario(PRESS3V3),
+      maxTicks: 600,
+      cpuAntiHuddle: false,
+    }),
+  );
+  const pinnedFive = trimToCompleteAttempts(
+    runCpuTackleMatch({
+      scenario: loadScenario(RUN5V5),
+      maxTicks: 600,
+      cpuAntiHuddle: false,
+    }),
+  );
+  resetMechanismCounters();
+
   fixture = {
     three,
     threeControl,
     five,
+    pinnedThree,
+    pinnedFive,
     threeSuite: evaluateSuite("duels", three.observations as TelemetryObservation[]),
     threeControlSuite: evaluateSuite(
       "duels",
@@ -384,7 +413,9 @@ describe("CPU-DEFENSIVE-TACKLE: the commitment binds the defender", () => {
 
   it("a beaten CPU challenge still costs the full window and concedes ground", () => {
     const f = fixture!;
-    const lost = f.three.attempts.filter((a) => a.outcome === "duel-contact-only");
+    // The accepted ground-concession claim is a property of the pinned window at
+    // the historical configuration (pre anti-huddle-v1).
+    const lost = f.pinnedThree.attempts.filter((a) => a.outcome === "duel-contact-only");
     expect(lost.length).toBeGreaterThan(0);
     for (const attempt of lost) {
       expect(attempt.cpuIssued).toBe(true);
@@ -426,12 +457,13 @@ describe("CPU-DEFENSIVE-TACKLE: artifact binding and scanner honesty", () => {
       expect(three.state_hashes!.length).toBe(three.ticks);
       expect(five.state_hashes!.length).toBe(five.ticks);
 
-      expect(f.three.stateHashes).toEqual(three.state_hashes);
-      expect(f.five.stateHashes).toEqual(five.state_hashes);
+      // Pinned at the historical configuration (pre anti-huddle-v1).
+      expect(f.pinnedThree.stateHashes).toEqual(three.state_hashes);
+      expect(f.pinnedFive.stateHashes).toEqual(five.state_hashes);
 
       // Same attempts, same ticks, same outcomes.
-      expect(f.three.attempts).toEqual(three.attempts);
-      expect(f.five.attempts).toEqual(five.attempts);
+      expect(f.pinnedThree.attempts).toEqual(three.attempts);
+      expect(f.pinnedFive.attempts).toEqual(five.attempts);
       expect(three.duels_suite["TACK-ST-001-PHASE"]).toBe("PASS");
       expect(three.duels_suite["TACK-SL-001-PHASE"]).toBe("PASS");
     },
@@ -442,14 +474,17 @@ describe("CPU-DEFENSIVE-TACKLE: artifact binding and scanner honesty", () => {
     "PHYSICAL_DUEL scanner read in the artifact is reproduced from the same run",
     async () => {
       const f = fixture!;
-      const scan = scanMatchResult(f.three.events, f.three.observations);
+      // Scanner read is reproduced from the pinned window at the historical
+      // configuration (pre anti-huddle-v1); the live shape is covered by the
+      // mechanism tests above.
+      const scan = scanMatchResult(f.pinnedThree.events, f.pinnedThree.observations);
       const duel = scan.localizations.find((l) => l.situation_id === "PHYSICAL_DUEL")!;
       const pinned = artifactRun("3v3-cpu-vs-cpu").situation_scan.physical_duel;
 
       expect(duel.presence).toBe(pinned.presence);
       expect(pinned.observed_kinds).toContain("player-player-contact");
       // CPU tackle duels are part of what the scanner now sees for the situation.
-      const tackleContacts = f.three.events.filter(
+      const tackleContacts = f.pinnedThree.events.filter(
         (event) =>
           event.kind === "player-player-contact" &&
           String((event.payload as Record<string, unknown>).contactType ?? "").endsWith("-tackle"),
@@ -458,7 +493,7 @@ describe("CPU-DEFENSIVE-TACKLE: artifact binding and scanner honesty", () => {
 
       // Honest disclosure: with no organic input-rejection the accepted scanner
       // must not claim presence.
-      const rejections = f.three.events.filter((e) => e.kind === "input-rejection").length;
+      const rejections = f.pinnedThree.events.filter((e) => e.kind === "input-rejection").length;
       if (rejections === 0) {
         expect(duel.presence).not.toBe("present");
       }

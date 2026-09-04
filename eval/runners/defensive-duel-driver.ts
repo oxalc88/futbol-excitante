@@ -76,6 +76,12 @@ export interface DefensiveDuelConfig {
   attempts?: TackleAttempt[];
   /** Ticks the human holds a sprint while closing down. Default 1. */
   sprint?: number;
+  /**
+   * Anti-huddle team shape for the CPU slots (5V5-KICKOFF-ANTI-HUDDLE). Default
+   * true. Accepted evidence captured before `anti-huddle-v1` replays with
+   * `false` so the historical CPU configuration is reproduced byte-for-byte.
+   */
+  cpuAntiHuddle?: boolean;
 }
 
 /** A press the human policy actually issued, with its tick and bit mask. */
@@ -140,6 +146,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
   const { scenario, maxTicks } = config;
   const attempts = config.attempts ?? [];
   const sprint = config.sprint ?? 1;
+  const cpuAntiHuddle = config.cpuAntiHuddle ?? true;
 
   const world = createWorld({ scenario });
   const observations: TelemetryObservation[] = [];
@@ -201,6 +208,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
     for (const entry of cpuSlots) {
       if (!teamDecisions.has(entry.teamId)) {
         const teamObs = buildCpuObservation(snapshot, entry.teamId, entry.controlledPlayerId);
+        teamObs.cpuAntiHuddle = cpuAntiHuddle;
         teamDecisions.set(entry.teamId, computeTeamDecision(teamObs, entry.teamId));
       }
     }
@@ -209,6 +217,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
     for (const entry of cpuSlots) {
       const obs = buildCpuObservation(snapshot, entry.teamId, entry.controlledPlayerId);
       obs.teamDecision = teamDecisions.get(entry.teamId);
+      obs.cpuAntiHuddle = cpuAntiHuddle;
       const frame = entry.adapter.sample(tick, obs);
       frame.controlSlot = entry.controlSlot;
       frames.push(frame);

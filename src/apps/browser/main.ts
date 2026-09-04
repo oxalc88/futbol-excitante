@@ -584,6 +584,9 @@ function startMatch(
           if (!teamDecisions.has(tid)) {
             const teamObs = buildCpuObservation(snapshot, tid, controlledPlayerId);
             teamObs.difficulty = difficulty;
+            // The press designation the slots act on is decided under the same
+            // switch the slots run with (5V5-KICKOFF-ANTI-HUDDLE).
+            teamObs.cpuAntiHuddle = true;
             teamDecisions.set(tid, computeTeamDecision(teamObs, tid));
           }
         }
@@ -595,6 +598,10 @@ function startMatch(
           // This CPU controller exposes the defensive tackle buttons, exactly as
           // the human keyboard binding does (CPU-DEFENSIVE-TACKLE).
           obs.cpuDefensiveTackle = true;
+          // Small-sided CPU matches run with the anti-huddle team shape: only
+          // the designated chaser converges on the ball, everyone else holds a
+          // fixed kickoff home (5V5-KICKOFF-ANTI-HUDDLE).
+          obs.cpuAntiHuddle = true;
           const cpuFrame = cpuAd.sample(sim.tick, obs);
           cpuFrame.controlSlot = controlSlot;
           allFrames.push(cpuFrame);
@@ -603,6 +610,7 @@ function startMatch(
         const obs = buildCpuObservation(sim.snapshot(), cpuTeamId, cpuControlledPlayerId);
         obs.difficulty = difficulty;
         obs.cpuDefensiveTackle = true;
+        obs.cpuAntiHuddle = true;
         const cpuFrame = cpuAdapter.sample(sim.tick, obs);
         allFrames.push(cpuFrame);
       }

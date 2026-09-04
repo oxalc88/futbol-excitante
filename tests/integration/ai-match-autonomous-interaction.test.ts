@@ -5,7 +5,10 @@ import { buildCpuObservation, createCpuAdapter } from "../../src/adapters/input-
 import { FOUNDATION_SCENARIO_AI_VS_AI } from "../../src/apps/browser/foundation-scenario.js";
 
 describe("AI-MATCH-E2E-002: autonomous interaction", () => {
-  it("uses distinct owned players and produces bounded deterministic interaction", () => {
+  // Two full 360-tick CPU-driven replays of the same match run inside one test,
+  // so the default 5 s budget is not enough (measured ~4.9 s on the pinned
+  // runtime, which is why this intermittently timed out). Assertions unchanged.
+  it("uses distinct owned players and produces bounded deterministic interaction", { timeout: 30_000 }, () => {
     const run = () => {
       const sim = createSimulation(createWorld({ scenario: FOUNDATION_SCENARIO_AI_VS_AI }));
       const entries = Object.entries(FOUNDATION_SCENARIO_AI_VS_AI.controlAssignments).map(([controlSlot, assignment]) => ({

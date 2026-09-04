@@ -65,16 +65,28 @@ function loadBaseline(): BaselineEntry[] {
  * cpu-adapters match executes the full sim twice (baseline compare plus the
  * determinism re-run), so it needs generous headroom. Scenarios without an
  * explicit value keep the normal default.
+ *
+ * `cpuAntiHuddle: false` reproduces the historical CPU shape: this accepted
+ * baseline was captured before the anti-huddle team shape (anti-huddle-v1), so
+ * the pin is held at cpuAntiHuddle:false to preserve the historical
+ * configuration byte-for-byte instead of re-pinning the artifact.
  */
 const SPEC_MAP: Record<
   string,
-  { ticks: number; drive: "scenario-program" | "cpu-adapters"; timeoutMs?: number }
+  {
+    ticks: number;
+    drive: "scenario-program" | "cpu-adapters";
+    timeoutMs?: number;
+    cpuAntiHuddle?: boolean;
+  }
 > = {
   "foundation-move-and-roll":              { ticks: 120, drive: "scenario-program" },
   "two-player-duel":                       { ticks: 120, drive: "scenario-program" },
   "duel-rejection-fixture":                { ticks: 60,  drive: "scenario-program" },
-  "human-vs-cpu-5v5-no-defensive-input":   { ticks: 340, drive: "cpu-adapters", timeoutMs: 120_000 },
-  "ai-vs-ai-3v3-press-no-input":           { ticks: 300, drive: "cpu-adapters", timeoutMs: 60_000 },
+  // Accepted baseline predates anti-huddle-v1 → pinned at the historical shape.
+  "human-vs-cpu-5v5-no-defensive-input":   { ticks: 340, drive: "cpu-adapters", timeoutMs: 120_000, cpuAntiHuddle: false },
+  // Accepted baseline predates anti-huddle-v1 → pinned at the historical shape.
+  "ai-vs-ai-3v3-press-no-input":           { ticks: 300, drive: "cpu-adapters", timeoutMs: 60_000, cpuAntiHuddle: false },
 };
 
 // ---------------------------------------------------------------------------
@@ -102,6 +114,8 @@ describe("no-tackle-additivity: byte-identical hashes vs baseline", () => {
           scenario,
           ticks: spec.ticks,
           drive: spec.drive,
+          // Pinned historical configuration (see SPEC_MAP note).
+          cpuAntiHuddle: spec.cpuAntiHuddle ?? true,
         }];
 
         const runs = runNoTackleAdditivityRuns(runSpecs);

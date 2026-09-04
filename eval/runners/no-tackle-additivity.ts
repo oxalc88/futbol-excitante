@@ -45,6 +45,13 @@ export interface NoTackleRunSpec {
    * human slot that presses no action bits at all.
    */
   drive: "scenario-program" | "cpu-adapters";
+  /**
+   * Anti-huddle switch for `cpu-adapters` drives (5V5-KICKOFF-ANTI-HUDDLE).
+   * Left undefined the slots run with the current shape; pinned baselines
+   * recorded before `anti-huddle-v1` pass `false` so the historical CPU shape is
+   * reproduced byte-for-byte instead of being re-pinned.
+   */
+  cpuAntiHuddle?: boolean;
 }
 
 /**
@@ -79,6 +86,7 @@ function runScenarioProgram(
 function runHumanVsCpuNoDefensive(
   scenario: ScenarioDefinition,
   ticks: number,
+  cpuAntiHuddle = true,
 ): string[] {
   const world = createWorld({ scenario });
   const sim = createSimulation(world);
@@ -121,6 +129,7 @@ function runHumanVsCpuNoDefensive(
     for (const entry of cpuSlots) {
       if (!teamDecisions.has(entry.teamId)) {
         const teamObs = buildCpuObservation(snapshot, entry.teamId, entry.controlledPlayerId);
+        teamObs.cpuAntiHuddle = cpuAntiHuddle;
         teamDecisions.set(entry.teamId, computeTeamDecision(teamObs, entry.teamId));
       }
     }
@@ -129,6 +138,7 @@ function runHumanVsCpuNoDefensive(
     for (const entry of cpuSlots) {
       const obs = buildCpuObservation(snapshot, entry.teamId, entry.controlledPlayerId);
       obs.teamDecision = teamDecisions.get(entry.teamId);
+      obs.cpuAntiHuddle = cpuAntiHuddle;
       const frame = entry.adapter.sample(tick, obs);
       frame.controlSlot = entry.controlSlot;
       frames.push(frame);
@@ -178,7 +188,7 @@ export function runNoTackleAdditivityRuns(specs: NoTackleRunSpec[]): NoTackleRun
   for (const spec of specs) {
     const hashes =
       spec.drive === "cpu-adapters"
-        ? runHumanVsCpuNoDefensive(spec.scenario, spec.ticks)
+        ? runHumanVsCpuNoDefensive(spec.scenario, spec.ticks, spec.cpuAntiHuddle ?? true)
         : runScenarioProgram(spec.scenario, spec.ticks);
     runs.push({
       id: spec.id,

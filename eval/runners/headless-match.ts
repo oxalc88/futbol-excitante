@@ -118,6 +118,22 @@ export interface HeadlessMatchConfig {
    * tackle-free control shape the strictly-additive baselines pin.
    */
   cpuDefensiveTackle?: boolean;
+  /**
+   * Anti-huddle team shape (5V5-KICKOFF-ANTI-HUDDLE): kickoff freeze to fixed
+   * homes plus nearest-only chasing of the ball. Default true, which is what the
+   * browser composition root runs with. Explicitly false restores the
+   * chase-everything shape this runner produced before the objective — the
+   * discriminating guards stash the behavior through this switch.
+   */
+  cpuAntiHuddle?: boolean;
+  /**
+   * Build each CPU slot's observation through `buildCpuObservation` with the
+   * slot's team and player resolved — the browser composition root's shape,
+   * which carries the fixed formation anchor and the teammate list. Opt-in: the
+   * runner's own minimal team-filtered shape stays byte-identical for every
+   * accepted headless evidence run.
+   */
+  browserParityObservations?: boolean;
 }
 
 /**
@@ -444,6 +460,8 @@ export function runHeadlessMatch(
     goalTeamMapping = DEFAULT_GOAL_TEAM_MAPPING,
     autoGoalReset,
     cpuDefensiveTackle = false,
+    cpuAntiHuddle = true,
+    browserParityObservations = false,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
 
@@ -550,6 +568,7 @@ export function runHeadlessMatch(
     // The simulation maps: first-half → playing, halftime → halftime,
     // second-half → playing, fulltime → fulltime, kickoff → kickoff.
     // Goal phase is handled internally by the simulation's countdown.
+    let syncedState: WorldState | null = null;
     {
       let simPhase: import("../../src/contracts/state.js").MatchPhase;
       switch (phase) {
@@ -568,16 +587,21 @@ export function runHeadlessMatch(
         default:
           simPhase = "playing";
       }
-      // Update simulation matchPhase via deepClone/restore if different.
-      const mutable = deepClone(sim.snapshot()) as WorldState;
-      if (mutable.matchPhase !== simPhase) {
+      // `snapshot()` already hands back a deep clone, so the extra mutable copy
+      // is only taken on the ticks where the phase actually differs. The
+      // resulting state — and every hash — is unchanged either way.
+      const current = sim.snapshot();
+      syncedState = current;
+      if (current.matchPhase !== simPhase) {
+        const mutable = deepClone(current) as WorldState;
         mutable.matchPhase = simPhase;
         sim.restore(mutable);
+        syncedState = sim.snapshot();
       }
     }
 
     // a. Snapshot the world (deep clone — CPU adapters only read).
-    const snapshot = sim.snapshot();
+    const snapshot = syncedState ?? sim.snapshot();
 
     // b. Build full CpuObservation, then filter per team.
     //    Each CPU sees the full world but its OWN player is always first
@@ -607,6 +631,9 @@ export function runHeadlessMatch(
     for (const { teamId } of slotCpus) {
       if (!teamDecisions.has(teamId)) {
         const teamObs = buildTeamCpuObservation(fullObs, teamId);
+        // The press designation lives or dies with the same switch the slots
+        // are given, so a stashed run is one shape end to end.
+        teamObs.cpuAntiHuddle = cpuAntiHuddle;
         const cpuGoals = scoreAccum[teamId] ?? 0;
         const opponentTeamId = teamId === "team-a" ? "team-b" : "team-a";
         const opponentGoals = scoreAccum[opponentTeamId] ?? 0;
@@ -616,7 +643,12 @@ export function runHeadlessMatch(
     }
 
     for (const { adapter, controlSlot, teamId, controlledPlayerId } of slotCpus) {
-      const teamObs = buildTeamCpuObservation(fullObs, teamId, controlledPlayerId);
+      // Browser parity: the composition root resolves the slot's team/player
+      // through buildCpuObservation, which also supplies the fixed formation
+      // anchor and the teammate list the support mechanisms read.
+      const teamObs = browserParityObservations
+        ? buildCpuObservation(snapshot, teamId, controlledPlayerId)
+        : buildTeamCpuObservation(fullObs, teamId, controlledPlayerId);
       // Inject score differential for score-aware AI.
       const cpuGoals = scoreAccum[teamId] ?? 0;
       const opponentTeamId = teamId === "team-a" ? "team-b" : "team-a";
@@ -628,6 +660,9 @@ export function runHeadlessMatch(
       if (cpuDefensiveTackle) {
         teamObs.cpuDefensiveTackle = true;
       }
+      // 5V5-KICKOFF-ANTI-HUDDLE: the anti-huddle shape is live unless a caller
+      // explicitly stashes it (the discriminating guards do exactly that).
+      teamObs.cpuAntiHuddle = cpuAntiHuddle;
 
       const frame = adapter.sample(tick, teamObs);
       frame.controlSlot = controlSlot;

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import {
+  assignChaseRoles,
   buildCpuObservation,
   createCpuAdapter,
 } from "../../src/adapters/input-browser/cpu-adapter.js";
@@ -22,17 +23,41 @@ describe("AI-MATCH-E2E-001: CPU slot ownership and pursuit", () => {
     expect(obsA.controlledPlayerId).not.toBe(obsB.controlledPlayerId);
   });
 
-  it("both CPU slots initially move toward the ball from opposite sides", () => {
+  it("both CPU slots pursue the ball from opposite sides once it is in play", () => {
+    // Anti-huddle kickoff contract (5V5-KICKOFF-ANTI-HUDDLE): while the restart
+    // ball carries no touch reference only the kick taker closes on it, so the
+    // opposite-sides pursuit is asserted in the in-play window — with the shape
+    // stashed both slots still charge, and with the shape over-converging the
+    // untouched-window single-taker assertion below goes red.
     const world = createWorld({ scenario: FOUNDATION_SCENARIO_AI_VS_AI });
-    const frameA = createCpuAdapter().sample(
-      0,
-      buildCpuObservation(world, slot1.teamId, slot1.controlledPlayerId),
-    );
-    const frameB = createCpuAdapter().sample(
-      0,
-      buildCpuObservation(world, slot2.teamId, slot2.controlledPlayerId),
-    );
+    const untouchedA = buildCpuObservation(world, slot1.teamId, slot1.controlledPlayerId);
+    const untouchedB = buildCpuObservation(world, slot2.teamId, slot2.controlledPlayerId);
+    const takerId = assignChaseRoles(untouchedA, slot1.teamId).kickoffTakerId;
+    expect(takerId).toBeTruthy();
 
+    const takerFrame = createCpuAdapter().sample(
+      0,
+      takerId === slot1.controlledPlayerId ? untouchedA : untouchedB,
+    );
+    const heldFrame = createCpuAdapter().sample(
+      0,
+      takerId === slot1.controlledPlayerId ? untouchedB : untouchedA,
+    );
+    expect(Math.abs(takerFrame.moveX) + Math.abs(takerFrame.moveY)).toBeGreaterThan(0);
+    expect(heldFrame.moveX).toBe(0);
+    expect(heldFrame.moveY).toBe(0);
+
+    // Ball in play: each team's own designated presser closes from its own side.
+    const inPlayA = buildCpuObservation(world, slot1.teamId, slot1.controlledPlayerId);
+    const inPlayB = buildCpuObservation(world, slot2.teamId, slot2.controlledPlayerId);
+    inPlayA.ball.lastTouchRef = "kickoff-touch-0";
+    inPlayB.ball.lastTouchRef = "kickoff-touch-0";
+    const frameA = createCpuAdapter().sample(0, inPlayA);
+    const frameB = createCpuAdapter().sample(0, inPlayB);
+
+    expect(assignChaseRoles(inPlayA, slot1.teamId).chaserPlayerId).toBe(slot1.controlledPlayerId);
+    expect(assignChaseRoles(inPlayB, slot2.teamId).chaserPlayerId).toBe(slot2.controlledPlayerId);
+    // player-a starts behind the ball (x = -0.5), player-b ahead of it (x = 5).
     expect(frameA.moveX).toBeGreaterThan(0);
     expect(frameB.moveX).toBeLessThan(0);
   });
