@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "CAPTURE-HYGIENE-ENFORCEMENT",
+  "accepted_at": "2026-09-04T21:07:10.450Z",
+  "candidate_commit": "09eb70d",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/CAPTURE-HYGIENE-ENFORCEMENT/audit.json",
+      "sha256": "c5a65d5c6bd8e61d8cf259d567b7d2b3be212e0e15e8779c29e4d41401d06cb0",
+      "git_blob": "f58c9952ff21040100b64ebf56fc12b2fd23d450",
+      "candidate_commit": "09eb70d",
+      "bytes": 2685,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-04/2026-09-04T21-07-10-450Z-CAPTURE-HYGIENE-ENFORCEMENT-acceptance.json"
+}
