@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-08-24T21:15:00Z
+measured_at: 2026-09-04T04:43:00Z
 tracking_contract_version: 1
-last_tracked_objective: SMALL-SIDED-ORGANIC-DUEL-CLOSURE
-usage_aggregates_through: SMALL-SIDED-ORGANIC-DUEL-CLOSURE
-clock_aggregates_through: SMALL-SIDED-ORGANIC-DUEL-CLOSURE
-model_evaluation_through: SMALL-SIDED-ORGANIC-DUEL-CLOSURE
+last_tracked_objective: BROWSER-DEFENSIVE-CONTROLS-LEGEND
+usage_aggregates_through: BROWSER-DEFENSIVE-CONTROLS-LEGEND
+clock_aggregates_through: BROWSER-DEFENSIVE-CONTROLS-LEGEND
+model_evaluation_through: BROWSER-DEFENSIVE-CONTROLS-LEGEND
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,16 +42,24 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 53h 49m |
+| Calendar span (first work → measurement) | 507h 24m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | 43h 40m |
-| Sum of per-step agent time | 35h 52m |
-| Orchestrator thinking between steps | ~12h 48m |
+| Active work (anything running) | ~113h est. |
+| Sum of per-step agent time | ~112h 20m |
+| Orchestrator thinking between steps | ~5h est. (within-session only) |
+| Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-08-24T21:15:01Z`.
-The per-step total now includes DUELS-SUITE (1h 40m), MUTANT-1V1 (23m), SWERVE (40m), and CPU-OPPONENT-1V1 (21m);
-"orchestrator thinking" grew because it absorbs the grok-4.6 handoff/docs
-bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46–16:44 UTC).
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-04T04:43:00Z`.
+Recomputed 2026-09-04 at the BROWSER-DEFENSIVE-CONTROLS-LEGEND acceptance: the
+per-step table now holds 163 accepted rows (145 fully parsed + compound-duration
+rows re-parsed) summing to ~112h 20m; the new objective adds ~2h 20m
+(builder ~2h 7m / critic 9m / integration 2m / commits ~2m). Calendar span is
+recomputed from session start to this measurement. Long session gaps
+(2026-08-24 → 2026-09-03, several days) are NOT itemized as orchestrator
+thinking; they are intersession idle. The earlier 43h 40m "active work" figure
+covered only through the 2026-08-24 measurement and is superseded by the
+per-step sum above. Step times remain estimates from subagent wall-clock, not
+provider invoices.
 
 ## Per-step time and tokens
 
@@ -240,6 +248,7 @@ bookkeeping window (02:12–05:33 UTC) and the DeepSeek overflow window (05:46�
 | HUMAN-DEFENSIVE-DUEL-CONTROL | accepted | ~4h* | 3h | 23m | 1h | ~10m | ~30M est. | n/a |
 | CPU-DEFENSIVE-TACKLE | accepted | ~4.5h | 4h | 16m | 14m | ~30m | ~30M est. | n/a |
 | SMALL-SIDED-ORGANIC-DUEL-CLOSURE | accepted | ~20m | 12m | 4m | 1m | ~3m | ~1M est. | n/a |
+| BROWSER-DEFENSIVE-CONTROLS-LEGEND | accepted | ~2h 20m | ~2h 7m | 9m | 2m | ~2m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -540,6 +549,7 @@ on an H task is the interesting result.
 | HUMAN-DEFENSIVE-DUEL-CONTROL | qwen3.8-flash (mimo-v2.5 original; qwen3.6 mid-flight) | M | Medium — original builder mimo-v2.5 (initial tackle system); qwen3.8-flash (caption correction, tests, evidence reconciliation). 247 tests green, typecheck exit 0, audit PASS, FOUNDATION_LAB_PASS eval.json supersession |
 | SMALL-SIDED-ORGANIC-DUEL-CLOSURE | deepseek-v4-flash | L | Low — BOOKKEEPING: re-scan coherent matches with CPU tackle, update manifest, materialize playtest record, supersede bundle (evidence-bundle only, zero gameplay) | 0 | A | 185 eval/scenario suites pass, typecheck 0, build 0, honest PHYSICAL_DUEL disclosure |
 | CPU-DEFENSIVE-TACKLE | qwen3.8-flash | M | Medium — CPU defensive tackle committed to team-decision profile; no omniscience, geometric/temporal justification, commitment binding; 99 tests green, typecheck exit 0, audit PASS, critic first pass |
+| BROWSER-DEFENSIVE-CONTROLS-LEGEND | qwen3.8-flash | M | Medium — presentation affordance: extracted importable controls-legend-ui module, 14-test real-Chromium DOM suite, Vite+Playwright real-app capture script; found+fixed startMatch() hint-strip clobber (toggle deleted at match start) and pointer-events lockout; replaced prior session's fabricated mock evidence with real-app captures; 26+14 tests green, typecheck 0, build 0, core byte-identical | 0 | A | first-pass ACCEPT; audit PASS 20/20 BROWSER_VISIBLE |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -776,6 +786,8 @@ on an H task is the interesting result.
 | CPU-DEFENSIVE-TACKLE | integration-reviewer (deepseek-v4-flash) | deepseek-v4-flash | ACCEPT | composition clean; no evaluator weakened; 99 tests green, typecheck exit 0, audit PASS |
 | HUMAN-DEFENSIVE-DUEL-CONTROL | critic (deepseek-v4-flash) | deepseek-v4-flash | ACCEPT | first pass clean (critic); second pass after RETRY fix: caption corrected, evidence reproducible, all substantive criteria PASS; post-repair integration ACCEPT; 247 tests green, typecheck exit 0, audit PASS, FOUNDATION_LAB_PASS eval.json supersession |
 | CPU-DEFENSIVE-TACKLE | critic (deepseek-v4-flash) | deepseek-v4-flash | ACCEPT | first pass clean; all substantive criteria PASS (omniscience-free, reachability guard, commitment binding, organic integration, honest scanner); RESULT.md fix applied post-retry |
+| BROWSER-DEFENSIVE-CONTROLS-LEGEND | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; visually verified both PNGs (setup-menu legend 10 rows; live tick-194 5v5 overlay opened by real click); sha256sum reproduced both hashes; re-ran parity guard 26/26 + UI suite 14/14; single source of truth verified (capture loads the contract via ssrLoadModule); no architecture violations; pre-existing node failures disclosed not absorbed |
+| BROWSER-DEFENSIVE-CONTROLS-LEGEND | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; ladder-menu-parity 9/9 + controls-legend-ui 14/14 (browser) + parity guard 26/26 (node) + typecheck exit 0 independently executed; core byte-identical; dependency direction PASS (contract zero-import, UI module browser-adapter layer); no evaluator change; critic verified ran |
 
 ### Builder scoreboard
 

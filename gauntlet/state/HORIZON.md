@@ -4,12 +4,12 @@
 
 ```yaml
 horizon_version: 23
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "defensive-duels-and-organic-duel-closure"
 created_from_commit: 421f98f
 created_at: 2026-08-29
 reason: "Horizon v22 (EXHAUSTED 5/5, remote-durable at 421f98f) closed coherent-match situation localization to 7/8 organically (SHOT_TO_RESULT organic via the 600-tick 5v5 continuous match), leaving PHYSICAL_DUEL as the single disclosed insufficient_context — its indicative kind (input-rejection) is structurally unreachable in organic CPU-vs-CPU play — and no formal tackle actions exist anywhere (TACK-ST-001/TACK-SL-001 stay NOT_EVALUATED UNKNOWN/REGRESSION in the duels suite). A second repaired defect: the pre-existing typecheck failure in src/simulation/loop/simulation.ts (emitted event kinds \"slot-switch\"/\"slot-wiring-violation\" missing from the SimulationEvent.kind union in src/contracts/scenario.ts → 2 TS2322 errors) keeps `pnpm run typecheck`/`test-all` red and masks new type errors. v23 closes both within small-sided bounds: repair the event-kind union; add human standing+sliding tackle actions (ordered prepare-active-recover phases, finite reach/active contact window, recovery cost, no teleport/permanent collider) with browser keys and executable TACK-* HARD_INVARIANT phase criteria in the duels evaluator; extend the team decision profile with CPU defensive tackle commitment (same locomotion/contact model, no omniscience); re-run the situation scanner + SMALL_SIDED_SHAPE reducer on the deepened matches for honest organic PHYSICAL_DUEL closure; and surface a browser controls legend covering the defensive actions. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
-current_index: 4
+current_index: 5
 objectives:
   - id: CORE-EVENT-TYPE-UNION-FIX
     status: accepted
@@ -32,12 +32,12 @@ objectives:
     builder: builder-structured
     prerequisite: HUMAN-DEFENSIVE-DUEL-CONTROL, CPU-DEFENSIVE-TACKLE
   - id: BROWSER-DEFENSIVE-CONTROLS-LEGEND
-    status: pending
+    status: accepted
     reason: "Surface an in-browser controls legend (setup menu and/or match overlay) documenting the full human control set including the new defensive actions (standing/slide tackle keys beside pass/shot/through-ball/sprint/switch), with a binding/parity guard asserting every documented control has a live binding (removing a binding or a legend entry fails the guard) and BROWSER_VISIBLE screenshots of the legend and an in-match state. Presentation affordance only — no gameplay change, no invented rubric."
     builder: builder-gameplay
     prerequisite: HUMAN-DEFENSIVE-DUEL-CONTROL
 observable_progress_target: "The browser 5v5 human-vs-CPU match visibly supports a full two-way role: the human commits to standing/sliding tackles with prepare-active-recover commitment (lunge, contact, recovery), CPU defenders equally commit with risk (a missed tackle leaves the lane open), the situation scanner localizes PHYSICAL_DUEL organically from human-driven and CPU-driven duels (honestly disclosed if the input-rejection kind still needs a human input), the controls legend is discoverable in the UI, and the typecheck gate is green throughout. NO GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity/PROMOTION work."
-last_invalidation_reason: "Horizon v22 EXHAUSTED 5/5: small-sided coherent play closed to 7/8 organic situations (SHOT_TO_RESULT organic), PHYSICAL_DUEL disclosed insufficient_context (input-rejection structurally unreachable in organic CPU-vs-CPU play), no formal tackle actions exist anywhere (TACK-* NOT_EVALUATED in the duels suite), and the pre-existing simulation.ts event-kind-union typecheck defect keeps test-all red. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity still deferred."
+last_invalidation_reason: "Horizon v23 EXHAUSTED 5/5: CORE-EVENT-TYPE-UNION-FIX (typecheck gate green), HUMAN-DEFENSIVE-DUEL-CONTROL (standing/sliding tackle actions, U/I), CPU-DEFENSIVE-TACKLE (CPU tackle commitment), SMALL-SIDED-ORGANIC-DUEL-CLOSURE (honest coherent-match closure, PHYSICAL_DUEL disclosed), BROWSER-DEFENSIVE-CONTROLS-LEGEND (legend + parity guard + real-app BROWSER_VISIBLE evidence) all accepted. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity still deferred."
 replan_if:
   - objective_blocked
   - architectural_invalidation

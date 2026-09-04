@@ -8,11 +8,9 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: BROWSER-DEFENSIVE-CONTROLS-LEGEND
-
 best_known:
-  commit: 7697bd3
-  note: "SMALL-SIDED-ORGANIC-DUEL-CLOSURE accepted (Horizon v23 4/5) — BOOKKEEPING: re-scanned 5v5/3v3 with CPU tackle live. PHYSICAL_DUEL honest insufficient_context. BATCH-5 decisive → milestone PASS preserved. Bundle fully repaired (playtest materialized, source_objectives corrected, latest_playtest_result updated). 185 suites pass, typecheck 0, build 0. CRITIC: ACCEPT first pass (independent mimo-v2.5)."
+  commit: 14040a7
+  note: "BROWSER-DEFENSIVE-CONTROLS-LEGEND accepted (Horizon v23 5/5 COMPLETE) — in-browser controls legend from the shared CONTROLS_LEGEND contract (setup menu + in-match ? overlay via extracted controls-legend-ui module). Fixed startMatch() hint-strip clobber (toggle deleted at match start) + unclickable toggle (pointer-events). Parity guard 26 tests (both drift directions) + 14 real-Chromium DOM guards. Real-app Vite+Playwright captures (byte-distinct, replaced prior synthetic/mock evidence). Core byte-identical. typecheck 0, build 0. Critic+integration ACCEPT first pass (glm5.3-flash independent of qwen3.8-flash). Audit PASS 20/20 BROWSER_VISIBLE."
 active_candidate: null
 builder_in_use: null
 critic_in_use: null
@@ -158,12 +156,22 @@ accepted:
   - HUMAN-DEFENSIVE-DUEL-CONTROL
   - CPU-DEFENSIVE-TACKLE
   - SMALL-SIDED-ORGANIC-DUEL-CLOSURE
+  - BROWSER-DEFENSIVE-CONTROLS-LEGEND
 
 blocked: []
 
-selection_note: "Horizon v23 (defensive-duels-and-organic-duel-closure) ACTIVE 0/5 — created 2026-08-29 after horizon v22 exhaustion (5/5) and verified remote durability of the final acceptance commit 421f98f (origin/main contains it; push d653ce3..421f98f). Reassessment selected five objectives within small-sided bounds: (1) CORE-EVENT-TYPE-UNION-FIX — repair ALL pre-existing typecheck defects so `pnpm run typecheck` exits 0: the slot-switch / slot-wiring-violation kinds missing from the SimulationEvent.kind union in src/contracts/scenario.ts (2 TS2322, masked at baseline by the && short-circuit), plus the 10 further masked pre-existing node-project errors in eval/runners/* (type-drift repairs, zero runtime change); (2) HUMAN-DEFENSIVE-DUEL-CONTROL — human standing+sliding tackles as ordered prepare-active-recover phases (finite reach, active-window contact, recovery cost, no teleport/permanent collider), new input bits bound to browser keys, executable TACK-ST/SL-001-PHASE HARD_INVARIANT criteria in the duels evaluator, event-centered DYNAMIC_VISUAL+MULTI_TICK evidence, making the input-rejection duel kind organically observable vs a CPU presser; (3) CPU-DEFENSIVE-TACKLE — same action system consumed by team-decision profile (commitment/risk/recovery, no omniscience, reachability guard), organic tackle events in coherent CPU-vs-CPU play, scanner PHYSICAL_DUEL advancement (honest); (4) SMALL-SIDED-ORGANIC-DUEL-CLOSURE — BOOKKEEPING scanner+reducer re-run updating coherent_match_sources honestly and superseding the milestone bundle; (5) BROWSER-DEFENSIVE-CONTROLS-LEGEND — controls legend + parity guard, BROWSER_VISIBLE. Horizon v23 1/5 accepted (CORE-EVENT-TYPE-UNION-FIX, candidate 96dc1b5, critic+integration ACCEPT) — next objective: HUMAN-DEFENSIVE-DUEL-CONTROL (builder-gameplay). GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
+selection_note: "Horizon v23 (defensive-duels-and-organic-duel-closure) EXHAUSTED 5/5 — created 2026-08-29 after horizon v22 exhaustion (5/5). All five objectives accepted: (1) CORE-EVENT-TYPE-UNION-FIX, (2) HUMAN-DEFENSIVE-DUEL-CONTROL, (3) CPU-DEFENSIVE-TACKLE, (4) SMALL-SIDED-ORGANIC-DUEL-CLOSURE, (5) BROWSER-DEFENSIVE-CONTROLS-LEGEND (candidate 14040a7, critic+integration ACCEPT first pass glm5.3-flash, audit PASS 20/20 BROWSER_VISIBLE). NEXT: strategic replan (Horizon v24) after remote-durability verification. Human-directed gameplay priority for v24: stop the 5v5 ball huddle — only nearest player per team chases, others hold fixed kickoff homes, kickoff freeze until first touch, then one presser + cover so organic pass can fire; prove with a 30s organic clip / MULTI_TICK evidence, not an 8-tick fixture. Disclosed for the replan: 9 pre-existing node-gate failures at HEAD de62b06 (clean-worktree reproduced; nondeterminism-canary x2, match-set-piece, match-lifecycle, compare-foundation x2, playable-1v1-re-evaluation, COHERENT-EVIDENCE-RERUN-binding, difficulty-capture) — none touch the browser adapter; classify against the last acceptance commit during replan. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
 ```
 ## Last accepted objective
+BROWSER-DEFENSIVE-CONTROLS-LEGEND — In-browser controls legend from the shared CONTROLS_LEGEND contract: setup-menu legend section + in-match overlay opened by the `?` toggle, both populated by the extracted `controls-legend-ui` module (single source of truth; 10 entries incl. Standing Tackle U / Slide Tackle I beside Pass/Shot/Through Ball/Sprint/Switch). Fixed two real bugs the prior synthetic evidence had hidden: startMatch() overwrote the controls hint strip (deleting the toggle once a match began) and `pointer-events: none` made the toggle unclickable. Binding/parity guard (26 tests) fails on binding or legend-entry removal in both directions + wrong bitmasks; 14 real-Chromium DOM/behavior guards with discriminating negatives (feature stash → 11/14 fail). BROWSER_VISIBLE evidence: real-app Vite+Playwright captures legend-setup-menu.png (SHA-256 a728b84b…) and legend-in-match-overlay.png (cece7726…, live 5v5 human-vs-CPU tick 194, overlay opened by real click), byte-distinct; the prior session's fabricated mock-page tests/PNGs were deleted. typecheck 0, build 0, capture 0; neighbors green (ladder-menu-parity 9/9, difficulty 9/9, small-sided-001 10/10, 5v5-human 20/20); `git diff --stat src/simulation/ eval/` empty. 9 node-gate failures disclosed pre-existing at HEAD de62b06 (clean-worktree reproduced), none touching the browser adapter. Horizon v23 5/5 COMPLETE — strategic replan next.
+
+- builder: builder-gameplay / qwen3.8-flash
+- critic: critic / glm5.3-flash — ACCEPT (first pass)
+- integration: integration-reviewer / glm5.3-flash — ACCEPT (first pass)
+- Evidence: durable acceptance manifest + record (2026-09-04T04:43:09Z); deterministic audit PASS 20/20
+- Candidate: 14040a7
+
+Previously accepted:
 SMALL-SIDED-ORGANIC-DUEL-CLOSURE — BOOKKEEPING: re-scanned 5v5/3v3 with CPU tackle active. PHYSICAL_DUEL honest insufficient_context. BATCH-5 decisive → milestone PASS preserved. Bundle fully repaired (playtest materialized, source_objectives corrected, latest_playtest_result updated). 185 suites pass, typecheck 0, build 0. CRITIC: ACCEPT first pass (independent mimo-v2.5). INTEGRATION: ACCEPT first pass. Horizon v23 4/5.
 HUMAN-DEFENSIVE-DUEL-CONTROL — Human standing + sliding tackle actions with prepare-active-recover phases, finite reach, active-window contact, recovery lock-out, velocity-only effects, browser keys U/I. Evidence: trajectory.json (121 hashes, 8 tackle-phase events, lockout rejection, 352 contacts), 5 semantic PNG frames (sequence.json, 205x460, event-centered on tick 43). 247 tests green, typecheck exit 0, audit PASS. REGRESSION_REPAIR: FOUNDATION_LAB_PASS eval.json superseded (registrySetId 24b5341e, PASS preserved). Critic + integration ACCEPT first pass.
 
