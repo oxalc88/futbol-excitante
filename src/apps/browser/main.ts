@@ -577,6 +577,11 @@ function startMatch(
       // Player switching is handled natively by sim.step() via SWITCH_PLAYER_BIT.
 
       // CPU frames
+      // GK-BROWSER-DYNAMIC-EVIDENCE: the 5v5 CPU-vs-CPU match runs the
+      // SMALL-SIDED goalkeeper role. Every other mode keeps exactly the frames
+      // it emitted before any keeper existed — the role is opt-in (GK-SPEC §§4-8),
+      // so gating it on `ai-match-5v5` leaves the human-control paths untouched.
+      const GK_5V5 = IS_AI_MATCH_5V5;
       if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5 || IS_HUMAN_VS_CPU_5V3 || IS_HUMAN_VS_CPU_3V3 || IS_HUMAN_VS_CPU_5V5 || IS_HUMAN_VS_CPU_1V1) {
         const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
         const snapshot = sim.snapshot();
@@ -587,6 +592,10 @@ function startMatch(
             // The press designation the slots act on is decided under the same
             // switch the slots run with (5V5-KICKOFF-ANTI-HUDDLE).
             teamObs.cpuAntiHuddle = true;
+            // With the keeper role live the shared press designation must also
+            // drop the designated keeper from the press/eligible set, so the
+            // team decision and the slot frames are decided under one switch.
+            teamObs.gkBehavior = GK_5V5;
             teamDecisions.set(tid, computeTeamDecision(teamObs, tid));
           }
         }
@@ -602,6 +611,10 @@ function startMatch(
           // the designated chaser converges on the ball, everyone else holds a
           // fixed kickoff home (5V5-KICKOFF-ANTI-HUDDLE).
           obs.cpuAntiHuddle = true;
+          // The 5v5 CPU-vs-CPU match is the browser-visible GK completion: the
+          // designated keeper holds its goal arc and answers on-target shots
+          // through the same tick-indexed InputFrame path (GK-SPEC §§5-8).
+          obs.gkBehavior = GK_5V5;
           const cpuFrame = cpuAd.sample(sim.tick, obs);
           cpuFrame.controlSlot = controlSlot;
           allFrames.push(cpuFrame);
