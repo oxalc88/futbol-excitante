@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-05T18:15:00Z
+measured_at: 2026-09-05T19:10:00Z
 tracking_contract_version: 1
-last_tracked_objective: COMMON-FULL-MATCH-INVARIANT-TRIAGE
-usage_aggregates_through: COMMON-FULL-MATCH-INVARIANT-TRIAGE
-clock_aggregates_through: COMMON-FULL-MATCH-INVARIANT-TRIAGE
-model_evaluation_through: COMMON-FULL-MATCH-INVARIANT-TRIAGE
+last_tracked_objective: GK-SUITE-VERDICTS-STATE
+usage_aggregates_through: GK-SUITE-VERDICTS-STATE
+clock_aggregates_through: GK-SUITE-VERDICTS-STATE
+model_evaluation_through: GK-SUITE-VERDICTS-STATE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,18 +42,18 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 541h 17m |
+| Calendar span (first work → measurement) | 542h 12m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~146h est. |
-| Sum of per-step agent time | ~145h 15m |
+| Active work (anything running) | ~147h est. |
+| Sum of per-step agent time | ~146h 00m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T18:15:00Z`.
-Recomputed 2026-09-05 at the COMMON-FULL-MATCH-INVARIANT-TRIAGE acceptance
-(Horizon v27 3/4): 180 accepted per-step rows summing to ~145h 15m (the new
-objective adds ~1h 33m: builder ~1h 10m / critic 6m / integration 15m / commits
-~2m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T19:10:00Z`.
+Recomputed 2026-09-05 at the GK-SUITE-VERDICTS-STATE acceptance
+(Horizon v27 4/4 — horizon COMPLETE): 181 accepted per-step rows summing to
+~146h 00m (the new objective adds ~45m: builder ~27m / critic 8m / integration
+8m / commits ~2m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -263,6 +263,7 @@ invoices.
 | GK-KEEPER-ORACLE-REGISTRATION | accepted | ~1h 03m | ~34m | 17m | 10m | ~2m | n/a | n/a |
 | GK-DISTRIBUTION-BEHAVIOR | accepted | ~1h 19m | ~49m | 16m | 12m | ~2m | n/a | n/a |
 | COMMON-FULL-MATCH-INVARIANT-TRIAGE | accepted | ~1h 33m | ~1h 10m | 6m | 15m | ~2m | n/a | n/a |
+| GK-SUITE-VERDICTS-STATE | accepted | ~45m | ~27m | 8m | 8m | ~2m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -581,6 +582,7 @@ on an H task is the interesting result.
 | GK-KEEPER-ORACLE-REGISTRATION | deepseek-v4-flash | M | Medium - five protected keeper oracles registered (eval/oracles/gk-role.ts + additive wire/foundation-evaluator wiring; headless-match gk-role designation observation injection gated on gkBehavior — necessary because the keeper is an adapter designation a position-based oracle cannot re-derive); mutant-guarded; honest executed verdicts (3 organic PASS + SAVE-CLAIM driven PASS + DISTRIBUTION NOT_EVALUATED); registry hash unchanged; binding-test reproduction superseded with discriminating power retained | 0 | A | first-pass ACCEPT; critic re-derived every verdict by re-running the capture (record hash reproduced byte-exact) and adjudicated both disclosed deviations; integration 226/226 + registry hash verified identical at HEAD and worktree |
 | GK-DISTRIBUTION-BEHAVIOR | deepseek-v4-flash (qwen reroute continues) | M | Medium-High - keeper distribution at the adapter layer: post-claim release to an observed teammate via the sanctioned PASS InputFrame path (no omniscience — target from current-tick observations; opponent/unobserved targets are oracle falsifiers); keeper-release OBSERVATION-level telemetry injected by the adapter-aware runner (gk-role precedent — core byte-identical; the core event-union extension deliberately avoided because the core cannot know the adapter designation); distribution oracle real verdict (driven fixture PASS; organic 0 releases honestly disclosed) | 0 | A | first-pass ACCEPT; critic adjudicated the observation-level deviation against §20 + the gk-role precedent and reproduced every number; integration 237/237 + stash verifier 4/4 re-executed + additive-only evaluator change verified |
 | COMMON-FULL-MATCH-INVARIANT-TRIAGE | deepseek-v4-flash | M | Medium - NODE-GATE-TRIAGE-style root-cause of the thrice-disclosed full-match COMMON FAILs: COMMON-REFERENCES was a REAL invariant defect (persistent lastTouchRef resolved per-observation; 1719/1800 fails, 0 absent from the window union; core validator resolves against cumulative events) — fixed with window-union resolution + per-tick fallback, oracle discriminating power retained; COMMON-BOUNDS invariant CORRECT — residual confined to the 4 legacy phase-sync runs (real illegal positions from the legacy restart-freeze), no bound widening, honest residual disclosure; new deterministic capture producer + 3-test discriminating guard | 0 | A | first-pass ACCEPT; critic wrote and ran its own measurement script reproducing 1719/1800 → 0/1800 two-run byte-identical; integration reproduced the whole capture tree byte-identically and confirmed the residual pattern exactly |
+| GK-SUITE-VERDICTS-STATE | deepseek-v4-flash | S | Small - post-oracle honest verdict state: deterministic producer re-running the goalkeepers suite with the registered oracles + distribution behavior over 5 manifest-pinned accepted runs; full verdict table (3 organic PASS + SAVE-CLAIM/DISTRIBUTION driven-labeled); binding test 11 with cross-manifest provenance assertions; zero evaluator/gameplay change | 0 | A | first-pass ACCEPT; critic reproduced the record hash byte-exact in its own ephemeral re-run and verified the verdict table against raw telemetry; integration recomputed the hash + ordinary-mode producer re-run byte-identical |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -853,6 +855,8 @@ on an H task is the interesting result.
 | GK-DISTRIBUTION-BEHAVIOR | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 237/237 main gate + 64/64 accepted pins + foundation-evaluator 36/36 re-run; typecheck 0; stash verifier re-executed 4/4 vs 0fb5f3d; computeOutcome change additive-only verified (empty -> NOT_EVALUATED, fail-first priority, no existing criterion changed); core/contracts/apps diff empty |
 | COMMON-FULL-MATCH-INVARIANT-TRIAGE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; root-cause measurement independently reproduced with its own script (1719/1800 per-tick fails → 0 window-union fails, two-run byte-identical); oracle not weakened (nonexistent refs still FAIL; per-tick fallback preserves single-observation behavior); COMMON-BOUNDS residual confined exactly to the 4 legacy runs with bounds.ts untouched and no widening; 161/161 tests; pnpm-workspace.yaml adjudicated inert tooling |
 | COMMON-FULL-MATCH-INVARIANT-TRIAGE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 161/161 tests re-run incl. SHOT-RESULT/DUEL-REJECTION bindings; typecheck 0; all 8 capture runs re-executed ordinary-mode — whole evidence tree byte-identical with stable record hashes; residual pattern confirmed exactly (FAIL on precisely the 4 legacy runs; COMMON-REFERENCES PASS everywhere); wire.ts diff exactly one hunk; latent possession-oracle pattern noted for future triage |
+| GK-SUITE-VERDICTS-STATE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 reproduced byte-exact in its own ephemeral producer re-run; per-run verdict table matches raw telemetry (continuous 0 releases/0 save chains -> SAVE-CLAIM/DISTRIBUTION honestly NOT_EVALUATED; fixture releases @408/433 -> PASS); all 5 provenance pins verified against the cited manifests; driven-vs-organic labeling accurate; 140/140 neighbors + typecheck 0 |
+| GK-SUITE-VERDICTS-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 151/151 neighbor tests re-run; typecheck 0; record hash recomputed byte-exact + ordinary-mode producer re-run left docs/evidence byte-identical; all 5 cited manifests read verbatim; zero evaluator/gameplay change |
 
 ### Builder scoreboard
 
