@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "objective_id": "VIDEO-CAPTURE-RESTORE-30S-CLIP",
+  "durable_capture": true,
+  "artifact_id": "anti-huddle-ai-match-5v5-30s",
+  "artifact_name": "ai-match-5v5-30s.webm",
+  "provider": "playwright-chromium native recordVideo (bundled WebM codec; no system ffmpeg)",
+  "created_at": "2026-09-05T06:41:54.010Z",
+  "expires_at": null,
+  "mode": "ai-match-5v5",
+  "scenario": "eval/scenarios/5v5-fixture-v1.json",
+  "anti_huddle": true,
+  "viewport": {
+    "width": 800,
+    "height": 600
+  },
+  "format": "webm",
+  "codec": null,
+  "duration_seconds": 36.2,
+  "container_duration_seconds": 36.2,
+  "width": 800,
+  "height": 600,
+  "bytes": 1125058,
+  "sha256": "575ff1140de82f97128ed0029a4ec5a304d74f9f99950e389c62fe922f0c4fd3",
+  "capture_wall_seconds": 33.191,
+  "final_tick": 900,
+  "final_hud_state_hash": "fnv1a64-v1:435ed7a48...",
+  "ffmpeg": {
+    "available": false,
+    "converter_used": "none"
+  },
+  "notes": [
+    "duration_seconds is the .webm container duration parsed back through Chromium's media stack (system ffmpeg/ffprobe is absent); capture_wall_seconds is the wall-clock window the match was on screen, which is shorter because recordVideo also spans page load/teardown.",
+    "final_hud_state_hash is the HUD-displayed value, which the app truncates to 20 chars; the authoritative per-tick hash chain is in the accepted trajectories, not in a video.",
+    "binary .webm is optional/ephemeral; the committed record is this metadata + a video-reference.json written separately after the candidate commit exists.",
+    "video is optional diagnostic evidence; it never replaces a trajectory or semantic frame sequence and never becomes gameplay evidence."
+  ]
+}
