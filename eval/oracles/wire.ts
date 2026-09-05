@@ -61,7 +61,16 @@ const entries: OracleEntry[] = [
   {
     oracle_id: "event-references",
     oracle_version: "oracle-references-v1",
-    fn: perObservation(checkEventReferences),
+    // `ball.lastTouchRef` is a persistent reference to the most recent
+    // touch event, which may have been emitted on an earlier tick. Resolve
+    // it against the union of every event emitted across the observation
+    // window, not just the current observation's own per-tick events.
+    fn: (observations) => {
+      const allEventIds = new Set(
+        observations.flatMap((o) => o.events.map((e) => e.id)),
+      );
+      return observations.map((o) => checkEventReferences(o, allEventIds));
+    },
   },
   {
     oracle_id: "ball-continuity",

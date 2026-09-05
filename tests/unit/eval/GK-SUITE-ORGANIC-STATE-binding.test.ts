@@ -20,7 +20,13 @@
  *     from driven-fixture-only evidence (GK-SAVE-CLAIM) and no-observation
  *     (GK-DISTRIBUTION-NO-OMNISCIENCE).  The COMMON-REFERENCES / COMMON-BOUNDS
  *     FAIL over the organic full-match runs is disclosed as pre-existing
- *     invariant behavior, not a keeper regression.
+ *     invariant behavior, not a keeper regression.  COMMON-REFERENCES was
+ *     subsequently FIXED by COMMON-FULL-MATCH-INVARIANT-TRIAGE (the
+ *     event-references oracle now resolves the persistent `ball.lastTouchRef`
+ *     against the observation-window event union), so the current reproduction
+ *     returns COMMON-REFERENCES PASS while the immutable record still documents
+ *     the pre-fix FAIL; COMMON-BOUNDS remains FAIL on the legacy phase-sync
+ *     runs.
  *  4. Every cited source run's `source_candidate` matches the accepted
  *     manifest's `candidate_commit` (cross-manifest provenance binding — the
  *     duels rerun's RETRY over a mislabeled source_candidate is the caution).
@@ -221,7 +227,12 @@ describe("GK-SUITE-ORGANIC-STATE goalkeepers-suite record", () => {
       expect(gkBehavior["GK-DISTRIBUTION-NO-OMNISCIENCE"]).toBe("PASS");
       expect(common["COMMON-FINITE"]).toBe("PASS");
       expect(common["COMMON-DETERMINISTIC"]).toBe("NOT_EVALUATED");
-      expect(common["COMMON-REFERENCES"]).toBe("FAIL");
+      // COMMON-REFERENCES changed from FAIL to PASS because
+      // COMMON-FULL-MATCH-INVARIANT-TRIAGE fixed the event-references oracle to
+      // resolve `ball.lastTouchRef` against the observation-window event union
+      // (a prior-tick touch reference is valid, not a broken reference). The
+      // immutable record below still documents the pre-fix FAIL.
+      expect(common["COMMON-REFERENCES"]).toBe("PASS");
       expect(common["COMMON-BOUNDS"]).toBe("FAIL");
 
       // The immutable record still documents the pre-oracle NOT_EVALUATED state.
