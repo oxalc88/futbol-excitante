@@ -75,6 +75,8 @@ export interface RendererConfig {
   ballColor: number;
   /** Controlled-player marker color. */
   markerColor: number;
+  /** Designated-keeper kit marker color (presentation-only role legibility). */
+  keeperMarkerColor: number;
 }
 
 /**
@@ -99,6 +101,7 @@ export const DEFAULT_RENDERER_CONFIG: RendererConfig = {
   playerColorB: 0xcc3333,
   ballColor: 0xffffff,
   markerColor: 0xffcc00,
+  keeperMarkerColor: 0xff33ff,
 };
 
 // ---------------------------------------------------------------------------
@@ -180,6 +183,37 @@ const ARCHETYPE_VISUAL_REGISTRY: Record<string, ArchetypeVisualOverride> = {
 function resolveArchetypeVisual(archetypeId: string | undefined): ArchetypeVisualOverride {
   if (!archetypeId) return ARCHETYPE_VISUAL_BASELINE;
   return ARCHETYPE_VISUAL_REGISTRY[archetypeId] ?? ARCHETYPE_VISUAL_BASELINE;
+}
+
+// ---------------------------------------------------------------------------
+// Keeper-role snapshot enrichment (presentation-only, additive)
+// ---------------------------------------------------------------------------
+
+/**
+ * Return a copy of a presentation snapshot with `keeperRole` set on each team's
+ * designated keeper, and left absent (and byte-identical) everywhere else.
+ *
+ * The designation map is teamId -> designated keeper playerId, produced by the
+ * composition layer from the adapter-layer keeper rule (spec §4).  This is a
+ * presentation-only post-process applied to the immutable base snapshot — the
+ * base object is never mutated, and no football state is touched, so a
+ * run without a keeper map (or with `gkBehavior` off) yields a snapshot that is
+ * semantically identical to the input and renders byte-identically.
+ *
+ * @param snapshot - The immutable base presentation snapshot.
+ * @param keeperPlayerIds - teamId -> designated keeper playerId (per team).
+ * @returns A shallow copy with the keeper entries carrying `keeperRole: true`.
+ */
+export function enrichPresentationWithKeeperRoles(
+  snapshot: PresentationSnapshot,
+  keeperPlayerIds: Record<string, string>,
+): PresentationSnapshot {
+  const players = snapshot.players.map((player) =>
+    keeperPlayerIds[player.teamId] === player.playerId
+      ? { ...player, keeperRole: true }
+      : player,
+  );
+  return { ...snapshot, players };
 }
 
 // ---------------------------------------------------------------------------
@@ -546,6 +580,26 @@ function createControlledMarker(config: RendererConfig): THREE.Mesh {
 }
 
 /**
+ * Create the designated-keeper kit marker — a magenta triangle above the head.
+ *
+ * Role legibility cue (KEEPER-VISUAL-MARKER): a 3-sided cone reads as a
+ * triangle from the gameplay camera, and its magenta colour is independent of
+ * both team kits and the yellow controlled-player ring, so the keeper is a
+ * distinct silhouette with no chance of colliding with the kit/controlled cues.
+ * Presentation-only: it never mutates simulation state or a football outcome.
+ */
+function createKeeperMarker(config: RendererConfig): THREE.Mesh {
+  const geometry = new THREE.ConeGeometry(0.36, 0.55, 3);
+  const material = new THREE.MeshBasicMaterial({
+    color: config.keeperMarkerColor,
+    side: THREE.DoubleSide,
+  });
+  const marker = new THREE.Mesh(geometry, material);
+  marker.name = "keeper-marker";
+  return marker;
+}
+
+/**
  * Create the ball — an independent sphere.
  *
  * The ball is NEVER parented to a player.  It is always an
@@ -607,6 +661,7 @@ export function createPresentationSession(
   let pitchGroup: THREE.Group | null = null;
   const playerMeshes = new Map<string, THREE.Group>();
   let markerMesh: THREE.Mesh | null = null;
+  const keeperMarkerMeshes = new Map<string, THREE.Mesh>();
   let ballMesh: THREE.Mesh | null = null;
   let ballShadowMesh: THREE.Mesh | null = null;
 
@@ -702,6 +757,7 @@ export function createPresentationSession(
   ): void {
     // --- Players ---
     const activePlayerIds = new Set<string>();
+    const activeKeeperIds = new Set<string>();
 
     // Reset controlled-player marker visibility each frame so it
     // hides automatically when no human-controlled player exists.
@@ -768,6 +824,25 @@ export function createPresentationSession(
         markerMesh.visible = true;
         markerMesh.position.set(px, config.playerHeight + 0.5, pz);
       }
+
+      // Designated-keeper kit marker — magenta triangle above the head.  It is
+      // drawn ONLY when the player's snapshot entry carries `keeperRole`, which
+      // the composition layer sets from the adapter keeper designation.  With
+      // the field absent (gkBehavior off, or an outfield player) this branch is
+      // never entered and no marker mesh exists, so the render is byte-identical
+      // to the pre-keeper-marker baseline.
+      if (pp.keeperRole) {
+        activeKeeperIds.add(pp.playerId);
+        let keeperMarker = keeperMarkerMeshes.get(pp.playerId);
+        if (!keeperMarker) {
+          keeperMarker = createKeeperMarker(config);
+          keeperMarker.name = `keeper-marker-${pp.playerId}`;
+          scene.add(keeperMarker);
+          keeperMarkerMeshes.set(pp.playerId, keeperMarker);
+        }
+        keeperMarker.position.set(px, config.playerHeight + 0.9, pz);
+        keeperMarker.visible = true;
+      }
     }
 
     // Remove stale player meshes
@@ -776,6 +851,14 @@ export function createPresentationSession(
         scene.remove(mesh);
         playerMeshes.delete(id);
         playerLegAnimState.delete(`player-${id}`);
+      }
+    }
+
+    // Remove keeper markers that no longer belong to a designated keeper.
+    for (const [id, mesh] of keeperMarkerMeshes) {
+      if (!activeKeeperIds.has(id)) {
+        scene.remove(mesh);
+        keeperMarkerMeshes.delete(id);
       }
     }
 
@@ -822,6 +905,7 @@ export function createPresentationSession(
       playerMeshes.clear();
       playerLegAnimState.clear();
       markerMesh = null;
+      keeperMarkerMeshes.clear();
       ballMesh = null;
       ballShadowMesh = null;
       pitchGroup = null;

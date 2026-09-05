@@ -101,9 +101,12 @@ export interface TestBridge {
   /**
    * Capture the current presentation state — screenshot + diagnostics.
    *
+   * @param presentation - Optional presentation snapshot to render instead of
+   *   the simulation's own derived snapshot.  Used for presentation-only
+   *   enrichment (e.g. the keeper-role marker); the simulation is untouched.
    * @returns CaptureResult with screenshot and diagnostics.
    */
-  capture(): Promise<CaptureResult>;
+  capture(presentation?: PresentationSnapshot): Promise<CaptureResult>;
 
   /**
    * Render a single frame without advancing the simulation.
@@ -259,12 +262,12 @@ export function createTestBridge(
       return sim.stateHash();
     },
 
-    async capture(): Promise<CaptureResult> {
-      // Render the current state.
-      const presentation = sim.presentation();
+    async capture(presentation?: PresentationSnapshot): Promise<CaptureResult> {
+      // Render the current state (or the provided presentation-only override).
+      const view = presentation ?? sim.presentation();
       session.advance(
-        presentation,
-        presentation,
+        view,
+        view,
         { numerator: 0, denominator: 1 },
       );
       session.render();
@@ -304,7 +307,7 @@ export function createTestBridge(
       const camera = session.getCamera();
 
       return {
-        presentationSnapshot: presentation,
+        presentationSnapshot: view,
         screenshot,
         sceneObjectCount: scene.children.length,
         cameraPosition: {

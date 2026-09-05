@@ -64,6 +64,18 @@ export interface PlayerPresentation {
    * outcomes.
    */
   archetypeId?: string;
+  /**
+   * True when this player is a team's designated SMALL-SIDED goalkeeper.
+   *
+   * Presentation-only role legibility cue: the renderer draws a distinct
+   * keeper kit marker (a magenta triangle above the head) when, and only when,
+   * this field is present.  It is populated by the composition layer from the
+   * adapter-layer keeper designation (spec §4) and is OPTIONAL/absent for every
+   * mode where `gkBehavior` is off, so existing snapshots stay semantically
+   * identical and the renderer's absence path is byte-identical to the
+   * pre-keeper-marker baseline.  Never an authoritative simulation input.
+   */
+  keeperRole?: boolean;
 }
 
 /**

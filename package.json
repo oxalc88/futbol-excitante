@@ -27,6 +27,7 @@
     "capture-5v5-anti-huddle-frames": "WIP_SECTION=__EVIDENCE__:BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE vitest run tests/browser/anti-huddle-dynamic-evidence.browser.test.ts --project browser",
     "capture-human-vs-cpu-arc-frames": "WIP_SECTION=__EVIDENCE__:HUMAN-VS-CPU-ARC-INTERACTION vitest run tests/browser/human-arc-interaction.browser.test.ts --project browser",
     "capture-gk-browser-dynamic-evidence": "WIP_SECTION=__EVIDENCE__:GK-BROWSER-DYNAMIC-EVIDENCE vitest run tests/browser/gk-browser-dynamic-evidence.browser.test.ts --project browser",
+    "capture-keeper-visual-marker": "WIP_SECTION=__EVIDENCE__:KEEPER-VISUAL-MARKER vitest run tests/browser/keeper-visual-marker.browser.test.ts --project browser",
     "capture-ai-video": "node scripts/capture-ai-match-video.mjs",
     "capture-controls-legend": "node scripts/capture-controls-legend-screenshots.mjs",
     "gauntlet:audit": "tsx gauntlet/evals/src/gauntlet-audit.ts",

@@ -16,7 +16,10 @@
 
 import { createWorld } from "../../simulation/world/create.js";
 import { createSimulation } from "../../simulation/loop/simulation.js";
-import { createPresentationSession } from "../../adapters/renderer-three/renderer.js";
+import {
+  createPresentationSession,
+  enrichPresentationWithKeeperRoles,
+} from "../../adapters/renderer-three/renderer.js";
 import {
   createKeyboardAdapter,
   DEFAULT_KEYBOARD_CONFIG,
@@ -26,8 +29,13 @@ import {
 import { selectBrowserScenario } from "./scenario-selector.js";
 import type { ScenarioDefinition } from "../../contracts/scenario.js";
 import type { InputFrame } from "../../contracts/input.js";
+import type { PresentationSnapshot } from "../../contracts/presentation.js";
 import type { Simulation } from "../../simulation/loop/simulation.js";
-import { createCpuAdapter, buildCpuObservation } from "../../adapters/input-browser/cpu-adapter.js";
+import {
+  createCpuAdapter,
+  buildCpuObservation,
+  designateKeeperFromLayout,
+} from "../../adapters/input-browser/cpu-adapter.js";
 import type { DifficultyLevel } from "../../adapters/input-browser/cpu-adapter.js";
 import { computeTeamDecision } from "../../adapters/input-browser/team-decision-profile.js";
 import {
@@ -86,6 +94,26 @@ const MATCH_MODES: MatchModeEntry[] = [
  */
 function resolveMatchMode(modeId: string): MatchModeEntry {
   return MATCH_MODES.find((m) => m.modeId === modeId) ?? MATCH_MODES[0];
+}
+
+/**
+ * Resolve the designated keeper per team from the match's starting layout
+ * (spec §4).  This is the same adapter-layer rule the CPU adapters act on, so
+ * the presentation-only keeper marker highlights the body that actually holds
+ * the goal arc.  Only called when the keeper role is live; otherwise the
+ * marker stays absent for every mode.
+ */
+function keeperPlayerIdsFromLayout(scenario: ScenarioDefinition): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const teamId of [...new Set(scenario.players.map((player) => player.teamId))]) {
+    const resolved = designateKeeperFromLayout(
+      scenario.players,
+      teamId,
+      scenario.pitchLength,
+    );
+    if (resolved !== undefined) out[teamId] = resolved;
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -548,8 +576,21 @@ function startMatch(
   if (!container) throw new Error("Game container element not found");
   const session = createPresentationSession(container);
 
+  // KEEPER-VISUAL-MARKER: with the keeper role live (5v5 CPU-vs-CPU only) the
+  // presentation snapshot carries `keeperRole` on each team's designated keeper
+  // so the renderer draws the kit marker.  Every other mode leaves the field
+  // absent (gkBehavior off) and renders byte-identically to the pre-marker path.
+  const keeperPids = IS_AI_MATCH_5V5 ? keeperPlayerIdsFromLayout(scenario) : {};
+
+  /** Enrich a base snapshot with the keeper designation (presentation-only). */
+  const displaySnapshot = (): PresentationSnapshot => {
+    const base = sim.presentation();
+    return IS_AI_MATCH_5V5 ? enrichPresentationWithKeeperRoles(base, keeperPids) : base;
+  };
+
   // 6. Render initial state.
-  session.advance(sim.presentation(), sim.presentation(), { numerator: 0, denominator: 1 });
+  const initialDisplay = displaySnapshot();
+  session.advance(initialDisplay, initialDisplay, { numerator: 0, denominator: 1 });
   session.render();
 
   // 7. Real-time loop — wall-clock accumulator, fixed core steps.
@@ -673,8 +714,8 @@ function startMatch(
     }
 
     // Render
-    const presentation = sim.presentation();
-    session.advance(presentation, presentation, { numerator: 0, denominator: 1 });
+    const display = displaySnapshot();
+    session.advance(display, display, { numerator: 0, denominator: 1 });
     session.render();
 
     // HUD

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "objective_id": "KEEPER-VISUAL-MARKER",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "semantic_order": "keeper goal-arc marker -> shot on target -> recorded save contact",
+  "durable_capture": true,
+  "scenario": "5v5-keeper-shot-fixture-v1",
+  "marker": {
+    "design": "magenta 3-sided cone (triangle) above the head, kit-independent colour 0xff33ff, drawn ONLY when snapshot PlayerPresentation.keeperRole is true",
+    "channel": "presentation-only snapshot enrichment, never a simulation value",
+    "absent_rendering": "byte-identical to the pre-change baseline (see parity guard)"
+  },
+  "arc": {
+    "keeper_team_id": "team-b",
+    "keeper_player_id": "player-10",
+    "shot_tick": 366,
+    "shot_player_id": "player-1",
+    "projected_cross_y": -0.343,
+    "save_tick": 370,
+    "save_kind": "dribble-touch",
+    "save_distance_metres": 0.7139,
+    "within_reach": true,
+    "ticks_from_shot_to_contact": 4,
+    "station_tick": 195,
+    "press_tick": 355
+  },
+  "reproduction": {
+    "capture_test": "tests/browser/keeper-visual-marker.browser.test.ts",
+    "wiring": "src/apps/browser/main.ts 5v5 CPU-vs-CPU composition root with CpuObservation.cpuAntiHuddle + cpuDefensiveTackle + gkBehavior, presentation enriched via enrichPresentationWithKeeperRoles",
+    "scenario_path": "eval/scenarios/5v5-keeper-shot-fixture.v1.json",
+    "play_ticks": 600,
+    "browser_trajectory": "docs/evidence/KEEPER-VISUAL-MARKER/trajectory.json"
+  },
+  "frames": [
+    {
+      "index": 1,
+      "label": "keeper-arc-marker",
+      "tick": 195,
+      "semantic": "before",
+      "description": "Keeper kit marker on its goal arc: the designated keeper (player-10) holds its arc with the magenta marker above the head, while the anti-huddle one-presser+cover shape runs and the keeper is never the chaser",
+      "path": "keeper-arc-marker.png",
+      "sha256": "ff36453a9087cfa9dd008e2d7fa2570f6f31befd889aefb8e0792f15327a8ab3"
+    },
+    {
+      "index": 2,
+      "label": "shot-on-target",
+      "tick": 366,
+      "semantic": "event",
+      "description": "Shot on target: player-1 strikes the ball toward the keeper's goal (projected cross at y=-0.343); the keeper (player-10) marker is visible defending the arc",
+      "path": "shot-on-target.png",
+      "sha256": "7ba5224935e26ca4ed81945582c17953b03e9ff23d8f1bf377f7cb17af01237c"
+    },
+    {
+      "index": 3,
+      "label": "save-contact",
+      "tick": 370,
+      "semantic": "result",
+      "description": "Save contact: the keeper (player-10) answers the shot with a recorded ball contact 0.7139 m off it (within save_claim_reach_radius) 4 ticks later; the ball stays independent",
+      "path": "save-contact.png",
+      "sha256": "dec864e8744e36d1b878e8b98c4c90dfacdebc4bd4225fc4ae79b9d83e78f641"
+    }
+  ]
+}
