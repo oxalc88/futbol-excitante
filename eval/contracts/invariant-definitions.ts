@@ -129,14 +129,17 @@ export const INV_TACKLE_PHASE_SLIDE: InvariantDefinition = {
 // ---------------------------------------------------------------------------
 // goalkeepers suite invariants
 //
-// Each invariant is declared here as contract data.  No keeper oracle is
-// registered yet, so the corresponding criteria evaluate to NOT_EVALUATED
-// (honest "not yet observable") rather than claiming PASS on gameplay.
+// Each invariant is declared here as contract data and bound to a registered
+// protected keeper oracle (eval/oracles/gk-role.ts, wired in
+// eval/oracles/wire.ts and mapped in eval/runners/foundation-evaluator.ts).
+// A criterion still yields NOT_EVALUATED when the observation stream is not a
+// two-team keeper match (no keeper designation observable) — honest "not yet
+// observable" rather than claiming PASS on gameplay.
 // ---------------------------------------------------------------------------
 
 /**
  * GK role-designation evidence: exactly one designated keeper per team.
- * oracle_id is not registered → criterion yields NOT_EVALUATED.
+ * Bound to the protected gk-role-designation oracle.
  */
 export const INV_GK_ROLE_DESIGNATION: InvariantDefinition = {
   invariant_id: "gk-role-designation-evidence",
@@ -152,7 +155,7 @@ export const INV_GK_ROLE_DESIGNATION: InvariantDefinition = {
 
 /**
  * GK positioning evidence: keeper holds the goal arc with bounded drift.
- * oracle_id is not registered → criterion yields NOT_EVALUATED.
+ * Bound to the protected gk-positioning oracle.
  */
 export const INV_GK_POSITIONING: InvariantDefinition = {
   invariant_id: "gk-positioning-evidence",
@@ -168,7 +171,7 @@ export const INV_GK_POSITIONING: InvariantDefinition = {
 
 /**
  * GK no-field-chase evidence: keeper never chases the ball into the field.
- * oracle_id is not registered → criterion yields NOT_EVALUATED.
+ * Bound to the protected gk-no-field-chase oracle.
  */
 export const INV_GK_NO_FIELD_CHASE: InvariantDefinition = {
   invariant_id: "gk-no-field-chase-evidence",
@@ -184,7 +187,7 @@ export const INV_GK_NO_FIELD_CHASE: InvariantDefinition = {
 
 /**
  * GK save/claim evidence: keeper claim is an explicit recorded ball contact.
- * oracle_id is not registered → criterion yields NOT_EVALUATED.
+ * Bound to the protected gk-save-claim oracle.
  */
 export const INV_GK_SAVE_CLAIM: InvariantDefinition = {
   invariant_id: "gk-save-claim-evidence",
@@ -200,7 +203,9 @@ export const INV_GK_SAVE_CLAIM: InvariantDefinition = {
 
 /**
  * GK distribution evidence: keeper release is a normal pass with no omniscience.
- * oracle_id is not registered → criterion yields NOT_EVALUATED.
+ * Bound to the protected gk-distribution oracle (which returns NOT_EVALUATED
+ * while no keeper-release observation event kind exists in the committed
+ * telemetry).
  */
 export const INV_GK_DISTRIBUTION: InvariantDefinition = {
   invariant_id: "gk-distribution-evidence",

@@ -177,6 +177,30 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "tackle-phase-evidence-slide",
     oracle_version: "oracle-tackle-phase-v1",
   },
+  // SMALL-SIDED goalkeeper behavior criteria (GK-KEEPER-ORACLE-REGISTRATION):
+  // the five GK behavior criteria bind to their protected keeper oracles so the
+  // goalkeepers suite produces real verdicts.  Additive; no existing entry is
+  // changed and the duels/foundation criteria keep their existing bindings.
+  "GK-POSITIONING-HOLD": {
+    oracle_id: "gk-positioning-oracle-v1",
+    oracle_version: "oracle-gk-positioning-v1",
+  },
+  "GK-NO-FIELD-CHASE": {
+    oracle_id: "gk-no-field-chase-oracle-v1",
+    oracle_version: "oracle-gk-no-field-chase-v1",
+  },
+  "GK-SAVE-CLAIM": {
+    oracle_id: "gk-save-claim-oracle-v1",
+    oracle_version: "oracle-gk-save-claim-v1",
+  },
+  "GK-ROLE-DESIGNATION": {
+    oracle_id: "gk-role-designation-oracle-v1",
+    oracle_version: "oracle-gk-role-designation-v1",
+  },
+  "GK-DISTRIBUTION-NO-OMNISCIENCE": {
+    oracle_id: "gk-distribution-oracle-v1",
+    oracle_version: "oracle-gk-distribution-v1",
+  },
 };
 
 // ---------------------------------------------------------------------------

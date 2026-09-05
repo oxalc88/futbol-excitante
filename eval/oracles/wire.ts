@@ -24,6 +24,13 @@ import { checkPlayerContactEvidence } from "./player-contact.js";
 import { checkTacklePhaseEvidence } from "./tackle-phase.js";
 import { checkScoreTracker } from "./match.js";
 import { checkMatchClock } from "./match.js";
+import {
+  checkGkRoleDesignation,
+  checkGkPositioningHold,
+  checkGkNoFieldChase,
+  checkGkSaveClaim,
+  checkGkDistributionNoOmniscience,
+} from "./gk-role.js";
 import type { OracleEntry } from "./oracle-registry.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 
@@ -123,6 +130,32 @@ const entries: OracleEntry[] = [
     oracle_id: "match-clock",
     oracle_version: "oracle-match-clock-v1",
     fn: checkMatchClock,
+  },
+  // SMALL-SIDED goalkeeper behavior oracles (protected; read committed telemetry).
+  {
+    oracle_id: "gk-role-designation-oracle-v1",
+    oracle_version: "oracle-gk-role-designation-v1",
+    fn: checkGkRoleDesignation,
+  },
+  {
+    oracle_id: "gk-positioning-oracle-v1",
+    oracle_version: "oracle-gk-positioning-v1",
+    fn: checkGkPositioningHold,
+  },
+  {
+    oracle_id: "gk-no-field-chase-oracle-v1",
+    oracle_version: "oracle-gk-no-field-chase-v1",
+    fn: checkGkNoFieldChase,
+  },
+  {
+    oracle_id: "gk-save-claim-oracle-v1",
+    oracle_version: "oracle-gk-save-claim-v1",
+    fn: checkGkSaveClaim,
+  },
+  {
+    oracle_id: "gk-distribution-oracle-v1",
+    oracle_version: "oracle-gk-distribution-v1",
+    fn: checkGkDistributionNoOmniscience,
   },
 ];
 

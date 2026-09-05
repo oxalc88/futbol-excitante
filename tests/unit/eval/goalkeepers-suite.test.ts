@@ -222,12 +222,15 @@ describe("GK criteria honesty (no gameplay PASS)", () => {
     expect(causalCriterion!.outcome).toBe("NOT_EVALUATED");
   });
 
-  it("HARD_INVARIANT GK criteria (no keeper oracle) resolve to NOT_EVALUATED", () => {
+  it("HARD_INVARIANT GK criteria resolve to NOT_EVALUATED on a non-GK fixture", () => {
     const result = runGoalkeepersSuite();
     const rea = result.tests.find((t) => t.test_id === "GK-REA-001");
     const positioning = rea!.criteria.find((c) => c.criterion_id === "GK-POSITIONING-HOLD");
     expect(positioning).toBeDefined();
     expect(positioning!.class).toBe("HARD_INVARIANT");
+    // The keeper oracle is registered, but this single-body foundation fixture
+    // carries no keeper designation, so the protected oracle returns
+    // NOT_EVALUATED (honest "not yet observable") rather than a verdict.
     expect(positioning!.outcome).toBe("NOT_EVALUATED");
   });
 });

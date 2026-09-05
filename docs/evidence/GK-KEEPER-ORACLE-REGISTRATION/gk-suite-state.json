@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "objective_id": "GK-KEEPER-ORACLE-REGISTRATION",
+  "suite_id": "goalkeepers",
+  "suite_version": "suite-goalkeepers-v1",
+  "produced_by": "scripts/capture-gk-keeper-oracle-registration.ts",
+  "evidence_class": "HEADLESS",
+  "generated_at": "2026-09-05T14:26:18.174Z",
+  "record_sha256": "404b62a68be54260fc4bc15687f3d23d2a63909e7fbbe7abd584c6c97b1bef7a",
+  "before": {
+    "gk_behavior": {
+      "GK-POSITIONING-HOLD": "NOT_EVALUATED",
+      "GK-NO-FIELD-CHASE": "NOT_EVALUATED",
+      "GK-SAVE-CLAIM": "NOT_EVALUATED",
+      "GK-ROLE-DESIGNATION": "NOT_EVALUATED",
+      "GK-DISTRIBUTION-NO-OMNISCIENCE": "NOT_EVALUATED"
+    },
+    "catalog": {
+      "GK_REF": "BLOCKED_MISSING_REFERENCE",
+      "GK_VIS": "NEEDS_PERCEPTUAL_REVIEW",
+      "GK_REG": "NOT_EVALUATED",
+      "GK_CAUSAL": "NOT_EVALUATED"
+    },
+    "common": {
+      "COMMON-FINITE": "PASS",
+      "COMMON-DETERMINISTIC": "NOT_EVALUATED (single-run)",
+      "COMMON-REFERENCES": "PASS",
+      "COMMON-BOUNDS": "PASS"
+    }
+  },
+  "after": {
+    "gk_behavior": {
+      "GK-POSITIONING-HOLD": {
+        "verdict": "PASS",
+        "observations": "organic",
+        "source": "executed evaluator over 2 organic runs: gk-continuous-live=PASS, gk-shot-fixture-live=PASS. Organic arc-hold observations present in both GK runs (the designated keeper is commanded onto and holds its goal arc, bounded lateral drift). The protected gk-positioning oracle now reads them and returns PASS."
+      },
+      "GK-NO-FIELD-CHASE": {
+        "verdict": "PASS",
+        "observations": "organic",
+        "source": "executed evaluator over 2 organic runs: gk-continuous-live=PASS, gk-shot-fixture-live=PASS. Organic no-field-chase observations present: the designated keeper is never the team's chaser/presser (keeper chase ticks = 0). The protected gk-no-field-chase oracle now reads them and returns PASS."
+      },
+      "GK-SAVE-CLAIM": {
+        "verdict": "PASS",
+        "observations": "driven (fixture) only",
+        "source": "executed evaluator over 2 organic runs: gk-continuous-live=NOT_EVALUATED, gk-shot-fixture-live=PASS. Save/claim evidence is fixture-driven only: it comes from the controlled 5v5-keeper-shot-fixture run (on-target shot answered by a recorded keeper contact inside the versioned reach). The organically-flowing match's own on-target shots were answered by another body first (0 save chains), so there is NO organic save-chain observation — the driven fixture run passes, the organic run is NOT_EVALUATED. Labeled driven, not organic."
+      },
+      "GK-ROLE-DESIGNATION": {
+        "verdict": "PASS",
+        "observations": "organic",
+        "source": "executed evaluator over 2 organic runs: gk-continuous-live=PASS, gk-shot-fixture-live=PASS. Organic designation observations present: exactly one designated keeper per team (team-a→player-4, team-b→player-10). The protected gk-role-designation oracle now reads the runner-injected designation and returns PASS."
+      },
+      "GK-DISTRIBUTION-NO-OMNISCIENCE": {
+        "verdict": "NOT_EVALUATED",
+        "observations": "none",
+        "source": "executed evaluator over 2 organic runs: gk-continuous-live=NOT_EVALUATED, gk-shot-fixture-live=NOT_EVALUATED. No organic observation: the core telemetry carries no keeper-release event kind. The criterion is an ENGINE_DESIGN_TARGET with no CapabilityDesignProfile and the gk-distribution oracle returns NOT_EVALUATED. Not upgraded."
+      }
+    },
+    "catalog": {
+      "ref": "BLOCKED_MISSING_REFERENCE",
+      "vis": "NEEDS_PERCEPTUAL_REVIEW",
+      "reg": "NOT_EVALUATED",
+      "causal": "NOT_EVALUATED"
+    },
+    "common": {
+      "COMMON-FINITE": "PASS",
+      "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+      "COMMON-REFERENCES": "FAIL",
+      "COMMON-BOUNDS": "FAIL"
+    }
+  },
+  "organic_runs": [
+    {
+      "run_id": "gk-continuous-live",
+      "scenario": "5v5-continuous-play-v1",
+      "ticks": 1800,
+      "source_evidence": "docs/evidence/GK-5V5-ADAPTER-BEHAVIOR/trajectory.json",
+      "source_candidate": "40aa0dae902a1e7c1375c2444304296d10116bf9",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-continuous-play.v1.json, maxTicks: 1800, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'legacy' })",
+      "observations": 1800,
+      "gk_behavior": {
+        "GK-SAVE-CLAIM": "NOT_EVALUATED",
+        "GK-POSITIONING-HOLD": "PASS",
+        "GK-ROLE-DESIGNATION": "PASS",
+        "GK-DISTRIBUTION-NO-OMNISCIENCE": "NOT_EVALUATED",
+        "GK-NO-FIELD-CHASE": "PASS"
+      },
+      "common": {
+        "COMMON-FINITE": "PASS",
+        "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+        "COMMON-REFERENCES": "FAIL",
+        "COMMON-BOUNDS": "FAIL"
+      },
+      "catalog": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "NOT_EVALUATED",
+        "causal": "NOT_EVALUATED"
+      }
+    },
+    {
+      "run_id": "gk-shot-fixture-live",
+      "scenario": "5v5-keeper-shot-fixture-v1",
+      "ticks": 600,
+      "source_evidence": "docs/evidence/GK-5V5-ADAPTER-BEHAVIOR/trajectory.json",
+      "source_candidate": "40aa0dae902a1e7c1375c2444304296d10116bf9",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-keeper-shot-fixture.v1.json, maxTicks: 600, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'legacy' })",
+      "observations": 600,
+      "gk_behavior": {
+        "GK-SAVE-CLAIM": "PASS",
+        "GK-POSITIONING-HOLD": "PASS",
+        "GK-ROLE-DESIGNATION": "PASS",
+        "GK-DISTRIBUTION-NO-OMNISCIENCE": "NOT_EVALUATED",
+        "GK-NO-FIELD-CHASE": "PASS"
+      },
+      "common": {
+        "COMMON-FINITE": "PASS",
+        "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+        "COMMON-REFERENCES": "FAIL",
+        "COMMON-BOUNDS": "FAIL"
+      },
+      "catalog": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "NOT_EVALUATED",
+        "causal": "NOT_EVALUATED"
+      }
+    }
+  ],
+  "sources_consulted": [
+    {
+      "manifest_path": "docs/evidence/GK-5V5-ADAPTER-BEHAVIOR/manifest.json",
+      "candidate_commit": "40aa0dae902a1e7c1375c2444304296d10116bf9",
+      "note": "Headless MULTI_TICK keeper runs (continuous + shot fixture). Reproduced headlessly and evaluated here."
+    },
+    {
+      "manifest_path": "docs/evidence/GK-BROWSER-DYNAMIC-EVIDENCE/manifest.json",
+      "candidate_commit": "fd6de8d99553d490f50f1462efa83e3a96703a8f",
+      "note": "Browser DYNAMIC_VISUAL fixture run (arc-hold + save-contact@370). Chromium-runtime floats are NOT fed into the Node headless evaluator (known pinned-runtime gap); its keeper content is reflected by the headless gk-shot-fixture-live run and disclosed."
+    }
+  ],
+  "claims_not_made": [
+    "No PROMOTION claim.",
+    "No GK criterion is upgraded to gameplay PASS beyond what the executed evaluator returns.",
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No invented reference envelope or tolerance (reaction latency, save probability, wrong-foot reversal, high-cross claim threshold, parry energy ratio stay BLOCKED_MISSING_REFERENCE).",
+    "Gameplay implementation (src/adapters/, src/simulation/, src/contracts/, eval/scenarios/, specs/) untouched; only the evaluator registers/wires the oracles and the runner annotates the gk-role designation when gkBehavior is on."
+  ]
+}

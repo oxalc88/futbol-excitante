@@ -797,6 +797,38 @@ export function runHeadlessMatch(
     adapter.reset();
   }
 
+  // GK-KEEPER-ORACLE-REGISTRATION: propagate the adapter-layer keeper
+  // designation into the observation stream so the protected GK oracles
+  // (eval/oracles/gk-role.ts) read the actual designated keeper rather than
+  // re-deriving it.  Emitted once on the first observation, and only when
+  // gkBehavior is on (gkBehavior:false — every accepted non-GK pin — stays
+  // byte-identical).  This is a runner observation annotation; the simulation
+  // core, its event union and its contracts are untouched.
+  if (gkBehavior && keeperRoles !== undefined && observations.length > 0) {
+    const first = observations[0];
+    let maxSeq = 0;
+    for (const ev of first.events) {
+      if (ev.sequence > maxSeq) maxSeq = ev.sequence;
+    }
+    const teams = Object.keys(keeperRoles).sort();
+    for (let i = 0; i < teams.length; i++) {
+      const teamId = teams[i];
+      first.events.push({
+        id: `gk-role-${first.tick}-${teamId}`,
+        tick: first.tick,
+        sequence: maxSeq + 1 + i,
+        kind: "gk-role",
+        label: `designated keeper ${keeperRoles[teamId]}`,
+        payload: {
+          teamId,
+          keeperPlayerId: keeperRoles[teamId],
+          keeperRoleFlag: true,
+          pitchLength: scenario.pitchLength,
+        },
+      });
+    }
+  }
+
   // 6. Compute match stats (clock + score) from events.
   const { score, goalEvents, elapsedTicks, matchTimeSeconds } = computeMatchStats(
     events,
