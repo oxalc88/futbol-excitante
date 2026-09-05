@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-05T01:24:55.525Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "RESTART-ANTI-HUDDLE-COHERENCE",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "210b27c",
+  "builder": {
+    "builder": "builder-gameplay",
+    "model": "qwen3.8-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v25 1/4: anti-huddle contract extended to match restarts (throw-in, goal kick, corner, post-goal) in coherent 5v5 CPU-vs-CPU play, adapter/team-decision layer only (core+contracts byte-identical). Restart-window re-arm (post-goal/halftime resets re-key the untouched signal to the carried-through touch reference; RESTART_HOLD_MIN_TICKS=2, anti-huddle-v1), per-window restartAnchor freeze (set-piece bodies frozen at the core placement; kickoff byte-identical), window-aware untouched derivation + single-taker designation, getRestartFreezeActivations counter. HEADLESS-vs-browser parity defect repaired behind an opt-in lifecyclePhaseSync policy: the runner legacy phase-sync silently killed the core restart windows headless while the browser always ran them; DEFAULT legacy preserves every accepted pinned artifact byte-for-byte; core-owned (used by all new evidence) lets MATCH-THROW-IN/GOAL-KICK/CORNER/SET-PIECE run; migration disclosed as future work. Evidence trajectory.json SHA-256 a7b3ec47991849c9670e3e97e7dc183c843886eb68dba89ae3f89e8e3571e2fe (3 live 1800-tick runs covering corner/2 throw-ins/goal-kick/6 post-goal + 3 stashed controls; per-window frozenCountAtServe=9, drift 0 m, single taker, windows close at first touch; two-pass byte-identical). 26 new integration tests; accepted kickoff suite 17/17 UNCHANGED; CPU-DEFENSIVE-TACKLE pins reproduced. Critic ACCEPT first pass (per-window geometry verified from raw rows); integration ACCEPT first pass (64/64 neighbors, typecheck 0). Audit PASS 20/20 MULTI_TICK."
+}

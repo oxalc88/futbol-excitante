@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-04T21:07:00Z
+measured_at: 2026-09-05T01:24:00Z
 tracking_contract_version: 1
-last_tracked_objective: CAPTURE-HYGIENE-ENFORCEMENT
-usage_aggregates_through: CAPTURE-HYGIENE-ENFORCEMENT
-clock_aggregates_through: CAPTURE-HYGIENE-ENFORCEMENT
-model_evaluation_through: CAPTURE-HYGIENE-ENFORCEMENT
+last_tracked_objective: RESTART-ANTI-HUDDLE-COHERENCE
+usage_aggregates_through: RESTART-ANTI-HUDDLE-COHERENCE
+clock_aggregates_through: RESTART-ANTI-HUDDLE-COHERENCE
+model_evaluation_through: RESTART-ANTI-HUDDLE-COHERENCE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,17 +42,17 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 524h 12m |
+| Calendar span (first work → measurement) | 527h 29m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~129h est. |
-| Sum of per-step agent time | ~128h 30m |
+| Active work (anything running) | ~133h est. |
+| Sum of per-step agent time | ~132h 03m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-04T21:07:00Z`.
-Recomputed 2026-09-04 at the CAPTURE-HYGIENE-ENFORCEMENT acceptance (Horizon
-v24 EXHAUSTED 6/6): 169 accepted per-step rows summing to ~128h 30m (the new
-objective adds ~1h 45m: builder ~49m / critic 5m / integration 3m / commits
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T01:24:00Z`.
+Recomputed 2026-09-05 at the RESTART-ANTI-HUDDLE-COHERENCE acceptance
+(Horizon v25 1/4): 170 accepted per-step rows summing to ~132h 03m (the new
+objective adds ~3h 33m: builder ~3h 33m / critic 3m / integration 3m / commits
 ~3m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
@@ -252,6 +252,7 @@ invoices.
 | SMALL-SIDED-ORGANIC-PASS-FLOW-CLOSURE | accepted | ~2h 25m | ~1h 55m | 30m | 5m | ~5m | n/a | n/a |
 | NODE-GATE-REGRESSION-TRIAGE | accepted | ~1h 40m | ~1h 1m | 8m | 4m | ~3m | n/a | n/a |
 | CAPTURE-HYGIENE-ENFORCEMENT | accepted | ~1h 45m | ~49m | 5m | 3m | ~3m | n/a | n/a |
+| RESTART-ANTI-HUDDLE-COHERENCE | accepted | ~3h 33m | ~3h 33m | 3m | 3m | ~3m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -559,6 +560,7 @@ on an H task is the interesting result.
 | SMALL-SIDED-ORGANIC-PASS-FLOW-CLOSURE | deepseek-v4-flash | M | Medium — BOOKKEEPING scanner/reducer re-run over the new coherent matches; anti-huddle flowing run 8/0/0 organically (PHYSICAL_DUEL present); rev-1 falsely attributed browser-parity scan deltas to the ball fix — critic RETRY with 2×2 isolation, corrected to historical-config re-scan (1062/262 byte-identical, unchanged by the ball fix); binding test with false-narrative rejection | 1 | A- | RETRY resolved cleanly; milestone PASS preserved; bundle superseded 19/19 |
 | NODE-GATE-REGRESSION-TRIAGE | deepseek-v4-flash | H | High — root-caused a REAL determinism defect (evaluate() inputProgram off-by-one dropping tick-0 inputs; caused compare-foundation ×2 + nondeterminism-canary ×2), fixed with an additive hash guard; timeout-only raise; stale eval artifact superseded with backup; stale binding counts updated with provenance; capture redirect to ephemeral path; node gate exits 0 (168/168 files) | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic reconciled shard partition 61+26+81=168 |
 | CAPTURE-HYGIENE-ENFORCEMENT | deepseek-v4-flash | M | Medium — 0.9.2+ capture hygiene enforced repo-wide: 11 mutating browser suites gated to the evidence-mode pattern (durable path = historical accepted path so reruns hit assertEvidenceMutable), guard test with byte-identity + immutability-block + source-gate assertions, byte-identity proven for every docs/screenshots-writing suite; no src/ change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic verified no assertion weakened |
+| RESTART-ANTI-HUDDLE-COHERENCE | qwen3.8-flash | H | High — anti-huddle contract extended to restarts (throw-in/goal-kick/corner/post-goal) in the adapter layer (restartTouchBaseline, restartAnchor freeze, window-aware untouched, getRestartFreezeActivations); headless lifecyclePhaseSync parity defect repaired behind opt-in core-owned policy (legacy default protects accepted pins); 26 new integration tests; accepted kickoff suite unchanged; two-pass byte-identical trajectory | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic verified per-window geometry from raw rows |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -809,6 +811,8 @@ on an H task is the interesting result.
 | NODE-GATE-REGRESSION-TRIAGE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 6 suites / 77 tests independently re-run green; typecheck 0; src/ empty (only eval adapter changed); supersession exactly one line with backup; post-rerun docs/ shows exactly the declared delta |
 | CAPTURE-HYGIENE-ENFORCEMENT | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; independently verified gate sentinel + durable-path equality with accepted evidence; immutability block reproduced non-zero with byte-identity; worst-offender 8/8 leaves docs/screenshots byte-identical; no weakening (assertion diff empty) |
 | CAPTURE-HYGIENE-ENFORCEMENT | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; guard 3/3 re-run; 9/9 neighbors green with docs byte-identical (187-file SHA diff); typecheck 0; src/ empty; deltas output-root switches only |
+| RESTART-ANTI-HUDDLE-COHERENCE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; trajectory SHA verified; per-window geometry verified from raw rows (frozenCountAtServe=9, drift 0 m, single taker, windows close at first touch); stash controls discriminate; legacy-default framing judged transparent not weakening; accepted kickoff suite 17/17 unchanged (43/43 combined) |
+| RESTART-ANTI-HUDDLE-COHERENCE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 64/64 neighbors green (26 new + 17 accepted kickoff + 21 tackle pin); typecheck 0; src/simulation/ + src/contracts/ empty; legacy default confirmed in lifecyclePhaseSync; accepted pinned expectations unchanged |
 
 ### Builder scoreboard
 

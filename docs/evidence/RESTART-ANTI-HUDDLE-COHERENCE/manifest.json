@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "RESTART-ANTI-HUDDLE-COHERENCE",
+  "accepted_at": "2026-09-05T01:24:55.525Z",
+  "candidate_commit": "210b27c",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/RESTART-ANTI-HUDDLE-COHERENCE/trajectory.json",
+      "sha256": "a7b3ec47991849c9670e3e97e7dc183c843886eb68dba89ae3f89e8e3571e2fe",
+      "git_blob": "0a38146b4373978baacd7cef77b7faba6baf7fa0",
+      "candidate_commit": "210b27c",
+      "bytes": 4210227,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/RESTART-ANTI-HUDDLE-COHERENCE/audit.json",
+      "sha256": "f8e27319b84e39462035c70e9ddb01b5120d543e7138efe81b20f2053c657894",
+      "git_blob": "2b6c58de61b58ef4f99a697f65b83c38f1a8b7d4",
+      "candidate_commit": "210b27c",
+      "bytes": 2669,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-05/2026-09-05T01-24-55-525Z-RESTART-ANTI-HUDDLE-COHERENCE-acceptance.json"
+}

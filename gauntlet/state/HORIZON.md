@@ -9,10 +9,10 @@ horizon_id: "restart-flow-human-arc-and-duels-rerun"
 created_from_commit: 7d77fc0
 created_at: 2026-09-04
 reason: "Horizon v24 (EXHAUSTED 6/6, remote-durable at 7d77fc0) completed the human-directed anti-huddle arc: kickoff freeze + nearest-only chase + fixed homes + one presser + cover (adapter layer, stash-identity proven), the settled-ball impulse fix (the only core change), browser DYNAMIC_VISUAL evidence of the full arc with a traveling ball, the organic situation closure (anti-huddle run scans 8/0/0 incl. PHYSICAL_DUEL), the node gate green after the evaluate() off-by-one root-cause fix, and repo-wide capture hygiene. v25 (still within small-sided bounds, no GK/regulation/full-match/PES envelopes) continues the football realism of restarts and the human side of the arc: (a) match restarts (throw-in, goal kick, corner, post-goal) must follow the same freeze-until-first-touch + nearest-only contract the accepted anti-huddle established at kickoff — verify per restart type in coherent play and fix any resurfacing huddle; (b) the human-vs-CPU 5v5 match must show the human interacting with that arc (Tab switch, standing/slide tackle, pass) as browser DYNAMIC_VISUAL evidence; (c) the duels evaluator suite is re-run against the now-organic PHYSICAL_DUEL observations for an honest suite state; (d) the repository video path referenced by package.json (capture-ai-video → scripts/capture-ai-match-video.mjs) is missing — restore it and produce the deferred 30 s organic clip as optional diagnostic evidence. Perceptual-rubric/networked work remains deferred."
-current_index: 0
+current_index: 1
 objectives:
   - id: RESTART-ANTI-HUDDLE-COHERENCE
-    status: pending
+    status: accepted
     reason: "Extend the accepted anti-huddle contract to match restarts in coherent small-sided play: throw-in, goal kick, corner and post-goal restarts must follow the same freeze-until-first-touch + nearest-only + fixed-homes shape (the accepted restart touch re-arm covers re-freeze; verify the full geometry per restart type) and any resurfacing huddle at restarts is fixed in the adapter/team-decision layer (core byte-identical). Evidence class MULTI_TICK: coherent 5v5 (or 3v3) CPU-vs-CPU runs that include each restart type, per-tick restart window geometry (frozen bodies, single taker/chaser, first touch of the restarted ball) + discriminating stashed guards; provisional parameters labeled; no GK/11v11/PES envelopes."
     builder: builder-gameplay
     prerequisite: ""
