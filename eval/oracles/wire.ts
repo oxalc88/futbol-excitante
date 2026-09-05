@@ -96,7 +96,16 @@ const entries: OracleEntry[] = [
   {
     oracle_id: "possession-evidence",
     oracle_version: "oracle-possession-v1",
-    fn: checkPossessionEvidence,
+    // `ball.lastTouchRef` is a persistent reference to the most recent
+    // touch event, which may have been emitted on an earlier tick. Resolve
+    // it against the union of every event emitted across the observation
+    // window, not just the current observation's own per-tick events.
+    fn: (observations) => {
+      const allEventIds = new Set(
+        observations.flatMap((o) => o.events.map((e) => e.id)),
+      );
+      return checkPossessionEvidence(observations, allEventIds);
+    },
   },
   {
     oracle_id: "camera-hash",

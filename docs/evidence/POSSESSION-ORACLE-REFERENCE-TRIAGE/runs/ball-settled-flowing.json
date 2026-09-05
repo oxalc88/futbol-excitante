@@ -1,0 +1,26 @@
+{
+  "run_id": "ball-settled-flowing",
+  "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+  "maxTicks": 1200,
+  "lifecyclePhaseSync": "legacy",
+  "gkBehavior": false,
+  "observations": 1200,
+  "nonNullLastTouchRef": 1200,
+  "before": {
+    "perTickResolution": {
+      "noEvidenceFails": 0,
+      "orphanRefFails": 1149,
+      "totalFails": 1149
+    }
+  },
+  "after": {
+    "windowUnionResolution": {
+      "totalFails": 0
+    }
+  },
+  "genuinelyInvalidRefs": {
+    "count": 0,
+    "refs": []
+  },
+  "record_sha256": "b8773602eaba425935b088a491cedeaa142e2e084bc1fbc7f2ee2e8e169daacc"
+}

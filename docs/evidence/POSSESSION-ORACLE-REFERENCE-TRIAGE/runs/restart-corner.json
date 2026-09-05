@@ -1,0 +1,26 @@
+{
+  "run_id": "restart-corner",
+  "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+  "maxTicks": 1800,
+  "lifecyclePhaseSync": "core-owned",
+  "gkBehavior": false,
+  "observations": 1800,
+  "nonNullLastTouchRef": 1799,
+  "before": {
+    "perTickResolution": {
+      "noEvidenceFails": 0,
+      "orphanRefFails": 1749,
+      "totalFails": 1749
+    }
+  },
+  "after": {
+    "windowUnionResolution": {
+      "totalFails": 0
+    }
+  },
+  "genuinelyInvalidRefs": {
+    "count": 0,
+    "refs": []
+  },
+  "record_sha256": "7dfa88a7c624de9d186dd6f2702bc0bc70288cc772e5d668732b8c8afbbf02d8"
+}

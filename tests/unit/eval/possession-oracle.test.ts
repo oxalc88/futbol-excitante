@@ -248,3 +248,114 @@ describe("checkPossessionEvidence: edge cases", () => {
     expect(results[0].status).toBe("pass");
   });
 });
+
+// ---------------------------------------------------------------------------
+// (c) POSSESSION-ORACLE-REFERENCE-TRIAGE discriminating guards (additive)
+// ---------------------------------------------------------------------------
+
+// `ball.lastTouchRef` is a persistent reference to the most recent touch
+// event, which may have been emitted on an earlier tick. Full-match maps carry
+// a non-null lastTouchRef on the vast majority of ticks while the referenced
+// event exists only on the touch tick. Resolving it only against the current
+// tick's own events false-fails those persistent-tick references — the same
+// defect class fixed in COMMON-FULL-MATCH-INVARIANT-TRIAGE (references.ts).
+describe("checkPossessionEvidence: prior-tick lastTouchRef resolution (window-union)", () => {
+  function persistentObs(): TelemetryObservation[] {
+    return [
+      baseObs(0),
+      baseObs(1, {
+        ball: {
+          position: { x: 1, y: 0, z: 0.11 },
+          linearVelocity: { x: 2, y: 0, z: 0 },
+          angularVelocity: { x: 0, y: 0, z: 0 },
+          regime: "ground-roll",
+          lastTouchRef: "evt-touch-1",
+        },
+        events: [
+          { id: "evt-touch-1", tick: 1, sequence: 0, kind: "touch", label: "touch" },
+        ],
+      }),
+      baseObs(2, {
+        ball: {
+          position: { x: 1, y: 0, z: 0.11 },
+          linearVelocity: { x: 2, y: 0, z: 0 },
+          angularVelocity: { x: 0, y: 0, z: 0 },
+          regime: "ground-roll",
+          lastTouchRef: "evt-touch-1",
+        },
+        events: [],
+      }),
+      baseObs(3, {
+        ball: {
+          position: { x: 1, y: 0, z: 0.11 },
+          linearVelocity: { x: 2, y: 0, z: 0 },
+          angularVelocity: { x: 0, y: 0, z: 0 },
+          regime: "ground-roll",
+          lastTouchRef: "evt-touch-1",
+        },
+        events: [],
+      }),
+    ];
+  }
+
+  it("a persistent prior-tick lastTouchRef false-fails per-tick and passes with the window union", () => {
+    const obs = persistentObs();
+    const allEventIds = new Set(obs.flatMap((o) => o.events.map((e) => e.id)));
+
+    // BEFORE (per-tick fallback, no window union): the persistent lastTouchRef
+    // on ticks 2-3 is not in those ticks' own events → orphan-ref false FAIL.
+    const beforeFails = checkPossessionEvidence(obs).filter((r) => r.status === "fail");
+    expect(beforeFails.length).toBeGreaterThan(0);
+    expect(beforeFails.some((r) => r.id.includes("orphan-ref"))).toBe(true);
+
+    // AFTER (window-union): the same prior-tick reference resolves → no fail.
+    const afterResults = checkPossessionEvidence(obs, allEventIds);
+    expect(afterResults.filter((r) => r.status === "fail")).toHaveLength(0);
+  });
+
+  it("a reference present nowhere in the window still FAILs (no oracle weakening)", () => {
+    const obs = [
+      baseObs(0),
+      baseObs(1, {
+        ball: {
+          position: { x: 1, y: 0, z: 0.11 },
+          linearVelocity: { x: 2, y: 0, z: 0 },
+          angularVelocity: { x: 0, y: 0, z: 0 },
+          regime: "ground-roll",
+          lastTouchRef: "ghost-nowhere",
+        },
+        events: [
+          { id: "evt-valid-1", tick: 1, sequence: 0, kind: "whistle", label: "whistle" },
+        ],
+      }),
+    ];
+    const allEventIds = new Set(obs.flatMap((o) => o.events.map((e) => e.id)));
+
+    const results = checkPossessionEvidence(obs, allEventIds);
+    expect(
+      results.some((r) => r.id.includes("orphan-ref") && r.status === "fail"),
+    ).toBe(true);
+  });
+
+  it("a genuine change-without-evidence still FAILs under window-union resolution", () => {
+    const obs = [
+      baseObs(0),
+      baseObs(1, {
+        ball: {
+          position: { x: 1, y: 0, z: 0.11 },
+          linearVelocity: { x: 2, y: 0, z: 0 },
+          angularVelocity: { x: 0, y: 0, z: 0 },
+          regime: "ground-roll",
+          lastTouchRef: "mystery",
+        },
+        events: [],
+      }),
+    ];
+    const allEventIds = new Set(obs.flatMap((o) => o.events.map((e) => e.id)));
+
+    const results = checkPossessionEvidence(obs, allEventIds);
+    expect(
+      results.some((r) => r.id.includes("no-evidence") && r.status === "fail"),
+    ).toBe(true);
+  });
+});

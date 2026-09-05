@@ -19,10 +19,17 @@ import type { InvariantResult } from "../../src/contracts/telemetry.js";
  * interaction evidence (a touch event in the current tick).
  *
  * @param observations - Ordered observations sorted by tick.
+ * @param knownEventIds - Optional union of every event id emitted across the
+ *   observation window. `ball.lastTouchRef` is a persistent reference to the
+ *   most recent touch event, which may have been emitted on an earlier tick,
+ *   so the reference-resolution half of the check resolves against this union
+ *   when supplied, and falls back to the observation's own per-tick events
+ *   for single-observation callers.
  * @returns InvariantResult (first observation is skipped).
  */
 export function checkPossessionEvidence(
   observations: TelemetryObservation[],
+  knownEventIds?: Set<string>,
 ): InvariantResult[] {
   const results: InvariantResult[] = [];
 
@@ -59,8 +66,12 @@ export function checkPossessionEvidence(
     }
 
     // Also check: if lastTouchRef is non-null, it must resolve to an event.
+    // `lastTouchRef` is a persistent/cumulative reference, so allow it to
+    // resolve against the window event union (prior-tick touches) rather than
+    // only the current tick's events, falling back to per-tick events for
+    // single-observation callers.
     if (curr.ball.lastTouchRef !== null) {
-      const eventIds = new Set(curr.events.map((e) => e.id));
+      const eventIds = knownEventIds ?? new Set(curr.events.map((e) => e.id));
       if (!eventIds.has(curr.ball.lastTouchRef)) {
         results.push({
           id: `possession-orphan-ref-tick-${curr.tick}`,
