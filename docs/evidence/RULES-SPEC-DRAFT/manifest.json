@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "RULES-SPEC-DRAFT",
+  "accepted_at": "2026-09-05T19:48:55.508Z",
+  "candidate_commit": "a3754d742134828267ea81659dcb3b2aa15fd9be",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/RULES-SPEC-DRAFT/audit.json",
+      "sha256": "0185a7521fa4c05c7e2607a43f0cdafbd705d82045a24c7e223fe759333f8c28",
+      "git_blob": "397db873d58839210fdba86a42a89f9a164ca550",
+      "candidate_commit": "a3754d742134828267ea81659dcb3b2aa15fd9be",
+      "bytes": 2674,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-05/2026-09-05T19-48-55-508Z-RULES-SPEC-DRAFT-acceptance.json"
+}
