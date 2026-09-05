@@ -9,7 +9,7 @@ horizon_id: "goalkeeper-arc-small-sided"
 created_from_commit: 5829156
 created_at: 2026-09-05
 reason: "Horizon v25 (COMPLETE 4/4, remote-durable at 5829156) finished the restart/human-arc/duels/video arc: restarts follow the accepted freeze+nearest-only contract, the human visibly interacts with the anti-huddle arc (DYNAMIC_VISUAL), the duels suite honestly reflects organic PHYSICAL_DUEL (TACK/PHY criteria organic PASS, protected COMMON FAILs disclosed), and the repository video path is restored with a real ~36 s organic clip as diagnostic evidence. The objective catalog gates the next product arc behind dedicated specs: REGULATION needs a goalkeeper spec first, and AGENTS.md defers goalkeepers until their dedicated specs and suites exist. v26 therefore opens the small-sided goalkeeper arc strictly inside the established bounds: (a) write the dedicated goalkeeper spec + versioned evaluator suite contracts (no implementation, no PES envelopes, missing references stay BLOCKED_MISSING_REFERENCE); (b) implement designated-keeper behavior in the 5v5 small-sided match at the adapter/team-decision layer (hold-goal-position, no field chase, basic save/claim reaction) with MULTI_TICK evidence and a discriminating stashed control; (c) browser DYNAMIC_VISUAL evidence of GK positioning + a save/claim event; (d) honest organic GK-suite state re-run. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity work beyond these remains deferred."
-current_index: 1
+current_index: 2
 objectives:
   - id: GK-SPEC-SUITE-CONTRACTS
     status: accepted
@@ -17,7 +17,7 @@ objectives:
     builder: builder-structured
     prerequisite: ""
   - id: GK-5V5-ADAPTER-BEHAVIOR
-    status: pending
+    status: accepted
     reason: "Designated-keeper behavior in the 5v5 small-sided CPU-vs-CPU match at the adapter/team-decision layer only (core byte-identical): a keeper-designated body per team holds its goal position (bounded lateral drift), never joins the field chase (anti-huddle contract inherited), and performs a basic save/claim reaction on shots on target. Evidence class MULTI_TICK: coherent run(s) with per-tick keeper geometry + discriminating stashed control; provisional parameters labeled; no GK full-match/PES envelopes."
     builder: builder-gameplay
     prerequisite: GK-SPEC-SUITE-CONTRACTS
