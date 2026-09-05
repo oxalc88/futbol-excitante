@@ -83,11 +83,123 @@ export const OBS_PLAYER_MOTION: ObservationDefinition = {
   missing_data_behavior: "INVALID_RUN",
 };
 
+// ---------------------------------------------------------------------------
+// goalkeepers suite observations
+//
+// These declare the observation requirements each goalkeeper suite criterion
+// needs.  No keeper serializer produces them yet, so the corresponding
+// criteria evaluate to NOT_EVALUATED (honest "not yet observable").
+// ---------------------------------------------------------------------------
+
+/**
+ * GK role-designation observation — which player is the designated keeper.
+ */
+export const OBS_GK_ROLE: ObservationDefinition = {
+  observation_id: "obs-gk-role-v1",
+  observation_version: "obs-gk-role-v1",
+  source_kind: "RAW_CANONICAL",
+  producer_boundary: "SIMULATION_SERIALIZER",
+  schema_id: "gk-role-observation-v1",
+  schema_version: "schema-gk-role-obs-v1",
+  required_fields: [
+    "tick",
+    "teamId",
+    "keeperPlayerId",
+    "keeperRoleFlag",
+  ],
+  cadence: "PER_TICK",
+  missing_data_behavior: "INVALID_RUN",
+};
+
+/**
+ * GK positioning observation — keeper arc position, lateral drift, and bounds.
+ */
+export const OBS_GK_POSITIONING: ObservationDefinition = {
+  observation_id: "obs-gk-positioning-v1",
+  observation_version: "obs-gk-positioning-v1",
+  source_kind: "RAW_CANONICAL",
+  producer_boundary: "SIMULATION_SERIALIZER",
+  schema_id: "gk-positioning-observation-v1",
+  schema_version: "schema-gk-positioning-obs-v1",
+  required_fields: [
+    "tick",
+    "keeperPlayerId",
+    "groundPosition",
+    "arcCenter",
+    "arcRadius",
+    "lateralDrift",
+  ],
+  cadence: "PER_TICK",
+  missing_data_behavior: "INVALID_RUN",
+};
+
+/**
+ * GK field-chase observation — whether the keeper left the arc to chase.
+ */
+export const OBS_GK_CHASE: ObservationDefinition = {
+  observation_id: "obs-gk-chase-v1",
+  observation_version: "obs-gk-chase-v1",
+  source_kind: "RAW_CANONICAL",
+  producer_boundary: "SIMULATION_SERIALIZER",
+  schema_id: "gk-chase-observation-v1",
+  schema_version: "schema-gk-chase-obs-v1",
+  required_fields: ["tick", "keeperPlayerId", "onGoalArc", "fieldChaseFlag"],
+  cadence: "PER_TICK",
+  missing_data_behavior: "INVALID_RUN",
+};
+
+/**
+ * GK save/claim observation — shot-contact to save/claim ball-contact chain.
+ */
+export const OBS_GK_SAVE_CLAIM: ObservationDefinition = {
+  observation_id: "obs-gk-save-claim-v1",
+  observation_version: "obs-gk-save-claim-v1",
+  source_kind: "RAW_CANONICAL",
+  producer_boundary: "SIMULATION_SERIALIZER",
+  schema_id: "gk-save-claim-observation-v1",
+  schema_version: "schema-gk-save-claim-obs-v1",
+  required_fields: [
+    "tick",
+    "keeperPlayerId",
+    "shotContactTick",
+    "keeperContactTick",
+    "contactKind",
+  ],
+  cadence: "PER_EVENT",
+  missing_data_behavior: "INVALID_RUN",
+};
+
+/**
+ * GK distribution observation — keeper release to a teammate.
+ */
+export const OBS_GK_DISTRIBUTION: ObservationDefinition = {
+  observation_id: "obs-gk-distribution-v1",
+  observation_version: "obs-gk-distribution-v1",
+  source_kind: "RAW_CANONICAL",
+  producer_boundary: "SIMULATION_SERIALIZER",
+  schema_id: "gk-distribution-observation-v1",
+  schema_version: "schema-gk-distribution-obs-v1",
+  required_fields: [
+    "tick",
+    "keeperPlayerId",
+    "releaseTick",
+    "targetPlayerId",
+    "releasePassRef",
+  ],
+  cadence: "PER_EVENT",
+  missing_data_behavior: "INVALID_RUN",
+};
+
 /** All registered observation definitions keyed by observation_id. */
 export const OBSERVATION_DEFINITIONS: Record<string, ObservationDefinition> = {
   [OBS_PER_TICK.observation_id]: OBS_PER_TICK,
   [OBS_BALL_MOTION.observation_id]: OBS_BALL_MOTION,
   [OBS_PLAYER_MOTION.observation_id]: OBS_PLAYER_MOTION,
+  [OBS_GK_ROLE.observation_id]: OBS_GK_ROLE,
+  [OBS_GK_POSITIONING.observation_id]: OBS_GK_POSITIONING,
+  [OBS_GK_CHASE.observation_id]: OBS_GK_CHASE,
+  [OBS_GK_SAVE_CLAIM.observation_id]: OBS_GK_SAVE_CLAIM,
+  [OBS_GK_DISTRIBUTION.observation_id]: OBS_GK_DISTRIBUTION,
 };
 
 /**

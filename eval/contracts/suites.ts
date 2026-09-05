@@ -170,6 +170,45 @@ export const DUELS_SUITE: SuiteDefinition = {
 };
 
 /**
+ * Goalkeepers suite — small-sided goalkeeper criteria.
+ *
+ * Direct tests are the goalkeeper catalog tests from GAMEPLAY_EVALUATION_SPEC
+ * §7.4 (GK-REA-001, GK-WF-001, GK-LEG-001, GK-PARRY-001, GK-REC-001,
+ * GK-HIGH-001).  Each test carries its catalog criteria plus the small-sided
+ * GK behavior criteria defined in specs/GOALKEEPER_SPEC.md.  No keeper
+ * behavior is implemented, so the GK-specific criteria evaluate to
+ * NOT_EVALUATED (honest "not yet observable") — this suite never claims PASS
+ * on gameplay.
+ */
+export const GOALKEEPERS_SUITE: SuiteDefinition = {
+  suite_id: "goalkeepers",
+  suite_version: "suite-goalkeepers-v1",
+  direct_test_ids: [
+    "GK-REA-001",
+    "GK-WF-001",
+    "GK-LEG-001",
+    "GK-PARRY-001",
+    "GK-REC-001",
+    "GK-HIGH-001",
+  ],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+    "COMMON-BOUNDS",
+  ],
+  impact_closure: "NONE",
+  prerequisite_capabilities: ["GOALKEEPERS"],
+  seed_matrix_id: "seeds-family-v1",
+  config_matrix_id: "config-goalkeepers-v1",
+  held_out_policy_id: null,
+  browser_case_ids: [],
+  resource_policy_id: "resources-family-v1",
+  outcome_reduction_profile_id: "profile-selected-v1",
+  expected_expansion_manifest_id: "expansion-goalkeepers-v1",
+};
+
+/**
  * Normative declaration of the team suite required by SMALL_SIDED_SHAPE.
  *
  * This record mirrors GAMEPLAY_EVALUATION_SPEC.md §8, but it is deliberately
@@ -222,6 +261,7 @@ export const SUITES: Record<string, SuiteDefinition> = {
   [BALL_SUITE.suite_id]: BALL_SUITE,
   [TOUCH_AND_ACTIONS_SUITE.suite_id]: TOUCH_AND_ACTIONS_SUITE,
   [DUELS_SUITE.suite_id]: DUELS_SUITE,
+  [GOALKEEPERS_SUITE.suite_id]: GOALKEEPERS_SUITE,
 };
 
 /**

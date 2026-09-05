@@ -673,6 +673,141 @@ export const BINDING_DUELS_INT_FAST_001: TestImplementationBinding = makeTestBin
 );
 
 // ---------------------------------------------------------------------------
+// goalkeepers suite test bindings
+// ---------------------------------------------------------------------------
+
+/**
+ * GK-REA-001 — set keeper response sequence to a shot.
+ * Catalog REF (MEASURED_TARGET) → BLOCKED_MISSING_REFERENCE, VIS
+ * (PERCEPTUAL_TARGET) → NEEDS_PERCEPTUAL_REVIEW, REG (REGRESSION) →
+ * NOT_EVALUATED.  Small-sided GK behavior criteria (POSITIONING-HOLD,
+ * SAVE-CLAIM, ROLE-DESIGNATION) are bound to their (unimplemented) GK
+ * invariants → NOT_EVALUATED.
+ */
+export const BINDING_GK_REA_001: TestImplementationBinding = makeTestBindingWith(
+  "GK-REA-001",
+  ["scn-gk-rea-001-v1"],
+  ["player-speed", "player-displacement", "ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "event-references", "gk-positioning-evidence", "gk-save-claim-evidence", "gk-role-designation-evidence"],
+  ["obs-per-tick-v1", "obs-gk-positioning-v1", "obs-gk-save-claim-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "GK-REA-001-REF": [],
+    "GK-REA-001-VIS": [],
+    "GK-REA-001-REG": [],
+    "GK-POSITIONING-HOLD": ["gk-positioning-evidence"],
+    "GK-SAVE-CLAIM": ["gk-save-claim-evidence"],
+    "GK-ROLE-DESIGNATION": ["gk-role-designation-evidence"],
+  },
+);
+
+/**
+ * GK-WF-001 — wrong-foot correction.
+ * CAUSAL (UNKNOWN) → NOT_EVALUATED, VIS → NEEDS_PERCEPTUAL_REVIEW, REG →
+ * NOT_EVALUATED.  Small-sided behavior: NO-FIELD-CHASE + POSITIONING-HOLD.
+ */
+export const BINDING_GK_WF_001: TestImplementationBinding = makeTestBindingWith(
+  "GK-WF-001",
+  ["scn-gk-wf-001-v1"],
+  ["player-speed", "player-displacement", "ball-speed"],
+  ["finite-number", "event-references", "gk-no-field-chase-evidence", "gk-positioning-evidence"],
+  ["obs-per-tick-v1", "obs-gk-chase-v1", "obs-gk-positioning-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "GK-WF-001-CAUSAL": [],
+    "GK-WF-001-VIS": [],
+    "GK-WF-001-REG": [],
+    "GK-NO-FIELD-CHASE": ["gk-no-field-chase-evidence"],
+    "GK-POSITIONING-HOLD": ["gk-positioning-evidence"],
+  },
+);
+
+/**
+ * GK-LEG-001 — low close shot saved by an explicit leg/foot contact.
+ * CONTACT (HARD_INVARIANT) bound to the GK save/claim invariant; the
+ * keeper subsystem is absent so it evaluates NOT_EVALUATED.
+ */
+export const BINDING_GK_LEG_001: TestImplementationBinding = makeTestBindingWith(
+  "GK-LEG-001",
+  ["scn-gk-leg-001-v1"],
+  ["player-speed", "player-displacement", "ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "event-references", "gk-save-claim-evidence"],
+  ["obs-per-tick-v1", "obs-gk-save-claim-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "GK-LEG-001-CONTACT": ["gk-save-claim-evidence"],
+    "GK-LEG-001-REF": [],
+    "GK-LEG-001-VIS": [],
+    "GK-LEG-001-REG": [],
+    "GK-SAVE-CLAIM": ["gk-save-claim-evidence"],
+  },
+);
+
+/**
+ * GK-PARRY-001 — parry direction/outcome by surface.
+ * CONTACT bound to the GK save/claim invariant; keeper subsystem absent →
+ * NOT_EVALUATED.
+ */
+export const BINDING_GK_PARRY_001: TestImplementationBinding = makeTestBindingWith(
+  "GK-PARRY-001",
+  ["scn-gk-parry-001-v1"],
+  ["player-speed", "player-displacement", "ball-speed", "ball-distance", "ball-contact"],
+  ["finite-number", "event-references", "gk-save-claim-evidence"],
+  ["obs-per-tick-v1", "obs-gk-save-claim-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "GK-PARRY-001-CONTACT": ["gk-save-claim-evidence"],
+    "GK-PARRY-001-REF": [],
+    "GK-PARRY-001-VIS": [],
+    "GK-PARRY-001-REG": [],
+    "GK-SAVE-CLAIM": ["gk-save-claim-evidence"],
+  },
+);
+
+/**
+ * GK-REC-001 — recovery from a grounded save.
+ * REF → BLOCKED_MISSING_REFERENCE, VIS → NEEDS_PERCEPTUAL_REVIEW, REG →
+ * NOT_EVALUATED.  Small-sided: POSITIONING-HOLD + DISTRIBUTION-NO-OMNISCIENCE.
+ */
+export const BINDING_GK_REC_001: TestImplementationBinding = makeTestBindingWith(
+  "GK-REC-001",
+  ["scn-gk-rec-001-v1"],
+  ["player-speed", "player-displacement", "ball-speed", "ball-distance"],
+  ["finite-number", "event-references", "gk-positioning-evidence", "gk-distribution-evidence"],
+  ["obs-per-tick-v1", "obs-gk-positioning-v1", "obs-gk-distribution-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "GK-REC-001-REF": [],
+    "GK-REC-001-VIS": [],
+    "GK-REC-001-REG": [],
+    "GK-POSITIONING-HOLD": ["gk-positioning-evidence"],
+    "GK-DISTRIBUTION-NO-OMNISCIENCE": ["gk-distribution-evidence"],
+  },
+);
+
+/**
+ * GK-HIGH-001 — take off and catch/parry a high cross.
+ * REACH (HARD_INVARIANT) bound to the GK save/claim invariant; keeper
+ * subsystem absent → NOT_EVALUATED.
+ */
+export const BINDING_GK_HIGH_001: TestImplementationBinding = makeTestBindingWith(
+  "GK-HIGH-001",
+  ["scn-gk-high-001-v1"],
+  ["player-speed", "player-displacement", "ball-speed", "ball-distance", "ball-height", "ball-contact"],
+  ["finite-number", "event-references", "gk-save-claim-evidence", "gk-positioning-evidence"],
+  ["obs-per-tick-v1", "obs-gk-save-claim-v1", "obs-gk-positioning-v1"],
+  ["COMMON-FINITE", "COMMON-DETERMINISTIC", "COMMON-REFERENCES", "COMMON-BOUNDS"],
+  {
+    "GK-HIGH-001-REACH": ["gk-save-claim-evidence"],
+    "GK-HIGH-001-REF": [],
+    "GK-HIGH-001-VIS": [],
+    "GK-HIGH-001-REG": [],
+    "GK-SAVE-CLAIM": ["gk-save-claim-evidence"],
+    "GK-POSITIONING-HOLD": ["gk-positioning-evidence"],
+  },
+);
+
+// ---------------------------------------------------------------------------
 // Registry — all bindings keyed by test_id
 // ---------------------------------------------------------------------------
 
@@ -723,6 +858,14 @@ export const TEST_BINDINGS: Record<string, TestImplementationBinding> = {
   [BINDING_DUELS_TACK_ANG_001.test_id]: BINDING_DUELS_TACK_ANG_001,
   [BINDING_DUELS_INT_PASS_001.test_id]: BINDING_DUELS_INT_PASS_001,
   [BINDING_DUELS_INT_FAST_001.test_id]: BINDING_DUELS_INT_FAST_001,
+
+  // goalkeepers suite bindings
+  [BINDING_GK_REA_001.test_id]: BINDING_GK_REA_001,
+  [BINDING_GK_WF_001.test_id]: BINDING_GK_WF_001,
+  [BINDING_GK_LEG_001.test_id]: BINDING_GK_LEG_001,
+  [BINDING_GK_PARRY_001.test_id]: BINDING_GK_PARRY_001,
+  [BINDING_GK_REC_001.test_id]: BINDING_GK_REC_001,
+  [BINDING_GK_HIGH_001.test_id]: BINDING_GK_HIGH_001,
 };
 
 /**

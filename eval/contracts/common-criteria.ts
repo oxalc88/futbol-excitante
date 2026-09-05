@@ -460,6 +460,284 @@ export const INT_FAST_001_REG: EvaluationCriterion = {
   rule: "Preserve fast intercept behavior versus best.",
 };
 
+// ---------------------------------------------------------------------------
+// goalkeepers suite criteria — GAMEPLAY_EVALUATION_SPEC §7.4
+// ---------------------------------------------------------------------------
+
+/**
+ * GK-REA-001-REF — compare apparent keeper response sequence to a shot.
+ * Class: MEASURED_TARGET.  No reference target → BLOCKED_MISSING_REFERENCE.
+ */
+export const GK_REA_001_REF: EvaluationCriterion = {
+  criterion_id: "GK-REA-001-REF",
+  class: "MEASURED_TARGET",
+  rule: "Compare apparent response sequence; never label it pure AI reaction time without perception evidence.",
+};
+
+/**
+ * GK-REA-001-VIS — keeper pose/action transition plausibility.
+ * Class: PERCEPTUAL_TARGET.  No versioned rubric → NEEDS_PERCEPTUAL_REVIEW.
+ */
+export const GK_REA_001_VIS: EvaluationCriterion = {
+  criterion_id: "GK-REA-001-VIS",
+  class: "PERCEPTUAL_TARGET",
+  rule: "Keeper pose/action transition and contact plausibility require a versioned browser rubric.",
+};
+
+/**
+ * GK-REA-001-REG — preserve wrong-foot, leg-save, and recovery behavior.
+ * Class: REGRESSION.  No policy → NOT_EVALUATED.
+ */
+export const GK_REA_001_REG: EvaluationCriterion = {
+  criterion_id: "GK-REA-001-REG",
+  class: "REGRESSION",
+  rule: "Preserve wrong-foot, leg-save, and recovery behavior.",
+};
+
+/**
+ * GK-WF-001-CAUSAL — wrong-foot correction curve.
+ * Class: UNKNOWN.  No controlled capture → NOT_EVALUATED.
+ */
+export const GK_WF_001_CAUSAL: EvaluationCriterion = {
+  criterion_id: "GK-WF-001-CAUSAL",
+  class: "UNKNOWN",
+  rule: "No PES correction threshold/curve until controlled capture.",
+};
+
+/**
+ * GK-WF-001-VIS — weight-shift/reversal plausibility check.
+ * Class: PERCEPTUAL_TARGET.  No rubric → NEEDS_PERCEPTUAL_REVIEW.
+ */
+export const GK_WF_001_VIS: EvaluationCriterion = {
+  criterion_id: "GK-WF-001-VIS",
+  class: "PERCEPTUAL_TARGET",
+  rule: "Browser diagnostic checks weight-shift/reversal plausibility; no pass gate until rubric validation.",
+};
+
+/**
+ * GK-WF-001-REG — preserve ordinary reaction and reach.
+ * Class: REGRESSION.  No policy → NOT_EVALUATED.
+ */
+export const GK_WF_001_REG: EvaluationCriterion = {
+  criterion_id: "GK-WF-001-REG",
+  class: "REGRESSION",
+  rule: "Preserve ordinary reaction and reach.",
+};
+
+/**
+ * GK-LEG-001-CONTACT — save outcome requires an ordered feasible contact event.
+ * Class: HARD_INVARIANT.  Keeper subsystem not implemented → NOT_EVALUATED.
+ */
+export const GK_LEG_001_CONTACT: EvaluationCriterion = {
+  criterion_id: "GK-LEG-001-CONTACT",
+  class: "HARD_INVARIANT",
+  rule: "Save outcome requires an ordered feasible leg/foot contact event and continuous rebound.",
+};
+
+/**
+ * GK-LEG-001-REF — compare contact/rebound observables.
+ * Class: MEASURED_TARGET → BLOCKED_MISSING_REFERENCE.
+ */
+export const GK_LEG_001_REF: EvaluationCriterion = {
+  criterion_id: "GK-LEG-001-REF",
+  class: "MEASURED_TARGET",
+  rule: "Compare contact/rebound observables when a reference target exists.",
+};
+
+/**
+ * GK-LEG-001-VIS — rendered limb and ball contact agree with event.
+ * Class: PERCEPTUAL_TARGET.  No rubric → NEEDS_PERCEPTUAL_REVIEW.
+ */
+export const GK_LEG_001_VIS: EvaluationCriterion = {
+  criterion_id: "GK-LEG-001-VIS",
+  class: "PERCEPTUAL_TARGET",
+  rule: "Rendered limb and ball contact agree with the canonical event; rubric required.",
+};
+
+/**
+ * GK-LEG-001-REG — preserve reaction, parry, and recovery.
+ * Class: REGRESSION.  No policy → NOT_EVALUATED.
+ */
+export const GK_LEG_001_REG: EvaluationCriterion = {
+  criterion_id: "GK-LEG-001-REG",
+  class: "REGRESSION",
+  rule: "Preserve reaction, parry, and recovery.",
+};
+
+/**
+ * GK-PARRY-001-CONTACT — parry is an explicit surface contact.
+ * Class: HARD_INVARIANT.  Keeper subsystem not implemented → NOT_EVALUATED.
+ */
+export const GK_PARRY_001_CONTACT: EvaluationCriterion = {
+  criterion_id: "GK-PARRY-001-CONTACT",
+  class: "HARD_INVARIANT",
+  rule: "Parry is an explicit surface contact; outgoing state and any skill correction are inspectable.",
+};
+
+/**
+ * GK-PARRY-001-REF — surface-conditioned rebound comparison.
+ * Class: MEASURED_TARGET → BLOCKED_MISSING_REFERENCE.
+ */
+export const GK_PARRY_001_REF: EvaluationCriterion = {
+  criterion_id: "GK-PARRY-001-REF",
+  class: "MEASURED_TARGET",
+  rule: "Compare surface-conditioned rebound observables with uncertainty when populated.",
+};
+
+/**
+ * GK-PARRY-001-VIS — contacted surface and rebound continuity.
+ * Class: PERCEPTUAL_TARGET.  No rubric → NEEDS_PERCEPTUAL_REVIEW.
+ */
+export const GK_PARRY_001_VIS: EvaluationCriterion = {
+  criterion_id: "GK-PARRY-001-VIS",
+  class: "PERCEPTUAL_TARGET",
+  rule: "Browser frame strip validates contacted surface and rebound continuity.",
+};
+
+/**
+ * GK-PARRY-001-REG — preserve ball continuity and keeper recovery.
+ * Class: REGRESSION.  No policy → NOT_EVALUATED.
+ */
+export const GK_PARRY_001_REG: EvaluationCriterion = {
+  criterion_id: "GK-PARRY-001-REG",
+  class: "REGRESSION",
+  rule: "Preserve ball continuity and keeper recovery.",
+};
+
+/**
+ * GK-REC-001-REF — phase-timing comparison.
+ * Class: MEASURED_TARGET → BLOCKED_MISSING_REFERENCE.
+ */
+export const GK_REC_001_REF: EvaluationCriterion = {
+  criterion_id: "GK-REC-001-REF",
+  class: "MEASURED_TARGET",
+  rule: "Compare phase timing distributions under equivalent observable initial states.",
+};
+
+/**
+ * GK-REC-001-VIS — grounded/recovery transition plausibility.
+ * Class: PERCEPTUAL_TARGET.  No rubric → NEEDS_PERCEPTUAL_REVIEW.
+ */
+export const GK_REC_001_VIS: EvaluationCriterion = {
+  criterion_id: "GK-REC-001-VIS",
+  class: "PERCEPTUAL_TARGET",
+  rule: "Rendered grounded/recovery transition and second contact require rubric review.",
+};
+
+/**
+ * GK-REC-001-REG — preserve first-save contact/rebound behavior.
+ * Class: REGRESSION.  No policy → NOT_EVALUATED.
+ */
+export const GK_REC_001_REG: EvaluationCriterion = {
+  criterion_id: "GK-REC-001-REG",
+  class: "REGRESSION",
+  rule: "Preserve first-save contact/rebound behavior.",
+};
+
+/**
+ * GK-HIGH-001-REACH — claim/parry requires a feasible recorded reach/contact.
+ * Class: HARD_INVARIANT.  Keeper subsystem not implemented → NOT_EVALUATED.
+ */
+export const GK_HIGH_001_REACH: EvaluationCriterion = {
+  criterion_id: "GK-HIGH-001-REACH",
+  class: "HARD_INVARIANT",
+  rule: "Claim/parry requires a feasible recorded reach/contact; catch state never teleports the ball.",
+};
+
+/**
+ * GK-HIGH-001-REF — timing/contact/outcome distribution.
+ * Class: MEASURED_TARGET → BLOCKED_MISSING_REFERENCE.
+ */
+export const GK_HIGH_001_REF: EvaluationCriterion = {
+  criterion_id: "GK-HIGH-001-REF",
+  class: "MEASURED_TARGET",
+  rule: "Compare timing/contact/outcome distribution with stated aerial uncertainty.",
+};
+
+/**
+ * GK-HIGH-001-VIS — aerial pose/contact/congestion continuity.
+ * Class: PERCEPTUAL_TARGET.  No rubric → NEEDS_PERCEPTUAL_REVIEW.
+ */
+export const GK_HIGH_001_VIS: EvaluationCriterion = {
+  criterion_id: "GK-HIGH-001-VIS",
+  class: "PERCEPTUAL_TARGET",
+  rule: "Browser review validates aerial pose, contact, and congestion continuity.",
+};
+
+/**
+ * GK-HIGH-001-REG — preserve crosses, headers, and keeper ground actions.
+ * Class: REGRESSION.  No policy → NOT_EVALUATED.
+ */
+export const GK_HIGH_001_REG: EvaluationCriterion = {
+  criterion_id: "GK-HIGH-001-REG",
+  class: "REGRESSION",
+  rule: "Preserve crosses, headers, and keeper ground actions.",
+};
+
+// ---------------------------------------------------------------------------
+// goalkeepers suite criteria — small-sided GK behavior (specs/GOALKEEPER_SPEC.md)
+// ---------------------------------------------------------------------------
+
+/**
+ * GK-ROLE-DESIGNATION — exactly one designated keeper per team in small-sided play.
+ * Class: HARD_INVARIANT.  Keeper role not implemented → NOT_EVALUATED.
+ */
+export const GK_ROLE_DESIGNATION: EvaluationCriterion = {
+  criterion_id: "GK-ROLE-DESIGNATION",
+  class: "HARD_INVARIANT",
+  rule:
+    "In a small-sided match exactly one player per team is the designated keeper; the " +
+    "keeper role is distinct from outfield roles and must not be substituted by an outfield body.",
+};
+
+/**
+ * GK-POSITIONING-HOLD — keeper holds its goal arc with bounded lateral drift.
+ * Class: HARD_INVARIANT.  No keeper positioning oracle → NOT_EVALUATED.
+ */
+export const GK_POSITIONING_HOLD: EvaluationCriterion = {
+  criterion_id: "GK-POSITIONING-HOLD",
+  class: "HARD_INVARIANT",
+  rule:
+    "The designated keeper remains on the configured goal arc and within the versioned " +
+    "bounded lateral drift; it never leaves the arc to chase into the field.",
+};
+
+/**
+ * GK-NO-FIELD-CHASE — keeper never joins the field chase (anti-huddle contract inherited).
+ * Class: HARD_INVARIANT.  No keeper chase oracle → NOT_EVALUATED.
+ */
+export const GK_NO_FIELD_CHASE: EvaluationCriterion = {
+  criterion_id: "GK-NO-FIELD-CHASE",
+  class: "HARD_INVARIANT",
+  rule:
+    "The designated keeper never chases the ball into the field beyond its goal arc; " +
+    "this inherits the accepted small-sided anti-huddle contract.",
+};
+
+/**
+ * GK-SAVE-CLAIM — a keeper save/claim is an explicit recorded contact on the ball.
+ * Class: HARD_INVARIANT.  No keeper contact oracle → NOT_EVALUATED.
+ */
+export const GK_SAVE_CLAIM: EvaluationCriterion = {
+  criterion_id: "GK-SAVE-CLAIM",
+  class: "HARD_INVARIANT",
+  rule:
+    "A keeper save/claim on a shot on target is an explicit recorded contact on the " +
+    "independent ball; the ball is never parented or teleported into keeper possession.",
+};
+
+/**
+ * GK-DISTRIBUTION-NO-OMNISCIENCE — keeper release uses only modelled information.
+ * Class: ENGINE_DESIGN_TARGET.  No CapabilityDesignProfile → NOT_EVALUATED.
+ */
+export const GK_DISTRIBUTION_NO_OMNISCIENCE: EvaluationCriterion = {
+  criterion_id: "GK-DISTRIBUTION-NO-OMNISCIENCE",
+  class: "ENGINE_DESIGN_TARGET",
+  rule:
+    "A keeper release may reach a teammate through normal pass semantics and is not " +
+    "guided by omniscient target selection beyond the keeper's modelled information.",
+};
+
 /** All common criteria keyed by criterion_id. */
 export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [COMMON_FINITE.criterion_id]: COMMON_FINITE,
@@ -509,6 +787,36 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [INT_PASS_001_REG.criterion_id]: INT_PASS_001_REG,
   [INT_FAST_001_CAUSAL.criterion_id]: INT_FAST_001_CAUSAL,
   [INT_FAST_001_REG.criterion_id]: INT_FAST_001_REG,
+
+  // goalkeepers suite criteria — GAMEPLAY_EVALUATION_SPEC §7.4
+  [GK_REA_001_REF.criterion_id]: GK_REA_001_REF,
+  [GK_REA_001_VIS.criterion_id]: GK_REA_001_VIS,
+  [GK_REA_001_REG.criterion_id]: GK_REA_001_REG,
+  [GK_WF_001_CAUSAL.criterion_id]: GK_WF_001_CAUSAL,
+  [GK_WF_001_VIS.criterion_id]: GK_WF_001_VIS,
+  [GK_WF_001_REG.criterion_id]: GK_WF_001_REG,
+  [GK_LEG_001_CONTACT.criterion_id]: GK_LEG_001_CONTACT,
+  [GK_LEG_001_REF.criterion_id]: GK_LEG_001_REF,
+  [GK_LEG_001_VIS.criterion_id]: GK_LEG_001_VIS,
+  [GK_LEG_001_REG.criterion_id]: GK_LEG_001_REG,
+  [GK_PARRY_001_CONTACT.criterion_id]: GK_PARRY_001_CONTACT,
+  [GK_PARRY_001_REF.criterion_id]: GK_PARRY_001_REF,
+  [GK_PARRY_001_VIS.criterion_id]: GK_PARRY_001_VIS,
+  [GK_PARRY_001_REG.criterion_id]: GK_PARRY_001_REG,
+  [GK_REC_001_REF.criterion_id]: GK_REC_001_REF,
+  [GK_REC_001_VIS.criterion_id]: GK_REC_001_VIS,
+  [GK_REC_001_REG.criterion_id]: GK_REC_001_REG,
+  [GK_HIGH_001_REACH.criterion_id]: GK_HIGH_001_REACH,
+  [GK_HIGH_001_REF.criterion_id]: GK_HIGH_001_REF,
+  [GK_HIGH_001_VIS.criterion_id]: GK_HIGH_001_VIS,
+  [GK_HIGH_001_REG.criterion_id]: GK_HIGH_001_REG,
+
+  // goalkeepers suite criteria — small-sided GK behavior
+  [GK_ROLE_DESIGNATION.criterion_id]: GK_ROLE_DESIGNATION,
+  [GK_POSITIONING_HOLD.criterion_id]: GK_POSITIONING_HOLD,
+  [GK_NO_FIELD_CHASE.criterion_id]: GK_NO_FIELD_CHASE,
+  [GK_SAVE_CLAIM.criterion_id]: GK_SAVE_CLAIM,
+  [GK_DISTRIBUTION_NO_OMNISCIENCE.criterion_id]: GK_DISTRIBUTION_NO_OMNISCIENCE,
 };
 
 /**

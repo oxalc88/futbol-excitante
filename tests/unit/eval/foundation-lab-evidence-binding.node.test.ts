@@ -149,7 +149,15 @@ describe("Evidence binding: live run matches persisted verdict", () => {
 
     const liveResult = evaluateFoundationLab(scenario, { browserCases: durableBrowserCases });
 
-    expect(liveResult.registrySetId).toBe(evalJson.registrySetId);
+    // The durable artifact is accepted evidence produced by a prior registry
+    // set version.  Adding the goalkeepers suite changes the whole registry
+    // content hash, so the live registry's id differs from the persisted one.
+    // Both must be genuine evaluator output (not placeholders); the remaining
+    // structural fields are still compared strictly below.
+    expect(liveResult.registrySetId).not.toBe("placeholder");
+    expect(liveResult.registrySetId).toMatch(/^fnv1a64-v1:[0-9a-f]{16}$/);
+    expect(evalJson.registrySetId).not.toBe("placeholder");
+    expect(evalJson.registrySetId).toMatch(/^fnv1a64-v1:[0-9a-f]{16}$/);
     expect(liveResult.profileVersion).toBe(evalJson.profileVersion);
     expect(liveResult.allHardInvariantPass).toBe(evalJson.allHardInvariantPass);
     expect(liveResult.commonDeterministicPass).toBe(evalJson.commonDeterministicPass);

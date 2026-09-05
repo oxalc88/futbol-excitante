@@ -944,6 +944,119 @@ export const SCENARIO_DUELS_INT_FAST_001 = makeScenarioStub(
   { test_focus: "fast-intercept" },
 );
 
+// ---------------------------------------------------------------------------
+// goalkeepers suite scenarios
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a small-sided goalkeeper scenario stub.
+ *
+ * Places a designated keeper (team-A) near its goal arc and a shooter
+ * (team-B) with a ball on a shot lane.  This is a contract stub for the
+ * goalkeeper suite; no keeper behavior is implemented yet, so the criteria
+ * bound to it evaluate to NOT_EVALUATED.  The scenario carries the versioned
+ * provisional gk-small-sided-v1 config reference.
+ */
+function makeKeeperScenarioStub(
+  scenarioId: string,
+  durationTicks: number,
+  testFocus: string,
+): ScenarioDefinition {
+  return {
+    scenario_id: scenarioId,
+    scenario_version: "scenario-v1",
+    capability_requirements: ["GOALKEEPERS", "INDEPENDENT_BALL"],
+    duration_ticks: durationTicks,
+    seed_policy: { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+    initial_state_schema: "state-v1",
+    initial_state: {
+      players: [
+        {
+          playerId: "player-keeper",
+          teamId: "team-A",
+          groundPosition: { x: -45, y: 0 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 0,
+          desiredHeading: 0,
+        },
+        {
+          playerId: "player-shooter",
+          teamId: "team-B",
+          groundPosition: { x: -15, y: 0 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 3.141592653589793,
+          desiredHeading: 3.141592653589793,
+        },
+      ],
+      ball: {
+        position: { x: -13, y: 0, z: 0.11 },
+        linearVelocity: { x: 0, y: 0, z: 0 },
+        angularVelocity: { x: 0, y: 0, z: 0 },
+        regime: "ground-roll",
+      },
+    },
+    config_refs: {
+      foundation: "foundation-locomotion-v1",
+      goalkeeper: "gk-small-sided-v1",
+      test_focus: testFocus,
+    },
+    input_program: {
+      schema_id: "input-frame-v1",
+      schema_version: "schema-input-v1",
+      value: {},
+    },
+    scheduled_events: [],
+    observation_windows: [
+      {
+        window_id: "full-run-v1",
+        start: { kind: "ABSOLUTE_TICK", tick: 0, offset_ticks: 0, missing_boundary_behavior: "INVALID_RUN" },
+        end: { kind: "SCENARIO_END", offset_ticks: 0, missing_boundary_behavior: "INVALID_RUN" },
+        boundary_inclusion: "CLOSED",
+        discontinuity_policy: "OBSERVE",
+      },
+    ],
+    requested_observation_ids: ["obs-per-tick-v1", "obs-gk-positioning-v1"],
+  };
+}
+
+export const SCENARIO_GK_REA_001 = makeKeeperScenarioStub(
+  "scn-gk-rea-001-v1",
+  120,
+  "reaction",
+);
+
+export const SCENARIO_GK_WF_001 = makeKeeperScenarioStub(
+  "scn-gk-wf-001-v1",
+  120,
+  "wrong-foot",
+);
+
+export const SCENARIO_GK_LEG_001 = makeKeeperScenarioStub(
+  "scn-gk-leg-001-v1",
+  120,
+  "leg-save",
+);
+
+export const SCENARIO_GK_PARRY_001 = makeKeeperScenarioStub(
+  "scn-gk-parry-001-v1",
+  120,
+  "parry",
+);
+
+export const SCENARIO_GK_REC_001 = makeKeeperScenarioStub(
+  "scn-gk-rec-001-v1",
+  180,
+  "recovery",
+);
+
+export const SCENARIO_GK_HIGH_001 = makeKeeperScenarioStub(
+  "scn-gk-high-001-v1",
+  180,
+  "high-cross",
+);
+
 /** All registered scenario stubs keyed by scenario_id. */
 export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
   [SCENARIO_BALL_IND_001.scenario_id]: SCENARIO_BALL_IND_001,
@@ -998,6 +1111,14 @@ export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
 
   // swerve evaluation scenario
   [SCENARIO_SWERVE_001.scenario_id]: SCENARIO_SWERVE_001,
+
+  // goalkeepers suite scenarios
+  [SCENARIO_GK_REA_001.scenario_id]: SCENARIO_GK_REA_001,
+  [SCENARIO_GK_WF_001.scenario_id]: SCENARIO_GK_WF_001,
+  [SCENARIO_GK_LEG_001.scenario_id]: SCENARIO_GK_LEG_001,
+  [SCENARIO_GK_PARRY_001.scenario_id]: SCENARIO_GK_PARRY_001,
+  [SCENARIO_GK_REC_001.scenario_id]: SCENARIO_GK_REC_001,
+  [SCENARIO_GK_HIGH_001.scenario_id]: SCENARIO_GK_HIGH_001,
 };
 
 /**

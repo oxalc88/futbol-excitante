@@ -100,6 +100,40 @@ export function isRelevantEvent(
       );
     }
 
+    case "GK_POSITIONING": {
+      const req = GK_SITUATION_EVIDENCE_REQUIREMENTS[situationId];
+      return (
+        String(event.kind) === "keeper-arc-position" ||
+        req.indicative_event_kinds.includes(event.kind)
+      );
+    }
+
+    case "GK_NO_FIELD_CHASE": {
+      const req = GK_SITUATION_EVIDENCE_REQUIREMENTS[situationId];
+      return (
+        String(event.kind) === "keeper-field-chase" ||
+        req.indicative_event_kinds.includes(event.kind)
+      );
+    }
+
+    case "GK_SAVE_CLAIM": {
+      const req = GK_SITUATION_EVIDENCE_REQUIREMENTS[situationId];
+      return (
+        event.kind === "shot" ||
+        String(event.kind) === "keeper-ball-contact" ||
+        req.indicative_event_kinds.includes(event.kind)
+      );
+    }
+
+    case "GK_DISTRIBUTION": {
+      const req = GK_SITUATION_EVIDENCE_REQUIREMENTS[situationId];
+      return (
+        String(event.kind) === "keeper-release" ||
+        event.kind === "pass" ||
+        req.indicative_event_kinds.includes(event.kind)
+      );
+    }
+
     default:
       return false;
   }
@@ -258,6 +292,91 @@ export const SITUATION_EVIDENCE_REQUIREMENTS: Record<
       "indicate successful or failed press",
   },
 };
+
+// ---------------------------------------------------------------------------
+// Goalkeeper situation evidence mappings
+//
+// These describe the SMALL-SIDED goalkeeper situations from
+// specs/GOALKEEPER_SPEC.md.  They live in a SEPARATE registry so they do not
+// join MAPPED_SITUATION_IDS (the small-sided scanner intentionally scans the
+// eight non-GK situations first).  All mappings are NOT_EVALUATED because no
+// keeper behavior is implemented yet.
+// ---------------------------------------------------------------------------
+
+/**
+ * Goalkeeper situation evidence requirements (small-sided only).
+ *
+ * Kept distinct from SITUATION_EVIDENCE_REQUIREMENTS so the scanner's
+ * MAPPED_SITUATION_IDS set is unchanged.  The goalkeeper suite criteria
+ * (GK-POSITIONING-HOLD, GK-NO-FIELD-CHASE, GK-SAVE-CLAIM,
+ * GK-DISTRIBUTION-NO-OMNISCIENCE) bind to these situations.
+ */
+export const GK_SITUATION_EVIDENCE_REQUIREMENTS: Record<
+  string,
+  SituationEvidenceRequirement
+> = {
+  GK_POSITIONING: {
+    situation_id: "GK_POSITIONING",
+    required_event_kinds: ["keeper-arc-position"],
+    indicative_event_kinds: ["keeper-lateral-drift"],
+    requires_position_data: true,
+    requires_team_geometry: false,
+    mapping_status: "NOT_EVALUATED",
+    evidence_chain:
+      "Keeper role designation per team → per-tick keeper ground position " +
+      "→ verify the keeper remains on its goal arc within the versioned " +
+      "bounded lateral drift (gk-small-sided-v1)",
+  },
+  GK_NO_FIELD_CHASE: {
+    situation_id: "GK_NO_FIELD_CHASE",
+    required_event_kinds: ["keeper-field-chase"],
+    indicative_event_kinds: ["keeper-arc-exit"],
+    requires_position_data: true,
+    requires_team_geometry: false,
+    mapping_status: "NOT_EVALUATED",
+    evidence_chain:
+      "Per-tick keeper position vs goal arc → verify the keeper never " +
+      "chases the ball into the field beyond the arc (anti-huddle contract inherited)",
+  },
+  GK_SAVE_CLAIM: {
+    situation_id: "GK_SAVE_CLAIM",
+    required_event_kinds: ["shot", "keeper-ball-contact"],
+    indicative_event_kinds: ["goal", "ball-out-of-play"],
+    requires_position_data: true,
+    requires_team_geometry: false,
+    mapping_status: "NOT_EVALUATED",
+    evidence_chain:
+      "Shot event → ball trajectory → keeper-ball-contact event → verify the " +
+      "claim is an explicit recorded contact on the independent ball (no teleport)",
+  },
+  GK_DISTRIBUTION: {
+    situation_id: "GK_DISTRIBUTION",
+    required_event_kinds: ["keeper-release", "pass"],
+    indicative_event_kinds: ["player-ball-contact"],
+    requires_position_data: true,
+    requires_team_geometry: false,
+    mapping_status: "NOT_EVALUATED",
+    evidence_chain:
+      "Keeper release event → pass/contact chain → verify the release reaches " +
+      "a teammate through normal pass semantics without omniscient target selection",
+  },
+};
+
+/**
+ * All GK situation IDs that have evidence mappings.
+ */
+export const MAPPED_GK_SITUATION_IDS: string[] = Object.keys(
+  GK_SITUATION_EVIDENCE_REQUIREMENTS,
+);
+
+/**
+ * Get goalkeeper situation evidence requirements by situation id.
+ */
+export function getGkSituationEvidence(
+  situationId: string,
+): SituationEvidenceRequirement | undefined {
+  return GK_SITUATION_EVIDENCE_REQUIREMENTS[situationId];
+}
 
 /**
  * All situation IDs that have evidence mappings.

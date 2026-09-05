@@ -150,6 +150,17 @@ export const CONFIG_DUELS_V1: ConfigMatrixPolicy = {
   description: "Duels-suite config.",
 };
 
+export const CONFIG_GOALKEEPERS_V1: ConfigMatrixPolicy = {
+  policy_id: "config-goalkeepers-v1",
+  policy_version: "config-matrix-goalkeepers-v1",
+  config_refs: {
+    foundation: "foundation-locomotion-v1",
+    goalkeeper: "gk-small-sided-v1",
+  },
+  description:
+    "Goalkeepers-suite config referencing the versioned provisional gk-small-sided-v1 model.",
+};
+
 // ---------------------------------------------------------------------------
 // Resource policies (referenced by suite resource_policy_id)
 // ---------------------------------------------------------------------------
@@ -414,6 +425,43 @@ export const EXPANSION_DUELS_V1: ExpansionManifest = {
   content_hash: "placeholder",
 };
 
+/**
+ * Expansion manifest for the goalkeepers suite.
+ *
+ * impact_closure is NONE so expanded = direct set + common criteria.
+ */
+export const EXPANSION_GOALKEEPERS_V1: ExpansionManifest = {
+  policy_id: "expansion-goalkeepers-v1",
+  suite_id: "goalkeepers",
+  suite_version: "suite-goalkeepers-v1",
+  direct_test_ids: [
+    "GK-REA-001",
+    "GK-WF-001",
+    "GK-LEG-001",
+    "GK-PARRY-001",
+    "GK-REC-001",
+    "GK-HIGH-001",
+  ],
+  expanded_test_ids: [
+    "GK-HIGH-001",
+    "GK-LEG-001",
+    "GK-PARRY-001",
+    "GK-REA-001",
+    "GK-REC-001",
+    "GK-WF-001",
+  ],
+  common_criterion_ids: [
+    "COMMON-FINITE",
+    "COMMON-DETERMINISTIC",
+    "COMMON-REFERENCES",
+    "COMMON-BOUNDS",
+  ],
+  impact_closure: "NONE",
+  catalog_version: "gameplay-evaluation-v2",
+  registry_set_id: "placeholder",
+  content_hash: "placeholder",
+};
+
 // ---------------------------------------------------------------------------
 // Policy registries
 // ---------------------------------------------------------------------------
@@ -431,6 +479,7 @@ export const CONFIG_POLICIES: Record<string, ConfigMatrixPolicy> = {
   [CONFIG_BALL_V1.policy_id]: CONFIG_BALL_V1,
   [CONFIG_ACTIONS_V1.policy_id]: CONFIG_ACTIONS_V1,
   [CONFIG_DUELS_V1.policy_id]: CONFIG_DUELS_V1,
+  [CONFIG_GOALKEEPERS_V1.policy_id]: CONFIG_GOALKEEPERS_V1,
 };
 
 /** Resource policies keyed by policy_id. */
@@ -456,6 +505,7 @@ export const EXPANSION_MANIFESTS: Record<string, ExpansionManifest> = {
   "expansion-ball-v1": EXPANSION_BALL_V1,
   "expansion-touch-actions-v1": EXPANSION_TOUCH_ACTIONS_V1,
   "expansion-duels-v1": EXPANSION_DUELS_V1,
+  "expansion-goalkeepers-v1": EXPANSION_GOALKEEPERS_V1,
 };
 
 // ---------------------------------------------------------------------------
