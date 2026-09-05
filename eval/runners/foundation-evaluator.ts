@@ -295,9 +295,29 @@ function computeOutcome(
     return "NOT_EVALUATED";
   }
 
-  // ENGINE_DESIGN_TARGET: NOT_EVALUATED.
+  // ENGINE_DESIGN_TARGET: the verdict comes from the bound oracle's own result.
+  // An ENGINE_DESIGN_TARGET criterion that has a registered oracle (the GK
+  // distribution criterion does) is judged on what that oracle actually
+  // observes — PASS on a clean run, FAIL on a mutant, NOT_EVALUATED when the
+  // criterion genuinely has nothing to observe.  Criteria with no oracle stay
+  // NOT_EVALUATED (there is no engine-design runner to exercise them).
   if (criterionClass === "ENGINE_DESIGN_TARGET") {
-    return "NOT_EVALUATED";
+    if (oracleResults.length === 0) {
+      return "NOT_EVALUATED";
+    }
+    const anyFail = oracleResults.some((r) => r.status === "fail");
+    if (anyFail) {
+      return "FAIL";
+    }
+    const anyNotEval = oracleResults.some((r) => r.status === "not_evaluated");
+    if (anyNotEval) {
+      return "NOT_EVALUATED";
+    }
+    const allPass = oracleResults.every((r) => r.status === "pass");
+    if (allPass) {
+      return "PASS";
+    }
+    return "FAIL";
   }
 
   // PERCEPTUAL_TARGET: NEEDS_PERCEPTUAL_REVIEW.

@@ -284,9 +284,50 @@ describe("GK-SAVE-CLAIM oracle", () => {
 // GK-DISTRIBUTION-NO-OMNISCIENCE
 // ---------------------------------------------------------------------------
 
+/** A keeper-release to team-b's attacker (player-6), target = committed pos. */
+function releaseObservations(targetPlayerId = "player-6", targetPos?: { x: number; y: number }): TelemetryObservation[] {
+  const target = TEAM_B.find((p) => p.id === targetPlayerId);
+  const pos = targetPos ?? (target ? { x: target.x, y: target.y } : { x: 30, y: 0 });
+  const obs1 = makeObs(1);
+  const release = {
+    id: `keeper-release-2-player-10-1`,
+    tick: 2,
+    sequence: 1,
+    kind: "keeper-release",
+    label: `keeper player-10 released to ${targetPlayerId}`,
+    payload: {
+      keeperPlayerId: "player-10",
+      teamId: "team-b",
+      releaseTargetPlayerId: targetPlayerId,
+      releaseTargetPosition: pos,
+      keeperPosition: { x: HALF - 0.2, y: -0.3 },
+    },
+  };
+  const obs2 = makeObs(2, {
+    events: [release],
+    withGkRole: false,
+  });
+  return [obs1, obs2];
+}
+
 describe("GK-DISTRIBUTION-NO-OMNISCIENCE oracle", () => {
   it("stays NOT_EVALUATED (no keeper-release event kind in the telemetry)", () => {
     const res = checkGkDistributionNoOmniscience(cleanObservations());
     expect(res[0].status).toBe("not_evaluated");
+  });
+
+  it("PASS on an observed teammate release", () => {
+    const res = checkGkDistributionNoOmniscience(releaseObservations("player-6"));
+    expect(res[0].status).toBe("pass");
+  });
+
+  it("FAIL when the release targets an opponent, not a teammate", () => {
+    const res = checkGkDistributionNoOmniscience(releaseObservations("player-1"));
+    expect(res[0].status).toBe("fail");
+  });
+
+  it("FAIL when the release target position is not the observed one (a hidden future)", () => {
+    const res = checkGkDistributionNoOmniscience(releaseObservations("player-6", { x: 60, y: 60 }));
+    expect(res[0].status).toBe("fail");
   });
 });

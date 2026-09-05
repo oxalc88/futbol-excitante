@@ -484,13 +484,14 @@ export function getKeeperPressExclusionActivations(): number {
   return _keeperPressExclusions;
 }
 
-/** Zero every keeper-path counter (call before a measured run). */
+/** Zero every keeper-path counter and release record (call before a measured run). */
 export function resetKeeperMechanismCounters(): void {
   _keeperHoldTicks = 0;
   _keeperSaveArms = 0;
   _keeperSavePresses = 0;
   _keeperReleasePresses = 0;
   _keeperPressExclusions = 0;
+  _keeperReleases = [];
 }
 
 /** Called by the team-decision layer whenever it excludes the keeper. */
@@ -516,4 +517,48 @@ export function noteKeeperSavePress(): void {
 /** Called by the CPU adapter when it presses a distribution release. */
 export function noteKeeperReleasePress(): void {
   _keeperReleasePresses++;
+}
+
+// ---------------------------------------------------------------------------
+// Release observability record (§8) — a keeper-release event source
+// ---------------------------------------------------------------------------
+
+/**
+ * One committed keeper-release action, recorded by the adapter at the moment it
+ * presses the distribution pass.  The target and positions are the observing
+ * keeper's OWN view at that tick (observed teammate/opponent positions only),
+ * so the protected distribution oracle can re-verify that no hidden future
+ * state was read.  This is the source the runner turns into a `keeper-release`
+ * telemetry event; it carries no core authority.
+ */
+export interface KeeperReleaseRecord {
+  /** Tick the release action was issued. */
+  tick: number;
+  teamId: string;
+  /** The designated keeper that released. */
+  keeperPlayerId: string;
+  /** The observed teammate the keeper released toward. */
+  releaseTargetPlayerId: string;
+  /** The target's observed position at the release tick. */
+  releaseTargetPosition: { x: number; y: number };
+  /** The keeper's own observed position at the release tick. */
+  keeperPosition: { x: number; y: number };
+}
+
+/** Release records appended since the last reset. */
+let _keeperReleases: KeeperReleaseRecord[] = [];
+
+/** Append one released-action record (called by the CPU adapter). */
+export function noteKeeperRelease(record: KeeperReleaseRecord): void {
+  _keeperReleases.push(record);
+}
+
+/** All release records accumulated since the last reset (ordered by issue). */
+export function getKeeperReleaseRecords(): readonly KeeperReleaseRecord[] {
+  return _keeperReleases;
+}
+
+/** Discard every accumulated release record. */
+export function resetKeeperReleaseRecords(): void {
+  _keeperReleases = [];
 }

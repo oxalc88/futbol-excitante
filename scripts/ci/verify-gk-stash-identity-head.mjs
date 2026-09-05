@@ -27,7 +27,10 @@ import { createHash } from "node:crypto";
 import { relative, resolve } from "node:path";
 
 const repoRoot = process.cwd();
-const OBJECTIVE_ID = "GK-5V5-ADAPTER-BEHAVIOR";
+// GK-DISTRIBUTION-BEHAVIOR extends the stash-identity check: every objective
+// whose evidence carries a gk_behavior:false control is verified below, so the
+// keeper switch stays byte-identical across the adapter and the new release path.
+const OBJECTIVE_IDS = ["GK-5V5-ADAPTER-BEHAVIOR", "GK-DISTRIBUTION-BEHAVIOR"];
 
 const refArg = process.argv.find((arg) => arg.startsWith("--ref="));
 const refFlagIndex = process.argv.indexOf("--ref");
@@ -39,12 +42,17 @@ if (!baseRef) {
   process.exit(2);
 }
 
-const artifactPath = resolve(repoRoot, "docs/evidence", OBJECTIVE_ID, "trajectory.json");
-const artifact = JSON.parse(readFileSync(artifactPath, "utf-8"));
-
-const stashedRuns = artifact.runs.filter((run) => run.gk_behavior === false);
+const stashedRuns = [];
+for (const objectiveId of OBJECTIVE_IDS) {
+  const artifactPath = resolve(repoRoot, "docs/evidence", objectiveId, "trajectory.json");
+  if (!existsSync(artifactPath)) continue;
+  const artifact = JSON.parse(readFileSync(artifactPath, "utf-8"));
+  for (const run of artifact.runs.filter((r) => r.gk_behavior === false)) {
+    stashedRuns.push({ objective_id: objectiveId, ...run });
+  }
+}
 if (stashedRuns.length === 0) {
-  console.error("no gk_behavior:false runs in the artifact — nothing to verify");
+  console.error("no gk_behavior:false runs in the artifacts — nothing to verify");
   process.exit(2);
 }
 
@@ -113,16 +121,23 @@ const baseResults = JSON.parse(stdout.trim().split("\n").filter(Boolean).pop() ?
 
 let failures = 0;
 for (const run of stashedRuns) {
-  const recordedChain = run.per_tick.map((row) => String(row[row.length - 1]));
-  const recordedHashOfHashes = createHash("sha256")
-    .update(JSON.stringify(recordedChain)).digest("hex");
   const base = baseResults.find((entry) => entry.id === run.id);
-  const chainOk = recordedHashOfHashes === run.determinism.state_hash_of_hashes;
+  // Cross-check the artifact's own per-tick chain only when it stores per_tick;
+  // a run without per_tick (e.g. GK-DISTRIBUTION-BEHAVIOR records hash-of-hashes
+  // directly) is verified by the base-tree reproduction (baseOk) alone.
+  let chainOk = true;
+  if (Array.isArray(run.per_tick) && run.per_tick.length > 0) {
+    const recordedChain = run.per_tick.map((row) => String(row[row.length - 1]));
+    const recordedHashOfHashes = createHash("sha256")
+      .update(JSON.stringify(recordedChain)).digest("hex");
+    chainOk = recordedHashOfHashes === run.determinism.state_hash_of_hashes;
+  }
   const baseOk = !!base && base.state_hash_of_hashes === run.determinism.state_hash_of_hashes;
   const tickOk = !!base && base.ticks === run.ticks;
   const ok = chainOk && baseOk && tickOk;
   if (!ok) failures++;
   console.log(JSON.stringify({
+    objective: run.objective_id,
     run: run.id,
     scenario: run.scenario_path,
     ticks: run.ticks,

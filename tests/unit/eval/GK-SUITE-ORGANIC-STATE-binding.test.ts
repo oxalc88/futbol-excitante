@@ -183,10 +183,11 @@ describe("GK-SUITE-ORGANIC-STATE goalkeepers-suite record", () => {
       // same runner + evaluator the record cites.  The record itself documents the
       // PRE-oracle state (authored when no keeper oracle was registered): every GK
       // behavior criterion was NOT_EVALUATED.  Since GK-KEEPER-ORACLE-REGISTRATION
-      // registered the protected keepers, the current evaluator now produces real
-      // verdicts over the same reproduction — POSITIONING-HOLD / NO-FIELD-CHASE /
-      // ROLE-DESIGNATION / SAVE-CLAIM are PASS on the driven fixture, and
-      // DISTRIBUTION stays NOT_EVALUATED (no keeper-release telemetry).
+      // registered the protected keepers, and GK-DISTRIBUTION-BEHAVIOR added the
+      // keeper-release telemetry, the current evaluator now produces real verdicts
+      // over the same reproduction — POSITIONING-HOLD / NO-FIELD-CHASE /
+      // ROLE-DESIGNATION / SAVE-CLAIM / DISTRIBUTION are PASS on the driven fixture
+      // (the keeper releases to an observed teammate after its claim).
       const scenario = loadScenario("eval/scenarios/5v5-keeper-shot-fixture.v1.json");
       const match = runHeadlessMatch({
         scenario,
@@ -217,7 +218,7 @@ describe("GK-SUITE-ORGANIC-STATE goalkeepers-suite record", () => {
       expect(gkBehavior["GK-NO-FIELD-CHASE"]).toBe("PASS");
       expect(gkBehavior["GK-ROLE-DESIGNATION"]).toBe("PASS");
       expect(gkBehavior["GK-SAVE-CLAIM"]).toBe("PASS");
-      expect(gkBehavior["GK-DISTRIBUTION-NO-OMNISCIENCE"]).toBe("NOT_EVALUATED");
+      expect(gkBehavior["GK-DISTRIBUTION-NO-OMNISCIENCE"]).toBe("PASS");
       expect(common["COMMON-FINITE"]).toBe("PASS");
       expect(common["COMMON-DETERMINISTIC"]).toBe("NOT_EVALUATED");
       expect(common["COMMON-REFERENCES"]).toBe("FAIL");

@@ -82,13 +82,14 @@ import {
   advanceKeeperReaction,
   KEEPER_REACTION_IDLE,
   noteKeeperHoldTick,
+  noteKeeperRelease,
   noteKeeperReleasePress,
   noteKeeperSaveArm,
   noteKeeperSavePress,
   resetKeeperMechanismCounters,
   ownGoalLineX,
 } from "./goalkeeper-role.js";
-import type { KeeperReactionState, KeeperShotInfo } from "./goalkeeper-role.js";
+import type { KeeperReactionState, KeeperShotInfo, KeeperReleaseRecord } from "./goalkeeper-role.js";
 export type {
   TeamDecision,
   DefensiveSubMode,
@@ -97,7 +98,7 @@ export type {
   CpuTackleEvaluation,
   TackleWithheldReason,
 } from "./team-decision-profile.js";
-export type { KeeperLayoutBody, KeeperShotInfo } from "./goalkeeper-role.js";
+export type { KeeperLayoutBody, KeeperShotInfo, KeeperReleaseRecord } from "./goalkeeper-role.js";
 export {
   computeTeamDecision,
   getBallZone,
@@ -131,6 +132,7 @@ export {
   getKeeperSavePressActivations,
   getKeeperReleasePressActivations,
   getKeeperPressExclusionActivations,
+  getKeeperReleaseRecords,
   resetKeeperMechanismCounters,
 } from "./goalkeeper-role.js";
 
@@ -2341,6 +2343,11 @@ function computeKeeperFrame(
   const inReach = self.distToBall <= GK_SMALL_SIDED_V1.save_claim_reach_radius.value;
   const secured = self.distToBall < POSSESSION_RANGE &&
     self.ballHSpeed < POSSESSION_SPEED_THRESHOLD;
+  // A release is a distribution pass toward a forward teammate the keeper
+  // legitimately observes (no hidden future state). The pass only *connects*
+  // when the ball happens to be inside the versioned reach at release time, but
+  // the release decision itself is about the keepers' observed target, so it is
+  // driven by `secured` (the ball under control within the keeper's reach orbit).
   const releaseTarget = secured && observation.teammates !== undefined
     ? getBestTeammateTarget(
       observation.teammates,
@@ -2358,12 +2365,44 @@ function computeKeeperFrame(
   if (aimedAtTeammate) {
     // Distribution (§8): the target comes from observed teammate and opponent
     // positions only — never a modelled future — and the release fires only down
-    // a lane this body is already facing, so holding the arc and releasing stay
-    // the same position.
+    // a lane this body is already facing. Command the movement along the release
+    // lane so the pass direction (derived from moveX/moveY) actually carries the
+    // ball to that teammate, capped at the in-arc repositioning scale so a keeper
+    // never leaves its goal arc to aim.
+    if (releaseTarget !== undefined) {
+      const aimMag = Math.sqrt(aimDx * aimDx + aimDy * aimDy);
+      if (aimMag > 1e-9) {
+        const releaseScale = isInsideGoalArc({ x: self.x, y: self.y }, arcCenter)
+          ? GK_SMALL_SIDED_V1.keeper_reposition_speed.value / FOUNDATION_LOCOMOTION_V1.maxSpeed.value
+          : 1;
+        moveX = (aimDx / aimMag) * releaseScale;
+        moveY = (aimDy / aimMag) * releaseScale;
+      }
+    }
     heldButtons |= PASS_BIT;
     if (!state.passWasPressed) {
       pressedButtons |= PASS_BIT;
       noteKeeperReleasePress();
+      // Record the release for the protected distribution oracle: the target is
+      // the keeper's OWN observed teammate at this tick, so the oracle can
+      // re-verify no hidden future state was read.
+      if (releaseTarget !== undefined && observation.teammates !== undefined) {
+        const targetPlayer = observation.teammates.find(
+          (tm) =>
+            Math.abs(tm.groundPosition.x - releaseTarget.x) < 1e-6 &&
+            Math.abs(tm.groundPosition.y - releaseTarget.y) < 1e-6,
+        );
+        if (targetPlayer !== undefined) {
+          noteKeeperRelease({
+            tick,
+            teamId,
+            keeperPlayerId: self.playerId,
+            releaseTargetPlayerId: targetPlayer.playerId,
+            releaseTargetPosition: { x: releaseTarget.x, y: releaseTarget.y },
+            keeperPosition: { x: self.x, y: self.y },
+          });
+        }
+      }
     }
     state.passWasPressed = true;
   } else {

@@ -521,9 +521,15 @@ function* iterateFrom(
 /**
  * Distribution release is a normal pass with no omniscience (spec §8).
  *
- * The committed telemetry carries no keeper-release observation event kind, so
- * the release contract is not observable yet.  The oracle returns
- * NOT_EVALUATED (honest) rather than inventing release semantics.
+ * Reads the runner-injected `keeper-release` observation events: each one
+ * records the designated keeper, the observed teammate it released toward, and
+ * that teammate's observed position.  The release is verified against the
+ * committed telemetry — the target must be a teammate of the keeper present at
+ * the release tick, and the recorded target position must coincide with that
+ * teammate's committed position (so it was an observed position, not a hidden
+ * future location).  A release whose target is not an observed teammate is an
+ * omniscient mutant and fails.  With no `keeper-release` events the criterion is
+ * NOT_EVALUATED (honest — nothing was released).
  */
 export function checkGkDistributionNoOmniscience(
   observations: TelemetryObservation[],
@@ -540,13 +546,117 @@ export function checkGkDistributionNoOmniscience(
     ];
   }
 
+  const teamOfPlayer: Record<string, string> = {};
+  for (const o of observations) {
+    for (const p of o.players) {
+      teamOfPlayer[p.playerId] = p.teamId;
+    }
+  }
+
+  interface ReleaseCheck {
+    keeperId: string;
+    teamId: string;
+    targetId: string;
+    tick: number;
+    targetPos: { x: number; y: number };
+  }
+  const releases: ReleaseCheck[] = [];
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "keeper-release") continue;
+      const payload = ev.payload as
+        | {
+            keeperPlayerId?: string;
+            teamId?: string;
+            releaseTargetPlayerId?: string;
+            releaseTargetPosition?: { x?: number; y?: number };
+          }
+        | undefined;
+      if (
+        typeof payload?.keeperPlayerId !== "string" ||
+        typeof payload.releaseTargetPlayerId !== "string" ||
+        payload.releaseTargetPosition?.x === undefined ||
+        payload.releaseTargetPosition.y === undefined
+      ) {
+        continue;
+      }
+      releases.push({
+        keeperId: payload.keeperPlayerId,
+        teamId: payload.teamId ?? teamOfPlayer[payload.keeperPlayerId] ?? "",
+        targetId: payload.releaseTargetPlayerId,
+        tick: o.tick,
+        targetPos: { x: payload.releaseTargetPosition.x, y: payload.releaseTargetPosition.y },
+      });
+    }
+  }
+
+  if (releases.length === 0) {
+    return [
+      {
+        id: "gk-distribution-not-evaluated",
+        status: "not_evaluated",
+        description:
+          `No keeper-release observation event in the committed telemetry (${observations.length} observations); the distribution contract is not observable`,
+        details: { keeperByTeam: match.keeperByTeam },
+      },
+    ];
+  }
+
+  const failures: string[] = [];
+  const clean: string[] = [];
+  for (const rel of releases) {
+    const obs = observations.find((o) => o.tick === rel.tick);
+    if (obs === undefined) {
+      failures.push(`release at tick ${rel.tick} has no committed observation`);
+      break;
+    }
+    const target = findPlayer(obs, rel.targetId);
+    const keeper = findPlayer(obs, rel.keeperId);
+    if (target === undefined || keeper === undefined) {
+      failures.push(
+        `release at tick ${rel.tick} target ${rel.targetId} or keeper ${rel.keeperId} is not a committed body`,
+      );
+      break;
+    }
+    if (target.teamId !== rel.teamId || target.teamId !== keeper.teamId) {
+      failures.push(
+        `release at tick ${rel.tick} targeted ${rel.targetId} (team ${target.teamId}), not a teammate of ${rel.keeperId}`,
+      );
+      break;
+    }
+    // The recorded target position must be the teammate's committed position at
+    // the release tick (an observed position), within a small motion tolerance
+    // for the tick the decision was read from.
+    const observedDist = planarDist(rel.targetPos, target.groundPosition);
+    if (observedDist > 1.5) {
+      failures.push(
+        `release at tick ${rel.tick} target ${rel.targetId} at an unobserved position (${observedDist.toFixed(2)}m from its committed position)`,
+      );
+      break;
+    }
+    clean.push(
+      `tick ${rel.tick}: keeper ${rel.keeperId} released to teammate ${rel.targetId} (observed, ${observedDist.toFixed(2)}m)`,
+    );
+  }
+
+  if (failures.length > 0) {
+    return [
+      {
+        id: "gk-distribution-omniscient",
+        status: "fail",
+        description: `GK distribution released to a non-observable target: ${failures.join("; ")}`,
+        details: { failures, releases },
+      },
+    ];
+  }
+
   return [
     {
-      id: "gk-distribution-not-evaluated",
-      status: "not_evaluated",
+      id: "gk-distribution-no-omniscience-held",
+      status: "pass",
       description:
-        `No keeper-release observation event kind in the committed telemetry (${observations.length} observations); the distribution contract is not observable yet`,
-      details: { keeperByTeam: match.keeperByTeam },
+        `Keeper release(s) targeted an observed teammate, never a hidden future position: ${clean.join("; ")}`,
+      details: { releases, count: clean.length },
     },
   ];
 }

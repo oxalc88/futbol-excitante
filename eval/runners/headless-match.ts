@@ -19,7 +19,7 @@ import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { deepClone } from "../../src/simulation/world/clone.js";
 import type { WorldState, MatchPhase as SimMatchPhase } from "../../src/contracts/state.js";
-import { createCpuAdapter, buildCpuObservation, type CpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
+import { createCpuAdapter, buildCpuObservation, getKeeperReleaseRecords, type CpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
 import { designateKeeperFromLayout } from "../../src/adapters/input-browser/goalkeeper-role.js";
 import { computeTeamDecision } from "../../src/adapters/input-browser/team-decision-profile.js";
 import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
@@ -607,6 +607,10 @@ export function runHeadlessMatch(
   let hadGoal = false;
   let currentPhase: MatchPhase = "kickoff";
   const phaseHistory: PhaseHistoryRecord[] = [{ tick: 0, phase: "kickoff" }];
+  // GK-DISTRIBUTION-BEHAVIOR: capture the release-record baseline before the
+  // loop so this run's keeper-release actions can be turned into committed
+  // telemetry below, without disturbing any records a prior run left behind.
+  const releaseRecordsStart = gkBehavior ? getKeeperReleaseRecords().length : 0;
 
   for (let i = 0; i < maxTicks; i++) {
     // Phase derivation for this tick.
@@ -824,6 +828,40 @@ export function runHeadlessMatch(
           keeperPlayerId: keeperRoles[teamId],
           keeperRoleFlag: true,
           pitchLength: scenario.pitchLength,
+        },
+      });
+    }
+  }
+
+  // GK-DISTRIBUTION-BEHAVIOR: turn the adapter's committed keeper-release
+  // actions into `keeper-release` telemetry events so the protected distribution
+  // oracle (checkGkDistributionNoOmniscience) has real observations. The keeper
+  // designation is an adapter-layer fact the simulation core does not and must
+  // not know, so (as with the `gk-role` designation) the release event is an
+  // observation-level annotation injected by the runner — never a core event —
+  // and is emitted only when `gkBehavior` is on (a gkBehavior:false run stays
+  // byte-identical). Only the release edges recorded during THIS run are used.
+  if (gkBehavior && keeperRoles !== undefined) {
+    const releases = getKeeperReleaseRecords().slice(releaseRecordsStart);
+    const obsByTick = new Map<number, (typeof observations)[number]>();
+    for (const o of observations) obsByTick.set(o.tick, o);
+    for (const release of releases) {
+      const o = obsByTick.get(release.tick);
+      if (o === undefined) continue;
+      let maxSeq = 0;
+      for (const ev of o.events) if (ev.sequence > maxSeq) maxSeq = ev.sequence;
+      o.events.push({
+        id: `keeper-release-${release.tick}-${release.keeperPlayerId}-${maxSeq + 1}`,
+        tick: release.tick,
+        sequence: maxSeq + 1,
+        kind: "keeper-release",
+        label: `keeper ${release.keeperPlayerId} released to ${release.releaseTargetPlayerId}`,
+        payload: {
+          keeperPlayerId: release.keeperPlayerId,
+          teamId: release.teamId,
+          releaseTargetPlayerId: release.releaseTargetPlayerId,
+          releaseTargetPosition: release.releaseTargetPosition,
+          keeperPosition: release.keeperPosition,
         },
       });
     }
