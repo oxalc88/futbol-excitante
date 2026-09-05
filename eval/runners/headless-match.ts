@@ -18,7 +18,7 @@
 import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { deepClone } from "../../src/simulation/world/clone.js";
-import type { WorldState } from "../../src/contracts/state.js";
+import type { WorldState, MatchPhase as SimMatchPhase } from "../../src/contracts/state.js";
 import { createCpuAdapter, buildCpuObservation, type CpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
 import { computeTeamDecision } from "../../src/adapters/input-browser/team-decision-profile.js";
 import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
@@ -134,6 +134,19 @@ export interface HeadlessMatchConfig {
    * accepted headless evidence run.
    */
   browserParityObservations?: boolean;
+  /**
+   * Lifecycle phase-sync policy (RESTART-ANTI-HUDDLE-COHERENCE).
+   * - "legacy" (default): the historical driver behavior, in which the runner
+   *   overwrote the core's match phase with its own derived label on every
+   *   tick. That froze the core's restart countdowns, so set pieces and the
+   *   post-goal/halftime reset never executed headless — a driver defect the
+   *   browser wiring never had. Every accepted headless artifact was produced
+   *   under it, so the default keeps those byte-for-byte bindings intact.
+   * - "core-owned": the corrected policy — the core owns every phase it opens
+   *   and its restart machinery executes exactly as it does in the browser.
+   *   Opt-in, the same way `browserParityObservations` is.
+   */
+  lifecyclePhaseSync?: "legacy" | "core-owned";
 }
 
 /**
@@ -192,6 +205,13 @@ export interface HeadlessMatchResult {
   matchPhase: MatchPhase;
   /** Phase history — ordered list of {tick, phase} marking transitions. */
   phaseHistory: PhaseHistoryRecord[];
+  /**
+   * Committed simulation-core match phase per tick (index-aligned with
+   * `observations`), as recorded by RESTART-ANTI-HUDDLE-COHERENCE so evidence
+   * can label the core's own restart windows. `null`-free: every tick carries
+   * the core's phase at sample time.
+   */
+  coreMatchPhases: SimMatchPhase[];
 }
 
 // ---------------------------------------------------------------------------
@@ -462,6 +482,7 @@ export function runHeadlessMatch(
     cpuDefensiveTackle = false,
     cpuAntiHuddle = true,
     browserParityObservations = false,
+    lifecyclePhaseSync = "legacy",
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
 
@@ -532,6 +553,10 @@ export function runHeadlessMatch(
   // 3. Run the match loop.
   const events: SimulationEvent[] = [];
   const stateHashes: string[] = [];
+  // Per-tick committed core match phase, index-aligned with the observations.
+  // This is the phase the core actually ran the window with (the same one the
+  // browser wiring hands its adapters), not the runner's derived phase label.
+  const coreMatchPhases: SimMatchPhase[] = [];
 
   // Phase tracking.
   let hadGoal = false;
@@ -565,9 +590,11 @@ export function runHeadlessMatch(
     }
 
     // Sync high-level match lifecycle phases to the simulation core.
-    // The simulation maps: first-half → playing, halftime → halftime,
-    // second-half → playing, fulltime → fulltime, kickoff → kickoff.
-    // Goal phase is handled internally by the simulation's countdown.
+    // RESTART-ANTI-HUDDLE-COHERENCE: before this change the runner rewrote the
+    // core's phase to its own derived label every tick, which killed the core's
+    // restart windows (set pieces and the post-goal/halftime reset never
+    // executed) — a headless driver defect the browser wiring never had (the
+    // browser does no phase sync). The policy now is in the block below.
     let syncedState: WorldState | null = null;
     {
       let simPhase: import("../../src/contracts/state.js").MatchPhase;
@@ -592,12 +619,39 @@ export function runHeadlessMatch(
       // resulting state — and every hash — is unchanged either way.
       const current = sim.snapshot();
       syncedState = current;
-      if (current.matchPhase !== simPhase) {
+      const syncToRunnerPhase = () => {
         const mutable = deepClone(current) as WorldState;
         mutable.matchPhase = simPhase;
         sim.restore(mutable);
         syncedState = sim.snapshot();
+      };
+      if (lifecyclePhaseSync === "legacy") {
+        // Historical driver behavior: the runner's derived label wins every
+        // tick, which kills the core's own restart windows. Left as the
+        // default so every accepted pinned replay stays byte-identical.
+        if (current.matchPhase !== simPhase) syncToRunnerPhase();
+      } else {
+        // "core-owned" (RESTART-ANTI-HUDDLE-COHERENCE): the core owns every
+        // phase it opens; its set-piece and post-goal/halftime machinery runs
+        // exactly as it does in the browser (which never syncs). The runner
+        // may only (a) seed the opening "kickoff" tick and release that seed,
+        // and (b) stamp the terminal "fulltime" tick — in both cases only
+        // from a live "playing" phase.
+        const forceable = simPhase === "kickoff" || simPhase === "fulltime";
+        const releaseKickoffSeed =
+          current.matchPhase === "kickoff" && simPhase === "playing";
+        if (
+          current.matchPhase !== simPhase &&
+          (forceable || releaseKickoffSeed) &&
+          (current.matchPhase === "playing" || releaseKickoffSeed)
+        ) {
+          syncToRunnerPhase();
+        }
       }
+      // Evidence records the phase the CPU slots were actually sampled with —
+      // equal to the core's own phase on every restart tick under the
+      // core-owned policy (browser parity).
+      coreMatchPhases.push(syncedState.matchPhase);
     }
 
     // a. Snapshot the world (deep clone — CPU adapters only read).
@@ -714,5 +768,6 @@ export function runHeadlessMatch(
     goalEvents,
     matchPhase: currentPhase,
     phaseHistory,
+    coreMatchPhases,
   };
 }

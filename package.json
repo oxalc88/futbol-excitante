@@ -20,6 +20,7 @@
     "test-all": "CI=1 pnpm install --frozen-lockfile && CI=1 pnpm run gauntlet:eval && CI=1 pnpm run typecheck && CI=1 pnpm run test && CI=1 pnpm run test-browser && CI=1 pnpm run sim-smoke && pnpm run build",
     "capture-ai-trajectory": "tsx scripts/capture-ai-match-trajectory.ts",
     "capture-5v5-anti-huddle-evidence": "tsx scripts/capture-5v5-kickoff-anti-huddle-evidence.ts",
+    "capture-restart-anti-huddle-evidence": "tsx scripts/capture-restart-anti-huddle-evidence.ts",
     "capture-cpu-tackle-evidence": "tsx scripts/capture-cpu-defensive-tackle-evidence.ts",
     "capture-cpu-tackle-frames": "WIP_SECTION=__EVIDENCE__:CPU-DEFENSIVE-TACKLE vitest run tests/browser/cpu-tackle-screenshot-capture.browser.test.ts --project browser",
     "capture-5v5-anti-huddle-frames": "WIP_SECTION=__EVIDENCE__:BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE vitest run tests/browser/anti-huddle-dynamic-evidence.browser.test.ts --project browser",

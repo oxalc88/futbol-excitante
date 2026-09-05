@@ -12,8 +12,11 @@
  *  - Post-shot cooldown: suppress FIRST_TOUCH after shooting.
  *  - Chase-ball: only the team's designated chaser converges on the ball;
  *    every other field body holds its fixed kickoff home (anti-huddle).
- *  - Kickoff freeze: non-chasing bodies hold home until the ball's
- *    authoritative touch reference shows it has been played.
+ *  - Restart freeze: non-chasing bodies hold their window anchor (the kickoff
+ *    home at kickoff and after a reset; the core's restart placement during a
+ *    set piece) until the restarted ball's authoritative touch reference shows
+ *    it has been played — throw-in, goal kick, corner and post-goal restarts
+ *    re-arm the same freeze the kickoff established.
  *  - FIRST_TOUCH: press when within ~1.5 m of a slow ball (defense).
  *  - Always sprint (sprint = 1).
  *  - sourceId is "cpu" — pure provenance, never affects gameplay.
@@ -41,7 +44,8 @@
  *  - PRESS_RADIUS, MARKING_DISTANCE, PRESS_STRENGTH
  *  - CPU defensive-tackle decision thresholds: FOUNDATION_CPU_TACKLE_V1
  *  - Anti-huddle hold tolerances (anti-huddle-v1):
- *    KICKOFF_FREEZE_HOME_TOLERANCE, CHASE_NEAREST_HOME_TOLERANCE
+ *    KICKOFF_FREEZE_HOME_TOLERANCE, CHASE_NEAREST_HOME_TOLERANCE,
+ *    RESTART_HOLD_MIN_TICKS
  */
 
 import type { InputFrame } from "../../contracts/input.js";
@@ -105,6 +109,13 @@ let _supportMechanismActivations = 0;
  */
 let _kickoffFreezeActivations = 0;
 let _nearestOnlyChaseActivations = 0;
+/**
+ * Restart freeze ticks (RESTART-ANTI-HUDDLE-COHERENCE): ticks inside an
+ * untouched window that is not the instance's opening kickoff window —
+ * throw-in, goal kick, corner and post-goal restarts. Stash the anti-huddle
+ * and this stays 0 while the restart itself still runs.
+ */
+let _restartFreezeActivations = 0;
 
 /**
  * Module-level counter incremented every time a CPU adapter actually presses a
@@ -148,6 +159,15 @@ export function getNearestOnlyChaseActivations(): number {
 }
 
 /**
+ * Ticks on which a CPU body was frozen inside a match-restart window —
+ * throw-in, goal kick, corner or post-goal restart (RESTART-ANTI-HUDDLE-COHERENCE
+ * reachability guard).
+ */
+export function getRestartFreezeActivations(): number {
+  return _restartFreezeActivations;
+}
+
+/**
  * Total number of defensive tackle presses actually issued by CPU adapters
  * (CPU-DEFENSIVE-TACKLE reachability guard).
  */
@@ -165,6 +185,7 @@ export function resetMechanismCounters(): void {
   _cpuTackleCommits = 0;
   _kickoffFreezeActivations = 0;
   _nearestOnlyChaseActivations = 0;
+  _restartFreezeActivations = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -619,6 +640,37 @@ interface CpuInternalState {
    * fixed point to hold (5V5-KICKOFF-ANTI-HUDDLE). null until first sample.
    */
   kickoffHome: { x: number; y: number } | null;
+  /**
+   * Touch-reference value observed the moment play resumed from a core restart
+   * hold whose reset does not clear the ball's reference (post-goal, halftime).
+   * While the ball still carries exactly this stale reference it is the
+   * untouched restart ball, so the freeze re-arms without any core change.
+   * null while no restart baseline is pending (RESTART-ANTI-HUDDLE-COHERENCE).
+   */
+  restartTouchBaseline: string | null;
+  /**
+   * Ground point this body is frozen at for the duration of the current
+   * untouched restart window, captured on the window's first sample. A kickoff
+   * window starts with the body already at its kickoff home, so the anchor then
+   * equals the accepted kickoff-home freeze value (5V5-KICKOFF-ANTI-HUDDLE
+   * unchanged); a set-piece window anchors the body where the core's restart
+   * placement left it. null while no window is open.
+   */
+  restartAnchor: { x: number; y: number } | null;
+  /** Number of untouched restart windows this instance has entered. */
+  untouchedWindowOrdinal: number;
+  /** True when this instance's very first sample already carried an untouched ball. */
+  firstWindowWasKickoff: boolean;
+  /** Consecutive observed non-live match phases (restart hold length). */
+  restartHoldTicks: number;
+  /**
+   * The ball's touch reference as observed on the previous sample. A restart
+   * baseline arms only when the reference carried through the whole hold
+   * unchanged — the signature of a reset that did not clear it (post-goal,
+   * halftime), as opposed to a set-piece serve whose reference is freshly
+   * written (or null) the tick the ball is placed.
+   */
+  lastSeenTouchRef: string | null | undefined;
   /** Consecutive ticks the team has had possession while this player
    * does NOT have the ball.  Used for cycling off-ball movement. */
   possessionDuration: number;
@@ -1370,6 +1422,17 @@ const KICKOFF_FREEZE_HOME_TOLERANCE = 0.75;
 const CHASE_NEAREST_HOME_TOLERANCE = 0.75;
 
 /**
+ * Consecutive observed hold ticks required before a resumption arms a restart
+ * freeze window (RESTART-ANTI-HUDDLE-COHERENCE). Every core restart window
+ * holds play for dozens of ticks before its reset/serve lands; a lifecycle
+ * wiring that stamps a non-playing phase for a single tick and immediately
+ * returns to "playing" without resetting anything is not a restart.
+ * Provisional placeholder — not a measured PES value. Exported so evidence
+ * drivers mirror the exact arming rule the adapters act on.
+ */
+export const RESTART_HOLD_MIN_TICKS = 2;
+
+/**
  * The press/cover pair of a team, computed the way the accepted cover mechanism
  * computes it: the presser is the nearest non-attacker to the ball, the cover is
  * the second-nearest non-attacker.
@@ -1462,10 +1525,19 @@ export interface ChaseRoleAssignment {
 export function assignChaseRoles(
   observation: CpuObservation,
   teamId: string,
+  /**
+   * Window-aware untouched signal (RESTART-ANTI-HUDDLE-COHERENCE). The
+   * production adapter passes the same flag its freeze acts on, so a restart
+   * whose ball carries a stale touch reference (post-goal/halftime reset) still
+   * designates one kick taker. Absent, the signal is derived from the
+   * reference itself — the accepted kickoff behaviour, byte-identical.
+   */
+  untouchedOverride?: boolean,
 ): ChaseRoleAssignment {
-  const ballTouched =
-    observation.ball.lastTouchRef !== undefined &&
-    observation.ball.lastTouchRef !== null;
+  const ballTouched = untouchedOverride !== undefined
+    ? !untouchedOverride
+    : observation.ball.lastTouchRef !== undefined &&
+      observation.ball.lastTouchRef !== null;
   const presser = designatePresser(observation, teamId);
   return {
     chaserPlayerId: presser.playerId,
@@ -2025,6 +2097,12 @@ export function createCpuAdapter(): CpuAdapter {
     isLoftedPass: false,
     formationDisplacementTicks: 0,
     kickoffHome: null,
+    restartTouchBaseline: null,
+    restartAnchor: null,
+    untouchedWindowOrdinal: 0,
+    firstWindowWasKickoff: false,
+    restartHoldTicks: 0,
+    lastSeenTouchRef: undefined,
     possessionDuration: 0,
     activePassTick: -1,
     activePasserPosition: { x: 0, y: 0 },
@@ -2094,7 +2172,37 @@ export function createCpuAdapter(): CpuAdapter {
       // so this entire block is skipped with zero overhead.
       if (observation.matchPhase != null) {
         applyFatigueAndPhase(state, observation, tick);
-        if (observation.matchPhase !== "playing" && observation.matchPhase !== "kickoff") {
+        // Restart resume (RESTART-ANTI-HUDDLE-COHERENCE): when play moves from
+        // a core restart hold back to a live phase, the ball may still carry
+        // the pre-restart touch reference — the post-goal and halftime resets
+        // reposition everything without clearing it. Record that value as the
+        // window baseline so "untouched since restart" stays an observable
+        // condition (the reference changes only when a body actually plays
+        // it). A real core window holds for dozens of ticks; the headless
+        // lifecycle wiring's single-tick phase stamps (which immediately
+        // return to "playing" without any reset happening) fall under the
+        // minimum and never arm a window.
+        const phaseNow = observation.matchPhase;
+        // The reference observed on the previous sample. A core reset leaves
+        // the pre-restart reference carried through the whole hold (nobody
+        // can touch a held ball), while a set-piece serve's reference is
+        // freshly written the tick the ball is placed — equal to the previous
+        // sample only for a real reset.
+        const previousTouchRef = state.lastSeenTouchRef;
+        state.lastSeenTouchRef = observation.ball.lastTouchRef ?? null;
+        if (phaseNow !== "playing" && phaseNow !== "kickoff") {
+          state.restartHoldTicks++;
+        } else {
+          if (
+            state.restartHoldTicks >= RESTART_HOLD_MIN_TICKS &&
+            observation.ball.lastTouchRef &&
+            observation.ball.lastTouchRef === previousTouchRef
+          ) {
+            state.restartTouchBaseline = observation.ball.lastTouchRef;
+          }
+          state.restartHoldTicks = 0;
+        }
+        if (phaseNow !== "playing" && phaseNow !== "kickoff") {
           return {
             tick,
             sourceId: "cpu",
@@ -2147,12 +2255,28 @@ export function createCpuAdapter(): CpuAdapter {
       // press/cover/support mechanisms perturb around.
       const cpuTeamId = observation.cpuTeamId;
       const myPlayerId = observation.controlledPlayerId ?? cpuPlayer.playerId;
+      const firstSample = state.kickoffHome === null;
       if (state.kickoffHome === null) {
         state.kickoffHome = { x: playerX, y: playerY };
       }
       const kickoffHome = state.kickoffHome;
+
+      // Untouched restart ball (RESTART-ANTI-HUDDLE-COHERENCE): the accepted
+      // signal is a null touch reference (kickoff and every set-piece serve);
+      // a core reset that repositions play WITHOUT clearing the reference
+      // (post-goal, halftime) leaves the stale value — still equal to the
+      // resume-time baseline captured above — as the observable untouched mark.
+      const touchRefNow = observation.ball.lastTouchRef;
+      const ballUntouched = touchRefNow === null ||
+        (state.restartTouchBaseline !== null && touchRefNow === state.restartTouchBaseline);
+      // Any different reference means the restart ball has been played: release
+      // the baseline, which closes the window for every body at once.
+      if (state.restartTouchBaseline !== null && touchRefNow !== state.restartTouchBaseline) {
+        state.restartTouchBaseline = null;
+      }
+
       const chaseRoles = antiHuddleActive && cpuTeamId !== undefined
-        ? assignChaseRoles(observation, cpuTeamId)
+        ? assignChaseRoles(observation, cpuTeamId, ballUntouched)
         : undefined;
       const isDesignatedChaser = chaseRoles !== undefined &&
         chaseRoles.chaserPlayerId !== undefined &&
@@ -2161,23 +2285,45 @@ export function createCpuAdapter(): CpuAdapter {
       // ball, so playing it adds no converging player and a restart can still be
       // taken without a scripted serve.
       const atBallRange = antiHuddleActive && distToBall <= touchPressRange;
-      const homeDx = kickoffHome.x - playerX;
-      const homeDy = kickoffHome.y - playerY;
+
+      // Window anchor: each untouched window freezes this body where it stood
+      // when the window opened. At kickoff (and after a post-goal/halftime
+      // reset, which repositions every body to its scenario start) that point
+      // IS the kickoff home, so the accepted 5V5-KICKOFF-ANTI-HUDDLE frames are
+      // unchanged; a set-piece window anchors the body at the core's restart
+      // placement instead of dragging it back across the pitch.
+      if (ballUntouched) {
+        if (state.restartAnchor === null) {
+          state.restartAnchor = { x: playerX, y: playerY };
+          state.untouchedWindowOrdinal++;
+          if (firstSample) state.firstWindowWasKickoff = true;
+        }
+      } else {
+        state.restartAnchor = null;
+      }
+      const freezeAnchor = state.restartAnchor ?? kickoffHome;
+      const homeDx = freezeAnchor.x - playerX;
+      const homeDy = freezeAnchor.y - playerY;
       const homeDist = Math.sqrt(homeDx * homeDx + homeDy * homeDy);
 
-      // Kickoff freeze: while the ball carries no touch reference only the kick
-      // taker — the single closest body in the match to it — may close the
-      // distance. Two opposing bodies meeting an untouched ball lock each other
-      // outside contact range and the match never opens, so the freeze holds
-      // every other body at its fixed home until that first touch lands.
-      const ballUntouched = observation.ball.lastTouchRef === null;
+      // Restart freeze (the kickoff freeze, extended to every restart): while
+      // the ball is an untouched restart ball only the kick taker — the single
+      // closest body in the match to it — may close the distance. Two opposing
+      // bodies meeting an untouched ball lock each other outside contact range
+      // and the match never opens, so the freeze holds every other body at its
+      // anchor until that first touch lands.
       const isKickoffTaker = ballUntouched && chaseRoles !== undefined &&
         chaseRoles.kickoffTakerId === myPlayerId;
       if (antiHuddleActive && !isKickoffTaker && !atBallRange && ballUntouched) {
-        // Hold the fixed home until the ball is first touched.
+        // Hold the anchor until the ball is first touched.
         state.ballWasInRange = false;
         state.hasPossession = false;
         _kickoffFreezeActivations++;
+        // A window that is not this instance's opening kickoff window is a
+        // match restart (RESTART-ANTI-HUDDLE-COHERENCE reachability guard).
+        if (!state.firstWindowWasKickoff || state.untouchedWindowOrdinal > 1) {
+          _restartFreezeActivations++;
+        }
         const frozen = homeDist > KICKOFF_FREEZE_HOME_TOLERANCE;
         return {
           tick,
@@ -3011,12 +3157,13 @@ export function createCpuAdapter(): CpuAdapter {
           ? 0
           : FIRST_TOUCH_BIT;
 
-        // Restart re-arm (5V5-KICKOFF-ANTI-HUDDLE): while the ball carries no
-        // touch reference at all it is still the untouched restart ball, so a
-        // body that is inside the radius the contact system honours keeps
-        // issuing the edge instead of spending its one entering press on a tick
-        // the core could not execute. Past the first touch this path never runs.
-        if (antiHuddleActive && ball.lastTouchRef === null &&
+        // Restart re-arm (5V5-KICKOFF-ANTI-HUDDLE, window-aware since
+        // RESTART-ANTI-HUDDLE-COHERENCE): while the ball is an untouched
+        // restart ball it is still the serve nobody has played, so a body that
+        // is inside the radius the contact system honours keeps issuing the
+        // edge instead of spending its one entering press on a tick the core
+        // could not execute. Past the first touch this path never runs.
+        if (antiHuddleActive && ballUntouched &&
             distToBall <= touchPressRange && !inCooldown) {
           pressedButtons |= FIRST_TOUCH_BIT;
         }
@@ -3116,6 +3263,12 @@ export function createCpuAdapter(): CpuAdapter {
       state.isLoftedPass = false;
       state.formationDisplacementTicks = 0;
       state.kickoffHome = null;
+      state.restartTouchBaseline = null;
+      state.restartAnchor = null;
+      state.untouchedWindowOrdinal = 0;
+      state.firstWindowWasKickoff = false;
+      state.restartHoldTicks = 0;
+      state.lastSeenTouchRef = undefined;
       state.possessionDuration = 0;
       state.activePassTick = -1;
       state.activePasserPosition = { x: 0, y: 0 };
