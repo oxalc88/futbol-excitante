@@ -1,26 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
-    "paths": {
-      "@pes/contracts": ["./src/contracts/index.ts"],
-      "@pes/simulation": ["./src/simulation/index.ts"],
-      "@pes/adapters/*": ["./src/adapters/*"],
-      "@pes/apps/*": ["./src/apps/*"],
-      "@pes/eval/*": ["./eval/*"]
-    }
+    "target": "ES2022", "module": "ESNext", "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"], "strict": true,
+    "noEmit": true, "skipLibCheck": true, "resolveJsonModule": true,
+    "allowImportingTsExtensions": true, "types": ["node"]
   },
-  "exclude": ["node_modules", "dist", "artifacts", "eval", "tests"]
+  "include": ["src", "tests", "scripts", "vite.config.ts"]
 }

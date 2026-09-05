@@ -1,2 +1,0 @@
-2026-08-22T11:45:57.745Z milestone:evaluate SMALL_SIDED_SHAPE --input docs/evidence/SMALL-SIDED-SHAPE-AFTER-1V1/input.json → exit 1 (NOT_EVALUATED)
-2026-08-22T11:46:23.915Z audit: SMALL-SIDED-SHAPE-AFTER-1V1 --class HEADLESS --tests-pass true → exit 0 (PASS)

@@ -1,0 +1,572 @@
+{
+  "version": "rebuild-evaluation-v1",
+  "runtime": "v24.19.0",
+  "configVersion": "vision-rebuild-config-v1",
+  "runs": [
+    {
+      "seed": 2017,
+      "ticks": 24062,
+      "phase": "fulltime",
+      "score": [
+        0,
+        3
+      ],
+      "stats": [
+        {
+          "shots": 3,
+          "onTarget": 3,
+          "passes": 39,
+          "completed": 19,
+          "saves": 3,
+          "tackles": 5,
+          "fouls": 2,
+          "possessionTicks": 7305,
+          "corners": 0,
+          "offsides": 0
+        },
+        {
+          "shots": 7,
+          "onTarget": 7,
+          "passes": 53,
+          "completed": 32,
+          "saves": 2,
+          "tackles": 2,
+          "fouls": 5,
+          "possessionTicks": 9276,
+          "corners": 1,
+          "offsides": 0
+        }
+      ],
+      "events": {
+        "ball-contact": 350,
+        "kickoff-executed": 5,
+        "bounce": 115,
+        "restart-awarded": 33,
+        "throw-in-executed": 19,
+        "action-start": 109,
+        "stumble": 7,
+        "foul": 7,
+        "free-kick-executed": 7,
+        "pass-completed": 51,
+        "first-touch": 90,
+        "dribble-touch": 148,
+        "pass": 58,
+        "body-contact": 45,
+        "action-missed": 26,
+        "shoot": 10,
+        "keeper-ball-contact": 8,
+        "save": 5,
+        "keeper-claim": 3,
+        "tackle-won": 7,
+        "interception": 22,
+        "goal": 3,
+        "body-deflection": 3,
+        "corner-executed": 1,
+        "halftime": 1,
+        "goal-kick-executed": 2,
+        "fulltime": 1
+      },
+      "stateHash": "b2edb6ca",
+      "wallMilliseconds": 938,
+      "ticksPerSecond": 25650,
+      "provisional": true
+    },
+    {
+      "seed": 37,
+      "ticks": 24216,
+      "phase": "fulltime",
+      "score": [
+        1,
+        1
+      ],
+      "stats": [
+        {
+          "shots": 4,
+          "onTarget": 4,
+          "passes": 43,
+          "completed": 19,
+          "saves": 4,
+          "tackles": 8,
+          "fouls": 4,
+          "possessionTicks": 7749,
+          "corners": 1,
+          "offsides": 0
+        },
+        {
+          "shots": 6,
+          "onTarget": 6,
+          "passes": 49,
+          "completed": 25,
+          "saves": 3,
+          "tackles": 8,
+          "fouls": 1,
+          "possessionTicks": 7651,
+          "corners": 2,
+          "offsides": 0
+        }
+      ],
+      "events": {
+        "ball-contact": 306,
+        "kickoff-executed": 4,
+        "bounce": 151,
+        "restart-awarded": 37,
+        "throw-in-executed": 21,
+        "action-start": 107,
+        "stumble": 5,
+        "foul": 5,
+        "free-kick-executed": 5,
+        "pass-completed": 44,
+        "first-touch": 76,
+        "dribble-touch": 108,
+        "pass": 53,
+        "body-contact": 34,
+        "interception": 24,
+        "tackle-won": 16,
+        "shoot": 10,
+        "goal": 2,
+        "keeper-ball-contact": 11,
+        "save": 7,
+        "action-missed": 26,
+        "corner-executed": 3,
+        "goal-kick-executed": 5,
+        "body-deflection": 4,
+        "halftime": 1,
+        "keeper-claim": 4,
+        "cross": 1,
+        "fulltime": 1
+      },
+      "stateHash": "43708df1",
+      "wallMilliseconds": 724,
+      "ticksPerSecond": 33453,
+      "provisional": true
+    },
+    {
+      "seed": 88,
+      "ticks": 24370,
+      "phase": "fulltime",
+      "score": [
+        1,
+        0
+      ],
+      "stats": [
+        {
+          "shots": 3,
+          "onTarget": 3,
+          "passes": 46,
+          "completed": 23,
+          "saves": 3,
+          "tackles": 6,
+          "fouls": 3,
+          "possessionTicks": 8181,
+          "corners": 1,
+          "offsides": 0
+        },
+        {
+          "shots": 3,
+          "onTarget": 3,
+          "passes": 47,
+          "completed": 21,
+          "saves": 2,
+          "tackles": 4,
+          "fouls": 5,
+          "possessionTicks": 7214,
+          "corners": 4,
+          "offsides": 0
+        }
+      ],
+      "events": {
+        "ball-contact": 308,
+        "kickoff-executed": 3,
+        "bounce": 139,
+        "restart-awarded": 41,
+        "throw-in-executed": 22,
+        "action-start": 104,
+        "stumble": 8,
+        "foul": 8,
+        "free-kick-executed": 8,
+        "pass-completed": 44,
+        "first-touch": 90,
+        "dribble-touch": 109,
+        "pass": 50,
+        "body-contact": 43,
+        "action-missed": 23,
+        "interception": 25,
+        "header": 1,
+        "keeper-ball-contact": 9,
+        "save": 5,
+        "corner-executed": 5,
+        "keeper-claim": 4,
+        "tackle-won": 10,
+        "goal-kick-executed": 4,
+        "shoot": 5,
+        "halftime": 1,
+        "goal": 1,
+        "cross": 1,
+        "fulltime": 1
+      },
+      "stateHash": "95591200",
+      "wallMilliseconds": 719,
+      "ticksPerSecond": 33908,
+      "provisional": true
+    }
+  ],
+  "gameplayCatalog": [
+    {
+      "test_id": "LOC-ACC-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "LOC-ACC-002",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "LOC-MAX-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "LOC-DEC-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "LOC-REV-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "LOC-T45-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "LOC-T90-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "LOC-ORI-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "LOC-BALL-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PHY-SHLD-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PHY-STR-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PHY-BC-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PHY-PC-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "BALL-IND-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "BALL-GND-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "BALL-GND-002",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "BALL-BNC-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "BALL-SPN-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "BALL-SPN-002",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TOUCH-SLOW-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TOUCH-FAST-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TOUCH-BACK-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TOUCH-90-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TOUCH-WF-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PASS-LOW-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PASS-ANG-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PASS-RUN-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PASS-THR-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PASS-LOFT-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "CROSS-HI-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "SHOT-PWR-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "SHOT-IND-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "SHOT-SWV-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "HEAD-FREE-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "HEAD-DUEL-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TACK-ST-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TACK-SL-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TACK-ANG-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "INT-PASS-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "INT-FAST-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "GK-REA-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "GK-WF-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "GK-LEG-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "GK-PARRY-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "GK-REC-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "GK-HIGH-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "OFF-RUN-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "OFF-SUP-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "DEF-SHAPE-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "DEF-SHIFT-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PRESS-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PRESS-GG-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "PRESS-REC-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TACT-COMP-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TACT-DLINE-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TACT-SUP-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TACT-TIKI-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TACT-MARK-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "AI-ADAPT-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "AI-ADAPT-002",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TRANS-AD-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TRANS-DA-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "CTRL-LAT-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "CTRL-ACT-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "CAM-FLW-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "CAM-PER-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TEMPO-001",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TEMPO-002",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    },
+    {
+      "test_id": "TEMPO-003",
+      "outcome": "NOT_EVALUATED",
+      "reason": "Original catalog registry/binding and independent oracle are not materialized in this rebuild."
+    }
+  ],
+  "reference": {
+    "outcome": "BLOCKED_MISSING_REFERENCE",
+    "reason": "Preserved research contains no measured PES target corpus."
+  },
+  "visual": {
+    "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+    "reason": "No completed device playtest or blinded perceptual rubric."
+  },
+  "milestone": {
+    "outcome": "NOT_EVALUATED",
+    "reason": "Headless prototype diagnostics do not grant an original-spec milestone PASS."
+  }
+}
