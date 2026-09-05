@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-05T06:08:11.831Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "DUELS-SUITE-ORGANIC-RERUN",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "8756cbe5ad88aebd59771e592abdd3318a2c8462",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v25 3/4: honest duels-suite refresh — the accepted duels evaluator suite (evaluateSuite(\"duels\", observations), eval/runners/foundation-evaluator.ts) re-run over ORGANIC small-sided observations via scripts/capture-duels-suite-organic-rerun.ts. TACK-ST-001-PHASE, TACK-SL-001-PHASE, PHY-SHLD-001-CONT all PASS organically; PHYSICAL_DUEL insufficient_context -> present across six organic runs (input-rejections 3/1/3/5/3/4; player-player contacts 181/339/371/294/234/96; sources: 5V5-KICKOFF-ANTI-HUDDLE 47bb0db, HUMAN-DEFENSIVE-DUEL-CONTROL dc40fd2, RESTART-ANTI-HUDDLE-COHERENCE 210b27c, BALL-SETTLED-REGIME-FIX 455f4ec — cross-manifest source_candidate binding asserted). Protected COMMON criteria unchanged: COMMON-REFERENCES / COMMON-BOUNDS remain FAIL (pre-existing, disclosed, not weakened or converted to passes); COMMON-DETERMINISTIC honestly NOT_EVALUATED. Evidence: docs/evidence/DUELS-SUITE-ORGANIC-RERUN/duels-suite-state.json record_sha256 af040ac5d05bbd3e6e52e204b7c3c35df6debdd70a006c5e55ae3d710415ef21 (independently recomputed byte-exact by reviewer); audit.json PASS 20/20 (16 PASS / 4 NOT_APPLICABLE), evidence_class HEADLESS. Binding test tests/unit/eval/DUELS-SUITE-ORGANIC-RERUN-binding.test.ts 8/8 (incl. cross-manifest source_candidate assertion added in the critic retry). Zero gameplay change: git diff src/ eval/scenarios/ specs/ eval/runners/ EMPTY (core byte-identical); binding test + typecheck independently re-executed by integration (exit 0). Critic (glm5.3-flash, independent of deepseek-v4-flash builder) ACCEPT after 1 RETRY: rev-1 provenance mislabel fixed — human-duel run cites HUMAN-DEFENSIVE-DUEL-CONTROL manifest pin dc40fd2, not d56ccad (BROWSER-DEFENSIVE-CONTROLS-LEGEND acceptance commit); rev 2 regenerated the record (record_sha256 9d8e55b6... -> af040ac5...), corrected RESULT.md, added the cross-manifest test (7->8). Integration ACCEPT (verdict + independent re-verification). Non-blocking cosmetics disclosed, left untouched post-review: two stale 'candidate d56ccad' comments in the producer script (lines 10/162) and stale '7 binding tests' wording in two RESULT.md bullets (actual 8, execution-verified). claims_not_made: no PROMOTION / PES fidelity / FOUNDATION_LAB_PASS / no gameplay change / no evaluator or oracle change / no missing-reference conversion."
+}
