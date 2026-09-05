@@ -9,10 +9,10 @@ horizon_id: "keeper-verdicts-and-common-fixes"
 created_from_commit: 7da25c0
 created_at: 2026-09-05
 reason: "Horizon v26 (COMPLETE 4/4, remote-durable at 7da25c0) delivered the small-sided goalkeeper arc: dedicated spec + versioned suite contracts, adapter-layer designated-keeper behavior (arc hold, never chaser, save/claim via InputFrames, ball independent, stash-identity proven), browser DYNAMIC_VISUAL evidence, and an honest suite state re-run. That re-run exposed the next two real gaps, which v27 closes: (a) the five GK behavior criteria are NOT_EVALUATED solely because no keeper oracle is registered — now that keeper behavior is implemented and accepted evidence exists, registering protected keeper oracles (the established oracle pattern) lets the goalkeepers suite produce real verdicts honestly; (b) COMMON-REFERENCES / COMMON-BOUNDS FAIL on full-match runs (prior-tick lastTouchRef resolution; ball-out-of-play safety-bounds) — the same pre-existing invariant defect disclosed three times (duels rerun, GK runs) — gets NODE-GATE-TRIAGE-style root-cause treatment. Also: keeper distribution behavior (the one GK role duty with no organic observations because core telemetry has no keeper-release event kind) via the established additive core-event-union precedent. Strictly small-sided; no regulation rules, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 0
+current_index: 1
 objectives:
   - id: GK-KEEPER-ORACLE-REGISTRATION
-    status: pending
+    status: accepted
     reason: "Register protected keeper oracles for the five GK behavior criteria (GK-POSITIONING-HOLD, GK-NO-FIELD-CHASE, GK-SAVE-CLAIM, GK-ROLE-DESIGNATION, GK-DISTRIBUTION-NO-OMNISCIENCE) following the established protected-oracle pattern (mirant-canary style; verdicts derived from observations per the accepted GK evidence shape), so evaluateSuite(\"goalkeepers\") produces real verdicts. Re-run the suite state honestly (driven save evidence labeled driven; no criterion upgraded beyond what the evaluator returns); mutant/canary guards so the oracles are falsifiable; binding tests. Evaluator change is this objective's purpose — behavior implementations stay untouched."
     builder: builder-structured
     prerequisite: ""
