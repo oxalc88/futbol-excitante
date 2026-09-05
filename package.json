@@ -36,7 +36,11 @@
     "gauntlet:video:reference": "tsx gauntlet/evals/src/write-video-reference.ts",
     "gauntlet:milestone:bundle": "tsx gauntlet/evals/src/build-milestone-bundle.ts",
     "gauntlet:milestone:evaluate": "tsx gauntlet/evals/src/evaluate-milestone-playtest.ts",
-    "gauntlet:candidate-scope": "node scripts/ci/verify-candidate-scope.mjs"
+    "gauntlet:candidate-scope": "node scripts/ci/verify-candidate-scope.mjs",
+    "memory:check": "tsx scripts/gauntlet-memory.ts check",
+    "memory:search": "tsx scripts/gauntlet-memory.ts search",
+    "gauntlet:context": "tsx scripts/gauntlet-context.ts",
+    "gauntlet:verify:batch": "tsx scripts/gauntlet-verify-batch.ts"
   },
   "dependencies": {
     "three": "^0.170.0"

@@ -40,3 +40,19 @@ run = "pnpm run test-browser"
 [tasks.test-all]
 description = "Frozen-install check, typecheck, architecture/node/browser tests, headless smoke, Vite production build"
 run = "pnpm run test-all"
+
+[tasks."memory:check"]
+description = "Validate bounded repository project memory"
+run = "pnpm run memory:check"
+
+[tasks."memory:search"]
+description = "Return at most five project-memory previews for supplied keywords"
+run = "pnpm run memory:search"
+
+[tasks."gauntlet:context"]
+description = "Create or validate a local objective context packet or builder checkpoint"
+run = "pnpm run gauntlet:context --"
+
+[tasks."gauntlet:verify:batch"]
+description = "Run deterministic verification and emit one bounded result"
+run = "pnpm run gauntlet:verify:batch"

@@ -9,6 +9,10 @@ argument-hint: optional focus, e.g. finish PLAYABLE-DUELS-SUITE only
 
 Resume from persisted `HANDOFF.md`/`CURRENT.md`/`HORIZON.md`; do not start over. Read `gauntlet/PROMPT.md`, `gauntlet/principles.md`, `gauntlet/VERSION.json`, `gauntlet/observability-contract.md`, and `gauntlet/regression-inbox-contract.md` before delegation.
 
+Read `gauntlet/runtime-efficiency-contract.md` and `gauntlet/memory-context-contract.md`. Resume the same persisted work from canonical state, the current objective, an objective context packet, a builder checkpoint when present, bounded selected memory, and persisted evidence/reviewer state. Do not require or include the previous transcript.
+
+After a child starts, let the runtime wait for one terminal event; progress UI updates do not call the parent model. Apply shared model admission/backoff, safe builder phase rotation, and verification batching without bypassing the critic, integration review, evidence, acceptance, or publication gates.
+
 Before any other status prose, print one compact startup line using the version read from `gauntlet/VERSION.json`:
 
 `Gauntlet <version> · orchestrator-deepseek · deepseek-v4-flash`

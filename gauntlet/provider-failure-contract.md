@@ -40,6 +40,10 @@ The exact sleep may vary inside the jitter window. Do not reset the objective, c
 
 After the retry budget is exhausted, mark the active work blocked/paused with provider-failure evidence and return control according to the normal stop semantics. Never spin indefinitely.
 
+For a model/provider bucket declared in `gauntlet/runtime-policy.json`, backoff is shared across every assigned role and queued wake source. A queued child completion, tool completion, parent wakeup, or safe user continuation cannot create a new logical inference budget. It waits behind the active incident. Retry count resets only after successful model recovery, not after a new host turn or queued event.
+
+The `nan/glm5.3-flash` bucket also applies rolling-60-second admission before submission. The adapter reserves its estimated prompt and delays when recent successful processed input plus reservations would cross the configured soft ceiling.
+
 ## State invariants
 
 A provider/harness failure must never by itself:

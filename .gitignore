@@ -17,4 +17,5 @@ blob-report/
 *.tsbuildinfo
 .DS_Store
 .worktrees/
+.delivery-local/
 tests/browser/__screenshots__/

@@ -112,11 +112,36 @@ Otherwise continue the loop.
 
 Authoritative specs: `specs/TECHNICAL_SPEC.md`, `specs/GAMEPLAY_EVALUATION_SPEC.md`, `specs/VISUAL_SPEC.md`.
 
+## Runtime efficiency and bounded continuation
+
+Read and follow `gauntlet/runtime-efficiency-contract.md`, `gauntlet/memory-context-contract.md`, and `gauntlet/runtime-policy.json`. These change scheduling and context transport only; the acceptance pipeline above remains mandatory.
+
+- After spawning a child, yield waiting to the host runtime. Progress/heartbeat UI updates do not wake this model. A child terminal event wakes the parent once; never generate repeatedly only to issue another wait.
+- Every `orchestrator-glm`, `critic`, and `integration-reviewer` request uses the shared `nan/glm5.3-flash` rolling admission bucket. Reserve the estimated prompt before submission. A GLM 429 creates shared model backoff that queued child/tool/parent/user wakeups cannot bypass or reset.
+- For a complex objective, use the bounded read-only context mapper to create an ignored objective context packet. Bypass it for an obvious task of at most three files. Never preload `memory/`; search for at most five previews and initially read at most three selected topics.
+- Treat memory and packets only as locators. Verify canonical references for implementation and review; neither can change requirements, evidence, verdicts, acceptance, horizon state, or repository authority.
+- Track every builder's context, cumulative successful processed input, generation count, peak, phase, exact model and session ID. At a safe persisted phase boundary after a soft budget is crossed, write a compact builder checkpoint and rotate materially different follow-up work to a fresh builder.
+- Seed a fresh builder with the objective contract, objective context packet, builder checkpoint, selected memory topics, canonical references and persisted evidence/reviewer state. Do not include the previous transcript.
+- Batch deterministic verification where safe and wake the builder once with command verdicts, actionable failure excerpts and artifact paths. Run every required check and preserve failure information.
+- Persist available operational usage under ignored `.delivery-local/` artifacts and incorporate it honestly in the next `TIMING.md` acceptance refresh. Processed input is not provider-billed input unless the provider exposes that field.
+
+Fresh-session continuation reconstructs the same work from:
+
+1. canonical Gauntlet state and current objective;
+2. objective context packet;
+3. builder checkpoint when present;
+4. bounded selected memory;
+5. persisted evidence and reviewer state.
+
+It never requires the prior parent or builder transcript. `/gauntlet`, `/gauntlet-continue`, and `/gcont` differ only in selected parent model and existing Grok quota handoff behavior.
+
 An empty implementation is a valid starting state. Begin at `BOOTSTRAP-01` only if the toolchain and `src/` do not exist. `gauntlet/objectives.md` and milestones guide planning; they are never a rigid backlog. If builders repeatedly fail, decompose, reroute to the other existing builder role only when its responsibility actually fits, or mark the objective blocked. Do not create ad-hoc model-named builder roles and do not implement as Grok.
 
 ## Context discipline
 
 Use persisted concise state instead of carrying or restating raw builder/critic transcripts when deciding routine next actions. Keep `HORIZON.md` concise: objective IDs, reasons, dependencies/order, current index/status, and invalidation reason only. Do not copy specs, research, diffs, command logs, or full review reports into it.
+
+Use `memory:search` only for bounded previews, then load no more than three relevant topics initially. A stale source digest makes a topic or packet review-required; it never updates knowledge automatically.
 
 Use `aux` when a long diff/log/artifact set must be condensed for orchestration. Child reports remain authoritative evidence; summarization must not weaken critic or integration independence.
 

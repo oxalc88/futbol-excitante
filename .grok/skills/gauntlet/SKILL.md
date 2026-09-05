@@ -11,6 +11,10 @@ Start or resume the PES Simulator Gauntlet Loop now. Do not implement gameplay y
 
 Read `gauntlet/PROMPT.md`, `gauntlet/principles.md`, `gauntlet/VERSION.json`, `gauntlet/observability-contract.md`, `gauntlet/regression-inbox-contract.md`, `gauntlet/state/HANDOFF.md`, `gauntlet/state/CURRENT.md`, and `gauntlet/state/HORIZON.md`. Follow the validated rolling horizon and existing model routing.
 
+Read `gauntlet/runtime-efficiency-contract.md` and `gauntlet/memory-context-contract.md`. Resume the same persisted work from canonical state, the current objective, an objective context packet, a builder checkpoint when present, bounded selected memory, and persisted evidence/reviewer state. Do not require or include the previous transcript.
+
+After a child starts, let the runtime wait for one terminal event; progress UI updates do not call the parent model. Apply shared model admission/backoff, safe builder phase rotation, and verification batching without bypassing the critic, integration review, evidence, acceptance, or publication gates.
+
 Before any other status prose, print one compact startup line using the version read from `gauntlet/VERSION.json`:
 
 `Gauntlet <version> · orchestrator · grok-4.6`

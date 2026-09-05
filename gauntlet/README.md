@@ -14,9 +14,9 @@ All Gauntlet agents, skills, routing, deterministic evals, and contracts live in
 
 `gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-Current candidate: **0.9.6** over 0.9.5.
+Current candidate: **0.9.7** over 0.9.6.
 
-0.9.6 does not change gameplay or model assignments. It makes the three orchestrator entry points equivalent for persisted-work continuation, fixes the GLM route, and synchronizes agent-role documentation with `gauntlet-models-v7`.
+0.9.7 does not change gameplay, model assignments, evidence, review, or acceptance authority. It adds event-driven child waiting contracts, shared GLM TPM admission/backoff, safe long-builder phase rotation, bounded project memory, objective context packets, builder checkpoints, verification batching, and measurable usage telemetry. See `gauntlet/runtime-efficiency-contract.md`, `gauntlet/memory-context-contract.md`, and `gauntlet/RELEASE-0.9.7.md`.
 
 `gauntlet/state/CURRENT.md` uses `gauntlet_version: gauntlet-loop-v1` as the persisted loop/state protocol identifier; it is not the Gauntlet system SemVer. The canonical release version remains `gauntlet/VERSION.json`.
 

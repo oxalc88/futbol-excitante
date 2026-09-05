@@ -8,6 +8,10 @@ Use real session/runtime data when available, such as Grok session metadata, sub
 
 If a metric is unavailable, write `n/a` and state why. Estimated values must be labeled as estimates. Processed prompt tokens are not provider-billed tokens unless the provider exposes that exact billing field.
 
+Gauntlet 0.9.7 runtime adapters persist available raw operational summaries under ignored `.delivery-local/` paths. On the next accepted-objective refresh, aggregate them by exact role, model and session without copying conversations or tool logs into `TIMING.md`.
+
+Where exposed, record input, output, cached input, generations, context peak, cumulative processed input, duration, retries, rate limits, compactions, phase boundaries and fresh-session rotations. GLM records rolling-60 input maximum, admission waits and backoff events. Builders record rotation context, old cumulative input, fresh starting context and checkpoint size. Mapping/memory records mapper input/output, topics retrieved, canonical files selected, packet size, initial builder context and measurable continuation re-reads. Missing provider fields remain `n/a`.
+
 ## Machine-readable refresh markers
 
 The YAML metadata block near the top of `TIMING.md` must include:

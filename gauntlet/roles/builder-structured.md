@@ -22,6 +22,12 @@ Use this role for toolchain, contracts, deterministic systems, input/replay, eva
 - Do not edit specs, research, Gauntlet role/agent contracts, or routing.
 - Do not commit/push or start the next objective.
 
+## Bounded continuation
+
+Use the objective context packet and selected memory only as navigation to canonical sources. For long work, report current context, cumulative successful input, generation count, peak, phase, model and session ID. At a safe persisted phase boundary requested by the controller, write the compact builder checkpoint described by `gauntlet/memory-context-contract.md`; never store the previous transcript or raw tool output.
+
+Use deterministic verification batching where safe. Preserve every required command, exit code, actionable failure and artifact path.
+
 ## Evidence
 
 Read `gauntlet/evidence-contract.md`. Report every required command with the exit code actually observed. Fix in-scope failures before reporting; otherwise report the failure honestly.

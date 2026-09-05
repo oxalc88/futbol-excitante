@@ -8,7 +8,9 @@
     "src/contracts/**/*.ts",
     "src/simulation/**/*.ts",
     "src/apps/**/*.ts",
-    "eval/**/*.ts"
+    "eval/**/*.ts",
+    "gauntlet/runtime/**/*.ts",
+    "scripts/gauntlet-*.ts"
   ],
   "exclude": [
     "node_modules",

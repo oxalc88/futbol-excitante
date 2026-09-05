@@ -1,10 +1,10 @@
 {
-  "version": "0.9.6",
+  "version": "0.9.7",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.9.5",
+  "previous_system_version": "0.9.6",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
-  "baseline_commit": "a13439ca235805a97a9c7955213058005fb9bbdc",
+  "baseline_commit": "6e1c294199a802ed084931c83c957b80351f9f3a",
   "includes": [
     "prompts",
     "agents",
@@ -35,6 +35,15 @@
     "model-capability-routing",
     "timing-aggregate-consistency",
     "routing-wrapper-consistency",
-    "equivalent-orchestrator-continuation"
+    "equivalent-orchestrator-continuation",
+    "event-driven-child-waiting",
+    "shared-glm-tpm-admission",
+    "global-model-backoff",
+    "bounded-project-memory",
+    "objective-context-packets",
+    "builder-checkpoints",
+    "builder-phase-rotation",
+    "verification-batching",
+    "usage-effectiveness-telemetry"
   ]
 }

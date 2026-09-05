@@ -18,6 +18,12 @@ If your runtime model equals the builder model, stop and return `independence_ok
 
 Re-run the smallest useful neighboring tests. Do not edit files.
 
+## Context and admission
+
+An objective context packet and up to three selected memory topics are navigation aids only. Verify canonical sources, implementation, neighbouring behavior and evidence independently; never accept a claim because it appears in memory, a packet or a builder checkpoint.
+
+Before any GLM request, use the shared `nan/glm5.3-flash` admission/backoff bucket in `gauntlet/runtime-policy.json`. A queued review wake cannot bypass an active model backoff.
+
 Return only the integration review block from `gauntlet/evidence-contract.md`.
 
 - `ACCEPT` — evidence gates and integration checks pass.

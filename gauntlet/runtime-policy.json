@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "event_driven_waiting": {
+    "enabled": true,
+    "model_wake_events": ["child_terminal", "user_message"],
+    "runtime_only_events": ["child_progress", "tool_progress", "status_heartbeat", "user_interrupt"],
+    "coalesce_terminal_events": true
+  },
+  "rate_limit_buckets": {
+    "nan/glm5.3-flash": {
+      "provider": "nan",
+      "model": "glm5.3-flash",
+      "roles": ["orchestrator-glm", "critic", "integration-reviewer"],
+      "rolling_window_ms": 60000,
+      "hard_limit_input_tokens": 800000,
+      "soft_limit_input_tokens": 675000,
+      "reservation_multiplier": 1.05,
+      "backoff_delays_ms": [2000, 5000, 10000, 20000, 40000],
+      "jitter_percent": 20,
+      "maximum_failures": 5
+    }
+  },
+  "builder_budgets": {
+    "qwen3.8-flash": {
+      "context_soft_limit_tokens": 180000,
+      "cumulative_input_soft_limit_tokens": 12000000,
+      "generation_soft_limit": 80
+    },
+    "deepseek-v4-flash": {
+      "context_soft_limit_tokens": 180000,
+      "cumulative_input_soft_limit_tokens": 12000000,
+      "generation_soft_limit": 80
+    }
+  },
+  "memory": {
+    "search_preview_limit": 5,
+    "initial_topic_limit": 3,
+    "summary_max_characters": 600,
+    "body_max_characters": 4000
+  },
+  "objective_context": {
+    "target_min_tokens": 1000,
+    "maximum_tokens": 1500,
+    "mapper_search_limit": 4,
+    "mapper_file_limit": 12,
+    "small_task_file_limit": 3
+  },
+  "builder_checkpoint": {
+    "maximum_tokens": 1000
+  },
+  "verification": {
+    "failure_excerpt_lines": 40
+  }
+}

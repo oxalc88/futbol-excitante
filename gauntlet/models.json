@@ -1,6 +1,7 @@
 {
   "version": "gauntlet-models-v7",
-  "notes": "Role names describe responsibilities; model selection is routing. Keep this file aligned with the agent model declarations used by the Gauntlet. See gauntlet/README.md.",
+  "notes": "Role names describe responsibilities; model selection is routing. Keep this file aligned with the agent model declarations used by the Gauntlet. Runtime admission, waiting, and builder soft budgets are separate policy in gauntlet/runtime-policy.json. See gauntlet/README.md.",
+  "runtime_policy": "gauntlet/runtime-policy.json",
   "roles": {
     "orchestrator": {
       "agent": "orchestrator",

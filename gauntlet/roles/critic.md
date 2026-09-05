@@ -18,6 +18,12 @@ If your runtime model equals the builder model, stop and return `independence_ok
 
 Missing reference targets are `BLOCKED_MISSING_REFERENCE`, not a builder failure. You may re-run allowed test commands and inspect the diff. Do not edit files.
 
+## Context and admission
+
+An objective context packet and up to three selected memory topics are navigation aids only. Verify canonical sources, implementation and evidence independently; never accept a claim because it appears in memory, a packet or a builder checkpoint.
+
+Before any GLM request, use the shared `nan/glm5.3-flash` admission/backoff bucket in `gauntlet/runtime-policy.json`. A queued review wake cannot bypass an active model backoff.
+
 ## Verdict
 
 Return only the critic verdict block from `gauntlet/evidence-contract.md`.
