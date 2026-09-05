@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-05T01:24:00Z
+measured_at: 2026-09-05T04:27:00Z
 tracking_contract_version: 1
-last_tracked_objective: RESTART-ANTI-HUDDLE-COHERENCE
-usage_aggregates_through: RESTART-ANTI-HUDDLE-COHERENCE
-clock_aggregates_through: RESTART-ANTI-HUDDLE-COHERENCE
-model_evaluation_through: RESTART-ANTI-HUDDLE-COHERENCE
+last_tracked_objective: HUMAN-VS-CPU-ARC-INTERACTION
+usage_aggregates_through: HUMAN-VS-CPU-ARC-INTERACTION
+clock_aggregates_through: HUMAN-VS-CPU-ARC-INTERACTION
+model_evaluation_through: HUMAN-VS-CPU-ARC-INTERACTION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -49,11 +49,11 @@ style meter is the live context window, not session cost.
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T01:24:00Z`.
-Recomputed 2026-09-05 at the RESTART-ANTI-HUDDLE-COHERENCE acceptance
-(Horizon v25 1/4): 170 accepted per-step rows summing to ~132h 03m (the new
-objective adds ~3h 33m: builder ~3h 33m / critic 3m / integration 3m / commits
-~3m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T04:27:00Z`.
+Recomputed 2026-09-05 at the HUMAN-VS-CPU-ARC-INTERACTION acceptance
+(Horizon v25 2/4): 171 accepted per-step rows summing to ~133h 44m (the new
+objective adds ~1h 39m: builder ~1h 6m / critic 6m / integration 5m / commits
+~4m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -253,6 +253,7 @@ invoices.
 | NODE-GATE-REGRESSION-TRIAGE | accepted | ~1h 40m | ~1h 1m | 8m | 4m | ~3m | n/a | n/a |
 | CAPTURE-HYGIENE-ENFORCEMENT | accepted | ~1h 45m | ~49m | 5m | 3m | ~3m | n/a | n/a |
 | RESTART-ANTI-HUDDLE-COHERENCE | accepted | ~3h 33m | ~3h 33m | 3m | 3m | ~3m | n/a | n/a |
+| HUMAN-VS-CPU-ARC-INTERACTION | accepted | ~1h 39m | ~1h 6m | 6m | 5m | ~4m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -561,6 +562,7 @@ on an H task is the interesting result.
 | NODE-GATE-REGRESSION-TRIAGE | deepseek-v4-flash | H | High — root-caused a REAL determinism defect (evaluate() inputProgram off-by-one dropping tick-0 inputs; caused compare-foundation ×2 + nondeterminism-canary ×2), fixed with an additive hash guard; timeout-only raise; stale eval artifact superseded with backup; stale binding counts updated with provenance; capture redirect to ephemeral path; node gate exits 0 (168/168 files) | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic reconciled shard partition 61+26+81=168 |
 | CAPTURE-HYGIENE-ENFORCEMENT | deepseek-v4-flash | M | Medium — 0.9.2+ capture hygiene enforced repo-wide: 11 mutating browser suites gated to the evidence-mode pattern (durable path = historical accepted path so reruns hit assertEvidenceMutable), guard test with byte-identity + immutability-block + source-gate assertions, byte-identity proven for every docs/screenshots-writing suite; no src/ change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic verified no assertion weakened |
 | RESTART-ANTI-HUDDLE-COHERENCE | qwen3.8-flash | H | High — anti-huddle contract extended to restarts (throw-in/goal-kick/corner/post-goal) in the adapter layer (restartTouchBaseline, restartAnchor freeze, window-aware untouched, getRestartFreezeActivations); headless lifecyclePhaseSync parity defect repaired behind opt-in core-owned policy (legacy default protects accepted pins); 26 new integration tests; accepted kickoff suite unchanged; two-pass byte-identical trajectory | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic verified per-window geometry from raw rows |
+| HUMAN-VS-CPU-ARC-INTERACTION | qwen3.8-flash | M | Medium - DYNAMIC_VISUAL browser capture of the human side of the anti-huddle arc (Tab switch chain, slide tackle duelWon, human pass 4.5 m; two-pass Chromium capture, 5 event-centered frames + sequence.json + 720-tick browser trajectory, byte-identical two-pass), capture-hygiene gating, discriminating negatives (idle human; cpuAntiHuddle:false), honest video NOT_PRODUCED; no src/ change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic reproduced identical frame ticks in an independent rerun |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -813,6 +815,8 @@ on an H task is the interesting result.
 | CAPTURE-HYGIENE-ENFORCEMENT | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; guard 3/3 re-run; 9/9 neighbors green with docs byte-identical (187-file SHA diff); typecheck 0; src/ empty; deltas output-root switches only |
 | RESTART-ANTI-HUDDLE-COHERENCE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; trajectory SHA verified; per-window geometry verified from raw rows (frozenCountAtServe=9, drift 0 m, single taker, windows close at first touch); stash controls discriminate; legacy-default framing judged transparent not weakening; accepted kickoff suite 17/17 unchanged (43/43 combined) |
 | RESTART-ANTI-HUDDLE-COHERENCE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 64/64 neighbors green (26 new + 17 accepted kickoff + 21 tackle pin); typecheck 0; src/simulation/ + src/contracts/ empty; legacy default confirmed in lifecyclePhaseSync; accepted pinned expectations unchanged |
+| HUMAN-VS-CPU-ARC-INTERACTION | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; independent ordinary-mode rerun reproduced the identical frame ticks 18/44/329/332/446; all 5 PNG SHA-256s verified; vision review of all frames (genuine rendered match, event-centered); guards verified discriminating (idle-human; cpuAntiHuddle:false); no weakening |
+| HUMAN-VS-CPU-ARC-INTERACTION | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 2 browser suites 4/4 green; typecheck 0; docs byte-identical after runs (ordinary capture -> test-results only); src/ eval/ specs/ gauntlet/ diff empty; trajectory SHA verified |
 
 ### Builder scoreboard
 

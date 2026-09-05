@@ -8,11 +8,31 @@ overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
 
-next_objective_id: HUMAN-VS-CPU-ARC-INTERACTION
+next_objective_id: DUELS-SUITE-ORGANIC-RERUN
 
 best_known:
   commit: 210b27c
-  note: "RESTART-ANTI-HUDDLE-COHERENCE accepted (Horizon v25 1/4) — anti-huddle contract extended to match restarts (throw-in, goal kick, corner, post-goal) in coherent 5v5 CPU-vs-CPU play, adapter/team-decision layer only (core+contracts byte-identical). Restart-window re-arm (post-goal/halftime resets re-key the untouched signal to the carried-through touch reference; RESTART_HOLD_MIN_TICKS=2, anti-huddle-v1), per-window restartAnchor freeze (set-piece bodies frozen at the core placement; kickoff byte-identical), window-aware untouched derivation + single-taker designation, getRestartFreezeActivations counter. HEADLESS-vs-browser parity defect repaired behind an opt-in lifecyclePhaseSync policy (DEFAULT legacy preserves every accepted pinned artifact byte-for-byte; core-owned runs MATCH-THROW-IN/GOAL-KICK/CORNER/SET-PIECE; migration disclosed as future work). Evidence trajectory.json SHA-256 a7b3ec47… (3 live 1800-tick runs covering corner/2 throw-ins/goal-kick/6 post-goal + 3 stashed controls; per-window frozenCountAtServe=9, drift 0 m, single taker; two-pass byte-identical). 26 new integration tests; accepted kickoff suite 17/17 UNCHANGED. Critic+integration ACCEPT first pass (glm5.3-flash independent of qwen3.8-flash). Audit PASS 20/20 MULTI_TICK."- CPU-MULTI-PLAYER
+  note: "RESTART-ANTI-HUDDLE-COHERENCE accepted (Horizon v25 1/4) — anti-huddle contract extended to match restarts (throw-in, goal kick, corner, post-goal) in coherent 5v5 CPU-vs-CPU play, adapter/team-decision layer only (core+contracts byte-identical). Restart-window re-arm (post-goal/halftime resets re-key the untouched signal to the carried-through touch reference; RESTART_HOLD_MIN_TICKS=2, anti-huddle-v1), per-window restartAnchor freeze (set-piece bodies frozen at the core placement; kickoff byte-identical), window-aware untouched derivation + single-taker designation, getRestartFreezeActivations counter. HEADLESS-vs-browser parity defect repaired behind an opt-in lifecyclePhaseSync policy (DEFAULT legacy preserves every accepted pinned artifact byte-for-byte; core-owned runs MATCH-THROW-IN/GOAL-KICK/CORNER/SET-PIECE; migration disclosed as future work). Evidence trajectory.json SHA-256 a7b3ec47… (3 live 1800-tick runs covering corner/2 throw-ins/goal-kick/6 post-goal + 3 stashed controls; per-window frozenCountAtServe=9, drift 0 m, single taker; two-pass byte-identical). 26 new integration tests; accepted kickoff suite 17/17 UNCHANGED. Critic+integration ACCEPT first pass (glm5.3-flash independent of qwen3.8-flash). Audit PASS 20/20 MULTI_TICK."
+
+accepted:
+  - BOOTSTRAP-01 through BOOTSTRAP-12
+  - FOUNDATION-REGISTRIES through FOUNDATION-PROMOTION
+  - CAPABILITY-DESIGN-PROFILE
+  - PLAYABLE-FIRST-TOUCH through PLAYABLE-MUTANT-1V1
+  - CAPABILITY-PHYSICAL-CONTACT through CAPABILITY-BODY-CONTROL
+  - LOCOMOTION-LATERAL-DRIFT
+  - CAPABILITY-SWERVE
+  - CPU-OPPONENT-1V1
+  - BALL-GOAL-COLLISION
+  - CPU-GOAL-AWARENESS
+  - HEADLESS-CPU-MATCH
+  - MATCH-SCORING
+  - BROWSER-SCOREBOARD
+  - MATCH-LIFECYCLE
+  - AI-GOAL-IMPROVEMENT
+  - MATCH-ORACLE
+  - MATCH-REPLAY-EXTENSION
+  - CPU-MULTI-PLAYER
   - SCENARIO-2V2-FIXTURE
   - CPU-BASIC-FORMATION
   - BROWSER-HUMAN-VS-CPU
@@ -134,22 +154,22 @@ best_known:
   - NODE-GATE-REGRESSION-TRIAGE
   - CAPTURE-HYGIENE-ENFORCEMENT
   - RESTART-ANTI-HUDDLE-COHERENCE
+  - HUMAN-VS-CPU-ARC-INTERACTION
   - RESTART-ANTI-HUDDLE-COHERENCE
   - RESTART-ANTI-HUDDLE-COHERENCE
 
 blocked: []
 
-selection_note: "Horizon v25 (restart-flow-human-arc-and-duels-rerun) ACTIVE 1/4 — created 2026-09-04 after horizon v24 exhaustion (6/6) and verified remote durability of the final acceptance commit 7d77fc0 (push 0f16ee8..7d77fc0). (1) RESTART-ANTI-HUDDLE-COHERENCE ACCEPTED (candidate 210b27c, acceptance pending commit): restarts follow the freeze-until-first-touch + nearest-only contract across corner/throw-in/goal-kick/post-goal (core-owned lifecyclePhaseSync for new evidence; legacy default protects accepted pins); critic+integration ACCEPT first pass. Remaining: (2) HUMAN-VS-CPU-ARC-INTERACTION — human interacts with the arc (Tab switch, tackle, pass) as browser DYNAMIC_VISUAL evidence (builder-gameplay); (3) DUELS-SUITE-ORGANIC-RERUN — honest duels-suite refresh against the now-organic PHYSICAL_DUEL (builder-structured); (4) VIDEO-CAPTURE-RESTORE-30S-CLIP — restore the missing capture-ai-video tool and produce the deferred 30 s organic clip or disclose the blocker (builder-structured). GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
+selection_note: "Horizon v25 (restart-flow-human-arc-and-duels-rerun) ACTIVE 2/4 - created 2026-09-04 after horizon v24 exhaustion (6/6) and verified remote durability of 7d77fc0. (1) RESTART-ANTI-HUDDLE-COHERENCE ACCEPTED (candidate 210b27c, acceptance 9ec8c98): restarts follow the freeze-until-first-touch + nearest-only contract across corner/throw-in/goal-kick/post-goal (core-owned lifecyclePhaseSync for new evidence; legacy default protects accepted pins); critic+integration ACCEPT first pass. (2) HUMAN-VS-CPU-ARC-INTERACTION ACCEPTED (candidate 6db29f2): human interacts with the arc (Tab switch chain, slide tackle duelWon, human pass 4.5 m) as browser DYNAMIC_VISUAL evidence (5 frames + sequence.json + 720-tick trajectory); critic+integration ACCEPT first pass. Remaining: (3) DUELS-SUITE-ORGANIC-RERUN - honest duels-suite refresh against the now-organic PHYSICAL_DUEL (builder-structured); (4) VIDEO-CAPTURE-RESTORE-30S-CLIP - restore the missing capture-ai-video tool and produce the deferred 30 s organic clip or disclose the blocker (builder-structured). GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred."
 ```
 ## Last accepted objective
-RESTART-ANTI-HUDDLE-COHERENCE — Horizon v25 1/4. Anti-huddle contract extended to match restarts (throw-in, goal kick, corner, post-goal) in coherent 5v5 CPU-vs-CPU play, adapter/team-decision layer only (core+contracts byte-identical). Restart-window re-arm (post-goal/halftime resets re-key the untouched signal to the carried-through touch reference; RESTART_HOLD_MIN_TICKS=2, anti-huddle-v1), per-window restartAnchor freeze (set-piece bodies frozen at the core placement; kickoff byte-identical), window-aware untouched derivation + single-taker designation, getRestartFreezeActivations counter. HEADLESS-vs-browser parity defect repaired behind an opt-in lifecyclePhaseSync policy: the runner legacy phase-sync silently killed the core restart windows headless while the browser always ran them; DEFAULT legacy preserves every accepted pinned artifact byte-for-byte; core-owned (used by all new evidence) lets MATCH-THROW-IN/GOAL-KICK/CORNER/SET-PIECE run; migration disclosed as future work. Evidence trajectory.json SHA-256 a7b3ec47991849c9670e3e97e7dc183c843886eb68dba89ae3f89e8e3571e2fe (3 live 1800-tick runs covering corner/2 throw-ins/goal-kick/6 post-goal + 3 stashed controls; per-window frozenCountAtServe=9, drift 0 m, single taker; two-pass byte-identical). 26 new integration tests; accepted kickoff suite 17/17 UNCHANGED; CPU-DEFENSIVE-TACKLE pins reproduced. Critic ACCEPT first pass (per-window geometry verified from raw rows); integration ACCEPT first pass (64/64 neighbors, typecheck 0). Audit PASS 20/20 MULTI_TICK.
+HUMAN-VS-CPU-ARC-INTERACTION - Horizon v25 2/4. Human side of the accepted anti-huddle arc as browser DYNAMIC_VISUAL evidence in the real 5v5 human-vs-CPU match (live Chromium, createTestBridge, real Three renderer via bridge.capture(), two-pass capture: pass 1 locates event ticks from the run's own log, pass 2 replays and renders). 5 event-centered semantic frames + sequence.json: arc-open@18 (kickoff release after freeze), tab-switch@44 (slot-switch chain player-1->2->3->4->5->1 from Tab presses 43/49/55/61/67, marker follows), tackle-commit@329 (I slide tackle input 328 on CPU carrier player-10), tackle-result@332 (duelWon + tackle-ball-contact), human-pass@446 (J pass input 445, ball displaced 4.5 m by tick 506 - possible only after BALL-SETTLED-REGIME-FIX). Human inputs enter ONLY as tick-indexed InputFrames via sim.applyInputs (no state writes). Browser trajectory.json 720 ticks, SHA-256 8efdca1a7d28fbc4eadddc455ccad5601fb6821189dba00f9ad56f7c171a01b7 (per-tick committed hashes, human input rows byte-bound to ticks, per-team chaser/cover designation, replay_identical true, ball_travel 25.62 m; two-pass byte-identical). Discriminating negatives: idling human -> arc locate null, 0 presses, 0 slot-switches, 0 player-1 tackle/pass events while the CPU arc still opens; cpuAntiHuddle:false -> ball never touched, counters 0. Capture hygiene: durable writes gated on WIP_SECTION=__EVIDENCE__:HUMAN-VS-CPU-ARC-INTERACTION; ordinary runs write only ignored test-results; docs/screenshots byte-identical on ordinary runs. Video honestly NOT_PRODUCED (repository video tooling absent). Critic ACCEPT first pass (independent ordinary-mode rerun reproduced the identical frame ticks 18/44/329/332/446; all 5 PNG SHA-256s verified against on-disk bytes; vision review of all frames); integration ACCEPT first pass (typecheck 0; docs byte-identical after runs). Audit PASS 20/20 DYNAMIC_VISUAL. No gameplay change (git diff src/ eval/ specs/ gauntlet/ empty). Known gaps disclosed: standing tackle whiffed organically at reach 1.6 m (slide tackle used - objective allows standing-or-sliding); 24 core-native slot-wiring diagnostics during the Tab cycle (accepted main.ts behaviour, presses taken after control returns to player-1); video NOT_PRODUCED. Horizon v25 2/4.
 
 - builder: builder-gameplay / qwen3.8-flash
-- critic: critic / glm5.3-flash — ACCEPT (first pass)
-- integration: integration-reviewer / glm5.3-flash — ACCEPT (first pass)
-- Evidence: durable acceptance manifest + record (2026-09-05T01:24:55Z); deterministic audit PASS 20/20
-- Candidate: 210b27c
-
+- critic: critic / glm5.3-flash - ACCEPT (first pass)
+- integration: integration-reviewer / glm5.3-flash - ACCEPT (first pass)
+- Evidence: durable acceptance manifest + record (2026-09-05T04:27:25Z); deterministic audit PASS 20/20
+- Candidate: 6db29f2
 
 Previously accepted:
 SMALL-SIDED-ORGANIC-PASS-FLOW-CLOSURE — Horizon v24 4/6 (BOOKKEEPING, evidence-bundle only; git diff src/ eval/scenarios/ specs/ eval/runners/ EMPTY). Scanner + SMALL_SIDED_SHAPE milestone reducer re-run over the new coherent matches; coherent_match_sources updated honestly (6 sources with per-source browserParityObservations disclosure): the anti-huddle 1800-tick flowing run scans 8/0/0 — ALL eight situations present organically including PHYSICAL_DUEL via 3 genuine input-rejection indicative events (120.012 m travel); the post-fix kickoff run scans 5/1/2 (first touch tick 18, 20.772 m travel); the two existing cpuTackle sources re-scanned under the HISTORICAL runCpuTackleMatch config reproduce 1062/262 events byte-identically at the post-fix HEAD — honestly unchanged by the ball fix. CRITIC RETRY resolved: rev-1 had falsely attributed the browser-parity scan deltas to the ball fix; the critic's 2×2 isolation (pre/post-fix × bp=false/true) proved the deltas come from the observation-shape switch; rev-1 was removed before commit, the false narrative replaced with measured facts, and the binding test (9 tests) now rejects the false attribution. Milestone PASS preserved via BATCH-5 8/8 decisive (reducer overallVerdict PASS from real evaluators; MUTANT_TEAM_PASS + TEAM_SHAPE_SUITE_PASS exit prereqs pass); bundle superseded to 19 sources / 19 runs, prior bundle preserved byte-identically (sha256 b14efa2c…). Critic ACCEPT after RETRY (independent byte-exact re-runs); integration ACCEPT first pass (evaluator integrity PASS; rev-1 never committed — RETRY correction, not accepted-history rewrite). Audit PASS 20/20 BOOKKEEPING. Known gap disclosed: SMALL-SIDED-COHERENT-EVIDENCE-RERUN-binding stale 18/17 vs live 19/19 pre-existing, owned by NODE-GATE-REGRESSION-TRIAGE (now repaired). Horizon v24 4/6.
