@@ -3,36 +3,36 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 26
-status: EXHAUSTED
-horizon_id: "goalkeeper-arc-small-sided"
-created_from_commit: 5829156
+horizon_version: 27
+status: ACTIVE
+horizon_id: "keeper-verdicts-and-common-fixes"
+created_from_commit: 7da25c0
 created_at: 2026-09-05
-reason: "Horizon v25 (COMPLETE 4/4, remote-durable at 5829156) finished the restart/human-arc/duels/video arc: restarts follow the accepted freeze+nearest-only contract, the human visibly interacts with the anti-huddle arc (DYNAMIC_VISUAL), the duels suite honestly reflects organic PHYSICAL_DUEL (TACK/PHY criteria organic PASS, protected COMMON FAILs disclosed), and the repository video path is restored with a real ~36 s organic clip as diagnostic evidence. The objective catalog gates the next product arc behind dedicated specs: REGULATION needs a goalkeeper spec first, and AGENTS.md defers goalkeepers until their dedicated specs and suites exist. v26 therefore opens the small-sided goalkeeper arc strictly inside the established bounds: (a) write the dedicated goalkeeper spec + versioned evaluator suite contracts (no implementation, no PES envelopes, missing references stay BLOCKED_MISSING_REFERENCE); (b) implement designated-keeper behavior in the 5v5 small-sided match at the adapter/team-decision layer (hold-goal-position, no field chase, basic save/claim reaction) with MULTI_TICK evidence and a discriminating stashed control; (c) browser DYNAMIC_VISUAL evidence of GK positioning + a save/claim event; (d) honest organic GK-suite state re-run. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity work beyond these remains deferred."
-current_index: 4
+reason: "Horizon v26 (COMPLETE 4/4, remote-durable at 7da25c0) delivered the small-sided goalkeeper arc: dedicated spec + versioned suite contracts, adapter-layer designated-keeper behavior (arc hold, never chaser, save/claim via InputFrames, ball independent, stash-identity proven), browser DYNAMIC_VISUAL evidence, and an honest suite state re-run. That re-run exposed the next two real gaps, which v27 closes: (a) the five GK behavior criteria are NOT_EVALUATED solely because no keeper oracle is registered — now that keeper behavior is implemented and accepted evidence exists, registering protected keeper oracles (the established oracle pattern) lets the goalkeepers suite produce real verdicts honestly; (b) COMMON-REFERENCES / COMMON-BOUNDS FAIL on full-match runs (prior-tick lastTouchRef resolution; ball-out-of-play safety-bounds) — the same pre-existing invariant defect disclosed three times (duels rerun, GK runs) — gets NODE-GATE-TRIAGE-style root-cause treatment. Also: keeper distribution behavior (the one GK role duty with no organic observations because core telemetry has no keeper-release event kind) via the established additive core-event-union precedent. Strictly small-sided; no regulation rules, no full-match ecology, no PES envelopes; blocked references stay blocked."
+current_index: 0
 objectives:
-  - id: GK-SPEC-SUITE-CONTRACTS
-    status: accepted
-    reason: "Write the dedicated goalkeeper spec (specs/GAMEKEEPER-SPEC.md or the established specs naming) plus its versioned evaluator suite contracts: registry entries, situation mappings (e.g. GK_POSITIONING, GK_SAVE_CLAIM), criteria bindings, and provisional versioned config for unmeasured values (never hard-coded PES constants). Spec + contracts only — NO behavior implementation. Missing reference targets stay BLOCKED_MISSING_REFERENCE (disclosed, never invented). All invariants executable; binding tests prove the registry wires up."
+  - id: GK-KEEPER-ORACLE-REGISTRATION
+    status: pending
+    reason: "Register protected keeper oracles for the five GK behavior criteria (GK-POSITIONING-HOLD, GK-NO-FIELD-CHASE, GK-SAVE-CLAIM, GK-ROLE-DESIGNATION, GK-DISTRIBUTION-NO-OMNISCIENCE) following the established protected-oracle pattern (mirant-canary style; verdicts derived from observations per the accepted GK evidence shape), so evaluateSuite(\"goalkeepers\") produces real verdicts. Re-run the suite state honestly (driven save evidence labeled driven; no criterion upgraded beyond what the evaluator returns); mutant/canary guards so the oracles are falsifiable; binding tests. Evaluator change is this objective's purpose — behavior implementations stay untouched."
     builder: builder-structured
     prerequisite: ""
-  - id: GK-5V5-ADAPTER-BEHAVIOR
-    status: accepted
-    reason: "Designated-keeper behavior in the 5v5 small-sided CPU-vs-CPU match at the adapter/team-decision layer only (core byte-identical): a keeper-designated body per team holds its goal position (bounded lateral drift), never joins the field chase (anti-huddle contract inherited), and performs a basic save/claim reaction on shots on target. Evidence class MULTI_TICK: coherent run(s) with per-tick keeper geometry + discriminating stashed control; provisional parameters labeled; no GK full-match/PES envelopes."
+  - id: GK-DISTRIBUTION-BEHAVIOR
+    status: pending
+    reason: "Keeper distribution behavior at the adapter/team-decision layer: after a claimed ball the keeper releases to a teammate within the accepted distribution semantics (no omniscience), and core telemetry gains the minimal ADDITIVE keeper-release event kind (the established CORE-EVENT-TYPE-UNION-FIX precedent: additive union extension + discriminating guards, zero behavior change to existing paths). MULTI_TICK evidence with stashed control; behavior values from gk-small-sided-v1 or newly versioned provisional entries."
     builder: builder-gameplay
-    prerequisite: GK-SPEC-SUITE-CONTRACTS
-  - id: GK-BROWSER-DYNAMIC-EVIDENCE
-    status: accepted
-    reason: "Browser-facing completion of the GK arc: in the real 5v5 match the keeper visibly holds its arc and executes at least one save/claim event, captured from the running browser app as DYNAMIC_VISUAL evidence (event-centered frames + sequence.json + browser trajectory with the GK events byte-bound to ticks, matching the accepted pattern). No new rubric; no gameplay change beyond the accepted GK behavior."
-    builder: builder-gameplay
-    prerequisite: GK-5V5-ADAPTER-BEHAVIOR
-  - id: GK-SUITE-ORGANIC-STATE
-    status: accepted
-    reason: "Honest GK-suite state: re-run the GK evaluator suite over the organic 5v5 runs that now include keepers; update the suite state honestly (before/after table; criteria without organic observations stay honestly not_observed; missing references stay BLOCKED_MISSING_REFERENCE and disclosed). BOOKKEEPING-leaning; zero gameplay change expected (git diff src/ eval/scenarios/ specs/ eval/runners/ EMPTY)."
+    prerequisite: ""
+  - id: COMMON-FULL-MATCH-INVARIANT-TRIAGE
+    status: pending
+    reason: "NODE-GATE-TRIAGE-style root-cause treatment of the COMMON-REFERENCES / COMMON-BOUNDS FAILs on full-match observations (disclosed three times: duels rerun + both GK suite runs): (a) COMMON-REFERENCES prior-tick lastTouchRef resolution on full-match observation mapping; (b) COMMON-BOUNDS ball-out-of-play safety-bounds behavior. Root cause first; fix in the invariant/observation layer with discriminating guards; accepted artifacts byte-untouched; the full-match COMMON criteria should turn honestly green (or the residual disclosed) without weakening any oracle."
     builder: builder-structured
-    prerequisite: GK-5V5-ADAPTER-BEHAVIOR
-observable_progress_target: "A dedicated goalkeeper spec with executable, versioned suite contracts; designated keepers in the 5v5 small-sided match that hold their goal arc, never join the field chase, and execute a basic save/claim; browser DYNAMIC_VISUAL evidence of GK behavior; an honest organic GK-suite state table. NO GK beyond small-sided, no regulation rules, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
-last_invalidation_reason: "Horizon v25 COMPLETE 4/4: RESTART-ANTI-HUDDLE-COHERENCE (restarts follow the freeze+nearest-only contract; lifecyclePhaseSync parity defect repaired behind opt-in policy), HUMAN-VS-CPU-ARC-INTERACTION (human Tab/tackle/pass arc as DYNAMIC_VISUAL), DUELS-SUITE-ORGANIC-RERUN (duels suite honest over organic PHYSICAL_DUEL; protected COMMON FAILs disclosed), VIDEO-CAPTURE-RESTORE-30S-CLIP (capture-ai-video tool restored, real ~36 s organic clip). Remote-durable at 5829156; strategic reassessment produced Horizon v26 (goalkeeper-arc-small-sided). GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity remain deferred beyond the bounded GK-arc objectives."
+    prerequisite: ""
+  - id: GK-SUITE-VERDICTS-STATE
+    status: pending
+    reason: "Post-oracle honest suite state: re-run the goalkeepers suite with registered oracles + the distribution behavior and publish the honest verdict table (expected: POSITIONING-HOLD / NO-FIELD-CHASE / ROLE-DESIGNATION measurable from accepted evidence; SAVE-CLAIM driven-labeled; DISTRIBUTION from the new behavior's organic runs). BOOKKEEPING; zero gameplay change."
+    builder: builder-structured
+    prerequisite: GK-KEEPER-ORACLE-REGISTRATION
+observable_progress_target: "The goalkeepers suite produces real verdicts through registered protected oracles (falsifiable, canary-guarded); keeper distribution behavior exists organically with the additive keeper-release telemetry event; the full-match COMMON-REFERENCES / COMMON-BOUNDS invariant FAILs are root-caused and fixed (or honestly residual-disclosed); a post-oracle honest suite verdict table. NO GK beyond small-sided, no regulation rules, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
+last_invalidation_reason: "Horizon v26 COMPLETE 4/4: GK-SPEC-SUITE-CONTRACTS (dedicated spec + versioned suite contracts), GK-5V5-ADAPTER-BEHAVIOR (designated-keeper arc hold/save at the adapter layer, stash-identity proven; qwen3.8-flash quota reroute to deepseek-v4-flash disclosed), GK-BROWSER-DYNAMIC-EVIDENCE (browser gkBehavior + 4 event-centered frames; critic independently reproduced the run), GK-SUITE-ORGANIC-STATE (honest suite re-run: GK criteria NOT_EVALUATED for lack of keeper oracles — the gap v27 objective 1 closes; COMMON-REFERENCES/BOUNDS FAILs root-caused for v27 objective 3). Remote-durable at 7da25c0; strategic reassessment produced Horizon v27 (keeper-verdicts-and-common-fixes). GK beyond small-sided, regulation rules, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -44,6 +44,8 @@ replan_if:
 ```
 
 ## Completed horizons
+
+Horizon v26 (goalkeeper-arc-small-sided) — COMPLETE 4/4: GK-SPEC-SUITE-CONTRACTS accepted (dedicated small-sided goalkeeper spec with versioned provisional config gk-small-sided-v1 and 5 BLOCKED_MISSING_REFERENCE disclosures + versioned `goalkeepers` evaluator suite contracts; 24-test binding suite; registry hash growth 24b5341e→c9098fb8 with two provenance assertions accommodated, verdict comparisons strict). GK-5V5-ADAPTER-BEHAVIOR accepted (designated-keeper arc hold/save at the adapter layer on existing bodies; save/claim via tick-indexed InputFrames; gkBehavior:false stash-identity to 91ff0be; 4-run MULTI_TICK trajectory ca9443a0… with 4 driven save chains and the organic 21-armed/0-completed result honestly disclosed; builder rerouted qwen3.8-flash→deepseek-v4-flash mid-task on the monthly token cap). GK-BROWSER-DYNAMIC-EVIDENCE accepted (gkBehavior wired into the 5v5 CPU-vs-CPU composition root, human modes untouched; 4 event-centered frames + trajectory 9acef93e…; save fixture-driven and disclosed; critic independently reproduced the run with byte-identical PNGs). GK-SUITE-ORGANIC-STATE accepted (honest suite state re-run over manifest-pinned keeper runs; GK criteria honestly NOT_EVALUATED — no keeper oracle registered; observations-presence bookkeeping; COMMON FAILs disclosed). Remote-durable at 7da25c0; strategic reassessment produced Horizon v27.
 
 Horizon v25 (restart-flow-human-arc-and-duels-rerun) — COMPLETE 4/4: RESTART-ANTI-HUDDLE-COHERENCE accepted (anti-huddle contract extended to throw-in/goal-kick/corner/post-goal restarts; restart-window re-arm + per-window anchor freeze + single-taker designation; HEADLESS-vs-browser parity defect repaired behind opt-in lifecyclePhaseSync, legacy default protects accepted pins). HUMAN-VS-CPU-ARC-INTERACTION accepted (human Tab-switch chain + slide tackle duelWon + human pass 4.5 m as 5 event-centered DYNAMIC_VISUAL frames + sequence.json + 720-tick browser trajectory). DUELS-SUITE-ORGANIC-RERUN accepted (accepted duels evaluator re-run over organic observations: TACK-ST-001-PHASE/TACK-SL-001-PHASE/PHY-SHLD-001-CONT organic PASS; PHYSICAL_DUEL insufficient_context->present across six runs; protected COMMON FAILs disclosed; provenance RETRY resolved d56ccad->dc40fd2 with a cross-manifest binding test). VIDEO-CAPTURE-RESTORE-30S-CLIP accepted (missing capture-ai-match-video.mjs restored as a Playwright-native WebM tool; real ~36 s clip of the accepted anti-huddle 5v5 arc as optional diagnostic evidence; video-meta + video-reference durable records). Remote-durable at 5829156; strategic reassessment produced Horizon v26.
 
