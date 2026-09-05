@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "GK-SPEC-SUITE-CONTRACTS",
+  "accepted_at": "2026-09-05T08:46:41.513Z",
+  "candidate_commit": "0f431888bcea7773e16e7246f063636967ba1fb2",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/GK-SPEC-SUITE-CONTRACTS/audit.json",
+      "sha256": "5d8a0e0540d6460f8322c47e756b76ba454fcd7e76d36e7f00fa91440fa074a1",
+      "git_blob": "7b01e1a614f30e9152c6d323880d8e782bf4d76a",
+      "candidate_commit": "0f431888bcea7773e16e7246f063636967ba1fb2",
+      "bytes": 2681,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-05/2026-09-05T08-46-41-513Z-GK-SPEC-SUITE-CONTRACTS-acceptance.json"
+}

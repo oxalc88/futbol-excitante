@@ -9,10 +9,10 @@ horizon_id: "goalkeeper-arc-small-sided"
 created_from_commit: 5829156
 created_at: 2026-09-05
 reason: "Horizon v25 (COMPLETE 4/4, remote-durable at 5829156) finished the restart/human-arc/duels/video arc: restarts follow the accepted freeze+nearest-only contract, the human visibly interacts with the anti-huddle arc (DYNAMIC_VISUAL), the duels suite honestly reflects organic PHYSICAL_DUEL (TACK/PHY criteria organic PASS, protected COMMON FAILs disclosed), and the repository video path is restored with a real ~36 s organic clip as diagnostic evidence. The objective catalog gates the next product arc behind dedicated specs: REGULATION needs a goalkeeper spec first, and AGENTS.md defers goalkeepers until their dedicated specs and suites exist. v26 therefore opens the small-sided goalkeeper arc strictly inside the established bounds: (a) write the dedicated goalkeeper spec + versioned evaluator suite contracts (no implementation, no PES envelopes, missing references stay BLOCKED_MISSING_REFERENCE); (b) implement designated-keeper behavior in the 5v5 small-sided match at the adapter/team-decision layer (hold-goal-position, no field chase, basic save/claim reaction) with MULTI_TICK evidence and a discriminating stashed control; (c) browser DYNAMIC_VISUAL evidence of GK positioning + a save/claim event; (d) honest organic GK-suite state re-run. GK/regulation/full-match/perceptual-rubric/networked/PES-fidelity work beyond these remains deferred."
-current_index: 0
+current_index: 1
 objectives:
   - id: GK-SPEC-SUITE-CONTRACTS
-    status: pending
+    status: accepted
     reason: "Write the dedicated goalkeeper spec (specs/GAMEKEEPER-SPEC.md or the established specs naming) plus its versioned evaluator suite contracts: registry entries, situation mappings (e.g. GK_POSITIONING, GK_SAVE_CLAIM), criteria bindings, and provisional versioned config for unmeasured values (never hard-coded PES constants). Spec + contracts only — NO behavior implementation. Missing reference targets stay BLOCKED_MISSING_REFERENCE (disclosed, never invented). All invariants executable; binding tests prove the registry wires up."
     builder: builder-structured
     prerequisite: ""

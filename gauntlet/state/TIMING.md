@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-05T07:00:00Z
+measured_at: 2026-09-05T08:05:00Z
 tracking_contract_version: 1
-last_tracked_objective: VIDEO-CAPTURE-RESTORE-30S-CLIP
-usage_aggregates_through: VIDEO-CAPTURE-RESTORE-30S-CLIP
-clock_aggregates_through: VIDEO-CAPTURE-RESTORE-30S-CLIP
-model_evaluation_through: VIDEO-CAPTURE-RESTORE-30S-CLIP
+last_tracked_objective: GK-SPEC-SUITE-CONTRACTS
+usage_aggregates_through: GK-SPEC-SUITE-CONTRACTS
+clock_aggregates_through: GK-SPEC-SUITE-CONTRACTS
+model_evaluation_through: GK-SPEC-SUITE-CONTRACTS
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,18 +42,17 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 530h 02m |
+| Calendar span (first work → measurement) | 531h 07m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~136h est. |
-| Sum of per-step agent time | ~136h 01m |
+| Active work (anything running) | ~137h est. |
+| Sum of per-step agent time | ~136h 49m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T07:00:00Z`.
-Recomputed 2026-09-05 at the VIDEO-CAPTURE-RESTORE-30S-CLIP acceptance
-(Horizon v25 4/4 — horizon COMPLETE): 173 accepted per-step rows summing to
-~136h 01m (the new objective adds ~29m: builder ~21m / critic 3m / integration
-4m / commits ~1m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T08:05:00Z`.
+Recomputed 2026-09-05 at the GK-SPEC-SUITE-CONTRACTS acceptance
+(Horizon v26 1/4): 174 accepted per-step rows summing to ~136h 49m (the new
+objective adds ~48m: builder ~36m / critic 6m / integration 5m / commits ~1m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -256,6 +255,7 @@ invoices.
 | HUMAN-VS-CPU-ARC-INTERACTION | accepted | ~1h 39m | ~1h 6m | 6m | 5m | ~4m | n/a | n/a |
 | DUELS-SUITE-ORGANIC-RERUN | accepted | ~1h 48m | ~1h 30m | 12m | 4m | ~2m | n/a | n/a |
 | VIDEO-CAPTURE-RESTORE-30S-CLIP | accepted | ~29m | ~21m | 3m | 4m | ~1m | n/a | n/a |
+| GK-SPEC-SUITE-CONTRACTS | accepted | ~48m | ~36m | 6m | 5m | ~1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -567,6 +567,7 @@ on an H task is the interesting result.
 | HUMAN-VS-CPU-ARC-INTERACTION | qwen3.8-flash | M | Medium - DYNAMIC_VISUAL browser capture of the human side of the anti-huddle arc (Tab switch chain, slide tackle duelWon, human pass 4.5 m; two-pass Chromium capture, 5 event-centered frames + sequence.json + 720-tick browser trajectory, byte-identical two-pass), capture-hygiene gating, discriminating negatives (idle human; cpuAntiHuddle:false), honest video NOT_PRODUCED; no src/ change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic reproduced identical frame ticks in an independent rerun |
 | DUELS-SUITE-ORGANIC-RERUN | deepseek-v4-flash | M | Low - evidence re-run of the accepted duels evaluator suite over organic observations (producer script + binding test + refreshed suite record; no source change; cross-manifest source_candidate provenance binding) | 1 | A | provenance mislabel (human-duel source_candidate d56ccad -> dc40fd2) caught and fixed in rev 2 with a cross-manifest binding test (7->8); protected COMMON FAILs kept disclosed |
 | VIDEO-CAPTURE-RESTORE-30S-CLIP | deepseek-v4-flash | M | Low-Medium - restore the missing capture-ai-video tool with Playwright-native WebM recording (no system ffmpeg), hygiene-gated durable capture, real ~36 s clip of the accepted anti-huddle arc, binding test asserting real-artifact metadata honesty; no source change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic independently recomputed clip SHA/bytes, verified EBML magic, the real match path, and ordinary-run docs/ byte-identity (824-file hash diff) |
+| GK-SPEC-SUITE-CONTRACTS | deepseek-v4-flash | M | Medium - new normative spec (GOALKEEPER_SPEC.md, small-sided-only) + versioned `goalkeepers` evaluator suite (suite-goalkeepers-v1: criteria bindings, invariants, observations, scenario stubs, provisional config gk-small-sided-v1 with 5 BLOCKED_MISSING_REFERENCE disclosures) + 24-test binding suite with negative controls; registry grew 24b5341e -> c9098fb8 with two provenance assertions accommodated as format+provenance validation; zero src/ change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic proved the accommodation retains discriminating power and all verdict-bearing comparisons strict; integration re-ran 148/148 neighbors + typecheck 0 |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -825,6 +826,8 @@ on an H task is the interesting result.
 | DUELS-SUITE-ORGANIC-RERUN | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 af040ac5… independently recomputed byte-exact; all four source_candidate values verified against accepted manifests (47bb0db / dc40fd2 / 210b27c / 455f4ec); binding test 8/8 re-executed + typecheck 0; zero tracked-file change (git diff src/ eval/scenarios/ specs/ eval/runners/ empty); COMMON-REFERENCES / COMMON-BOUNDS FAILs confirmed disclosed, not masked |
 | VIDEO-CAPTURE-RESTORE-30S-CLIP | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; clip SHA-256 575ff114… and 1,125,058 bytes independently recomputed; EBML magic verified (genuine WebM); ordinary 2 s run left docs/ byte-identical (824-file hash diff) with durable gate verified; real-match path verified (ai-match-5v5, cpuAntiHuddle:true, sim advancing to tick 120 in 2 s); claims_not_made honest; video-reference deferral verified mechanically genuine |
 | VIDEO-CAPTURE-RESTORE-30S-CLIP | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 9/9 neighboring tests re-run (binding 5 + capture-hygiene 3 + capture-wip 1); typecheck 0; vite production build OK; protected-path diff empty; artifact SHA recomputed; presentation authority + evaluator integrity PASS; video-reference post-commit obligation verified mechanically |
+| GK-SPEC-SUITE-CONTRACTS | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; registrySetId mismatch independently reproduced (durable fnv1a64-v1:24b5341e2bc3fbd3 vs live fnv1a64-v1:c9098fb8ecd66341 from the added suite); accommodation ruled legitimate superset-accommodation — format/provenance check retains tamper discrimination (placeholder/malformed/wrong-length/non-hex all fail), verdict-bearing comparisons strict, git diff -- docs/ empty; spec honesty machine-mirrored (gk-small-sided-v1 + 5 BLOCKED_MISSING_REFERENCE); no GK criterion claims gameplay PASS |
+| GK-SPEC-SUITE-CONTRACTS | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 148/148 neighboring tests re-run (goalkeepers-suite 24 + eval-registry 48 + duels-suite 39 + foundation-lab 8 + playable-1v1 29); typecheck 0; all 8 contract files purely additive (deletions=0); full test diffs reviewed (zero skip/todo/only; only relaxation = the two registrySetId assertions); no out-of-scope files |
 
 ### Builder scoreboard
 
