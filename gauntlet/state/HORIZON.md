@@ -9,7 +9,7 @@ horizon_id: "rules-spec-and-keeper-legibility"
 created_from_commit: b8ced54
 created_at: 2026-09-05
 reason: "Horizon v27 (COMPLETE 4/4, remote-durable at b8ced54) closed the keeper-verdicts arc: five protected keeper oracles registered (suite produces real verdicts), keeper distribution behavior with observation-level keeper-release telemetry (core byte-identical, deviation adjudicated), the thrice-disclosed COMMON-REFERENCES invariant defect root-caused and fixed (window-union resolution; PASS on all 8 full-match maps) with the COMMON-BOUNDS legacy residual honestly disclosed, and the post-oracle verdict table published (all five GK behavior criteria PASS: 3 organic + 2 driven-labeled). v28 opens the next product gateway and closes the noted residuals: (a) the objective catalog gates the REGULATION milestone behind a dedicated RULES spec (the goalkeeper spec now exists) — draft the dedicated rules spec (throw-in, goal kick, corner, kickoff, scoring, out-of-play) as spec-only, no implementation; (b) keeper visual legibility — the browser-evidence critic noted the keeper has no distinct visual kit marker (role legibility positional only); add an additive presentation-snapshot keeperRole field with renderer rendering + browser frames evidence and parity guards; (c) the possession oracle retains the same latent per-tick lastTouchRef pattern references.ts had — triage it before it false-fails on a future full-match criterion; (d) the lifecyclePhaseSync legacy→core-owned migration assessment (the documented future work whose legacy runs carry the COMMON-BOUNDS residual) — root-cause-grade assessment + migration plan (or migration with byte-identity proofs for accepted pins if safe). Strictly small-sided; no regulation implementation, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 1
+current_index: 2
 objectives:
   - id: RULES-SPEC-DRAFT
     status: accepted
@@ -17,7 +17,7 @@ objectives:
     builder: builder-structured
     prerequisite: ""
   - id: KEEPER-VISUAL-MARKER
-    status: pending
+    status: accepted
     reason: "Keeper visual legibility: additive PresentationSnapshot keeperRole field (populated from the accepted adapter designation through the snapshot path) + renderer kit marker for the designated keeper; browser DYNAMIC_VISUAL frames proving the keeper is visually distinguishable; parity guards (snapshot without the field / marker disabled must render byte-identical to HEAD); renderer consumes snapshots only, owns no football state."
     builder: builder-gameplay
     prerequisite: ""
