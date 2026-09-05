@@ -4,12 +4,12 @@
 
 ```yaml
 horizon_version: 25
-status: ACTIVE
+status: EXHAUSTED
 horizon_id: "restart-flow-human-arc-and-duels-rerun"
 created_from_commit: 7d77fc0
 created_at: 2026-09-04
 reason: "Horizon v24 (EXHAUSTED 6/6, remote-durable at 7d77fc0) completed the human-directed anti-huddle arc: kickoff freeze + nearest-only chase + fixed homes + one presser + cover (adapter layer, stash-identity proven), the settled-ball impulse fix (the only core change), browser DYNAMIC_VISUAL evidence of the full arc with a traveling ball, the organic situation closure (anti-huddle run scans 8/0/0 incl. PHYSICAL_DUEL), the node gate green after the evaluate() off-by-one root-cause fix, and repo-wide capture hygiene. v25 (still within small-sided bounds, no GK/regulation/full-match/PES envelopes) continues the football realism of restarts and the human side of the arc: (a) match restarts (throw-in, goal kick, corner, post-goal) must follow the same freeze-until-first-touch + nearest-only contract the accepted anti-huddle established at kickoff — verify per restart type in coherent play and fix any resurfacing huddle; (b) the human-vs-CPU 5v5 match must show the human interacting with that arc (Tab switch, standing/slide tackle, pass) as browser DYNAMIC_VISUAL evidence; (c) the duels evaluator suite is re-run against the now-organic PHYSICAL_DUEL observations for an honest suite state; (d) the repository video path referenced by package.json (capture-ai-video → scripts/capture-ai-match-video.mjs) is missing — restore it and produce the deferred 30 s organic clip as optional diagnostic evidence. Perceptual-rubric/networked work remains deferred."
-current_index: 3
+current_index: 4
 objectives:
   - id: RESTART-ANTI-HUDDLE-COHERENCE
     status: accepted
@@ -27,7 +27,7 @@ objectives:
     builder: builder-structured
     prerequisite: ""
   - id: VIDEO-CAPTURE-RESTORE-30S-CLIP
-    status: pending
+    status: accepted
     reason: "Restore the repository video path: package.json references scripts/capture-ai-match-video.mjs (capture-ai-video) but the file is missing (disclosed twice this session, blocking the optional 30 s organic clip in BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE). Recreate the capture tool (Node + ffmpeg if available, honest NOT_PRODUCED + disclosure if ffmpeg is absent), wire it to the anti-huddle coherent run, and produce the 30 s organic clip as optional diagnostic evidence with docs/evidence/<id>/video-reference.json per gauntlet/evidence-manifest-contract.md (objective, provider artifact id/name, dates, candidate commit). Video is optional diagnostic evidence and never replaces trajectories/frames; no invented metadata when the tool is unavailable."
     builder: builder-structured
     prerequisite: ""

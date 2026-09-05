@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "VIDEO-CAPTURE-RESTORE-30S-CLIP",
+  "accepted_at": "2026-09-05T06:57:55.692Z",
+  "candidate_commit": "0f63f92f67cd07911f73997b0315f6541d4e761a",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/VIDEO-CAPTURE-RESTORE-30S-CLIP/audit.json",
+      "sha256": "8038d1eca2111b0092862a68a6057ab2380a98e6c31c97ada52cad71d8e2d550",
+      "git_blob": "bfa06e272e79ce173b5c4803f4718ccf20c5735d",
+      "candidate_commit": "0f63f92f67cd07911f73997b0315f6541d4e761a",
+      "bytes": 2688,
+      "committed_with_candidate": true
+    },
+    "video": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "VIDEO-CAPTURE-RESTORE-30S-CLIP",
+        "artifact_id": "anti-huddle-ai-match-5v5-30s",
+        "artifact_name": "ai-match-5v5-30s.webm",
+        "provider": "playwright-chromium native recordVideo (bundled WebM codec; no system ffmpeg)",
+        "created_at": "2026-09-05T06:41:54.010Z",
+        "expires_at": null,
+        "candidate_commit": "0f63f92f67cd07911f73997b0315f6541d4e761a"
+      },
+      "artifact": {
+        "path": "docs/evidence/VIDEO-CAPTURE-RESTORE-30S-CLIP/video-reference.json",
+        "sha256": "82195d728614fc031fd8b0253a6b8b37000965e52938ef8d3954b09eb4eabdca",
+        "git_blob": null,
+        "candidate_commit": "0f63f92f67cd07911f73997b0315f6541d4e761a",
+        "bytes": 398,
+        "committed_with_candidate": false
+      }
+    },
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-05/2026-09-05T06-57-55-692Z-VIDEO-CAPTURE-RESTORE-30S-CLIP-acceptance.json"
+}

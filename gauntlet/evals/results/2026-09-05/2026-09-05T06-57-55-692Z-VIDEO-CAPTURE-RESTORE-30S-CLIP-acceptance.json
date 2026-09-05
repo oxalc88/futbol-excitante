@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-05T06:57:55.692Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "VIDEO-CAPTURE-RESTORE-30S-CLIP",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "0f63f92f67cd07911f73997b0315f6541d4e761a",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v25 4/4: repository video path restored. package.json already references scripts/capture-ai-match-video.mjs (capture-ai-video) but the file was MISSING (disclosed twice; blocked the optional clip in BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE, accepted with video honestly NOT_PRODUCED). Tool restored: Playwright Chromium NATIVE recordVideo -> WebM (system ffmpeg genuinely absent on this host; tool probes and honestly skips mp4 conversion; WIP_SECTION=__EVIDENCE__:VIDEO-CAPTURE-RESTORE-30S-CLIP durable gate, ordinary runs write only ignored test-results/gauntlet-capture/** and leave docs/ byte-identical — critic hashed all 824 docs/ files before/after an ordinary run). Wired to the accepted anti-huddle arc via the real browser app (?mode=ai-match-5v5 -> FOUNDATION_SCENARIO_5V5, cpuAntiHuddle:true; ~30 s window, sim reached tick 900). Clip facts: ai-match-5v5-30s.webm 800x600, container duration 36.2 s (capture wall 33.191 s), 1,125,058 bytes, SHA-256 575ff1140de82f97128ed0029a4ec5a304d74f9f99950e389c62fe922f0c4fd3 (independently recomputed by critic + integration; EBML magic verified) — binary is optional/ephemeral under ignored test-results per evidence-manifest-contract; durable record is committed video-meta.json + video-reference.json (written post-candidate-commit by the orchestrator with the resolvable SHA, provider/artifact/dates per evidence-manifest-contract). Binding test tests/capture-ai-video.node.test.ts 5/5 (tool+hook resolve, bad inputs fail cleanly, real 2 s Chromium run asserts metadata-vs-file honesty). Evidence class HEADLESS; video NEVER replaces trajectories/frames and never becomes gameplay evidence. Zero gameplay change (git diff src/simulation/ src/contracts/ eval/runners/ eval/scenarios/ specs/ EMPTY). Integration reviewer independently re-ran binding test + capture-hygiene + capture-wip (9/9), typecheck 0, vite build OK. Critic (glm5.3-flash) ACCEPT first pass; integration (glm5.3-flash) ACCEPT first pass. Audit PASS 20/20 HEADLESS. claims_not_made: no PROMOTION / PES fidelity / FOUNDATION_LAB_PASS / no gameplay PASS / no invented envelopes / video is diagnostic only."
+}

@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-05T06:08:00Z
+measured_at: 2026-09-05T07:00:00Z
 tracking_contract_version: 1
-last_tracked_objective: DUELS-SUITE-ORGANIC-RERUN
-usage_aggregates_through: DUELS-SUITE-ORGANIC-RERUN
-clock_aggregates_through: DUELS-SUITE-ORGANIC-RERUN
-model_evaluation_through: DUELS-SUITE-ORGANIC-RERUN
+last_tracked_objective: VIDEO-CAPTURE-RESTORE-30S-CLIP
+usage_aggregates_through: VIDEO-CAPTURE-RESTORE-30S-CLIP
+clock_aggregates_through: VIDEO-CAPTURE-RESTORE-30S-CLIP
+model_evaluation_through: VIDEO-CAPTURE-RESTORE-30S-CLIP
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,18 +42,18 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 529h 10m |
+| Calendar span (first work → measurement) | 530h 02m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~135h est. |
-| Sum of per-step agent time | ~135h 32m |
+| Active work (anything running) | ~136h est. |
+| Sum of per-step agent time | ~136h 01m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T06:08:00Z`.
-Recomputed 2026-09-05 at the DUELS-SUITE-ORGANIC-RERUN acceptance
-(Horizon v25 3/4): 172 accepted per-step rows summing to ~135h 32m (the new
-objective adds ~1h 48m: builder ~1h 30m / critic 12m / integration 4m / commits
-~2m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T07:00:00Z`.
+Recomputed 2026-09-05 at the VIDEO-CAPTURE-RESTORE-30S-CLIP acceptance
+(Horizon v25 4/4 — horizon COMPLETE): 173 accepted per-step rows summing to
+~136h 01m (the new objective adds ~29m: builder ~21m / critic 3m / integration
+4m / commits ~1m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -255,6 +255,7 @@ invoices.
 | RESTART-ANTI-HUDDLE-COHERENCE | accepted | ~3h 33m | ~3h 33m | 3m | 3m | ~3m | n/a | n/a |
 | HUMAN-VS-CPU-ARC-INTERACTION | accepted | ~1h 39m | ~1h 6m | 6m | 5m | ~4m | n/a | n/a |
 | DUELS-SUITE-ORGANIC-RERUN | accepted | ~1h 48m | ~1h 30m | 12m | 4m | ~2m | n/a | n/a |
+| VIDEO-CAPTURE-RESTORE-30S-CLIP | accepted | ~29m | ~21m | 3m | 4m | ~1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -565,6 +566,7 @@ on an H task is the interesting result.
 | RESTART-ANTI-HUDDLE-COHERENCE | qwen3.8-flash | H | High — anti-huddle contract extended to restarts (throw-in/goal-kick/corner/post-goal) in the adapter layer (restartTouchBaseline, restartAnchor freeze, window-aware untouched, getRestartFreezeActivations); headless lifecyclePhaseSync parity defect repaired behind opt-in core-owned policy (legacy default protects accepted pins); 26 new integration tests; accepted kickoff suite unchanged; two-pass byte-identical trajectory | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic verified per-window geometry from raw rows |
 | HUMAN-VS-CPU-ARC-INTERACTION | qwen3.8-flash | M | Medium - DYNAMIC_VISUAL browser capture of the human side of the anti-huddle arc (Tab switch chain, slide tackle duelWon, human pass 4.5 m; two-pass Chromium capture, 5 event-centered frames + sequence.json + 720-tick browser trajectory, byte-identical two-pass), capture-hygiene gating, discriminating negatives (idle human; cpuAntiHuddle:false), honest video NOT_PRODUCED; no src/ change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic reproduced identical frame ticks in an independent rerun |
 | DUELS-SUITE-ORGANIC-RERUN | deepseek-v4-flash | M | Low - evidence re-run of the accepted duels evaluator suite over organic observations (producer script + binding test + refreshed suite record; no source change; cross-manifest source_candidate provenance binding) | 1 | A | provenance mislabel (human-duel source_candidate d56ccad -> dc40fd2) caught and fixed in rev 2 with a cross-manifest binding test (7->8); protected COMMON FAILs kept disclosed |
+| VIDEO-CAPTURE-RESTORE-30S-CLIP | deepseek-v4-flash | M | Low-Medium - restore the missing capture-ai-video tool with Playwright-native WebM recording (no system ffmpeg), hygiene-gated durable capture, real ~36 s clip of the accepted anti-huddle arc, binding test asserting real-artifact metadata honesty; no source change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic independently recomputed clip SHA/bytes, verified EBML magic, the real match path, and ordinary-run docs/ byte-identity (824-file hash diff) |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -821,6 +823,8 @@ on an H task is the interesting result.
 | HUMAN-VS-CPU-ARC-INTERACTION | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 2 browser suites 4/4 green; typecheck 0; docs byte-identical after runs (ordinary capture -> test-results only); src/ eval/ specs/ gauntlet/ diff empty; trajectory SHA verified |
 | DUELS-SUITE-ORGANIC-RERUN | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | 1 RETRY — rev-1 cited d56ccad (BROWSER-DEFENSIVE-CONTROLS-LEGEND acceptance commit) as the human-duel source_candidate; corrected to the HUMAN-DEFENSIVE-DUEL-CONTROL manifest pin dc40fd2; rev 2 regenerated the record (record_sha256 9d8e55b6…→af040ac5…), corrected RESULT.md, added the cross-manifest binding assertion (7→8 tests); rev-1 never accepted; rev 2 clean ACCEPT |
 | DUELS-SUITE-ORGANIC-RERUN | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 af040ac5… independently recomputed byte-exact; all four source_candidate values verified against accepted manifests (47bb0db / dc40fd2 / 210b27c / 455f4ec); binding test 8/8 re-executed + typecheck 0; zero tracked-file change (git diff src/ eval/scenarios/ specs/ eval/runners/ empty); COMMON-REFERENCES / COMMON-BOUNDS FAILs confirmed disclosed, not masked |
+| VIDEO-CAPTURE-RESTORE-30S-CLIP | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; clip SHA-256 575ff114… and 1,125,058 bytes independently recomputed; EBML magic verified (genuine WebM); ordinary 2 s run left docs/ byte-identical (824-file hash diff) with durable gate verified; real-match path verified (ai-match-5v5, cpuAntiHuddle:true, sim advancing to tick 120 in 2 s); claims_not_made honest; video-reference deferral verified mechanically genuine |
+| VIDEO-CAPTURE-RESTORE-30S-CLIP | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 9/9 neighboring tests re-run (binding 5 + capture-hygiene 3 + capture-wip 1); typecheck 0; vite production build OK; protected-path diff empty; artifact SHA recomputed; presentation authority + evaluator integrity PASS; video-reference post-commit obligation verified mechanically |
 
 ### Builder scoreboard
 
