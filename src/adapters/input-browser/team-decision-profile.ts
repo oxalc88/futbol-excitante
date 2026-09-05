@@ -45,6 +45,10 @@ import {
   FOUNDATION_LOCOMOTION_V1,
   FOUNDATION_TACKLE_V1,
 } from "../../simulation/config/foundation.js";
+import {
+  designateKeeperFromLayout,
+  noteKeeperPressExclusion,
+} from "./goalkeeper-role.js";
 import type {
   CpuTackleConfig,
   TackleConfig,
@@ -293,6 +297,49 @@ export function isAntiHuddleActive(observation: CpuObservation): boolean {
     observation.cpuTeamId !== undefined;
 }
 
+// ---------------------------------------------------------------------------
+// Designated keeper (GK-5V5-ADAPTER-BEHAVIOR)
+// ---------------------------------------------------------------------------
+
+/**
+ * Whether the small-sided keeper role is live for this observation.
+ *
+ * Unlike the anti-huddle shape, the keeper role is opt-in: it lives only when
+ * the wiring explicitly declares `gkBehavior: true` on top of the same
+ * observable preconditions the anti-huddle contract keys on (the ball's
+ * authoritative touch reference and a team for this CPU to reason about). With
+ * the switch absent or false every frame is exactly what this tree emitted
+ * before the keeper existed, which is what makes the stashed control a real
+ * control rather than a look-alike.
+ *
+ * Deterministic pure function of the observation.
+ */
+export function isKeeperBehaviorActive(observation: CpuObservation): boolean {
+  return observation.gkBehavior === true && isAntiHuddleActive(observation);
+}
+
+/**
+ * The designated keeper of `teamId` for this observation, or `undefined` when no
+ * keeper role is live.
+ *
+ * The production wiring freezes the designation at the first sample (the
+ * scenario's role layout) and injects the whole match's map as
+ * `keeperPlayerIds`, so a keeper is a stable actor id rather than a per-tick
+ * ball fact (spec §4). When a wiring omits a team, the same adapter-layer rule
+ * re-designates from the layout this observation carries; that fallback exists
+ * for hand-built observations and agrees with the frozen value whenever the
+ * adapters start at the first sample.
+ */
+export function resolveKeeperPlayerId(
+  observation: CpuObservation,
+  teamId: string,
+): string | undefined {
+  if (!isKeeperBehaviorActive(observation)) return undefined;
+  const injected = observation.keeperPlayerIds?.[teamId];
+  if (injected !== undefined) return injected;
+  return designateKeeperFromLayout(observation.players, teamId, observation.pitchLength);
+}
+
 /**
  * Designate the one body of `teamId` that presses and chases the ball this tick.
  *
@@ -305,6 +352,12 @@ export function isAntiHuddleActive(observation: CpuObservation): boolean {
  * authorisation all name the same player. A team with no eligible body keeps the
  * accepted nearest-body designation, so a chaser always exists.
  *
+ * With the keeper role live (GK-5V5-ADAPTER-BEHAVIOR, spec §6) the designated
+ * keeper is dropped from the eligible set before the nearest eligible body is
+ * chosen, so the keeper is never the presser/chaser and the anti-huddle bound
+ * stays one *field* body per team. A team whose only eligible body is the
+ * keeper keeps the accepted designation, so a chaser always exists.
+ *
  * Ties resolve by ascending playerId, so the choice never depends on the order
  * players happen to appear in the observation.
  */
@@ -315,12 +368,18 @@ export function designatePresser(
   const nearest = findNearestToBall(observation, teamId);
   if (!isAntiHuddleActive(observation)) return nearest;
 
+  const keeperPlayerId = resolveKeeperPlayerId(observation, teamId);
   const allowed: ReadonlyArray<string> = FOUNDATION_CPU_TACKLE_V1.committingRoles.value;
   let bestId: string | undefined;
   let bestDist = Number.POSITIVE_INFINITY;
+  let keeperWasEligible = false;
   for (const p of observation.players) {
     if (p.teamId !== teamId) continue;
     if (p.formationRole !== undefined && !allowed.includes(p.formationRole)) continue;
+    if (keeperPlayerId !== undefined && p.playerId === keeperPlayerId) {
+      keeperWasEligible = true;
+      continue;
+    }
     const dist = planarDistance(
       p.groundPosition.x,
       p.groundPosition.y,
@@ -335,6 +394,7 @@ export function designatePresser(
       bestId = p.playerId;
     }
   }
+  if (keeperWasEligible && bestId !== undefined) noteKeeperPressExclusion();
   return bestId === undefined ? nearest : { playerId: bestId, distance: bestDist };
 }
 

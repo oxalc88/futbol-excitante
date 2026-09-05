@@ -60,14 +60,35 @@ import type { WorldState } from "../../contracts/state.js";
 import {
   FOUNDATION_CONTACT_V1,
   FOUNDATION_CPU_TACKLE_V1,
+  FOUNDATION_LOCOMOTION_V1,
   FOUNDATION_TACKLE_V1,
 } from "../../simulation/config/foundation.js";
 import {
   designatePresser,
   isAntiHuddleActive,
+  isKeeperBehaviorActive,
+  resolveKeeperPlayerId,
   teamHasPossession,
 } from "./team-decision-profile.js";
 import type { TeamDecision } from "./team-decision-profile.js";
+import {
+  GK_SMALL_SIDED_V1,
+  designateKeeperFromLayout,
+  goalArcCenter,
+  isApproachingGoalLine,
+  isInsideGoalArc,
+  keeperStationTarget,
+  latestOnTargetShotAgainst,
+  advanceKeeperReaction,
+  KEEPER_REACTION_IDLE,
+  noteKeeperHoldTick,
+  noteKeeperReleasePress,
+  noteKeeperSaveArm,
+  noteKeeperSavePress,
+  resetKeeperMechanismCounters,
+  ownGoalLineX,
+} from "./goalkeeper-role.js";
+import type { KeeperReactionState, KeeperShotInfo } from "./goalkeeper-role.js";
 export type {
   TeamDecision,
   DefensiveSubMode,
@@ -76,6 +97,7 @@ export type {
   CpuTackleEvaluation,
   TackleWithheldReason,
 } from "./team-decision-profile.js";
+export type { KeeperLayoutBody, KeeperShotInfo } from "./goalkeeper-role.js";
 export {
   computeTeamDecision,
   getBallZone,
@@ -83,7 +105,34 @@ export {
   evaluateCpuTackleCommit,
   isAntiHuddleActive,
   designatePresser,
+  isKeeperBehaviorActive,
+  resolveKeeperPlayerId,
 } from "./team-decision-profile.js";
+export {
+  GK_SMALL_SIDED_V1,
+  designateKeeperFromLayout,
+  goalArcCenter,
+  keeperArcSetPoint,
+  keeperStationTarget,
+  latestOnTargetShotAgainst,
+  clampToArcLateralBand,
+  distanceToArcCenter,
+  lateralDriftMetres,
+  isInsideGoalArc,
+  shotIsOnTargetToOwnGoal,
+  advanceKeeperReaction,
+  KEEPER_REACTION_IDLE,
+  projectedGoalLineCrossY,
+  ownGoalLineX,
+  isApproachingGoalLine,
+  GK_GOAL_HALF_WIDTH_METRES,
+  getKeeperHoldActivations,
+  getKeeperSaveArmActivations,
+  getKeeperSavePressActivations,
+  getKeeperReleasePressActivations,
+  getKeeperPressExclusionActivations,
+  resetKeeperMechanismCounters,
+} from "./goalkeeper-role.js";
 
 // ---------------------------------------------------------------------------
 // Mechanism activation tracking (SMALL-SIDED-PRESS-AND-SUPPORT-DEPTH)
@@ -186,6 +235,7 @@ export function resetMechanismCounters(): void {
   _kickoffFreezeActivations = 0;
   _nearestOnlyChaseActivations = 0;
   _restartFreezeActivations = 0;
+  resetKeeperMechanismCounters();
 }
 
 // ---------------------------------------------------------------------------
@@ -464,6 +514,43 @@ export interface CpuObservation {
    * Provisional — not a measured PES 2017 concept.
    */
   cpuAntiHuddle?: boolean;
+
+  // -----------------------------------------------------------------
+  // Designated keeper (GK-5V5-ADAPTER-BEHAVIOR)
+  // -----------------------------------------------------------------
+
+  /**
+   * Kill switch for the SMALL-SIDED goalkeeper role: the arc hold, the
+   * no-field-chase exclusion, the save/claim reaction and the distribution
+   * release. Unlike the anti-huddle shape this role is strictly opt-in — it is
+   * live only when the wiring declares `true`, and with the flag absent or false
+   * the adapter emits exactly the frames it emitted before any keeper existed.
+   * It is a configuration switch, never extra knowledge: it widens nothing the
+   * observation exposes.
+   *
+   * Provisional — model `gk-small-sided-v1`, not a measured PES 2017 concept.
+   */
+  gkBehavior?: boolean;
+
+  /**
+   * The match's keeper designation, team by team (spec §4): stable actor ids
+   * assigned by the wiring from the layout the match starts with, never derived
+   * from a ball fact. Both teams are carried so a side's restart-taker
+   * selection can exclude the opposing keeper too. For a team the map omits, the
+   * adapter-layer designation rule resolves it from the layout this observation
+   * carries.
+   */
+  keeperPlayerIds?: Record<string, string>;
+
+  /**
+   * Canonical `shot` events the keeper may perceive, newest first, extracted
+   * from the committed world events exactly the way recent passes already are.
+   * Only the state the shot itself recorded is carried — never a future ball
+   * state.
+   *
+   * Provisional — model `gk-small-sided-v1`.
+   */
+  recentShotEvents?: KeeperShotInfo[];
 }
 
 // ---------------------------------------------------------------------------
@@ -587,6 +674,43 @@ export function buildCpuObservation(
     result.recentPassEvents = passEvents;
   }
 
+  // Extract recent canonical shot events for the designated keeper (spec §7).
+  // Same backward walk and the same provisional perception window the pass
+  // extraction already uses, so the keeper can only ever read a shot the world
+  // has already committed — and it can read nothing about a shot that has not
+  // happened yet. Ordered newest first.
+  const shotEvents: KeeperShotInfo[] = [];
+  if (world.events.length > 0) {
+    for (let i = world.events.length - 1; i >= 0; i--) {
+      const evt = world.events[i];
+      if (evt.kind !== "shot") continue;
+      if (world.tick - evt.tick > SHOT_EVENT_WINDOW_TICKS) break;
+      const p = evt.payload;
+      const incoming = p.incoming as
+        { position?: { x?: number; y?: number } } | undefined;
+      const outgoing = p.outgoing as
+        { linearVelocity?: { x?: number; y?: number } } | undefined;
+      if (!incoming?.position || !outgoing?.linearVelocity) continue;
+      shotEvents.push({
+        tick: evt.tick,
+        eventId: evt.id,
+        shooterPlayerId: p.playerId as string,
+        shooterTeamId: p.teamId as string,
+        ballPosition: {
+          x: incoming.position.x as number,
+          y: incoming.position.y as number,
+        },
+        ballVelocity: {
+          x: outgoing.linearVelocity.x as number,
+          y: outgoing.linearVelocity.y as number,
+        },
+      });
+    }
+  }
+  if (shotEvents.length > 0) {
+    result.recentShotEvents = shotEvents;
+  }
+
   // Populate tactical awareness signals from deterministic world state.
   result.matchPhase = world.matchPhase;
   result.currentHalf = world.currentHalf;
@@ -708,6 +832,21 @@ interface CpuInternalState {
    * lock-out window. 0 while no attempt is outstanding.
    */
   tackleReleaseTick: number;
+
+  // --- Designated keeper (GK-5V5-ADAPTER-BEHAVIOR) ---
+  /**
+   * Frozen keeper designation for this body's team, resolved once at the first
+   * sample from the wiring's role assignment (or the adapter-layer layout rule).
+   * Never re-derived from ball state afterwards (spec §4).
+   */
+  keeperPlayerId: string | undefined;
+  /**
+   * This keeper's live save/claim reaction (spec §7), advanced by the shared
+   * production rule so evidence and behavior arm and disarm identically.
+   */
+  keeperReaction: KeeperReactionState;
+  /** Whether the ball was inside `save_claim_reach_radius` last sample. */
+  ballWasInSaveReach: boolean;
 }
 
 /**
@@ -1433,16 +1572,33 @@ const CHASE_NEAREST_HOME_TOLERANCE = 0.75;
 export const RESTART_HOLD_MIN_TICKS = 2;
 
 /**
+ * Ticks a committed `shot` event stays perceptible to a keeper, mirroring the
+ * provisional window the accepted pass-awareness extraction already uses. The
+ * window is a perception bound, not a reaction threshold: the model's declared
+ * reaction window (`keeper_reaction_window_ticks`) is checked against the tick a
+ * keeper actually initiates on.
+ *
+ * Provisional — model `gk-small-sided-v1`.
+ */
+export const SHOT_EVENT_WINDOW_TICKS = 10;
+
+/**
  * The press/cover pair of a team, computed the way the accepted cover mechanism
  * computes it: the presser is the nearest non-attacker to the ball, the cover is
  * the second-nearest non-attacker.
  *
  * Exported so per-tick evidence records the assignment the adapter actually
  * acts on instead of re-deriving it somewhere else.
+ *
+ * `excludedPlayerId` (GK-5V5-ADAPTER-BEHAVIOR) removes one body from the pair —
+ * the production wiring passes the designated keeper, which is confined to its
+ * goal arc and can therefore be neither presser nor cover. Absent, the accepted
+ * pair is unchanged.
  */
 export function findPressCoverPair(
   observation: CpuObservation,
   teamId: string,
+  excludedPlayerId?: string,
 ): {
   presserId: string | undefined;
   presserDistance: number;
@@ -1457,6 +1613,7 @@ export function findPressCoverPair(
     if (p.teamId !== teamId) continue;
     // Attackers stay forward for support and never form the press pair.
     if (p.formationRole === "attacker") continue;
+    if (excludedPlayerId !== undefined && p.playerId === excludedPlayerId) continue;
     const dx = observation.ball.position.x - p.groundPosition.x;
     const dy = observation.ball.position.y - p.groundPosition.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -1477,23 +1634,57 @@ export function findPressCoverPair(
  * The single body allowed to break the kickoff freeze: the nearest player in
  * the match to the untouched ball, i.e. the kick taker. Ties resolve by
  * ascending playerId so the choice never depends on array order.
+ *
+ * With the keeper role live (GK-5V5-ADAPTER-BEHAVIOR) each team's designated
+ * keeper is dropped from that selection: a keeper is never sent out of its goal
+ * arc to take a restart. A restart whose serve lands inside a keeper's own arc
+ * is still resolved, because that body is separately exempt while it is already
+ * at the ball. If a team's keeper is the only body in the match the accepted
+ * selection stands, so an untouched ball can never become unplayable.
  */
-function findKickoffTaker(observation: CpuObservation): string | undefined {
-  let bestId: string | undefined;
-  let bestDist = Infinity;
-  for (const p of observation.players) {
-    const dx = observation.ball.position.x - p.groundPosition.x;
-    const dy = observation.ball.position.y - p.groundPosition.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (
-      dist < bestDist ||
-      (dist === bestDist && bestId !== undefined && p.playerId < bestId)
-    ) {
-      bestDist = dist;
-      bestId = p.playerId;
+function findKickoffTaker(
+  observation: CpuObservation,
+  excludeKeeper = false,
+): string | undefined {
+  const nearestExcluding = (skip: string[]): string | undefined => {
+    let bestId: string | undefined;
+    let bestDist = Infinity;
+    for (const p of observation.players) {
+      if (skip.includes(p.playerId)) continue;
+      const dx = observation.ball.position.x - p.groundPosition.x;
+      const dy = observation.ball.position.y - p.groundPosition.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (
+        dist < bestDist ||
+        (dist === bestDist && bestId !== undefined && p.playerId < bestId)
+      ) {
+        bestDist = dist;
+        bestId = p.playerId;
+      }
     }
+    return bestId;
+  };
+  const keepers = excludeKeeper ? keeperIdsForMatch(observation) : [];
+  if (keepers.length === 0) return nearestExcluding([]);
+  // Every body in the match is a keeper: the accepted selection stands.
+  return nearestExcluding(keepers) ?? nearestExcluding([]);
+}
+
+/**
+ * The designated keeper of every team visible in this observation. The
+ * taker-selection fallback needs both teams' designations, while a per-team
+ * caller only ever reads its own.
+ */
+function keeperIdsForMatch(observation: CpuObservation): string[] {
+  if (!isKeeperBehaviorActive(observation)) return [];
+  const teams = new Set<string>();
+  for (const p of observation.players) teams.add(p.teamId);
+  const ids: string[] = [];
+  for (const teamId of teams) {
+    const keeperId = resolveKeeperPlayerId(observation, teamId);
+    if (keeperId !== undefined) ids.push(keeperId);
   }
-  return bestId;
+  return ids;
 }
 
 /** Per-team, per-tick anti-huddle chase assignment. */
@@ -1511,6 +1702,12 @@ export interface ChaseRoleAssignment {
    * the same body.
    */
   kickoffTakerId: string | undefined;
+  /**
+   * The team's designated keeper for this tick, or `undefined` when no keeper
+   * role is live (GK-5V5-ADAPTER-BEHAVIOR). Recorded here so per-tick evidence
+   * and the chase assignment come from one production call.
+   */
+  keeperPlayerId: string | undefined;
 }
 
 /**
@@ -1544,10 +1741,13 @@ export function assignChaseRoles(
     // The press pair only forms once the ball is in play; the kick taker only
     // matters while it is not. Each window needs one pass over the bodies.
     coverPlayerId: ballTouched
-      ? findPressCoverPair(observation, teamId).coverId
+      ? findPressCoverPair(observation, teamId, resolveKeeperPlayerId(observation, teamId)).coverId
       : undefined,
     ballTouched,
-    kickoffTakerId: ballTouched ? undefined : findKickoffTaker(observation),
+    kickoffTakerId: ballTouched
+      ? undefined
+      : findKickoffTaker(observation, isKeeperBehaviorActive(observation)),
+    keeperPlayerId: resolveKeeperPlayerId(observation, teamId),
   };
 }
 
@@ -2024,6 +2224,181 @@ function computeMarkOffsetPosition(
   };
 }
 
+/** What the keeper path needs about its own body, resolved by the caller. */
+interface KeeperSelf {
+  playerId: string;
+  x: number;
+  y: number;
+  bodyHeading: number;
+  distToBall: number;
+  ballHSpeed: number;
+}
+
+/**
+ * The designated keeper's frame (GK-5V5-ADAPTER-BEHAVIOR, spec §§5-8).
+ *
+ * Positioning (§5): the commanded target is always a point on the keeper's own
+ * goal arc — the goal-line centre offset longitudinally by the versioned
+ * `goal_arc_center_x_offset`, drifted laterally toward the ball but never past
+ * `goal_arc_lateral_max`. Because that point is inside the arc by construction,
+ * the keeper has no path into a field chase, and it is never the team's
+ * designated presser (`designatePresser` drops it from the eligible set).
+ *
+ * Save/claim (§7): an opponent's canonical `shot` event that is on target at
+ * this goal arms the reaction on the first tick it is observable — inside the
+ * versioned `keeper_reaction_window_ticks` — and the claim itself is the same
+ * `FIRST_TOUCH` input a human or the accepted CPU press uses, so the contact is
+ * resolved by the contact system on the independent ball and recorded as an
+ * event. The keeper never parents, carries or teleports the ball, and only ever
+ * reaches within the versioned `save_claim_reach_radius` of its own position.
+ *
+ * Distribution (§8): a keeper in possession releases with the accepted `PASS`
+ * action to a teammate selected from observed positions only, and only along a
+ * lane already inside its own facing tolerance — it never leaves the arc to aim.
+ *
+ * Speed (§5): inside the arc the keeper repositions at the versioned
+ * `keeper_reposition_speed`; a scenario's kickoff home is not its goal line, so
+ * while outside the arc it closes on its own station at the same accepted
+ * locomotion cap every other body uses. No new speed value is introduced.
+ *
+ * Deterministic: same (tick, observation, instance state) → same frame.
+ */
+function computeKeeperFrame(
+  tick: number,
+  observation: CpuObservation,
+  state: CpuInternalState,
+  teamId: string,
+  self: KeeperSelf,
+): InputFrame {
+  const ball = observation.ball;
+  const pitchLength = observation.pitchLength;
+  const goalLineX = ownGoalLineX(teamId, pitchLength);
+  const arcCenter = goalArcCenter(teamId, pitchLength);
+  const ballPos = { x: ball.position.x, y: ball.position.y };
+  const ballVel = { x: ball.linearVelocity.x, y: ball.linearVelocity.y };
+
+  // ------------------------------------------------------------------
+  // Save/claim reaction (spec §7)
+  // ------------------------------------------------------------------
+  // One shared production rule arms and disarms the reaction, keyed to the shot's
+  // own event id — the ball reference that shot wrote — so the reaction ends the
+  // tick any body, this keeper's own claim included, plays the ball.
+  const reaction = advanceKeeperReaction(state.keeperReaction, {
+    tick,
+    teamId,
+    pitchLength,
+    recentShotEvents: observation.recentShotEvents,
+    ballPosition: ballPos,
+    ballVelocity: ballVel,
+    lastTouchRef: ball.lastTouchRef,
+  });
+  if (reaction.armedNow) noteKeeperSaveArm();
+  state.keeperReaction = reaction.state;
+  const saveArmed = reaction.state.shotTick !== null;
+
+  // ------------------------------------------------------------------
+  // Goal-arc positioning with bounded lateral drift (spec §5)
+  // ------------------------------------------------------------------
+  // While a shot is live the keeper drifts to where that ball crosses its goal
+  // line (a linear projection of the state it can observe, the same information
+  // class the accepted interception awareness already uses); otherwise it holds
+  // the arc in front of the ball's lateral position. Either way the point is
+  // clamped inside `goal_arc_lateral_max`, so it is never a field chase.
+  const station = keeperStationTarget(
+    teamId,
+    pitchLength,
+    ballPos,
+    ballVel,
+    saveArmed,
+  );
+
+  let moveX = 0;
+  let moveY = 0;
+  const stationDx = station.x - self.x;
+  const stationDy = station.y - self.y;
+  const stationDist = Math.sqrt(stationDx * stationDx + stationDy * stationDy);
+  if (stationDist > KICKOFF_FREEZE_HOME_TOLERANCE) {
+    const speedScale = isInsideGoalArc({ x: self.x, y: self.y }, arcCenter)
+      ? GK_SMALL_SIDED_V1.keeper_reposition_speed.value / FOUNDATION_LOCOMOTION_V1.maxSpeed.value
+      : 1;
+    const magnitude = Math.min(stationDist, 1) * speedScale;
+    moveX = (stationDx / stationDist) * magnitude;
+    moveY = (stationDy / stationDist) * magnitude;
+  }
+
+  // ------------------------------------------------------------------
+  // Claim and release
+  // ------------------------------------------------------------------
+  // Two states, in priority order. A ball the keeper has already secured (slow,
+  // at its feet) is distributed (§8); anything else that comes inside the
+  // versioned reach is claimed — the inbound shot on target (§7), a loose ball
+  // in the arc, or an untouched restart the core served there. Both are the same
+  // canonical actions a human reaches through the keyboard bindings: the contact
+  // system resolves them against the independent ball and records the event, so
+  // the ball is never parented to the keeper nor teleported.
+  let heldButtons = 0;
+  let pressedButtons = 0;
+  const inReach = self.distToBall <= GK_SMALL_SIDED_V1.save_claim_reach_radius.value;
+  const secured = self.distToBall < POSSESSION_RANGE &&
+    self.ballHSpeed < POSSESSION_SPEED_THRESHOLD;
+  const releaseTarget = secured && observation.teammates !== undefined
+    ? getBestTeammateTarget(
+      observation.teammates,
+      { x: self.x, y: self.y },
+      teamId,
+      getOpponentPositions(observation, teamId),
+    )
+    : undefined;
+  const aimDx = releaseTarget !== undefined ? releaseTarget.x - self.x : 0;
+  const aimDy = releaseTarget !== undefined ? releaseTarget.y - self.y : 0;
+  const aimedAtTeammate = releaseTarget !== undefined &&
+    Math.abs(normalizeAngle(self.bodyHeading - Math.atan2(aimDy, aimDx))) <=
+      FACING_TOLERANCE_WIDE;
+
+  if (aimedAtTeammate) {
+    // Distribution (§8): the target comes from observed teammate and opponent
+    // positions only — never a modelled future — and the release fires only down
+    // a lane this body is already facing, so holding the arc and releasing stay
+    // the same position.
+    heldButtons |= PASS_BIT;
+    if (!state.passWasPressed) {
+      pressedButtons |= PASS_BIT;
+      noteKeeperReleasePress();
+    }
+    state.passWasPressed = true;
+  } else {
+    if (inReach && (saveArmed || secured || ball.lastTouchRef === null)) {
+      heldButtons |= FIRST_TOUCH_BIT;
+      if (!state.ballWasInSaveReach) {
+        pressedButtons |= FIRST_TOUCH_BIT;
+        noteKeeperSavePress();
+      }
+    }
+    state.passWasPressed = false;
+  }
+  state.ballWasInSaveReach = inReach;
+  // Field-mode possession bookkeeping is not meaningful for a body that never
+  // plays as a field player; clear it the way the restart freeze does, so a
+  // keeper released back to the accepted path (an untouched restart it must
+  // take) starts from a clean state.
+  state.ballWasInRange = false;
+  state.hasPossession = false;
+
+  noteKeeperHoldTick();
+
+  return {
+    tick,
+    sourceId: "cpu",
+    controlSlot: "slot-cpu",
+    moveX,
+    moveY,
+    sprint: 1,
+    heldButtons,
+    pressedButtons,
+    releasedButtons: 0,
+  };
+}
+
 /**
  * Create a new CPU adapter with goal-aware strategy.
  *
@@ -2113,6 +2488,9 @@ export function createCpuAdapter(): CpuAdapter {
     lastCurrentHalf: 1,
     tackleHoldTicks: 0,
     tackleReleaseTick: -1,
+    keeperPlayerId: undefined,
+    keeperReaction: { ...KEEPER_REACTION_IDLE },
+    ballWasInSaveReach: false,
   };
 
   return {
@@ -2336,6 +2714,37 @@ export function createCpuAdapter(): CpuAdapter {
           pressedButtons: 0,
           releasedButtons: 0,
         };
+      }
+
+      // ------------------------------------------------------------------
+      // Designated keeper (GK-5V5-ADAPTER-BEHAVIOR, spec §§4-8)
+      // ------------------------------------------------------------------
+      // The role is assigned by the wiring from the match's starting layout and
+      // frozen here, so it is a stable actor id rather than a ball fact. A
+      // keeper-designated body never runs the field branches below: its
+      // commanded target is always a point inside its own goal arc, and its only
+      // ball actions are the recorded save/claim contact and the distribution
+      // release, both issued through the sanctioned tick-indexed input path.
+      // While a restart ball is still untouched the accepted freeze owns this
+      // body too: a keeper is never the match's designated restart taker, and a
+      // serve that lands inside its own arc is claimed from there.
+      if (isKeeperBehaviorActive(observation) && state.keeperPlayerId === undefined &&
+        cpuTeamId !== undefined) {
+        state.keeperPlayerId = resolveKeeperPlayerId(observation, cpuTeamId);
+      }
+      const isDesignatedKeeper = state.keeperPlayerId !== undefined &&
+        cpuTeamId !== undefined &&
+        state.keeperPlayerId === myPlayerId;
+
+      if (isDesignatedKeeper) {
+        return computeKeeperFrame(tick, observation, state, cpuTeamId as string, {
+          playerId: myPlayerId,
+          x: playerX,
+          y: playerY,
+          bodyHeading: cpuPlayer.bodyHeading,
+          distToBall,
+          ballHSpeed,
+        });
       }
 
       // Baseline for every non-chasing body once the freeze is over: hold the
@@ -3279,6 +3688,9 @@ export function createCpuAdapter(): CpuAdapter {
       state.lastCurrentHalf = 1;
       state.tackleHoldTicks = 0;
       state.tackleReleaseTick = -1;
+      state.keeperPlayerId = undefined;
+      state.keeperReaction = { ...KEEPER_REACTION_IDLE };
+      state.ballWasInSaveReach = false;
     },
   };
 }

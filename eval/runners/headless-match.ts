@@ -20,6 +20,7 @@ import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { deepClone } from "../../src/simulation/world/clone.js";
 import type { WorldState, MatchPhase as SimMatchPhase } from "../../src/contracts/state.js";
 import { createCpuAdapter, buildCpuObservation, type CpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
+import { designateKeeperFromLayout } from "../../src/adapters/input-browser/goalkeeper-role.js";
 import { computeTeamDecision } from "../../src/adapters/input-browser/team-decision-profile.js";
 import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
 import type { SimulationObserver } from "../../src/simulation/telemetry/observer.js";
@@ -126,6 +127,19 @@ export interface HeadlessMatchConfig {
    * discriminating guards stash the behavior through this switch.
    */
   cpuAntiHuddle?: boolean;
+  /**
+   * Designated-keeper role (GK-5V5-ADAPTER-BEHAVIOR): assign one of the bodies
+   * the scenario already ships per team as its SMALL-SIDED keeper and let the
+   * adapter-layer keeper path run (goal-arc hold, no field chase, save/claim on
+   * shots on target).
+   *
+   * Default false — the shape every accepted headless artifact was produced
+   * with, and the explicit stash the discriminating guards use to reproduce the
+   * pre-keeper frames. No body is added and no player count changes: the role is
+   * an adapter-layer assignment resolved once from the match's starting layout
+   * and injected as a stable actor id.
+   */
+  gkBehavior?: boolean;
   /**
    * Build each CPU slot's observation through `buildCpuObservation` with the
    * slot's team and player resolved — the browser composition root's shape,
@@ -481,6 +495,7 @@ export function runHeadlessMatch(
     autoGoalReset,
     cpuDefensiveTackle = false,
     cpuAntiHuddle = true,
+    gkBehavior = false,
     browserParityObservations = false,
     lifecyclePhaseSync = "legacy",
   } = config;
@@ -549,6 +564,36 @@ export function runHeadlessMatch(
       slots.add(slotId);
     }
   }
+
+  // GK-5V5-ADAPTER-BEHAVIOR: the keeper role is an adapter-layer assignment on
+  // the bodies the scenario already ships. It is resolved once, from the layout
+  // the match starts with — never from a ball fact — and then injected into
+  // every observation of that team, so a team's keeper is a stable actor id for
+  // the whole run (spec §4). No world body is added and no player count changes.
+  const keeperByTeam = new Map<string, string>();
+  if (gkBehavior) {
+    const layout = scenario.players.map((p) => ({
+      playerId: p.playerId,
+      teamId: p.teamId,
+      groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
+      formationRole: (p as { formationRole?: "defender" | "midfielder" | "attacker" })
+        .formationRole,
+    }));
+    for (const { teamId } of slotCpus) {
+      if (keeperByTeam.has(teamId)) continue;
+      const keeperId = designateKeeperFromLayout(layout, teamId, scenario.pitchLength);
+      if (keeperId !== undefined) keeperByTeam.set(teamId, keeperId);
+    }
+  }
+
+  const keeperRoles = gkBehavior
+    ? Object.fromEntries(keeperByTeam.entries())
+    : undefined;
+  const applyGkRole = (teamObs: CpuObservation): void => {
+    if (!gkBehavior || keeperRoles === undefined) return;
+    teamObs.gkBehavior = true;
+    teamObs.keeperPlayerIds = keeperRoles;
+  };
 
   // 3. Run the match loop.
   const events: SimulationEvent[] = [];
@@ -688,6 +733,10 @@ export function runHeadlessMatch(
         // The press designation lives or dies with the same switch the slots
         // are given, so a stashed run is one shape end to end.
         teamObs.cpuAntiHuddle = cpuAntiHuddle;
+        // With the keeper role live the shared press designation can never name
+        // a team's keeper, so the chase, the press block and the tackle
+        // authorisation all stay field-body decisions.
+        applyGkRole(teamObs);
         const cpuGoals = scoreAccum[teamId] ?? 0;
         const opponentTeamId = teamId === "team-a" ? "team-b" : "team-a";
         const opponentGoals = scoreAccum[opponentTeamId] ?? 0;
@@ -717,6 +766,7 @@ export function runHeadlessMatch(
       // 5V5-KICKOFF-ANTI-HUDDLE: the anti-huddle shape is live unless a caller
       // explicitly stashes it (the discriminating guards do exactly that).
       teamObs.cpuAntiHuddle = cpuAntiHuddle;
+      applyGkRole(teamObs);
 
       const frame = adapter.sample(tick, teamObs);
       frame.controlSlot = controlSlot;
