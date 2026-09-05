@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-05T12:05:00Z
+measured_at: 2026-09-05T13:05:00Z
 tracking_contract_version: 1
-last_tracked_objective: GK-5V5-ADAPTER-BEHAVIOR
-usage_aggregates_through: GK-5V5-ADAPTER-BEHAVIOR
-clock_aggregates_through: GK-5V5-ADAPTER-BEHAVIOR
-model_evaluation_through: GK-5V5-ADAPTER-BEHAVIOR
+last_tracked_objective: GK-BROWSER-DYNAMIC-EVIDENCE
+usage_aggregates_through: GK-BROWSER-DYNAMIC-EVIDENCE
+clock_aggregates_through: GK-BROWSER-DYNAMIC-EVIDENCE
+model_evaluation_through: GK-BROWSER-DYNAMIC-EVIDENCE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,19 +42,18 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 535h 07m |
+| Calendar span (first work → measurement) | 536h 07m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~140h est. |
-| Sum of per-step agent time | ~139h 54m |
+| Active work (anything running) | ~141h est. |
+| Sum of per-step agent time | ~140h 44m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T12:05:00Z`.
-Recomputed 2026-09-05 at the GK-5V5-ADAPTER-BEHAVIOR acceptance
-(Horizon v26 2/4): 175 accepted per-step rows summing to ~139h 54m (the new
-objective adds ~3h 05m: builder ~2h 45m incl. the qwen3.8-flash quota death at
-~80% completion + the deepseek-v4-flash reroute completion ~19m / critic 10m /
-integration 8m / commits ~2m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-05T13:05:00Z`.
+Recomputed 2026-09-05 at the GK-BROWSER-DYNAMIC-EVIDENCE acceptance
+(Horizon v26 3/4): 176 accepted per-step rows summing to ~140h 44m (the new
+objective adds ~50m: builder ~27m / critic 15m / integration 7m / commits ~1m;
+all on the deepseek-v4-flash reroute). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -259,6 +258,7 @@ invoices.
 | VIDEO-CAPTURE-RESTORE-30S-CLIP | accepted | ~29m | ~21m | 3m | 4m | ~1m | n/a | n/a |
 | GK-SPEC-SUITE-CONTRACTS | accepted | ~48m | ~36m | 6m | 5m | ~1m | n/a | n/a |
 | GK-5V5-ADAPTER-BEHAVIOR | accepted | ~3h 05m | ~2h 45m | 10m | 8m | ~2m | n/a | n/a |
+| GK-BROWSER-DYNAMIC-EVIDENCE | accepted | ~50m | ~27m | 15m | 7m | ~1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -572,6 +572,7 @@ on an H task is the interesting result.
 | VIDEO-CAPTURE-RESTORE-30S-CLIP | deepseek-v4-flash | M | Low-Medium - restore the missing capture-ai-video tool with Playwright-native WebM recording (no system ffmpeg), hygiene-gated durable capture, real ~36 s clip of the accepted anti-huddle arc, binding test asserting real-artifact metadata honesty; no source change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic independently recomputed clip SHA/bytes, verified EBML magic, the real match path, and ordinary-run docs/ byte-identity (824-file hash diff) |
 | GK-SPEC-SUITE-CONTRACTS | deepseek-v4-flash | M | Medium - new normative spec (GOALKEEPER_SPEC.md, small-sided-only) + versioned `goalkeepers` evaluator suite (suite-goalkeepers-v1: criteria bindings, invariants, observations, scenario stubs, provisional config gk-small-sided-v1 with 5 BLOCKED_MISSING_REFERENCE disclosures) + 24-test binding suite with negative controls; registry grew 24b5341e -> c9098fb8 with two provenance assertions accommodated as format+provenance validation; zero src/ change | 0 | A | first-pass ACCEPT; audit PASS 20/20; critic proved the accommodation retains discriminating power and all verdict-bearing comparisons strict; integration re-ran 148/148 neighbors + typecheck 0 |
 | GK-5V5-ADAPTER-BEHAVIOR | deepseek-v4-flash (rerouted from qwen3.8-flash mid-task on monthly quota cap; ~80% qwen-written implementation kept and re-verified) | M | Medium-High - adapter-layer designated-keeper role (goalkeeper-role.ts + cpu-adapter/team-decision-profile wiring): arc hold with bounded drift from gk-small-sided-v1, never chaser/presser, save/claim via tick-indexed InputFrames, ball independent; gkBehavior:false kill switch with stash-identity to 91ff0be; 4-run MULTI_TICK trajectory (2 driven fixture runs give 4 save chains; organic run armed 21 reactions / 0 completed chains — disclosed); runner wiring default-false evidence-only | 0 | A | first-pass ACCEPT; audit PASS; critic verified raw rows + stash-identity cross-checked vs the accepted anti-huddle pin; integration re-ran 115/115 + stash verifier + typecheck 0 |
+| GK-BROWSER-DYNAMIC-EVIDENCE | deepseek-v4-flash (qwen reroute continues) | M | Medium - gkBehavior enabled in the 5v5 CPU-vs-CPU browser composition root (wiring-only, IS_AI_MATCH_5V5-gated, human modes untouched) + DYNAMIC_VISUAL capture: 4 event-centered frames (arc-hold@195, press-and-cover@355, shot@366, save-contact@370) + sequence.json + browser trajectory 9acef93e… (replay_identical; stashed control all-zero); save provenance fixture-driven and disclosed (organic: 0 save chains); browser binding test 2/2 with discriminating negative | 0 | A | first-pass ACCEPT; critic INDEPENDENTLY REPRODUCED the run in its own Chromium (identical ticks, byte-identical PNGs); integration 118/118 node + 4/4 accepted DYNAMIC_VISUAL + typecheck 0 |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -834,6 +835,8 @@ on an H task is the interesting result.
 | GK-SPEC-SUITE-CONTRACTS | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 148/148 neighboring tests re-run (goalkeepers-suite 24 + eval-registry 48 + duels-suite 39 + foundation-lab 8 + playable-1v1 29); typecheck 0; all 8 contract files purely additive (deletions=0); full test diffs reviewed (zero skip/todo/only; only relaxation = the two registrySetId assertions); no out-of-scope files |
 | GK-5V5-ADAPTER-BEHAVIOR | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; trajectory SHA ca9443a0… recomputed; 4-run structure + 4 save chains verified from raw rows; keeper never chaser/presser on any tick; drift ≤2.5 m; stash-identity independently re-executed (gkBehavior:false byte-equals 91ff0be chains; continuous chain matches the accepted anti-huddle pin); core byte-identity + runner-touches-as-infrastructure verified; honesty verified (organic 0 completed save chains disclosed; save evidence driven-by-layout; no GK-* verdict claimed) |
 | GK-5V5-ADAPTER-BEHAVIOR | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 115/115 tests re-run (51 objective + 64 accepted pins) + team-decision-profile neighbor 15/15; typecheck 0; stash verifier re-executed vs 91ff0be; core byte-identity + eval/contracts untouched; presentation authority PASS (browser composition root unchanged); blocked references stay blocked |
+| GK-BROWSER-DYNAMIC-EVIDENCE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; INDEPENDENT Chromium reproduction: identical event ticks 195/355/366/370, byte-identical PNGs, trajectory differing only by the durable_capture flag; vision review of all 4 frames (genuine Three output; keeper on the goal line; ball adjacent at contact); trajectory SHA recomputed; counters + stashed all-zero verified; hygiene mechanically proven (841 docs/ files byte-identical on ordinary runs); honesty verified (fixture-driven save disclosed; no organic-save overclaim) |
+| GK-BROWSER-DYNAMIC-EVIDENCE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 2/2 browser suite + 4/4 accepted DYNAMIC_VISUAL suites + 118/118 node regressions re-run; typecheck 0; main.ts wiring-only verified (human modes untouched); presentation authority PASS; docs/ byte-identical on ordinary runs with evidence SHAs re-verified |
 
 ### Builder scoreboard
 
