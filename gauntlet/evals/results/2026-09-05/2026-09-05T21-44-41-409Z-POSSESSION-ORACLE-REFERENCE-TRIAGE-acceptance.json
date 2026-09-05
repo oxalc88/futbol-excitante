@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-05T21:44:41.409Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "POSSESSION-ORACLE-REFERENCE-TRIAGE",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "a034f72dacfbdd2076633fbe5905a5ad36936217",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v28 3/4: triage of the latent per-tick lastTouchRef pattern in the possession oracle (flagged by the accepted COMMON-FULL-MATCH-INVARIANT-TRIAGE: eval/oracles/possession.ts lines ~62-70). CAN-IT-FAIL-FAIL ANALYSIS: YES — same defect class as references.ts. The telemetry contract defines ball.lastTouchRef as a persistent reference while observation.events are per-tick; the oracle's possession-orphar-ref check resolved it only against the current observation's own per-tick events. BEFORE per-tick orphan-ref fails measured on 4 real full-match maps (runHeadlessMatch, same organic driver as the accepted triage): anti-huddle-flowing 1719/1800 (the EXACT COMMON-REFERENCES false-fail count), ball-settled-flowing 1149/1200, restart-corner 1749/1800, gk-continuous-live 1685/1800; no-evidence fails 0 on every run; 0 genuinely-invalid refs (window-union). The genuine possession-CHANGE check (BALL-IND-001-POSS) had 0 fails on every run — the defect is reference-resolution ONLY, not a per-tick-by-design semantic, so the honest result is a FIX, not a no-change. FIX: checkPossessionEvidence(observations, knownEventIds?) — orphan-ref resolves against the window event union (per-tick fallback for single-observation callers, preserving old behavior where it was correct); the possession-change logic stays per-tick by design and is byte-identical to HEAD; wire.ts passes the window union mirroring the accepted event-references wiring verbatim. NO WEAKENING: a synthetic never-anywhere-in-run reference still produces BOTH no-evidence and orphan-ref FAILs; 3 additive discriminating guards (false-fail-signature fails against pre-fix behavior and passes with the union; ghost-nowhere still FAILs under the union; change-without-evidence still FAILs). AFTER: 0 orphan-ref fails on all 4 maps. Accepted pins byte-identical: BALL-IND-001-POSS PASS, TOUCH-SLOW-001-CONTACT PASS, MUTANT_TEAM_PASS (clean=pass / poisoned=fail — mutant-team 34/34 incl. the poison still firing), close-control 26/26, oracles-mutant-canary 23/23; git diff -- docs/ empty (accepted evidence untouched). Zero gameplay change (git diff src/simulation/ src/contracts/ src/adapters/ eval/scenarios/ specs/ EMPTY; the oracle remains pure). Evidence: docs/evidence/POSSESSION-ORACLE-REFERENCE-TRIAGE/{RESULT.md, audit.json, possession-triage.json, runs/*.json} by the new deterministic producer scripts/capture-possession-oracle-triage.ts (BEFORE numbers reproduced EXACTLY by critic — which extracted the genuine pre-fix code from git HEAD — and by integration: all 4 captures re-run, evidence tree byte-identical EVIDENCE-TREE-BYTE-IDENTICAL, record hashes stable). Tests 290+ targeted green: possession-oracle 13 (+3 guards), mutant-core 33, mutant-team 34, mutant-1v1 38, oracle-registry 19, duels-suite 39, goalkeepers-suite 24, eval-registry 48, foundation-evaluator 36, close-control 26, oracles-mutant-canary 23, compare-foundation 8, headless 13, telemetry 11, evaluator 18; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass; integration ACCEPT first pass (162/162 in the 6-file gate; 4/4 captures reproduced). Audit PASS HEADLESS. claims_not_made: no PROMOTION / no PES fidelity / no FOUNDATION_LAB_PASS / no invented envelope / no oracle weakened / no test weakened."
+}
