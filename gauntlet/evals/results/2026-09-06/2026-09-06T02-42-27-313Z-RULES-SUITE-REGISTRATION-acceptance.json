@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-06T02:42:27.313Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "RULES-SUITE-REGISTRATION",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "bdcaf91f1904f8c1a55bc005b7115169278cf0e4",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v29 1/4: the `rules` evaluator suite (suite-rules-v1) registered per MATCH_RULES_SPEC §15 so the rules semantics become executable. Registration (additive-only; registry discipline per the GK-SPEC-SUITE-CONTRACTS + GK-KEEPER-ORACLE-REGISTRATION pattern): 25 MATCH-* criteria in common-criteria.ts (names match spec §15 exactly, cross-checked), 8 invariants, obs-rules-restart-v1, scenario stub, 8 bindings, 8 PROTECTED ORACLES (eval/oracles/rules-restart.ts 6 + rules-phase.ts 2; mutant/canary-guarded — wrong-team award FAILs, goal-kick to non-defending team FAILs, corner-awarded-when-goal-kick-required FAILs, invalid goalIndex/malformed payload FAILs, goal+OOP same tick FAILs, null-touch-boundary-then-execution FAILs, nonexistent reference honestly NOT_EVALUATED) wired in wire.ts + 8 additive CRITERION_TO_ORACLE rows in foundation-evaluator.ts (the gk-role precedent layer); headless-match.ts UNTOUCHED (the silent-consumer inventory from the LIFECYCLE-MIGRATION lesson: all ~15 runHeadlessMatch callers inventoried, none affected). Executed outcomes on the 3 accepted restart fixtures (1800 ticks, core-owned): MATCH-OUT-OF-PLAY-DETECT / MATCH-OUT-OF-PLAY-NO-LAST-TOUCH / MATCH-KICKOFF-FREEZE / MATCH-SCORING-GOAL-DEVENT PASS; restart-AWARD + TIMER-FREEZE honestly NOT_EVALUATED (the committed observation stream does not serialize restart-executed events or core matchPhase/matchTimer — disclosed serialization limitation, verified real by the critic); MATCH-GOAL-KICK-DISTRIBUTION / MATCH-CORNER-KICK-CROSS BLOCKED_MISSING_REFERENCE (spec §14). Registry content hash evolved c9098fb8… → 980873a8… (provenance-accommodation precedent; provenance gates pass unchanged). CRITIC RETRY resolved (3 fixes): (1) per-run reporting corrected to match the evaluator (rules-corner-live × KICKOFF-FREEZE PASS→NOT_EVALUATED; conclusions prose aligned); (2) serialization disclosure for MATCH-OUT-OF-PLAY-NO-LAST-TOUCH applied consistently in record conclusions + RESULT.md source note + claims_not_made (option a: outcome unaltered, the PASS attests the observable null-touch-boundary identification only); (3) unused geometry constants deleted + module header corrected. INTEGRATION REJECT resolved (1 fix): the producer hashed a wall-clock generated_at field into record_sha256 (ordinary re-runs produced different hashes) — the field REMOVED entirely matching the accepted possession-triage precedent; new stable record_sha256 7503f9fe61b86731d08460dd47651b541abc3672b21ff26d0056ad8fd81029f8; two consecutive ordinary-mode runs BYTE-IDENTICAL (empty diff; integration independently verified: recomputed hash match, durable-vs-run1/run2/run1-vs-run2 all IDENTICAL). record_sha256 7503f9fe… (recomputed independently by critic AND integration). Zero gameplay change (git diff src/ src/simulation/ src/contracts/ src/adapters/ eval/scenarios/ specs/ EMPTY). Tests 54/54 rules gate (24 oracle + 17 suite + 13 binding) + 220/220 neighbors (goalkeepers 24 + registry 48 + duels 39 + oracle-registry 19 + mutant-core 33 + gk-oracle 16 + GK bindings 5+8 + match-rules-spec-binding 28) + 78/78 foundation/provenance + hygiene 3/3; typecheck 0; audit PASS HEADLESS. Critic (glm5.3-flash, independent) RETRY→ACCEPT; integration (glm5.3-flash) REJECT→fix→ACCEPT. claims_not_made: no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity/envelope / no invented reference tolerance / 7 BLOCKED_MISSING_REFERENCE stay blocked / no criterion upgraded beyond the executed evaluator / no suite-level PASS claim."
+}
