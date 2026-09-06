@@ -6,3 +6,7 @@ Import rejects: 0
 Existing reference IDs overwritten: 0
 Reason: no decodable PES media, measured PTS, camera calibration or measurements.
 Source download failures are recorded separately and are NOT importer rejects.
+
+ACQUISITION REVIEW: remote media reported; no videos transferred here.
+Additional reference:import invocations: 0; successes: 0; rejects: 0.
+Secondary provenance is not exported as DIRECT_CAPTURE.

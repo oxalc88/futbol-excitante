@@ -8,6 +8,7 @@
   "rejects": [],
   "existing_reference_files_before": [],
   "existing_reference_files_after": [],
-  "reason": "Acquisition delivered no video. No media SHA-256, decoded PTS, calibrated tracks or measured estimates exist. Do not call the importer on metadata/planning files.",
-  "future_command": "npm run reference:import -- <measured-reference.json>"
+  "reason": "Acquired videos are documented on another machine but not transferred. No local calibrated tracks or measured estimates exist. Public secondary provenance also does not match DIRECT_CAPTURE.",
+  "future_command": "npm run reference:import -- <measured-reference.json>",
+  "last_reviewed_at": "2026-09-06T15:48:55.704214+00:00"
 }

@@ -1,9 +1,9 @@
 {
   "version": "pes-source-preflight-v1",
   "generated_at": "2026-09-06T07:00:01.255679+00:00",
-  "status": "BLOCKED_SOURCE_MEDIA_UNAVAILABLE",
+  "status": "BLOCKED_MEDIA_TRANSFER_AND_PROVENANCE",
   "admitted": 0,
-  "pending": 2,
+  "pending": 3,
   "rejected_initial_set": 1,
   "sources": [
     {
@@ -13,11 +13,12 @@
       "uploader": "Tajae Lawrence",
       "channel_id": "UCukT9qP4DU0bOr-oPuQrDqA",
       "metadata_file": "source-audits/C4-W1u8w-yE.metadata.json",
-      "decision": "PENDING_MEDIA_ACCESS",
+      "decision": "REMOTE_AUDIT_REPORTED_PENDING_TRANSFER",
       "admitted": false,
       "decision_reasons": [
-        "No media file obtained: download read timeout",
-        "Decoded PTS/content cadence and camera/pitch review not performed"
+        "The acquisition operator reports complete media; MP4 is excluded from Git and absent here",
+        "Camera/pitch and content cadence have not been visually reviewed here",
+        "Secondary public media is not eligible for the current DIRECT_CAPTURE-only import contract"
       ],
       "game_declared": "PES 2017",
       "declared_platform": "PC",
@@ -41,7 +42,18 @@
       "camera_stability_verified": null,
       "uninterrupted_windows": null,
       "calibration": null,
-      "event_count": 0
+      "event_count": 0,
+      "prior_decision": "PENDING_MEDIA_ACCESS",
+      "acquisition_report": {
+        "operator": "gauntlet-observer-box",
+        "index": "raw/media/INDEX.csv",
+        "media_sha256_reported": "7c2d52bf91bd89315f352bf641c8f065c957c7bdb2d2e7166dfbc0eb8204f1fb",
+        "media_bytes_reported": 9760410,
+        "reported_provenance": "SECONDARY_PUBLIC_MEDIA",
+        "byte_hash_verified_here": false,
+        "summary_file": "raw/media/C4-W1u8w-yE.ffprobe.json",
+        "timing_audit_summary": "raw/audit-C4-W1u8w-yE/audit.json"
+      }
     },
     {
       "source_id": "8afTHuMZxbI",
@@ -50,11 +62,12 @@
       "uploader": "Throneful",
       "channel_id": "UCIw5rbXUrtk31t20Ap5817w",
       "metadata_file": "source-audits/8afTHuMZxbI.metadata.json",
-      "decision": "PENDING_MEDIA_ACCESS",
+      "decision": "REMOTE_ACQUISITION_REPORTED_PENDING_TRANSFER_AND_AUDIT",
       "admitted": false,
       "decision_reasons": [
-        "No media file obtained: download read timeout",
-        "Decoded PTS/content cadence and camera/pitch review not performed"
+        "The acquisition operator reports complete media; MP4 is excluded from Git and absent here",
+        "Camera/pitch and content cadence have not been visually reviewed here",
+        "Secondary public media is not eligible for the current DIRECT_CAPTURE-only import contract"
       ],
       "game_declared": "PES 2017",
       "declared_platform": "PC",
@@ -78,7 +91,17 @@
       "camera_stability_verified": null,
       "uninterrupted_windows": null,
       "calibration": null,
-      "event_count": 0
+      "event_count": 0,
+      "prior_decision": "PENDING_MEDIA_ACCESS",
+      "acquisition_report": {
+        "operator": "gauntlet-observer-box",
+        "index": "raw/media/INDEX.csv",
+        "media_sha256_reported": "510ca9f1d74454fc71a4b94c2e8de435d3f0d65b651b3d2fc0c37b647f56c081",
+        "media_bytes_reported": 531983243,
+        "reported_provenance": "SECONDARY_PUBLIC_MEDIA",
+        "byte_hash_verified_here": false,
+        "summary_file": "raw/media/8afTHuMZxbI.ffprobe.json"
+      }
     },
     {
       "source_id": "7daF_qg6B8s",
@@ -118,6 +141,61 @@
       "uninterrupted_windows": null,
       "calibration": null,
       "event_count": 0
+    },
+    {
+      "channel_id": null,
+      "platform": null,
+      "build": null,
+      "mode": null,
+      "difficulty": null,
+      "gameSpeed": null,
+      "controller": null,
+      "camera": null,
+      "media_sha256": null,
+      "decoded_frames": null,
+      "container_time_base": null,
+      "pts": null,
+      "verified_unique_content_cadence": null,
+      "pitch_markings_visible": null,
+      "camera_stability_verified": null,
+      "uninterrupted_windows": null,
+      "calibration": null,
+      "source_id": "LFvEnk0mcLI",
+      "role": "match-held-out",
+      "uri": "https://www.youtube.com/watch?v=LFvEnk0mcLI",
+      "uploader": "LioN KoLLA (declared in ACQUISITION.md)",
+      "metadata_file": "raw/media/LFvEnk0mcLI.ffprobe.json",
+      "admitted": false,
+      "game_declared": "PES 2017",
+      "declared_platform": "PC",
+      "direct_capture_verified": false,
+      "input_known": false,
+      "controlledInputs": false,
+      "inputLogSha256": null,
+      "event_count": 0,
+      "replaces": "7daF_qg6B8s",
+      "independent_capture_verified": false,
+      "prior_decision": null,
+      "decision": "REMOTE_ACQUISITION_REPORTED_PENDING_TRANSFER_AND_AUDIT",
+      "decision_reasons": [
+        "The acquisition operator reports complete media; MP4 is excluded from Git and absent here",
+        "Camera/pitch and content cadence have not been visually reviewed here",
+        "Secondary public media is not eligible for the current DIRECT_CAPTURE-only import contract"
+      ],
+      "acquisition_report": {
+        "operator": "gauntlet-observer-box",
+        "index": "raw/media/INDEX.csv",
+        "media_sha256_reported": "7af3f258ceed67a9ae8499c6d02c30e90afad714547bd257ce8a6eb47c445024",
+        "media_bytes_reported": 300019453,
+        "reported_provenance": "SECONDARY_PUBLIC_MEDIA",
+        "byte_hash_verified_here": false,
+        "summary_file": "raw/media/LFvEnk0mcLI.ffprobe.json"
+      }
     }
-  ]
+  ],
+  "updated_at": "2026-09-06T15:48:55.704214+00:00",
+  "acquisition_commit": "b5e0ffbba73985d4da705e922600aefc832ede36",
+  "acquired_as_reported_by_operator": 3,
+  "local_video_files": 0,
+  "revision_note": "Remote acquisition is documented; only metadata and one aggregate audit were transferred through Git."
 }

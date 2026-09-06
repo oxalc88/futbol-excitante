@@ -1,0 +1,50 @@
+{
+  "version": "acquisition-review-v1",
+  "recorded_at": "2026-09-06T15:48:55.704214+00:00",
+  "acquisition_commit": "b5e0ffbba73985d4da705e922600aefc832ede36",
+  "status": "BLOCKED_MEDIA_TRANSFER_AND_PROVENANCE",
+  "review_method": "Read-only consistency checks on acquired metadata; NOT a local video decode or camera review",
+  "received_input_sha256": {
+    "raw/media/ACQUISITION.md": "b9375bc63e2ef290b17bb5bdec009c662962a100a00dc72d4009f47e39c8a454",
+    "raw/media/INDEX.csv": "cc9760dde9f3991a6e54dbf9e26277a6b69b66347396ebef23041b448c5be57e",
+    "raw/audit-C4-W1u8w-yE/audit.json": "2df3d77cae0e09586070634636e74ee90432ba108985ae5172d81d293da53b44",
+    "raw/media/8afTHuMZxbI.ffprobe.json": "75c6f930fbea4e2c963ea802b0e574825a0893726d5cbb644366820da26bf0fb",
+    "raw/media/C4-W1u8w-yE.ffprobe.json": "00707d67dafebd79c5fde2fd6a55d0a95255968afabbe1cf13259805f56fc758",
+    "raw/media/LFvEnk0mcLI.ffprobe.json": "3a07b05108ed1a50a364782bd766cdf95ef3e0c0773f8a5e840e22573d7721d2"
+  },
+  "summary_consistency_checks": {
+    "declared_hash_matches_index": true,
+    "declared_size_matches_index": true,
+    "frame_counts_match": true,
+    "interval_count_matches_frames": true,
+    "endpoints_match_interval_histogram": true,
+    "still_not_admitted": true
+  },
+  "missing_local_evidence": [
+    "raw/media/C4-W1u8w-yE.mp4",
+    "raw/media/8afTHuMZxbI.mp4",
+    "raw/media/LFvEnk0mcLI.mp4",
+    "raw/audit-C4-W1u8w-yE/ffmpeg.stderr.log",
+    "raw/audit-C4-W1u8w-yE/ffprobe.json",
+    "raw/audit-C4-W1u8w-yE/ffprobe.stderr.log",
+    "raw/audit-C4-W1u8w-yE/frames.jsonl"
+  ],
+  "media_hashes_verified_here": 0,
+  "sources_admitted": 0,
+  "measurements_added": 0,
+  "npm_reference_import_invocations": 0,
+  "local_acquisition_attempt": {
+    "source_id": "C4-W1u8w-yE",
+    "format": "136+251",
+    "output_container": "mp4",
+    "extractor_version": "2026.08.19",
+    "network_timeout_seconds": 15,
+    "retry_count": 0,
+    "exit_code": 1,
+    "status": "YOUTUBE_AUTHENTICATION_CHALLENGE",
+    "video_files_obtained": 0,
+    "log": "logs/acquisition-transfer-recheck.log",
+    "authentication_or_bypass_attempted": false
+  },
+  "next_minimum_transfer": "C4-W1u8w-yE.mp4 matching INDEX.csv; regenerate or transfer raw frame audit records"
+}
