@@ -9,10 +9,12 @@ horizon_id: "conformance-completion-and-match-flow"
 created_from_commit: 0b5ae53
 created_at: 2026-09-06
 reason: "Horizon v30 (COMPLETE 4/4, remote-durable at 0b5ae53) closed the surfaced threads: ten serialized-fact rules criteria upgraded to executed PASS plus genuine timer-driven halftime/fulltime on a new driven timing fixture (5f29f2f), a genuine driven corner completing the per-restart conformance set with DYNAMIC_VISUAL frames (c07cebb), the core-owned team-a keeper off-arc drift root-caused (post-goal reset strands an off-arc-home keeper) and fixed at the adapter layer with rehomeKeeperToArc (e687fa9), and the goalkeepers suite honestly re-published under core-owned with COMMON-BOUNDS FAIL→PASS (de9fd3b). v31 completes the executable layer and adds a browser-facing capability: (a) serialize the adapter restart-window designation facts behind the same gate so the 3 anti-huddle restart-behavior criteria evaluate (rules suite → 23 PASS / 2 BLOCKED); (b) re-publish the rules suite state after that; (c) browser-visible full-match lifecycle flow (halftime break countdown + fulltime terminal state in the real app) as the observable capability; (d) two-run deterministic attestation so COMMON-DETERMINISTIC evaluates for the GK and rules suites. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 0
+current_index: 1
 objectives:
   - id: RESTART-DESIGNATION-FACTS-CONFORMANCE
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-06
+    candidate_commit: 0d7d76d
     reason: "Extend the gated serializeRestartFacts injection with the adapter restart-window designation facts (designated taker / per-team presser / window anchor) — same gate discipline: default false, strictly post-loop, provably hash-neutral, chain-identity guards extended — so the 3 anti-huddle restart-behavior criteria (MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH, MATCH-RESTART-NEAREST-ONLY, MATCH-RESTART-REARM) evaluate honestly through the rules suite over driven streams. If a fact is not runner-observable or a criterion is unanswerable even with the extension, leave it honestly NOT_EVALUATED. Fold in the two reviewer non-binding notes as disclosed text fixes in the touched files (checkKickoffFirstTouch doc-comment/implementation alignment on keeper taker exclusion; tighten the inherited claims wording to 'no suite-level PASS'). No suite-level PASS claim; corner-cross + distribution stay BLOCKED."
     builder: builder-structured
     prerequisite: ""

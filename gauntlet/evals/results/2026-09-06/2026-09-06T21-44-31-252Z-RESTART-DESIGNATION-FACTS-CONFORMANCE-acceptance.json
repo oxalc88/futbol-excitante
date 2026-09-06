@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-06T21:44:31.252Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "RESTART-DESIGNATION-FACTS-CONFORMANCE",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "0d7d76d5582e5181589678cd5c62395dafc9472d",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v31 1/4: the adapter restart-window designation facts ARE runner-observable, and the gated serializeRestartFacts injection now carries them — closing the 3 anti-huddle restart-behavior criteria through the rules suite. MECHANISM (the gk-role precedent extended): the injection computes `restart-designation` events STRICTLY post-loop (inside `if (serializeRestartFacts && observations.length > 0)`, after every stateHashes.push/adapter.reset) from the SAME production source of truth the adapters act on — the exported `assignChaseRoles(observation, untouchedOverride)` (src/adapters/input-browser/cpu-adapter.ts:1724-1753, called per tick at :2695) + committed coreMatchPhases + ball lastTouchRef — carrying ballUntouched, the designated taker, per-team designated chaser, per-body window anchor, and baselineTouchRef/re-armed state. The runner propagates the ACTUAL adapter designation and owns no football state. Empirical confirmation: browserParity arc run yields 8 untouched windows incl. 6 re-armed post-goal; non-browserParity run yields 2 (no re-arm) — matching real adapter behavior; the critic re-computed assignChaseRoles from a fresh 1800-tick arc run with 0/3600 team-tick mismatches against the injected facts. OUTCOMES: MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH PASS, MATCH-RESTART-NEAREST-ONLY PASS, MATCH-RESTART-REARM PASS (designation-arc-live post-goal + designation-fullmatch-live halftime; honestly NOT_EVALUATED on designation-throwin-live — no reset occurs); composition over the 3 browserParity live runs: 20 PASS / 2 BLOCKED_MISSING_REFERENCE / 3 NOT_EVALUATED (corner cluster out of scope, owned by the accepted CORNER-DRIVEN-CONFORMANCE streams) / 0 FAIL. FOLD-IN fixes (both reviewer non-binding notes): (a) checkKickoffFirstTouch now EXCLUDES the keeper from taker selection — implementation aligned to the doc comment after spec §12.1 (lines 232/239) verified to mandate the exclusion; reads the runner-injected gk-role designation only (no new ownership), a no-op without gk-role events, and KICKOFF-FIRST-TOUCH stays PASS everywhere it was previously PASS (the accepted RULES-FACTS-DEPTH-CONFORMANCE pin preserved); (b) claims wording tightened to the accurate 'no suite-level PASS' phrasing. INJECTION SAFETY under the enlarged surface (re-verified independently by critic AND integration): the role functions are pure readers; gate-off byte-identity and live/stashed state-hash-chain identity re-verified (all 3 stashed controls state_hash_chain_identical with 0 injected facts); the mirror's one-step ref offset (phase exact at tick i, ref from post-step i) is conservative — it can only shorten windows or false-fail, never fabricate a PASS; keeper-exclusion gating verified structural (gk-role events injected only under gkBehavior && keeperRoles !== undefined, and no producer combines gkBehavior with serializeRestartFacts — so the exclusion is a no-op on every ungated rules run). Falsifiers both-direction: wrong-taker injection FAILs freeze (critic adversarially confirmed), clump FAILs nearest-only, missed re-arm FAILs rearm; constants from production/anti-huddle-v1 (0.75 home tolerance, 2 hold ticks) with evaluator-side sampling parameters disclosed as such. Evidence: trajectory.json 6 runs (3 live + 3 stashed); record_sha256 271b1526592cc13e3792bee42f2544379e7dea16de9571b43113b32b57e7fc56 (no wall-clock field; reproduced byte-exact independently by critic AND integration; two consecutive ordinary-mode runs byte-identical; ordinary runs leave docs/ byte-identical); audit PASS MULTI_TICK (16 PASS / 4 NOT_APPLICABLE / 0 FAIL). Tests: rules gate 150/150 (builder) re-run as 185/185 by integration + GK/stateHash pins 34/34 (builder) 109/109 (integration wider) + registry/provenance 102-123 + neighbors 80/80 + hygiene 16/16; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass — every battery personally executed, the mechanism verified against production code, adversarial falsification performed; integration (glm5.3-flash) ACCEPT first pass — silent-consumer hunt over every serializeRestartFacts enabler (5 producers) and consumer (5 test files), default-false path byte-identical. Critic non-binding observations recorded for future cleanups: dead `chasers` variable in checkRestartNearestOnly; the conservative mirror offset (acceptable as-is, disclosed); the post-loop gated calls inflate the _keeperPressExclusions diagnostics counter (verified read by no gated evidence — future hygiene: never combine gated designation runs with GK counter reads in one process). claims_not_made: no suite-level PASS claim (the accurate wording used) / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity or invented constant / corner-cross + goal-kick-distribution stay BLOCKED_MISSING_REFERENCE / no forced or synthesized events (the facts are the actual adapter designation) / no criterion upgraded beyond the executed evaluator / no core or spec change."
+}
