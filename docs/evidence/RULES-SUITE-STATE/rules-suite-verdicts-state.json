@@ -1,0 +1,431 @@
+{
+  "schema_version": 1,
+  "objective_id": "RULES-SUITE-STATE",
+  "suite_id": "rules",
+  "suite_version": "suite-rules-v1",
+  "produced_by": "scripts/capture-rules-suite-verdicts-state.ts",
+  "evidence_class": "BOOKKEEPING",
+  "lifecycle_phase_sync": "core-owned",
+  "runs": [
+    {
+      "run_id": "rules-throwin-baseline",
+      "scenario": "5v5-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-throwin.v1.json",
+      "ticks": 1800,
+      "serialize_restart_facts": false,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-throwin.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: false })",
+      "observation_count": 1800,
+      "note": "accepted throw-in fixture under core-owned, no serialization: the restart-executed event is not in the standard stream, so MATCH-THROW-IN-AWARD is honestly NOT_EVALUATED (RULES-SUITE-REGISTRATION baseline)",
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "invariants": {
+        "rules-out-of-play-detect-evidence": "PASS",
+        "rules-out-of-play-no-last-touch-evidence": "PASS",
+        "rules-throw-in-award-evidence": "NOT_EVALUATED",
+        "rules-goal-kick-award-evidence": "NOT_EVALUATED",
+        "rules-corner-kick-award-evidence": "NOT_EVALUATED",
+        "rules-goal-detection-evidence": "PASS",
+        "rules-kickoff-freeze-evidence": "PASS",
+        "rules-timer-freeze-evidence": "NOT_EVALUATED"
+      }
+    },
+    {
+      "run_id": "rules-goalkick-postgoal-baseline",
+      "scenario": "5v5-restart-arc-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-arc.v1.json",
+      "ticks": 1800,
+      "serialize_restart_facts": false,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-arc.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: false })",
+      "observation_count": 1800,
+      "note": "accepted arc fixture under core-owned, no serialization: MATCH-GOAL-KICK-AWARD / MATCH-TIMER-FREEZE are honestly NOT_EVALUATED (baseline)",
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "invariants": {
+        "rules-out-of-play-detect-evidence": "PASS",
+        "rules-out-of-play-no-last-touch-evidence": "NOT_EVALUATED",
+        "rules-throw-in-award-evidence": "NOT_EVALUATED",
+        "rules-goal-kick-award-evidence": "NOT_EVALUATED",
+        "rules-corner-kick-award-evidence": "NOT_EVALUATED",
+        "rules-goal-detection-evidence": "PASS",
+        "rules-kickoff-freeze-evidence": "PASS",
+        "rules-timer-freeze-evidence": "NOT_EVALUATED"
+      }
+    },
+    {
+      "run_id": "rules-corner-baseline",
+      "scenario": "5v5-continuous-play-v1",
+      "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+      "ticks": 1800,
+      "serialize_restart_facts": false,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-continuous-play.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: false })",
+      "observation_count": 1800,
+      "note": "accepted continuous-play fixture under core-owned, no serialization: no corner restart is produced (baseline)",
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "invariants": {
+        "rules-out-of-play-detect-evidence": "PASS",
+        "rules-out-of-play-no-last-touch-evidence": "NOT_EVALUATED",
+        "rules-throw-in-award-evidence": "NOT_EVALUATED",
+        "rules-goal-kick-award-evidence": "NOT_EVALUATED",
+        "rules-corner-kick-award-evidence": "NOT_EVALUATED",
+        "rules-goal-detection-evidence": "PASS",
+        "rules-kickoff-freeze-evidence": "NOT_EVALUATED",
+        "rules-timer-freeze-evidence": "NOT_EVALUATED"
+      }
+    },
+    {
+      "run_id": "rules-throw-in-live",
+      "scenario": "5v5-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-throwin.v1.json",
+      "ticks": 1800,
+      "serialize_restart_facts": true,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-throwin.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: true })",
+      "observation_count": 1800,
+      "note": "driven conformance stream (RESTART-RULES-CONFORMANCE) with serializeRestartFacts:true — the throw-in-executed events + core matchPhase/matchTimer are injected, so MATCH-THROW-IN-AWARD and MATCH-TIMER-FREEZE are measurable",
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "PASS",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "invariants": {
+        "rules-out-of-play-detect-evidence": "PASS",
+        "rules-out-of-play-no-last-touch-evidence": "PASS",
+        "rules-throw-in-award-evidence": "PASS",
+        "rules-goal-kick-award-evidence": "NOT_EVALUATED",
+        "rules-corner-kick-award-evidence": "NOT_EVALUATED",
+        "rules-goal-detection-evidence": "PASS",
+        "rules-kickoff-freeze-evidence": "PASS",
+        "rules-timer-freeze-evidence": "PASS"
+      }
+    },
+    {
+      "run_id": "rules-goal-kick-live",
+      "scenario": "5v5-restart-arc-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-arc.v1.json",
+      "ticks": 1800,
+      "serialize_restart_facts": true,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-arc.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: true })",
+      "observation_count": 1800,
+      "note": "driven conformance stream (RESTART-RULES-CONFORMANCE) with serializeRestartFacts:true — MATCH-GOAL-KICK-AWARD and MATCH-TIMER-FREEZE are measurable",
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "PASS",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "invariants": {
+        "rules-out-of-play-detect-evidence": "PASS",
+        "rules-out-of-play-no-last-touch-evidence": "NOT_EVALUATED",
+        "rules-throw-in-award-evidence": "NOT_EVALUATED",
+        "rules-goal-kick-award-evidence": "PASS",
+        "rules-corner-kick-award-evidence": "NOT_EVALUATED",
+        "rules-goal-detection-evidence": "PASS",
+        "rules-kickoff-freeze-evidence": "PASS",
+        "rules-timer-freeze-evidence": "PASS"
+      }
+    }
+  ],
+  "verdict_summary": {
+    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+    "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+    "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-AWARD": "PASS",
+    "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+    "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-KICKOFF-FREEZE": "PASS",
+    "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+    "MATCH-RESTART-REARM": "NOT_EVALUATED",
+    "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+    "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+    "MATCH-SCORING-GOAL-DEVENT": "PASS",
+    "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+    "MATCH-THROW-IN-AWARD": "PASS",
+    "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+    "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+    "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+    "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+    "MATCH-TIMER-FREEZE": "PASS"
+  },
+  "criterion_reasons": {
+    "MATCH-OUT-OF-PLAY-DETECT": "PASS on every boundary-carrying run: boundary events carry well-formed payloads and goal / goal-line out-of-play are mutually exclusive.",
+    "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS where a no-last-touch boundary was observed (rules-throwin-baseline, rules-throw-in-live): every such boundary opened no restart. NOT_EVALUATED where every boundary had a resolvable last touch.",
+    "MATCH-KICKOFF-FREEZE": "PASS where a clean multi-body untouched opening window was observed (throw-in and arc runs): only the designated taker + any at-ball body left home. NOT_EVALUATED where the window is absent / single-body (rules-corner-baseline).",
+    "MATCH-SCORING-GOAL-DEVENT": "PASS on every goal-carrying run: every goal event carries a valid goalIndex and is mutually exclusive with goal-line out-of-play.",
+    "MATCH-THROW-IN-AWARD": "PASS on the driven throw-in stream (rules-throw-in-live, 2 executed throw-ins): each served throw-in went to the team opposite the last-touch team. NOT_EVALUATED on the non-serialized baseline (the throw-in-executed event is not in the standard stream).",
+    "MATCH-GOAL-KICK-AWARD": "PASS on the driven goal-kick stream (rules-goal-kick-live, 1 executed goal kick): the goal kick was awarded to the defending team of the exited goal line. NOT_EVALUATED on the non-serialized baseline.",
+    "MATCH-TIMER-FREEZE": "PASS on the driven streams (rules-throw-in-live, rules-goal-kick-live): the core matchTimer is frozen during the non-playing restart / goal phases. NOT_EVALUATED on the non-serialized baseline (core matchPhase/matchTimer not in the standard stream).",
+    "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED: no driven or organic run produced a corner-kick execution (a defending-team last-touch over its own goal line is rare in this engine). Not forced to PASS.",
+    "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE (§14 corner_cross_trajectory_ref).",
+    "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE (§14 goal_kick_distribution_ref).",
+    "MATCH-THROW-IN-PLACEMENT / MATCH-THROW-IN-SERVE / MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED — no oracle yet for the placement / serve / restart-specific timer-freeze semantics.",
+    "MATCH-GOAL-KICK-PLACEMENT / MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED — no oracle yet for the goal-kick placement / restart-specific timer-freeze semantics.",
+    "MATCH-CORNER-KICK-PLACEMENT / MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED — no oracle yet for the corner placement / restart-specific timer-freeze semantics.",
+    "MATCH-KICKOFF-FIRST-TOUCH / MATCH-RESTART-REARM": "NOT_EVALUATED — no oracle yet for the first-touch / restart-rearm semantics.",
+    "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED — no oracle yet for the playing → goal → playing phase transition.",
+    "MATCH-TIMER-DECREMENT / MATCH-TIMER-HALFTIME / MATCH-TIMER-FULLTIME": "NOT_EVALUATED — no oracle yet for the decrement / halftime / fulltime semantics.",
+    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH / MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED — no oracle yet for the anti-huddle freeze / nearest-only semantics."
+  },
+  "invariants": {
+    "rules-out-of-play-detect-evidence": "PASS",
+    "rules-out-of-play-no-last-touch-evidence": "PASS",
+    "rules-throw-in-award-evidence": "PASS",
+    "rules-goal-kick-award-evidence": "PASS",
+    "rules-corner-kick-award-evidence": "NOT_EVALUATED",
+    "rules-goal-detection-evidence": "PASS",
+    "rules-kickoff-freeze-evidence": "PASS",
+    "rules-timer-freeze-evidence": "PASS"
+  },
+  "verdict_deltas": {
+    "changed": [
+      {
+        "criterion": "MATCH-GOAL-KICK-AWARD",
+        "from": "NOT_EVALUATED",
+        "to": "PASS",
+        "reason": "the gated serializeRestartFacts runner option (post-loop injection of the committed restart-executed events + the core matchPhase/matchTimer) is enabled on the driven RESTART-RULES-CONFORMANCE streams, so the executed award / timer-freeze semantics become measurable — previously NOT_EVALUATED because the standard observation stream does not serialize them"
+      },
+      {
+        "criterion": "MATCH-THROW-IN-AWARD",
+        "from": "NOT_EVALUATED",
+        "to": "PASS",
+        "reason": "the gated serializeRestartFacts runner option (post-loop injection of the committed restart-executed events + the core matchPhase/matchTimer) is enabled on the driven RESTART-RULES-CONFORMANCE streams, so the executed award / timer-freeze semantics become measurable — previously NOT_EVALUATED because the standard observation stream does not serialize them"
+      },
+      {
+        "criterion": "MATCH-TIMER-FREEZE",
+        "from": "NOT_EVALUATED",
+        "to": "PASS",
+        "reason": "the gated serializeRestartFacts runner option (post-loop injection of the committed restart-executed events + the core matchPhase/matchTimer) is enabled on the driven RESTART-RULES-CONFORMANCE streams, so the executed award / timer-freeze semantics become measurable — previously NOT_EVALUATED because the standard observation stream does not serialize them"
+      }
+    ],
+    "unchanged": [
+      {
+        "criterion": "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-RESTART-NEAREST-ONLY",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-CORNER-KICK-AWARD",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-CORNER-KICK-PLACEMENT",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-CORNER-KICK-CROSS",
+        "outcome": "BLOCKED_MISSING_REFERENCE"
+      },
+      {
+        "criterion": "MATCH-CORNER-KICK-TIMER-FREEZE",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-GOAL-KICK-PLACEMENT",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-GOAL-KICK-DISTRIBUTION",
+        "outcome": "BLOCKED_MISSING_REFERENCE"
+      },
+      {
+        "criterion": "MATCH-GOAL-KICK-TIMER-FREEZE",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-KICKOFF-FREEZE",
+        "outcome": "PASS"
+      },
+      {
+        "criterion": "MATCH-KICKOFF-FIRST-TOUCH",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-RESTART-REARM",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-OUT-OF-PLAY-DETECT",
+        "outcome": "PASS"
+      },
+      {
+        "criterion": "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH",
+        "outcome": "PASS"
+      },
+      {
+        "criterion": "MATCH-SCORING-GOAL-DEVENT",
+        "outcome": "PASS"
+      },
+      {
+        "criterion": "MATCH-SCORING-GOAL-PHASE",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-THROW-IN-PLACEMENT",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-THROW-IN-SERVE",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-THROW-IN-TIMER-FREEZE",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-TIMER-DECREMENT",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-TIMER-HALFTIME",
+        "outcome": "NOT_EVALUATED"
+      },
+      {
+        "criterion": "MATCH-TIMER-FULLTIME",
+        "outcome": "NOT_EVALUATED"
+      }
+    ],
+    "disclosure": "Deltas vs the RULES-SUITE-REGISTRATION state (record_sha256 7503f9fe…): MATCH-THROW-IN-AWARD, MATCH-GOAL-KICK-AWARD and MATCH-TIMER-FREEZE move NOT_EVALUATED → PASS solely because the gated serializeRestartFacts observation extension (the RESTART-RULES-CONFORMANCE driven streams) now serializes the executed restart events and the core matchPhase/matchTimer. Blocked references stay BLOCKED_MISSING_REFERENCE; MATCH-CORNER-KICK-AWARD stays NOT_EVALUATED; every NOT_EVALUATED stays NOT_EVALUATED unless the driven stream genuinely carries it."
+  },
+  "claims_not_made": [
+    "No suite-level PASS claim: the per-test overall for the rules suite stays NOT_EVALUATED / BLOCKED_MISSING_REFERENCE (it never reduces to a suite PASS).",
+    "No PROMOTION claim.",
+    "No criterion is upgraded beyond what the executed evaluator returns: PASS is reported only where the driven stream genuinely carries the semantics, and NOT_EVALUATED elsewhere.",
+    "No PES 2017 fidelity / measured PES envelope claim; MATCH-GOAL-KICK-DISTRIBUTION and MATCH-CORNER-KICK-CROSS stay BLOCKED_MISSING_REFERENCE (§14).",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No invented reference envelope or tolerance: the 7 BLOCKED_MISSING_REFERENCE values stay blocked.",
+    "MATCH-CORNER-KICK-AWARD stays NOT_EVALUATED (no genuine driven/organic corner-kick execution exists); it is not forced to PASS.",
+    "No gameplay / source / contract / adapter / scenario / spec change: src/, eval/runners/, eval/oracles/, eval/invariants/, eval/scenarios/, specs/ are EMPTY; only evidence + a binding test + this producer are added."
+  ],
+  "record_sha256": "bae56e5a63463bcf79b01e6d32d17b063501d468ee63b8605f16d467abb8f930"
+}
