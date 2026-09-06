@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-06T16:03:19.388Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "GK-CORE-OWNED-ARC-FIX",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "e687fa920e339036434e4b85468d4fc933bbee13",
+  "builder": {
+    "builder": "builder-gameplay",
+    "model": "deepseek-v4-flash (reroute — qwen3.8-flash quota-exhausted until 2026-10-01)"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v30 3/4: the core-owned team-a keeper off-arc drift (disclosed in the accepted GK-GOALLINE-BOUNDS-RESIDUAL) is root-caused and fixed at the adapter layer. ROOT CAUSE (reproduced exactly by the critic: single-tick jump 24.6711 m at tick 451 from (-52.373, 0.397) to (-30.000, -10.000) with velocity (0,0)): the core-owned post-goal reset — the core's applyGoalReset re-places EVERY body at its scenario kickoff home after the tick-391 goal — strands the team-a keeper because its scenario kickoff home (-30, -10) sits 24.62 m off its own goal arc centre (-52.5, 0), while team-b's keeper home (52.40, -0.30) is on-arc (0.32 m) and holds; the keeper then re-transits at the locomotion cap but cannot recover before the run ends (~9.47 m off-arc at tick 600); on every off-arc tick chaser=none (keeperDesignatedChaserTicks=0) — NOT a chase-arbitration bug; the legacy lifecycle masked the reset by overriding the phase every tick. FIX (zero src/ change — change confined to eval/runners/headless-match.ts, 92 lines): pure deterministic helper `rehomeKeeperToArc(scenario)` re-homes a designated keeper whose kickoff home is off its own goal arc onto that arc (keeperArcSetPoint = goal-line centre with ±2.5 lateral clamp from the VERSIONED gk-small-sided-v1 geometry: goalArcCenter, radius-4.0 isInsideGoalArc — no invented constant), returning a new scenario copy only when changed; gated by `rehomeKeeper ?? (gkBehavior && lifecyclePhaseSync === \"core-owned\")` with a `rehomeKeeper?: boolean` config opt-out (used by the evidence producer for the before-state); the world is created from the re-homed scenario so the core's own applyGoalReset restores on-arc positions (the fix works through the core's existing machinery). AFTER: GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE PASS on the core-owned gk-shot-fixture run (maxDist 2.50 m, maxLateralDrift 2.50 m, offArc 0/600, onArcRatio 1.00; the reset still executes — 2.9 m jump at 451 — but lands on-arc). SILENT-CONSUMER HUNT (the LIFECYCLE-MIGRATION discipline, re-verified independently by critic AND integration): every accepted-pin producer threads explicit legacy or gkBehavior:false (verified per-file) → byte-identical; stash identity `gauntlet:verify-gk-stash --ref=91ff0be` PASS 4/4; exactly TWO fresh-run consumers change at HEAD, both targeting the fixed defect and both regenerable to pre-fix bytes via the documented rehomeKeeper:false opt-out: capture-goalline-bounds-residual.ts (its live guard re-runs the config and still passes 7/7) and the LIFECYCLE-MIGRATION probe's core-owned gk arms (binding reads persisted artifacts only); browser composition root has zero references to the runner helper — browser keeper behavior is adapter-owned and untouched, human modes untouched. Evidence: record_sha256 92e4c4a3a59d45796173e652e03833acf529182db25a99d3626fd93bcd86cc7d (no wall-clock field — the fresh ordinary-mode artifact is byte-identical to the durable record; two consecutive ordinary-mode runs byte-identical; ordinary runs leave docs/ byte-identical); audit PASS HEADLESS. Tests: guard 6/6 + GK families 83/83 (gk-oracle 16, goalkeepers-suite 24, GK bindings 24, V1-drift 6, goalline guard 7) + stateHash pins 50/50 (CPU-DEFENSIVE-TACKLE 16, LIFECYCLE-MIGRATION-ASSESSMENT 5, rules spot checks) + integration/runner neighbors 117/117; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass — 324 tests + stash verification re-run green, every before/after number reproduced, all runHeadlessMatch callers classified by gate flags; integration (glm5.3-flash) ACCEPT first pass — 250 tests re-run, silent-consumer hunt independently confirmed (exactly the two intended consumers), record hash recomputed MATCH. claims_not_made: no suite-level PASS claim (the goalkeepers suite verdict is re-published under core-owned by the next objective GK-SUITE-CORE-OWNED-STATE) / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity or invented constant (versioned gk-small-sided-v1 geometry only) / no oracle weakening (a stranded keeper still FAILs — guard-proven) / no core, adapters, scenario, or spec change / accepted legacy-produced GK suite records byte-untouched / GK beyond small-sided stays deferred."
+}

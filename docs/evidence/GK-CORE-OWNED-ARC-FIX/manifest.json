@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "GK-CORE-OWNED-ARC-FIX",
+  "accepted_at": "2026-09-06T16:03:19.388Z",
+  "candidate_commit": "e687fa920e339036434e4b85468d4fc933bbee13",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/GK-CORE-OWNED-ARC-FIX/audit.json",
+      "sha256": "9884e0789b24d1b6377570d01d6006e62271357366ab6c66c9d9e1c47f73145a",
+      "git_blob": "61dafe8a0f44aa895aaab48249d151dcbed7300c",
+      "candidate_commit": "e687fa920e339036434e4b85468d4fc933bbee13",
+      "bytes": 2717,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-06/2026-09-06T16-03-19-388Z-GK-CORE-OWNED-ARC-FIX-acceptance.json"
+}

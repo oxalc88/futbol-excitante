@@ -9,7 +9,7 @@ horizon_id: "conformance-depth-and-core-owned-gk"
 created_from_commit: c8a2abf
 created_at: 2026-09-06
 reason: "Horizon v29 (COMPLETE 4/4, remote-durable at c8a2abf) made the rules spec executable: the suite registered per MATCH_RULES_SPEC §15 (8 protected mutant-guarded oracles), the serialization limitation closed by the gated post-loop restart-facts injection (driven throw-in + goal-kick award conformance), the last COMMON-BOUNDS residual resolved as a constant-derived goal-mouth geometry correction (52.5 → 56.5 m), and the honest verdict state published (7 PASS / 2 BLOCKED / 16 NOT_EVALUATED / 0 FAIL; no suite-level PASS claim). v30 closes the open threads that publication surfaced: (a) evaluate the remaining NOT_EVALUATED criteria answerable from already-serialized facts (per-restart placement/serve/timer-freeze, restart behavior, timer/phase) — extending the gated injection only where a fact is genuinely missing; (b) produce a feasible DRIVEN corner so the corner restart type conforms through the suite (CORNER-KICK-CROSS stays BLOCKED_MISSING_REFERENCE — never invent the trajectory reference); (c) fix the core-owned team-a keeper arc defect (player-4 ~24.6 m off-arc in the gk-shot-fixture) at the adapter layer — the GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE FAILs disclosed in v29-3; (d) re-publish the goalkeepers suite state under core-owned after the fix. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 2
+current_index: 3
 objectives:
   - id: RULES-FACTS-DEPTH-CONFORMANCE
     status: accepted
@@ -26,7 +26,9 @@ objectives:
     builder: builder-structured
     prerequisite: ""
   - id: GK-CORE-OWNED-ARC-FIX
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-06
+    candidate_commit: e687fa9
     reason: "Root-cause and fix the core-owned team-a keeper arc defect disclosed in v29-3 (gk-shot-fixture: GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE FAIL — player-4 drifts up to ~24.6 m off-arc, onArcRatio 0.63, while team-b holds its arc): why does the team-a keeper leave the arc under core-owned lifecyclePhaseSync when the legacy policy masked it, and which adapter-layer behavior owns the drift? Fix at the adapter layer with discriminating guards; accepted legacy-produced GK suite records stay byte-untouched; no core change."
     builder: builder-gameplay
     prerequisite: ""
