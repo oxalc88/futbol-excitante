@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-06T11:35:00Z
+measured_at: 2026-09-06T13:54:00Z
 tracking_contract_version: 1
-last_tracked_objective: RULES-FACTS-DEPTH-CONFORMANCE
-usage_aggregates_through: RULES-FACTS-DEPTH-CONFORMANCE
-clock_aggregates_through: RULES-FACTS-DEPTH-CONFORMANCE
-model_evaluation_through: RULES-FACTS-DEPTH-CONFORMANCE
+last_tracked_objective: CORNER-DRIVEN-CONFORMANCE
+usage_aggregates_through: CORNER-DRIVEN-CONFORMANCE
+clock_aggregates_through: CORNER-DRIVEN-CONFORMANCE
+model_evaluation_through: CORNER-DRIVEN-CONFORMANCE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,18 +42,18 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 558h 37m |
+| Calendar span (first work → measurement) | 560h 56m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~162h est. |
-| Sum of per-step agent time | ~159h 47m |
+| Active work (anything running) | ~164h est. |
+| Sum of per-step agent time | ~161h 49m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-06T11:35:00Z`.
-Recomputed 2026-09-06 at the RULES-FACTS-DEPTH-CONFORMANCE acceptance
-(Horizon v30 1/4): 190 accepted per-step rows summing to ~159h 47m (the new
-objective adds ~1h 57m: builder ~62m / critic 26m / integration 28m /
-commit <1m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-06T13:54:00Z`.
+Recomputed 2026-09-06 at the CORNER-DRIVEN-CONFORMANCE acceptance
+(Horizon v30 2/4): 191 accepted per-step rows summing to ~161h 49m (the new
+objective adds ~2h 02m incl. the critic-RETRY cycle: builder ~41m / critic
+~62m / integration 18m / commits <1m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -273,6 +273,7 @@ invoices.
 | GK-GOALLINE-BOUNDS-RESIDUAL | accepted | ~1h 42m | ~53m | 32m | 16m | <1m | n/a | n/a |
 | RULES-SUITE-STATE | accepted | ~1h 41m | ~56m | 19m | 25m | <1m | n/a | n/a |
 | RULES-FACTS-DEPTH-CONFORMANCE | accepted | ~1h 57m | ~62m | 26m | 28m | <1m | n/a | n/a |
+| CORNER-DRIVEN-CONFORMANCE | accepted | ~2h 02m | ~41m | 62m | 18m | <1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -601,6 +602,7 @@ on an H task is the interesting result.
 | GK-GOALLINE-BOUNDS-RESIDUAL | deepseek-v4-flash | M | Medium - root-cause of the last COMMON-BOUNDS residual resolved honestly as path (b) goal-depth geometry: the offending body is the team-b keeper legitimately pushed into its goal mouth by core contact resolution (ticks 391-399 after the tick-391 goal); protected bounds oracle maxX widened 52.5 → 56.5 m derived from versioned gk-small-sided-v1 constants (goalLineX + |arc centre offset| + goal_arc_radius, drift-bound); non-masking guards (beyond 56.5 FAILs; legacy 59.47 m escape stays FAIL); zero src/ change | 0 | A | first-pass ACCEPT; critic reproduced the root cause (exact max 52.53084814… at tick 399) and proved the derivation non-hard-coded by constant mutation; integration hunted every checkBounds/bounds-oracle consumer and re-ran the batteries |
 | RULES-SUITE-STATE | deepseek-v4-flash | M | Medium - honest rules-suite state publication (BOOKKEEPING, zero source change): rules evaluator re-run over 5 evidence streams (3 core-owned baselines + 2 gated driven streams); 25-criterion verdict table 7 PASS / 2 BLOCKED / 16 NOT_EVALUATED / 0 FAIL with exactly 3 gated upgrades vs the registration baseline and exact delta bookkeeping; no suite-level PASS claim (negative-control binding); byte-reproducible record (no wall-clock field) | 0 | A | first-pass ACCEPT; critic re-derived the table from two ordinary-mode runs and programmatically diffed the accepted records; integration re-ran the rules gate 91/91 + silent-consumer hunt + durability verifier |
 | RULES-FACTS-DEPTH-CONFORMANCE | deepseek-v4-flash | H | High - the remaining non-corner NOT_EVALUATED rules criteria evaluated from existing serialized facts with NO injection change: 10 additive protected oracle checks (placement/serve/timer-freeze/decrement/halftime/fulltime/goal-phase/kickoff-first-touch) + ONE NEW driven full-match timing fixture (5v5-full-match-timing-v1, 240-tick halves) making the timer transitions genuinely observable (literal 1→0 zero-crossing; runner-stamped labels explicitly rejected); 3 anti-huddle criteria honestly NOT_EVALUATED (no adapter-designation facts in committed streams); verdict table 17 PASS / 2 BLOCKED / 6 NOT_EVALUATED / 0 FAIL | 0 | A | first-pass ACCEPT; critic re-ran the production runner + evaluator on all three live streams with 0 mismatches across 3×25 verdicts and verified the timer evidence genuine; integration verified additive-only line-by-line + wider gate 149/149 + silent-consumer hunt clean |
+| CORNER-DRIVEN-CONFORMANCE | deepseek-v4-flash | H | High - a GENUINE driven corner via adapter initial state only (5v5-corner-driven-v1: ball inside the +x goal-line span outside the posts + defender positioned to head back toward its own goal; empty inputProgram/scheduledEvents): the core's own §8.1 award to team-a after a defending-team last touch over its own goal line + §8.2 flag execution; 2 new protected oracles (placement/timer-freeze) + 7 corner falsifier guards; CORNER-KICK-CROSS stays BLOCKED; goal-kick neighbour discriminator; 4 event-centered Chromium frames; critic RETRY enforced the strictest-class audit (DYNAMIC_VISUAL incl. semantic visual sequence) and the sequence.json path-binding convention — fixed with the pinned record byte-unchanged | 1 | A | RETRY→ACCEPT; critic reproduced the driven corner across seeds/positions and the strictest-class FAIL, verified all 3 fixes mechanically with the record byte-frozen; integration reproduced all variants + frame SHAs proven real-capture + batteries green |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -891,6 +893,8 @@ on an H task is the interesting result.
 | RULES-SUITE-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | new-files-only scope verified (tracked diff 0 lines incl. eval/contracts/); batteries re-run: RULES-SUITE-STATE-binding 10/10, rules gate 91/91, registry 67/67, GK/stateHash pins 21/21, hygiene/arch 12/12, typecheck 0, verify-acceptance-durability green; silent-consumer hunt: new paths referenced only by producer/binding/bookkeeping (publication is data, not code); WIP gate verified empirically (ordinary runs write only under ignored test-results/); record hash recomputed MATCH; critic's audit.json regeneration adjudicated contract-consistent (latest-wins tool location; hashed record unaffected); two RESULT.md prose slips corrected before persistence (audit count 14→13 BOOKKEEPING shape; unchanged-PASS 7→4) |
 | RULES-FACTS-DEPTH-CONFORMANCE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: re-ran runHeadlessMatch + evaluateSuite on all three live streams — 0 mismatches across 3×25 criterion verdicts; timer evidence verified GENUINE (half-2 literal 1→0 zero-crossing at t=660→661; §9.4 60-tick break countdown in-step; fulltime oracle rejects runner-stamped labels — stays NOT_EVALUATED on 1800-tick fixtures); honesty verified (event-kind scan: no adapter-designation facts in any committed stream; corner cluster untouched; FAIL 0 by tally; no suite-level PASS); no-weakening verified (only removed lines are 10 empty binding arrays + 2 type-line extensions; prior verdicts byte-match; injection untouched — headless-match.ts diff EMPTY); record hash recomputed byte-exact; rules gate 121 + neighbors + foundation 81 + typecheck 0 re-run |
 | RULES-FACTS-DEPTH-CONFORMANCE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | architecture 27/27 + wider rules gate 149/149 + stateHash pins 100/100 + registry/hygiene/GK 50/50 + integration throw-in/goal-kick 23/23 + typecheck 0; silent-consumer hunt over bindings/invariant-definitions/wire/CRITERION_TO_ORACLE consumers clean (payload type extensions erased at runtime; existing award/freeze oracles verdict-identical — pinned table stays green); constants verified spec-derived (goal-area 5.5/9.16, throw-in z 1.5 from match-rules-v1 §13; 0.75 home tolerance from anti-huddle-v1 §12; 0.2 m tolerance is evaluator-side slack); scenario registry-clean; WIP gate verified empirically; record hash recomputed MATCH; critic's wording note adjudicated non-binding with the overalls derivation independently reproduced (3 per-test PASSes, never a suite PASS) |
+| CORNER-DRIVEN-CONFORMANCE | critic (glm5.3-flash) | glm5.3-flash | RETRY→ACCEPT | first review: all substantive criteria PASS reproduced (corner boundary tick 71 + execution tick 131 independently re-derived; award block pre-existing core code; falsifiers real; record byte-reproducible) BUT RETRY — the objective names DYNAMIC_VISUAL frames and the audit was run at MULTI_TICK only: critic reproduced the strictest-class audit FAIL ("semantic visual sequence" — sequence.json frames lacked the repo-wide path binding) and enforced the no-downgrade rule; fixes verified: path bindings written by the browser test source (not hand-patched JSON), DYNAMIC_VISUAL audit re-run PASS incl. semantic visual sequence, hygiene corrections (binding count 7 not 8, arithmetic restated 137/137, phantom RECORD entry removed, doc/evidence typo fixed) — pinned record byte-unchanged (21e3aa08… recomputed) |
+| CORNER-DRIVEN-CONFORMANCE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | all batteries re-run green: rules gate 165 tests (8 files), registry/provenance/hygiene 75, GK/stateHash pins 28, evaluator-map consumers 116, browser corner 2/2 in Chromium, typecheck 0; driven corner independently reproduced across seeds 7/123/999 and defender x 46/47/48; per-criterion union reproduces 20 PASS / 2 BLOCKED / 3 NOT_EVALUATED / 0 FAIL; frame SHAs byte-identical across own ordinary-mode Chromium captures (real capture, not hand-patched); scenario collision-free + driven-fixture discipline (empty inputProgram/scheduledEvents); record hash recomputed MATCH with no wall-clock field; 916-file docs/ manifest byte-identical after all verification runs; audit conditions re-derived from the audit source (3–5 labeled frames, SHA uniqueness) |
 | GK-SUITE-VERDICTS-STATE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 reproduced byte-exact in its own ephemeral producer re-run; per-run verdict table matches raw telemetry (continuous 0 releases/0 save chains -> SAVE-CLAIM/DISTRIBUTION honestly NOT_EVALUATED; fixture releases @408/433 -> PASS); all 5 provenance pins verified against the cited manifests; driven-vs-organic labeling accurate; 140/140 neighbors + typecheck 0 |
 | GK-SUITE-VERDICTS-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 151/151 neighbor tests re-run; typecheck 0; record hash recomputed byte-exact + ordinary-mode producer re-run left docs/evidence byte-identical; all 5 cited manifests read verbatim; zero evaluator/gameplay change |
 

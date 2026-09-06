@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-06T13:53:32.655Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "CORNER-DRIVEN-CONFORMANCE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "candidate_commit": "c07cebb488ed04d49f01421a923732692d58a887",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v30 2/4: a GENUINE driven corner completes the per-restart conformance set through the rules suite. Mechanism: eval/scenarios/5v5-corner-driven.v1.json (versioned 5v5-corner-driven-v1, collision-free) is the accepted 5v5-restart-arc layout with TWO driven initial-state changes only — ball at (51.5, 12, 0.11) inside the +x goal-line span outside the posts, and team-b defender player-9 at (47, 12) between ball and field centre — empty inputProgram/scheduledEvents (pure initial state, the accepted driven-fixture discipline); over ~70 ticks the adapter drives player-9 to the ball, its touch sends the ball over the +x goal line outside the posts, and because team-b (the +x defending team) was last touch the CORE's own §8.1 rules award a corner to team-a and execute it (boundary tick 71: ball-out-of-play goalIndex 0 ballPosition (52.5, 12.11, 0.11) lastTouchRef pass-48-2 → team-b; execution tick 131: corner-kick-executed teamId team-a cornerPosition (52.5, 34) targetPosition (44.5, 0) crossDirection (-0.229, -0.973) = §8.2 nearest corner flag). Robust across seeds 7/123/999 and defender x ∈ {46,47,48} (critic AND integration independently reproduced). Outcomes: MATCH-CORNER-KICK-AWARD NOT_EVALUATED→PASS, MATCH-CORNER-KICK-PLACEMENT NOT_EVALUATED→PASS (new protected oracle checkCornerKickPlacement + CORNER_FLAG_Y=34 from spec §8.2), MATCH-CORNER-KICK-TIMER-FREEZE NOT_EVALUATED→PASS (new protected oracle checkCornerKickTimerFreeze); MATCH-CORNER-KICK-CROSS stays BLOCKED_MISSING_REFERENCE (§14 — never invented); carried PASSes on the corner stream (KICKOFF-FREEZE, KICKOFF-FIRST-TOUCH, OOP-DETECT, TIMER-FREEZE, TIMER-DECREMENT); the goal-kick neighbour stream is a discriminator (0 corners, corner criteria NOT_EVALUATED there). Suite now 20 PASS / 2 BLOCKED_MISSING_REFERENCE / 3 NOT_EVALUATED (the anti-huddle restart-behavior criteria, honestly unanswerable) / 0 FAIL. DYNAMIC_VISUAL evidence (the strictest named class, after the critic's RETRY): 4 event-centered frames captured in real Chromium (corner-before@60 → corner-award@71 → corner-set-piece@105 → corner-execution@137, distinct SHAs, corner-aimed camera disclosed) with sequence.json path bindings written by the browser test source (not hand-patched JSON — frame SHAs byte-identical across ordinary-mode Chromium re-captures by critic and integration); audit PASS at --class DYNAMIC_VISUAL including the semantic-visual-sequence check (the critic had REJECTED the first candidate's MULTI_TICK-only audit as the forbidden downgrade and reproduced the FAIL). MULTI_TICK record: trajectory.json 3 runs (live + stashed + goal-kick neighbour; stashed chain-identical with 0 injected events); record_sha256 21e3aa08be951f1416bb5258aef666218c1533716cfea3eea40a71a782b279b1 (no wall-clock field in hashed content; byte-frozen across the RETRY — reproduced byte-exact by critic AND integration; two consecutive ordinary-mode runs byte-identical; ordinary runs leave docs/ byte-identical, scratch confined to gitignored test-results/). Tests: rules gate 137/137 (rules-oracle 66 incl. 7 new corner guards in both directions + corner-driven-conformance-binding 7 + RULES-SUITE-REGISTRATION-binding 25) + neighbors 231/231 + foundation/provenance/hygiene 81/81 + browser corner 2/2 in Chromium; typecheck 0. Critic (glm5.3-flash, independent) RETRY→ACCEPT: first verdict RETRY (3 fixes — path bindings, DYNAMIC_VISUAL-class audit incl. semantic visual sequence, report hygiene: binding count 8→7 with arithmetic restated, phantom RECORD artifact entry removed, doc/evidence typo fixed); all fixes mechanically verified with the pinned record byte-unchanged. Integration (glm5.3-flash) ACCEPT first pass on the repaired candidate — all batteries re-run green, driven corner reproduced across all seed/position variants, frame SHAs proven real-capture, audit conditions re-derived from the audit source. Note: audit.json candidate_commit was null at build time; the candidate commit is recorded here and in the acceptance manifest. claims_not_made: no suite-level PASS claim / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity or invented envelope / MATCH-CORNER-KICK-CROSS stays BLOCKED_MISSING_REFERENCE / the corner is DRIVEN not organic (disclosed everywhere) / no forced or synthesized events / no criterion upgraded beyond the executed evaluator / no core or spec change."
+}

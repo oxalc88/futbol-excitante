@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "CORNER-DRIVEN-CONFORMANCE",
+  "accepted_at": "2026-09-06T13:53:32.655Z",
+  "candidate_commit": "c07cebb488ed04d49f01421a923732692d58a887",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/CORNER-DRIVEN-CONFORMANCE/corner-award.png",
+        "sha256": "0ccef36af5d54f5217591d9cf3e53a40694306259ef96c7478299a890919da59",
+        "git_blob": "220b0f9d5d7515a06fa30facce8a2e5338ceca64",
+        "candidate_commit": "c07cebb488ed04d49f01421a923732692d58a887",
+        "bytes": 25125,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CORNER-DRIVEN-CONFORMANCE/corner-before.png",
+        "sha256": "bd4fbe9356d975f1306fdf5f794cee34a3a9cbad6bd3f75c2cc49134267e50e4",
+        "git_blob": "e5ac4e2de37dbff4ab141d7374d024b3c6aba76e",
+        "candidate_commit": "c07cebb488ed04d49f01421a923732692d58a887",
+        "bytes": 25521,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CORNER-DRIVEN-CONFORMANCE/corner-execution.png",
+        "sha256": "6293ff145a7e036dbaa4c0ac6afaaeeeb974f05d884bca0baa0d05e4d2b38936",
+        "git_blob": "31d4f3d0ecd672cc34686042f9311fe2758afdcc",
+        "candidate_commit": "c07cebb488ed04d49f01421a923732692d58a887",
+        "bytes": 25266,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CORNER-DRIVEN-CONFORMANCE/corner-set-piece.png",
+        "sha256": "5e94955c8d2b8e65d5c8846483c1fcc1287ed0343cb8abd93bc2a118383a8272",
+        "git_blob": "70abe1e542873b1f2b00426d42f7440da234eaea",
+        "candidate_commit": "c07cebb488ed04d49f01421a923732692d58a887",
+        "bytes": 25232,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "CORNER-DRIVEN-CONFORMANCE",
+        "evidence_class": "DYNAMIC_VISUAL",
+        "semantic_order": "before → event → transition → result",
+        "frames": [
+          {
+            "label": "corner-before",
+            "path": "corner-before.png",
+            "tick": 60,
+            "hash": "fnv1a64-v1:51b930318d1dfe07",
+            "note": "ball near the +x goal line, team-b defender chasing back toward its own goal"
+          },
+          {
+            "label": "corner-award",
+            "path": "corner-award.png",
+            "tick": 71,
+            "hash": "fnv1a64-v1:a7f663a05ee6a461",
+            "note": "the ball crossed the goal line outside the posts with a defending-team last touch — the core awards a corner to team-a and opens the corner-kick phase"
+          },
+          {
+            "label": "corner-set-piece",
+            "path": "corner-set-piece.png",
+            "tick": 105,
+            "hash": "fnv1a64-v1:813c3ee616c1e679",
+            "note": "corner-kick phase: the taker moves to the corner flag, attacking box and defending mark set"
+          },
+          {
+            "label": "corner-execution",
+            "path": "corner-execution.png",
+            "tick": 137,
+            "hash": "fnv1a64-v1:02f3dfd6bfb60e59",
+            "note": "corner-kick-executed (tick ~130): the ball is placed at the corner flag and crossed toward the penalty area — this frame is a few ticks later so the cross is in flight"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/CORNER-DRIVEN-CONFORMANCE/sequence.json",
+        "sha256": "a4ba1f8e854f65a5cb4a05ea311013c97e7e7b92884c36988c18a338b42a69ff",
+        "git_blob": "b3a7941ac19af5bd1cb296ab7a08e3149389b44d",
+        "candidate_commit": "c07cebb488ed04d49f01421a923732692d58a887",
+        "bytes": 1334,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/CORNER-DRIVEN-CONFORMANCE/trajectory.json",
+      "sha256": "7b99fd5e308cc1223714eb70c8f140f653684c8e1f5dcd5fbef038fdaa1ee749",
+      "git_blob": "ab5740d40d686cb4a099b55f5aaecc2a5cd8ed96",
+      "candidate_commit": "c07cebb488ed04d49f01421a923732692d58a887",
+      "bytes": 10605,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/CORNER-DRIVEN-CONFORMANCE/audit.json",
+      "sha256": "a7b74a67069e4515ad52758276935a3d2433c3137e9dc966bdd68b099d41ae22",
+      "git_blob": "b7ddf3a03e42186c11d18e98504a2c0f9f7b71c4",
+      "candidate_commit": "c07cebb488ed04d49f01421a923732692d58a887",
+      "bytes": 2639,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-06/2026-09-06T13-53-32-655Z-CORNER-DRIVEN-CONFORMANCE-acceptance.json"
+}
