@@ -1,0 +1,388 @@
+{
+  "schema_version": 1,
+  "objective_id": "GK-SUITE-CORE-OWNED-STATE",
+  "suite_id": "goalkeepers",
+  "suite_version": "suite-goalkeepers-v1",
+  "produced_by": "scripts/capture-gk-suite-core-owned-state.ts",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "ea467be8b476f7e16b2fd380ef9a1e12fed44bbf",
+  "record_sha256": "5cd1c80879d400c2dabfc0ba6d9b195447fc9476f7b6ebb5329877dd2a69204a",
+  "lifecycle": {
+    "policy": "core-owned",
+    "rehome_keeper": "auto (true when gkBehavior && lifecyclePhaseSync === 'core-owned')",
+    "rehome_applied": true,
+    "note": "The registered goalkeepers suite is re-run over core-owned runs WITH the GK-CORE-OWNED-ARC-FIX re-home active (the fresh-run default). The re-home lives in eval/runners/headless-match.ts rehomeKeeperToArc (gated rehomeKeeper ?? (gkBehavior && lifecyclePhaseSync === 'core-owned')) and runs before the world is created. The accepted v27 table was produced under the legacy lifecycle opt-out."
+  },
+  "accepted_v27": {
+    "source_record": "docs/evidence/GK-SUITE-VERDICTS-STATE/gk-suite-verdicts-state.json",
+    "source_candidate": "e34565bc12e585c11bd29701e5c96772b7848a9f",
+    "record_sha256": "222b5f61983d30d693af71c0be23f60de6fc3751fce6d75e34732011e3f5c6de",
+    "lifecycle": "legacy",
+    "verdicts": {
+      "gk_behavior": {
+        "GK-POSITIONING-HOLD": "PASS",
+        "GK-NO-FIELD-CHASE": "PASS",
+        "GK-SAVE-CLAIM": "PASS",
+        "GK-ROLE-DESIGNATION": "PASS",
+        "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS"
+      },
+      "common": {
+        "COMMON-FINITE": "PASS",
+        "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+        "COMMON-REFERENCES": "PASS",
+        "COMMON-BOUNDS": "FAIL"
+      },
+      "catalog": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "NOT_EVALUATED",
+        "causal": "NOT_EVALUATED"
+      }
+    },
+    "per_run": {
+      "gk-continuous-live": {
+        "gk_behavior": {
+          "GK-SAVE-CLAIM": "NOT_EVALUATED",
+          "GK-POSITIONING-HOLD": "PASS",
+          "GK-ROLE-DESIGNATION": "PASS",
+          "GK-DISTRIBUTION-NO-OMNISCIENCE": "NOT_EVALUATED",
+          "GK-NO-FIELD-CHASE": "PASS"
+        },
+        "common": {
+          "COMMON-FINITE": "PASS",
+          "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+          "COMMON-REFERENCES": "PASS",
+          "COMMON-BOUNDS": "FAIL"
+        },
+        "distribution": {
+          "releases": 0,
+          "release_ticks": [],
+          "release_targets": []
+        }
+      },
+      "gk-shot-fixture-live": {
+        "gk_behavior": {
+          "GK-SAVE-CLAIM": "PASS",
+          "GK-POSITIONING-HOLD": "PASS",
+          "GK-ROLE-DESIGNATION": "PASS",
+          "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS",
+          "GK-NO-FIELD-CHASE": "PASS"
+        },
+        "common": {
+          "COMMON-FINITE": "PASS",
+          "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+          "COMMON-REFERENCES": "PASS",
+          "COMMON-BOUNDS": "FAIL"
+        },
+        "distribution": {
+          "releases": 2,
+          "release_ticks": [
+            408,
+            433
+          ],
+          "release_targets": [
+            "player-6",
+            "player-6"
+          ]
+        }
+      }
+    }
+  },
+  "after": {
+    "gk_behavior": {
+      "GK-POSITIONING-HOLD": {
+        "verdict": "PASS",
+        "observations": "organic (core-owned, re-home on)",
+        "source": "executed evaluator over 2 core-owned runs (re-home on): gk-continuous-live=PASS, gk-shot-fixture-live=PASS. Organic arc-hold observations present in both core-owned GK runs. Under the core-owned lifecycle the post-goal/halftime reset re-places every body at its kickoff home; with the GK-CORE-OWNED-ARC-FIX re-home active the designated keeper's kickoff home IS its goal arc (the team-a keeper player-4 is re-homed from (-30,-10) onto its arc), so the keeper holds. Without the re-home the team-a keeper would be stranded off-arc (~24.6 m) and these criteria would FAIL under core-owned (disclosed in GK-CORE-OWNED-ARC-FIX). The protected gk-positioning oracle returns PASS on both runs."
+      },
+      "GK-NO-FIELD-CHASE": {
+        "verdict": "PASS",
+        "observations": "organic (core-owned, re-home on)",
+        "source": "executed evaluator over 2 core-owned runs (re-home on): gk-continuous-live=PASS, gk-shot-fixture-live=PASS. Organic no-field-chase observations present: the designated keeper is never the team's chaser/presser (keeper chase ticks = 0). With the re-home the keeper's home is its arc, so the core reset never strands it into the field. The protected gk-no-field-chase oracle returns PASS on both runs."
+      },
+      "GK-SAVE-CLAIM": {
+        "verdict": "PASS",
+        "observations": "driven (fixture) only",
+        "source": "executed evaluator over 2 core-owned runs (re-home on): gk-continuous-live=NOT_EVALUATED, gk-shot-fixture-live=PASS. Save/claim evidence is fixture-driven only: it comes from the controlled 5v5-keeper-shot-fixture run (on-target shot answered by a recorded team-b keeper contact inside the versioned reach, contact ticks 362/368/374/380/386). The organically-flowing continuous run's keeper contacts (tick 165) are not within a shot's reaction window, so the continuous run is NOT_EVALUATED. Labeled driven, not organic."
+      },
+      "GK-ROLE-DESIGNATION": {
+        "verdict": "PASS",
+        "observations": "organic (core-owned, re-home on)",
+        "source": "executed evaluator over 2 core-owned runs (re-home on): gk-continuous-live=PASS, gk-shot-fixture-live=PASS. Organic designation observations present: exactly one designated keeper per team (team-a→player-4, team-b→player-10). The protected gk-role-designation oracle reads the runner-injected designation and returns PASS on both runs."
+      },
+      "GK-DISTRIBUTION-NO-OMNISCIENCE": {
+        "verdict": "PASS",
+        "observations": "organic (core-owned, re-home on)",
+        "source": "executed evaluator over 2 core-owned runs (re-home on): gk-continuous-live=PASS, gk-shot-fixture-live=NOT_EVALUATED. Under the core-owned lifecycle the organic continuous run now carries the release evidence: the team-b keeper (player-10) records a claim contact at tick 165 and releases 8 times to the observed team-b teammate player-9 (ticks 166/169/210/212/214/216/218/220). The driven shot-fixture run records 0 keeper-release events under core-owned (the keeper claims but does not release), so the fixture is NOT_EVALUATED. This is the inverse of the v27 legacy table (fixture carried the releases; continuous had 0) — a lifecycle consequence of run dynamics, not a criterion redefinition. Continuous run releases: [166,169,210,212,214,216,218,220] (keepers [\"player-10\",\"player-10\",\"player-10\",\"player-10\",\"player-10\",\"player-10\",\"player-10\",\"player-10\"], targets [\"player-9\",\"player-9\",\"player-9\",\"player-9\",\"player-9\",\"player-9\",\"player-9\",\"player-9\"]); fixture run releases 0."
+      }
+    },
+    "catalog": {
+      "ref": "BLOCKED_MISSING_REFERENCE",
+      "vis": "NEEDS_PERCEPTUAL_REVIEW",
+      "reg": "NOT_EVALUATED",
+      "causal": "NOT_EVALUATED"
+    },
+    "common": {
+      "COMMON-FINITE": "PASS",
+      "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+      "COMMON-REFERENCES": "PASS",
+      "COMMON-BOUNDS": "PASS"
+    }
+  },
+  "runs": [
+    {
+      "run_id": "gk-continuous-live",
+      "scenario": "5v5-continuous-play-v1",
+      "ticks": 1800,
+      "lifecycle": "core-owned",
+      "rehome_keeper": true,
+      "source_candidate": "ea467be8b476f7e16b2fd380ef9a1e12fed44bbf",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-continuous-play.v1.json, maxTicks: 1800, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' })",
+      "observations": 1800,
+      "goals": 0,
+      "gk_behavior": {
+        "GK-SAVE-CLAIM": "NOT_EVALUATED",
+        "GK-POSITIONING-HOLD": "PASS",
+        "GK-ROLE-DESIGNATION": "PASS",
+        "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS",
+        "GK-NO-FIELD-CHASE": "PASS"
+      },
+      "common": {
+        "COMMON-FINITE": "PASS",
+        "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+        "COMMON-REFERENCES": "PASS",
+        "COMMON-BOUNDS": "PASS"
+      },
+      "catalog": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "NOT_EVALUATED",
+        "causal": "NOT_EVALUATED"
+      },
+      "distribution": {
+        "releases": 8,
+        "release_ticks": [
+          166,
+          169,
+          210,
+          212,
+          214,
+          216,
+          218,
+          220
+        ],
+        "release_targets": [
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9"
+        ],
+        "release_keepers": [
+          "player-10",
+          "player-10",
+          "player-10",
+          "player-10",
+          "player-10",
+          "player-10",
+          "player-10",
+          "player-10"
+        ]
+      },
+      "arc_metrics": {
+        "team-a": {
+          "stationTick": 1,
+          "postStationTicks": 1800,
+          "onArcTicks": 1800,
+          "offArcTicks": 0,
+          "onArcRatio": 1,
+          "maxDistToArcCenter": 2.5,
+          "maxLateralDrift": 2.5,
+          "worstTick": 1
+        },
+        "team-b": {
+          "stationTick": 1,
+          "postStationTicks": 1800,
+          "onArcTicks": 1800,
+          "offArcTicks": 0,
+          "onArcRatio": 1,
+          "maxDistToArcCenter": 2.7732468003137547,
+          "maxLateralDrift": 2.5,
+          "worstTick": 277
+        }
+      }
+    },
+    {
+      "run_id": "gk-shot-fixture-live",
+      "scenario": "5v5-keeper-shot-fixture-v1",
+      "ticks": 600,
+      "lifecycle": "core-owned",
+      "rehome_keeper": true,
+      "source_candidate": "ea467be8b476f7e16b2fd380ef9a1e12fed44bbf",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-keeper-shot-fixture.v1.json, maxTicks: 600, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' })",
+      "observations": 600,
+      "goals": 1,
+      "gk_behavior": {
+        "GK-SAVE-CLAIM": "PASS",
+        "GK-POSITIONING-HOLD": "PASS",
+        "GK-ROLE-DESIGNATION": "PASS",
+        "GK-DISTRIBUTION-NO-OMNISCIENCE": "NOT_EVALUATED",
+        "GK-NO-FIELD-CHASE": "PASS"
+      },
+      "common": {
+        "COMMON-FINITE": "PASS",
+        "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+        "COMMON-REFERENCES": "PASS",
+        "COMMON-BOUNDS": "PASS"
+      },
+      "catalog": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "NOT_EVALUATED",
+        "causal": "NOT_EVALUATED"
+      },
+      "distribution": {
+        "releases": 0,
+        "release_ticks": [],
+        "release_targets": [],
+        "release_keepers": []
+      },
+      "arc_metrics": {
+        "team-a": {
+          "stationTick": 1,
+          "postStationTicks": 600,
+          "onArcTicks": 600,
+          "offArcTicks": 0,
+          "onArcRatio": 1,
+          "maxDistToArcCenter": 2.5,
+          "maxLateralDrift": 2.5,
+          "worstTick": 1
+        },
+        "team-b": {
+          "stationTick": 1,
+          "postStationTicks": 600,
+          "onArcTicks": 600,
+          "offArcTicks": 0,
+          "onArcRatio": 1,
+          "maxDistToArcCenter": 1.8370993124312665,
+          "maxLateralDrift": 1.8368573658181828,
+          "worstTick": 58
+        }
+      }
+    }
+  ],
+  "verdict_deltas": [
+    {
+      "criterion": "GK-POSITIONING-HOLD",
+      "v27_verdict": "PASS",
+      "core_owned_verdict": "PASS",
+      "changed": false,
+      "reason": "Verdict unchanged (PASS) but the run source changed legacy→core-owned. Under core-owned WITHOUT the GK-CORE-OWNED-ARC-FIX re-home the team-a keeper (player-4) is stranded off-arc by the post-goal/halftime reset (~24.6 m) and these criteria FAIL; with the re-home active the keeper's kickoff home IS its arc so it holds (onArcRatio 1.00, maxDist 2.50 m). The verdict is PASS under core-owned only because the re-home fix is live. (v27 observations: organic; core-owned observations: organic (core-owned, re-home on))"
+    },
+    {
+      "criterion": "GK-NO-FIELD-CHASE",
+      "v27_verdict": "PASS",
+      "core_owned_verdict": "PASS",
+      "changed": false,
+      "reason": "Verdict unchanged (PASS) but the run source changed legacy→core-owned. Under core-owned WITHOUT the GK-CORE-OWNED-ARC-FIX re-home the team-a keeper (player-4) is stranded off-arc by the post-goal/halftime reset (~24.6 m) and these criteria FAIL; with the re-home active the keeper's kickoff home IS its arc so it holds (onArcRatio 1.00, maxDist 2.50 m). The verdict is PASS under core-owned only because the re-home fix is live. (v27 observations: organic; core-owned observations: organic (core-owned, re-home on))"
+    },
+    {
+      "criterion": "GK-SAVE-CLAIM",
+      "v27_verdict": "PASS",
+      "core_owned_verdict": "PASS",
+      "changed": false,
+      "reason": "Verdict unchanged (PASS, driven fixture only). The shot-fixture run still records a keeper save/claim contact within reach (team-b keeper player-10, contact ticks 362/368/374/380/386). The organic continuous run is NOT_EVALUATED (no shot answered by a keeper contact within the reaction window). (v27 observations: driven (fixture) only; core-owned observations: driven (fixture) only)"
+    },
+    {
+      "criterion": "GK-ROLE-DESIGNATION",
+      "v27_verdict": "PASS",
+      "core_owned_verdict": "PASS",
+      "changed": false,
+      "reason": "Verdict unchanged (PASS, organic). Exactly one designated keeper per team under core-owned; the re-home does not change the designation. (v27 observations: organic; core-owned observations: organic (core-owned, re-home on))"
+    },
+    {
+      "criterion": "GK-DISTRIBUTION-NO-OMNISCIENCE",
+      "v27_verdict": "PASS",
+      "core_owned_verdict": "PASS",
+      "changed": false,
+      "reason": "Verdict unchanged (PASS) but the observation source flipped: the v27 legacy table carried the release evidence on the DRIVEN shot fixture (2 releases to player-6 at ticks 408/433) with the continuous run NOT_EVALUATED (0 releases). Under core-owned the organic continuous run carries the release evidence (8 releases to observed team-b teammate player-9) while the shot fixture records 0 releases (NOT_EVALUATED). A lifecycle consequence of run dynamics, not a criterion redefinition; the criterion is still PASS on the executed evaluator, never upgraded beyond it. (v27 observations: driven (fixture) only; core-owned observations: organic (core-owned, re-home on))"
+    },
+    {
+      "criterion": "COMMON-FINITE",
+      "v27_verdict": "PASS",
+      "core_owned_verdict": "PASS",
+      "changed": false,
+      "reason": "Verdict unchanged (PASS)."
+    },
+    {
+      "criterion": "COMMON-DETERMINISTIC",
+      "v27_verdict": "NOT_EVALUATED",
+      "core_owned_verdict": "NOT_EVALUATED",
+      "changed": false,
+      "reason": "Verdict unchanged (NOT_EVALUATED). Single-run evaluation; the two-run comparison is not performed (duels precedent)."
+    },
+    {
+      "criterion": "COMMON-REFERENCES",
+      "v27_verdict": "PASS",
+      "core_owned_verdict": "PASS",
+      "changed": false,
+      "reason": "Verdict unchanged (PASS). The COMMON-FULL-MATCH-INVARIANT-TRIAGE event-references fix is live; the full-match core-owned maps pass."
+    },
+    {
+      "criterion": "COMMON-BOUNDS",
+      "v27_verdict": "FAIL",
+      "core_owned_verdict": "PASS",
+      "changed": true,
+      "reason": "TRUE verdict change (FAIL→PASS). The v27 legacy phase-sync runs froze the core's restart machinery, so the ball escaped the pitch without a restart and players chased it out of bounds (body at |x| up to ~61 m), a real illegal position flagged by the un-widened safety-bounds invariant. Under core-owned the restart machinery runs, so there is no legacy out-of-play escape, and the goal-mouth bound derived in GK-GOALLINE-BOUNDS-RESIDUAL (goalLineX + |offset| + goal_arc_radius = 52.5+0+4.0 = 56.5 m) resolves the team-b keeper legitimately pushed into its goal mouth. COMMON-BOUNDS is PASS on both core-owned runs."
+    },
+    {
+      "criterion": "ref",
+      "v27_verdict": "BLOCKED_MISSING_REFERENCE",
+      "core_owned_verdict": "BLOCKED_MISSING_REFERENCE",
+      "changed": false,
+      "reason": "GK-*-REF criteria stay BLOCKED_MISSING_REFERENCE (no eligible ReferenceTarget; blocked references stay blocked)."
+    },
+    {
+      "criterion": "vis",
+      "v27_verdict": "NEEDS_PERCEPTUAL_REVIEW",
+      "core_owned_verdict": "NEEDS_PERCEPTUAL_REVIEW",
+      "changed": false,
+      "reason": "GK-*-VIS criteria stay NEEDS_PERCEPTUAL_REVIEW (no versioned perceptual rubric)."
+    },
+    {
+      "criterion": "reg",
+      "v27_verdict": "NOT_EVALUATED",
+      "core_owned_verdict": "NOT_EVALUATED",
+      "changed": false,
+      "reason": "GK-*-REG criteria stay NOT_EVALUATED (no versioned regression policy)."
+    },
+    {
+      "criterion": "causal",
+      "v27_verdict": "NOT_EVALUATED",
+      "core_owned_verdict": "NOT_EVALUATED",
+      "changed": false,
+      "reason": "GK-*-CAUSAL criteria stay NOT_EVALUATED."
+    }
+  ],
+  "disclosures": [
+    "CRITICAL (forwarded from the GK-CORE-OWNED-ARC-FIX reviewers): two fresh-run producers now re-run WITH the re-home at HEAD — scripts/capture-goalline-bounds-residual.ts (its live guard still passes 7/7) and the LIFECYCLE-MIGRATION probe's core-owned gk arms. Their accepted bytes regenerate only via the documented rehomeKeeper:false opt-out. At HEAD the default rehomeKeeper ?? (gkBehavior && lifecyclePhaseSync === 'core-owned') is true, so any fresh core-owned gkBehavior run without an explicit rehomeKeeper:false now re-homes the keeper and would produce new bytes; the accepted historical records for those producers were authored before the re-home gate and are only reproducible with the opt-out.",
+    "The accepted GK suite records (GK-SUITE-VERDICTS-STATE, GK-SUITE-ORGANIC-STATE) are produced under the explicit legacy lifecycle opt-out and are byte-untouched by this objective.",
+    "Under core-owned WITHOUT the re-home, GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE FAIL on the gk-shot-fixture (the team-a keeper stranded ~24.6 m off-arc); the re-home fix (GK-CORE-OWNED-ARC-FIX) is what makes them PASS here. This is a core-owned lifecycle consequence, not a criterion redefinition or an oracle weakening.",
+    "GK-SAVE-CLAIM is PASS only from the driven shot fixture; the organic continuous run is NOT_EVALUATED (no shot answered by a keeper contact within the reaction window). GK-DISTRIBUTION-NO-OMNISCIENCE is PASS from the organic continuous run (8 releases) and NOT_EVALUATED on the shot fixture (0 releases) — the inverse of the v27 legacy table, disclosed.",
+    "COMMON-BOUNDS is PASS under core-owned with the goal-mouth bound; the v27 legacy COMMON-BOUNDS FAIL (body at |x| up to ~61 m, a real illegal position from the documented restart-suspension driver behavior) is disclosed-not-widenable and is a legacy-only artifact, not a keeper regression."
+  ],
+  "claims_not_made": [
+    "No PROMOTION claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No invented reference envelope or tolerance (reaction latency, save probability, wrong-foot reversal, high-cross claim threshold, parry energy ratio stay BLOCKED_MISSING_REFERENCE).",
+    "No suite-level PASS claim for the goalkeepers suite.",
+    "No criterion is upgraded beyond what the executed evaluator returns; the goalkeepers suite criteria are only re-run under core-owned, not redefined.",
+    "No gameplay change (git diff src/ src/simulation/ src/contracts/ src/adapters/ eval/runners/ eval/oracles/ eval/invariants/ eval/scenarios/ specs/ is empty). No oracle / catalog / invariant / observation / scenario / spec change; the goalkeepers suite criteria are only re-run, not redefined.",
+    "No accepted record mutation: the v27 records (GK-SUITE-VERDICTS-STATE, GK-SUITE-ORGANIC-STATE) stay byte-untouched.",
+    "GK-*-REF criteria stay BLOCKED_MISSING_REFERENCE; GK-*-VIS criteria stay NEEDS_PERCEPTUAL_REVIEW."
+  ]
+}
