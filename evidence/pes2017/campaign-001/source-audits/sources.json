@@ -197,5 +197,8 @@
   "acquisition_commit": "b5e0ffbba73985d4da705e922600aefc832ede36",
   "acquired_as_reported_by_operator": 3,
   "local_video_files": 0,
-  "revision_note": "Remote acquisition is documented; only metadata and one aggregate audit were transferred through Git."
+  "revision_note": "Remote acquisition is documented; only metadata and one aggregate audit were transferred through Git.",
+  "latest_acquisition_execution": "raw/media/ACQUISITION-RUN-ea1c074.md",
+  "last_local_acquisition_status": "FAILED_NONMEDIA_RESPONSE_AND_TIMEOUTS",
+  "manual_user_transfer_available": false
 }

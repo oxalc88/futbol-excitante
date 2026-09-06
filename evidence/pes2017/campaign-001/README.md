@@ -1,6 +1,6 @@
 # PES 2017 — campaña 001: selección de fuentes
 
-## Cómo obtener los MP4 en cualquier máquina
+## Obtención local de los MP4
 
 Los vídeos **no** están en Git. Desde la raíz del repo:
 
@@ -10,13 +10,15 @@ python3 evidence/pes2017/campaign-001/raw/media/fetch_media.py
 
 Detalle, recipe yt-dlp, SHA-256 y comandos manuales: [`raw/media/ACQUISITION.md`](raw/media/ACQUISITION.md) · [`raw/media/INDEX.csv`](raw/media/INDEX.csv) · script [`raw/media/fetch_media.py`](raw/media/fetch_media.py).
 
+**Ejecución de `ea1c074`:** se probó el script nuevo y descargas independientes de las tres fuentes, con soporte JavaScript y certificados del sistema. No llegó vídeo utilizable: la receta inicial recibió páginas HTML de 195 bytes y los intentos independientes agotaron sus timeouts. Véase [el registro de ejecución](raw/media/ACQUISITION-RUN-ea1c074.md). La entrega manual por el usuario queda descartada; falta una transferencia automática desde la máquina de adquisición o ejecutar allí las mediciones.
+
 ## Estado tras recibir la adquisición
 
 Se revisó el commit `b5e0ffb` de `gauntlet-observer-box`: documenta tres descargas de 720p y un resumen de auditoría del entrenamiento. Los MP4 y registros por frame están excluidos de Git y no llegaron a este entorno. La comprobación de consistencia del resumen fue correcta; la revisión visual sigue bloqueada por transferencia de medios. El nuevo intento local terminó con una exigencia de autenticación de YouTube, sin vídeo.
 
 `LFvEnk0mcLI` sustituye al candidato republicado en los 14 cupos reservados. Hay **tres fuentes adquiridas según el operador, cero vídeos locales, cero fuentes admitidas y cero importaciones**. No se han asignado PTS a los 54 cupos.
 
-Véase [la revisión de adquisición y transferencia mínima](raw/media/ACQUISITION-REVIEW.md). Con `fetch_media.py` cualquier máquina puede materializar la evidencia local (si YouTube no exige login); no basta con metadatos en el remoto.
+Véase [la revisión anterior de adquisición](raw/media/ACQUISITION-REVIEW.md). `fetch_media.py` requiere acceso funcional a los servidores de vídeo, además de acceso a los metadatos; la ejecución más reciente está documentada arriba.
 
 ## Auditoría inicial conservada como historial
 
