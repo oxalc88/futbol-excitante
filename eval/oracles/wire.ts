@@ -38,10 +38,20 @@ import {
   checkGoalKickAward,
   checkCornerKickAward,
   checkGoalDetection,
+  checkThrowInPlacement,
+  checkThrowInServe,
+  checkGoalKickPlacement,
+  checkGoalPhase,
+  checkKickoffFirstTouch,
 } from "./rules-restart.js";
 import {
   checkKickoffFreeze,
   checkTimerFreeze,
+  checkThrowInTimerFreeze,
+  checkGoalKickTimerFreeze,
+  checkTimerDecrement,
+  checkTimerHalftime,
+  checkTimerFulltime,
 } from "./rules-phase.js";
 import type { OracleEntry } from "./oracle-registry.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
@@ -232,6 +242,60 @@ const entries: OracleEntry[] = [
     oracle_id: "rules-timer-freeze-oracle-v1",
     oracle_version: "oracle-rules-timer-freeze-v1",
     fn: checkTimerFreeze,
+  },
+  // MATCH_RULES_SPEC §15 depth oracles (RULES-FACTS-DEPTH-CONFORMANCE):
+  // per-restart placement / serve / phase-specific timer-freeze, the
+  // timer decrement / halftime / fulltime transitions, the goal phase, and
+  // the kickoff first-touch window.  Additive; no existing entry is changed.
+  {
+    oracle_id: "rules-throw-in-placement-oracle-v1",
+    oracle_version: "oracle-rules-throw-in-placement-v1",
+    fn: checkThrowInPlacement,
+  },
+  {
+    oracle_id: "rules-throw-in-serve-oracle-v1",
+    oracle_version: "oracle-rules-throw-in-serve-v1",
+    fn: checkThrowInServe,
+  },
+  {
+    oracle_id: "rules-goal-kick-placement-oracle-v1",
+    oracle_version: "oracle-rules-goal-kick-placement-v1",
+    fn: checkGoalKickPlacement,
+  },
+  {
+    oracle_id: "rules-goal-phase-oracle-v1",
+    oracle_version: "oracle-rules-goal-phase-v1",
+    fn: checkGoalPhase,
+  },
+  {
+    oracle_id: "rules-kickoff-first-touch-oracle-v1",
+    oracle_version: "oracle-rules-kickoff-first-touch-v1",
+    fn: checkKickoffFirstTouch,
+  },
+  {
+    oracle_id: "rules-throw-in-timer-freeze-oracle-v1",
+    oracle_version: "oracle-rules-throw-in-timer-freeze-v1",
+    fn: checkThrowInTimerFreeze,
+  },
+  {
+    oracle_id: "rules-goal-kick-timer-freeze-oracle-v1",
+    oracle_version: "oracle-rules-goal-kick-timer-freeze-v1",
+    fn: checkGoalKickTimerFreeze,
+  },
+  {
+    oracle_id: "rules-timer-decrement-oracle-v1",
+    oracle_version: "oracle-rules-timer-decrement-v1",
+    fn: checkTimerDecrement,
+  },
+  {
+    oracle_id: "rules-timer-halftime-oracle-v1",
+    oracle_version: "oracle-rules-timer-halftime-v1",
+    fn: checkTimerHalftime,
+  },
+  {
+    oracle_id: "rules-timer-fulltime-oracle-v1",
+    oracle_version: "oracle-rules-timer-fulltime-v1",
+    fn: checkTimerFulltime,
   },
 ];
 

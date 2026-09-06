@@ -845,9 +845,9 @@ export const BINDING_RULES_THROWIN_001: TestImplementationBinding = makeTestBind
   [],
   {
     "MATCH-THROW-IN-AWARD": ["rules-throw-in-award-evidence"],
-    "MATCH-THROW-IN-PLACEMENT": [],
-    "MATCH-THROW-IN-SERVE": [],
-    "MATCH-THROW-IN-TIMER-FREEZE": [],
+    "MATCH-THROW-IN-PLACEMENT": ["rules-throw-in-placement-evidence"],
+    "MATCH-THROW-IN-SERVE": ["rules-throw-in-serve-evidence"],
+    "MATCH-THROW-IN-TIMER-FREEZE": ["rules-throw-in-timer-freeze-evidence"],
   },
 );
 
@@ -866,9 +866,9 @@ export const BINDING_RULES_GOALKICK_001: TestImplementationBinding = makeTestBin
   [],
   {
     "MATCH-GOAL-KICK-AWARD": ["rules-goal-kick-award-evidence"],
-    "MATCH-GOAL-KICK-PLACEMENT": [],
+    "MATCH-GOAL-KICK-PLACEMENT": ["rules-goal-kick-placement-evidence"],
     "MATCH-GOAL-KICK-DISTRIBUTION": [],
-    "MATCH-GOAL-KICK-TIMER-FREEZE": [],
+    "MATCH-GOAL-KICK-TIMER-FREEZE": ["rules-goal-kick-timer-freeze-evidence"],
   },
 );
 
@@ -907,7 +907,7 @@ export const BINDING_RULES_KICKOFF_001: TestImplementationBinding = makeTestBind
   [],
   {
     "MATCH-KICKOFF-FREEZE": ["rules-kickoff-freeze-evidence"],
-    "MATCH-KICKOFF-FIRST-TOUCH": [],
+    "MATCH-KICKOFF-FIRST-TOUCH": ["rules-kickoff-first-touch-evidence"],
     "MATCH-RESTART-REARM": [],
   },
 );
@@ -926,7 +926,7 @@ export const BINDING_RULES_SCORING_001: TestImplementationBinding = makeTestBind
   [],
   {
     "MATCH-SCORING-GOAL-DEVENT": ["rules-goal-detection-evidence"],
-    "MATCH-SCORING-GOAL-PHASE": [],
+    "MATCH-SCORING-GOAL-PHASE": ["rules-goal-phase-evidence"],
   },
 );
 
@@ -944,9 +944,9 @@ export const BINDING_RULES_TIMING_001: TestImplementationBinding = makeTestBindi
   ["obs-per-tick-v1", "obs-rules-restart-v1"],
   [],
   {
-    "MATCH-TIMER-DECREMENT": [],
-    "MATCH-TIMER-HALFTIME": [],
-    "MATCH-TIMER-FULLTIME": [],
+    "MATCH-TIMER-DECREMENT": ["rules-timer-decrement-evidence"],
+    "MATCH-TIMER-HALFTIME": ["rules-timer-halftime-evidence"],
+    "MATCH-TIMER-FULLTIME": ["rules-timer-fulltime-evidence"],
     "MATCH-TIMER-FREEZE": ["rules-timer-freeze-evidence"],
   },
 );

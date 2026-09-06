@@ -236,6 +236,48 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "rules-timer-freeze-oracle-v1",
     oracle_version: "oracle-rules-timer-freeze-v1",
   },
+  // MATCH_RULES_SPEC §15 depth criteria (RULES-FACTS-DEPTH-CONFORMANCE).
+  // Additive; no existing entry is changed.
+  "MATCH-THROW-IN-PLACEMENT": {
+    oracle_id: "rules-throw-in-placement-oracle-v1",
+    oracle_version: "oracle-rules-throw-in-placement-v1",
+  },
+  "MATCH-THROW-IN-SERVE": {
+    oracle_id: "rules-throw-in-serve-oracle-v1",
+    oracle_version: "oracle-rules-throw-in-serve-v1",
+  },
+  "MATCH-THROW-IN-TIMER-FREEZE": {
+    oracle_id: "rules-throw-in-timer-freeze-oracle-v1",
+    oracle_version: "oracle-rules-throw-in-timer-freeze-v1",
+  },
+  "MATCH-GOAL-KICK-PLACEMENT": {
+    oracle_id: "rules-goal-kick-placement-oracle-v1",
+    oracle_version: "oracle-rules-goal-kick-placement-v1",
+  },
+  "MATCH-GOAL-KICK-TIMER-FREEZE": {
+    oracle_id: "rules-goal-kick-timer-freeze-oracle-v1",
+    oracle_version: "oracle-rules-goal-kick-timer-freeze-v1",
+  },
+  "MATCH-KICKOFF-FIRST-TOUCH": {
+    oracle_id: "rules-kickoff-first-touch-oracle-v1",
+    oracle_version: "oracle-rules-kickoff-first-touch-v1",
+  },
+  "MATCH-SCORING-GOAL-PHASE": {
+    oracle_id: "rules-goal-phase-oracle-v1",
+    oracle_version: "oracle-rules-goal-phase-v1",
+  },
+  "MATCH-TIMER-DECREMENT": {
+    oracle_id: "rules-timer-decrement-oracle-v1",
+    oracle_version: "oracle-rules-timer-decrement-v1",
+  },
+  "MATCH-TIMER-HALFTIME": {
+    oracle_id: "rules-timer-halftime-oracle-v1",
+    oracle_version: "oracle-rules-timer-halftime-v1",
+  },
+  "MATCH-TIMER-FULLTIME": {
+    oracle_id: "rules-timer-fulltime-oracle-v1",
+    oracle_version: "oracle-rules-timer-fulltime-v1",
+  },
 };
 
 // ---------------------------------------------------------------------------

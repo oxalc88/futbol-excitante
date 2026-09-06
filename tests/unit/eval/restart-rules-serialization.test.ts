@@ -80,6 +80,47 @@ describe("RESTART-RULES-CONFORMANCE serialization guards", () => {
   );
 
   it(
+    "full-match fixture gate ON: the stream carries the halftime / fulltime phase facts and the stashed control is hash-identical",
+    { timeout: 60000 },
+    () => {
+      const scenario = JSON.parse(
+        readFileSync(resolve("eval/scenarios/5v5-full-match-timing.v1.json"), "utf-8"),
+      ) as ScenarioDefinition;
+      const gated = runHeadlessMatch({
+        scenario,
+        maxTicks: 800,
+        cpuAntiHuddle: true,
+        lifecyclePhaseSync: "core-owned",
+        serializeRestartFacts: true,
+      });
+      const stashed = runHeadlessMatch({
+        scenario,
+        maxTicks: 800,
+        cpuAntiHuddle: true,
+        lifecyclePhaseSync: "core-owned",
+        serializeRestartFacts: false,
+      });
+      // Hash-neutral: the injection is post-loop, so the committed hash chains match.
+      expect(JSON.stringify(stashed.stateHashes)).toBe(JSON.stringify(gated.stateHashes));
+      expect(countKind(stashed.observations, "core-match-phase")).toBe(0);
+      expect(countKind(gated.observations, "core-match-phase")).toBe(800);
+
+      // The gated stream carries the genuine timer-driven halftime and fulltime
+      // transitions so the timing/phase cluster is adjudicable.
+      const phases = new Set<string>();
+      for (const o of gated.observations) {
+        for (const ev of o.events) {
+          if (ev.kind !== "core-match-phase") continue;
+          const p = ev.payload as { matchPhase?: string } | undefined;
+          if (typeof p?.matchPhase === "string") phases.add(p.matchPhase);
+        }
+      }
+      expect(phases.has("halftime")).toBe(true);
+      expect(phases.has("fulltime")).toBe(true);
+    },
+  );
+
+  it(
     "gate OFF: the observation stream is untreated and the state-hash chain is identical to the gated run",
     { timeout: 30000 },
     () => {

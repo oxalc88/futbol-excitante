@@ -41,6 +41,16 @@ const RULES_ORACLE_CRITERIA: Record<string, string> = {
   "MATCH-SCORING-GOAL-DEVENT": "rules-goal-detection-oracle-v1",
   "MATCH-KICKOFF-FREEZE": "rules-kickoff-freeze-oracle-v1",
   "MATCH-TIMER-FREEZE": "rules-timer-freeze-oracle-v1",
+  "MATCH-THROW-IN-PLACEMENT": "rules-throw-in-placement-oracle-v1",
+  "MATCH-THROW-IN-SERVE": "rules-throw-in-serve-oracle-v1",
+  "MATCH-THROW-IN-TIMER-FREEZE": "rules-throw-in-timer-freeze-oracle-v1",
+  "MATCH-GOAL-KICK-PLACEMENT": "rules-goal-kick-placement-oracle-v1",
+  "MATCH-GOAL-KICK-TIMER-FREEZE": "rules-goal-kick-timer-freeze-oracle-v1",
+  "MATCH-KICKOFF-FIRST-TOUCH": "rules-kickoff-first-touch-oracle-v1",
+  "MATCH-SCORING-GOAL-PHASE": "rules-goal-phase-oracle-v1",
+  "MATCH-TIMER-DECREMENT": "rules-timer-decrement-oracle-v1",
+  "MATCH-TIMER-HALFTIME": "rules-timer-halftime-oracle-v1",
+  "MATCH-TIMER-FULLTIME": "rules-timer-fulltime-oracle-v1",
 };
 
 // ---------------------------------------------------------------------------

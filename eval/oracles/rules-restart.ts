@@ -64,6 +64,8 @@ interface Boundary {
   kind: "touchline" | "goalline";
   goalIndex?: number;
   touchlineIndex?: number;
+  /** The crossing ball position recorded by the boundary event (placement/serve facts). */
+  ballPosition?: { x: number; y: number; z: number } | null;
 }
 
 interface Execution {
@@ -141,22 +143,24 @@ function pairRestartBoundaries(observations: TelemetryObservation[]): RestartPai
 
   for (const { tick, ev } of collectRestartEvents(observations)) {
     if (ev.kind === "ball-touchline-out-of-play") {
-      const p = ev.payload as { lastTouchRef?: string | null; touchlineIndex?: number } | undefined;
+      const p = ev.payload as { lastTouchRef?: string | null; touchlineIndex?: number; ballPosition?: { x: number; y: number; z: number } } | undefined;
       if (hasPhaseFacts && startPhaseByTick.get(tick) !== "playing") continue;
       pending.push({
         tick,
         lastTouchRef: p?.lastTouchRef ?? null,
         kind: "touchline",
         touchlineIndex: p?.touchlineIndex,
+        ballPosition: p?.ballPosition ?? null,
       });
     } else if (ev.kind === "ball-out-of-play") {
-      const p = ev.payload as { lastTouchRef?: string | null; goalIndex?: number } | undefined;
+      const p = ev.payload as { lastTouchRef?: string | null; goalIndex?: number; ballPosition?: { x: number; y: number; z: number } } | undefined;
       if (hasPhaseFacts && startPhaseByTick.get(tick) !== "playing") continue;
       pending.push({
         tick,
         lastTouchRef: p?.lastTouchRef ?? null,
         kind: "goalline",
         goalIndex: p?.goalIndex,
+        ballPosition: p?.ballPosition ?? null,
       });
     } else if (ev.kind === "throw-in-executed") {
       const teamId = (ev.payload as { teamId?: string } | undefined)?.teamId ?? null;
@@ -540,4 +544,363 @@ export function checkGoalDetection(
   }
 
   return pass("rules-goal-detection-held", "Goal event(s) carry a valid goalIndex and are mutually exclusive with out-of-play");
+}
+
+// ---------------------------------------------------------------------------
+// MATCH-THROW-IN-PLACEMENT / MATCH-THROW-IN-SERVE (MATCH_RULES_SPEC §6.3/§6.4)
+// ---------------------------------------------------------------------------
+
+/**
+ * Versioned provisional placement geometry (match-rules-v1, §13). These are the
+ * core's own provisional goal-area values the placement oracle validates the
+ * executed kick against — not measured PES constants.
+ */
+const GOAL_AREA_DEPTH = 5.5;
+const GOAL_AREA_HALF_WIDTH = 9.16;
+/** Throw-in chest-height ball placement (match-rules-v1, §13). */
+const THROW_IN_BALL_Z = 1.5;
+/** Position comparison tolerance (m) for restart placement. */
+const PLACEMENT_TOLERANCE = 0.2;
+/** Kickoff freeze home tolerance (m) — anti-huddle-v1 (referenced). */
+const KICKOFF_FREEZE_HOME_TOLERANCE = 0.75;
+
+/** Index the observations by tick. */
+function observationsByTick(observations: TelemetryObservation[]): Map<number, TelemetryObservation> {
+  const m = new Map<number, TelemetryObservation>();
+  for (const o of observations) m.set(o.tick, o);
+  return m;
+}
+
+/** Collect every executed event of a kind, preserving tick + payload. */
+function collectExecuted(
+  observations: TelemetryObservation[],
+  kind: string,
+): Array<{ tick: number; payload: Record<string, unknown> }> {
+  const out: Array<{ tick: number; payload: Record<string, unknown> }> = [];
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind === kind) out.push({ tick: ev.tick, payload: (ev.payload ?? {}) as Record<string, unknown> });
+    }
+  }
+  out.sort((a, b) => a.tick - b.tick);
+  return out;
+}
+
+/** Return the executed throw-in placement facts paired with the boundary that opened the window. */
+function throwInPlacementPairs(observations: TelemetryObservation[]): Array<{
+  boundary: Boundary | null;
+  execution: { tick: number; payload: Record<string, unknown> };
+}> {
+  const pairs = pairRestartBoundaries(observations);
+  const execs = collectExecuted(observations, "throw-in-executed");
+  const byTick = new Map<number, { boundary: Boundary | null; execution: { tick: number; payload: Record<string, unknown> } }>();
+  for (const pair of pairs) {
+    if (pair.execution.kind === "throw-in") {
+      byTick.set(pair.execution.tick, {
+        boundary: pair.boundary,
+        execution: { tick: pair.execution.tick, payload: {} },
+      });
+    }
+  }
+  // Re-attach the full executed payload (the RestartPair only carries the team id).
+  for (const exec of execs) {
+    const entry = byTick.get(exec.tick);
+    if (entry) entry.execution.payload = exec.payload;
+  }
+  return [...byTick.values()];
+}
+
+/**
+ * The ball is placed at the exact touchline exit point (§6.3).  The executed
+ * throw-in's `throwPosition` must equal the boundary event's `ballPosition`.
+ * FAIL on a mismatch; NOT_EVALUATED when no throw-in with a resolvable boundary
+ * and placement payload is observed.
+ */
+export function checkThrowInPlacement(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const pairs = throwInPlacementPairs(observations).filter(
+    (p) => p.boundary !== null && p.boundary!.ballPosition && p.execution.payload.throwPosition,
+  );
+
+  if (pairs.length === 0) {
+    return notEvaluated("rules-throw-in-placement", "No throw-in with a resolvable boundary + placement payload observed");
+  }
+
+  const failures: string[] = [];
+  for (const pair of pairs) {
+    const bp = pair.boundary!.ballPosition!;
+    const tp = pair.execution.payload.throwPosition as { x?: unknown; y?: unknown };
+    if (typeof tp?.x !== "number" || typeof tp?.y !== "number") {
+      failures.push(`throw-in at tick ${pair.execution.tick} has a malformed throwPosition`);
+      continue;
+    }
+    if (Math.hypot(tp.x - bp.x, tp.y - bp.y) > PLACEMENT_TOLERANCE) {
+      failures.push(
+        `throw-in at tick ${pair.execution.tick} placed at (${tp.x.toFixed(3)},${tp.y.toFixed(3)}) ` +
+          `but the exit point was (${bp.x.toFixed(3)},${bp.y.toFixed(3)})`,
+      );
+    }
+  }
+
+  if (failures.length > 0) {
+    return [{ id: "rules-throw-in-placement-mutated", status: "fail", description: `Throw-in placement violated: ${failures.join("; ")}`, details: { failures } }];
+  }
+  return pass("rules-throw-in-placement-held", `${pairs.length} throw-in(s) placed at the exact touchline exit point`, { verified: pairs.length });
+}
+
+/**
+ * The throw-in is served at chest height toward the nearest awarding-team
+ * receiver and into play (§6.4).  At the execution tick the ball sits at
+ * `throw_in_ball_z` (1.5 m) with a positive vertical velocity; the payload
+ * carries the target receiver position and the into-play direction.
+ * FAIL on a violation; NOT_EVALUATED when no throw-in execution is observed.
+ */
+export function checkThrowInServe(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const execs = collectExecuted(observations, "throw-in-executed");
+  if (execs.length === 0) {
+    return notEvaluated("rules-throw-in-serve", "No throw-in execution observed");
+  }
+  const byTick = observationsByTick(observations);
+  const failures: string[] = [];
+  for (const exec of execs) {
+    const o = byTick.get(exec.tick);
+    if (!o) continue;
+    const tp = exec.payload.throwPosition as { x?: unknown; y?: unknown } | undefined;
+    const tgt = exec.payload.targetPosition as { x?: unknown; y?: unknown } | undefined;
+    const dir = exec.payload.throwDirection as { x?: unknown; y?: unknown } | undefined;
+    // Chest-height serve.
+    if (Math.abs(o.ball.position.z - THROW_IN_BALL_Z) > PLACEMENT_TOLERANCE) {
+      failures.push(`throw-in at tick ${exec.tick}: ball z=${o.ball.position.z.toFixed(3)} (expected ~${THROW_IN_BALL_Z} chest height)`);
+    }
+    if (o.ball.linearVelocity.z <= 0) {
+      failures.push(`throw-in at tick ${exec.tick}: ball vertical velocity ${o.ball.linearVelocity.z.toFixed(3)} is not upward`);
+    }
+    // Into-play toward a receiver: a distinct target exists and the direction is a unit vector.
+    if (typeof tgt?.x !== "number" || typeof tgt?.y !== "number") {
+      failures.push(`throw-in at tick ${exec.tick}: no target receiver position in the payload`);
+    } else if (typeof tp?.x !== "number" || typeof tp?.y !== "number") {
+      failures.push(`throw-in at tick ${exec.tick}: no throwPosition in the payload`);
+    } else if (Math.hypot(tgt.x - tp.x, tgt.y - tp.y) < 0.5) {
+      failures.push(`throw-in at tick ${exec.tick}: the serve target is the exit point itself (not into play)`);
+    }
+    if (typeof dir?.x !== "number" || typeof dir?.y !== "number") {
+      failures.push(`throw-in at tick ${exec.tick}: no throwDirection in the payload`);
+    } else {
+      const mag = Math.hypot(dir.x, dir.y);
+      if (Math.abs(mag - 1) > 0.05) {
+        failures.push(`throw-in at tick ${exec.tick}: throwDirection is not a unit vector (mag ${mag.toFixed(3)})`);
+      }
+    }
+  }
+
+  if (failures.length > 0) {
+    return [{ id: "rules-throw-in-serve-mutated", status: "fail", description: `Throw-in serve violated: ${failures.join("; ")}`, details: { failures } }];
+  }
+  return pass("rules-throw-in-serve-held", `${execs.length} throw-in(s) served at chest height into play`, { verified: execs.length });
+}
+
+// ---------------------------------------------------------------------------
+// MATCH-GOAL-KICK-PLACEMENT (MATCH_RULES_SPEC §7.3)
+// ---------------------------------------------------------------------------
+
+/** Pair each executed goal kick with the goalline boundary that opened it. */
+function goalKickPlacementPairs(observations: TelemetryObservation[]): Array<{
+  boundary: Boundary | null;
+  execution: { tick: number; payload: Record<string, unknown> };
+}> {
+  const pairs = pairRestartBoundaries(observations);
+  const execs = collectExecuted(observations, "goal-kick-executed");
+  const byTick = new Map<number, { boundary: Boundary | null; execution: { tick: number; payload: Record<string, unknown> } }>();
+  for (const pair of pairs) {
+    if (pair.execution.kind === "goal-kick") {
+      byTick.set(pair.execution.tick, {
+        boundary: pair.boundary,
+        execution: { tick: pair.execution.tick, payload: {} },
+      });
+    }
+  }
+  for (const exec of execs) {
+    const entry = byTick.get(exec.tick);
+    if (entry) entry.execution.payload = exec.payload;
+  }
+  return [...byTick.values()];
+}
+
+/**
+ * The goal kick is placed inside the goal area on the exit side (§7.3): the
+ * goal-area spot is `(±(goalLineX − GOAL_AREA_DEPTH), clamp(exitY, ±GOAL_AREA_HALF_WIDTH))`
+ * preserving the sign of the exit y.  The executed goal kick's `kickPosition`
+ * must match.  FAIL on a mismatch; NOT_EVALUATED when no goal kick with a
+ * resolvable boundary + placement payload is observed.
+ */
+export function checkGoalKickPlacement(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const pairs = goalKickPlacementPairs(observations).filter(
+    (p) => p.boundary !== null && p.boundary!.ballPosition && p.execution.payload.kickPosition,
+  );
+
+  if (pairs.length === 0) {
+    return notEvaluated("rules-goal-kick-placement", "No goal kick with a resolvable boundary + placement payload observed");
+  }
+
+  const failures: string[] = [];
+  for (const pair of pairs) {
+    const bp = pair.boundary!.ballPosition!;
+    const goalIndex = pair.boundary!.goalIndex;
+    const kp = pair.execution.payload.kickPosition as { x?: unknown; y?: unknown };
+    if (typeof kp?.x !== "number" || typeof kp?.y !== "number") {
+      failures.push(`goal kick at tick ${pair.execution.tick} has a malformed kickPosition`);
+      continue;
+    }
+    if (goalIndex === undefined) continue;
+    // The goal area x is the goal-line side minus the goal-area depth.
+    const goalLineX = Math.abs(bp.x);
+    const expectedX = goalIndex === 0 ? goalLineX - GOAL_AREA_DEPTH : -(goalLineX - GOAL_AREA_DEPTH);
+    const expectedY = Math.max(-GOAL_AREA_HALF_WIDTH, Math.min(GOAL_AREA_HALF_WIDTH, bp.y));
+    if (Math.hypot(kp.x - expectedX, kp.y - expectedY) > PLACEMENT_TOLERANCE) {
+      failures.push(
+        `goal kick at tick ${pair.execution.tick} placed at (${kp.x.toFixed(3)},${kp.y.toFixed(3)}) ` +
+          `but the goal-area spot was (${expectedX.toFixed(3)},${expectedY.toFixed(3)})`,
+      );
+    }
+  }
+
+  if (failures.length > 0) {
+    return [{ id: "rules-goal-kick-placement-mutated", status: "fail", description: `Goal-kick placement violated: ${failures.join("; ")}`, details: { failures } }];
+  }
+  return pass("rules-goal-kick-placement-held", `${pairs.length} goal kick(s) placed inside the goal area on the exit side`, { verified: pairs.length });
+}
+
+// ---------------------------------------------------------------------------
+// MATCH-SCORING-GOAL-PHASE (MATCH_RULES_SPEC §10.2/§9.3)
+// ---------------------------------------------------------------------------
+
+/**
+ * A goal opens the goal phase, which resets play and returns to playing
+ * (§10.2, §9.3).  Reads the runner-injected `core-match-phase` facts: a goal
+ * event must be followed by a `goal` phase and then a return to `playing`
+ * (the post-goal auto-reset).  FAIL on a missing goal phase or a goal that
+ * never returns to playing; NOT_EVALUATED when no goal is observed or the
+ * stream carries no phase facts.
+ */
+export function checkGoalPhase(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  let goalSeen = false;
+  for (const o of observations) {
+    for (const ev of o.events) if (ev.kind === "goal") { goalSeen = true; break; }
+  }
+  if (!goalSeen) return notEvaluated("rules-goal-phase", "No goal event observed in the run");
+
+  const facts: Array<{ tick: number; phase: string }> = [];
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "core-match-phase") continue;
+      const p = ev.payload as { matchPhase?: unknown } | undefined;
+      if (typeof p?.matchPhase === "string") facts.push({ tick: o.tick, phase: p.matchPhase });
+    }
+  }
+  if (facts.length === 0) return notEvaluated("rules-goal-phase", "The observation stream carries no core phase facts");
+
+  // A valid goal phase is a `goal` post-phase tick that is followed by a return to `playing`.
+  let goalPhaseSeen = false;
+  let returnedToPlaying = false;
+  let current = 0;
+  for (const f of facts) {
+    if (f.phase === "goal") { goalPhaseSeen = true; current = 1; }
+    else if (current === 1 && f.phase === "playing") { returnedToPlaying = true; current = 2; }
+  }
+
+  if (!goalPhaseSeen || !returnedToPlaying) {
+    return [{ id: "rules-goal-phase-mutated", status: "fail", description: `A goal did not open a goal phase that returned to playing (goalPhase=${goalPhaseSeen}, returnedToPlaying=${returnedToPlaying})`, details: { goalPhaseSeen, returnedToPlaying } }];
+  }
+  return pass("rules-goal-phase-held", "A goal opened the goal phase and play returned to playing via the post-goal reset", {});
+}
+
+// ---------------------------------------------------------------------------
+// MATCH-KICKOFF-FIRST-TOUCH (MATCH_RULES_SPEC §9.2)
+// ---------------------------------------------------------------------------
+
+/**
+ * The restart window closes on the first touch of the restarted ball, and only
+ * the designated taker (the nearest body to the untouched ball, ties by
+ * ascending playerId, keeper excluded) may break the freeze (§9.2).  Reads the
+ * opening untouched window (ball `lastTouchRef` null) and the player-ball
+ * contact that closes it.  FAIL when the window never closes, the first-touch
+ * body is not the designated taker, or a non-taker body left its home during
+ * the window; NOT_EVALUATED when there is no untouched opening window.
+ */
+export function checkKickoffFirstTouch(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  if (observations.length === 0) return notEvaluated("rules-kickoff-first-touch", "No observations in the run");
+
+  const first = observations[0];
+  if (first.players.length < 2) return notEvaluated("rules-kickoff-first-touch", "Only one body observed; a taker/freeze distinction is not observable");
+
+  // Opening untouched run.
+  let freezeEnd = 0;
+  while (freezeEnd < observations.length && observations[freezeEnd].ball.lastTouchRef === null) freezeEnd++;
+  if (freezeEnd < 2) return notEvaluated("rules-kickoff-first-touch", "The kickoff ball was touched immediately (no untouched opening window)");
+
+  // Designated taker = nearest body to the untouched ball, ties by ascending playerId.
+  const ball = first.ball.position;
+  let taker: string | null = null;
+  let bestDist = Infinity;
+  const sorted = [...first.players].sort((a, b) => a.playerId.localeCompare(b.playerId));
+  for (const p of sorted) {
+    const d = Math.hypot(p.groundPosition.x - ball.x, p.groundPosition.y - ball.y);
+    if (d < bestDist) { bestDist = d; taker = p.playerId; }
+  }
+
+  // The tick the window closes (first non-null lastTouchRef).
+  const firstTouchObs = observations[freezeEnd];
+  const firstTouchRef = firstTouchObs.ball.lastTouchRef;
+  if (firstTouchRef === null) {
+    return [{ id: "rules-kickoff-first-touch-mutated", status: "fail", description: "The kickoff ball remained untouched for the whole run (window never closed)", details: {} }];
+  }
+  // Resolve the body that made the first touch from the contact event.
+  let firstTouchPlayerId: string | null = null;
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.id === firstTouchRef) {
+        const p = ev.payload as { playerId?: unknown } | undefined;
+        firstTouchPlayerId = typeof p?.playerId === "string" ? p.playerId : null;
+      }
+    }
+  }
+  if (firstTouchPlayerId === null) {
+    return notEvaluated("rules-kickoff-first-touch", "The first-touch reference does not resolve to a player id");
+  }
+
+  const failures: string[] = [];
+  if (firstTouchPlayerId !== taker) {
+    failures.push(`the first touch was by ${firstTouchPlayerId}, not the designated taker ${taker}`);
+  }
+
+  // Only the taker (+ at-ball) may leave its kickoff home while untouched.
+  const home: Record<string, { x: number; y: number }> = {};
+  for (const p of first.players) home[p.playerId] = { x: p.groundPosition.x, y: p.groundPosition.y };
+  const movers = new Set<string>();
+  for (let i = 0; i < freezeEnd; i++) {
+    const o = observations[i];
+    for (const p of o.players) {
+      const h = home[p.playerId];
+      if (!h) continue;
+      if (Math.hypot(p.groundPosition.x - h.x, p.groundPosition.y - h.y) > KICKOFF_FREEZE_HOME_TOLERANCE) movers.add(p.playerId);
+    }
+  }
+  const nonTakerMovers = [...movers].filter((id) => id !== taker);
+  if (nonTakerMovers.length > 0) {
+    failures.push(`non-taker body(ies) left home during the untouched window: ${nonTakerMovers.join(", ")}`);
+  }
+
+  if (failures.length > 0) {
+    return [{ id: "rules-kickoff-first-touch-mutated", status: "fail", description: `Kickoff first-touch violated: ${failures.join("; ")}`, details: { failures, taker, firstTouchPlayerId } }];
+  }
+  return pass("rules-kickoff-first-touch-held", `The kickoff window closed on the first touch by the designated taker ${taker}`, { taker, firstTouchPlayerId });
 }
