@@ -9,7 +9,7 @@ horizon_id: "rules-executable-conformance"
 created_from_commit: 8c50b54
 created_at: 2026-09-06
 reason: "Horizon v28 (COMPLETE 4/4, remote-durable at 8c50b54) delivered the rules spec gateway (MATCH_RULES_SPEC: lifecycle model core-owned — now the runner default after the accepted migration with per-pin proofs — per-restart normative semantics, match-rules-v1 parameters, 7 blocked references), keeper visual legibility (additive PresentationSnapshot keeperRole + magenta cone marker with a genuine bridge-capture parity guard), the possession-oracle reference fix (same defect class as the COMMON triage), and the lifecyclePhaseSync migration. v29 makes the rules spec executable: (a) register the rules evaluator suite per the spec §15 criteria (protected oracles, canary-guarded — the GK-KEEPER-ORACLE-REGISTRATION pattern); (b) driven conformance evidence per restart type against the spec + the new suite (the accepted restart machinery is the implementation under test); (c) root-cause the last COMMON-BOUNDS residual (gk-shot-fixture 52.53 m goal-line position — fix the driver if genuinely illegal, or disclose if the bound needs goal-depth geometry derived from constants); (d) publish the honest rules-suite state. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 3
+current_index: 4
 objectives:
   - id: RULES-SUITE-REGISTRATION
     status: accepted
@@ -31,11 +31,11 @@ objectives:
     builder: builder-structured
     prerequisite: ""
   - id: RULES-SUITE-STATE
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-06
+    candidate_commit: f9c3735
     reason: "Honest rules-suite state publication: re-run the rules suite over the conformance evidence and publish the verdict table (per-rule outcomes; blocked references stay blocked; no suite-level PASS claim). BOOKKEEPING; zero gameplay change."
-    builder: builder-structured
     prerequisite: RULES-SUITE-REGISTRATION
-    prerequisite_note: "also benefits from RESTART-RULES-CONFORMANCE"
 observable_progress_target: "The rules spec §15 criteria executable through a registered protected rules suite; per-restart conformance verdicts from the accepted restart machinery; the gk-shot-fixture COMMON-BOUNDS residual root-caused and honestly resolved; a published rules-suite verdict state. NO regulation implementation beyond suite-gated behavior, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
 last_invalidation_reason: "Horizon v28 COMPLETE 4/4: RULES-SPEC-DRAFT (dedicated match-rules spec; critic RETRY resolved), KEEPER-VISUAL-MARKER (additive keeperRole presentation field + magenta cone marker with a genuine bridge-capture parity guard), POSSESSION-ORACLE-REFERENCE-TRIAGE (possession oracle false-fail fixed with the window-union resolution), LIFECYCLE-MIGRATION-ASSESSMENT (lifecyclePhaseSync default migrated legacy→core-owned with per-pin proofs; first candidate REJECT for the silently-migrated CPU-DEFENSIVE-TACKLE pin repaired). Remote-durable at 8c50b54; strategic reassessment produced Horizon v29 (rules-executable-conformance). Regulation implementation stays deferred until the rules spec AND suites exist; GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
 replan_if:
