@@ -19,7 +19,14 @@ import { createWorld } from "../../src/simulation/world/create.js";
 import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { deepClone } from "../../src/simulation/world/clone.js";
 import type { WorldState, MatchPhase as SimMatchPhase } from "../../src/contracts/state.js";
-import { createCpuAdapter, buildCpuObservation, getKeeperReleaseRecords, type CpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
+import {
+  createCpuAdapter,
+  buildCpuObservation,
+  getKeeperReleaseRecords,
+  assignChaseRoles,
+  RESTART_HOLD_MIN_TICKS,
+  type CpuObservation,
+} from "../../src/adapters/input-browser/cpu-adapter.js";
 import {
   designateKeeperFromLayout,
   goalArcCenter,
@@ -577,6 +584,55 @@ export function rehomeKeeperToArc(scenario: ScenarioDefinition): ScenarioDefinit
   return changed ? { ...scenario, players } : scenario;
 }
 
+/** Core phases that hold play while a restart is prepared (RESTART-ANTI-HUDDLE-COHERENCE). */
+const RESTART_HOLD_PHASES = new Set<string>([
+  "goal",
+  "corner-kick",
+  "throw-in",
+  "goal-kick",
+  "halftime",
+]);
+
+/**
+ * Build the CpuObservation shape the production role functions consume from a
+ * committed telemetry observation. Only observable fields are carried across,
+ * plus the formation role (from the scenario layout) and the keeper role flags
+ * the runner already resolved, so `assignChaseRoles` sees the same shape the
+ * adapters act on.
+ */
+function designationTeamObservation(
+  observation: import("../../src/contracts/telemetry.js").TelemetryObservation,
+  identities: ReadonlyMap<string, { formationRole?: "defender" | "midfielder" | "attacker" }>,
+  pitchLength: number,
+  pitchWidth: number,
+  teamId: string,
+  cpuAntiHuddle: boolean,
+  gkBehavior: boolean,
+  keeperRoles: Record<string, string> | undefined,
+): CpuObservation {
+  return {
+    players: observation.players.map((p) => ({
+      playerId: p.playerId,
+      teamId: p.teamId,
+      groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
+      linearVelocity: { x: p.linearVelocity.x, y: p.linearVelocity.y },
+      bodyHeading: p.bodyHeading,
+      formationRole: identities.get(p.playerId)?.formationRole,
+    })),
+    ball: {
+      position: { x: observation.ball.position.x, y: observation.ball.position.y, z: observation.ball.position.z },
+      linearVelocity: { x: observation.ball.linearVelocity.x, y: observation.ball.linearVelocity.y, z: observation.ball.linearVelocity.z },
+      regime: observation.ball.regime,
+      lastTouchRef: observation.ball.lastTouchRef,
+    },
+    pitchLength,
+    pitchWidth,
+    cpuTeamId: teamId,
+    cpuAntiHuddle,
+    ...(gkBehavior && keeperRoles ? { gkBehavior: true, keeperPlayerIds: keeperRoles } : {}),
+  };
+}
+
 /**
  * Run a headless CPU-vs-CPU match.
  *
@@ -1073,6 +1129,127 @@ export function runHeadlessMatch(
           startPhase: coreMatchPhases[i],
         },
       });
+    }
+
+    // RESTART-DESIGNATION-FACTS-CONFORMANCE: serialize the adapter's restart-
+    // window designation facts so the anti-huddle restart-behavior criteria
+    // (FREEZE-UNTIL-FIRST-TOUCH / NEAREST-ONLY / REARM) become honestly
+    // measurable. The designation is computed from the same exported production
+    // function the adapters act on (`assignChaseRoles`) plus the committed
+    // coreMatchPhases + ball reference, so the runner propagates the ACTUAL
+    // adapter designation without owning football state. The `untouched`
+    // signal mirrors the adapter exactly: a null touch reference (kickoff /
+    // set-piece serve) or a stale reference that carried through a full core
+    // restart hold (post-goal / halftime reset). The latter is only possible
+    // when `browserParityObservations` is on, because that is the only wiring
+    // in which the adapter observes matchPhase and can arm the re-arm baseline.
+    // Post-loop, gated, and additive (observation-level annotations).
+    {
+      const identities = new Map<string, { formationRole?: "defender" | "midfielder" | "attacker" }>();
+      for (const p of scenario.players) {
+        identities.set(p.playerId, {
+          formationRole: (p as { formationRole?: "defender" | "midfielder" | "attacker" }).formationRole,
+        });
+      }
+      const teamIds = [...new Set(scenario.players.map((p) => p.teamId))].sort();
+
+      let baselineRef: string | null = null;
+      let holdTicks = 0;
+      let previousRef: string | null | undefined;
+      let anchors: Map<string, { x: number; y: number }> | null = null;
+      const designations: Array<{
+        ballUntouched: boolean;
+        takerId: string | null;
+        baselineTouchRef: string | null;
+        rearmed: boolean;
+        teams: Record<string, string | null>;
+        anchors: Record<string, { x: number; y: number }> | null;
+      }> = [];
+
+      for (let i = 0; i < observations.length; i++) {
+        const o = observations[i];
+        const phase = coreMatchPhases[i];
+        const ref = o.ball.lastTouchRef;
+
+        let untouched: boolean;
+        if (browserParityObservations) {
+          // Mirror the adapter's re-arm baseline (RESTART_HOLD_MIN_TICKS gate +
+          // carried-through-hold test).
+          if (RESTART_HOLD_PHASES.has(phase)) {
+            holdTicks++;
+          } else {
+            if (holdTicks >= RESTART_HOLD_MIN_TICKS && ref !== null && previousRef !== undefined && ref === previousRef) {
+              baselineRef = ref;
+            }
+            holdTicks = 0;
+          }
+          previousRef = ref;
+          // A boundary event closes the prior re-armed window: the ball went out
+          // of play, so the carried-through baseline no longer describes an
+          // untouched restart ball (the new restart is prepared separately).
+          if (o.events.some((ev) => ev.kind === "ball-out-of-play" || ev.kind === "ball-touchline-out-of-play")) {
+            baselineRef = null;
+          }
+          untouched = ref === null || (baselineRef !== null && ref === baselineRef);
+          if (baselineRef !== null && ref !== baselineRef) baselineRef = null;
+        } else {
+          // Non-browser-parity wiring: the adapter never observes matchPhase, so
+          // it never arms the re-arm baseline. Only a null reference is untouched.
+          untouched = ref === null;
+        }
+
+        let takerId: string | undefined;
+        const teams: Record<string, string | null> = {};
+        for (const teamId of teamIds) {
+          const teamObs = designationTeamObservation(
+            o, identities, scenario.pitchLength, scenario.pitchWidth,
+            teamId, cpuAntiHuddle, gkBehavior, keeperRoles,
+          );
+          const roles = assignChaseRoles(teamObs, teamId, untouched);
+          if (roles.kickoffTakerId !== undefined && roles.kickoffTakerId !== null) takerId = roles.kickoffTakerId;
+          teams[teamId] = roles.chaserPlayerId ?? null;
+        }
+
+        if (untouched && anchors === null) {
+          anchors = new Map();
+          for (const p of o.players) {
+            anchors.set(p.playerId, { x: p.groundPosition.x, y: p.groundPosition.y });
+          }
+        } else if (!untouched && anchors !== null) {
+          anchors = null;
+        }
+
+        designations.push({
+          ballUntouched: untouched,
+          takerId: takerId ?? null,
+          baselineTouchRef: baselineRef,
+          rearmed: baselineRef !== null,
+          teams,
+          anchors: anchors ? Object.fromEntries(anchors.entries()) : null,
+        });
+      }
+
+      for (let i = 0; i < observations.length; i++) {
+        const o = observations[i];
+        const d = designations[i];
+        let maxSeq = 0;
+        for (const ev of o.events) if (ev.sequence > maxSeq) maxSeq = ev.sequence;
+        o.events.push({
+          id: `restart-designation-${o.tick}`,
+          tick: o.tick,
+          sequence: maxSeq + 1,
+          kind: "restart-designation",
+          label: `restart designation tick ${o.tick} untouched=${d.ballUntouched} taker=${String(d.takerId)}`,
+          payload: {
+            ballUntouched: d.ballUntouched,
+            takerId: d.takerId,
+            baselineTouchRef: d.baselineTouchRef,
+            rearmed: d.rearmed,
+            teams: d.teams,
+            anchors: d.anchors,
+          },
+        });
+      }
     }
   }
 

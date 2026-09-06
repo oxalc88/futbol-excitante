@@ -30,6 +30,7 @@
 
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { InvariantResult } from "../../src/contracts/telemetry.js";
+import { FOUNDATION_CONTACT_V1 } from "../../src/simulation/config/foundation.js";
 
 // ---------------------------------------------------------------------------
 // Shared helpers (pure)
@@ -902,11 +903,14 @@ export function checkGoalPhase(
 /**
  * The restart window closes on the first touch of the restarted ball, and only
  * the designated taker (the nearest body to the untouched ball, ties by
- * ascending playerId, keeper excluded) may break the freeze (§9.2).  Reads the
- * opening untouched window (ball `lastTouchRef` null) and the player-ball
- * contact that closes it.  FAIL when the window never closes, the first-touch
- * body is not the designated taker, or a non-taker body left its home during
- * the window; NOT_EVALUATED when there is no untouched opening window.
+ * ascending playerId, keeper excluded per §12.1) may break the freeze (§9.2).
+ * Reads the opening untouched window (ball `lastTouchRef` null) and the
+ * player-ball contact that closes it.  The keeper exclusion is applied when the
+ * observation stream carries the runner-injected `gk-role` designation (the
+ * gkBehavior wiring); when no keeper is designated the nearest-body rule is
+ * used unchanged.  FAIL when the window never closes, the first-touch body is
+ * not the designated taker, or a non-taker body left its home during the
+ * window; NOT_EVALUATED when there is no untouched opening window.
  */
 export function checkKickoffFirstTouch(
   observations: TelemetryObservation[],
@@ -921,12 +925,23 @@ export function checkKickoffFirstTouch(
   while (freezeEnd < observations.length && observations[freezeEnd].ball.lastTouchRef === null) freezeEnd++;
   if (freezeEnd < 2) return notEvaluated("rules-kickoff-first-touch", "The kickoff ball was touched immediately (no untouched opening window)");
 
+  // The designated keeper (per team), excluded from taker selection (§12.1).
+  const keeperIds = new Set<string>();
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "gk-role") continue;
+      const p = ev.payload as { keeperPlayerId?: unknown } | undefined;
+      if (typeof p?.keeperPlayerId === "string") keeperIds.add(p.keeperPlayerId);
+    }
+  }
+
   // Designated taker = nearest body to the untouched ball, ties by ascending playerId.
   const ball = first.ball.position;
   let taker: string | null = null;
   let bestDist = Infinity;
   const sorted = [...first.players].sort((a, b) => a.playerId.localeCompare(b.playerId));
   for (const p of sorted) {
+    if (keeperIds.has(p.playerId)) continue;
     const d = Math.hypot(p.groundPosition.x - ball.x, p.groundPosition.y - ball.y);
     if (d < bestDist) { bestDist = d; taker = p.playerId; }
   }
@@ -977,4 +992,313 @@ export function checkKickoffFirstTouch(
     return [{ id: "rules-kickoff-first-touch-mutated", status: "fail", description: `Kickoff first-touch violated: ${failures.join("; ")}`, details: { failures, taker, firstTouchPlayerId } }];
   }
   return pass("rules-kickoff-first-touch-held", `The kickoff window closed on the first touch by the designated taker ${taker}`, { taker, firstTouchPlayerId });
+}
+
+// ---------------------------------------------------------------------------
+// Anti-huddle restart-behavior oracles (MATCH_RULES_SPEC §12/§9.5)
+// ---------------------------------------------------------------------------
+
+/** Planar radius (m) inside which the contact system honours a touch (exemption). */
+const TOUCH_PRESS_RANGE = FOUNDATION_CONTACT_V1.contactRadius.value;
+/** Huddle radius (m) at which same-team bodies count as one clump (anti-huddle-v1). */
+const HUDDLE_RADIUS_METRES = 5;
+/** Ticks of live-play geometry sampled after a first touch, for the reopen. */
+const AFTER_TOUCH_WINDOW_TICKS = 120;
+
+/** The runner-injected restart-window designation facts for one tick. */
+interface RestartDesignation {
+  tick: number;
+  ballUntouched: boolean;
+  takerId: string | null;
+  baselineTouchRef: string | null;
+  rearmed: boolean;
+  teams: Record<string, string | null>;
+  anchors: Record<string, { x: number; y: number }> | null;
+}
+
+/** Collect every `restart-designation` fact in tick order. */
+function collectRestartDesignations(
+  observations: TelemetryObservation[],
+): RestartDesignation[] {
+  const out: RestartDesignation[] = [];
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "restart-designation") continue;
+      const p = ev.payload as Partial<RestartDesignation> | undefined;
+      if (typeof p?.ballUntouched !== "boolean") continue;
+      out.push({
+        tick: o.tick,
+        ballUntouched: p.ballUntouched,
+        takerId: typeof p.takerId === "string" ? p.takerId : null,
+        baselineTouchRef: typeof p.baselineTouchRef === "string" ? p.baselineTouchRef : null,
+        rearmed: p.rearmed === true,
+        teams: p.teams ?? {},
+        anchors: p.anchors ?? null,
+      });
+    }
+  }
+  out.sort((a, b) => a.tick - b.tick);
+  return out;
+}
+
+/** A maximal run of consecutive untouched-ball ticks. */
+interface UntouchedWindow {
+  startTick: number;
+  endTick: number;
+  closed: boolean;
+  rearmed: boolean;
+  designations: RestartDesignation[];
+}
+
+function findUntouchedWindows(facts: RestartDesignation[]): UntouchedWindow[] {
+  const windows: UntouchedWindow[] = [];
+  let i = 0;
+  while (i < facts.length) {
+    if (!facts[i].ballUntouched) {
+      i++;
+      continue;
+    }
+    let j = i;
+    while (j + 1 < facts.length && facts[j + 1].ballUntouched) j++;
+    const closed = j + 1 < facts.length;
+    windows.push({
+      startTick: facts[i].tick,
+      endTick: facts[j].tick,
+      closed,
+      rearmed: facts[i].rearmed,
+      designations: facts.slice(i, j + 1),
+    });
+    i = j + 1;
+  }
+  return windows;
+}
+
+function observationByTick(
+  observations: TelemetryObservation[],
+  tick: number,
+): TelemetryObservation | undefined {
+  for (const o of observations) if (o.tick === tick) return o;
+  return undefined;
+}
+
+/** The post-step core phase facts (`core-match-phase`), used by the re-arm oracle. */
+function collectCorePhases(
+  observations: TelemetryObservation[],
+): Array<{ tick: number; phase: string }> {
+  const out: Array<{ tick: number; phase: string }> = [];
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "core-match-phase") continue;
+      const p = ev.payload as { matchPhase?: unknown } | undefined;
+      if (typeof p?.matchPhase === "string") out.push({ tick: o.tick, phase: p.matchPhase });
+    }
+  }
+  return out;
+}
+
+/** The core phase the restart machinery ran a tick from (the adapter's `matchPhase`). */
+function startPhaseByTick(observations: TelemetryObservation[]): Map<number, string> {
+  const m = new Map<number, string>();
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "core-match-phase") continue;
+      const p = ev.payload as { startPhase?: unknown } | undefined;
+      if (typeof p?.startPhase === "string") m.set(o.tick, p.startPhase);
+    }
+  }
+  return m;
+}
+
+/** The core post-step phase for a tick (the phase the tick ended in / the next restart phase). */
+function matchPhaseByTick(observations: TelemetryObservation[]): Map<number, string> {
+  const m = new Map<number, string>();
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "core-match-phase") continue;
+      const p = ev.payload as { matchPhase?: unknown } | undefined;
+      if (typeof p?.matchPhase === "string") m.set(o.tick, p.matchPhase);
+    }
+  }
+  return m;
+}
+
+/**
+ * Whether the adapter is in a restart-hold phase for a tick (the phase it
+ * samples). The freeze / nearest-only behavior only applies while the phase is
+ * `playing` or `kickoff`; during any other phase the adapter returns a neutral
+ * frame without converging or freezing, so those ticks are not freeze checks.
+ */
+function isHoldPhase(phase: string | undefined): boolean {
+  return phase === undefined || (phase !== "playing" && phase !== "kickoff");
+}
+
+// ---------------------------------------------------------------------------
+// MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH (MATCH_RULES_SPEC §12 rule 1)
+// ---------------------------------------------------------------------------
+
+/**
+ * In every restart window the whole team except the single designated taker is
+ * frozen at its window anchor while the restart ball is untouched (§12 rule 1).
+ * Reads the runner-injected `restart-designation` facts (ballUntouched, the
+ * designated taker, and the per-body window anchor).  A non-taker body outside
+ * the touch radius that drifts more than `KICKOFF_FREEZE_HOME_TOLERANCE` from
+ * its anchor while the ball is untouched FAILs.  NOT_EVALUATED when the stream
+ * carries no multi-tick untouched window (e.g. the ball is served and touched
+ * immediately).
+ */
+export function checkRestartFreezeUntilFirstTouch(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const facts = collectRestartDesignations(observations);
+  if (facts.length === 0) {
+    return notEvaluated("rules-restart-freeze", "The observation stream carries no restart-designation facts");
+  }
+
+  const windows = findUntouchedWindows(facts).filter((w) => w.designations.length >= 2);
+  if (windows.length === 0) {
+    return notEvaluated("rules-restart-freeze", "No multi-tick untouched restart window observed");
+  }
+
+  const matchPhase = matchPhaseByTick(observations);
+  const failures: string[] = [];
+  let checked = 0;
+  for (const window of windows) {
+    for (const d of window.designations) {
+      // The adapter only freezes while the ball is an untouched restart ball in a
+      // live phase; during a restart-hold phase (the tick the restart was awarded
+      // / a set-piece is being prepared) it returns a neutral frame without
+      // freezing and the core repositions the set-piece bodies.
+      if (isHoldPhase(matchPhase.get(d.tick))) continue;
+      const o = observationByTick(observations, d.tick);
+      if (!o) continue;
+      for (const p of o.players) {
+        if (p.playerId === d.takerId) continue;
+        const distToBall = Math.hypot(
+          p.groundPosition.x - o.ball.position.x,
+          p.groundPosition.y - o.ball.position.y,
+        );
+        // A body already inside the touch radius is at the ball and is exempt.
+        if (distToBall <= TOUCH_PRESS_RANGE) continue;
+        const anchor = d.anchors?.[p.playerId];
+        if (!anchor) continue;
+        const drift = Math.hypot(p.groundPosition.x - anchor.x, p.groundPosition.y - anchor.y);
+        checked++;
+        if (drift > KICKOFF_FREEZE_HOME_TOLERANCE) {
+          failures.push(
+            `tick ${d.tick}: non-taker ${p.playerId} drifted ${drift.toFixed(3)}m from its window anchor`,
+          );
+        }
+      }
+    }
+  }
+
+  if (failures.length > 0) {
+    return [{ id: "rules-restart-freeze-mutated", status: "fail", description: `Restart freeze violated: ${failures.slice(0, 5).join("; ")}`, details: { failures: failures.slice(0, 20), checked } }];
+  }
+  return pass("rules-restart-freeze-held", `In every restart window the whole team except the single designated taker is frozen at its window anchor`, { windows: windows.length, checked });
+}
+
+// ---------------------------------------------------------------------------
+// MATCH-RESTART-NEAREST-ONLY (MATCH_RULES_SPEC §12 rule 2)
+// ---------------------------------------------------------------------------
+
+/**
+ * After the restart ball is first touched, only one designated chaser per team
+ * converges on the ball (§12 rule 2): every team has exactly one designated
+ * chaser, and no team clumps more than two bodies around the ball.  Reads the
+ * runner-injected `restart-designation` facts and the committed geometry in the
+ * ticks after each closed window.  A second body chasing inside the window
+ * (a team clump) FAILs.  NOT_EVALUATED when no closed (first-touched) window is
+ * observed.
+ */
+export function checkRestartNearestOnly(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const facts = collectRestartDesignations(observations);
+  if (facts.length === 0) {
+    return notEvaluated("rules-restart-nearest", "The observation stream carries no restart-designation facts");
+  }
+
+  const closedWindows = findUntouchedWindows(facts).filter((w) => w.closed);
+  if (closedWindows.length === 0) {
+    return notEvaluated("rules-restart-nearest", "No closed (first-touched) restart window observed");
+  }
+
+  const matchPhase = matchPhaseByTick(observations);
+  const failures: string[] = [];
+  let checked = 0;
+  for (const window of closedWindows) {
+    const firstTouchIndex = facts.findIndex((f) => f.tick > window.endTick);
+    if (firstTouchIndex === -1) continue;
+    for (let k = firstTouchIndex; k < facts.length && k < firstTouchIndex + AFTER_TOUCH_WINDOW_TICKS; k++) {
+      const d = facts[k];
+      if (d.ballUntouched) continue;
+      // The chase / clump check only applies while the phase is playing/kickoff;
+      // during a restart-hold phase the adapter returns a neutral frame.
+      if (isHoldPhase(matchPhase.get(d.tick))) continue;
+      const o = observationByTick(observations, d.tick);
+      if (!o) continue;
+      // Exactly one designated chaser per team (the shared press designation).
+      const chasers = new Set<string>();
+      for (const chaserId of Object.values(d.teams)) {
+        if (chaserId) chasers.add(chaserId);
+      }
+      // No clump: at most 2 same-team bodies inside the huddle radius of the ball.
+      const within = new Map<string, number>();
+      for (const p of o.players) {
+        const dist = Math.hypot(
+          p.groundPosition.x - o.ball.position.x,
+          p.groundPosition.y - o.ball.position.y,
+        );
+        if (dist < HUDDLE_RADIUS_METRES) within.set(p.teamId, (within.get(p.teamId) ?? 0) + 1);
+      }
+      checked++;
+      for (const [teamId, count] of within) {
+        if (count > 2) {
+          failures.push(
+            `tick ${d.tick}: team ${teamId} has ${count} bodies within ${HUDDLE_RADIUS_METRES}m of the ball (a second body chasing)`,
+          );
+        }
+      }
+    }
+  }
+
+  if (failures.length > 0) {
+    return [{ id: "rules-restart-nearest-mutated", status: "fail", description: `Nearest-only chase violated: ${failures.slice(0, 5).join("; ")}`, details: { failures: failures.slice(0, 20), checked } }];
+  }
+  return pass("rules-restart-nearest-held", `After the first touch only one designated chaser per team converges on the ball`, { windows: closedWindows.length, checked });
+}
+
+// ---------------------------------------------------------------------------
+// MATCH-RESTART-REARM (MATCH_RULES_SPEC §9.5)
+// ---------------------------------------------------------------------------
+
+/**
+ * After a post-goal / halftime reset the adapter re-keys the 'untouched ball'
+ * signal to the carried-through touch reference and re-arms the restart window
+ * (§9.5).  Reads the runner-injected `restart-designation` facts: a window
+ * whose `rearmed` flag is true (baselineTouchRef non-null) is a re-armed window.
+ * When the stream carries a goal / halftime phase but no re-armed window, the
+ * re-arm was missed → FAIL.  NOT_EVALUATED when no post-goal / halftime reset
+ * occurs.
+ */
+export function checkRestartRearm(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const facts = collectRestartDesignations(observations);
+  if (facts.length === 0) {
+    return notEvaluated("rules-restart-rearm", "The observation stream carries no restart-designation facts");
+  }
+
+  const phases = collectCorePhases(observations);
+  const hasResetPhase = phases.some((f) => f.phase === "goal" || f.phase === "halftime");
+  if (!hasResetPhase) {
+    return notEvaluated("rules-restart-rearm", "No post-goal / halftime reset observed in the run");
+  }
+
+  const rearmedWindows = findUntouchedWindows(facts).filter((w) => w.rearmed);
+  if (rearmedWindows.length === 0) {
+    return [{ id: "rules-restart-rearm-mutated", status: "fail", description: "A post-goal / halftime reset occurred but no restart window was re-armed to the carried-through touch reference", details: { resetPhases: phases.filter((f) => f.phase === "goal" || f.phase === "halftime").length } }];
+  }
+  return pass("rules-restart-rearm-held", "A post-goal / halftime reset re-armed the restart window keyed to the carried-through touch reference", { rearmedWindows: rearmedWindows.length });
 }

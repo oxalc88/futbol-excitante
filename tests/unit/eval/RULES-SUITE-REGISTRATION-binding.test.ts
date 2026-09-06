@@ -53,6 +53,9 @@ const RULES_ORACLE_CRITERIA: Record<string, string> = {
   "MATCH-TIMER-DECREMENT": "rules-timer-decrement-oracle-v1",
   "MATCH-TIMER-HALFTIME": "rules-timer-halftime-oracle-v1",
   "MATCH-TIMER-FULLTIME": "rules-timer-fulltime-oracle-v1",
+  "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "rules-restart-freeze-until-first-touch-oracle-v1",
+  "MATCH-RESTART-NEAREST-ONLY": "rules-restart-nearest-only-oracle-v1",
+  "MATCH-RESTART-REARM": "rules-restart-rearm-oracle-v1",
 };
 
 // ---------------------------------------------------------------------------

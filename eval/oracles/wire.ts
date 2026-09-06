@@ -44,6 +44,9 @@ import {
   checkCornerKickPlacement,
   checkGoalPhase,
   checkKickoffFirstTouch,
+  checkRestartFreezeUntilFirstTouch,
+  checkRestartNearestOnly,
+  checkRestartRearm,
 } from "./rules-restart.js";
 import {
   checkKickoffFreeze,
@@ -308,6 +311,25 @@ const entries: OracleEntry[] = [
     oracle_id: "rules-timer-fulltime-oracle-v1",
     oracle_version: "oracle-rules-timer-fulltime-v1",
     fn: checkTimerFulltime,
+  },
+  // MATCH_RULES_SPEC §12/§9.5 anti-huddle restart-behavior oracles
+  // (RESTART-DESIGNATION-FACTS-CONFORMANCE): the restart freeze, the nearest-only
+  // chase, and the post-goal / halftime re-arm.  Additive; no existing entry is
+  // changed.
+  {
+    oracle_id: "rules-restart-freeze-until-first-touch-oracle-v1",
+    oracle_version: "oracle-rules-restart-freeze-until-first-touch-v1",
+    fn: checkRestartFreezeUntilFirstTouch,
+  },
+  {
+    oracle_id: "rules-restart-nearest-only-oracle-v1",
+    oracle_version: "oracle-rules-restart-nearest-only-v1",
+    fn: checkRestartNearestOnly,
+  },
+  {
+    oracle_id: "rules-restart-rearm-oracle-v1",
+    oracle_version: "oracle-rules-restart-rearm-v1",
+    fn: checkRestartRearm,
   },
 ];
 

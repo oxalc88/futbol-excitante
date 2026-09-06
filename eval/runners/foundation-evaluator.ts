@@ -286,6 +286,21 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "rules-timer-fulltime-oracle-v1",
     oracle_version: "oracle-rules-timer-fulltime-v1",
   },
+  // MATCH_RULES_SPEC §12/§9.5 anti-huddle restart-behavior criteria
+  // (RESTART-DESIGNATION-FACTS-CONFORMANCE).  Additive; no existing entry is
+  // changed.
+  "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": {
+    oracle_id: "rules-restart-freeze-until-first-touch-oracle-v1",
+    oracle_version: "oracle-rules-restart-freeze-until-first-touch-v1",
+  },
+  "MATCH-RESTART-NEAREST-ONLY": {
+    oracle_id: "rules-restart-nearest-only-oracle-v1",
+    oracle_version: "oracle-rules-restart-nearest-only-v1",
+  },
+  "MATCH-RESTART-REARM": {
+    oracle_id: "rules-restart-rearm-oracle-v1",
+    oracle_version: "oracle-rules-restart-rearm-v1",
+  },
 };
 
 // ---------------------------------------------------------------------------

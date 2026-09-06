@@ -76,6 +76,22 @@ describe("RESTART-RULES-CONFORMANCE serialization guards", () => {
       }
       expect(phases.has("playing")).toBe(true);
       expect(phases.has("throw-in") || phases.has("goal")).toBe(true);
+      // RESTART-DESIGNATION-FACTS-CONFORMANCE: the adapter restart-window
+      // designation facts are serialized (designated taker, per-team chaser,
+      // per-body window anchor, ballUntouched).
+      expect(countKind(gated.observations, "restart-designation")).toBe(TICKS);
+      const designation = gated.observations[0].events.find((ev) => ev.kind === "restart-designation");
+      expect(designation).toBeDefined();
+      const payload = designation!.payload as {
+        ballUntouched?: unknown;
+        takerId?: unknown;
+        teams?: unknown;
+        anchors?: unknown;
+      };
+      expect(typeof payload.ballUntouched).toBe("boolean");
+      expect(typeof payload.takerId).toBe("string");
+      expect(typeof payload.teams).toBe("object");
+      expect(typeof payload.anchors).toBe("object");
     },
   );
 
@@ -132,6 +148,7 @@ describe("RESTART-RULES-CONFORMANCE serialization guards", () => {
       // Non-gated stream carries no injected facts.
       expect(countKind(ungated.observations, "core-match-phase")).toBe(0);
       expect(countKind(ungated.observations, "throw-in-executed")).toBe(0);
+      expect(countKind(ungated.observations, "restart-designation")).toBe(0);
     },
   );
 

@@ -908,7 +908,7 @@ export const BINDING_RULES_KICKOFF_001: TestImplementationBinding = makeTestBind
   {
     "MATCH-KICKOFF-FREEZE": ["rules-kickoff-freeze-evidence"],
     "MATCH-KICKOFF-FIRST-TOUCH": ["rules-kickoff-first-touch-evidence"],
-    "MATCH-RESTART-REARM": [],
+    "MATCH-RESTART-REARM": ["rules-restart-rearm-evidence"],
   },
 );
 
@@ -963,8 +963,8 @@ export const BINDING_RULES_ANTIHUDDLE_001: TestImplementationBinding = makeTestB
   ["obs-per-tick-v1", "obs-rules-restart-v1"],
   [],
   {
-    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": [],
-    "MATCH-RESTART-NEAREST-ONLY": [],
+    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": ["rules-restart-freeze-until-first-touch-evidence"],
+    "MATCH-RESTART-NEAREST-ONLY": ["rules-restart-nearest-only-evidence"],
   },
 );
 

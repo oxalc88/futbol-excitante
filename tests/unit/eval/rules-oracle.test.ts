@@ -33,6 +33,9 @@ import {
   checkCornerKickPlacement,
   checkGoalPhase,
   checkKickoffFirstTouch,
+  checkRestartFreezeUntilFirstTouch,
+  checkRestartNearestOnly,
+  checkRestartRearm,
 } from "../../../eval/oracles/rules-restart.js";
 import {
   checkKickoffFreeze,
@@ -901,6 +904,138 @@ describe("MATCH-TIMER-FULLTIME oracle", () => {
       makeObs(2, [corePhase(2, "fulltime", "playing", 182)]),
     ];
     const res = checkTimerFulltime(obs);
+    expect(res[0].status).toBe("not_evaluated");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Anti-huddle restart-behavior oracles (MATCH_RULES_SPEC §12/§9.5)
+// ---------------------------------------------------------------------------
+
+/** A runner-injected `restart-designation` observation event. */
+function designation(tick: number, payload: Record<string, unknown>): ObsEvent {
+  return {
+    id: `restart-designation-${tick}`,
+    tick,
+    sequence: 11,
+    kind: "restart-designation",
+    payload,
+  };
+}
+
+/** Anchor positions for the default 4-body observation (matches ALL_PLAYERS). */
+const HOME_ANCHORS: Record<string, { x: number; y: number }> = {
+  "player-1": { x: 20, y: 0 },
+  "player-2": { x: -20, y: -5 },
+  "player-3": { x: -20, y: 5 },
+  "player-4": { x: 20, y: -5 },
+};
+
+function designationWith(overrides: Partial<Record<string, unknown>> = {}) {
+  return designation(0, {
+    ballUntouched: true,
+    takerId: "player-1",
+    baselineTouchRef: null,
+    rearmed: false,
+    teams: { "team-a": "player-1", "team-b": "player-3" },
+    anchors: HOME_ANCHORS,
+    ...overrides,
+  });
+}
+
+describe("MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH oracle", () => {
+  it("PASS when every non-taker body is frozen at its window anchor while the ball is untouched", () => {
+    const obs = [
+      makeObs(0, [designationWith({ ballUntouched: true }), corePhase(0, "playing", "playing", 100)], { players: ALL_PLAYERS, lastTouchRef: null }),
+      makeObs(1, [designationWith({ ballUntouched: true }), corePhase(1, "playing", "playing", 100)], { players: ALL_PLAYERS, lastTouchRef: null }),
+      makeObs(2, [designationWith({ ballUntouched: true }), corePhase(2, "playing", "playing", 100)], { players: ALL_PLAYERS, lastTouchRef: null }),
+    ];
+    const res = checkRestartFreezeUntilFirstTouch(obs);
+    expect(res[0].status).toBe("pass");
+  });
+
+  it("FAIL when a non-taker body drifts from its window anchor (a second body chasing inside the window)", () => {
+    const moved = ALL_PLAYERS.map((p) => (p.id === "player-2" ? { ...p, x: 30, y: 30 } : p));
+    const obs = [
+      makeObs(0, [designationWith({ ballUntouched: true }), corePhase(0, "playing", "playing", 100)], { players: ALL_PLAYERS, lastTouchRef: null }),
+      makeObs(1, [designationWith({ ballUntouched: true }), corePhase(1, "playing", "playing", 100)], { players: moved, lastTouchRef: null }),
+    ];
+    const res = checkRestartFreezeUntilFirstTouch(obs);
+    expect(res[0].status).toBe("fail");
+  });
+
+  it("NOT_EVALUATED when no multi-tick untouched window is observed", () => {
+    const obs = [
+      makeObs(0, [designationWith({ ballUntouched: false })], { lastTouchRef: "c-1" }),
+    ];
+    const res = checkRestartFreezeUntilFirstTouch(obs);
+    expect(res[0].status).toBe("not_evaluated");
+  });
+});
+
+describe("MATCH-RESTART-NEAREST-ONLY oracle", () => {
+  it("PASS when after the first touch only one designated chaser per team converges (no clump)", () => {
+    const obs = [
+      // A closed untouched window (2 ticks) then a touched tick with a single chaser near the ball.
+      makeObs(0, [designationWith({ ballUntouched: true })], { lastTouchRef: null }),
+      makeObs(1, [designationWith({ ballUntouched: true })], { lastTouchRef: null }),
+      makeObs(2, [designationWith({ ballUntouched: false, teams: { "team-a": "player-1", "team-b": "player-3" } }), corePhase(2, "playing", "playing", 100)], { lastTouchRef: "c-1" }),
+    ];
+    const res = checkRestartNearestOnly(obs);
+    expect(res[0].status).toBe("pass");
+  });
+
+  it("FAIL when a team clumps more than two bodies around the ball after the first touch", () => {
+    // Three team-a bodies all converge near the ball (0,0) in the after-touch tick.
+    const clump: P[] = [
+      { id: "player-1", team: "team-a", x: 1, y: 1 },
+      { id: "player-2", team: "team-a", x: 2, y: 1 },
+      { id: "player-3", team: "team-a", x: 1, y: 2 },
+      { id: "player-4", team: "team-b", x: 1, y: -1 },
+      { id: "player-5", team: "team-b", x: 2, y: -1 },
+    ];
+    const obs = [
+      makeObs(0, [designationWith({ ballUntouched: true })], { players: ALL_PLAYERS, lastTouchRef: null }),
+      makeObs(1, [designationWith({ ballUntouched: true })], { players: ALL_PLAYERS, lastTouchRef: null }),
+      makeObs(2, [designationWith({ ballUntouched: false, teams: { "team-a": "player-1", "team-b": "player-4" } }), corePhase(2, "playing", "playing", 100)], { players: clump, lastTouchRef: "c-1" }),
+    ];
+    const res = checkRestartNearestOnly(obs);
+    expect(res[0].status).toBe("fail");
+  });
+
+  it("NOT_EVALUATED when no closed (first-touched) window is observed", () => {
+    const obs = [
+      makeObs(0, [designationWith({ ballUntouched: true })], { lastTouchRef: null }),
+    ];
+    const res = checkRestartNearestOnly(obs);
+    expect(res[0].status).toBe("not_evaluated");
+  });
+});
+
+describe("MATCH-RESTART-REARM oracle", () => {
+  it("PASS when a post-goal reset re-arms the restart window keyed to the carried-through reference", () => {
+    const obs = [
+      makeObs(1, [corePhase(1, "goal", "goal", 100)], { lastTouchRef: "shot-1" }),
+      makeObs(2, [designationWith({ ballUntouched: true, rearmed: true, baselineTouchRef: "shot-1" }), corePhase(2, "playing", "goal", 100)], { lastTouchRef: "shot-1" }),
+    ];
+    const res = checkRestartRearm(obs);
+    expect(res[0].status).toBe("pass");
+  });
+
+  it("FAIL when a post-goal reset occurs but no restart window is re-armed", () => {
+    const obs = [
+      makeObs(1, [corePhase(1, "goal", "goal", 100)], { lastTouchRef: "shot-1" }),
+      makeObs(2, [designationWith({ ballUntouched: false, rearmed: false }), corePhase(2, "playing", "goal", 100)], { lastTouchRef: "shot-1" }),
+    ];
+    const res = checkRestartRearm(obs);
+    expect(res[0].status).toBe("fail");
+  });
+
+  it("NOT_EVALUATED when no post-goal / halftime reset is observed", () => {
+    const obs = [
+      makeObs(1, [corePhase(1, "playing", "playing", 100)], { lastTouchRef: "c-1" }),
+    ];
+    const res = checkRestartRearm(obs);
     expect(res[0].status).toBe("not_evaluated");
   });
 });

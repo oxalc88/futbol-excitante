@@ -514,6 +514,48 @@ export const INV_RULES_TIMER_FULLTIME: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+/**
+ * Anti-huddle restart-behavior invariants (RESTART-DESIGNATION-FACTS-CONFORMANCE):
+ * the restart freeze-until-first-touch, the nearest-only chase, and the
+ * post-goal / halftime re-arm.  Each is bound to a registered protected rules
+ * oracle reading the runner-injected `restart-designation` facts.
+ */
+export const INV_RULES_RESTART_FREEZE: InvariantDefinition = {
+  invariant_id: "rules-restart-freeze-until-first-touch-evidence",
+  invariant_version: "invariant-rules-restart-freeze-until-first-touch-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-restart-freeze-until-first-touch-oracle-v1",
+  oracle_version: "oracle-rules-restart-freeze-until-first-touch-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+export const INV_RULES_RESTART_NEAREST_ONLY: InvariantDefinition = {
+  invariant_id: "rules-restart-nearest-only-evidence",
+  invariant_version: "invariant-rules-restart-nearest-only-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-restart-nearest-only-oracle-v1",
+  oracle_version: "oracle-rules-restart-nearest-only-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+export const INV_RULES_RESTART_REARM: InvariantDefinition = {
+  invariant_id: "rules-restart-rearm-evidence",
+  invariant_version: "invariant-rules-restart-rearm-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-restart-rearm-oracle-v1",
+  oracle_version: "oracle-rules-restart-rearm-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 /** All registered invariant definitions keyed by invariant_id. */
 export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FINITE.invariant_id]: INV_FINITE,
@@ -549,6 +591,9 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_RULES_TIMER_DECREMENT.invariant_id]: INV_RULES_TIMER_DECREMENT,
   [INV_RULES_TIMER_HALFTIME.invariant_id]: INV_RULES_TIMER_HALFTIME,
   [INV_RULES_TIMER_FULLTIME.invariant_id]: INV_RULES_TIMER_FULLTIME,
+  [INV_RULES_RESTART_FREEZE.invariant_id]: INV_RULES_RESTART_FREEZE,
+  [INV_RULES_RESTART_NEAREST_ONLY.invariant_id]: INV_RULES_RESTART_NEAREST_ONLY,
+  [INV_RULES_RESTART_REARM.invariant_id]: INV_RULES_RESTART_REARM,
 };
 
 /**
