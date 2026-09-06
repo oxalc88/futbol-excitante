@@ -1,0 +1,766 @@
+{
+  "version": "read-only-evaluation-status-v1",
+  "source_report": "artifacts/evaluation.json",
+  "source_report_sha256": "65b9eb320865cf6bf12181e7e54915571f920166aa72ac12592263fc4fb9824e",
+  "source_commit": "c10c449711390e69a0fe2df35560587dac8e04de",
+  "evaluation_rerun": false,
+  "reason": "No engine or reference changes. This is a read-only extraction of the existing report.",
+  "criterion_counts": {
+    "BLOCKED_MISSING_REFERENCE": 42,
+    "PASS": 104,
+    "NOT_EVALUATED": 27,
+    "NEEDS_PERCEPTUAL_REVIEW": 18
+  },
+  "eligible_captures": 0,
+  "tests": [
+    {
+      "test_id": "LOC-ACC-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "LOC-ACC-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "LOC-MAX-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "LOC-MAX-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "LOC-DEC-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "LOC-DEC-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "LOC-REV-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "LOC-REV-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "LOC-T45-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "LOC-T45-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "LOC-T90-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "LOC-T90-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "LOC-ORI-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "LOC-ORI-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "LOC-ORI-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "PHY-SHLD-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "PHY-SHLD-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "BALL-IND-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "BALL-IND-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "BALL-GND-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "BALL-GND-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "BALL-GND-002",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "BALL-GND-002-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "BALL-BNC-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "BALL-BNC-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "BALL-SPN-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "BALL-SPN-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TOUCH-SLOW-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "TOUCH-SLOW-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TOUCH-FAST-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "TOUCH-FAST-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TOUCH-BACK-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "TOUCH-BACK-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "TOUCH-BACK-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TOUCH-90-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "TOUCH-90-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "TOUCH-90-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "PASS-LOW-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "PASS-LOW-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "PASS-RUN-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": true,
+      "pending_criteria": [
+        {
+          "criterion_id": "PASS-RUN-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "PASS-THR-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "PASS-THR-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "PASS-THR-001-USABLE",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "PASS-LOFT-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "PASS-LOFT-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "CROSS-HI-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "CROSS-HI-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "HEAD-FREE-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "HEAD-FREE-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "HEAD-FREE-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "HEAD-DUEL-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "HEAD-DUEL-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "HEAD-DUEL-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TACK-ST-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "TACK-ST-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "TACK-ST-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TACK-SL-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "TACK-SL-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "TACK-SL-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "INT-PASS-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "INT-PASS-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "GK-REA-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "GK-REA-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "GK-REA-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "GK-WF-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "GK-WF-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "GK-LEG-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "GK-LEG-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "GK-LEG-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "GK-PARRY-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "GK-PARRY-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "GK-PARRY-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "GK-REC-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "GK-REC-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "GK-REC-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "GK-HIGH-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "GK-HIGH-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        },
+        {
+          "criterion_id": "GK-HIGH-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "OFF-RUN-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "OFF-RUN-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "OFF-SUP-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "OFF-SUP-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "DEF-SHAPE-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "DEF-SHAPE-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "DEF-SHIFT-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "DEF-SHIFT-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "PRESS-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "PRESS-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TRANS-AD-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "TRANS-AD-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TRANS-DA-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "TRANS-DA-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "CTRL-LAT-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "CTRL-LAT-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "CTRL-ACT-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "CTRL-ACT-001-VIS",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "CAM-FLW-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "CAM-FLW-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "CAM-PER-001",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "CAM-PER-001-PERC",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TEMPO-001",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "TEMPO-001-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TEMPO-002",
+      "overall_outcome": "BLOCKED_MISSING_REFERENCE",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "TEMPO-002-REF",
+          "outcome": "BLOCKED_MISSING_REFERENCE",
+          "reasons": [
+            "No eligible measured PES capture matching this scenario"
+          ]
+        }
+      ]
+    },
+    {
+      "test_id": "TEMPO-003",
+      "overall_outcome": "NEEDS_PERCEPTUAL_REVIEW",
+      "campaign_target_conditional": false,
+      "pending_criteria": [
+        {
+          "criterion_id": "TEMPO-003-PERC",
+          "outcome": "NEEDS_PERCEPTUAL_REVIEW",
+          "reasons": [
+            "Requires actual rendered frames and human rubric; cloud preview was blocked by URL policy"
+          ]
+        }
+      ]
+    }
+  ]
+}

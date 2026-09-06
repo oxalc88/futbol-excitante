@@ -1,0 +1,8 @@
+STATUS: NOT_RUN_NO_ELIGIBLE_TARGETS
+Import-ready JSON files discovered: 0
+npm run reference:import invocations: 0
+Import successes: 0
+Import rejects: 0
+Existing reference IDs overwritten: 0
+Reason: no decodable PES media, measured PTS, camera calibration or measurements.
+Source download failures are recorded separately and are NOT importer rejects.

@@ -1,0 +1,14 @@
+{
+  "version": "unpopulated-evidence-register-v1",
+  "status": "NOT_STARTED_NO_ADMITTED_SOURCE",
+  "input_known": false,
+  "note": "Empty primary records. No illustrations, guessed coordinates or planned slots count as observations.",
+  "pitch_correspondences": [],
+  "camera_solutions": [],
+  "raw_2d_tracks": [],
+  "corrected_2d_tracks": [],
+  "world_tracks": [],
+  "events": [],
+  "uncertainty_records": [],
+  "measurements": []
+}

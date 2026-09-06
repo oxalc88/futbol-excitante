@@ -1,0 +1,76 @@
+{
+  "source_id": "C4-W1u8w-yE",
+  "role": "training",
+  "uri": "https://www.youtube.com/watch?v=C4-W1u8w-yE",
+  "playability": "OK",
+  "playability_reason": null,
+  "title": "PES 2017 Skills Training - Sprint (Gold)",
+  "author": "Tajae Lawrence",
+  "channel_id": "UCukT9qP4DU0bOr-oPuQrDqA",
+  "reported_duration_seconds": "58",
+  "published": "2016-10-30T12:44:02-07:00",
+  "formats": [
+    {
+      "itag": 137,
+      "mimeType": "video/mp4; codecs=\"avc1.640028\"",
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "approxDurationMs": "57557",
+      "contentLength": "17171039",
+      "direct_url_present": false,
+      "cipher_present": false
+    },
+    {
+      "itag": 136,
+      "mimeType": "video/mp4; codecs=\"avc1.4d401f\"",
+      "width": 1280,
+      "height": 720,
+      "fps": 30,
+      "approxDurationMs": "57557",
+      "contentLength": "8880789",
+      "direct_url_present": false,
+      "cipher_present": false
+    },
+    {
+      "itag": 134,
+      "mimeType": "video/mp4; codecs=\"avc1.4d401e\"",
+      "width": 640,
+      "height": 360,
+      "fps": 30,
+      "approxDurationMs": "57557",
+      "contentLength": "2322673",
+      "direct_url_present": false,
+      "cipher_present": false
+    },
+    {
+      "itag": 243,
+      "mimeType": "video/webm; codecs=\"vp9\"",
+      "width": 640,
+      "height": 360,
+      "fps": 30,
+      "approxDurationMs": "57557",
+      "contentLength": "1686130",
+      "direct_url_present": false,
+      "cipher_present": false
+    },
+    {
+      "itag": 160,
+      "mimeType": "video/mp4; codecs=\"avc1.4d400c\"",
+      "width": 256,
+      "height": 144,
+      "fps": 30,
+      "approxDurationMs": "57557",
+      "contentLength": "806046",
+      "direct_url_present": false,
+      "cipher_present": false
+    }
+  ],
+  "input_known": false,
+  "audit_status": "PENDING_DECODED_MEDIA",
+  "metadata_fetched_at": "2026-09-06T06:44:57.194086+00:00",
+  "retrieval_method": "Public watch HTML ytInitialPlayerResponse; selected descriptive fields only",
+  "format_notice": "Declared player formats, not ffprobe or delivered-cadence measurements",
+  "description_evidence_excerpt": "Intel i3-2348M 2.3GHz",
+  "description_findings": "Uploader describes a Windows PC"
+}

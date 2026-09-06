@@ -1,0 +1,87 @@
+{
+  "source_id": "8afTHuMZxbI",
+  "role": "match-development",
+  "uri": "https://www.youtube.com/watch?v=8afTHuMZxbI",
+  "playability": "OK",
+  "playability_reason": null,
+  "title": "PES 2017 - Arsenal FC vs FC Barcelona | Gameplay (PC HD) [1080p60FPS]",
+  "author": "Throneful",
+  "channel_id": "UCIw5rbXUrtk31t20Ap5817w",
+  "reported_duration_seconds": "1333",
+  "published": "2016-09-15T22:00:00-07:00",
+  "formats": [
+    {
+      "itag": 299,
+      "mimeType": "video/mp4; codecs=\"avc1.64002a\"",
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "approxDurationMs": "1332966",
+      "contentLength": "921987554",
+      "direct_url_present": false,
+      "cipher_present": false
+    },
+    {
+      "itag": 136,
+      "mimeType": "video/mp4; codecs=\"avc1.4d401f\"",
+      "width": 1280,
+      "height": 720,
+      "fps": 30,
+      "approxDurationMs": "1332966",
+      "contentLength": "372104488",
+      "direct_url_present": false,
+      "cipher_present": false
+    },
+    {
+      "itag": 298,
+      "mimeType": "video/mp4; codecs=\"avc1.4d4020\"",
+      "width": 1280,
+      "height": 720,
+      "fps": 60,
+      "approxDurationMs": "1332966",
+      "contentLength": "512043243",
+      "direct_url_present": false,
+      "cipher_present": false
+    },
+    {
+      "itag": 134,
+      "mimeType": "video/mp4; codecs=\"avc1.4d401e\"",
+      "width": 640,
+      "height": 360,
+      "fps": 30,
+      "approxDurationMs": "1332966",
+      "contentLength": "99055094",
+      "direct_url_present": false,
+      "cipher_present": false
+    },
+    {
+      "itag": 243,
+      "mimeType": "video/webm; codecs=\"vp9\"",
+      "width": 640,
+      "height": 360,
+      "fps": 30,
+      "approxDurationMs": "1332967",
+      "contentLength": "64014411",
+      "direct_url_present": false,
+      "cipher_present": false
+    },
+    {
+      "itag": 160,
+      "mimeType": "video/mp4; codecs=\"avc1.4d400c\"",
+      "width": 256,
+      "height": 144,
+      "fps": 30,
+      "approxDurationMs": "1332966",
+      "contentLength": "18562592",
+      "direct_url_present": false,
+      "cipher_present": false
+    }
+  ],
+  "input_known": false,
+  "audit_status": "PENDING_DECODED_MEDIA",
+  "metadata_fetched_at": "2026-09-06T06:44:57.224141+00:00",
+  "retrieval_method": "Public watch HTML ytInitialPlayerResponse; selected descriptive fields only",
+  "format_notice": "Declared player formats, not ffprobe or delivered-cadence measurements",
+  "description_evidence_excerpt": null,
+  "description_findings": "Uploader lists PC hardware"
+}

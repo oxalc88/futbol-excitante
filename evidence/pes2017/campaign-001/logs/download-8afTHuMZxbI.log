@@ -1,0 +1,13 @@
+[youtube] Extracting URL: https://www.youtube.com/watch?v=8afTHuMZxbI
+[youtube] 8afTHuMZxbI: Downloading webpage
+[youtube] 8afTHuMZxbI: Downloading visionos player API JSON
+[youtube] 8afTHuMZxbI: Downloading m3u8 information
+WARNING: [youtube] 8afTHuMZxbI: Failed to download m3u8 information: The read operation timed out
+[youtube] 8afTHuMZxbI: Downloading player f572e43c-main
+[youtube] [jsc:node] Solving JS challenges using node
+WARNING: [youtube] [jsc] Remote component challenge solver script (node) was skipped. It may be required to solve JS challenges. You can enable the download with  --remote-components ejs:github  (recommended). For more information and alternatives, refer to  https://github.com/yt-dlp/yt-dlp/wiki/EJS
+WARNING: [youtube] 8afTHuMZxbI: n challenge solving failed: Some formats may be missing. Ensure you have a supported JavaScript runtime and challenge solver script distribution installed. Review any warnings presented before this message. For more details, refer to  https://github.com/yt-dlp/yt-dlp/wiki/EJS
+[info] 8afTHuMZxbI: Downloading 1 format(s): 299
+[info] Writing video metadata as JSON to: /tmp/pes-media/8afTHuMZxbI.info.json
+ERROR:
+[download] Got error: The read operation timed out
