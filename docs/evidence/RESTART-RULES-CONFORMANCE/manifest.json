@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "RESTART-RULES-CONFORMANCE",
+  "accepted_at": "2026-09-06T05:26:36.220Z",
+  "candidate_commit": "d9ae7f77af2044576a72a6583d4bcb1fc0f28ebf",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/RESTART-RULES-CONFORMANCE/trajectory.json",
+      "sha256": "62d3b49f8b6ee5c88d6e89641e3c777e3ade5c266db4c8e732c4b2938e4f6f8f",
+      "git_blob": "941608ca65b6e992bf5e2fa80e74dfb78707efb7",
+      "candidate_commit": "d9ae7f77af2044576a72a6583d4bcb1fc0f28ebf",
+      "bytes": 13573,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/RESTART-RULES-CONFORMANCE/audit.json",
+      "sha256": "ce8fc5e155412859dd1a7d3e54ff9e0e0339ffe036e74831a5873f80425f4ac3",
+      "git_blob": "b5071e0a4d0f2bbdfb6d52c624ec98e19895ffe6",
+      "candidate_commit": "d9ae7f77af2044576a72a6583d4bcb1fc0f28ebf",
+      "bytes": 2665,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-06/2026-09-06T05-26-36-220Z-RESTART-RULES-CONFORMANCE-acceptance.json"
+}

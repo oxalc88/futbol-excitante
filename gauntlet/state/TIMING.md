@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-06T02:50:00Z
+measured_at: 2026-09-06T05:30:00Z
 tracking_contract_version: 1
-last_tracked_objective: RULES-SUITE-REGISTRATION
-usage_aggregates_through: RULES-SUITE-REGISTRATION
-clock_aggregates_through: RULES-SUITE-REGISTRATION
-model_evaluation_through: RULES-SUITE-REGISTRATION
+last_tracked_objective: RESTART-RULES-CONFORMANCE
+usage_aggregates_through: RESTART-RULES-CONFORMANCE
+clock_aggregates_through: RESTART-RULES-CONFORMANCE
+model_evaluation_through: RESTART-RULES-CONFORMANCE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,18 +42,18 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 549h 52m |
+| Calendar span (first work → measurement) | 552h 32m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~154h est. |
-| Sum of per-step agent time | ~152h 07m |
+| Active work (anything running) | ~156h est. |
+| Sum of per-step agent time | ~154h 27m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-06T02:50:00Z`.
-Recomputed 2026-09-06 at the RULES-SUITE-REGISTRATION acceptance
-(Horizon v29 1/4): 186 accepted per-step rows summing to ~152h 07m (the new
-objective adds ~2h 06m: builder ~1h 46m incl. the critic-RETRY + integration-
-REJECT fixes / critic 28m / integration 29m / commits ~2m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-06T05:30:00Z`.
+Recomputed 2026-09-06 at the RESTART-RULES-CONFORMANCE acceptance
+(Horizon v29 2/4): 187 accepted per-step rows summing to ~154h 27m (the new
+objective adds ~2h 20m: builder ~52m / critic 13m / integration 75m /
+commit <1m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -269,6 +269,7 @@ invoices.
 | POSSESSION-ORACLE-REFERENCE-TRIAGE | accepted | ~35m | ~15m | 11m | 7m | ~2m | n/a | n/a |
 | LIFECYCLE-MIGRATION-ASSESSMENT | accepted | ~1h 55m | ~1h 07m | 32m | 14m | ~2m | n/a | n/a |
 | RULES-SUITE-REGISTRATION | accepted | ~2h 06m | ~1h 46m | 28m | 29m | ~2m | n/a | n/a |
+| RESTART-RULES-CONFORMANCE | accepted | ~2h 20m | ~52m | 13m | 75m | <1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -593,6 +594,7 @@ on an H task is the interesting result.
 | POSSESSION-ORACLE-REFERENCE-TRIAGE | deepseek-v4-flash | M | Medium - triage + fix of the possession oracle's latent per-tick lastTouchRef pattern (the class flagged by the accepted COMMON triage): BEFORE per-tick orphan-ref fails 1719/1149/1749/1685 across 4 full-match maps (the genuine possession-CHANGE check had 0 fails — defect is reference-resolution only); fixed with the accepted window-union resolution (per-tick fallback); never-anywhere references still FAIL both checks; 3 additive discriminating guards + fresh reproducible triage capture; zero gameplay change | 0 | A | first-pass ACCEPT; critic extracted the genuine pre-fix code from git HEAD and reproduced the BEFORE numbers exactly; integration re-ran all 4 captures with the evidence tree byte-identical |
 | LIFECYCLE-MIGRATION-ASSESSMENT | deepseek-v4-flash | H | High - lifecyclePhaseSync legacy→core-owned DEFAULT-FLIP migration with per-pin proofs: pin inventory (Groups A-D), empirical probe (4 legacy pins diverge exactly at restart windows; no blocking pins), decision MIGRATED with explicit legacy opt-outs for historical pin reproductions; first candidate REJECTED for the silently-migrated CPU-DEFENSIVE-TACKLE pin (runCpuTackleMatch inherited the default) — repaired per the critic's four fixes (explicit-legacy threading, inventory/decision/claim corrections, spec §4 staleness line) | 1 | A | REJECT→repair→ACCEPT; critic reproduced the probe byte-identically, proved the omission causally, verified all four fixes with fresh re-runs; integration audited every runHeadlessMatch caller (no second missed consumer) + 63/63 mandated tests |
 | RULES-SUITE-REGISTRATION | deepseek-v4-flash | H | High - the `rules` evaluator suite registered per MATCH_RULES_SPEC §15: 25 MATCH-* criteria + 8 invariants + 8 bindings + 8 protected oracles (restart + phase, mutant-guarded), additive wiring; honest executed outcomes (4 PASS; AWARD/TIMER-FREEZE NOT_EVALUATED — serialization limitation verified real; 2 BLOCKED_MISSING_REFERENCE); registry hash evolved c9098fb8→980873a8; headless-match untouched (silent-consumer inventory) | 2 | A | critic RETRY→ACCEPT (3 reporting fixes); integration REJECT→ACCEPT (record byte-reproducibility: wall-clock field removed from the hashed record, two-run byte-identity demonstrated and independently verified) |
+| RESTART-RULES-CONFORMANCE | deepseek-v4-flash | H | High - per-restart conformance through the registered rules suite closing the serialization limitation: gated serializeRestartFacts runner option (default false, strictly post-loop, provably hash-neutral) injecting core-match-phase + committed restart-executed facts; rules-restart/rules-phase oracle consumption with no weakening (timer NOT_EVALUATED kept for non-gated streams + discriminating FAIL branch added); driven throw-in + goal-kick award conformance (corner honestly NOT_EVALUATED, nothing forced); byte-reproducible durable record (no wall-clock field) | 0 | A | first-pass ACCEPT; critic reproduced record_sha256 byte-exact + chain-identity stashes + all-24-oracle consumer inventory; integration re-ran ~3,270 tests in chunks + silent-consumer hunt over every runHeadlessMatch/evaluateSuite importer |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -875,6 +877,8 @@ on an H task is the interesting result.
 | LIFECYCLE-MIGRATION-ASSESSMENT | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | REJECT→repair→ACCEPT cycle audited: all four fixes mechanically verified; decisive silent-consumer hunt over every runHeadlessMatch caller — no second missed consumer (historical-pin producers thread explicit policy; default-adopting callers assert fresh-run behavior not byte-pins); 63/63 mandated batch + typecheck 0; honest residual redisclosed |
 | RULES-SUITE-REGISTRATION | critic (glm5.3-flash) | glm5.3-flash | RETRY→ACCEPT | RETRY with 3 reporting fixes: (1) RESULT.md per-run cell claimed a PASS the evaluator did not return (rules-corner-live × KICKOFF-FREEZE) — corrected; (2) MATCH-OUT-OF-PLAY-NO-LAST-TOUCH serialization disclosure applied in 3 places (FAIL branch not exercisable on committed streams); (3) unused geometry constants deleted + module header corrected; retry verified with fresh re-runs (record hash recomputed 9589b51a→ then superseded) |
 | RULES-SUITE-REGISTRATION | integration-reviewer (glm5.3-flash) | glm5.3-flash | REJECT→ACCEPT | first review REJECT: record_sha256 hashed a wall-clock generated_at (ordinary re-runs 52706c1a≠9589b51a, all verdict content byte-identical); fix verified: wall-clock field removed (matches the accepted possession-triage precedent), new stable 7503f9fe… recomputed independently, two consecutive ordinary-mode runs byte-identical (durable-vs-run1/run2/run1-vs-run2 all IDENTICAL); 233/233 + 40/40 tests re-run; silent-consumer sweep clean |
+| RESTART-RULES-CONFORMANCE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: trajectory SHA recomputed + record_sha256 reproduced byte-exact in an ephemeral re-run (confined to ignored test-results/); injection verified strictly post-loop and hash-neutral (chain-identity c4d35229…/1acd2d83… re-produced); all 24 wire.ts oracles inventoried for consumer safety (camera-hash honest gap disclosed); corner NOT_EVALUATED verified genuine (raw rows corner=0 on all 4 runs, no synthetic injection anywhere); core event flow + startPhase pairing re-derived from src/simulation/loop/simulation.ts |
+| RESTART-RULES-CONFORMANCE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | full node battery re-run (~3,270 tests / 184 files in deterministic chunks): rules gate 63 + neighbors 231 + provenance/hygiene 102 + integration battery 380 green; LIFECYCLE-MIGRATION + CPU-DEFENSIVE-TACKLE stateHash pins intact; silent-consumer hunt over every runHeadlessMatch/evaluateSuite importer (5 runners, 11 test files, 14 scripts, type-only verifier); residuals disclosed as non-candidate (1 non-reproducing transient, 3 env-bound 5s-timeout architecture sub-tests, 2 vitest RPC infra errors); computeMatchStats confirmed to read the runner events array, not injected observation events |
 | GK-SUITE-VERDICTS-STATE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 reproduced byte-exact in its own ephemeral producer re-run; per-run verdict table matches raw telemetry (continuous 0 releases/0 save chains -> SAVE-CLAIM/DISTRIBUTION honestly NOT_EVALUATED; fixture releases @408/433 -> PASS); all 5 provenance pins verified against the cited manifests; driven-vs-organic labeling accurate; 140/140 neighbors + typecheck 0 |
 | GK-SUITE-VERDICTS-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 151/151 neighbor tests re-run; typecheck 0; record hash recomputed byte-exact + ordinary-mode producer re-run left docs/evidence byte-identical; all 5 cited manifests read verbatim; zero evaluator/gameplay change |
 

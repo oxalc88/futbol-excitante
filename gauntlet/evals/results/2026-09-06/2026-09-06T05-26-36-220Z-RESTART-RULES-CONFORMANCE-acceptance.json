@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-06T05:26:36.220Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "RESTART-RULES-CONFORMANCE",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "d9ae7f77af2044576a72a6583d4bcb1fc0f28ebf",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v29 2/4: per-restart conformance evidence through the registered rules suite — the RULES-SUITE-REGISTRATION serialization limitation is closed. Builder change: new gated runner option `serializeRestartFacts` (default FALSE) in eval/runners/headless-match.ts — when true, AFTER the sim loop (post every input/step/stateHashes.push/adapter.reset(), provably unable to affect inputs, steps, or hashes) the runner injects per-observation facts: (a) a `core-match-phase` event per observation (core post-step matchPhase/matchTimer + the starting startPhase, mirroring the core's restart-window gate), (b) committed restart-executed events (throw-in/goal-kick/corner-kick executed, filtered from sim.snapshot().events) copied into matching-tick observations. Rules-restart/rules-phase oracles consume the facts gated + kind-generically (no weakening: checkTimerFreeze keeps honest NOT_EVALUATED for non-gated streams and adds a discriminating FAIL branch; phase-aware pairing is a false-fail fix with the original fallback preserved). Core untouched: git diff src/ EMPTY; ball independence untouched. Executed outcomes (evaluateSuite over driven 4-run 1800-tick trajectory, core-owned): rules-throw-in-live → MATCH-THROW-IN-AWARD + MATCH-TIMER-FREEZE + MATCH-KICKOFF-FREEZE + MATCH-SCORING-GOAL-DEVENT PASS (+OOP-DETECT/NO-LAST-TOUCH carried); rules-goal-kick-live → MATCH-GOAL-KICK-AWARD + same; stashed controls honestly NOT_EVALUATED (0 injected facts, chain-identical c4d35229…/1acd2d83…); MATCH-CORNER-KICK-AWARD honestly NOT_EVALUATED (no corner execution occurs in any driven run; injection path kind-generic; oracle has dedicated PASS/FAIL unit tests; nothing forced) — CORNER-KICK-CROSS + GOAL-KICK-DISTRIBUTION stay BLOCKED_MISSING_REFERENCE. Evidence: docs/evidence/RESTART-RULES-CONFORMANCE/ — trajectory.json SHA-256 62d3b49f8b6ee5c88d6e89641e3c777e3ade5c266db4c8e732c4b2938e4f6f8f (4 runs × 1800 ticks), suite-state record_sha256 71fbd6bf12c9bc69b97361540b8c74db4cb696464f5e8efb8aacfb8863e5873f (NO wall-clock field in hashed content — byte-reproducible across ordinary re-runs; reproduced byte-exact independently by critic AND integration), audit PASS MULTI_TICK (16 PASS / 4 NOT_APPLICABLE / 0 FAIL). Tests: rules gate 63 (rules-oracle 30 + restart-rules-serialization 3 + RULES-SUITE-REGISTRATION-binding 13 + goalkeepers-suite 24) + neighbors 231 + foundation/provenance 81/102-battery; typecheck 0; integration re-ran ALL 184 node test files (~3,270 tests) in deterministic chunks — every candidate- and neighbor-relevant suite green (LIFECYCLE-MIGRATION + CPU-DEFENSIVE-TACKLE stateHash pins intact). Critic (glm5.3-flash, independent) ACCEPT first pass — re-verified every claim, reproduced record_sha256 byte-exact, ephemeral re-run confined to ignored test-results/; integration (glm5.3-flash) ACCEPT first pass — silent-consumer hunt over every runHeadlessMatch/evaluateSuite importer (5 runners, 11 test files, 14 scripts, type-only verifier), serialization guards + hash pairs verified inside trajectory.json. claims_not_made: no corner-award PASS claim / no suite-level PASS claim / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity/envelope / no forced synthetic events / blocked references stay blocked / no criterion upgraded beyond the executed evaluator."
+}
