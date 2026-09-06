@@ -1,0 +1,40 @@
+{
+  "run_id": "anti-huddle-flowing",
+  "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+  "maxTicks": 1800,
+  "accepted_lifecycle": "legacy",
+  "nTicks": 1800,
+  "legacy": {
+    "stateHashChainSha": "6817faadf99dc0ec4629fd671c58d2774366b49946d078caaf4e0ba422d6ba5b",
+    "corePhaseHistogram": {
+      "kickoff": 1,
+      "playing": 1797,
+      "halftime": 1,
+      "fulltime": 1
+    },
+    "restartPhaseTicks": 2,
+    "commonBounds": "FAIL",
+    "commonRefs": "PASS",
+    "commonFinite": "PASS",
+    "maxPlayerAbsX": 61.182209821862784,
+    "maxBallAbsX": 61.24329228430366
+  },
+  "core": {
+    "stateHashChainSha": "e9ae20374d4c1f3d90e1a616476139236deacc91c0d0dce997b95b7b499b30a8",
+    "corePhaseHistogram": {
+      "kickoff": 1,
+      "playing": 1738,
+      "corner-kick": 60,
+      "fulltime": 1
+    },
+    "restartPhaseTicks": 61,
+    "commonBounds": "PASS",
+    "commonRefs": "PASS",
+    "commonFinite": "PASS",
+    "maxPlayerAbsX": 52.5,
+    "maxBallAbsX": 54.37420023984308
+  },
+  "byte_identical": false,
+  "firstDivergenceTick": 404,
+  "accepted_record_sha256": "14c34cd961eaf0a005c5ea328e3bf667d279442d156f3d4bbdb421458f2e6838"
+}

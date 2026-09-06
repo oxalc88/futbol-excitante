@@ -1,0 +1,40 @@
+{
+  "run_id": "gk-shot-fixture-live",
+  "scenario_path": "eval/scenarios/5v5-keeper-shot-fixture.v1.json",
+  "maxTicks": 600,
+  "accepted_lifecycle": "legacy",
+  "nTicks": 600,
+  "legacy": {
+    "stateHashChainSha": "6b7fa24cfa3cdbd30895eee3891da05765a6b95de52bff17e91a6043541e4dc1",
+    "corePhaseHistogram": {
+      "kickoff": 2,
+      "playing": 596,
+      "halftime": 1,
+      "fulltime": 1
+    },
+    "restartPhaseTicks": 3,
+    "commonBounds": "FAIL",
+    "commonRefs": "PASS",
+    "commonFinite": "PASS",
+    "maxPlayerAbsX": 59.47405905648815,
+    "maxBallAbsX": 59.90229368724021
+  },
+  "core": {
+    "stateHashChainSha": "9f7b86c06a3753d2e35e7f8e4fae08082a5615e78643a4d59767a8517b98278c",
+    "corePhaseHistogram": {
+      "kickoff": 1,
+      "playing": 538,
+      "goal": 60,
+      "fulltime": 1
+    },
+    "restartPhaseTicks": 61,
+    "commonBounds": "FAIL",
+    "commonRefs": "PASS",
+    "commonFinite": "PASS",
+    "maxPlayerAbsX": 52.53084814384061,
+    "maxBallAbsX": 52.62940506412074
+  },
+  "byte_identical": false,
+  "firstDivergenceTick": 300,
+  "accepted_record_sha256": "bdca70749b42d3af6984232e6d3ef6802c1c4973f0023f11afd06e606952fecf"
+}

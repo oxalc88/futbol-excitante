@@ -65,7 +65,7 @@ The RESTART-ANTI-HUDDLE-COHERENCE work surfaced a driver defect: the **legacy** 
 - the core owns `matchPhase` and its restart countdowns;
 - a restart phase (`corner-kick`, `throw-in`, `goal-kick`, `goal`) exercises the core's `apply*` functions at countdown zero and returns to `playing`.
 
-Under the **legacy** policy the core's restart windows are suppressed by the runner's overwrite, so the restart rules in this specification do NOT describe what a legacy run observes. The legacy policy is preserved as the default only to keep every accepted pinned artifact byte-identical to its historical production; it is a driver artifact, not a rules truth. Any criterion that adjudicates a restart MUST run under `core-owned` (`lifecyclePhaseSync: "core-owned"`).
+Under the **legacy** policy the core's restart windows are suppressed by the runner's overwrite, so the restart rules in this specification do NOT describe what a legacy run observes. As of LIFECYCLE-MIGRATION-ASSESSMENT the runner default IS `core-owned`; `legacy` is retained as an explicit opt-out only to reproduce the accepted pre-migration pins byte-for-byte (a driver artifact, not a rules truth). **Provenance:** `runHeadlessMatch`'s `lifecyclePhaseSync` default moved from `"legacy"` to `"core-owned"` in LIFECYCLE-MIGRATION-ASSESSMENT, and this sentence was corrected to match. Any criterion that adjudicates a restart MUST run under `core-owned` (`lifecyclePhaseSync: "core-owned"`).
 
 ## 5. Out-of-play detection
 

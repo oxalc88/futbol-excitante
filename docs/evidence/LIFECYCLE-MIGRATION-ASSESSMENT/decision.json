@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "objective_id": "LIFECYCLE-MIGRATION-ASSESSMENT",
+  "decision": "migrated",
+  "default_lifecycle": "core-owned",
+  "opt_out_lifecycle": "legacy",
+  "migrated": true,
+  "blocking_pins": [],
+  "blocking_reason": null,
+  "summary": "The lifecyclePhaseSync default moved from legacy to core-owned. Under core-owned every accepted legacy-phase-sync pin diverges exactly at the first restart window (the documented legacy suppression): the execution of the core's set-piece / post-goal / halftime reset machinery, which the legacy runner had frozen. No pin errors or becomes nondeterministic, so there are no blocking pins (all are classification 'b': deltas are exactly the documented restart-window behavior). COMMON-BOUNDS flips FAIL (legacy) to PASS (core-owned) for three of the four legacy pins (anti-huddle-flowing, ball-settled-flowing, gk-continuous-live), so the COMMON-BOUNDS legacy residual turns green for those. For gk-shot-fixture-live it stays FAIL even under core-owned: a defending body ends at |x|=52.53 m, marginally over the declared 52.5 m safety bound (the ball never escapes; the residual is a marginal goal-line position, not the legacy out-of-play escape). The accepted historical pins are preserved byte-untouched by pinning their producers to an explicit 'legacy' opt-out so they stay reproducible at their historical configuration.",
+  "historical_legacy_reproductions": [
+    {
+      "run_id": "anti-huddle-flowing",
+      "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+      "maxTicks": 1800,
+      "producer": "scripts/capture-common-full-match-triage.ts (explicit lifecyclePhaseSync: 'legacy')"
+    },
+    {
+      "run_id": "ball-settled-flowing",
+      "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+      "maxTicks": 1200,
+      "producer": "scripts/capture-common-full-match-triage.ts (explicit lifecyclePhaseSync: 'legacy')"
+    },
+    {
+      "run_id": "gk-continuous-live",
+      "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+      "maxTicks": 1800,
+      "producer": "scripts/capture-common-full-match-triage.ts (explicit lifecyclePhaseSync: 'legacy')"
+    },
+    {
+      "run_id": "gk-shot-fixture-live",
+      "scenario_path": "eval/scenarios/5v5-keeper-shot-fixture.v1.json",
+      "maxTicks": 600,
+      "producer": "scripts/capture-common-full-match-triage.ts (explicit lifecyclePhaseSync: 'legacy')"
+    },
+    {
+      "run_id": "3v3-cpu-vs-cpu",
+      "scenario_path": "eval/scenarios/3v3-press-scenario.v1.json",
+      "maxTicks": 600,
+      "producer": "scripts/capture-cpu-defensive-tackle-evidence.ts via eval/runners/cpu-tackle-match.ts (explicit lifecyclePhaseSync: 'legacy')"
+    },
+    {
+      "run_id": "5v5-cpu-vs-cpu",
+      "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+      "maxTicks": 600,
+      "producer": "scripts/capture-cpu-defensive-tackle-evidence.ts via eval/runners/cpu-tackle-match.ts (explicit lifecyclePhaseSync: 'legacy')"
+    },
+    {
+      "run_id": "3v3-cpu-vs-cpu-extended",
+      "scenario_path": "eval/scenarios/3v3-press-scenario.v1.json",
+      "maxTicks": 1800,
+      "producer": "scripts/capture-cpu-defensive-tackle-evidence.ts via eval/runners/cpu-tackle-match.ts (explicit lifecyclePhaseSync: 'legacy')"
+    }
+  ],
+  "per_pin_outcomes": [
+    {
+      "run_id": "anti-huddle-flowing",
+      "accepted_lifecycle": "legacy",
+      "byte_identical_under_core_owned": false,
+      "first_divergence_tick": 404,
+      "legacy_restart_phase_ticks": 2,
+      "core_restart_phase_ticks": 61,
+      "common_bounds_legacy": "FAIL",
+      "common_bounds_core_owned": "PASS",
+      "outcome_class": "b"
+    },
+    {
+      "run_id": "ball-settled-flowing",
+      "accepted_lifecycle": "legacy",
+      "byte_identical_under_core_owned": false,
+      "first_divergence_tick": 404,
+      "legacy_restart_phase_ticks": 2,
+      "core_restart_phase_ticks": 61,
+      "common_bounds_legacy": "FAIL",
+      "common_bounds_core_owned": "PASS",
+      "outcome_class": "b"
+    },
+    {
+      "run_id": "gk-continuous-live",
+      "accepted_lifecycle": "legacy",
+      "byte_identical_under_core_owned": false,
+      "first_divergence_tick": 176,
+      "legacy_restart_phase_ticks": 4,
+      "core_restart_phase_ticks": 121,
+      "common_bounds_legacy": "FAIL",
+      "common_bounds_core_owned": "PASS",
+      "outcome_class": "b"
+    },
+    {
+      "run_id": "gk-shot-fixture-live",
+      "accepted_lifecycle": "legacy",
+      "byte_identical_under_core_owned": false,
+      "first_divergence_tick": 300,
+      "legacy_restart_phase_ticks": 3,
+      "core_restart_phase_ticks": 61,
+      "common_bounds_legacy": "FAIL",
+      "common_bounds_core_owned": "FAIL",
+      "core_max_player_abs_x": 52.53084814384061,
+      "outcome_class": "b",
+      "note": "COMMON-BOUNDS stays FAIL under core-owned: a defending body ends at |x|=52.53 m, marginally over the 52.5 m safety bound. NOT the legacy out-of-play escape (maxBallAbsX drops 59.90 -> 52.63). Redisclosed as a marginal goal-line-position residual."
+    }
+  ]
+}

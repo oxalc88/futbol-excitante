@@ -53,7 +53,11 @@ const RUNS: Record<string, { spec: RunSpec; reproduce: () => TelemetryObservatio
       run_id: "anti-huddle-flowing",
       scenario_path: "eval/scenarios/5v5-continuous-play.v1.json",
       maxTicks: 1800,
-      opts: { cpuAntiHuddle: true, cpuDefensiveTackle: true, browserParityObservations: true },
+      // Historical pin: this accepted record was captured when the runner's
+      // lifecyclePhaseSync DEFAULT was "legacy". After the default moved to
+      // "core-owned" (LIFECYCLE-MIGRATION-ASSESSMENT), the accepted record is
+      // reproduced only under an explicit "legacy" here, so it stays immutable.
+      opts: { cpuAntiHuddle: true, cpuDefensiveTackle: true, browserParityObservations: true, lifecyclePhaseSync: "legacy" },
     },
     reproduce: null as never,
   },
@@ -62,7 +66,8 @@ const RUNS: Record<string, { spec: RunSpec; reproduce: () => TelemetryObservatio
       run_id: "ball-settled-flowing",
       scenario_path: "eval/scenarios/5v5-continuous-play.v1.json",
       maxTicks: 1200,
-      opts: { cpuAntiHuddle: true, cpuDefensiveTackle: true, browserParityObservations: true },
+      // Historical pin (see anti-huddle-flowing note).
+      opts: { cpuAntiHuddle: true, cpuDefensiveTackle: true, browserParityObservations: true, lifecyclePhaseSync: "legacy" },
     },
     reproduce: null as never,
   },

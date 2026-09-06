@@ -1,0 +1,40 @@
+{
+  "run_id": "ball-settled-flowing",
+  "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+  "maxTicks": 1200,
+  "accepted_lifecycle": "legacy",
+  "nTicks": 1200,
+  "legacy": {
+    "stateHashChainSha": "ae69bd411dd2d6a7507935afe0118a669ce77c2a95001dbdeebfa09a5b418aa1",
+    "corePhaseHistogram": {
+      "kickoff": 1,
+      "playing": 1197,
+      "halftime": 1,
+      "fulltime": 1
+    },
+    "restartPhaseTicks": 2,
+    "commonBounds": "FAIL",
+    "commonRefs": "PASS",
+    "commonFinite": "PASS",
+    "maxPlayerAbsX": 61.18221306780872,
+    "maxBallAbsX": 61.24329151586895
+  },
+  "core": {
+    "stateHashChainSha": "c578e025d67b186bd080cbea4000202c569d51ee7f9d476c87f16b24a2274d78",
+    "corePhaseHistogram": {
+      "kickoff": 1,
+      "playing": 1138,
+      "corner-kick": 60,
+      "fulltime": 1
+    },
+    "restartPhaseTicks": 61,
+    "commonBounds": "PASS",
+    "commonRefs": "PASS",
+    "commonFinite": "PASS",
+    "maxPlayerAbsX": 52.5,
+    "maxBallAbsX": 54.37420023984308
+  },
+  "byte_identical": false,
+  "firstDivergenceTick": 404,
+  "accepted_record_sha256": "dcfe7a256cf75a5e39f80bf5fe5362166136a98c3478d330f293eb7a6239c0ee"
+}

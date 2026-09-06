@@ -41,6 +41,16 @@ const FIXED_DT = 1 / 60;
 // ---------------------------------------------------------------------------
 
 /**
+ * The default lifecyclePhaseSync policy.
+ *
+ * "core-owned" (RESTART-ANTI-HUDDLE-COHERENCE migration completed by
+ * LIFECYCLE-MIGRATION-ASSESSMENT): the simulation core owns every phase it
+ * opens and its restart machinery runs exactly as in the browser. "legacy" is
+ * retained as an explicit opt-out for the accepted pre-migration pins.
+ */
+export const DEFAULT_LIFECYCLE_PHASE_SYNC = "core-owned";
+
+/**
  * Match lifecycle phase.
  */
 export type MatchPhase =
@@ -149,16 +159,18 @@ export interface HeadlessMatchConfig {
    */
   browserParityObservations?: boolean;
   /**
-   * Lifecycle phase-sync policy (RESTART-ANTI-HUDDLE-COHERENCE).
-   * - "legacy" (default): the historical driver behavior, in which the runner
-   *   overwrote the core's match phase with its own derived label on every
-   *   tick. That froze the core's restart countdowns, so set pieces and the
+   * Lifecycle phase-sync policy (RESTART-ANTI-HUDDLE-COHERENCE, migration
+   * completed by LIFECYCLE-MIGRATION-ASSESSMENT).
+   * - "core-owned" (default): the corrected policy — the core owns every phase
+   *   it opens and its restart machinery (set pieces + the post-goal/halftime
+   *   reset) executes exactly as it does in the browser, which never syncs.
+   * - "legacy": the historical driver behavior, in which the runner overwrote
+   *   the core's match phase with its own derived label on every tick. That
+   *   froze the core's restart countdowns, so set pieces and the
    *   post-goal/halftime reset never executed headless — a driver defect the
-   *   browser wiring never had. Every accepted headless artifact was produced
-   *   under it, so the default keeps those byte-for-byte bindings intact.
-   * - "core-owned": the corrected policy — the core owns every phase it opens
-   *   and its restart machinery executes exactly as it does in the browser.
-   *   Opt-in, the same way `browserParityObservations` is.
+   *   browser wiring never had. Retained as an explicit opt-out ONLY to
+   *   reproduce the accepted pre-migration pins byte-for-byte (documented in
+   *   docs/evidence/LIFECYCLE-MIGRATION-ASSESSMENT/RESULT.md).
    */
   lifecyclePhaseSync?: "legacy" | "core-owned";
 }
@@ -497,7 +509,7 @@ export function runHeadlessMatch(
     cpuAntiHuddle = true,
     gkBehavior = false,
     browserParityObservations = false,
-    lifecyclePhaseSync = "legacy",
+    lifecyclePhaseSync = DEFAULT_LIFECYCLE_PHASE_SYNC,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
 

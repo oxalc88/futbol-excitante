@@ -85,6 +85,12 @@ interface Fixture {
    */
   pinnedThree: CpuTackleMatchResult;
   pinnedFive: CpuTackleMatchResult;
+  /**
+   * The 3v3 pinned configuration re-run under the migrated core-owned policy.
+   * Used to lock that the driver threads `lifecyclePhaseSync` explicitly (the
+   * accepted pin was captured under the historical legacy policy).
+   */
+  pinnedThreeCoreOwned: CpuTackleMatchResult;
   threeSuite: ReturnType<typeof evaluateSuite>;
   threeControlSuite: ReturnType<typeof evaluateSuite>;
   /** Tackle presses each run's CPU adapters reported issuing. */
@@ -150,6 +156,17 @@ beforeAll(async () => {
       cpuAntiHuddle: false,
     }),
   );
+  // Same pinned configuration but under the migrated core-owned policy: the
+  // driver must honor the explicit option, so this diverges from the accepted
+  // legacy pin instead of silently following the runner default.
+  const pinnedThreeCoreOwned = trimToCompleteAttempts(
+    runCpuTackleMatch({
+      scenario: loadScenario(PRESS3V3),
+      maxTicks: 600,
+      cpuAntiHuddle: false,
+      lifecyclePhaseSync: "core-owned",
+    }),
+  );
   resetMechanismCounters();
 
   fixture = {
@@ -158,6 +175,7 @@ beforeAll(async () => {
     five,
     pinnedThree,
     pinnedFive,
+    pinnedThreeCoreOwned,
     threeSuite: evaluateSuite("duels", three.observations as TelemetryObservation[]),
     threeControlSuite: evaluateSuite(
       "duels",
@@ -457,9 +475,19 @@ describe("CPU-DEFENSIVE-TACKLE: artifact binding and scanner honesty", () => {
       expect(three.state_hashes!.length).toBe(three.ticks);
       expect(five.state_hashes!.length).toBe(five.ticks);
 
-      // Pinned at the historical configuration (pre anti-huddle-v1).
+      // Pinned at the historical configuration (pre anti-huddle-v1). The
+      // driver (runCpuTackleMatch) reproduces this under its explicit legacy
+      // lifecyclePhaseSync default, independent of the runner's migrated
+      // core-owned default.
       expect(f.pinnedThree.stateHashes).toEqual(three.state_hashes);
       expect(f.pinnedFive.stateHashes).toEqual(five.state_hashes);
+
+      // The lifecycle policy is genuinely threaded through the driver: the same
+      // pinned configuration re-run under the migrated core-owned policy
+      // diverges from the accepted legacy pin. If the driver stopped passing the
+      // explicit legacy opt-out and simply inherited the runner default, the
+      // default-path reproduction above would diverge and this test would fail.
+      expect(f.pinnedThreeCoreOwned.stateHashes).not.toEqual(three.state_hashes);
 
       // Same attempts, same ticks, same outcomes.
       expect(f.pinnedThree.attempts).toEqual(three.attempts);

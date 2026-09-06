@@ -1,0 +1,40 @@
+{
+  "run_id": "gk-continuous-live",
+  "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+  "maxTicks": 1800,
+  "accepted_lifecycle": "legacy",
+  "nTicks": 1800,
+  "legacy": {
+    "stateHashChainSha": "660c075a5c41fec9f93199eedd144320fdcca9fd1278bc1e5ded400cddd6a6c1",
+    "corePhaseHistogram": {
+      "kickoff": 3,
+      "playing": 1795,
+      "halftime": 1,
+      "fulltime": 1
+    },
+    "restartPhaseTicks": 4,
+    "commonBounds": "FAIL",
+    "commonRefs": "PASS",
+    "commonFinite": "PASS",
+    "maxPlayerAbsX": 56.0353834602953,
+    "maxBallAbsX": 56.60608456839925
+  },
+  "core": {
+    "stateHashChainSha": "a946c331fe779900420c74d500637c167c3dddb02dcb93a1f9a6470baa121616",
+    "corePhaseHistogram": {
+      "kickoff": 1,
+      "playing": 1678,
+      "goal": 120,
+      "fulltime": 1
+    },
+    "restartPhaseTicks": 121,
+    "commonBounds": "PASS",
+    "commonRefs": "PASS",
+    "commonFinite": "PASS",
+    "maxPlayerAbsX": 52.498804613438566,
+    "maxBallAbsX": 55.202479788540096
+  },
+  "byte_identical": false,
+  "firstDivergenceTick": 176,
+  "accepted_record_sha256": "80e1d352ddcfd9b7b363ec6a20cd0651e1c72bc64e07b492c8369b954ac21cfd"
+}

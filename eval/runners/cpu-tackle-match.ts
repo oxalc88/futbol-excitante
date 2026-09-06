@@ -128,6 +128,14 @@ export interface CpuTackleMatchConfig {
    * historical CPU configuration is reproduced byte-for-byte.
    */
   cpuAntiHuddle?: boolean;
+  /**
+   * Lifecycle phase-sync policy (RESTART-ANTI-HUDDLE-COHERENCE, migration
+   * completed by LIFECYCLE-MIGRATION-ASSESSMENT). CPU-DEFENSIVE-TACKLE accepted
+   * evidence was captured under the historical "legacy" policy, so this driver
+   * keeps the same explicit policy gk-match uses, independent of the runner's
+   * migrated default. Default "legacy".
+   */
+  lifecyclePhaseSync?: "legacy" | "core-owned";
 }
 
 // ---------------------------------------------------------------------------
@@ -209,6 +217,7 @@ export function runCpuTackleMatch(
     maxTicks: config.maxTicks,
     cpuDefensiveTackle,
     cpuAntiHuddle: config.cpuAntiHuddle ?? true,
+    lifecyclePhaseSync: config.lifecyclePhaseSync ?? "legacy",
   });
 
   const { events, observations } = match;
