@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-06T00:20:38.717Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "LIFECYCLE-MIGRATION-ASSESSMENT",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "79068c25310071e8d22c57439da09a5692c470cc",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v28 4/4 (HEADLESS): legacy→core-owned lifecyclePhaseSync migration EXECUTED with per-pin proofs. PIN INVENTORY: every accepted pinned artifact/trajectory classified by runner lifecycle (Groups A-D, detailed in RESULT.md) — the inventory initially OMITTED CPU-DEFENSIVE-TACKLE (runCpuTackleMatch silently inherited the runner default; its binding test pins fresh-run stateHashes against the accepted trajectory → 15/16 FAIL), caught by the critic's causality-proven REJECT (16/16 PASS with the candidate files reverted to HEAD) and REPAIRED: runCpuTackleMatch now threads an explicit historical policy (config.lifecyclePhaseSync ?? \"legacy\", mirroring gk-match.ts:478), the pin inventory (Group D) / decision.json historical_legacy_reproductions (3 cpu-tackle runs) / corrected consumer inventory (the false \"un-run remainder does not consume the default\" claim retracted — gk-5v5 uses gk-match's own legacy default, restart-anti-huddle explicit core-owned, remaining files verified clean) and the binding test all lock it. EMPIRICAL PROBE (per-pin, probes/*.json, reproduced BYTE-IDENTICALLY by the critic): the four accepted legacy pinned trajectories do NOT reproduce byte-identically under core-owned — every pin diverges EXACTLY at a restart window (legacy restart-phase ticks 2/2/4/3 → core-owned 61/61/121/61; anti-huddle-flowing@404, ball-settled-flowing@404, gk-continuous-live@176, gk-shot-fixture-live@300); COMMON-REFERENCES/FINITE stay PASS on both policies; no error, no nondeterminism → no blocking pins (all classification (b) = deltas exactly the documented restart-window behavior). DECISION: MIGRATED — eval/runners/headless-match.ts default flipped legacy → core-owned (DEFAULT_LIFECYCLE_PHASE_SYNC export; binding test locks DEFAULT === core-owned and discriminates: re-flip fails it); \"legacy\" retained as an explicit opt-out for historical pin reproductions (capture-common-full-match-triage.ts pins all 7 runs explicitly: 4 legacy incl. the two newly pinned + 3 core-owned; runCpuTackleMatch explicit legacy). HONEST CORRECTION: gk-shot-fixture-live keeps a COMMON-BOUNDS residual under core-owned (defending body |x|=52.5308 m vs the 52.5 m bound — a marginal goal-line position; maxBallAbsX drops 59.902→52.629 m, the legacy out-of-play escape GONE) — redisclosed, NOT widened, not claimed green; the other three legacy runs turn COMMON-BOUNDS green. SPEC STALENESS corrected (disclosed orchestrator-routed addition): specs/MATCH_RULES_SPEC.md §4 one sentence (runner default IS core-owned as of LIFECYCLE-MIGRATION-ASSESSMENT; legacy = explicit opt-out) with a provenance note — nothing else in the spec changed. Zero gameplay change (git diff src/simulation/ src/contracts/ EMPTY; the policy lives only in the eval runner). Two-run determinism confirmed. Tests: 249-test matrix (integration 129 + eval runner-consumers 59 + LIFECYCLE binding 5 + GK-suite bindings 19 + meta/hygiene 10 + architecture 27) + CPU-DEFENSIVE-TACKLE-binding 16/16 + match-rules-spec-binding 28/28 — all green under the migrated default; the silent-consumer hunt over EVERY runHeadlessMatch caller found no second missed consumer (integration reviewer audited all callers: historical-pin producers thread explicit policy; remaining default-adopting callers assert fresh-run behavior/determinism/geometry rather than byte-pinning). Typecheck 0; audit PASS HEADLESS (reproduced by critic). Critic (glm5.3-flash, independent) REJECT (omitted pin) → repair → ACCEPT; integration ACCEPT first pass on the repaired candidate (decisive silent-consumer hunt clean). Tooling debt noted: vitest-worker onTaskUpdate RPC timeout can make vitest exit 1 despite full pass (environmental, pre-existing). claims_not_made: no PROMOTION / no PES fidelity / no FOUNDATION_LAB_PASS / no invented envelope / no test weakening / the gk-shot-fixture residual NOT claimed green."
+}

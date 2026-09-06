@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "LIFECYCLE-MIGRATION-ASSESSMENT",
+  "accepted_at": "2026-09-06T00:20:38.717Z",
+  "candidate_commit": "79068c25310071e8d22c57439da09a5692c470cc",
+  "evidence_class": "HEADLESS",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/LIFECYCLE-MIGRATION-ASSESSMENT/audit.json",
+      "sha256": "5dd75e263db0fc53e19690eb4d1f658b8bb534b3f0a5794f1e4df3659b26a850",
+      "git_blob": "e23a2d54e4ae8fd0b008e706628082500a9eeb0b",
+      "candidate_commit": "79068c25310071e8d22c57439da09a5692c470cc",
+      "bytes": 2688,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-06/2026-09-06T00-20-38-717Z-LIFECYCLE-MIGRATION-ASSESSMENT-acceptance.json"
+}
