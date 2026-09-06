@@ -20,7 +20,12 @@ import { createSimulation } from "../../src/simulation/loop/simulation.js";
 import { deepClone } from "../../src/simulation/world/clone.js";
 import type { WorldState, MatchPhase as SimMatchPhase } from "../../src/contracts/state.js";
 import { createCpuAdapter, buildCpuObservation, getKeeperReleaseRecords, type CpuObservation } from "../../src/adapters/input-browser/cpu-adapter.js";
-import { designateKeeperFromLayout } from "../../src/adapters/input-browser/goalkeeper-role.js";
+import {
+  designateKeeperFromLayout,
+  goalArcCenter,
+  isInsideGoalArc,
+  keeperArcSetPoint,
+} from "../../src/adapters/input-browser/goalkeeper-role.js";
 import { computeTeamDecision } from "../../src/adapters/input-browser/team-decision-profile.js";
 import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
 import type { SimulationObserver } from "../../src/simulation/telemetry/observer.js";
@@ -190,6 +195,18 @@ export interface HeadlessMatchConfig {
    * every accepted non-gated run.
    */
   serializeRestartFacts?: boolean;
+  /**
+   * Re-home a designated keeper whose kickoff home is off its own goal arc onto
+   * that arc (GK-CORE-OWNED-ARC-FIX). Under the core-owned lifecycle a
+   * post-goal/halftime reset re-places every body at its kickoff home; a keeper
+   * designated from a field position would thereby be stranded off its arc (a
+   * core action the adapters do not control). The runner re-homes such a keeper
+   * onto its arc before the world is created. Default auto: true when
+   * `gkBehavior && lifecyclePhaseSync === "core-owned"` (so the `gkBehavior:false`
+   * stash identity and the accepted legacy pins are untouched). Explicitly false
+   * reproduces the pre-fix drift (the before-state for the evidence record).
+   */
+  rehomeKeeper?: boolean;
 }
 
 /**
@@ -506,6 +523,61 @@ function computeMatchStats(
 }
 
 /**
+ * Re-home every designated keeper onto its own goal arc when the keeper role is
+ * live under the core-owned lifecycle (GK-CORE-OWNED-ARC-FIX).
+ *
+ * A designated keeper is anchored to its goal arc (GOALKEEPER_SPEC §5).  A
+ * scenario's kickoff home for that body may, however, be a field position (this
+ * fixture designates team-a's keeper from a defender that starts ~24.6 m off its
+ * arc).  Under core-owned the simulation resets every body to its kickoff home
+ * after a goal/halftime, so that keeper would be re-placed off its arc and the
+ * run would fail GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE — even though the
+ * keeper itself never chose to leave the arc (the reset is a core action the
+ * adapters do not control).
+ *
+ * The fix is to re-home such a keeper to its goal arc before the world is
+ * created, so its kickoff home IS the arc (the same condition that lets team-b's
+ * keeper hold its arc).  The re-home is a pure function of the scenario layout
+ * (the same designation the runner injects), requires no core change, and is
+ * gated to `gkBehavior && lifecyclePhaseSync === "core-owned"` so the accepted
+ * legacy pins (which let the keeper transit from its kickoff home) and the
+ * `gkBehavior:false` stash-identity control stay byte-identical.
+ *
+ * Deterministic: same scenario → same re-homed scenario.  No Math.random, Date,
+ * DOM, or Node I/O.
+ */
+export function rehomeKeeperToArc(scenario: ScenarioDefinition): ScenarioDefinition {
+  const layout = scenario.players.map((p) => ({
+    playerId: p.playerId,
+    teamId: p.teamId,
+    groundPosition: { x: p.groundPosition.x, y: p.groundPosition.y },
+    formationRole: (p as { formationRole?: "defender" | "midfielder" | "attacker" })
+      .formationRole,
+  }));
+  const teamIds = [...new Set(scenario.players.map((p) => p.teamId))].sort();
+  const players = scenario.players.map((p) => ({ ...p }));
+  let changed = false;
+  for (const teamId of teamIds) {
+    const center = goalArcCenter(teamId, scenario.pitchLength);
+    const keeperId = designateKeeperFromLayout(layout, teamId, scenario.pitchLength);
+    if (keeperId === undefined) continue;
+    const keeper = players.find((p) => p.playerId === keeperId);
+    if (keeper === undefined) continue;
+    // A keeper already at its arc (team-b's kickoff home is on the arc) stays put.
+    if (isInsideGoalArc(keeper.groundPosition, center)) continue;
+    // Otherwise re-home it onto the arc: goal-line centre, lateral drift clamped
+    // inside the versioned band (this never commands a field position).
+    keeper.groundPosition = keeperArcSetPoint(
+      teamId,
+      scenario.pitchLength,
+      keeper.groundPosition.y,
+    );
+    changed = true;
+  }
+  return changed ? { ...scenario, players } : scenario;
+}
+
+/**
  * Run a headless CPU-vs-CPU match.
  *
  * Supports multi-slot scenarios (e.g. 2v2 with 4 slots) by creating one
@@ -528,14 +600,30 @@ export function runHeadlessMatch(
     browserParityObservations = false,
     lifecyclePhaseSync = DEFAULT_LIFECYCLE_PHASE_SYNC,
     serializeRestartFacts = false,
+    rehomeKeeper,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
 
   // Auto-reset: enable for non-LABORATORY profiles, respect explicit config.
   const doGoalReset = autoGoalReset ?? scenario.profile !== "LABORATORY";
 
+  // GK-CORE-OWNED-ARC-FIX: under the core-owned lifecycle a post-goal/halftime
+  // reset re-places every body at its kickoff home.  A designated keeper whose
+  // kickoff home is far off its goal arc would then be stranded off-arc (the
+  // run would fail GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE even though the
+  // keeper never chose to leave its arc).  Re-home the keeper onto its arc before
+  // the world is created so its home IS the arc.  Gated to `gkBehavior` (the
+  // stash-identity control is untouched) and to the core-owned policy (the
+  // accepted legacy pins, which let the keeper transit from its kickoff home,
+  // stay byte-identical).
+  const shouldRehomeKeeper =
+    rehomeKeeper ??
+    (gkBehavior && lifecyclePhaseSync === "core-owned");
+  const worldScenario =
+    shouldRehomeKeeper ? rehomeKeeperToArc(scenario) : scenario;
+
   // 1. Create world and simulation.
-  const world = createWorld({ scenario });
+  const world = createWorld({ scenario: worldScenario });
   const observations: TelemetryObservation[] = [];
 
   // Build observer that collects observations AND delegates to any user observer.

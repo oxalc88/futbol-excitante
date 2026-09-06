@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "objective_id": "GK-CORE-OWNED-ARC-FIX",
+  "produced_by": "scripts/capture-gk-core-owned-arc-fix.ts",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "2b1fdea8c7b36b758e4396720c0de3d1d20de4a8",
+  "root_cause": {
+    "keeper_team_a": "player-4",
+    "keeper_team_b": "player-10",
+    "team_a_kickoff_home": "(-30.00, -10.00)",
+    "team_b_kickoff_home": "(52.40, -0.30)",
+    "team_a_kickoff_home_dist_to_arc": "24.62",
+    "team_b_kickoff_home_dist_to_arc": "0.32",
+    "mechanism": "Under the core-owned lifecycle the simulation's post-goal/halftime reset (applyGoalReset) re-places every body at its scenario kickoff home. The team-a designated keeper's kickoff home is a field defender position ~24.6 m off its own goal arc, so after the tick-391 goal the reset (observed at tick 451: a single-tick 24.67 m discontinuity with velocity forced to 0) strands the keeper off-arc; it then re-transits back at the accepted locomotion cap but cannot recover before the run ends. The team-b keeper's kickoff home IS its arc, so the identical reset leaves it holding its arc. Under the legacy lifecycle the runner overwrote the core's phase every tick, so the reset never executed and the drift was masked.",
+    "lifecycle_asymmetry": "The asymmetry is the kickoff-home-relative-to-arc property of the two designated keepers, keyed on the team layout: team-a designates a body whose kickoff home is off-arc; team-b designates a body whose kickoff home is on-arc. The lifecycle change (legacy → core-owned) shifted WHICH ticks the keeper behavior sees — under core-owned it now sees the post-goal reset that re-places it off-arc.",
+    "wrong_candidates_considered": "Not a chase-arbitration bug: the keeper is never the designated chaser/cover/restart taker on the off-arc ticks (chaser=player-1, cover=player-2, taker=none). Not an on-arc-vs-chase arbitration error. The keeper is displaced by the core reset, which the adapters do not control."
+  },
+  "fix": {
+    "location": "eval/runners/headless-match.ts rehomeKeeperToArc (adapter-layer runner; zero src/simulation change)",
+    "behavior": "Before the world is created, a designated keeper whose kickoff home is off its own goal arc is re-homed onto that arc (goal-line centre, lateral drift clamped inside the versioned band). This makes the keeper's kickoff home IS its arc — the same condition that lets team-b's keeper hold — so the core reset no longer strands it.",
+    "gating": "re-home runs only when gkBehavior::true AND lifecyclePhaseSync::'core-owned' (default auto). The gkBehavior:false stash-identity control and the accepted legacy pins (which let the keeper transit from its kickoff home) are byte-identical. rehomeKeeper:false reproduces the pre-fix drift.",
+    "src_simulation_changed": false
+  },
+  "designations": {
+    "team-a": "player-4",
+    "team-b": "player-10"
+  },
+  "kickoff_homes": {
+    "player-1": {
+      "x": 32.5,
+      "y": 0.1
+    },
+    "player-2": {
+      "x": 0,
+      "y": -20
+    },
+    "player-3": {
+      "x": 0,
+      "y": 20
+    },
+    "player-4": {
+      "x": -30,
+      "y": -10
+    },
+    "player-5": {
+      "x": -30,
+      "y": 10
+    },
+    "player-6": {
+      "x": 20,
+      "y": 30
+    },
+    "player-7": {
+      "x": 10,
+      "y": -20
+    },
+    "player-8": {
+      "x": 10,
+      "y": 20
+    },
+    "player-9": {
+      "x": 30,
+      "y": -20
+    },
+    "player-10": {
+      "x": 52.4,
+      "y": -0.3
+    }
+  },
+  "before": {
+    "verdicts": {
+      "positioning": "FAIL",
+      "noFieldChase": "FAIL"
+    },
+    "per_team": {
+      "team-a": {
+        "stationTick": 195,
+        "postStationTicks": 406,
+        "onArcTicks": 256,
+        "offArcTicks": 150,
+        "onArcRatio": 0.6305418719211823,
+        "maxDistToArcCenter": 24.62214450449026,
+        "maxLateralDrift": 10,
+        "worstTick": 451
+      },
+      "team-b": {
+        "stationTick": 1,
+        "postStationTicks": 600,
+        "onArcTicks": 600,
+        "offArcTicks": 0,
+        "onArcRatio": 1,
+        "maxDistToArcCenter": 1.8370993124312665,
+        "maxLateralDrift": 1.8368573658181828,
+        "worstTick": 58
+      }
+    }
+  },
+  "after": {
+    "verdicts": {
+      "positioning": "PASS",
+      "noFieldChase": "PASS"
+    },
+    "per_team": {
+      "team-a": {
+        "stationTick": 1,
+        "postStationTicks": 600,
+        "onArcTicks": 600,
+        "offArcTicks": 0,
+        "onArcRatio": 1,
+        "maxDistToArcCenter": 2.5,
+        "maxLateralDrift": 2.5,
+        "worstTick": 1
+      },
+      "team-b": {
+        "stationTick": 1,
+        "postStationTicks": 600,
+        "onArcTicks": 600,
+        "offArcTicks": 0,
+        "onArcRatio": 1,
+        "maxDistToArcCenter": 1.8370993124312665,
+        "maxLateralDrift": 1.8368573658181828,
+        "worstTick": 58
+      }
+    }
+  },
+  "verdicts": {
+    "before": {
+      "positioning": "FAIL",
+      "noFieldChase": "FAIL"
+    },
+    "after": {
+      "positioning": "PASS",
+      "noFieldChase": "PASS"
+    }
+  },
+  "tests": {
+    "guard_test": "tests/unit/eval/GK-CORE-OWNED-ARC-FIX-guard.test.ts",
+    "guard_test_count": 6,
+    "guard_test_result": "PASS",
+    "goalline_guard_preserved": "GK-GOALLINE-BOUNDS-RESIDUAL-guard.test.ts 7/7 PASS",
+    "stash_identity": "gauntlet:verify-gk-stash -- --ref=91ff0be PASS (4/4 runs)",
+    "typecheck": "0"
+  },
+  "disclosures": [
+    "The accepted GK suite records (GK-SUITE-VERDICTS-STATE, GK-SUITE-ORGANIC-STATE) are produced under the explicit legacy opt-out and are byte-untouched (docs/evidence unchanged by this objective).",
+    "The re-home is gated to the core-owned policy: under the legacy opt-out the keeper still transits from its scenario kickoff home (accepted legacy pins preserved byte-for-byte).",
+    "The pre-existing legacy live-trajectory record in docs/evidence/GK-5V5-ADAPTER-BEHAVIOR was recorded at an earlier commit and does not re-reproduce byte-identically under the current HEAD; that drift is independent of this objective and is not asserted here."
+  ],
+  "claims_not_made": [
+    "No PROMOTION claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No invented PES constant or fudge factor: the re-home uses the versioned gk-small-sided-v1 goal-arc geometry already in the adapter.",
+    "No oracle weakening: the protected GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE oracles are unchanged and still FAIL a keeper stranded off its arc (guard-tested).",
+    "No core / src/simulation / contract / scenario / spec change.",
+    "No suite-level PASS claim: this fixes the core-owned team-a keeper arc drift; the goalkeepers suite is re-published under core-owned by the next horizon objective (GK-SUITE-CORE-OWNED-STATE)."
+  ],
+  "record_sha256": "92e4c4a3a59d45796173e652e03833acf529182db25a99d3626fd93bcd86cc7d"
+}
