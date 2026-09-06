@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-06T23:46:47.106Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "RULES-SUITE-STATE-RERUN",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "030c2e0425f9c7d9ec8624a7353c2656ce8d9dae",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v31 2/4: the rules suite's complete aggregate verdict state re-published across all evidence generations (BOOKKEEPING; zero source change — git diff src/ src/adapters/ eval/runners/ eval/oracles/ eval/invariants/ eval/contracts/ eval/scenarios/ specs/ EMPTY, verified by builder, critic, AND integration; no accepted record mutated). AGGREGATE VERDICT TABLE: 23 PASS / 2 BLOCKED_MISSING_REFERENCE / 0 NOT_EVALUATED / 0 FAIL over all 25 MATCH-* criteria (+ all 8 protected invariants aggregate PASS). EXACT DELTAS vs the RULES-FACTS-DEPTH-CONFORMANCE baseline (record ebf90831…, which declared 17 PASS / 2 BLOCKED / 6 NOT_EVALUATED / 0 FAIL): 6 criteria NOT_EVALUATED→PASS with source-stream attribution — MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH + MATCH-RESTART-NEAREST-ONLY + MATCH-RESTART-REARM from the designation streams (REARM correctly absent from the no-reset throw-in stream); MATCH-CORNER-KICK-AWARD + MATCH-CORNER-KICK-PLACEMENT + MATCH-CORNER-KICK-TIMER-FREEZE from rules-corner-live (discriminated by the NOT_EVALUATED goal-kick neighbour control); 17 PASS unchanged; 2 BLOCKED unchanged; 0 FAIL introduced. BASELINE-COUNT CORRECTION (disclosed in the record, verified by the critic against the accepted records): the horizon/task text attached the '20/2/3' figure to the RULES-FACTS-DEPTH-CONFORMANCE baseline, but that figure is actually the RESTART-DESIGNATION-FACTS-CONFORMANCE aggregate (record 271b1526…); the true RULES-FACTS-DEPTH baseline is 17/2/6 (record ebf90831…) — both converge on the same 23/2/0/0 aggregate with the corner stream composed in. DISCLOSURES (verified by the critic's same-stream probe and the integration's record reads): (a) the anti-huddle criteria are evaluated only on the browserParity designation streams — on non-browserParity gated streams the anti-huddle oracle result is a wiring/shape artifact of the runner's minimal team-filtered observation shape (criterion_eligibility in the record; runner code verified: parity shape at headless-match.ts:949, re-arm arming only under parity wiring :1144-1204); (b) the RULES-SUITE-STATE continuous-play corner baseline control (~149 s/run) not re-run within the capture budget — redundant (its only PASS verdicts OOP-DETECT/GOAL-DEVENT also PASS on the re-run streams; its corner NOT_EVALUATED superseded by the driven corner PASS) — its published per-run verdicts remain in the accepted record bae56e5a…. Evidence: record_sha256 36fc77e52909dbaceefa14927b37b8e533c248e451477fc579dc4952434979ef (no wall-clock field; reproduced byte-exact independently by critic AND integration; two consecutive ordinary-mode runs byte-identical AND byte-equal to the durable record, file SHA 622f1008…; ordinary runs leave docs/ byte-identical, scratch confined to gitignored test-results/); audit PASS at the tool-canonical BOOKKEEPING shape. Tests: binding 9/9 + rules gate 166/166 (critic and integration re-ran it: 179 across the wider gate) + neighbors 242/242 (one pre-existing vitest worker-RPC reporting timeout, all assertions green) + foundation/provenance/hygiene 81/81 + stateHash pins 69/69; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass — own ordinary-mode producer runs ×2, programmatic diff found exactly 6 changed criteria and no other delta, the aggregate recomputed from per-run verdicts matched the record 25/25, the eligibility exclusion independently verified from runner code + a same-stream probe, the omitted control's verdict list confirmed aggregate-neutral; integration (glm5.3-flash) ACCEPT first pass — all batteries re-run green, verify-acceptance-durability PASS at HEAD, silent-consumer hunt clean. claims_not_made: no suite-level PASS claim (the accurate phrasing; the 2 BLOCKED references keep the suite from a clean PASS) / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity or invented envelope / blocked references stay blocked / no criterion upgraded beyond the executed evaluator / zero gameplay/source/contract/adapter/spec change."
+}

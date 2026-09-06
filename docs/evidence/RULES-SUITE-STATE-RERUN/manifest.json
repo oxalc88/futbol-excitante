@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "RULES-SUITE-STATE-RERUN",
+  "accepted_at": "2026-09-06T23:46:47.106Z",
+  "candidate_commit": "030c2e0425f9c7d9ec8624a7353c2656ce8d9dae",
+  "evidence_class": "BOOKKEEPING",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/RULES-SUITE-STATE-RERUN/audit.json",
+      "sha256": "fba4c4bc9c7cd3f73a1c4f922d01c2f2e15de35b8ce5f17edbc387bf287e897d",
+      "git_blob": "5bc22a751a08d11cd824b5cd22df7a612cc3dd8e",
+      "candidate_commit": "030c2e0425f9c7d9ec8624a7353c2656ce8d9dae",
+      "bytes": 2694,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-06/2026-09-06T23-46-47-106Z-RULES-SUITE-STATE-RERUN-acceptance.json"
+}

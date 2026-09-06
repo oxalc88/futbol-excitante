@@ -9,7 +9,7 @@ horizon_id: "conformance-completion-and-match-flow"
 created_from_commit: 0b5ae53
 created_at: 2026-09-06
 reason: "Horizon v30 (COMPLETE 4/4, remote-durable at 0b5ae53) closed the surfaced threads: ten serialized-fact rules criteria upgraded to executed PASS plus genuine timer-driven halftime/fulltime on a new driven timing fixture (5f29f2f), a genuine driven corner completing the per-restart conformance set with DYNAMIC_VISUAL frames (c07cebb), the core-owned team-a keeper off-arc drift root-caused (post-goal reset strands an off-arc-home keeper) and fixed at the adapter layer with rehomeKeeperToArc (e687fa9), and the goalkeepers suite honestly re-published under core-owned with COMMON-BOUNDS FAIL→PASS (de9fd3b). v31 completes the executable layer and adds a browser-facing capability: (a) serialize the adapter restart-window designation facts behind the same gate so the 3 anti-huddle restart-behavior criteria evaluate (rules suite → 23 PASS / 2 BLOCKED); (b) re-publish the rules suite state after that; (c) browser-visible full-match lifecycle flow (halftime break countdown + fulltime terminal state in the real app) as the observable capability; (d) two-run deterministic attestation so COMMON-DETERMINISTIC evaluates for the GK and rules suites. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 1
+current_index: 2
 objectives:
   - id: RESTART-DESIGNATION-FACTS-CONFORMANCE
     status: accepted
@@ -19,8 +19,10 @@ objectives:
     builder: builder-structured
     prerequisite: ""
   - id: RULES-SUITE-STATE-RERUN
-    status: pending
-    reason: "Re-publish the rules suite verdict state after the designation-facts conformance: re-run the suite over all evidence streams and publish the honest verdict table with exact delta disclosure vs the RULES-FACTS-DEPTH-CONFORMANCE baseline (20 PASS / 2 BLOCKED / 3 NOT_EVALUATED / 0 FAIL at that point). BOOKKEEPING; zero gameplay change."
+    status: accepted
+    accepted_at: 2026-09-06
+    candidate_commit: 030c2e0
+    reason: "Re-publish the rules suite verdict state after the designation-facts conformance: re-run the suite over all evidence streams and publish the honest verdict table with exact delta disclosure vs the RULES-FACTS-DEPTH-CONFORMANCE baseline (17 PASS / 2 BLOCKED / 6 NOT_EVALUATED / 0 FAIL per its record ebf90831…; the 20/2/3 figure is the RESTART-DESIGNATION-FACTS aggregate — corrected in the re-published record). BOOKKEEPING; zero gameplay change."
     builder: builder-structured
     prerequisite: RESTART-DESIGNATION-FACTS-CONFORMANCE
   - id: BROWSER-FULL-MATCH-FLOW-EVIDENCE
