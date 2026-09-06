@@ -1,6 +1,14 @@
 # PES 2017 — campaña 001: selección de fuentes
 
+## Transfer package (when YouTube CDN times out)
+
+If `fetch_media.py` fails on googlevideo read timeouts, use the committed export instead of full match re-downloads:
+
+- [`transfer/README.md`](transfer/README.md) — training **MP4** + full PTS `frames.jsonl` + sparse JPEG strips for both matches
+- Full match MP4s remain producer-local / gitignored; PTS timelines are in `transfer/*/frames.jsonl.gz`
+
 ## Obtención local de los MP4
+
 
 Los vídeos **no** están en Git. Desde la raíz del repo:
 
