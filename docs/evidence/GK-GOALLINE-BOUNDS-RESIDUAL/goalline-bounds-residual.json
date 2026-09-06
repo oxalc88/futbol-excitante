@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "objective_id": "GK-GOALLINE-BOUNDS-RESIDUAL",
+  "produced_by": "scripts/capture-goalline-bounds-residual.ts",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "e2ab1908fd1598484004fe2dd8bf186bc4d19835",
+  "root_cause": {
+    "body": "player-10",
+    "team": "team-b",
+    "role": "designated keeper",
+    "position_x": "52.53084814384061",
+    "position_abs_x": "52.530848",
+    "declared_pitch_bound_x": "52.5",
+    "code_path": "post-goal: the ball crosses the team-b goal line (goal event); the attacking chaser follows the loose ball into the goal mouth and the player-player contact resolution pushes the team-b keeper back beyond the goal line. The keeper stays inside its nominal goal arc (a legitimate football position), so the position is a goal-mouth geometry case, not a genuinely illegal escape.",
+    "is_genuinely_illegal": "false — the keeper legitimately stands inside the goal mouth / net depth behind the goal line."
+  },
+  "derivation": {
+    "constant_model": "gk-small-sided-v1",
+    "goal_arc_center_x_offset": 0,
+    "goal_arc_radius": 4,
+    "formula": "goalMouthMaxX(goalLineX) = goalLineX + |goal_arc_center_x_offset| + goal_arc_radius",
+    "goal_line_x": 52.5,
+    "goal_mouth_max_x": 56.5,
+    "note": "Derived from the versioned gk-small-sided-v1 goal-arc constant; the keeper's nominal repositioning disk is centred on the goal line and extends goal_arc_radius behind it, so a body may legitimately occupy that goal-mouth depth. No PES constant or fudge factor is invented."
+  },
+  "bound_declaration": {
+    "path": "eval/oracles/wire.ts (the protected COMMON-BOUNDS 'bounds' oracle)",
+    "new_bounds": "{\"maxX\":56.5,\"maxY\":34,\"minZ\":-0.5,\"maxZ\":20}",
+    "old_bounds": "{\"maxX\":52.5,\"maxY\":34,\"minZ\":-0.5,\"maxZ\":20}",
+    "scenario_safety_bounds_unchanged": "the scenario's safetyBounds stay the pitch boundary (goal line) because safetyBounds is part of the hashed world state (meta.safetyBounds); changing it would perturb every pinned state-hash chain. The goal-mouth widening lives in the COMMON-BOUNDS oracle, which is not part of the simulation state hash."
+  },
+  "run": {
+    "scenario": "5v5-keeper-shot-fixture-v1",
+    "scenario_path": "eval/scenarios/5v5-keeper-shot-fixture.v1.json",
+    "ticks": 600,
+    "lifecycle_phase_sync": "core-owned",
+    "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-keeper-shot-fixture.v1.json\"), maxTicks: 600, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' })",
+    "observations": 600,
+    "goals": 1
+  },
+  "before_after": {
+    "declared_bound_x_before": 52.5,
+    "declared_bound_x_after": 56.5,
+    "max_player_abs_x": "52.530848",
+    "max_ball_abs_x": "52.629405",
+    "COMMON_BOUNDS_before_pitch_bound": "FAIL",
+    "COMMON_BOUNDS_after_goal_mouth_bound": "PASS",
+    "residual_resolved": "true"
+  },
+  "tests": {
+    "guard_test": "tests/unit/eval/GK-GOALLINE-BOUNDS-RESIDUAL-guard.test.ts",
+    "guard_test_count": 7,
+    "guard_test_result": "PASS"
+  },
+  "disclosures": [
+    "Pre-existing (not caused by this bound change): re-running the goalkeepers suite over core-owned observations reports GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE FAIL for the team-a keeper (player-4) — it drifts far from its goal arc (max distance ~24.6 m, off-arc ticks ~150/406) under the core-owned lifecycle. The accepted GK suite records are produced under the legacy opt-out and are byte-untouched; this bound correction does not address the team-a keeper positioning behavior.",
+    "The LIFECYCLE-MIGRATION binding test still asserts the historical decision.json common_bounds_core_owned = 'FAIL' for gk-shot-fixture-live, because that durable probe file records the old 52.5 m pitch bound. The migration probe was not re-run (which would overwrite the durable probe file)."
+  ],
+  "claims_not_made": [
+    "No PROMOTION claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No invented PES constant or fudge factor: the widened bound is derived from the versioned gk-small-sided-v1 goal_arc_radius constant.",
+    "No oracle weakening: a body beyond the derived goal-mouth limit still FAILs (guard-tested); the widening is a documented geometry correction.",
+    "No core / src / simulation / contract / adapter / scenario / spec change: only the COMMON-BOUNDS bound declaration (eval/oracles/wire.ts), the derivation (eval/invariants/bounds.ts) and tests changed.",
+    "No suite-level PASS claim: this is a bound geometry correction on a single COMMON-BOUNDS residual, not a gameplay or rules-suite PASS."
+  ],
+  "record_sha256": "7835bcd73b8861dafba9e70ed8622107f4c8a285282313850f9f9c82db0f7d87"
+}

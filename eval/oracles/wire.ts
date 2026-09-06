@@ -9,7 +9,7 @@
 
 import { registerOracle } from "./oracle-registry.js";
 import { checkFiniteNumber } from "../invariants/finite.js";
-import { checkBounds } from "../invariants/bounds.js";
+import { checkBounds, goalMouthSafetyBounds } from "../invariants/bounds.js";
 import { checkEventReferences } from "../invariants/references.js";
 import { checkBallContinuity } from "../invariants/ball-continuity.js";
 import type { BallContinuityConfig } from "../invariants/ball-continuity.js";
@@ -68,7 +68,12 @@ const entries: OracleEntry[] = [
   {
     oracle_id: "bounds",
     oracle_version: "oracle-bounds-v1",
-    fn: perObservation((obs) => checkBounds(obs, { maxX: 52.5, maxY: 34, minZ: -0.5, maxZ: 20 })),
+    // The safety bound accounts for the goal mouth: a body (e.g. a keeper on
+    // its goal arc, or a chaser entering the goal) may legitimately stand
+    // behind the goal line by the goal-mouth depth derived from the versioned
+    // `gk-small-sided-v1` arc.  The standard 105 m pitch has a goal line at
+    // 52.5 m, so maxX = 52.5 + |goal_arc_center_x_offset| + goal_arc_radius.
+    fn: perObservation((obs) => checkBounds(obs, goalMouthSafetyBounds(52.5))),
   },
   {
     oracle_id: "event-references",
