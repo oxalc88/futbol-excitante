@@ -9,10 +9,12 @@ horizon_id: "conformance-depth-and-core-owned-gk"
 created_from_commit: c8a2abf
 created_at: 2026-09-06
 reason: "Horizon v29 (COMPLETE 4/4, remote-durable at c8a2abf) made the rules spec executable: the suite registered per MATCH_RULES_SPEC §15 (8 protected mutant-guarded oracles), the serialization limitation closed by the gated post-loop restart-facts injection (driven throw-in + goal-kick award conformance), the last COMMON-BOUNDS residual resolved as a constant-derived goal-mouth geometry correction (52.5 → 56.5 m), and the honest verdict state published (7 PASS / 2 BLOCKED / 16 NOT_EVALUATED / 0 FAIL; no suite-level PASS claim). v30 closes the open threads that publication surfaced: (a) evaluate the remaining NOT_EVALUATED criteria answerable from already-serialized facts (per-restart placement/serve/timer-freeze, restart behavior, timer/phase) — extending the gated injection only where a fact is genuinely missing; (b) produce a feasible DRIVEN corner so the corner restart type conforms through the suite (CORNER-KICK-CROSS stays BLOCKED_MISSING_REFERENCE — never invent the trajectory reference); (c) fix the core-owned team-a keeper arc defect (player-4 ~24.6 m off-arc in the gk-shot-fixture) at the adapter layer — the GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE FAILs disclosed in v29-3; (d) re-publish the goalkeepers suite state under core-owned after the fix. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 0
+current_index: 1
 objectives:
   - id: RULES-FACTS-DEPTH-CONFORMANCE
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-06
+    candidate_commit: 5f29f2f
     reason: "Evaluate the remaining NOT_EVALUATED rules criteria answerable from existing serialized facts: per-restart PLACEMENT/SERVE (throw-in/goal-kick), per-restart TIMER-FREEZE variants, restart-behavior criteria (MATCH-KICKOFF-FIRST-TOUCH, MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH, MATCH-RESTART-NEAREST-ONLY, MATCH-RESTART-REARM), and the timer/phase cluster (MATCH-TIMER-DECREMENT, MATCH-TIMER-HALFTIME, MATCH-TIMER-FULLTIME, MATCH-SCORING-GOAL-PHASE). Extend the gated serializeRestartFacts injection ONLY where a fact is genuinely missing (same gate discipline: default false, post-loop, hash-neutral); honest NOT_EVALUATED for what no existing fact can answer; the corner cluster is excluded (owned by the driven-corner objective); blocked references stay blocked; no suite-level PASS claim."
     builder: builder-structured
     prerequisite: ""

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "RULES-FACTS-DEPTH-CONFORMANCE",
+  "accepted_at": "2026-09-06T11:34:12.564Z",
+  "candidate_commit": "5f29f2f654f478c607a4fd5e24e1a88bcb681909",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/RULES-FACTS-DEPTH-CONFORMANCE/trajectory.json",
+      "sha256": "f060b28a7a4776811c93838bfcae9e8c2fd42e0081e092bcbd40099386e28b14",
+      "git_blob": "4dd0cfa8d6ec7c343e8671b3040e2510c20a1daa",
+      "candidate_commit": "5f29f2f654f478c607a4fd5e24e1a88bcb681909",
+      "bytes": 18435,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/RULES-FACTS-DEPTH-CONFORMANCE/audit.json",
+      "sha256": "1dd42dac3c554931b1130c999e208f538763c5cde459446e26bee782ab584d41",
+      "git_blob": "4148c8bec804ed4dcd12ef642572d19b15438f00",
+      "candidate_commit": "5f29f2f654f478c607a4fd5e24e1a88bcb681909",
+      "bytes": 2669,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-06/2026-09-06T11-34-12-564Z-RULES-FACTS-DEPTH-CONFORMANCE-acceptance.json"
+}
