@@ -3,41 +3,36 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 29
+horizon_version: 30
 status: ACTIVE
-horizon_id: "rules-executable-conformance"
-created_from_commit: 8c50b54
+horizon_id: "conformance-depth-and-core-owned-gk"
+created_from_commit: c8a2abf
 created_at: 2026-09-06
-reason: "Horizon v28 (COMPLETE 4/4, remote-durable at 8c50b54) delivered the rules spec gateway (MATCH_RULES_SPEC: lifecycle model core-owned — now the runner default after the accepted migration with per-pin proofs — per-restart normative semantics, match-rules-v1 parameters, 7 blocked references), keeper visual legibility (additive PresentationSnapshot keeperRole + magenta cone marker with a genuine bridge-capture parity guard), the possession-oracle reference fix (same defect class as the COMMON triage), and the lifecyclePhaseSync migration. v29 makes the rules spec executable: (a) register the rules evaluator suite per the spec §15 criteria (protected oracles, canary-guarded — the GK-KEEPER-ORACLE-REGISTRATION pattern); (b) driven conformance evidence per restart type against the spec + the new suite (the accepted restart machinery is the implementation under test); (c) root-cause the last COMMON-BOUNDS residual (gk-shot-fixture 52.53 m goal-line position — fix the driver if genuinely illegal, or disclose if the bound needs goal-depth geometry derived from constants); (d) publish the honest rules-suite state. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 4
+reason: "Horizon v29 (COMPLETE 4/4, remote-durable at c8a2abf) made the rules spec executable: the suite registered per MATCH_RULES_SPEC §15 (8 protected mutant-guarded oracles), the serialization limitation closed by the gated post-loop restart-facts injection (driven throw-in + goal-kick award conformance), the last COMMON-BOUNDS residual resolved as a constant-derived goal-mouth geometry correction (52.5 → 56.5 m), and the honest verdict state published (7 PASS / 2 BLOCKED / 16 NOT_EVALUATED / 0 FAIL; no suite-level PASS claim). v30 closes the open threads that publication surfaced: (a) evaluate the remaining NOT_EVALUATED criteria answerable from already-serialized facts (per-restart placement/serve/timer-freeze, restart behavior, timer/phase) — extending the gated injection only where a fact is genuinely missing; (b) produce a feasible DRIVEN corner so the corner restart type conforms through the suite (CORNER-KICK-CROSS stays BLOCKED_MISSING_REFERENCE — never invent the trajectory reference); (c) fix the core-owned team-a keeper arc defect (player-4 ~24.6 m off-arc in the gk-shot-fixture) at the adapter layer — the GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE FAILs disclosed in v29-3; (d) re-publish the goalkeepers suite state under core-owned after the fix. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
+current_index: 0
 objectives:
-  - id: RULES-SUITE-REGISTRATION
-    status: accepted
-    reason: "Register the rules evaluator suite per MATCH_RULES_SPEC §15 (criteria named there — MATCH-THROW-IN-AWARD, MATCH-GOAL-KICK-AWARD, MATCH-CORNER-KICK-AWARD, MATCH-KICKOFF-FREEZE, MATCH-SCORING-GOAL-DEVENT, MATCH-TIMER-FREEZE etc.): protected oracles + bindings following the GK-KEEPER-ORACLE-REGISTRATION pattern (mutant/canary-guarded, additive, registry discipline), so the rules semantics become executable against observation streams."
+  - id: RULES-FACTS-DEPTH-CONFORMANCE
+    status: pending
+    reason: "Evaluate the remaining NOT_EVALUATED rules criteria answerable from existing serialized facts: per-restart PLACEMENT/SERVE (throw-in/goal-kick), per-restart TIMER-FREEZE variants, restart-behavior criteria (MATCH-KICKOFF-FIRST-TOUCH, MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH, MATCH-RESTART-NEAREST-ONLY, MATCH-RESTART-REARM), and the timer/phase cluster (MATCH-TIMER-DECREMENT, MATCH-TIMER-HALFTIME, MATCH-TIMER-FULLTIME, MATCH-SCORING-GOAL-PHASE). Extend the gated serializeRestartFacts injection ONLY where a fact is genuinely missing (same gate discipline: default false, post-loop, hash-neutral); honest NOT_EVALUATED for what no existing fact can answer; the corner cluster is excluded (owned by the driven-corner objective); blocked references stay blocked; no suite-level PASS claim."
     builder: builder-structured
     prerequisite: ""
-  - id: RESTART-RULES-CONFORMANCE
-    status: accepted
-    accepted_at: 2026-09-06
-    candidate_commit: d9ae7f7
-    reason: "Driven conformance evidence per restart type (throw-in, goal kick, corner, kickoff/post-goal reset) against the rules spec semantics using the accepted restart machinery: per-restart observation streams evaluated through the new rules suite; per-rule verdicts honest (driven where driven); MULTI_TICK trajectories + stashed controls where applicable."
-    builder: builder-structured
-    prerequisite: RULES-SUITE-REGISTRATION
-  - id: GK-GOALLINE-BOUNDS-RESIDUAL
-    status: accepted
-    accepted_at: 2026-09-06
-    candidate_commit: 69d5fb4
-    reason: "Root-cause the last COMMON-BOUNDS residual (gk-shot-fixture defending body at |x|=52.5308 m vs the 52.5 m bound, redisclosed twice): is the position genuinely illegal (fix the driver behavior — adapter layer) or does the declared bound need the goal-depth geometry (derive from constants, never invent)? If genuinely illegal, fix with discriminating guards; if the bound needs geometry, widen from constants with proofs. Either way the residual resolves honestly."
+  - id: CORNER-DRIVEN-CONFORMANCE
+    status: pending
+    reason: "Produce a feasible DRIVEN corner-kick execution stream (adapter-layer scenario driver, the driven throw-in/goal-kick precedent — zero core change) so the corner restart type conforms through the suite: MATCH-CORNER-KICK-AWARD (+ PLACEMENT/TIMER-FREEZE where the facts exist) evaluated; MATCH-CORNER-KICK-CROSS stays BLOCKED_MISSING_REFERENCE (the trajectory reference does not exist — never invent one). DYNAMIC_VISUAL event-centered corner frames as the horizon's observable browser-facing capability."
     builder: builder-structured
     prerequisite: ""
-  - id: RULES-SUITE-STATE
-    status: accepted
-    accepted_at: 2026-09-06
-    candidate_commit: f9c3735
-    reason: "Honest rules-suite state publication: re-run the rules suite over the conformance evidence and publish the verdict table (per-rule outcomes; blocked references stay blocked; no suite-level PASS claim). BOOKKEEPING; zero gameplay change."
-    prerequisite: RULES-SUITE-REGISTRATION
-observable_progress_target: "The rules spec §15 criteria executable through a registered protected rules suite; per-restart conformance verdicts from the accepted restart machinery; the gk-shot-fixture COMMON-BOUNDS residual root-caused and honestly resolved; a published rules-suite verdict state. NO regulation implementation beyond suite-gated behavior, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
-last_invalidation_reason: "Horizon v28 COMPLETE 4/4: RULES-SPEC-DRAFT (dedicated match-rules spec; critic RETRY resolved), KEEPER-VISUAL-MARKER (additive keeperRole presentation field + magenta cone marker with a genuine bridge-capture parity guard), POSSESSION-ORACLE-REFERENCE-TRIAGE (possession oracle false-fail fixed with the window-union resolution), LIFECYCLE-MIGRATION-ASSESSMENT (lifecyclePhaseSync default migrated legacy→core-owned with per-pin proofs; first candidate REJECT for the silently-migrated CPU-DEFENSIVE-TACKLE pin repaired). Remote-durable at 8c50b54; strategic reassessment produced Horizon v29 (rules-executable-conformance). Regulation implementation stays deferred until the rules spec AND suites exist; GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
+  - id: GK-CORE-OWNED-ARC-FIX
+    status: pending
+    reason: "Root-cause and fix the core-owned team-a keeper arc defect disclosed in v29-3 (gk-shot-fixture: GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE FAIL — player-4 drifts up to ~24.6 m off-arc, onArcRatio 0.63, while team-b holds its arc): why does the team-a keeper leave the arc under core-owned lifecyclePhaseSync when the legacy policy masked it, and which adapter-layer behavior owns the drift? Fix at the adapter layer with discriminating guards; accepted legacy-produced GK suite records stay byte-untouched; no core change."
+    builder: builder-gameplay
+    prerequisite: ""
+  - id: GK-SUITE-CORE-OWNED-STATE
+    status: pending
+    reason: "Re-publish the goalkeepers suite state under the core-owned lifecycle after the arc fix: re-run the registered GK suite over core-owned runs and publish the honest verdict table (the accepted v27 table was legacy-produced). BOOKKEEPING; zero gameplay change."
+    builder: builder-structured
+    prerequisite: GK-CORE-OWNED-ARC-FIX
+observable_progress_target: "Remaining serialized-fact rules criteria evaluated (placement/serve/timer-freeze, restart behavior, timer/phase); a feasible driven corner conforming through the suite with browser-visible corner evidence; the core-owned team-a keeper arc defect fixed with discriminating guards; the goalkeepers suite honestly re-published under core-owned. NO regulation implementation beyond suite-gated behavior, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
+last_invalidation_reason: "Horizon v29 COMPLETE 4/4: RULES-SUITE-REGISTRATION (the rules suite registered per MATCH_RULES_SPEC §15; critic RETRY + integration REJECT resolved), RESTART-RULES-CONFORMANCE (gated post-loop restart-facts serialization closes the suite's serialization limitation; driven throw-in + goal-kick conformance; corner honestly NOT_EVALUATED), GK-GOALLINE-BOUNDS-RESIDUAL (the COMMON-BOUNDS residual resolved as constant-derived goal-mouth geometry; the team-a keeper positioning FAIL disclosed as pre-existing), RULES-SUITE-STATE (honest 25-criterion verdict publication; 7 PASS / 2 BLOCKED / 16 NOT_EVALUATED / 0 FAIL). Remote-durable at c8a2abf; strategic reassessment produced Horizon v30 (conformance-depth-and-core-owned-gk). Regulation implementation, GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -49,6 +44,8 @@ replan_if:
 ```
 
 ## Completed horizons
+
+Horizon v29 (rules-executable-conformance) — COMPLETE 4/4: RULES-SUITE-REGISTRATION accepted (the `rules` evaluator suite registered per MATCH_RULES_SPEC §15: 25 MATCH-* criteria, 8 invariants, 8 bindings, 8 protected mutant-guarded oracles wired additively; 4 criteria PASS on the accepted restart fixtures, AWARD/TIMER-FREEZE honestly NOT_EVALUATED (serialization limitation), 2 BLOCKED_MISSING_REFERENCE; registry hash c9098fb8→980873a8; record byte-reproducible 7503f9fe… after critic-RETRY (3 reporting fixes) and integration-REJECT (wall-clock field removed) cycles). RESTART-RULES-CONFORMANCE accepted (gated serializeRestartFacts runner option — default false, strictly post-loop, hash-neutral — injects core-match-phase + committed restart-executed facts; driven throw-in + goal-kick award conformance through the executed suite (TIMER-FREEZE/KICKOFF-FREEZE/SCORING + OOP carried); stashed controls chain-identical; corner honestly NOT_EVALUATED (nothing forced); record byte-reproducible 71fbd6bf…). GK-GOALLINE-BOUNDS-RESIDUAL accepted (the last COMMON-BOUNDS residual resolved as path-(b) goal-depth geometry: the team-b keeper legitimately pushed into its goal mouth by core contact resolution; the protected bounds oracle derives maxX from gk-small-sided-v1 constants 52.5+0+4.0=56.5 m, drift-bound, non-masking — legacy 59.47 m escape stays FAIL; zero src/ change; record byte-reproducible 7835bcd7…; the pre-existing team-a keeper positioning FAIL disclosed as unrelated). RULES-SUITE-STATE accepted (honest 25-criterion verdict publication over the conformance evidence: 7 PASS / 2 BLOCKED_MISSING_REFERENCE / 16 NOT_EVALUATED / 0 FAIL; exactly 3 gated upgrades vs the registration baseline; no suite-level PASS claim; zero source change; record byte-reproducible bae56e5a…). Remote-durable at c8a2abf; strategic reassessment produced Horizon v30.
 
 Horizon v28 (rules-spec-and-keeper-legibility) — COMPLETE 4/4: RULES-SPEC-DRAFT accepted (dedicated match-rules spec: lifecycle model core-owned vs legacy, per-restart normative semantics grounded in the accepted restart machinery, match-rules-v1 provisional parameters, 7 BLOCKED_MISSING_REFERENCE, adjudicating criteria named-not-registered, deferred rules; critic RETRY resolved — real test IDs cited + all 7 blocked keys pinned). KEEPER-VISUAL-MARKER accepted (additive PlayerPresentation.keeperRole + magenta cone kit marker drawn only when present; absence renders byte-identically to HEAD — genuine bridge-capture SHA parity guard reproduced by critic and integration; 3 event-centered frames, save fixture-driven and disclosed). POSSESSION-ORACLE-REFERENCE-TRIAGE accepted (the possession oracle's orphan-ref check could false-fail on full-match maps — BEFORE 1719/1149/1749/1685; fixed with the accepted window-union resolution, never-anywhere refs still FAIL; possession-CHANGE check byte-identical). LIFECYCLE-MIGRATION-ASSESSMENT accepted (lifecyclePhaseSync default MIGRATED legacy→core-owned with per-pin proofs — divergences exactly at restart windows, no blocking pins; explicit legacy opt-outs for historical reproductions; gk-shot-fixture marginal 52.53 m residual redisclosed; critic REJECT→repair→ACCEPT on the silently-migrated CPU-DEFENSIVE-TACKLE pin). Remote-durable at 8c50b54; strategic reassessment produced Horizon v29.
 
