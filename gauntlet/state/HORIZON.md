@@ -9,7 +9,7 @@ horizon_id: "rules-executable-conformance"
 created_from_commit: 8c50b54
 created_at: 2026-09-06
 reason: "Horizon v28 (COMPLETE 4/4, remote-durable at 8c50b54) delivered the rules spec gateway (MATCH_RULES_SPEC: lifecycle model core-owned — now the runner default after the accepted migration with per-pin proofs — per-restart normative semantics, match-rules-v1 parameters, 7 blocked references), keeper visual legibility (additive PresentationSnapshot keeperRole + magenta cone marker with a genuine bridge-capture parity guard), the possession-oracle reference fix (same defect class as the COMMON triage), and the lifecyclePhaseSync migration. v29 makes the rules spec executable: (a) register the rules evaluator suite per the spec §15 criteria (protected oracles, canary-guarded — the GK-KEEPER-ORACLE-REGISTRATION pattern); (b) driven conformance evidence per restart type against the spec + the new suite (the accepted restart machinery is the implementation under test); (c) root-cause the last COMMON-BOUNDS residual (gk-shot-fixture 52.53 m goal-line position — fix the driver if genuinely illegal, or disclose if the bound needs goal-depth geometry derived from constants); (d) publish the honest rules-suite state. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 2
+current_index: 3
 objectives:
   - id: RULES-SUITE-REGISTRATION
     status: accepted
@@ -24,7 +24,9 @@ objectives:
     builder: builder-structured
     prerequisite: RULES-SUITE-REGISTRATION
   - id: GK-GOALLINE-BOUNDS-RESIDUAL
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-06
+    candidate_commit: 69d5fb4
     reason: "Root-cause the last COMMON-BOUNDS residual (gk-shot-fixture defending body at |x|=52.5308 m vs the 52.5 m bound, redisclosed twice): is the position genuinely illegal (fix the driver behavior — adapter layer) or does the declared bound need the goal-depth geometry (derive from constants, never invent)? If genuinely illegal, fix with discriminating guards; if the bound needs geometry, widen from constants with proofs. Either way the residual resolves honestly."
     builder: builder-structured
     prerequisite: ""
