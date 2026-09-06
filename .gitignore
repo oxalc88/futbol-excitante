@@ -7,3 +7,8 @@ artifacts/local/
 
 artifacts/traces/
 artifacts/targeted-evaluation.json
+
+# PES campaign raw media (re-download via ACQUISITION.md; do not commit MP4s)
+evidence/pes2017/**/raw/media/*.mp4
+evidence/pes2017/**/raw/audit-*/ffprobe.json
+evidence/pes2017/**/raw/audit-*/frames.jsonl
