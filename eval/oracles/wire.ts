@@ -31,6 +31,18 @@ import {
   checkGkSaveClaim,
   checkGkDistributionNoOmniscience,
 } from "./gk-role.js";
+import {
+  checkOutOfPlayDetection,
+  checkOutOfPlayNoLastTouch,
+  checkThrowInAward,
+  checkGoalKickAward,
+  checkCornerKickAward,
+  checkGoalDetection,
+} from "./rules-restart.js";
+import {
+  checkKickoffFreeze,
+  checkTimerFreeze,
+} from "./rules-phase.js";
 import type { OracleEntry } from "./oracle-registry.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 
@@ -174,6 +186,47 @@ const entries: OracleEntry[] = [
     oracle_id: "gk-distribution-oracle-v1",
     oracle_version: "oracle-gk-distribution-v1",
     fn: checkGkDistributionNoOmniscience,
+  },
+  // MATCH_RULES_SPEC §15 rules oracles (protected; read committed telemetry).
+  {
+    oracle_id: "rules-out-of-play-detect-oracle-v1",
+    oracle_version: "oracle-rules-out-of-play-detect-v1",
+    fn: checkOutOfPlayDetection,
+  },
+  {
+    oracle_id: "rules-out-of-play-no-last-touch-oracle-v1",
+    oracle_version: "oracle-rules-out-of-play-no-last-touch-v1",
+    fn: checkOutOfPlayNoLastTouch,
+  },
+  {
+    oracle_id: "rules-throw-in-award-oracle-v1",
+    oracle_version: "oracle-rules-throw-in-award-v1",
+    fn: checkThrowInAward,
+  },
+  {
+    oracle_id: "rules-goal-kick-award-oracle-v1",
+    oracle_version: "oracle-rules-goal-kick-award-v1",
+    fn: checkGoalKickAward,
+  },
+  {
+    oracle_id: "rules-corner-kick-award-oracle-v1",
+    oracle_version: "oracle-rules-corner-kick-award-v1",
+    fn: checkCornerKickAward,
+  },
+  {
+    oracle_id: "rules-goal-detection-oracle-v1",
+    oracle_version: "oracle-rules-goal-detection-v1",
+    fn: checkGoalDetection,
+  },
+  {
+    oracle_id: "rules-kickoff-freeze-oracle-v1",
+    oracle_version: "oracle-rules-kickoff-freeze-v1",
+    fn: checkKickoffFreeze,
+  },
+  {
+    oracle_id: "rules-timer-freeze-oracle-v1",
+    oracle_version: "oracle-rules-timer-freeze-v1",
+    fn: checkTimerFreeze,
   },
 ];
 

@@ -219,6 +219,151 @@ export const INV_GK_DISTRIBUTION: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+// ---------------------------------------------------------------------------
+// rules suite invariants
+//
+// Each invariant is bound to a registered protected rules oracle
+// (eval/oracles/rules-restart.ts / rules-phase.ts, wired in eval/oracles/wire.ts
+// and mapped in eval/runners/foundation-evaluator.ts).  A criterion still
+// yields NOT_EVALUATED when the committed observation stream cannot carry the
+// semantics (honest "not yet observable"), never an invented PASS.
+// ---------------------------------------------------------------------------
+
+/**
+ * Out-of-play detection evidence: a boundary crossing emits exactly one correct
+ * event and goal / goal-line out-of-play are mutually exclusive.
+ * Bound to the protected rules-out-of-play-detect oracle.
+ */
+export const INV_RULES_OUT_OF_PLAY_DETECT: InvariantDefinition = {
+  invariant_id: "rules-out-of-play-detect-evidence",
+  invariant_version: "invariant-rules-out-of-play-detect-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-out-of-play-detect-oracle-v1",
+  oracle_version: "oracle-rules-out-of-play-detect-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
+ * Out-of-play no-last-touch evidence: a boundary with null / unresolvable
+ * lastTouchRef opens no restart.  Bound to the protected
+ * rules-out-of-play-no-last-touch oracle.
+ */
+export const INV_RULES_OUT_OF_PLAY_NO_LAST_TOUCH: InvariantDefinition = {
+  invariant_id: "rules-out-of-play-no-last-touch-evidence",
+  invariant_version: "invariant-rules-out-of-play-no-last-touch-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-out-of-play-no-last-touch-oracle-v1",
+  oracle_version: "oracle-rules-out-of-play-no-last-touch-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
+ * Throw-in award evidence: the served throw-in goes to the team opposite the
+ * last-touch team.  Bound to the protected rules-throw-in-award oracle.
+ */
+export const INV_RULES_THROW_IN_AWARD: InvariantDefinition = {
+  invariant_id: "rules-throw-in-award-evidence",
+  invariant_version: "invariant-rules-throw-in-award-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-throw-in-award-oracle-v1",
+  oracle_version: "oracle-rules-throw-in-award-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
+ * Goal-kick award evidence: a goal kick is awarded to the defending team of the
+ * exited goal line.  Bound to the protected rules-goal-kick-award oracle.
+ */
+export const INV_RULES_GOAL_KICK_AWARD: InvariantDefinition = {
+  invariant_id: "rules-goal-kick-award-evidence",
+  invariant_version: "invariant-rules-goal-kick-award-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-goal-kick-award-oracle-v1",
+  oracle_version: "oracle-rules-goal-kick-award-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
+ * Corner-kick award evidence: a corner kick is awarded to the attacking team
+ * when the last touch is the defending team.  Bound to the protected
+ * rules-corner-kick-award oracle.
+ */
+export const INV_RULES_CORNER_KICK_AWARD: InvariantDefinition = {
+  invariant_id: "rules-corner-kick-award-evidence",
+  invariant_version: "invariant-rules-corner-kick-award-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-corner-kick-award-oracle-v1",
+  oracle_version: "oracle-rules-corner-kick-award-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
+ * Goal-detection evidence: a goal event carries a valid goalIndex and is
+ * mutually exclusive with goal-line out-of-play.  Bound to the protected
+ * rules-goal-detection oracle.
+ */
+export const INV_RULES_GOAL_DETECTION: InvariantDefinition = {
+  invariant_id: "rules-goal-detection-evidence",
+  invariant_version: "invariant-rules-goal-detection-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-goal-detection-oracle-v1",
+  oracle_version: "oracle-rules-goal-detection-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
+ * Kickoff-freeze evidence: while the kickoff restart ball is untouched every
+ * non-taker body is held at its kickoff home.  Bound to the protected
+ * rules-kickoff-freeze oracle.
+ */
+export const INV_RULES_KICKOFF_FREEZE: InvariantDefinition = {
+  invariant_id: "rules-kickoff-freeze-evidence",
+  invariant_version: "invariant-rules-kickoff-freeze-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-kickoff-freeze-oracle-v1",
+  oracle_version: "oracle-rules-kickoff-freeze-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
+ * Timer-freeze evidence: bound to the protected rules-timer-freeze oracle, which
+ * returns the honest NOT_EVALUATED because the committed observation stream does
+ * not carry the core matchPhase / matchTimer (the timer-decrement contract is
+ * core-owned and not serialized).  It never over-claims a timer-freeze PASS.
+ */
+export const INV_RULES_TIMER_FREEZE: InvariantDefinition = {
+  invariant_id: "rules-timer-freeze-evidence",
+  invariant_version: "invariant-rules-timer-freeze-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-timer-freeze-oracle-v1",
+  oracle_version: "oracle-rules-timer-freeze-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 /** All registered invariant definitions keyed by invariant_id. */
 export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FINITE.invariant_id]: INV_FINITE,
@@ -234,6 +379,14 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_GK_NO_FIELD_CHASE.invariant_id]: INV_GK_NO_FIELD_CHASE,
   [INV_GK_SAVE_CLAIM.invariant_id]: INV_GK_SAVE_CLAIM,
   [INV_GK_DISTRIBUTION.invariant_id]: INV_GK_DISTRIBUTION,
+  [INV_RULES_OUT_OF_PLAY_DETECT.invariant_id]: INV_RULES_OUT_OF_PLAY_DETECT,
+  [INV_RULES_OUT_OF_PLAY_NO_LAST_TOUCH.invariant_id]: INV_RULES_OUT_OF_PLAY_NO_LAST_TOUCH,
+  [INV_RULES_THROW_IN_AWARD.invariant_id]: INV_RULES_THROW_IN_AWARD,
+  [INV_RULES_GOAL_KICK_AWARD.invariant_id]: INV_RULES_GOAL_KICK_AWARD,
+  [INV_RULES_CORNER_KICK_AWARD.invariant_id]: INV_RULES_CORNER_KICK_AWARD,
+  [INV_RULES_GOAL_DETECTION.invariant_id]: INV_RULES_GOAL_DETECTION,
+  [INV_RULES_KICKOFF_FREEZE.invariant_id]: INV_RULES_KICKOFF_FREEZE,
+  [INV_RULES_TIMER_FREEZE.invariant_id]: INV_RULES_TIMER_FREEZE,
 };
 
 /**

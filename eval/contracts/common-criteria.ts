@@ -738,6 +738,305 @@ export const GK_DISTRIBUTION_NO_OMNISCIENCE: EvaluationCriterion = {
     "guided by omniscient target selection beyond the keeper's modelled information.",
 };
 
+// ---------------------------------------------------------------------------
+// rules suite criteria — MATCH_RULES_SPEC §15
+// ---------------------------------------------------------------------------
+
+/**
+ * MATCH-OUT-OF-PLAY-DETECT — the swept-line boundary test emits the correct
+ * `goal` / `ball-out-of-play` / `ball-touchline-out-of-play` event.
+ * Class: HARD_INVARIANT.  Oracle: rules-out-of-play-detect-oracle-v1.
+ */
+export const MATCH_OUT_OF_PLAY_DETECT: EvaluationCriterion = {
+  criterion_id: "MATCH-OUT-OF-PLAY-DETECT",
+  class: "HARD_INVARIANT",
+  rule:
+    "A boundary crossing produces exactly one of goal / ball-out-of-play / " +
+    "ball-touchline-out-of-play with the correct boundary payload; goal and " +
+    "goal-line out-of-play are mutually exclusive.",
+};
+
+/**
+ * MATCH-OUT-OF-PLAY-NO-LAST-TOUCH — null / unresolvable lastTouchRef → no restart.
+ * Class: HARD_INVARIANT.  Oracle: rules-out-of-play-no-last-touch-oracle-v1.
+ */
+export const MATCH_OUT_OF_PLAY_NO_LAST_TOUCH: EvaluationCriterion = {
+  criterion_id: "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH",
+  class: "HARD_INVARIANT",
+  rule:
+    "A boundary crossing whose lastTouchRef is null (or does not resolve to a " +
+    "team) opens no restart phase; play continues as playing.",
+};
+
+/**
+ * MATCH-THROW-IN-AWARD — throw-in awarded to the opposite of the last-touch team.
+ * Class: HARD_INVARIANT.  Oracle: rules-throw-in-award-oracle-v1.
+ */
+export const MATCH_THROW_IN_AWARD: EvaluationCriterion = {
+  criterion_id: "MATCH-THROW-IN-AWARD",
+  class: "HARD_INVARIANT",
+  rule:
+    "A throw-in is awarded to the team opposite whoever last touched the ball; " +
+    "the executed throw-in's team matches that award.",
+};
+
+/**
+ * MATCH-THROW-IN-PLACEMENT — ball placed at the touchline exit point.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_THROW_IN_PLACEMENT: EvaluationCriterion = {
+  criterion_id: "MATCH-THROW-IN-PLACEMENT",
+  class: "HARD_INVARIANT",
+  rule:
+    "The throw-in serve is placed at the exact touchline exit point where the " +
+    "ball left play.",
+};
+
+/**
+ * MATCH-THROW-IN-SERVE — chest-height throw into play toward the receiver.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED (serve physics reference
+ * is BLOCKED_MISSING_REFERENCE per §14).
+ */
+export const MATCH_THROW_IN_SERVE: EvaluationCriterion = {
+  criterion_id: "MATCH-THROW-IN-SERVE",
+  class: "HARD_INVARIANT",
+  rule:
+    "The throw-in is served at chest height toward the nearest awarding-team " +
+    "receiver and into play.",
+};
+
+/**
+ * MATCH-THROW-IN-TIMER-FREEZE — timer frozen during the throw-in phase.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_THROW_IN_TIMER_FREEZE: EvaluationCriterion = {
+  criterion_id: "MATCH-THROW-IN-TIMER-FREEZE",
+  class: "HARD_INVARIANT",
+  rule: "The match timer is frozen during the throw-in phase.",
+};
+
+/**
+ * MATCH-GOAL-KICK-AWARD — goal kick to the defending team of the exited goal line.
+ * Class: HARD_INVARIANT.  Oracle: rules-goal-kick-award-oracle-v1.
+ */
+export const MATCH_GOAL_KICK_AWARD: EvaluationCriterion = {
+  criterion_id: "MATCH-GOAL-KICK-AWARD",
+  class: "HARD_INVARIANT",
+  rule:
+    "When the last-touch team is not the defending team of the exited goal " +
+    "line, a goal kick is awarded to the defending team.",
+};
+
+/**
+ * MATCH-GOAL-KICK-PLACEMENT — ball placed inside the goal area on the exit side.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_GOAL_KICK_PLACEMENT: EvaluationCriterion = {
+  criterion_id: "MATCH-GOAL-KICK-PLACEMENT",
+  class: "HARD_INVARIANT",
+  rule:
+    "The goal kick is placed inside the goal area (x = ±(52.5−5.5), y clamped " +
+    "to the goal-area half-width, preserving the exit y sign).",
+};
+
+/**
+ * MATCH-GOAL-KICK-DISTRIBUTION — upfield distribution to the nearest receiver.
+ * Class: MEASURED_TARGET → BLOCKED_MISSING_REFERENCE (§14 goal_kick_distribution_ref).
+ */
+export const MATCH_GOAL_KICK_DISTRIBUTION: EvaluationCriterion = {
+  criterion_id: "MATCH-GOAL-KICK-DISTRIBUTION",
+  class: "MEASURED_TARGET",
+  rule: "Upfield distribution to the nearest receiver; reference is blocked (§14).",
+};
+
+/**
+ * MATCH-GOAL-KICK-TIMER-FREEZE — timer frozen during the goal-kick phase.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_GOAL_KICK_TIMER_FREEZE: EvaluationCriterion = {
+  criterion_id: "MATCH-GOAL-KICK-TIMER-FREEZE",
+  class: "HARD_INVARIANT",
+  rule: "The match timer is frozen during the goal-kick phase.",
+};
+
+/**
+ * MATCH-CORNER-KICK-AWARD — corner kick when the last touch is the defending team.
+ * Class: HARD_INVARIANT.  Oracle: rules-corner-kick-award-oracle-v1.
+ */
+export const MATCH_CORNER_KICK_AWARD: EvaluationCriterion = {
+  criterion_id: "MATCH-CORNER-KICK-AWARD",
+  class: "HARD_INVARIANT",
+  rule:
+    "When the last-touch team is the defending team of the exited goal line, a " +
+    "corner kick is awarded to the attacking team.",
+};
+
+/**
+ * MATCH-CORNER-KICK-PLACEMENT — ball placed at the nearest corner flag.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_CORNER_KICK_PLACEMENT: EvaluationCriterion = {
+  criterion_id: "MATCH-CORNER-KICK-PLACEMENT",
+  class: "HARD_INVARIANT",
+  rule:
+    "The corner kick is placed at the nearest corner flag (goalX, ±34) chosen by " +
+    "the sign of the ball's exit y.",
+};
+
+/**
+ * MATCH-CORNER-KICK-CROSS — lofted cross into the penalty area.
+ * Class: MEASURED_TARGET → BLOCKED_MISSING_REFERENCE (§14 corner_cross_trajectory_ref).
+ */
+export const MATCH_CORNER_KICK_CROSS: EvaluationCriterion = {
+  criterion_id: "MATCH-CORNER-KICK-CROSS",
+  class: "MEASURED_TARGET",
+  rule: "Lofted cross into the penalty area; reference is blocked (§14).",
+};
+
+/**
+ * MATCH-CORNER-KICK-TIMER-FREEZE — timer frozen during the corner-kick phase.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_CORNER_KICK_TIMER_FREEZE: EvaluationCriterion = {
+  criterion_id: "MATCH-CORNER-KICK-TIMER-FREEZE",
+  class: "HARD_INVARIANT",
+  rule: "The match timer is frozen during the corner-kick phase.",
+};
+
+/**
+ * MATCH-KICKOFF-FREEZE — while the kickoff ball is untouched every non-taker is
+ * held at its window anchor.
+ * Class: HARD_INVARIANT.  Oracle: rules-kickoff-freeze-oracle-v1.
+ */
+export const MATCH_KICKOFF_FREEZE: EvaluationCriterion = {
+  criterion_id: "MATCH-KICKOFF-FREEZE",
+  class: "HARD_INVARIANT",
+  rule:
+    "While the kickoff / post-goal / halftime restart ball is untouched, every " +
+    "non-taker body is held at its window anchor; only the designated taker " +
+    "closes distance.",
+};
+
+/**
+ * MATCH-KICKOFF-FIRST-TOUCH — the restart window closes on the first touch.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_KICKOFF_FIRST_TOUCH: EvaluationCriterion = {
+  criterion_id: "MATCH-KICKOFF-FIRST-TOUCH",
+  class: "HARD_INVARIANT",
+  rule:
+    "The restart window closes when the restarted ball is first touched; only the " +
+    "taker may break the freeze.",
+};
+
+/**
+ * MATCH-RESTART-REARM — post-goal / halftime reset re-arms the restart window.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_RESTART_REARM: EvaluationCriterion = {
+  criterion_id: "MATCH-RESTART-REARM",
+  class: "HARD_INVARIANT",
+  rule:
+    "A post-goal / halftime reset re-arms the restart window keyed to the " +
+    "carried-through touch reference.",
+};
+
+/**
+ * MATCH-SCORING-GOAL-DEVENT — a goal event fires exactly on the goal-mouth crossing.
+ * Class: HARD_INVARIANT.  Oracle: rules-goal-detection-oracle-v1.
+ */
+export const MATCH_SCORING_GOAL_DEVENT: EvaluationCriterion = {
+  criterion_id: "MATCH-SCORING-GOAL-DEVENT",
+  class: "HARD_INVARIANT",
+  rule:
+    "A goal event fires when the swept segment crosses the goal line between the " +
+    "posts and under the crossbar; the event carries a valid goalIndex.",
+};
+
+/**
+ * MATCH-SCORING-GOAL-PHASE — playing → goal → playing with a post-goal reset.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_SCORING_GOAL_PHASE: EvaluationCriterion = {
+  criterion_id: "MATCH-SCORING-GOAL-PHASE",
+  class: "HARD_INVARIANT",
+  rule:
+    "A goal opens the goal phase, which resets play and returns to playing.",
+};
+
+/**
+ * MATCH-TIMER-DECREMENT — the match timer decrements only during playing.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_TIMER_DECREMENT: EvaluationCriterion = {
+  criterion_id: "MATCH-TIMER-DECREMENT",
+  class: "HARD_INVARIANT",
+  rule: "The match timer decrements only while the match phase is playing.",
+};
+
+/**
+ * MATCH-TIMER-HALFTIME — playing → halftime → second-half transition.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_TIMER_HALFTIME: EvaluationCriterion = {
+  criterion_id: "MATCH-TIMER-HALFTIME",
+  class: "HARD_INVARIANT",
+  rule:
+    "When the timer reaches zero in half 1 the phase transitions to halftime and " +
+    "then to the second half.",
+};
+
+/**
+ * MATCH-TIMER-FULLTIME — fulltime transition when the timer reaches zero in half 2.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_TIMER_FULLTIME: EvaluationCriterion = {
+  criterion_id: "MATCH-TIMER-FULLTIME",
+  class: "HARD_INVARIANT",
+  rule: "When the timer reaches zero in half 2 the phase transitions to fulltime.",
+};
+
+/**
+ * MATCH-TIMER-FREEZE — the match timer is frozen during goal / halftime / fulltime
+ * / set-piece phases.
+ * Class: HARD_INVARIANT.  Oracle: rules-timer-freeze-oracle-v1 (which returns the
+ * honest NOT_EVALUATED because the committed observation stream does not carry the
+ * core matchPhase / matchTimer — see the oracle).
+ */
+export const MATCH_TIMER_FREEZE: EvaluationCriterion = {
+  criterion_id: "MATCH-TIMER-FREEZE",
+  class: "HARD_INVARIANT",
+  rule:
+    "The match timer is frozen during goal, halftime, fulltime and each set-piece " +
+    "phase (the decrement is gated on playing).",
+};
+
+/**
+ * MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH — every non-taker frozen at its anchor
+ * in every restart window while the restart ball is untouched.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_RESTART_FREEZE_UNTIL_FIRST_TOUCH: EvaluationCriterion = {
+  criterion_id: "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH",
+  class: "HARD_INVARIANT",
+  rule:
+    "In every restart window the whole team except the single designated taker " +
+    "is frozen at its window anchor while the restart ball is untouched.",
+};
+
+/**
+ * MATCH-RESTART-NEAREST-ONLY — after the first touch only one chaser per team
+ * converges on the ball.
+ * Class: HARD_INVARIANT.  No oracle yet → NOT_EVALUATED.
+ */
+export const MATCH_RESTART_NEAREST_ONLY: EvaluationCriterion = {
+  criterion_id: "MATCH-RESTART-NEAREST-ONLY",
+  class: "HARD_INVARIANT",
+  rule:
+    "After the restart ball is first touched, exactly one designated chaser per " +
+    "team converges on the ball.",
+};
+
 /** All common criteria keyed by criterion_id. */
 export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [COMMON_FINITE.criterion_id]: COMMON_FINITE,
@@ -817,6 +1116,33 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [GK_NO_FIELD_CHASE.criterion_id]: GK_NO_FIELD_CHASE,
   [GK_SAVE_CLAIM.criterion_id]: GK_SAVE_CLAIM,
   [GK_DISTRIBUTION_NO_OMNISCIENCE.criterion_id]: GK_DISTRIBUTION_NO_OMNISCIENCE,
+
+  // rules suite criteria — MATCH_RULES_SPEC §15
+  [MATCH_OUT_OF_PLAY_DETECT.criterion_id]: MATCH_OUT_OF_PLAY_DETECT,
+  [MATCH_OUT_OF_PLAY_NO_LAST_TOUCH.criterion_id]: MATCH_OUT_OF_PLAY_NO_LAST_TOUCH,
+  [MATCH_THROW_IN_AWARD.criterion_id]: MATCH_THROW_IN_AWARD,
+  [MATCH_THROW_IN_PLACEMENT.criterion_id]: MATCH_THROW_IN_PLACEMENT,
+  [MATCH_THROW_IN_SERVE.criterion_id]: MATCH_THROW_IN_SERVE,
+  [MATCH_THROW_IN_TIMER_FREEZE.criterion_id]: MATCH_THROW_IN_TIMER_FREEZE,
+  [MATCH_GOAL_KICK_AWARD.criterion_id]: MATCH_GOAL_KICK_AWARD,
+  [MATCH_GOAL_KICK_PLACEMENT.criterion_id]: MATCH_GOAL_KICK_PLACEMENT,
+  [MATCH_GOAL_KICK_DISTRIBUTION.criterion_id]: MATCH_GOAL_KICK_DISTRIBUTION,
+  [MATCH_GOAL_KICK_TIMER_FREEZE.criterion_id]: MATCH_GOAL_KICK_TIMER_FREEZE,
+  [MATCH_CORNER_KICK_AWARD.criterion_id]: MATCH_CORNER_KICK_AWARD,
+  [MATCH_CORNER_KICK_PLACEMENT.criterion_id]: MATCH_CORNER_KICK_PLACEMENT,
+  [MATCH_CORNER_KICK_CROSS.criterion_id]: MATCH_CORNER_KICK_CROSS,
+  [MATCH_CORNER_KICK_TIMER_FREEZE.criterion_id]: MATCH_CORNER_KICK_TIMER_FREEZE,
+  [MATCH_KICKOFF_FREEZE.criterion_id]: MATCH_KICKOFF_FREEZE,
+  [MATCH_KICKOFF_FIRST_TOUCH.criterion_id]: MATCH_KICKOFF_FIRST_TOUCH,
+  [MATCH_RESTART_REARM.criterion_id]: MATCH_RESTART_REARM,
+  [MATCH_SCORING_GOAL_DEVENT.criterion_id]: MATCH_SCORING_GOAL_DEVENT,
+  [MATCH_SCORING_GOAL_PHASE.criterion_id]: MATCH_SCORING_GOAL_PHASE,
+  [MATCH_TIMER_DECREMENT.criterion_id]: MATCH_TIMER_DECREMENT,
+  [MATCH_TIMER_HALFTIME.criterion_id]: MATCH_TIMER_HALFTIME,
+  [MATCH_TIMER_FULLTIME.criterion_id]: MATCH_TIMER_FULLTIME,
+  [MATCH_TIMER_FREEZE.criterion_id]: MATCH_TIMER_FREEZE,
+  [MATCH_RESTART_FREEZE_UNTIL_FIRST_TOUCH.criterion_id]: MATCH_RESTART_FREEZE_UNTIL_FIRST_TOUCH,
+  [MATCH_RESTART_NEAREST_ONLY.criterion_id]: MATCH_RESTART_NEAREST_ONLY,
 };
 
 /**

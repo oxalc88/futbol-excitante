@@ -808,6 +808,167 @@ export const BINDING_GK_HIGH_001: TestImplementationBinding = makeTestBindingWit
 );
 
 // ---------------------------------------------------------------------------
+// rules suite test bindings (MATCH_RULES_SPEC §15)
+// ---------------------------------------------------------------------------
+
+/**
+ * RULES-OOP-001 — out-of-play detection + no-last-touch behaviour.
+ *
+ * MATCH-OUT-OF-PLAY-DETECT and MATCH-OUT-OF-PLAY-NO-LAST-TOUCH are bound to the
+ * protected rules oracles.  Both share the same contract scenario stub
+ * (scn-rules-lifecycle-v1).
+ */
+export const BINDING_RULES_OOP_001: TestImplementationBinding = makeTestBindingWith(
+  "RULES-OOP-001",
+  ["scn-rules-lifecycle-v1"],
+  [],
+  ["rules-out-of-play-detect-evidence", "rules-out-of-play-no-last-touch-evidence"],
+  ["obs-per-tick-v1", "obs-rules-restart-v1"],
+  [],
+  {
+    "MATCH-OUT-OF-PLAY-DETECT": ["rules-out-of-play-detect-evidence"],
+    "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": ["rules-out-of-play-no-last-touch-evidence"],
+  },
+);
+
+/**
+ * RULES-THROWIN-001 — throw-in award + placement/serve/timer criteria.
+ * MATCH-THROW-IN-AWARD is bound to the protected rules-throw-in-award oracle;
+ * the placement / serve / timer criteria have no oracle yet → NOT_EVALUATED.
+ */
+export const BINDING_RULES_THROWIN_001: TestImplementationBinding = makeTestBindingWith(
+  "RULES-THROWIN-001",
+  ["scn-rules-lifecycle-v1"],
+  [],
+  ["rules-throw-in-award-evidence"],
+  ["obs-per-tick-v1", "obs-rules-restart-v1"],
+  [],
+  {
+    "MATCH-THROW-IN-AWARD": ["rules-throw-in-award-evidence"],
+    "MATCH-THROW-IN-PLACEMENT": [],
+    "MATCH-THROW-IN-SERVE": [],
+    "MATCH-THROW-IN-TIMER-FREEZE": [],
+  },
+);
+
+/**
+ * RULES-GOALKICK-001 — goal-kick award + placement/distribution/timer criteria.
+ * MATCH-GOAL-KICK-AWARD is bound to the rules-goal-kick-award oracle;
+ * DISTRIBUTION (MEASURED_TARGET) → BLOCKED_MISSING_REFERENCE; the others have no
+ * oracle yet → NOT_EVALUATED.
+ */
+export const BINDING_RULES_GOALKICK_001: TestImplementationBinding = makeTestBindingWith(
+  "RULES-GOALKICK-001",
+  ["scn-rules-lifecycle-v1"],
+  [],
+  ["rules-goal-kick-award-evidence"],
+  ["obs-per-tick-v1", "obs-rules-restart-v1"],
+  [],
+  {
+    "MATCH-GOAL-KICK-AWARD": ["rules-goal-kick-award-evidence"],
+    "MATCH-GOAL-KICK-PLACEMENT": [],
+    "MATCH-GOAL-KICK-DISTRIBUTION": [],
+    "MATCH-GOAL-KICK-TIMER-FREEZE": [],
+  },
+);
+
+/**
+ * RULES-CORNERKICK-001 — corner-kick award + placement/cross/timer criteria.
+ * MATCH-CORNER-KICK-AWARD is bound to the rules-corner-kick-award oracle;
+ * CROSS (MEASURED_TARGET) → BLOCKED_MISSING_REFERENCE; the others have no oracle
+ * yet → NOT_EVALUATED.
+ */
+export const BINDING_RULES_CORNERKICK_001: TestImplementationBinding = makeTestBindingWith(
+  "RULES-CORNERKICK-001",
+  ["scn-rules-lifecycle-v1"],
+  [],
+  ["rules-corner-kick-award-evidence"],
+  ["obs-per-tick-v1", "obs-rules-restart-v1"],
+  [],
+  {
+    "MATCH-CORNER-KICK-AWARD": ["rules-corner-kick-award-evidence"],
+    "MATCH-CORNER-KICK-PLACEMENT": [],
+    "MATCH-CORNER-KICK-CROSS": [],
+    "MATCH-CORNER-KICK-TIMER-FREEZE": [],
+  },
+);
+
+/**
+ * RULES-KICKOFF-001 — kickoff / restart freeze + first-touch + re-arm.
+ * MATCH-KICKOFF-FREEZE is bound to the rules-kickoff-freeze oracle; the others
+ * have no oracle yet → NOT_EVALUATED.
+ */
+export const BINDING_RULES_KICKOFF_001: TestImplementationBinding = makeTestBindingWith(
+  "RULES-KICKOFF-001",
+  ["scn-rules-lifecycle-v1"],
+  [],
+  ["rules-kickoff-freeze-evidence"],
+  ["obs-per-tick-v1", "obs-rules-restart-v1"],
+  [],
+  {
+    "MATCH-KICKOFF-FREEZE": ["rules-kickoff-freeze-evidence"],
+    "MATCH-KICKOFF-FIRST-TOUCH": [],
+    "MATCH-RESTART-REARM": [],
+  },
+);
+
+/**
+ * RULES-SCORING-001 — goal detection + goal phase.
+ * MATCH-SCORING-GOAL-DEVENT is bound to the rules-goal-detection oracle; the
+ * goal-phase criterion has no oracle yet → NOT_EVALUATED.
+ */
+export const BINDING_RULES_SCORING_001: TestImplementationBinding = makeTestBindingWith(
+  "RULES-SCORING-001",
+  ["scn-rules-lifecycle-v1"],
+  [],
+  ["rules-goal-detection-evidence"],
+  ["obs-per-tick-v1", "obs-rules-restart-v1"],
+  [],
+  {
+    "MATCH-SCORING-GOAL-DEVENT": ["rules-goal-detection-evidence"],
+    "MATCH-SCORING-GOAL-PHASE": [],
+  },
+);
+
+/**
+ * RULES-TIMING-001 — match timer criteria.
+ * MATCH-TIMER-FREEZE is bound to the rules-timer-freeze oracle (which returns
+ * the honest NOT_EVALUATED); the decrement / halftime / fulltime criteria have no
+ * oracle yet → NOT_EVALUATED.
+ */
+export const BINDING_RULES_TIMING_001: TestImplementationBinding = makeTestBindingWith(
+  "RULES-TIMING-001",
+  ["scn-rules-lifecycle-v1"],
+  [],
+  ["rules-timer-freeze-evidence"],
+  ["obs-per-tick-v1", "obs-rules-restart-v1"],
+  [],
+  {
+    "MATCH-TIMER-DECREMENT": [],
+    "MATCH-TIMER-HALFTIME": [],
+    "MATCH-TIMER-FULLTIME": [],
+    "MATCH-TIMER-FREEZE": ["rules-timer-freeze-evidence"],
+  },
+);
+
+/**
+ * RULES-ANTIHUDDLE-001 — anti-huddle interaction criteria.
+ * No oracle yet → NOT_EVALUATED for both criteria.
+ */
+export const BINDING_RULES_ANTIHUDDLE_001: TestImplementationBinding = makeTestBindingWith(
+  "RULES-ANTIHUDDLE-001",
+  ["scn-rules-lifecycle-v1"],
+  [],
+  [],
+  ["obs-per-tick-v1", "obs-rules-restart-v1"],
+  [],
+  {
+    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": [],
+    "MATCH-RESTART-NEAREST-ONLY": [],
+  },
+);
+
+// ---------------------------------------------------------------------------
 // Registry — all bindings keyed by test_id
 // ---------------------------------------------------------------------------
 
@@ -866,6 +1027,16 @@ export const TEST_BINDINGS: Record<string, TestImplementationBinding> = {
   [BINDING_GK_PARRY_001.test_id]: BINDING_GK_PARRY_001,
   [BINDING_GK_REC_001.test_id]: BINDING_GK_REC_001,
   [BINDING_GK_HIGH_001.test_id]: BINDING_GK_HIGH_001,
+
+  // rules suite bindings
+  [BINDING_RULES_OOP_001.test_id]: BINDING_RULES_OOP_001,
+  [BINDING_RULES_THROWIN_001.test_id]: BINDING_RULES_THROWIN_001,
+  [BINDING_RULES_GOALKICK_001.test_id]: BINDING_RULES_GOALKICK_001,
+  [BINDING_RULES_CORNERKICK_001.test_id]: BINDING_RULES_CORNERKICK_001,
+  [BINDING_RULES_KICKOFF_001.test_id]: BINDING_RULES_KICKOFF_001,
+  [BINDING_RULES_SCORING_001.test_id]: BINDING_RULES_SCORING_001,
+  [BINDING_RULES_TIMING_001.test_id]: BINDING_RULES_TIMING_001,
+  [BINDING_RULES_ANTIHUDDLE_001.test_id]: BINDING_RULES_ANTIHUDDLE_001,
 };
 
 /**

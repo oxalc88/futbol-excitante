@@ -190,6 +190,29 @@ export const OBS_GK_DISTRIBUTION: ObservationDefinition = {
   missing_data_behavior: "INVALID_RUN",
 };
 
+/**
+ * Rules restart observation — the event stream + touch reference needed to
+ * adjudicate the match-rule boundaries and restarts (MATCH_RULES_SPEC §15).
+ * The restart semantics are event-driven, so this observation carries the
+ * ordered event kinds and the ball's authoritative lastTouchRef per tick.
+ */
+export const OBS_RULES_RESTART: ObservationDefinition = {
+  observation_id: "obs-rules-restart-v1",
+  observation_version: "obs-rules-restart-v1",
+  source_kind: "RAW_CANONICAL",
+  producer_boundary: "SIMULATION_SERIALIZER",
+  schema_id: "rules-restart-observation-v1",
+  schema_version: "schema-rules-restart-obs-v1",
+  required_fields: [
+    "tick",
+    "ball.lastTouchRef",
+    "events",
+    "players",
+  ],
+  cadence: "PER_TICK",
+  missing_data_behavior: "INVALID_RUN",
+};
+
 /** All registered observation definitions keyed by observation_id. */
 export const OBSERVATION_DEFINITIONS: Record<string, ObservationDefinition> = {
   [OBS_PER_TICK.observation_id]: OBS_PER_TICK,
@@ -200,6 +223,7 @@ export const OBSERVATION_DEFINITIONS: Record<string, ObservationDefinition> = {
   [OBS_GK_CHASE.observation_id]: OBS_GK_CHASE,
   [OBS_GK_SAVE_CLAIM.observation_id]: OBS_GK_SAVE_CLAIM,
   [OBS_GK_DISTRIBUTION.observation_id]: OBS_GK_DISTRIBUTION,
+  [OBS_RULES_RESTART.observation_id]: OBS_RULES_RESTART,
 };
 
 /**

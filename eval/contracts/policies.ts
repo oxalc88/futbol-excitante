@@ -161,6 +161,17 @@ export const CONFIG_GOALKEEPERS_V1: ConfigMatrixPolicy = {
     "Goalkeepers-suite config referencing the versioned provisional gk-small-sided-v1 model.",
 };
 
+export const CONFIG_RULES_V1: ConfigMatrixPolicy = {
+  policy_id: "config-rules-v1",
+  policy_version: "config-matrix-rules-v1",
+  config_refs: {
+    foundation: "foundation-locomotion-v1",
+    match_rules: "match-rules-v1",
+  },
+  description:
+    "Rules-suite config referencing the versioned provisional match-rules-v1 model (prose-declared; no machine config module exists yet, so this is a nominal reference only).",
+};
+
 // ---------------------------------------------------------------------------
 // Resource policies (referenced by suite resource_policy_id)
 // ---------------------------------------------------------------------------
@@ -462,6 +473,44 @@ export const EXPANSION_GOALKEEPERS_V1: ExpansionManifest = {
   content_hash: "placeholder",
 };
 
+/**
+ * Expansion manifest for the rules suite.
+ *
+ * impact_closure is NONE so expanded = direct set; the suite has no COMMON-*
+ * criteria (the foundation suites own the shared COMMON invariants) so the
+ * expanded tests carry only their own §15 criterion bindings.
+ */
+export const EXPANSION_RULES_V1: ExpansionManifest = {
+  policy_id: "expansion-rules-v1",
+  suite_id: "rules",
+  suite_version: "suite-rules-v1",
+  direct_test_ids: [
+    "RULES-OOP-001",
+    "RULES-THROWIN-001",
+    "RULES-GOALKICK-001",
+    "RULES-CORNERKICK-001",
+    "RULES-KICKOFF-001",
+    "RULES-SCORING-001",
+    "RULES-TIMING-001",
+    "RULES-ANTIHUDDLE-001",
+  ],
+  expanded_test_ids: [
+    "RULES-ANTIHUDDLE-001",
+    "RULES-CORNERKICK-001",
+    "RULES-GOALKICK-001",
+    "RULES-KICKOFF-001",
+    "RULES-OOP-001",
+    "RULES-SCORING-001",
+    "RULES-THROWIN-001",
+    "RULES-TIMING-001",
+  ],
+  common_criterion_ids: [],
+  impact_closure: "NONE",
+  catalog_version: "gameplay-evaluation-v2",
+  registry_set_id: "placeholder",
+  content_hash: "placeholder",
+};
+
 // ---------------------------------------------------------------------------
 // Policy registries
 // ---------------------------------------------------------------------------
@@ -480,6 +529,7 @@ export const CONFIG_POLICIES: Record<string, ConfigMatrixPolicy> = {
   [CONFIG_ACTIONS_V1.policy_id]: CONFIG_ACTIONS_V1,
   [CONFIG_DUELS_V1.policy_id]: CONFIG_DUELS_V1,
   [CONFIG_GOALKEEPERS_V1.policy_id]: CONFIG_GOALKEEPERS_V1,
+  [CONFIG_RULES_V1.policy_id]: CONFIG_RULES_V1,
 };
 
 /** Resource policies keyed by policy_id. */
@@ -506,6 +556,7 @@ export const EXPANSION_MANIFESTS: Record<string, ExpansionManifest> = {
   "expansion-touch-actions-v1": EXPANSION_TOUCH_ACTIONS_V1,
   "expansion-duels-v1": EXPANSION_DUELS_V1,
   "expansion-goalkeepers-v1": EXPANSION_GOALKEEPERS_V1,
+  "expansion-rules-v1": EXPANSION_RULES_V1,
 };
 
 // ---------------------------------------------------------------------------

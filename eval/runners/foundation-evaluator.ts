@@ -201,6 +201,41 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "gk-distribution-oracle-v1",
     oracle_version: "oracle-gk-distribution-v1",
   },
+  // MATCH_RULES_SPEC §15 rules criteria (RULES-SUITE-REGISTRATION): the
+  // protected rules oracles.  Additive; no existing entry is changed and the
+  // duels/foundation/GK criteria keep their existing bindings.
+  "MATCH-OUT-OF-PLAY-DETECT": {
+    oracle_id: "rules-out-of-play-detect-oracle-v1",
+    oracle_version: "oracle-rules-out-of-play-detect-v1",
+  },
+  "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": {
+    oracle_id: "rules-out-of-play-no-last-touch-oracle-v1",
+    oracle_version: "oracle-rules-out-of-play-no-last-touch-v1",
+  },
+  "MATCH-THROW-IN-AWARD": {
+    oracle_id: "rules-throw-in-award-oracle-v1",
+    oracle_version: "oracle-rules-throw-in-award-v1",
+  },
+  "MATCH-GOAL-KICK-AWARD": {
+    oracle_id: "rules-goal-kick-award-oracle-v1",
+    oracle_version: "oracle-rules-goal-kick-award-v1",
+  },
+  "MATCH-CORNER-KICK-AWARD": {
+    oracle_id: "rules-corner-kick-award-oracle-v1",
+    oracle_version: "oracle-rules-corner-kick-award-v1",
+  },
+  "MATCH-SCORING-GOAL-DEVENT": {
+    oracle_id: "rules-goal-detection-oracle-v1",
+    oracle_version: "oracle-rules-goal-detection-v1",
+  },
+  "MATCH-KICKOFF-FREEZE": {
+    oracle_id: "rules-kickoff-freeze-oracle-v1",
+    oracle_version: "oracle-rules-kickoff-freeze-v1",
+  },
+  "MATCH-TIMER-FREEZE": {
+    oracle_id: "rules-timer-freeze-oracle-v1",
+    oracle_version: "oracle-rules-timer-freeze-v1",
+  },
 };
 
 // ---------------------------------------------------------------------------
