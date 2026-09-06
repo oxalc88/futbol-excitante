@@ -3,36 +3,37 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 28
-status: EXHAUSTED
-horizon_id: "rules-spec-and-keeper-legibility"
-created_from_commit: b8ced54
-created_at: 2026-09-05
-reason: "Horizon v27 (COMPLETE 4/4, remote-durable at b8ced54) closed the keeper-verdicts arc: five protected keeper oracles registered (suite produces real verdicts), keeper distribution behavior with observation-level keeper-release telemetry (core byte-identical, deviation adjudicated), the thrice-disclosed COMMON-REFERENCES invariant defect root-caused and fixed (window-union resolution; PASS on all 8 full-match maps) with the COMMON-BOUNDS legacy residual honestly disclosed, and the post-oracle verdict table published (all five GK behavior criteria PASS: 3 organic + 2 driven-labeled). v28 opens the next product gateway and closes the noted residuals: (a) the objective catalog gates the REGULATION milestone behind a dedicated RULES spec (the goalkeeper spec now exists) — draft the dedicated rules spec (throw-in, goal kick, corner, kickoff, scoring, out-of-play) as spec-only, no implementation; (b) keeper visual legibility — the browser-evidence critic noted the keeper has no distinct visual kit marker (role legibility positional only); add an additive presentation-snapshot keeperRole field with renderer rendering + browser frames evidence and parity guards; (c) the possession oracle retains the same latent per-tick lastTouchRef pattern references.ts had — triage it before it false-fails on a future full-match criterion; (d) the lifecyclePhaseSync legacy→core-owned migration assessment (the documented future work whose legacy runs carry the COMMON-BOUNDS residual) — root-cause-grade assessment + migration plan (or migration with byte-identity proofs for accepted pins if safe). Strictly small-sided; no regulation implementation, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 4
+horizon_version: 29
+status: ACTIVE
+horizon_id: "rules-executable-conformance"
+created_from_commit: 8c50b54
+created_at: 2026-09-06
+reason: "Horizon v28 (COMPLETE 4/4, remote-durable at 8c50b54) delivered the rules spec gateway (MATCH_RULES_SPEC: lifecycle model core-owned — now the runner default after the accepted migration with per-pin proofs — per-restart normative semantics, match-rules-v1 parameters, 7 blocked references), keeper visual legibility (additive PresentationSnapshot keeperRole + magenta cone marker with a genuine bridge-capture parity guard), the possession-oracle reference fix (same defect class as the COMMON triage), and the lifecyclePhaseSync migration. v29 makes the rules spec executable: (a) register the rules evaluator suite per the spec §15 criteria (protected oracles, canary-guarded — the GK-KEEPER-ORACLE-REGISTRATION pattern); (b) driven conformance evidence per restart type against the spec + the new suite (the accepted restart machinery is the implementation under test); (c) root-cause the last COMMON-BOUNDS residual (gk-shot-fixture 52.53 m goal-line position — fix the driver if genuinely illegal, or disclose if the bound needs goal-depth geometry derived from constants); (d) publish the honest rules-suite state. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
+current_index: 0
 objectives:
-  - id: RULES-SPEC-DRAFT
-    status: accepted
-    reason: "Draft the dedicated rules spec (specs/MATCH_RULES_SPEC.md or established naming): throw-in, goal kick, corner, kickoff, scoring, out-of-play, timing — spec ONLY (normative semantics + versioned provisional parameters + BLOCKED_MISSING_REFERENCE declarations), NO implementation. Grounded in the accepted restart machinery (RESTART-ANTI-HUDDLE-COHERENCE) and the existing MATCH-* suites; regular rules behavior stays deferred until suites exist per the catalog."
+  - id: RULES-SUITE-REGISTRATION
+    status: pending
+    reason: "Register the rules evaluator suite per MATCH_RULES_SPEC §15 (criteria named there — MATCH-THROW-IN-AWARD, MATCH-GOAL-KICK-AWARD, MATCH-CORNER-KICK-AWARD, MATCH-KICKOFF-FREEZE, MATCH-SCORING-GOAL-DEVENT, MATCH-TIMER-FREEZE etc.): protected oracles + bindings following the GK-KEEPER-ORACLE-REGISTRATION pattern (mutant/canary-guarded, additive, registry discipline), so the rules semantics become executable against observation streams."
     builder: builder-structured
     prerequisite: ""
-  - id: KEEPER-VISUAL-MARKER
-    status: accepted
-    reason: "Keeper visual legibility: additive PresentationSnapshot keeperRole field (populated from the accepted adapter designation through the snapshot path) + renderer kit marker for the designated keeper; browser DYNAMIC_VISUAL frames proving the keeper is visually distinguishable; parity guards (snapshot without the field / marker disabled must render byte-identical to HEAD); renderer consumes snapshots only, owns no football state."
-    builder: builder-gameplay
-    prerequisite: ""
-  - id: POSSESSION-ORACLE-REFERENCE-TRIAGE
-    status: accepted
-    reason: "Triage the latent per-tick lastTouchRef pattern in eval/oracles/possession.ts (lines ~62-70) — the same class of defect COMMON-FULL-MATCH-INVARIANT-TRIAGE fixed in references.ts: verify whether it can false-fail on a future full-match criterion and align it with the window-union resolution (with the same discriminating guards); zero behavior change where the current pattern is correct."
+  - id: RESTART-RULES-CONFORMANCE
+    status: pending
+    reason: "Driven conformance evidence per restart type (throw-in, goal kick, corner, kickoff/post-goal reset) against the rules spec semantics using the accepted restart machinery: per-restart observation streams evaluated through the new rules suite; per-rule verdicts honest (driven where driven); MULTI_TICK trajectories + stashed controls where applicable."
+    builder: builder-structured
+    prerequisite: RULES-SUITE-REGISTRATION
+  - id: GK-GOALLINE-BOUNDS-RESIDUAL
+    status: pending
+    reason: "Root-cause the last COMMON-BOUNDS residual (gk-shot-fixture defending body at |x|=52.5308 m vs the 52.5 m bound, redisclosed twice): is the position genuinely illegal (fix the driver behavior — adapter layer) or does the declared bound need the goal-depth geometry (derive from constants, never invent)? If genuinely illegal, fix with discriminating guards; if the bound needs geometry, widen from constants with proofs. Either way the residual resolves honestly."
     builder: builder-structured
     prerequisite: ""
-  - id: LIFECYCLE-MIGRATION-ASSESSMENT
-    status: accepted
-    reason: "Root-cause-grade assessment of migrating lifecyclePhaseSync legacy->core-owned (the documented future work; legacy runs carry the COMMON-BOUNDS residual because the legacy restart-freeze leaves an out-of-play ball un-reset): enumerate every accepted pin that depends on legacy behavior, prove byte-identity per pin under core-owned (or disclose the delta), and either execute the migration with proofs or publish the honest migration plan with the blocking pins named. The COMMON-BOUNDS legacy residual should turn green (or stay honestly disclosed) as an outcome."
+  - id: RULES-SUITE-STATE
+    status: pending
+    reason: "Honest rules-suite state publication: re-run the rules suite over the conformance evidence and publish the verdict table (per-rule outcomes; blocked references stay blocked; no suite-level PASS claim). BOOKKEEPING; zero gameplay change."
     builder: builder-structured
-    prerequisite: ""
-observable_progress_target: "A dedicated rules spec (spec-only, versioned provisional parameters, blocked references declared); the designated keeper visually distinguishable in the browser with parity-guarded additive snapshot data; the possession oracle latent pattern triaged; the lifecyclePhaseSync migration assessed with per-pin byte-identity proofs or an honest migration plan (the COMMON-BOUNDS legacy residual green or disclosed). NO regulation implementation, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
-last_invalidation_reason: "Horizon v27 COMPLETE 4/4: GK-KEEPER-ORACLE-REGISTRATION (five protected keeper oracles; suite produces real verdicts), GK-DISTRIBUTION-BEHAVIOR (keeper release via the sanctioned PASS path; observation-level keeper-release telemetry; distribution oracle real verdict), COMMON-FULL-MATCH-INVARIANT-TRIAGE (COMMON-REFERENCES real invariant defect fixed; COMMON-BOUNDS residual confined to legacy runs and disclosed), GK-SUITE-VERDICTS-STATE (post-oracle verdict table: all five GK behavior criteria PASS). Remote-durable at b8ced54; strategic reassessment produced Horizon v28 (rules-spec-and-keeper-legibility). Regulation implementation stays deferred until the rules spec AND suites exist; GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
+    prerequisite: RULES-SUITE-REGISTRATION
+    prerequisite_note: "also benefits from RESTART-RULES-CONFORMANCE"
+observable_progress_target: "The rules spec §15 criteria executable through a registered protected rules suite; per-restart conformance verdicts from the accepted restart machinery; the gk-shot-fixture COMMON-BOUNDS residual root-caused and honestly resolved; a published rules-suite verdict state. NO regulation implementation beyond suite-gated behavior, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
+last_invalidation_reason: "Horizon v28 COMPLETE 4/4: RULES-SPEC-DRAFT (dedicated match-rules spec; critic RETRY resolved), KEEPER-VISUAL-MARKER (additive keeperRole presentation field + magenta cone marker with a genuine bridge-capture parity guard), POSSESSION-ORACLE-REFERENCE-TRIAGE (possession oracle false-fail fixed with the window-union resolution), LIFECYCLE-MIGRATION-ASSESSMENT (lifecyclePhaseSync default migrated legacy→core-owned with per-pin proofs; first candidate REJECT for the silently-migrated CPU-DEFENSIVE-TACKLE pin repaired). Remote-durable at 8c50b54; strategic reassessment produced Horizon v29 (rules-executable-conformance). Regulation implementation stays deferred until the rules spec AND suites exist; GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -44,6 +45,8 @@ replan_if:
 ```
 
 ## Completed horizons
+
+Horizon v28 (rules-spec-and-keeper-legibility) — COMPLETE 4/4: RULES-SPEC-DRAFT accepted (dedicated match-rules spec: lifecycle model core-owned vs legacy, per-restart normative semantics grounded in the accepted restart machinery, match-rules-v1 provisional parameters, 7 BLOCKED_MISSING_REFERENCE, adjudicating criteria named-not-registered, deferred rules; critic RETRY resolved — real test IDs cited + all 7 blocked keys pinned). KEEPER-VISUAL-MARKER accepted (additive PlayerPresentation.keeperRole + magenta cone kit marker drawn only when present; absence renders byte-identically to HEAD — genuine bridge-capture SHA parity guard reproduced by critic and integration; 3 event-centered frames, save fixture-driven and disclosed). POSSESSION-ORACLE-REFERENCE-TRIAGE accepted (the possession oracle's orphan-ref check could false-fail on full-match maps — BEFORE 1719/1149/1749/1685; fixed with the accepted window-union resolution, never-anywhere refs still FAIL; possession-CHANGE check byte-identical). LIFECYCLE-MIGRATION-ASSESSMENT accepted (lifecyclePhaseSync default MIGRATED legacy→core-owned with per-pin proofs — divergences exactly at restart windows, no blocking pins; explicit legacy opt-outs for historical reproductions; gk-shot-fixture marginal 52.53 m residual redisclosed; critic REJECT→repair→ACCEPT on the silently-migrated CPU-DEFENSIVE-TACKLE pin). Remote-durable at 8c50b54; strategic reassessment produced Horizon v29.
 
 Horizon v27 (keeper-verdicts-and-common-fixes) — COMPLETE 4/4: GK-KEEPER-ORACLE-REGISTRATION accepted (five protected keeper oracles registered; the goalkeepers suite produces real verdicts; runner-injected gk-role designation observation because the keeper is an adapter-layer designation; registry hash unchanged; mutant-guarded). GK-DISTRIBUTION-BEHAVIOR accepted (keeper release to an observed teammate via the sanctioned PASS path — no omniscience; keeper-release observation-level telemetry injected by the adapter-aware runner, core byte-identical, deviation critic-adjudicated legitimate; distribution oracle real verdict from the driven fixture; organic 0 releases disclosed). COMMON-FULL-MATCH-INVARIANT-TRIAGE accepted (COMMON-REFERENCES was a REAL invariant defect — persistent lastTouchRef resolved per-observation; fixed with window-union resolution + per-tick fallback, PASS on all 8 full-match maps, oracle power retained; COMMON-BOUNDS invariant correct with the residual confined to the 4 legacy phase-sync runs, honestly disclosed, no bound widening). GK-SUITE-VERDICTS-STATE accepted (post-oracle verdict table: all five GK behavior criteria PASS — 3 organic + 2 driven-labeled with organic runs honestly NOT_EVALUATED; COMMON-REFERENCES PASS; COMMON-BOUNDS residual disclosed). Remote-durable at b8ced54; strategic reassessment produced Horizon v28.
 
