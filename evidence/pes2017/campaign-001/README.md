@@ -1,18 +1,28 @@
 # PES 2017 — campaña 001: selección de fuentes
 
+## Cómo obtener los MP4 en cualquier máquina
+
+Los vídeos **no** están en Git. Desde la raíz del repo:
+
+```bash
+python3 evidence/pes2017/campaign-001/raw/media/fetch_media.py
+```
+
+Detalle, recipe yt-dlp, SHA-256 y comandos manuales: [`raw/media/ACQUISITION.md`](raw/media/ACQUISITION.md) · [`raw/media/INDEX.csv`](raw/media/INDEX.csv) · script [`raw/media/fetch_media.py`](raw/media/fetch_media.py).
+
 ## Estado tras recibir la adquisición
 
 Se revisó el commit `b5e0ffb` de `gauntlet-observer-box`: documenta tres descargas de 720p y un resumen de auditoría del entrenamiento. Los MP4 y registros por frame están excluidos de Git y no llegaron a este entorno. La comprobación de consistencia del resumen fue correcta; la revisión visual sigue bloqueada por transferencia de medios. El nuevo intento local terminó con una exigencia de autenticación de YouTube, sin vídeo.
 
 `LFvEnk0mcLI` sustituye al candidato republicado en los 14 cupos reservados. Hay **tres fuentes adquiridas según el operador, cero vídeos locales, cero fuentes admitidas y cero importaciones**. No se han asignado PTS a los 54 cupos.
 
-Véase [la revisión de adquisición y transferencia mínima](raw/media/ACQUISITION-REVIEW.md). Para empezar el piloto basta adjuntar el MP4 de entrenamiento ya descargado; no hace falta volver a descargar todo.
+Véase [la revisión de adquisición y transferencia mínima](raw/media/ACQUISITION-REVIEW.md). Con `fetch_media.py` cualquier máquina puede materializar la evidencia local (si YouTube no exige login); no basta con metadatos en el remoto.
 
 ## Auditoría inicial conservada como historial
 
 Lo que sigue describe el estado anterior a la adquisición de `b5e0ffb`; la revisión enlazada arriba y `source-audits/sources.json` contienen el estado actualizado.
 
-**Resultado: bloqueo de acceso al vídeo. No hay mediciones PES ni referencias importables.**
+**Resultado previo: bloqueo de acceso al vídeo.** Sin archivos locales no hay mediciones PES ni referencias importables.
 
 Se inspeccionaron los metadatos de los tres candidatos citados por el research y se intentó descargar su pista de vídeo. Los tres intentos finalizaron por timeout, sin un archivo de vídeo. Esta es una **auditoría preliminar de acceso/procedencia**, no una auditoría FPS/PTS completada. No se han observado sus fotogramas, la cámara ni las marcas de cancha.
 
