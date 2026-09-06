@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-06T18:05:25.779Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "GK-SUITE-CORE-OWNED-STATE",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "de9fd3b094f95d52e1c4e6c5051ed5ded9323127",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v30 4/4 (horizon COMPLETE): the goalkeepers suite re-published under the core-owned lifecycle (BOOKKEEPING; zero source change — git diff src/ src/adapters/ eval/runners/ eval/oracles/ eval/invariants/ eval/scenarios/ specs/ EMPTY, verified by builder, critic, AND integration; the accepted v27 records GK-SUITE-VERDICTS-STATE / GK-SUITE-ORGANIC-STATE byte-untouched). Core-owned verdict table (re-home live, the GK-CORE-OWNED-ARC-FIX fresh-run default): 8 PASS (GK-POSITIONING-HOLD, GK-NO-FIELD-CHASE, GK-SAVE-CLAIM, GK-ROLE-DESIGNATION, GK-DISTRIBUTION-NO-OMNISCIENCE, COMMON-FINITE, COMMON-REFERENCES, COMMON-BOUNDS) / 3 NOT_EVALUATED (COMMON-DETERMINISTIC single-run duels precedent; GK-SAVE-CLAIM organic 0 save chains; GK-DISTRIBUTION fixture 0 releases) / 1 BLOCKED_MISSING_REFERENCE (GK-*-REF keys) / 1 NEEDS_PERCEPTUAL_REVIEW (GK-*-VIS) / 0 FAIL. The ONE true verdict change vs the accepted v27 legacy table: COMMON-BOUNDS FAIL→PASS (under legacy phase-sync the restarts were frozen so the ball escaped the pitch without a restart — bodies at 59.47–61.18 m, a real illegal position; under core-owned the restart machinery runs and the accepted GK-GOALLINE-BOUNDS-RESIDUAL goal-mouth bound 52.5+0+4.0=56.5 m resolves the team-b keeper goal-mouth position; max|player.x| 52.500/52.531, max|ball.x| 52.629 in the core-owned runs). Two source-flip disclosures (verdicts unchanged): GK-DISTRIBUTION-NO-OMNISCIENCE observation source driven(2 releases @408/433 to player-6)→organic (8 releases @166-220 to observed player-9, fixture 0); GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE run source legacy→core-owned — they PASS only because the re-home is live (the critic verified by re-running both core-owned scenarios with rehomeKeeper:false: both FAIL, team-a keeper 24.622 m off-arc on the fixture, 47.877 m on the continuous run). Forwarded disclosure (from the GK-CORE-OWNED-ARC-FIX reviewers): capture-goalline-bounds-residual.ts and the LIFECYCLE-MIGRATION probe's core-owned gk arms now re-run WITH the re-home at HEAD; accepted bytes regenerate only via the documented rehomeKeeper:false opt-out. Evidence: record_sha256 5cd1c80879d400c2dabfc0ba6d9b195447fc9476f7b6ebb5329877dd2a69204a (no wall-clock field in hashed content — only candidate_commit = HEAD ea467be; two consecutive ordinary-mode runs byte-identical to each other AND to the durable record, file SHA 1ef55d8b…; ordinary runs leave docs/ byte-identical, scratch confined to gitignored test-results/); audit PASS at the tool-canonical BOOKKEEPING shape. Tests: binding 11/11 (incl. an 87 s physical reproduction of both keeper runs through runHeadlessMatch + evaluateSuite(\"goalkeepers\") — the record is not hand-written) + GK families 58/58 (gk-oracle 16, goalkeepers-suite 24, keeper-oracle-registration 5, goalline guard 7, arc-fix guard 6) + stateHash pins 40/40 (CPU-DEFENSIVE-TACKLE, LIFECYCLE-MIGRATION-ASSESSMENT, GK-SUITE bindings) + rules gate 88/88 + evaluator/hygiene 153/153 + stash identity verify-gk-stash 91ff0be 4/4; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass — re-derived the table with its own independent script (zero mismatches across 9 tracked criteria + catalog outcomes + release ticks/targets), programmatically diffed against the accepted v27 record (the only verdict change is COMMON-BOUNDS), reproduced the empty-chain facts with its own chain checks, verified the re-home dependency via rehomeKeeper:false re-runs; integration (glm5.3-flash) ACCEPT first pass — all batteries re-run green, live re-run re-emits exactly the recorded per-run verdicts (0 mismatches), scope confirmed as exactly the horizon's item 4/4 with no creep. claims_not_made: no suite-level PASS claim (negative-control binding) / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity or invented reference envelope (the blocked GK reference keys — reaction latency, save probability, wrong-foot reversal, high-cross claim threshold, parry energy ratio — stay BLOCKED_MISSING_REFERENCE) / no criterion upgraded beyond the executed evaluator / no oracle/catalog/invariant/observation/scenario/spec change / no accepted record mutation / zero gameplay change."
+}

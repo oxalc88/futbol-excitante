@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-06T16:04:00Z
+measured_at: 2026-09-06T18:06:00Z
 tracking_contract_version: 1
-last_tracked_objective: GK-CORE-OWNED-ARC-FIX
-usage_aggregates_through: GK-CORE-OWNED-ARC-FIX
-clock_aggregates_through: GK-CORE-OWNED-ARC-FIX
-model_evaluation_through: GK-CORE-OWNED-ARC-FIX
+last_tracked_objective: GK-SUITE-CORE-OWNED-STATE
+usage_aggregates_through: GK-SUITE-CORE-OWNED-STATE
+clock_aggregates_through: GK-SUITE-CORE-OWNED-STATE
+model_evaluation_through: GK-SUITE-CORE-OWNED-STATE
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,18 +42,18 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 563h 06m |
+| Calendar span (first work → measurement) | 565h 08m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~166h est. |
-| Sum of per-step agent time | ~163h 27m |
+| Active work (anything running) | ~167h est. |
+| Sum of per-step agent time | ~164h 48m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-06T16:04:00Z`.
-Recomputed 2026-09-06 at the GK-CORE-OWNED-ARC-FIX acceptance
-(Horizon v30 3/4): 192 accepted per-step rows summing to ~163h 27m (the new
-objective adds ~1h 38m: builder ~43m incl. the 402-reroute relaunch /
-critic ~33m / integration 21m / commit <1m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-06T18:06:00Z`.
+Recomputed 2026-09-06 at the GK-SUITE-CORE-OWNED-STATE acceptance
+(Horizon v30 4/4): 193 accepted per-step rows summing to ~164h 48m (the new
+objective adds ~1h 21m: builder ~33m / critic ~33m / integration 14m /
+commit <1m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -275,6 +275,7 @@ invoices.
 | RULES-FACTS-DEPTH-CONFORMANCE | accepted | ~1h 57m | ~62m | 26m | 28m | <1m | n/a | n/a |
 | CORNER-DRIVEN-CONFORMANCE | accepted | ~2h 02m | ~41m | 62m | 18m | <1m | n/a | n/a |
 | GK-CORE-OWNED-ARC-FIX | accepted | ~1h 38m | ~43m | 33m | 21m | <1m | n/a | n/a |
+| GK-SUITE-CORE-OWNED-STATE | accepted | ~1h 21m | ~33m | 33m | 14m | <1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -605,6 +606,7 @@ on an H task is the interesting result.
 | RULES-FACTS-DEPTH-CONFORMANCE | deepseek-v4-flash | H | High - the remaining non-corner NOT_EVALUATED rules criteria evaluated from existing serialized facts with NO injection change: 10 additive protected oracle checks (placement/serve/timer-freeze/decrement/halftime/fulltime/goal-phase/kickoff-first-touch) + ONE NEW driven full-match timing fixture (5v5-full-match-timing-v1, 240-tick halves) making the timer transitions genuinely observable (literal 1→0 zero-crossing; runner-stamped labels explicitly rejected); 3 anti-huddle criteria honestly NOT_EVALUATED (no adapter-designation facts in committed streams); verdict table 17 PASS / 2 BLOCKED / 6 NOT_EVALUATED / 0 FAIL | 0 | A | first-pass ACCEPT; critic re-ran the production runner + evaluator on all three live streams with 0 mismatches across 3×25 verdicts and verified the timer evidence genuine; integration verified additive-only line-by-line + wider gate 149/149 + silent-consumer hunt clean |
 | CORNER-DRIVEN-CONFORMANCE | deepseek-v4-flash | H | High - a GENUINE driven corner via adapter initial state only (5v5-corner-driven-v1: ball inside the +x goal-line span outside the posts + defender positioned to head back toward its own goal; empty inputProgram/scheduledEvents): the core's own §8.1 award to team-a after a defending-team last touch over its own goal line + §8.2 flag execution; 2 new protected oracles (placement/timer-freeze) + 7 corner falsifier guards; CORNER-KICK-CROSS stays BLOCKED; goal-kick neighbour discriminator; 4 event-centered Chromium frames; critic RETRY enforced the strictest-class audit (DYNAMIC_VISUAL incl. semantic visual sequence) and the sequence.json path-binding convention — fixed with the pinned record byte-unchanged | 1 | A | RETRY→ACCEPT; critic reproduced the driven corner across seeds/positions and the strictest-class FAIL, verified all 3 fixes mechanically with the record byte-frozen; integration reproduced all variants + frame SHAs proven real-capture + batteries green |
 | GK-CORE-OWNED-ARC-FIX | deepseek-v4-flash (reroute) | M | Medium-High - root-cause + adapter-layer fix of the core-owned team-a keeper off-arc drift: the post-goal reset (applyGoalReset re-places every body at its scenario kickoff home) strands a keeper whose scenario kickoff home is 24.62 m off its own goal arc (team-b's is on-arc; legacy masked the reset by overriding the phase every tick; chaser=none on every off-arc tick — not a chase bug); fix: pure deterministic rehomeKeeperToArc (versioned gk-small-sided-v1 geometry, ±2.5 lateral clamp) gated rehomeKeeper ?? (gkBehavior && core-owned) with an opt-out — the core's own reset then restores on-arc positions; AFTER GK-POSITIONING-HOLD / GK-NO-FIELD-CHASE PASS (0/600 off-arc) | 0 | A | first-pass ACCEPT (after the 402 quota relaunch of the builder itself); critic reproduced the exact reset mechanism + all before/after numbers, classified every runHeadlessMatch caller by gate flags, re-ran 324 tests + stash verification; integration re-ran 250 tests + independently confirmed the two intended fresh-run consumers (regenerable via rehomeKeeper:false) |
+| GK-SUITE-CORE-OWNED-STATE | deepseek-v4-flash | M | Medium - the goalkeepers suite re-published under the core-owned lifecycle (BOOKKEEPING, zero source change): core-owned verdict table 8 PASS / 3 NOT_EVALUATED / 1 BLOCKED / 1 NEEDS_PERCEPTUAL_REVIEW / 0 FAIL with the one true verdict change COMMON-BOUNDS FAIL→PASS (legacy escape gone + the accepted 56.5 m goal-mouth bound) and two source-flip disclosures (DISTRIBUTION driven→organic; POSITIONING/NO-FIELD-CHASE legacy→core-owned, PASS only with the re-home live — verified by rehomeKeeper:false re-runs); forwarded disclosure on the two producers that re-run with the re-home at HEAD | 0 | A | first-pass ACCEPT; critic re-derived the table with its own independent script (zero mismatches), programmatically diffed vs v27 (only COMMON-BOUNDS changed), reproduced the empty-chain facts, verified the rehomeKeeper:false dependency; integration re-ran the batteries + a live re-run re-emitting the recorded verdicts (0 mismatches) |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -899,6 +901,8 @@ on an H task is the interesting result.
 | CORNER-DRIVEN-CONFORMANCE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | all batteries re-run green: rules gate 165 tests (8 files), registry/provenance/hygiene 75, GK/stateHash pins 28, evaluator-map consumers 116, browser corner 2/2 in Chromium, typecheck 0; driven corner independently reproduced across seeds 7/123/999 and defender x 46/47/48; per-criterion union reproduces 20 PASS / 2 BLOCKED / 3 NOT_EVALUATED / 0 FAIL; frame SHAs byte-identical across own ordinary-mode Chromium captures (real capture, not hand-patched); scenario collision-free + driven-fixture discipline (empty inputProgram/scheduledEvents); record hash recomputed MATCH with no wall-clock field; 916-file docs/ manifest byte-identical after all verification runs; audit conditions re-derived from the audit source (3–5 labeled frames, SHA uniqueness) |
 | GK-CORE-OWNED-ARC-FIX | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: root cause reproduced exactly (goal tick 391; single-tick reset jump 24.6711 m at tick 451 to the scenario kickoff home with velocity 0; maxDist 24.62214…, lateral 10, offArc 150/406, onArcRatio 0.6305; team-b metrics byte-equal both runs; legacy opt-out masks the reset); fix verified pure/deterministic/idempotent using versioned v1 production functions, designating via the same designateKeeperFromLayout, triggering only for designated keepers >4.0 m off-arc; AFTER reproduced (pass/pass, maxDist 2.5, 0/600 off-arc; reset still executes but lands on-arc); silent-consumer hunt: every accepted-pin producer threads explicit legacy or gkBehavior:false → byte-identical; stash verify-gk-stash 91ff0be 4/4; exactly two fresh-run consumers change (both target the defect; goalline guard still 7/7; migration binding reads persisted artifacts); oracles unchanged and mutant-preserved; 324 vitest tests + typecheck 0 re-run; record hash recomputed exact |
 | GK-CORE-OWNED-ARC-FIX | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | change confined to eval/runners/headless-match.ts (92 lines); helper imports only versioned v1 geometry (radius 4.0, lateral max 2.5, offset 0); 250 tests re-run: guard 6/6 + GK families 83/83 + stateHash pins 50/50 + integration/runner 117/117 + typecheck 0 + verify-gk-stash 4/4; silent-consumer hunt: every accepted-pin producer verified legacy/gkBehavior:false per-file → byte-identical; exactly two fresh-run consumers change (goalline-residual producer + migration probe core-owned gk arms — both target the fixed defect, regenerable via rehomeKeeper:false, which reproduces the BEFORE state); browser composition root has zero references to the helper (adapter-owned behavior untouched); record hash recomputed MATCH; two ordinary-mode runs byte-identical to the durable record (no wall-clock field); vitest onTaskUpdate RPC timeout noted as pre-existing under parallel load |
+| GK-SUITE-CORE-OWNED-STATE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: producer re-run twice byte-identical (run1 == run2 == durable record); its own independent script (not the builder's) re-ran runHeadlessMatch + evaluateSuite("goalkeepers") over both core-owned runs — zero mismatches across 9 tracked criteria + catalog outcomes + release ticks/targets; programmatic diff vs the accepted v27 record: the ONLY verdict change is COMMON-BOUNDS FAIL→PASS; the 3 NOT_EVALUATED reproduced empty by its own chain checks (0 keeper contacts in the 12-tick reaction window after 10 opponent shots; 0 keeper-release events; evaluator excludes single-run DETERMINISTIC); rehomeKeeper:false re-runs confirm the keeper PASSes depend on the re-home (24.622 m / 47.877 m off-arc without it); embedded v27 copy byte-faithful (embedded record_sha256 = accepted 222b5f61…); record hash recomputed exact; audit re-run PASS |
+| GK-SUITE-CORE-OWNED-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | zero tracked-file modification; binding 11/11 (incl. an 87 s physical reproduction through the production runner + evaluator — the record is not hand-written); GK families 58/58 + stateHash pins 40/40 + rules gate 88/88 + evaluator/hygiene 153/153 + verify-gk-stash 4/4 + typecheck 0; two consecutive ordinary-mode runs byte-identical to the durable record (1ef55d8b…) with docs/ SHA-verified untouched; live re-run re-emits exactly the recorded per-run verdicts (continuous 8 releases @166-220 → player-9; fixture 0; COMMON-BOUNDS PASS both) — 0 mismatches; publication is data not code with the WIP gate intact; scope confirmed as exactly horizon item 4/4 (current_index 3 → last item; prerequisite accepted) |
 | GK-SUITE-VERDICTS-STATE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 reproduced byte-exact in its own ephemeral producer re-run; per-run verdict table matches raw telemetry (continuous 0 releases/0 save chains -> SAVE-CLAIM/DISTRIBUTION honestly NOT_EVALUATED; fixture releases @408/433 -> PASS); all 5 provenance pins verified against the cited manifests; driven-vs-organic labeling accurate; 140/140 neighbors + typecheck 0 |
 | GK-SUITE-VERDICTS-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 151/151 neighbor tests re-run; typecheck 0; record hash recomputed byte-exact + ordinary-mode producer re-run left docs/evidence byte-identical; all 5 cited manifests read verbatim; zero evaluator/gameplay change |
 
