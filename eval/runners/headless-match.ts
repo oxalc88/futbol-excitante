@@ -173,6 +173,23 @@ export interface HeadlessMatchConfig {
    *   docs/evidence/LIFECYCLE-MIGRATION-ASSESSMENT/RESULT.md).
    */
   lifecyclePhaseSync?: "legacy" | "core-owned";
+  /**
+   * Serialize the restart facts the protected rules oracles need
+   * (RESTART-RULES-CONFORMANCE). When true, the runner injects, as
+   * observation-level telemetry annotations (the gk-role precedent, post-loop
+   * and additive):
+   *   - the core's per-tick post-step `matchPhase` and `matchTimer` (a
+   *     `core-match-phase` event per observation), and
+   *   - the committed restart-executed events (`throw-in-executed`,
+   *     `goal-kick-executed`, `corner-kick-executed`) read from the core's
+   *     persistent `state.events`, placed into the matching-tick observation.
+   * This closes the serialization limitation so `MATCH-TIMER-FREEZE` and the
+   * `MATCH-*-AWARD` criteria become honestly measurable. It never affects
+   * inputs, steps, or state hashes (all are committed before the injection),
+   * and when false (the default) the observation stream is byte-identical to
+   * every accepted non-gated run.
+   */
+  serializeRestartFacts?: boolean;
 }
 
 /**
@@ -510,6 +527,7 @@ export function runHeadlessMatch(
     gkBehavior = false,
     browserParityObservations = false,
     lifecyclePhaseSync = DEFAULT_LIFECYCLE_PHASE_SYNC,
+    serializeRestartFacts = false,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
 
@@ -615,6 +633,16 @@ export function runHeadlessMatch(
   // browser wiring hands its adapters), not the runner's derived phase label.
   const coreMatchPhases: SimMatchPhase[] = [];
 
+  // RESTART-RULES-CONFORMANCE: per-tick POST-STEP core phase + timer, index-
+  // aligned with the observations (this is the phase/timer that governed the
+  // core's timer block for that tick, so the TIMER-FREEZE oracle can adjudicate
+  // it). Populated only when `serializeRestartFacts` is on; value is captured
+  // from the state at the start of the following iteration (the previous
+  // tick's post-step state) and, for the final tick, from one snapshot after
+  // the loop. Never affects inputs / steps / hashes.
+  const postStepPhases: SimMatchPhase[] = [];
+  const postStepTimers: number[] = [];
+
   // Phase tracking.
   let hadGoal = false;
   let currentPhase: MatchPhase = "kickoff";
@@ -713,6 +741,15 @@ export function runHeadlessMatch(
       // equal to the core's own phase on every restart tick under the
       // core-owned policy (browser parity).
       coreMatchPhases.push(syncedState.matchPhase);
+      // RESTART-RULES-CONFORMANCE: the `current` snapshot (taken before any
+      // lifecycle sync) is the post-step state of the PREVIOUS tick, so it is
+      // the phase/timer that governed that tick's timer block. Capture it at
+      // index i-1 (the loop starts at i=0, so skip i=0 and fill the final tick
+      // after the loop). Gated on serializeRestartFacts.
+      if (serializeRestartFacts && i > 0) {
+        postStepPhases[i - 1] = current.matchPhase;
+        postStepTimers[i - 1] = current.matchTimer;
+      }
     }
 
     // a. Snapshot the world (deep clone — CPU adapters only read).
@@ -874,6 +911,78 @@ export function runHeadlessMatch(
           releaseTargetPlayerId: release.releaseTargetPlayerId,
           releaseTargetPosition: release.releaseTargetPosition,
           keeperPosition: release.keeperPosition,
+        },
+      });
+    }
+  }
+
+  // RESTART-RULES-CONFORMANCE: close the serialization limitation so the
+  // protected rules oracles can adjudicate the restart-AWARD (throw-in /
+  // goal-kick / corner-kick) and the TIMER-FREEZE criteria. This is gated on
+  // `serializeRestartFacts` (off => every accepted non-gated stream stays
+  // byte-identical), runs post-loop (inputs, steps and state hashes are all
+  // already committed, so it provably cannot affect them) and is additive
+  // (observation-level annotations, the gk-role precedent; the core, its event
+  // union and its contracts are untouched).
+  if (serializeRestartFacts && observations.length > 0) {
+    // The final snapshot after the loop is the post-step state of the last
+    // tick, so its phase/timer fill the final index (the loop captured indices
+    // 0..n-2 from the state at the start of each following iteration).
+    const finalState = sim.snapshot();
+    postStepPhases[observations.length - 1] = finalState.matchPhase;
+    postStepTimers[observations.length - 1] = finalState.matchTimer;
+
+    const obsByTick = new Map<number, (typeof observations)[number]>();
+    for (const o of observations) obsByTick.set(o.tick, o);
+
+    // 1. Inject the committed restart-executed events into the matching-tick
+    //    observation. The core writes these to its persistent `state.events`,
+    //    not to the per-step event array the observation stream carries, which
+    //    is exactly why the restart-AWARD criteria were NOT_EVALUATED. Each
+    //    event keeps its committed id/tick/sequence so the award oracles pair
+    //    it with the right boundary event.
+    const committedEvents = finalState.events;
+    const restartExecKinds = new Set([
+      "throw-in-executed",
+      "goal-kick-executed",
+      "corner-kick-executed",
+    ]);
+    for (const ev of committedEvents) {
+      if (!restartExecKinds.has(ev.kind)) continue;
+      const o = obsByTick.get(ev.tick);
+      if (o === undefined) continue;
+      o.events.push({
+        id: ev.id,
+        tick: ev.tick,
+        sequence: ev.sequence,
+        kind: ev.kind,
+        label: ev.label,
+        payload: ev.payload,
+      });
+    }
+
+    // 2. Inject the per-tick core post-step matchPhase + matchTimer as a single
+    //    `core-match-phase` observation event (the contract checkTimerFreeze
+    //    reads). Sequence is computed after the restart-executed events so it
+    //    never collides with an existing event id/sequence in that observation.
+    for (let i = 0; i < observations.length; i++) {
+      const o = observations[i];
+      let maxSeq = 0;
+      for (const ev of o.events) if (ev.sequence > maxSeq) maxSeq = ev.sequence;
+      o.events.push({
+        id: `core-match-phase-${o.tick}`,
+        tick: o.tick,
+        sequence: maxSeq + 1,
+        kind: "core-match-phase",
+        label: `core post-step phase ${String(postStepPhases[i])} timer ${postStepTimers[i]}`,
+        payload: {
+          // postPhase + matchTimer drive the TIMER-FREEZE oracle; startPhase is
+          // the phase the core saw at the START of this tick, which the restart
+          // machinery opens a window from (so `pairRestartBoundaries` can tell
+          // a phase-opening boundary from one the core ignored mid-window).
+          matchPhase: postStepPhases[i],
+          matchTimer: postStepTimers[i],
+          startPhase: coreMatchPhases[i],
         },
       });
     }

@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "objective_id": "RESTART-RULES-CONFORMANCE",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-restart-rules-conformance.ts",
+  "driver": "eval/runners/headless-match.ts with lifecyclePhaseSync:'core-owned' + the gated serializeRestartFacts observation extension (the gk-role precedent, post-loop and additive). The restart-AWARD / TIMER-FREEZE criteria are evaluated via evaluateSuite('rules', observations).",
+  "activation": {
+    "field": "runHeadlessMatch({ serializeRestartFacts })",
+    "meaning": "the runner injects the core's per-tick post-step matchPhase + matchTimer (a core-match-phase event per tick), the starting phase (for phase-aware award pairing), and the committed restart-executed events into the observation stream. Off (the default) the stream is byte-identical to every accepted non-gated run.",
+    "set_by": [
+      "eval/runners/headless-match.ts runHeadlessMatch({ serializeRestartFacts }) (these pinned runs)",
+      "tests/unit/eval/restart-rules-serialization.test.ts (live + stashed guards)",
+      "NOT the browser composition root"
+    ]
+  },
+  "disclosures": [
+    "No organic fixture produced a corner-kick execution: a defender last-touch on its own goal line is rare in this engine (the touch redirects the ball back toward play before the crossing), so MATCH-CORNER-KICK-AWARD is honestly NOT_EVALUATED on the driven runs. The corner oracle is unit-tested (PASS/FAIL on a synthetic stream) and the same injection path correctly carries throw-in and goal-kick executions.",
+    "The serialization extension is an observation-level annotation (the gk-role precedent): git diff src/simulation/ and src/contracts/ are empty; the core, its event union and its contracts are untouched, and serializeRestartFacts:false is byte-identical.",
+    "No criterion is upgraded beyond what the executed evaluator returns; a PASS is reported only where the driven stream genuinely carries the semantics, and NOT_EVALUATED elsewhere. No forced outcome."
+  ],
+  "runs": [
+    {
+      "id": "rules-throw-in-live",
+      "restart_type": "throw-in",
+      "role": "the accepted throw-in fixture (driven): two organic throw-in windows inside coherent 5v5 CPU-vs-CPU play",
+      "scenario": "5v5-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-throwin.v1.json",
+      "ticks": 1800,
+      "gated_serialization": true,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-throwin.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: true })",
+      "observation_count": 1800,
+      "event_kind_counts": {
+        "core-match-phase": 1800,
+        "ball-touchline-out-of-play": 4,
+        "player-ball-contact": 32,
+        "pass": 8,
+        "second-touch": 105,
+        "player-player-contact": 141,
+        "throw-in-executed": 2,
+        "pitch-contact": 6,
+        "shot": 41,
+        "goal": 2
+      },
+      "phase_distribution": {
+        "kickoff": 1,
+        "playing": 1618,
+        "throw-in": 120,
+        "goal": 60,
+        "fulltime": 1
+      },
+      "executed_restart_counts": {
+        "throw-in": 2,
+        "goal-kick": 0,
+        "corner": 0
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "PASS",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "timer_freeze_ticks": 182,
+      "determinism": {
+        "state_hash_of_hashes": "c4d352291e98f8d6fcce04c495129e9bf3236ccdb98d0702cef1c5177b1cdd59",
+        "final_state_hash": "fnv1a64-v1:2e17befdab442b94"
+      }
+    },
+    {
+      "id": "rules-throw-in-stashed",
+      "restart_type": "throw-in",
+      "role": "that fixture with serializeRestartFacts:false — the stash-identity control: observations untreated, state-hash chain identical to the gated run",
+      "scenario": "5v5-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-throwin.v1.json",
+      "ticks": 1800,
+      "gated_serialization": false,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-throwin.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: false })",
+      "observation_count": 1800,
+      "event_kind_counts": {
+        "ball-touchline-out-of-play": 4,
+        "player-ball-contact": 32,
+        "pass": 8,
+        "second-touch": 105,
+        "player-player-contact": 141,
+        "pitch-contact": 6,
+        "shot": 41,
+        "goal": 2
+      },
+      "phase_distribution": {},
+      "executed_restart_counts": {
+        "throw-in": 0,
+        "goal-kick": 0,
+        "corner": 0
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "timer_freeze_ticks": 0,
+      "determinism": {
+        "state_hash_of_hashes": "c4d352291e98f8d6fcce04c495129e9bf3236ccdb98d0702cef1c5177b1cdd59",
+        "final_state_hash": "fnv1a64-v1:2e17befdab442b94"
+      },
+      "stash_identity": {
+        "injected_core_match_phase_events": 0,
+        "injected_restart_executed_events": 0,
+        "gated_on_state_hash_of_hashes": "c4d352291e98f8d6fcce04c495129e9bf3236ccdb98d0702cef1c5177b1cdd59",
+        "state_hash_chain_identical": true
+      }
+    },
+    {
+      "id": "rules-goal-kick-live",
+      "restart_type": "goal-kick",
+      "role": "the accepted arc fixture (driven): an early shot off the goal-line scramble returns as a goal kick; goals return as post-goal restarts",
+      "scenario": "5v5-restart-arc-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-arc.v1.json",
+      "ticks": 1800,
+      "gated_serialization": true,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-arc.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: true })",
+      "observation_count": 1800,
+      "event_kind_counts": {
+        "core-match-phase": 1800,
+        "player-ball-contact": 41,
+        "shot": 77,
+        "ball-out-of-play": 1,
+        "goal-kick-executed": 1,
+        "pass": 4,
+        "second-touch": 60,
+        "player-player-contact": 237,
+        "pitch-contact": 2,
+        "goal": 3
+      },
+      "phase_distribution": {
+        "kickoff": 1,
+        "playing": 1618,
+        "goal-kick": 60,
+        "goal": 120,
+        "fulltime": 1
+      },
+      "executed_restart_counts": {
+        "throw-in": 0,
+        "goal-kick": 1,
+        "corner": 0
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "PASS",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "timer_freeze_ticks": 182,
+      "determinism": {
+        "state_hash_of_hashes": "1acd2d83745a12a00dc1bc920f38bb0a8a111f6b6981b07aa27e5a446273f989",
+        "final_state_hash": "fnv1a64-v1:cf7a0272a2dab120"
+      }
+    },
+    {
+      "id": "rules-goal-kick-stashed",
+      "restart_type": "goal-kick",
+      "role": "that fixture with serializeRestartFacts:false — the stash-identity control",
+      "scenario": "5v5-restart-arc-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-arc.v1.json",
+      "ticks": 1800,
+      "gated_serialization": false,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-arc.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: false })",
+      "observation_count": 1800,
+      "event_kind_counts": {
+        "player-ball-contact": 41,
+        "shot": 77,
+        "ball-out-of-play": 1,
+        "pass": 4,
+        "second-touch": 60,
+        "player-player-contact": 237,
+        "pitch-contact": 2,
+        "goal": 3
+      },
+      "phase_distribution": {},
+      "executed_restart_counts": {
+        "throw-in": 0,
+        "goal-kick": 0,
+        "corner": 0
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "timer_freeze_ticks": 0,
+      "determinism": {
+        "state_hash_of_hashes": "1acd2d83745a12a00dc1bc920f38bb0a8a111f6b6981b07aa27e5a446273f989",
+        "final_state_hash": "fnv1a64-v1:cf7a0272a2dab120"
+      },
+      "stash_identity": {
+        "injected_core_match_phase_events": 0,
+        "injected_restart_executed_events": 0,
+        "gated_on_state_hash_of_hashes": "1acd2d83745a12a00dc1bc920f38bb0a8a111f6b6981b07aa27e5a446273f989",
+        "state_hash_chain_identical": true
+      }
+    }
+  ]
+}

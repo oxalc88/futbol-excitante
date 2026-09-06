@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "objective_id": "RESTART-RULES-CONFORMANCE",
+  "suite_id": "rules",
+  "suite_version": "suite-rules-v1",
+  "produced_by": "scripts/capture-restart-rules-conformance.ts",
+  "evidence_class": "MULTI_TICK",
+  "lifecycle_phase_sync": "core-owned",
+  "by_run": {
+    "rules-throw-in-live": {
+      "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+      "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+      "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+      "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+      "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+      "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+      "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+      "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+      "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+      "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+      "MATCH-KICKOFF-FREEZE": "PASS",
+      "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+      "MATCH-RESTART-REARM": "NOT_EVALUATED",
+      "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+      "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+      "MATCH-SCORING-GOAL-DEVENT": "PASS",
+      "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+      "MATCH-THROW-IN-AWARD": "PASS",
+      "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+      "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+      "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+      "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+      "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+      "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+      "MATCH-TIMER-FREEZE": "PASS"
+    },
+    "rules-goal-kick-live": {
+      "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+      "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+      "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+      "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+      "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+      "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+      "MATCH-GOAL-KICK-AWARD": "PASS",
+      "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+      "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+      "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+      "MATCH-KICKOFF-FREEZE": "PASS",
+      "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+      "MATCH-RESTART-REARM": "NOT_EVALUATED",
+      "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+      "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+      "MATCH-SCORING-GOAL-DEVENT": "PASS",
+      "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+      "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+      "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+      "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+      "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+      "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+      "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+      "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+      "MATCH-TIMER-FREEZE": "PASS"
+    }
+  },
+  "by_criterion": {
+    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-RESTART-NEAREST-ONLY": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-CORNER-KICK-AWARD": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-CORNER-KICK-PLACEMENT": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-CORNER-KICK-CROSS": [
+      "rules-throw-in-live=BLOCKED_MISSING_REFERENCE",
+      "rules-goal-kick-live=BLOCKED_MISSING_REFERENCE"
+    ],
+    "MATCH-CORNER-KICK-TIMER-FREEZE": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-GOAL-KICK-AWARD": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=PASS"
+    ],
+    "MATCH-GOAL-KICK-PLACEMENT": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-GOAL-KICK-DISTRIBUTION": [
+      "rules-throw-in-live=BLOCKED_MISSING_REFERENCE",
+      "rules-goal-kick-live=BLOCKED_MISSING_REFERENCE"
+    ],
+    "MATCH-GOAL-KICK-TIMER-FREEZE": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-KICKOFF-FREEZE": [
+      "rules-throw-in-live=PASS",
+      "rules-goal-kick-live=PASS"
+    ],
+    "MATCH-KICKOFF-FIRST-TOUCH": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-RESTART-REARM": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-OUT-OF-PLAY-DETECT": [
+      "rules-throw-in-live=PASS",
+      "rules-goal-kick-live=PASS"
+    ],
+    "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": [
+      "rules-throw-in-live=PASS",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-SCORING-GOAL-DEVENT": [
+      "rules-throw-in-live=PASS",
+      "rules-goal-kick-live=PASS"
+    ],
+    "MATCH-SCORING-GOAL-PHASE": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-THROW-IN-AWARD": [
+      "rules-throw-in-live=PASS",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-THROW-IN-PLACEMENT": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-THROW-IN-SERVE": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-THROW-IN-TIMER-FREEZE": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-TIMER-DECREMENT": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-TIMER-HALFTIME": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-TIMER-FULLTIME": [
+      "rules-throw-in-live=NOT_EVALUATED",
+      "rules-goal-kick-live=NOT_EVALUATED"
+    ],
+    "MATCH-TIMER-FREEZE": [
+      "rules-throw-in-live=PASS",
+      "rules-goal-kick-live=PASS"
+    ]
+  },
+  "verdict_summary": {
+    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+    "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+    "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-AWARD": "PASS",
+    "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+    "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-KICKOFF-FREEZE": "PASS",
+    "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+    "MATCH-RESTART-REARM": "NOT_EVALUATED",
+    "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+    "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+    "MATCH-SCORING-GOAL-DEVENT": "PASS",
+    "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+    "MATCH-THROW-IN-AWARD": "PASS",
+    "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+    "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+    "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+    "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+    "MATCH-TIMER-FREEZE": "PASS"
+  },
+  "disclosures": [
+    "MATCH-CORNER-KICK-AWARD is NOT_EVALUATED on the driven runs (no corner-kick execution observed).",
+    "No criterion is upgraded beyond what the executed evaluator returns.",
+    "No PES 2017 fidelity / measured-envelope claim; BLOCKED_MISSING_REFERENCE criteria stay blocked."
+  ],
+  "record_sha256": "71fbd6bf12c9bc69b97361540b8c74db4cb696464f5e8efb8aacfb8863e5873f"
+}

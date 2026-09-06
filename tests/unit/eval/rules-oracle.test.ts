@@ -387,3 +387,91 @@ describe("MATCH-TIMER-FREEZE oracle", () => {
     expect(res).toHaveLength(0);
   });
 });
+
+// ---------------------------------------------------------------------------
+// MATCH-TIMER-FREEZE (RESTART-RULES-CONFORMANCE: serialized phase/timer facts)
+// ---------------------------------------------------------------------------
+
+/** A runner-injected `core-match-phase` observation event (postPhase + startPhase + timer). */
+function corePhase(tick: number, postPhase: string, startPhase: string, timer: number): ObsEvent {
+  return {
+    id: `core-match-phase-${tick}`,
+    tick,
+    sequence: 10,
+    kind: "core-match-phase",
+    payload: { matchPhase: postPhase, matchTimer: timer, startPhase },
+  };
+}
+
+describe("MATCH-TIMER-FREEZE oracle with serialized phase/timer facts", () => {
+  it("PASS when the ball-in-play clock stays frozen during a set-piece run", () => {
+    const obs = [
+      makeObs(100, [corePhase(100, "playing", "playing", 100)]),
+      makeObs(101, [corePhase(101, "throw-in", "playing", 100)]),
+      makeObs(102, [corePhase(102, "throw-in", "throw-in", 100)]),
+      makeObs(103, [corePhase(103, "playing", "throw-in", 100)]),
+    ];
+    const res = checkTimerFreeze(obs);
+    expect(res[0].id).toBe("rules-timer-freeze-held");
+    expect(res[0].status).toBe("pass");
+  });
+
+  it("FAIL when the clock decrements across a frozen phase tick", () => {
+    const obs = [
+      makeObs(100, [corePhase(100, "playing", "playing", 100)]),
+      makeObs(101, [corePhase(101, "throw-in", "playing", 99)]),
+    ];
+    const res = checkTimerFreeze(obs);
+    expect(res[0].id).toBe("rules-timer-freeze-mutated");
+    expect(res[0].status).toBe("fail");
+  });
+
+  it("does not FAIL the legitimate playing→fulltime zero-crossing entry", () => {
+    const obs = [
+      makeObs(99, [corePhase(99, "playing", "playing", 1)]),
+      makeObs(100, [corePhase(100, "fulltime", "playing", 0)]),
+    ];
+    const res = checkTimerFreeze(obs);
+    expect(res[0].status).toBe("pass");
+  });
+
+  it("NOT_EVALUATED when there is no frozen (non-playing, non-halftime) tick", () => {
+    const obs = [
+      makeObs(1, [corePhase(1, "playing", "playing", 100)]),
+      makeObs(2, [corePhase(2, "playing", "playing", 99)]),
+    ];
+    const res = checkTimerFreeze(obs);
+    expect(res[0].status).toBe("not_evaluated");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// restart award pairing (RESTART-RULES-CONFORMANCE: phase-aware, startPhase)
+// ---------------------------------------------------------------------------
+
+describe("restart award pairing uses the phase-opening boundary (phase-aware)", () => {
+  it("pairs an execution with the boundary that opened the window, not an extra boundary fired mid-window", () => {
+    const obs = [
+      // tick 10: core starts tick 10 in "playing"; a touchline exit (team-a last
+      // touch) opens the throw-in window.
+      makeObs(10, [corePhase(10, "throw-in", "playing", 100), contact("c-10", 10, "team-a"), touchlineOut(10, "c-10")], { lastTouchRef: "c-10" }),
+      // tick 11: the window is already open (startPhase "throw-in"); a late extra
+      // touchline exit (team-b last touch) is ignored by the core (no new window).
+      makeObs(11, [corePhase(11, "throw-in", "throw-in", 100), contact("c-11", 11, "team-b"), touchlineOut(11, "c-11")], { lastTouchRef: "c-11" }),
+      // tick 70: the throw-in executes for team-b (opposite of the opening team-a).
+      makeObs(70, [corePhase(70, "playing", "throw-in", 100), throwInExec(70, "team-b")]),
+    ];
+    const res = checkThrowInAward(obs);
+    expect(res[0].id).toBe("rules-throw-in-award-held");
+    expect(res[0].status).toBe("pass");
+  });
+
+  it("still FAILs a genuine award mutant (execution is the same team as the opening last-touch)", () => {
+    const obs = [
+      makeObs(10, [corePhase(10, "throw-in", "playing", 100), contact("c-10", 10, "team-a"), touchlineOut(10, "c-10")], { lastTouchRef: "c-10" }),
+      makeObs(70, [corePhase(70, "playing", "throw-in", 100), throwInExec(70, "team-a")]),
+    ];
+    const res = checkThrowInAward(obs);
+    expect(res[0].status).toBe("fail");
+  });
+});

@@ -145,27 +145,106 @@ export function checkKickoffFreeze(
 // ---------------------------------------------------------------------------
 
 /**
- * The match timer is frozen during goal / halftime / fulltime / set-piece
- * phases (§11).  The committed TelemetryObservation does NOT carry the core
- * matchPhase per tick, nor the matchTimer — that contract is core-owned and not
- * serialized into the observation stream.  There is therefore no executable
- * observation of the freeze, so this protected oracle returns the honest
- * NOT_EVALUATED rather than inventing a PASS.  A run with no observations is
- * likewise NOT_EVALUATED (empty result → evaluator NOT_EVALUATED).
+ * The match timer is frozen during goal / fulltime / kickoff / set-piece
+ * phases (§11); its ball-in-play decrement is gated on "playing".  When the
+ * observation stream carries the runner-injected per-tick `core-match-phase`
+ * facts (the RESTART-RULES-CONFORMANCE serialization), this oracle adjudicates
+ * the freeze: it FAILs if the ball-in-play clock decrements across a tick whose
+ * post-step phase is a frozen phase, PASSes when every frozen tick held the
+ * clock, and stays NOT_EVALUATED when there is no frozen tick to adjudicate.
+ * When the stream carries no phase/timer facts (a non-gated run), it returns
+ * the honest NOT_EVALUATED rather than inventing a PASS.  A run with no
+ * observations is likewise NOT_EVALUATED (empty result → evaluator
+ * NOT_EVALUATED).
  */
 export function checkTimerFreeze(
   observations: TelemetryObservation[],
 ): InvariantResult[] {
   if (observations.length === 0) return [];
+
+  // Collect the per-tick core post-step phase + timer from the runner-injected
+  // `core-match-phase` events.
+  const facts: Array<{ tick: number; phase: string; timer: number }> = [];
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "core-match-phase") continue;
+      const payload = ev.payload as { matchPhase?: unknown; matchTimer?: unknown } | undefined;
+      if (typeof payload?.matchPhase !== "string" || typeof payload?.matchTimer !== "number") continue;
+      facts.push({ tick: o.tick, phase: payload.matchPhase, timer: payload.matchTimer });
+    }
+  }
+
+  if (facts.length === 0) {
+    return [
+      {
+        id: "rules-timer-freeze",
+        status: "not_evaluated",
+        description:
+          "The committed observation stream does not carry the core matchTimer per tick; " +
+          "the timer-freeze contract (decrement gated on 'playing') is core-owned and not " +
+          "serialized, so it is not observable from the standard observation stream — " +
+          "never over-claimed as PASS",
+        details: { observations: observations.length },
+      },
+    ];
+  }
+
+  facts.sort((a, b) => a.tick - b.tick);
+
+  // Phases the ball-in-play clock is frozen in. "playing" decrements; "halftime"
+  // re-uses the timer as the break countdown (a documented separate use), so it
+  // is not a frozen clock tick.
+  const FROZEN = new Set(["goal", "fulltime", "kickoff", "corner-kick", "throw-in", "goal-kick"]);
+  let frozenTicks = 0;
+  const failures: string[] = [];
+  for (let i = 1; i < facts.length; i++) {
+    const prev = facts[i - 1];
+    const cur = facts[i];
+    if (!FROZEN.has(cur.phase)) continue;
+    frozenTicks++;
+    // The one legitimate exception: the ball-in-play clock reaches zero inside
+    // the "playing" branch and the core enters "fulltime" on that same tick, so
+    // the first fulltime tick carries a timer that just decremented to 0.
+    const isFulltimeEntry = cur.phase === "fulltime" && prev.phase === "playing" && cur.timer === 0;
+    if (!isFulltimeEntry && cur.timer < prev.timer) {
+      failures.push(
+        `tick ${cur.tick} phase ${cur.phase}: matchTimer ${prev.timer}→${cur.timer} (decremented during a frozen phase)`,
+      );
+    }
+  }
+
+  if (frozenTicks === 0) {
+    return [
+      {
+        id: "rules-timer-freeze",
+        status: "not_evaluated",
+        description:
+          "No non-playing (goal / fulltime / kickoff / set-piece) tick was observed, so the " +
+          "timer-freeze contract had nothing to adjudicate in this run",
+        details: { frozenTicks },
+      },
+    ];
+  }
+
+  if (failures.length > 0) {
+    return [
+      {
+        id: "rules-timer-freeze-mutated",
+        status: "fail",
+        description: `Match timer froze incorrectly: ${failures.join("; ")}`,
+        details: { failures, frozenTicks },
+      },
+    ];
+  }
+
   return [
     {
-      id: "rules-timer-freeze",
-      status: "not_evaluated",
+      id: "rules-timer-freeze-held",
+      status: "pass",
       description:
-        "The committed observation stream does not carry the core matchPhase per tick nor the matchTimer; " +
-        "the timer-freeze contract (decrement gated on 'playing') is core-owned and not serialized, so it is " +
-        "not observable from the standard observation stream — never over-claimed as PASS",
-      details: { observations: observations.length },
+        `Match timer froze correctly across ${frozenTicks} non-playing tick(s): the ball-in-play ` +
+        `clock did not decrement during goal / fulltime / kickoff / set-piece phases`,
+      details: { frozenTicks },
     },
   ];
 }

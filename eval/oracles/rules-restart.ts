@@ -100,6 +100,34 @@ function collectRestartEvents(
 }
 
 /**
+ * RESTART-RULES-CONFORMANCE: when the observation stream carries the runner's
+ * per-tick `core-match-phase` facts, return the STARTING core phase per tick.
+ * The restart machinery opens a single window only from a "playing" phase, so a
+ * boundary emitted on a tick whose starting phase is not "playing" was ignored
+ * by the core (an already-open restart window) and must not be paired with an
+ * execution — otherwise an organic late extra boundary would be mis-attributed
+ * as the award source. When the stream carries no phase facts (synthetic unit
+ * streams, non-gated real runs) the pairing falls back to the original
+ * last-boundary-of-kind rule.
+ */
+function restingPhaseByTick(
+  observations: TelemetryObservation[],
+): { hasPhaseFacts: boolean; startPhaseByTick: Map<number, string> } {
+  const startPhaseByTick = new Map<number, string>();
+  let hasPhaseFacts = false;
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "core-match-phase") continue;
+      const payload = ev.payload as { startPhase?: unknown } | undefined;
+      if (typeof payload?.startPhase !== "string") continue;
+      hasPhaseFacts = true;
+      startPhaseByTick.set(o.tick, payload.startPhase);
+    }
+  }
+  return { hasPhaseFacts, startPhaseByTick };
+}
+
+/**
  * Pair every boundary (goal line / touchline) with the restart execution the
  * core issued in response, in the order the core runs one window at a time.
  * A boundary whose last touch could not be resolved opens no restart and so is
@@ -107,12 +135,14 @@ function collectRestartEvents(
  * recorded as an orphan (boundary null).
  */
 function pairRestartBoundaries(observations: TelemetryObservation[]): RestartPair[] {
+  const { hasPhaseFacts, startPhaseByTick } = restingPhaseByTick(observations);
   const pending: Boundary[] = [];
   const pairs: RestartPair[] = [];
 
   for (const { tick, ev } of collectRestartEvents(observations)) {
     if (ev.kind === "ball-touchline-out-of-play") {
       const p = ev.payload as { lastTouchRef?: string | null; touchlineIndex?: number } | undefined;
+      if (hasPhaseFacts && startPhaseByTick.get(tick) !== "playing") continue;
       pending.push({
         tick,
         lastTouchRef: p?.lastTouchRef ?? null,
@@ -121,6 +151,7 @@ function pairRestartBoundaries(observations: TelemetryObservation[]): RestartPai
       });
     } else if (ev.kind === "ball-out-of-play") {
       const p = ev.payload as { lastTouchRef?: string | null; goalIndex?: number } | undefined;
+      if (hasPhaseFacts && startPhaseByTick.get(tick) !== "playing") continue;
       pending.push({
         tick,
         lastTouchRef: p?.lastTouchRef ?? null,
