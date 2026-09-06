@@ -1,4 +1,4 @@
-name: Rebuild — test and deploy Pages
+name: Local stage — tests and build
 on:
   push:
     branches: [rebuild/vision-first-2026-09-05]
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: vision-rebuild-pages
+  group: vision-rebuild-local
   cancel-in-progress: false
 
 jobs:
@@ -27,21 +27,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: simulation-evidence
-          path: artifacts/evaluation.json
-      - uses: actions/upload-pages-artifact@v3
+          path: artifacts/
+      - uses: actions/upload-artifact@v4
         with:
+          name: local-build
           path: dist
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/configure-pages@v5
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+# Publishing is intentionally disabled for this stage.

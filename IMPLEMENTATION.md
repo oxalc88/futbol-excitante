@@ -1,67 +1,58 @@
-# Contrato de esta reconstrucción
+# Contrato de implementación local v2
 
-## Fuentes preservadas
+## Fuentes y límites
 
-`VISION.md`, los siete documentos de `research/` y los seis de `specs/` se conservan byte a byte. Se partió del commit `becbcdc0aaaace4f9b98006ae44e0449795c001a`. No se reutilizaron el motor, el pipeline de agentes, los evaluadores ni la UI anteriores.
+`VISION.md`, los siete documentos de `research/` y los seis de `specs/` se mantienen byte a byte. La base es `becbcdc0aaaace4f9b98006ae44e0449795c001a`. No se reutilizó la implementación histórica.
 
-La visión es la intención de producto. La auditoría de investigación prevalece frente a recomendaciones contradictorias de tecnología. Las especificaciones distinguen un objetivo futuro de un comportamiento medido o aceptado; esta implementación hace la misma distinción.
+El programa de investigación distingue comportamiento, hipótesis causales, objetivos de diseño y evidencia perceptual. Esta etapa implementa mecánicas locales y herramientas de evaluación, pero no declara promoción de los hitos normativos ni equivalencia con PES 2017.
 
-## Implementado
+## Motor y contratos
 
-| Objetivo de la visión | Implementación |
+`world-v2`, `replay-v2`, `vision-rebuild-config-v2`; SI, dt = 1/60 s y cuatro subpasos de balón. Xorshift32 serializado; hash canónico FNV-1a para diagnóstico, no seguridad criptográfica. Configuración, RNG, inputs futuros, fases, acciones, contactos, memoria táctica, ventaja, tarjetas pendientes, posesión del portero y restricciones de saque están en el checkpoint.
+
+El core no importa DOM, Three.js, red, archivos ni reloj real. El mismo scheduler sirve al partido, al replay, al laboratorio y a las pruebas headless. Los adaptadores no alteran el estado autoritativo. Las capturas están separadas por copia.
+
+Orden por tick: comandos → reglas pendientes → posesión e interferencia → decisiones tácticas → intenciones → preparación → locomoción → cuerpos → entradas activas → golpeos → balón subpasado → postes/límites/contactos → hechos derivados → reloj. Los contactos compiten por tiempo de barrido, distancia e ID estable. El contacto con poste modifica el recorrido antes de comprobar el límite. Las reposiciones son discontinuidades explícitas.
+
+## Mecánicas locales
+
+| Sistema | Comportamiento |
 |---|---|
-| Partido 11v11, también grupos pequeños | 11v11, 5v5 y 2v2; un arquero por equipo |
-| Balón físico independiente | Posición y velocidad 3D, gravedad, rodadura, arrastre, rebote, spin, curva y postes; cuatro subpasos por tick |
-| Peso de los jugadores | Intención, velocidad real y orientación independientes, aceleración, frenado, giro, stamina y protección |
-| Individualidad | Arquetipos ficticios físicos y técnicos; capacidades separadas de la presentación |
-| Interacción | Primer toque contextual, microcontactos de conducción, pase corto, filtrado, centro, disparo, cabezazo, tackle, contacto corporal e interceptación |
-| Porteros | Arco y deriva acotados, reacción con ticks, contacto explícito, claim/atajada y distribución |
-| IA y táctica | Formación, fases de transición, asignación de perseguidor, apoyos, marcas, coberturas; selección de pase con estimación de tiempo de llegada |
-| Reglas | Balón fuera, banda, córner, saque de meta, gol, reloj, entretiempo, cambio de lados, fuera de juego por intervención y faltas básicas con tiro libre |
-| Controles | Teclado, dos slots, dos mandos estándar, botones y stick táctil |
-| Presentación | Three.js, cancha 3D, jugadores estilizados articulados, color/patrón diferenciados, arquero distinto, indicador, radar, cámaras, HUD y sonido opcional |
-| Datos reemplazables | Contrato neutral, validación de equipo JSON e importación manual; datos integrados sin requests en partido |
-| Repetición | Estado inicial completo + seed/config + inputs con tick + hash final, exportación/importación |
-| Modo headless | Mismo core, pasos síncronos sin timers y reporte de eventos |
-| P2P | Prototipo de autoridad en anfitrión, signaling manual e interpolación de snapshots; pendiente prueba entre dispositivos |
-| Publicación | Vite estático y workflow para GitHub Pages |
+| Locomoción | Aceleración, frenado, orientación independiente de velocidad, pérdida de velocidad al girar, energía, recuperación |
+| Balón | Rodadura, gravedad, arrastre, restitución, spin y curvatura; impulso inicial sin homing |
+| Cuerpo | Separación ponderada por masa, intercambio de velocidad, estabilidad y tropiezo; proteger cambia resistencia y dirección de toque |
+| Recepción | Control contextual según velocidad, orientación, presión, capacidad y lado de pie; microcontactos de conducción |
+| Acciones | Pase, filtrado, elevado, centro, tiro cargado, cabezazo, entrada de pie y deslizante; preparación/contacto/recuperación observables |
+| Individualidad | Capacidades separadas de velocidad/aceleración, fuerza/equilibrio, potencia/técnica, cabeceo/salto; equipos ficticios reemplazables |
+| Portero | Arco pequeño en 2v2/5v5; área de movimiento mayor en 11v11; reacción, visibilidad, reversión por inercia, pie/mano, blocada/despeje, recuperación y distribución |
+| Táctica | Formación, perseguidor con histéresis, cobertura, apoyos, desmarques, línea, amplitud, compactación, contra presión temporal y retorno a estructura |
+| Adaptación | Memoria de contactos y bandas observadas con decaimiento; prioridad de marca y desplazamiento del bloque, siempre serializados |
+| Presentación | Cancha, kits, figuras articuladas, animaciones de golpeo/entrada/cabeceo/portero, radar, tres cámaras, HUD, estadísticas, sonido opcional |
+| Controles | Teclado, dos mandos estándar, stick derecho para apuntar, botones táctiles completos, tiro cargado, pausa y neutralización al perder foco |
 
-## Reglas experimentales: `rules-rebuild-v1`
+## Reglas experimentales v2
 
-La especificación conservada describe parte de la implementación anterior y difiere de la autoridad general definida por Technical Spec. Esta reconstrucción declara sus diferencias:
+El perfil se inspira en las leyes actuales de [fuera de juego](https://www.theifab.com/laws/latest/offside/), [faltas y sanciones](https://www.theifab.com/laws/latest/fouls-and-misconduct/) y [penalti](https://www.theifab.com/laws/latest/the-penalty-kick/), consultadas el 6 de septiembre de 2026. Las decisiones geométricas y umbrales del juego son aproximaciones declaradas:
 
-- **Autoridad:** el core posee marcador, posesión estadística, reloj y reinicios. Los runners nunca escriben fases. El marcador no se vuelve a derivar en otro adaptador.
-- **Tiempo:** ticks fijos de 1/60 s. Se acumula tiempo de juego sólo en `playing`; cada mitad dura la mitad del tiempo real elegido. Se muestra 45 minutos por mitad. No hay añadido, prórroga ni penales de desempate.
-- **Cruce:** balón completamente al otro lado de la línea; el barrido usa el radio del balón. Un gol requiere que el balón completo quepa entre postes y bajo el larguero. Esto corrige deliberadamente el criterio de centro cruzando línea descrito en el documento histórico.
-- **Reinicios:** un jugador de campo del equipo premiado toma el saque. Todos quedan congelados durante la preparación; la ejecución genera un contacto con identidad. Los arqueros nunca son elegidos como sacadores. La reposición de un saque es una discontinuidad explícita y no un movimiento físico.
-- **Último toque ausente:** se emite `unattributed-boundary` y se coloca un reinicio diagnóstico para el local. Los partidos normales tienen contacto desde el saque inicial. Es una recuperación de estado experimental, no una interpretación arbitral.
-- **Fuera de juego:** se toma una foto lógica de posiciones al golpeo; se marca a quien esté en mitad rival y más allá del balón y el segundo último rival. Se sanciona al tocar el balón. Los saques automáticos no generan esa foto. No se modela interferencia sin contacto, rebotes con distinción de parada deliberada, ni juego deliberado vs desvío en profundidad.
-- **Falta:** un tackle que falla el balón y alcanza un rival dentro de su ventana ocasiona recuperación y tiro libre. No hay ventaja, tarjetas, expulsión ni penalti: incluso una falta dentro del área genera tiro libre en este perfil básico.
-- **Arqueros 11v11:** se reutiliza el modelo de arco pequeño como prototipo. No hay salidas extensas, captura de centros calibrada, cesión reglamentaria, límite de manos por área, ni biomecánica real de manos. Un claim frena el balón en el punto de contacto sin parentarlo al arquero.
-- **Arbitraje del tick:** comandos → decisiones de equipo coherentes → intenciones → preparación de acciones → locomoción → pares de cuerpos en IDs estables → tackle activo → golpeos activos en IDs estables → física subpasada → postes → primer cruce de límite → contactos con balón → hechos derivados/reloj. Una falta invalida el golpeo pendiente al abrir el reinicio. El límite prevalece sobre un contacto posterior fuera del campo; un golpe en poste modifica la trayectoria antes del cruce.
-- **Contactos simultáneos:** dentro de un subpaso se ordenan por fracción de barrido, distancia e ID. Se procesa un contacto de jugador por subpaso. Es una política determinista provisional, no una garantía de resolver todos los casos reglamentarios.
+- Una falta en el área defensora da penalti; fuera del área, tiro libre. Entradas deslizantes imprudentes o de velocidad excesiva pueden recibir amarilla o roja. Segunda amarilla expulsa. Los expulsados conservan identidad en el estado, pero dejan de intervenir, aparecer o recibir control. En 11v11, menos de siete jugadores termina el partido; los modos pequeños usan un mínimo de dos.
+- La ventaja se mantiene durante una ventana finita si hay continuación favorable. Se devuelve al punto original si se pierde la ventaja; las tarjetas se muestran al detenerse el juego. Un gol del equipo beneficiado la consume.
+- El fuera de juego guarda candidatos al contacto de pase o tiro; exige intervención al jugar o disputar el balón, o interferencia cercana en la línea de visión del portero. Una parada o desvío no borra automáticamente la posición previa. Un juego deliberado rival la puede borrar. Hay excepción de recepción directa de banda, córner y saque de meta. Las posiciones usan centros físicos y márgenes, no una reconstrucción de cada extremidad para arbitraje.
+- Las manos del portero están limitadas al área. Se prohíbe blocar una cesión deliberada con el pie, un saque de banda propio directo y su propia distribución sin otro contacto. Una blocada detiene el balón en el punto de contacto; el portero permanece allí hasta distribuir. No se teletransporta el balón a una mano. Ocho segundos de posesión de manos dan córner rival; la distribución normal ocurre antes.
+- Los saques humanos aceptan dirección y acción y tienen ejecución automática de respaldo. En el penalti, el guardameta empieza sobre la línea y el resto queda fuera del área y detrás del punto. Se detecta segundo toque del sacador. Un tiro indirecto o una banda directos no pueden dar gol sin otro contacto; un saque directo a portería propia da córner.
+- Se usan dos mitades de tiempo efectivo escaladas a 45 minutos mostrados. No hay prórroga, tandas de desempate ni añadido. No se simulan árbitro humano, VAR, protestas, sustituciones, lesiones médicas, manos intencionadas de jugadores de campo o todos los protocolos disciplinarios. No se afirma reglamento completo certificado.
 
-## Determinismo y presentación
+## Representación y cámara
 
-`world-v1`, `vision-rebuild-config-v1`, xorshift32 y serialización canónica con claves ordenadas. El hash FNV-1a de 32 bits sirve para diagnóstico, no como prueba criptográfica. Snapshot/restore incluye PRNG, inputs futuros, memoria AI, contactos, acciones y estado de reinicio. El core rechaza entradas duplicadas o inválidas; el input ausente del slot humano es neutro.
+`procedural-rig-v2` declara unidades, superficies, alcances y longitudes. El solucionador de dos segmentos preserva longitudes y lleva el extremo al contacto factible; los objetivos imposibles se rechazan. El portero distingue extensión, recuperación y posesión. La representación sigue siendo estilizada y necesita revisión de fotogramas para comprobar deslizamientos, contacto de cabeza y legibilidad.
 
-El acumulador del navegador conserva el dt y limita recuperación a seis pasos por frame; al ocultar la página se pausa. La interpolación y los movimientos articulares son sólo visuales. Los cuerpos tienen variación visual reproducible por perfil ficticio, sin cambiar física. La cancha, postes y balón se representan en las unidades del motor.
+`camera-rig-v2` integra en ticks y no en frecuencia de dibujo. Cambiar cámara o calidad no altera el motor. El acumulador del juego recupera hasta seis pasos por frame; al perder visibilidad se pausa. El laboratorio separa reset, step, capture y registro de envío al render. Enviar un render no demuestra que el contacto sea visualmente correcto ni mide latencia física.
 
-La representación articulada se genera por código y es original. No hay assets, marcas, nombres de equipos ni datos de jugadores de PES. La anatomía y animación son un prototipo: faltan assets riggeados de producción y validación completa de `EmbodimentMapping`, correcciones pie/mano-balón y pruebas monocromas/LOD de la especificación visual. La elección de kits usa patrón y contraste de valor con una alternativa para enfrentamientos del mismo equipo; falta validar el criterio con simulaciones de visión de color.
+## Evaluación y estado real
 
-## Qué no se afirma como terminado
+Hay 69 IDs materializados como escenarios diagnósticos ejecutables con variantes, dos semillas, observaciones, métricas, bindings por criterio y cierre de impacto. Los oráculos protegidos verifican propiedades locales; controles negativos corrompen trazas para comprobar que se detectan teletransportes, impulsos sin contacto y cabezazos fuera de alcance. La base congelada pertenece a este motor provisional.
 
-La implementación cubre una versión jugable de las mecánicas de la visión, **no todo el programa de investigación y todos los requisitos normativos**:
+Esto no convierte las descripciones de investigación en evidencia PES. Las métricas instrumentadas están enumeradas en el reporte y en `eval/reference.ts`; las comparaciones perceptuales y causales sin datos permanecen abiertas. No hay un resultado global de fidelidad ni una promoción automática de milestone.
 
-- No existe el corpus PES de mediciones y capturas controladas. No se afirma sentir igual que PES 2017.
-- No están materializadas todas las registries, bindings y oráculos protegidos de `GAMEPLAY_EVALUATION_SPEC.md`, ni las pruebas de mutantes. El reporte lista cada ID original como `NOT_EVALUATED`; las pruebas de este rebuild usan contratos independientes y sus nombres reales.
-- No se completaron evaluaciones perceptuales, benchmark de GPU en dispositivos objetivo, pruebas reales de dos mandos o pruebas entre dos navegadores por Internet.
-- Las reglas indicadas arriba son básicas; faltan los casos reglamentarios completos, árbitro, tarjetas, ventaja y penaltis.
-- Networking sigue experimental; no se implementaron servidores Colyseus/Durable Objects, matchmaking, relay TURN, predicción, rollback o autoridad de producción. La visión enumera esas alternativas como fases futuras, no como servicios que deban coexistir.
-- No se hicieron scraping, licencias de equipos reales, infraestructura permanente, bases de datos, WASM, ECS, aprendizaje automático ni un nuevo orquestador de agentes; los propios documentos los difieren.
+La vista local fue bloqueada por la política de URL del navegador de trabajo. Las pruebas de `BrowserTestSession` verifican el adaptador sin GPU, no una sesión visual real. Tampoco se verificaron iPhone físico, mandos físicos ni juicio humano ciego. [EVALUATION.md](EVALUATION.md) deja el procedimiento para recoger esa evidencia.
 
-## Validación reproducible
-
-`npm test` verifica reproducibilidad, checkpoint/replay, independencia del balón, locomoción, goles barridos, poste, reinicios y reloj, cardinalidad/arco de porteros, acciones, fuera de juego y validación de datos. `npm run evaluate` ejecuta tres partidos CPU 11v11 con semillas diferentes hasta fulltime, preserva estadísticas y registra limitaciones explícitas. `npm run build` valida tipos y los recursos web.
-
-Esta evidencia no sustituye el juego humano. La siguiente validación de producto consiste en abrir el despliegue, jugar un partido con mando/teclado, observar controles y pases a distintas velocidades y probar los dos slots y móviles.
+Online y publicación se difieren por decisión del usuario. El workflow sólo prueba, evalúa y compila; no despliega.

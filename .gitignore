@@ -4,3 +4,6 @@ dist/
 *.local
 .env*
 artifacts/local/
+
+artifacts/traces/
+artifacts/targeted-evaluation.json

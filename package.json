@@ -1,6 +1,6 @@
 {
   "name": "futbol-excitante",
-  "version": "1.0.0-rebuild.1",
+  "version": "1.0.0-rebuild.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,9 +9,21 @@
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
-    "evaluate": "node --import tsx scripts/evaluate.ts"
+    "evaluate": "node --import tsx scripts/evaluate.ts",
+    "reference:import": "node --import tsx scripts/import-reference.ts",
+    "evaluate:traces": "node --import tsx scripts/evaluate.ts --traces"
   },
-  "dependencies": { "three": "0.180.0" },
-  "devDependencies": { "@types/node": "24.5.2", "@types/three": "0.180.0", "tsx": "4.20.5", "typescript": "5.9.2", "vite": "7.1.6" },
-  "engines": { "node": ">=22.12.0" }
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.5.2",
+    "@types/three": "0.180.0",
+    "tsx": "4.20.5",
+    "typescript": "5.9.2",
+    "vite": "7.1.6"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
 }
