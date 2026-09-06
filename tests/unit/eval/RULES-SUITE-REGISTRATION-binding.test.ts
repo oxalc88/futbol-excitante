@@ -46,6 +46,8 @@ const RULES_ORACLE_CRITERIA: Record<string, string> = {
   "MATCH-THROW-IN-TIMER-FREEZE": "rules-throw-in-timer-freeze-oracle-v1",
   "MATCH-GOAL-KICK-PLACEMENT": "rules-goal-kick-placement-oracle-v1",
   "MATCH-GOAL-KICK-TIMER-FREEZE": "rules-goal-kick-timer-freeze-oracle-v1",
+  "MATCH-CORNER-KICK-PLACEMENT": "rules-corner-kick-placement-oracle-v1",
+  "MATCH-CORNER-KICK-TIMER-FREEZE": "rules-corner-kick-timer-freeze-oracle-v1",
   "MATCH-KICKOFF-FIRST-TOUCH": "rules-kickoff-first-touch-oracle-v1",
   "MATCH-SCORING-GOAL-PHASE": "rules-goal-phase-oracle-v1",
   "MATCH-TIMER-DECREMENT": "rules-timer-decrement-oracle-v1",

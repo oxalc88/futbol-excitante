@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "objective_id": "CORNER-DRIVEN-CONFORMANCE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "semantic_order": "before → event → transition → result",
+  "frames": [
+    {
+      "label": "corner-before",
+      "path": "corner-before.png",
+      "tick": 60,
+      "hash": "fnv1a64-v1:51b930318d1dfe07",
+      "note": "ball near the +x goal line, team-b defender chasing back toward its own goal"
+    },
+    {
+      "label": "corner-award",
+      "path": "corner-award.png",
+      "tick": 71,
+      "hash": "fnv1a64-v1:a7f663a05ee6a461",
+      "note": "the ball crossed the goal line outside the posts with a defending-team last touch — the core awards a corner to team-a and opens the corner-kick phase"
+    },
+    {
+      "label": "corner-set-piece",
+      "path": "corner-set-piece.png",
+      "tick": 105,
+      "hash": "fnv1a64-v1:813c3ee616c1e679",
+      "note": "corner-kick phase: the taker moves to the corner flag, attacking box and defending mark set"
+    },
+    {
+      "label": "corner-execution",
+      "path": "corner-execution.png",
+      "tick": 137,
+      "hash": "fnv1a64-v1:02f3dfd6bfb60e59",
+      "note": "corner-kick-executed (tick ~130): the ball is placed at the corner flag and crossed toward the penalty area — this frame is a few ticks later so the cross is in flight"
+    }
+  ]
+}

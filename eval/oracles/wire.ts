@@ -41,6 +41,7 @@ import {
   checkThrowInPlacement,
   checkThrowInServe,
   checkGoalKickPlacement,
+  checkCornerKickPlacement,
   checkGoalPhase,
   checkKickoffFirstTouch,
 } from "./rules-restart.js";
@@ -49,6 +50,7 @@ import {
   checkTimerFreeze,
   checkThrowInTimerFreeze,
   checkGoalKickTimerFreeze,
+  checkCornerKickTimerFreeze,
   checkTimerDecrement,
   checkTimerHalftime,
   checkTimerFulltime,
@@ -263,6 +265,11 @@ const entries: OracleEntry[] = [
     fn: checkGoalKickPlacement,
   },
   {
+    oracle_id: "rules-corner-kick-placement-oracle-v1",
+    oracle_version: "oracle-rules-corner-kick-placement-v1",
+    fn: checkCornerKickPlacement,
+  },
+  {
     oracle_id: "rules-goal-phase-oracle-v1",
     oracle_version: "oracle-rules-goal-phase-v1",
     fn: checkGoalPhase,
@@ -281,6 +288,11 @@ const entries: OracleEntry[] = [
     oracle_id: "rules-goal-kick-timer-freeze-oracle-v1",
     oracle_version: "oracle-rules-goal-kick-timer-freeze-v1",
     fn: checkGoalKickTimerFreeze,
+  },
+  {
+    oracle_id: "rules-corner-kick-timer-freeze-oracle-v1",
+    oracle_version: "oracle-rules-corner-kick-timer-freeze-v1",
+    fn: checkCornerKickTimerFreeze,
   },
   {
     oracle_id: "rules-timer-decrement-oracle-v1",

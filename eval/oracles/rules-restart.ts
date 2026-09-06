@@ -559,6 +559,8 @@ const GOAL_AREA_DEPTH = 5.5;
 const GOAL_AREA_HALF_WIDTH = 9.16;
 /** Throw-in chest-height ball placement (match-rules-v1, §13). */
 const THROW_IN_BALL_Z = 1.5;
+/** Corner-flag lateral position (match-rules-v1 §8.2, provisional 68 m pitch). */
+const CORNER_FLAG_Y = 34;
 /** Position comparison tolerance (m) for restart placement. */
 const PLACEMENT_TOLERANCE = 0.2;
 /** Kickoff freeze home tolerance (m) — anti-huddle-v1 (referenced). */
@@ -773,6 +775,78 @@ export function checkGoalKickPlacement(
     return [{ id: "rules-goal-kick-placement-mutated", status: "fail", description: `Goal-kick placement violated: ${failures.join("; ")}`, details: { failures } }];
   }
   return pass("rules-goal-kick-placement-held", `${pairs.length} goal kick(s) placed inside the goal area on the exit side`, { verified: pairs.length });
+}
+
+// ---------------------------------------------------------------------------
+// MATCH-CORNER-KICK-PLACEMENT (MATCH_RULES_SPEC §8.2)
+// ---------------------------------------------------------------------------
+
+/** Pair each executed corner kick with the goalline boundary that opened it. */
+function cornerPlacementPairs(observations: TelemetryObservation[]): Array<{
+  boundary: Boundary | null;
+  execution: { tick: number; payload: Record<string, unknown> };
+}> {
+  const pairs = pairRestartBoundaries(observations);
+  const execs = collectExecuted(observations, "corner-kick-executed");
+  const byTick = new Map<number, { boundary: Boundary | null; execution: { tick: number; payload: Record<string, unknown> } }>();
+  for (const pair of pairs) {
+    if (pair.execution.kind === "corner") {
+      byTick.set(pair.execution.tick, {
+        boundary: pair.boundary,
+        execution: { tick: pair.execution.tick, payload: {} },
+      });
+    }
+  }
+  for (const exec of execs) {
+    const entry = byTick.get(exec.tick);
+    if (entry) entry.execution.payload = exec.payload;
+  }
+  return [...byTick.values()];
+}
+
+/**
+ * The corner kick is placed at the nearest corner flag (§8.2): `(goalX, ±34)`
+ * where `goalX = ±52.5` depends on the goal index and the y sign matches the
+ * ball's exit y.  The executed corner kick's `cornerPosition` must match.
+ * FAIL on a mismatch; NOT_EVALUATED when no corner kick with a resolvable
+ * boundary + placement payload is observed.
+ */
+export function checkCornerKickPlacement(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const pairs = cornerPlacementPairs(observations).filter(
+    (p) => p.boundary !== null && p.boundary!.ballPosition && p.execution.payload.cornerPosition,
+  );
+
+  if (pairs.length === 0) {
+    return notEvaluated("rules-corner-kick-placement", "No corner kick with a resolvable boundary + placement payload observed");
+  }
+
+  const failures: string[] = [];
+  for (const pair of pairs) {
+    const bp = pair.boundary!.ballPosition!;
+    const goalIndex = pair.boundary!.goalIndex;
+    const cp = pair.execution.payload.cornerPosition as { x?: unknown; y?: unknown };
+    if (typeof cp?.x !== "number" || typeof cp?.y !== "number") {
+      failures.push(`corner kick at tick ${pair.execution.tick} has a malformed cornerPosition`);
+      continue;
+    }
+    if (goalIndex === undefined) continue;
+    const goalLineX = Math.abs(bp.x);
+    const goalX = goalIndex === 0 ? goalLineX : -goalLineX;
+    const cornerY = bp.y >= 0 ? CORNER_FLAG_Y : -CORNER_FLAG_Y;
+    if (Math.hypot(cp.x - goalX, cp.y - cornerY) > PLACEMENT_TOLERANCE) {
+      failures.push(
+        `corner kick at tick ${pair.execution.tick} placed at (${cp.x.toFixed(3)},${cp.y.toFixed(3)}) ` +
+          `but the nearest corner flag was (${goalX.toFixed(3)},${cornerY.toFixed(3)})`,
+      );
+    }
+  }
+
+  if (failures.length > 0) {
+    return [{ id: "rules-corner-kick-placement-mutated", status: "fail", description: `Corner-kick placement violated: ${failures.join("; ")}`, details: { failures } }];
+  }
+  return pass("rules-corner-kick-placement-held", `${pairs.length} corner kick(s) placed at the nearest corner flag`, { verified: pairs.length });
 }
 
 // ---------------------------------------------------------------------------

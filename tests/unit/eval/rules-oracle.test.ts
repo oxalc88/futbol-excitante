@@ -30,6 +30,7 @@ import {
   checkThrowInPlacement,
   checkThrowInServe,
   checkGoalKickPlacement,
+  checkCornerKickPlacement,
   checkGoalPhase,
   checkKickoffFirstTouch,
 } from "../../../eval/oracles/rules-restart.js";
@@ -38,6 +39,7 @@ import {
   checkTimerFreeze,
   checkThrowInTimerFreeze,
   checkGoalKickTimerFreeze,
+  checkCornerKickTimerFreeze,
   checkTimerDecrement,
   checkTimerHalftime,
   checkTimerFulltime,
@@ -628,6 +630,55 @@ describe("MATCH-GOAL-KICK-PLACEMENT oracle", () => {
 });
 
 // ---------------------------------------------------------------------------
+// MATCH-CORNER-KICK-PLACEMENT (MATCH_RULES_SPEC §8.2)
+// ---------------------------------------------------------------------------
+
+function cornerExecFull(tick: number, teamId: string, x: number, y: number): ObsEvent {
+  return {
+    id: `corner-${tick}`, tick, sequence: 3, kind: "corner-kick-executed",
+    payload: { teamId, kickTakerId: "player-1", cornerPosition: { x, y }, targetPosition: { x: 44.5, y: 0 }, crossDirection: { x: -1, y: 0 } },
+  };
+}
+
+describe("MATCH-CORNER-KICK-PLACEMENT oracle", () => {
+  it("PASS when the corner kick is placed at the nearest corner flag on the exit-y sign", () => {
+    const obs = [
+      makeObs(1, [contact("c-1", 1, "team-b")], { lastTouchRef: "c-1" }),
+      makeObs(2, [goalLineExit(2, 0, "c-1", 52.5, 12)], { lastTouchRef: "c-1" }),
+      makeObs(3, [cornerExecFull(3, "team-a", 52.5, 34)]),
+    ];
+    const res = checkCornerKickPlacement(obs);
+    expect(res[0].status).toBe("pass");
+  });
+
+  it("FAIL when the corner kick is placed at the wrong flag (opposite y sign)", () => {
+    const obs = [
+      makeObs(1, [contact("c-1", 1, "team-b")], { lastTouchRef: "c-1" }),
+      makeObs(2, [goalLineExit(2, 0, "c-1", 52.5, 12)], { lastTouchRef: "c-1" }),
+      makeObs(3, [cornerExecFull(3, "team-a", 52.5, -34)]),
+    ];
+    const res = checkCornerKickPlacement(obs);
+    expect(res[0].status).toBe("fail");
+  });
+
+  it("FAIL when the corner kick is placed on the wrong goal line", () => {
+    const obs = [
+      makeObs(1, [contact("c-1", 1, "team-b")], { lastTouchRef: "c-1" }),
+      makeObs(2, [goalLineExit(2, 0, "c-1", 52.5, 12)], { lastTouchRef: "c-1" }),
+      makeObs(3, [cornerExecFull(3, "team-a", -52.5, 34)]),
+    ];
+    const res = checkCornerKickPlacement(obs);
+    expect(res[0].status).toBe("fail");
+  });
+
+  it("NOT_EVALUATED when no corner-kick execution with placement is observed", () => {
+    const obs = [makeObs(1, [cornerExec(1, "team-a")])];
+    const res = checkCornerKickPlacement(obs);
+    expect(res[0].status).toBe("not_evaluated");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // MATCH-SCORING-GOAL-PHASE
 // ---------------------------------------------------------------------------
 
@@ -742,6 +793,33 @@ describe("MATCH-GOAL-KICK-TIMER-FREEZE oracle", () => {
     ];
     const res = checkGoalKickTimerFreeze(obs);
     expect(res[0].status).toBe("fail");
+  });
+});
+
+describe("MATCH-CORNER-KICK-TIMER-FREEZE oracle", () => {
+  it("PASS when the timer stays frozen during the corner-kick phase", () => {
+    const obs = [
+      makeObs(10, [corePhase(10, "corner-kick", "playing", 100)]),
+      makeObs(11, [corePhase(11, "corner-kick", "corner-kick", 100)]),
+      makeObs(12, [corePhase(12, "playing", "corner-kick", 100)]),
+    ];
+    const res = checkCornerKickTimerFreeze(obs);
+    expect(res[0].status).toBe("pass");
+  });
+
+  it("FAIL when the timer decrements during the corner-kick phase", () => {
+    const obs = [
+      makeObs(10, [corePhase(10, "corner-kick", "playing", 100)]),
+      makeObs(11, [corePhase(11, "corner-kick", "corner-kick", 99)]),
+    ];
+    const res = checkCornerKickTimerFreeze(obs);
+    expect(res[0].status).toBe("fail");
+  });
+
+  it("NOT_EVALUATED when there is no corner-kick phase tick", () => {
+    const obs = [makeObs(1, [corePhase(1, "playing", "playing", 100)])];
+    const res = checkCornerKickTimerFreeze(obs);
+    expect(res[0].status).toBe("not_evaluated");
   });
 });
 

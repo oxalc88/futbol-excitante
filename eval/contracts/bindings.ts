@@ -887,9 +887,9 @@ export const BINDING_RULES_CORNERKICK_001: TestImplementationBinding = makeTestB
   [],
   {
     "MATCH-CORNER-KICK-AWARD": ["rules-corner-kick-award-evidence"],
-    "MATCH-CORNER-KICK-PLACEMENT": [],
+    "MATCH-CORNER-KICK-PLACEMENT": ["rules-corner-kick-placement-evidence"],
     "MATCH-CORNER-KICK-CROSS": [],
-    "MATCH-CORNER-KICK-TIMER-FREEZE": [],
+    "MATCH-CORNER-KICK-TIMER-FREEZE": ["rules-corner-kick-timer-freeze-evidence"],
   },
 );
 

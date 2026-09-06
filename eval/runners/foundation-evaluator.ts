@@ -254,9 +254,17 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "rules-goal-kick-placement-oracle-v1",
     oracle_version: "oracle-rules-goal-kick-placement-v1",
   },
+  "MATCH-CORNER-KICK-PLACEMENT": {
+    oracle_id: "rules-corner-kick-placement-oracle-v1",
+    oracle_version: "oracle-rules-corner-kick-placement-v1",
+  },
   "MATCH-GOAL-KICK-TIMER-FREEZE": {
     oracle_id: "rules-goal-kick-timer-freeze-oracle-v1",
     oracle_version: "oracle-rules-goal-kick-timer-freeze-v1",
+  },
+  "MATCH-CORNER-KICK-TIMER-FREEZE": {
+    oracle_id: "rules-corner-kick-timer-freeze-oracle-v1",
+    oracle_version: "oracle-rules-corner-kick-timer-freeze-v1",
   },
   "MATCH-KICKOFF-FIRST-TOUCH": {
     oracle_id: "rules-kickoff-first-touch-oracle-v1",

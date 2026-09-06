@@ -313,6 +313,11 @@ export function checkGoalKickTimerFreeze(observations: TelemetryObservation[]): 
   return checkPhaseTimerFreeze(observations, "goal-kick", "rules-goal-kick-timer-freeze");
 }
 
+/** MATCH-CORNER-KICK-TIMER-FREEZE: timer frozen during the corner-kick phase. */
+export function checkCornerKickTimerFreeze(observations: TelemetryObservation[]): InvariantResult[] {
+  return checkPhaseTimerFreeze(observations, "corner-kick", "rules-corner-kick-timer-freeze");
+}
+
 // ---------------------------------------------------------------------------
 // MATCH-TIMER-DECREMENT (MATCH_RULES_SPEC §11)
 // ---------------------------------------------------------------------------

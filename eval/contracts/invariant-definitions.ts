@@ -406,6 +406,18 @@ export const INV_RULES_GOAL_KICK_PLACEMENT: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+export const INV_RULES_CORNER_KICK_PLACEMENT: InvariantDefinition = {
+  invariant_id: "rules-corner-kick-placement-evidence",
+  invariant_version: "invariant-rules-corner-kick-placement-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-corner-kick-placement-oracle-v1",
+  oracle_version: "oracle-rules-corner-kick-placement-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 export const INV_RULES_GOAL_PHASE: InvariantDefinition = {
   invariant_id: "rules-goal-phase-evidence",
   invariant_version: "invariant-rules-goal-phase-v1",
@@ -448,6 +460,18 @@ export const INV_RULES_GOAL_KICK_TIMER_FREEZE: InvariantDefinition = {
   input_observation_ids: ["obs-rules-restart-v1"],
   oracle_id: "rules-goal-kick-timer-freeze-oracle-v1",
   oracle_version: "oracle-rules-goal-kick-timer-freeze-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+export const INV_RULES_CORNER_KICK_TIMER_FREEZE: InvariantDefinition = {
+  invariant_id: "rules-corner-kick-timer-freeze-evidence",
+  invariant_version: "invariant-rules-corner-kick-timer-freeze-v1",
+  input_observation_ids: ["obs-rules-restart-v1"],
+  oracle_id: "rules-corner-kick-timer-freeze-oracle-v1",
+  oracle_version: "oracle-rules-corner-kick-timer-freeze-v1",
   owner: "PROTECTED_EVALUATOR",
   invalid_data_behavior: "INVALID_RUN",
   output_schema_id: "invariant-result-v1",
@@ -516,10 +540,12 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_RULES_THROW_IN_PLACEMENT.invariant_id]: INV_RULES_THROW_IN_PLACEMENT,
   [INV_RULES_THROW_IN_SERVE.invariant_id]: INV_RULES_THROW_IN_SERVE,
   [INV_RULES_GOAL_KICK_PLACEMENT.invariant_id]: INV_RULES_GOAL_KICK_PLACEMENT,
+  [INV_RULES_CORNER_KICK_PLACEMENT.invariant_id]: INV_RULES_CORNER_KICK_PLACEMENT,
   [INV_RULES_GOAL_PHASE.invariant_id]: INV_RULES_GOAL_PHASE,
   [INV_RULES_KICKOFF_FIRST_TOUCH.invariant_id]: INV_RULES_KICKOFF_FIRST_TOUCH,
   [INV_RULES_THROW_IN_TIMER_FREEZE.invariant_id]: INV_RULES_THROW_IN_TIMER_FREEZE,
   [INV_RULES_GOAL_KICK_TIMER_FREEZE.invariant_id]: INV_RULES_GOAL_KICK_TIMER_FREEZE,
+  [INV_RULES_CORNER_KICK_TIMER_FREEZE.invariant_id]: INV_RULES_CORNER_KICK_TIMER_FREEZE,
   [INV_RULES_TIMER_DECREMENT.invariant_id]: INV_RULES_TIMER_DECREMENT,
   [INV_RULES_TIMER_HALFTIME.invariant_id]: INV_RULES_TIMER_HALFTIME,
   [INV_RULES_TIMER_FULLTIME.invariant_id]: INV_RULES_TIMER_FULLTIME,

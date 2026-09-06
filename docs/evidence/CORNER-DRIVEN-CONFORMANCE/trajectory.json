@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "objective_id": "CORNER-DRIVEN-CONFORMANCE",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-corner-driven-conformance.ts",
+  "driver": "eval/runners/headless-match.ts with lifecyclePhaseSync:'core-owned' + the gated serializeRestartFacts observation extension. The rules suite is evaluated via evaluateSuite('rules', observations) over the driven corner stream.",
+  "activation": {
+    "field": "runHeadlessMatch({ serializeRestartFacts })",
+    "meaning": "the runner injects the core's per-tick post-step matchPhase + matchTimer (a core-match-phase event per tick) and the committed restart-executed events into the observation stream. Off (the default) the stream is byte-identical to every accepted non-gated run.",
+    "set_by": [
+      "eval/runners/headless-match.ts runHeadlessMatch({ serializeRestartFacts }) (these pinned runs)",
+      "tests/unit/eval/restart-rules-serialization.test.ts and tests/unit/eval/corner-driven-conformance-binding.test.ts",
+      "NOT the browser composition root"
+    ]
+  },
+  "disclosures": [
+    "The driven corner fixture is an adapter/driver state (initial ball + player positions), not a core change: git diff src/simulation/ and src/contracts/ are empty. The corner is genuinely produced by the core's own award + execution machinery (a defending-team last touch over the goal line); nothing is forced or synthesized.",
+    "MATCH-CORNER-KICK-CROSS stays BLOCKED_MISSING_REFERENCE (§14 corner_cross_trajectory_ref): the lofted-cross trajectory reference does not exist and is never invented.",
+    "The corner PASS is not a blanket PASS: the goal-kick neighbour control returns the corner criteria NOT_EVALUATED (no corner execution), and the corner award oracle's mutant direction (last touch NOT the defending team → a goal kick was required) is unit-tested in both directions.",
+    "No criterion is upgraded beyond what the executed evaluator returns; a PASS is reported only where the driven stream genuinely carries the semantics, and NOT_EVALUATED elsewhere. No forced outcome."
+  ],
+  "runs": [
+    {
+      "id": "rules-corner-live",
+      "role": "driven corner fixture: the ball sits at (51.5, 12) inside the +x goal-line span and a team-b defender at (47, 12) chases back toward its own goal, so the AI play produces a defending-team last touch over the goal line — the core awards and executes a corner kick",
+      "scenario": "5v5-corner-driven-v1",
+      "scenario_path": "eval/scenarios/5v5-corner-driven.v1.json",
+      "ticks": 400,
+      "gated_serialization": true,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-corner-driven.v1.json\"), maxTicks: 400, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: true })",
+      "observation_count": 400,
+      "event_kind_counts": {
+        "core-match-phase": 400,
+        "player-ball-contact": 3,
+        "pass": 2,
+        "second-touch": 14,
+        "ball-out-of-play": 1,
+        "player-player-contact": 10,
+        "corner-kick-executed": 1,
+        "pitch-contact": 3
+      },
+      "phase_distribution": {
+        "kickoff": 1,
+        "playing": 338,
+        "corner-kick": 60,
+        "fulltime": 1
+      },
+      "executed_restart_counts": {
+        "throw-in": 0,
+        "goal-kick": 0,
+        "corner": 1
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "PASS",
+        "MATCH-CORNER-KICK-PLACEMENT": "PASS",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "PASS",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "0306d528ed0926d5ffd6f7feef5333aadebd158bff0642348742a8fde8d76e1a",
+        "final_state_hash": "fnv1a64-v1:c946848a85cc34cc"
+      }
+    },
+    {
+      "id": "rules-corner-stashed",
+      "role": "that fixture with serializeRestartFacts:false — the stash-identity control: observations untreated, state-hash chain identical to the gated run",
+      "scenario": "5v5-corner-driven-v1",
+      "scenario_path": "eval/scenarios/5v5-corner-driven.v1.json",
+      "ticks": 400,
+      "gated_serialization": false,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-corner-driven.v1.json\"), maxTicks: 400, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: false })",
+      "observation_count": 400,
+      "event_kind_counts": {
+        "player-ball-contact": 3,
+        "pass": 2,
+        "second-touch": 14,
+        "ball-out-of-play": 1,
+        "player-player-contact": 10,
+        "pitch-contact": 3
+      },
+      "phase_distribution": {},
+      "executed_restart_counts": {
+        "throw-in": 0,
+        "goal-kick": 0,
+        "corner": 0
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "0306d528ed0926d5ffd6f7feef5333aadebd158bff0642348742a8fde8d76e1a",
+        "final_state_hash": "fnv1a64-v1:c946848a85cc34cc"
+      },
+      "stash_identity": {
+        "injected_core_match_phase_events": 0,
+        "injected_restart_executed_events": 0,
+        "gated_on_state_hash_of_hashes": "0306d528ed0926d5ffd6f7feef5333aadebd158bff0642348742a8fde8d76e1a",
+        "state_hash_chain_identical": true
+      }
+    },
+    {
+      "id": "rules-corner-goalkick-neighbour",
+      "role": "the accepted goal-kick fixture under the same gated stream — a discriminating control: it produces a goal kick, never a corner, so the corner criteria must return NOT_EVALUATED (proving the corner PASS is not a blanket PASS)",
+      "scenario": "5v5-restart-arc-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-arc.v1.json",
+      "ticks": 400,
+      "gated_serialization": true,
+      "lifecycle_phase_sync": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-arc.v1.json\"), maxTicks: 400, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", serializeRestartFacts: true })",
+      "observation_count": 400,
+      "event_kind_counts": {
+        "core-match-phase": 400,
+        "player-ball-contact": 6,
+        "shot": 5,
+        "ball-out-of-play": 1,
+        "goal-kick-executed": 1,
+        "pass": 1,
+        "second-touch": 5,
+        "player-player-contact": 22,
+        "pitch-contact": 2,
+        "goal": 1
+      },
+      "phase_distribution": {
+        "kickoff": 1,
+        "playing": 278,
+        "goal-kick": 60,
+        "goal": 60,
+        "fulltime": 1
+      },
+      "executed_restart_counts": {
+        "throw-in": 0,
+        "goal-kick": 1,
+        "corner": 0
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "PASS",
+        "MATCH-GOAL-KICK-PLACEMENT": "PASS",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "PASS",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "PASS",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "4d972fd28a77c7b24a7c2c9c88b837304ab91e8b8f9ba6e2e266f660e512aa7a",
+        "final_state_hash": "fnv1a64-v1:c4a94b8a60b532ef"
+      }
+    }
+  ]
+}
