@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-DETECTION-MACHINERY",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-foul-detection-machinery.ts",
+  "driver": "eval/runners/headless-match.ts with cpuDefensiveTackle:true, lifecyclePhaseSync:'legacy', and the gated detectFouls observation extension (FOUL-DETECTION-MACHINERY); plus the driven proximate-5v5 stream via the accepted defensive-duel-driver with the pure detectFoulEvents read.",
+  "activation": {
+    "field": "runHeadlessMatch({ detectFouls }) + detectFoulEvents(observations)",
+    "meaning": "the runner injects, as observation-level annotations, a `foul` event into the matching-tick observation for every committed man-not-ball tackle contact (a player-player-contact with contactType ∈ {standing-tackle, slide-tackle}, tacklePhase === 'active', duelWon === false). Off (the default) the stream is byte-identical to every accepted run. Cards, advantage and free-kicks stay spec-only (not implemented).",
+    "set_by": [
+      "eval/runners/headless-match.ts runHeadlessMatch({ detectFouls }) (these pinned runs)",
+      "eval/runners/foul-detection.ts detectFoulEvents(observations)",
+      "tests/unit/eval/foul-detection-machinery-binding.test.ts",
+      "NOT the browser composition root"
+    ]
+  },
+  "disclosures": [
+    "FOUL-DETECT / FOUL-CLEAN-TACKLE are NAMED-BUT-UNREGISTERED criteria (FOULS_CARDS_SPEC §10): no evaluator suite, oracle, invariant, binding or scenario registration accompanies this objective, and no suite verdict is reported for them. That is the next objective (FOULS-SUITE-REGISTRATION).",
+    "Cards, advantage and free-kicks stay spec-only (not implemented): no card event, no advantage-window logic, no free-kick restart exists. Only the §5.1 man-not-ball foul read is emitted.",
+    "The driven stream uses the accepted defensive-duel-driver (scripted standing tackle) and applies the pure detectFoulEvents read; the runHeadlessMatch runner gate (detectFouls) is exercised by the organic live + stashed runs. The detection predicate is identical in both (the same exported function).",
+    "The detection is an observation-level annotation (the gk-role / restart-designation precedent): git diff src/simulation/ and src/contracts/ are empty; the core, its event union and its contracts are untouched, and detectFouls:false is byte-identical to the pre-change baseline.",
+    "No criterion is upgraded beyond what the executed read returns; a foul is reported only where a genuine man-not-ball contact is committed. No forced outcome."
+  ],
+  "runs": [
+    {
+      "id": "driven-foul-live",
+      "role": "proximate 5v5 human-vs-CPU (defensive-duel-driver) with a scripted standing tackle at earliestTick 48: the committed contact is a man-not-ball tackle (duelWon false, ballReachable false, tacklePhase active) — a genuine foul candidate. The pure detectFoulEvents read emits the `foul` event.",
+      "scenario": "5v5-human-vs-cpu-v1",
+      "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 120,
+      "detect_fouls": true,
+      "reproduction": "runDefensiveDuel({ scenario: withProximateHumanDefence(load(\"eval/scenarios/5v5-human-vs-cpu.v1.json\")), maxTicks: 120, attempts: [{ kind: \"standing\", commitDistance: 3.0, earliestTick: 48 }] }) + detectFoulEvents(observations)",
+      "observation_count": 120,
+      "event_kind_counts": {
+        "player-player-contact": 300,
+        "player-ball-contact": 1,
+        "pass": 1,
+        "tackle-phase": 4,
+        "foul": 1
+      },
+      "player_player_contact_count": 300,
+      "foul_count": 1,
+      "foul_events": [
+        {
+          "tick": 51,
+          "id": "foul-51-193",
+          "sourceEventId": "tackle-player-contact-51-192",
+          "payload": {
+            "playerIdA": "player-1",
+            "playerIdB": "player-10",
+            "teamIdA": "team-a",
+            "teamIdB": "team-b",
+            "contactType": "standing-tackle",
+            "tacklePhase": "active",
+            "duelWon": false,
+            "ballReachable": false,
+            "sourceEventId": "tackle-player-contact-51-192",
+            "attemptStartTick": 49,
+            "activeWindowStartTick": 51,
+            "activeWindowEndTick": 54,
+            "reach": 1.6,
+            "planarDistance": 0.40747702130911767,
+            "committedDirection": {
+              "x": 0.9999994220022065,
+              "y": -0.00107517219696549
+            }
+          }
+        }
+      ],
+      "foul_payload_validation": {
+        "errors": [],
+        "valid": true
+      },
+      "determinism": {
+        "state_hash_of_hashes": "8c227ab43ef51e0f1eacfe600cbfcca938384b50843e9fcf0a1b8603f23bfdcd",
+        "final_state_hash": "fnv1a64-v1:abd33ad43d344595"
+      }
+    },
+    {
+      "id": "organic-foul-live",
+      "role": "coherent 3v3 CPU-vs-CPU (3v3-press) with cpuDefensiveTackle:true and the runner gate detectFouls:true — a real man-not-ball contact emerges organically and is emitted as a `foul` event.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "scenario_path": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "detect_fouls": true,
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/3v3-press-scenario.v1.json\"), maxTicks: 600, cpuAntiHuddle: true, lifecyclePhaseSync: \"legacy\", cpuDefensiveTackle: true, detectFouls: true })",
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1,
+        "foul": 1
+      },
+      "player_player_contact_count": 73,
+      "foul_count": 1,
+      "foul_events": [
+        {
+          "tick": 536,
+          "id": "foul-536-138",
+          "sourceEventId": "tackle-player-contact-536-137",
+          "payload": {
+            "playerIdA": "player-1",
+            "playerIdB": "player-4",
+            "teamIdA": "team-a",
+            "teamIdB": "team-b",
+            "contactType": "slide-tackle",
+            "tacklePhase": "active",
+            "duelWon": false,
+            "ballReachable": false,
+            "sourceEventId": "tackle-player-contact-536-137",
+            "attemptStartTick": 530,
+            "activeWindowStartTick": 533,
+            "activeWindowEndTick": 541,
+            "reach": 2.8,
+            "planarDistance": 2.4490006780379376,
+            "committedDirection": {
+              "x": 0.574935483516312,
+              "y": 0.818198747123133
+            }
+          }
+        }
+      ],
+      "foul_payload_validation": {
+        "errors": [],
+        "valid": true
+      },
+      "determinism": {
+        "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+        "final_state_hash": "fnv1a64-v1:0d7e73ac5794c821"
+      }
+    },
+    {
+      "id": "organic-foul-stashed",
+      "role": "the SAME organic match with detectFouls:false — stash-identity control: state-hash chain identical to the gated run, 0 injected `foul` events, byte-identical to the pre-change baseline.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "scenario_path": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "detect_fouls": false,
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/3v3-press-scenario.v1.json\"), maxTicks: 600, cpuAntiHuddle: true, lifecyclePhaseSync: \"legacy\", cpuDefensiveTackle: true, detectFouls: false })",
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "player_player_contact_count": 73,
+      "foul_count": 0,
+      "foul_events": [],
+      "foul_payload_validation": {
+        "errors": [
+          "no foul emitted"
+        ],
+        "valid": false
+      },
+      "determinism": {
+        "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+        "final_state_hash": "fnv1a64-v1:0d7e73ac5794c821"
+      },
+      "stash_identity": {
+        "injected_foul_events": 0,
+        "gated_on_state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+        "state_hash_chain_identical": true,
+        "byte_identical_to_pre_change_baseline": true,
+        "baseline_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a"
+      }
+    }
+  ]
+}

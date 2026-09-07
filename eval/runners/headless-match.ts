@@ -38,6 +38,7 @@ import {
   describeHumanRestartWindow,
 } from "../../src/adapters/input-browser/human-restart-control.js";
 import { computeTeamDecision } from "../../src/adapters/input-browser/team-decision-profile.js";
+import { detectFoulEvents } from "./foul-detection.js";
 import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
 import type { SimulationObserver } from "../../src/simulation/telemetry/observer.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
@@ -206,6 +207,20 @@ export interface HeadlessMatchConfig {
    * every accepted non-gated run.
    */
   serializeRestartFacts?: boolean;
+  /**
+   * Detect man-not-ball tackle contacts as observation-level `foul` events
+   * (FOUL-DETECTION-MACHINERY, FOULS_CARDS_SPEC §5.1). When true, the runner
+   * injects, post-loop and additively, a `foul` event into the matching-tick
+   * observation for every committed `player-player-contact` event with
+   * `contactType` ∈ {`standing-tackle`, `slide-tackle`},
+   * `tacklePhase === "active"`, and `duelWon === false` — the engine-grounded
+   * man-not-ball foul candidate. This is a READ of the accepted tackle
+   * machinery's own contacts (zero gameplay change: the tackle behavior, the
+   * core, its event union and its contracts are untouched), and when false (the
+   * default) the observation stream is byte-identical to every accepted run.
+   * Cards, advantage and free-kicks stay spec-only (not implemented).
+   */
+  detectFouls?: boolean;
   /**
    * Drive a human-taken restart through the SAME core machinery and observation
    * extension (HUMAN-RESTART-RULES-CONFORMANCE). When present, the runner
@@ -690,6 +705,7 @@ export function runHeadlessMatch(
     browserParityObservations = false,
     lifecyclePhaseSync = DEFAULT_LIFECYCLE_PHASE_SYNC,
     serializeRestartFacts = false,
+    detectFouls = false,
     humanRestartControl,
     rehomeKeeper,
   } = config;
@@ -1438,6 +1454,21 @@ export function runHeadlessMatch(
         });
       }
     }
+  }
+
+  // FOUL-DETECTION-MACHINERY: close the serialization gap for the fouls spec's
+  // engine-grounded definition (FOULS_CARDS_SPEC §5.1). This is gated on
+  // `detectFouls` (off => every accepted run stays byte-identical), runs
+  // post-loop (inputs, steps and state hashes are all already committed, so it
+  // provably cannot affect them) and is additive (observation-level annotations,
+  // the gk-role / restart-designation precedent; the core, its event union and
+  // its contracts are untouched). It emits a `foul` event for each committed
+  // man-not-ball tackle contact — a `player-player-contact` with
+  // `contactType` ∈ {`standing-tackle`, `slide-tackle`},
+  // `tacklePhase === "active"`, and `duelWon === false`. Cards, advantage and
+  // free-kicks stay spec-only (not implemented).
+  if (detectFouls && observations.length > 0) {
+    detectFoulEvents(observations);
   }
 
   // 6. Compute match stats (clock + score) from events.

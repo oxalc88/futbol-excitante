@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-DETECTION-MACHINERY",
+  "produced_by": "scripts/capture-foul-detection-machinery.ts",
+  "evidence_class": "MULTI_TICK",
+  "spec_sections": [
+    "FOULS_CARDS_SPEC §4.2",
+    "FOULS_CARDS_SPEC §5.1",
+    "FOULS_CARDS_SPEC §10"
+  ],
+  "runs": [
+    {
+      "id": "driven-foul-live",
+      "role": "proximate 5v5 human-vs-CPU (defensive-duel-driver) with a scripted standing tackle at earliestTick 48: the committed contact is a man-not-ball tackle (duelWon false, ballReachable false, tacklePhase active) — a genuine foul candidate. The pure detectFoulEvents read emits the `foul` event.",
+      "scenario": "5v5-human-vs-cpu-v1",
+      "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 120,
+      "detect_fouls": true,
+      "reproduction": "runDefensiveDuel({ scenario: withProximateHumanDefence(load(\"eval/scenarios/5v5-human-vs-cpu.v1.json\")), maxTicks: 120, attempts: [{ kind: \"standing\", commitDistance: 3.0, earliestTick: 48 }] }) + detectFoulEvents(observations)",
+      "observation_count": 120,
+      "event_kind_counts": {
+        "player-player-contact": 300,
+        "player-ball-contact": 1,
+        "pass": 1,
+        "tackle-phase": 4,
+        "foul": 1
+      },
+      "player_player_contact_count": 300,
+      "foul_count": 1,
+      "foul_events": [
+        {
+          "tick": 51,
+          "id": "foul-51-193",
+          "sourceEventId": "tackle-player-contact-51-192",
+          "payload": {
+            "playerIdA": "player-1",
+            "playerIdB": "player-10",
+            "teamIdA": "team-a",
+            "teamIdB": "team-b",
+            "contactType": "standing-tackle",
+            "tacklePhase": "active",
+            "duelWon": false,
+            "ballReachable": false,
+            "sourceEventId": "tackle-player-contact-51-192",
+            "attemptStartTick": 49,
+            "activeWindowStartTick": 51,
+            "activeWindowEndTick": 54,
+            "reach": 1.6,
+            "planarDistance": 0.40747702130911767,
+            "committedDirection": {
+              "x": 0.9999994220022065,
+              "y": -0.00107517219696549
+            }
+          }
+        }
+      ],
+      "foul_payload_validation": {
+        "errors": [],
+        "valid": true
+      },
+      "determinism": {
+        "state_hash_of_hashes": "8c227ab43ef51e0f1eacfe600cbfcca938384b50843e9fcf0a1b8603f23bfdcd",
+        "final_state_hash": "fnv1a64-v1:abd33ad43d344595"
+      }
+    },
+    {
+      "id": "organic-foul-live",
+      "role": "coherent 3v3 CPU-vs-CPU (3v3-press) with cpuDefensiveTackle:true and the runner gate detectFouls:true — a real man-not-ball contact emerges organically and is emitted as a `foul` event.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "scenario_path": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "detect_fouls": true,
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/3v3-press-scenario.v1.json\"), maxTicks: 600, cpuAntiHuddle: true, lifecyclePhaseSync: \"legacy\", cpuDefensiveTackle: true, detectFouls: true })",
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1,
+        "foul": 1
+      },
+      "player_player_contact_count": 73,
+      "foul_count": 1,
+      "foul_events": [
+        {
+          "tick": 536,
+          "id": "foul-536-138",
+          "sourceEventId": "tackle-player-contact-536-137",
+          "payload": {
+            "playerIdA": "player-1",
+            "playerIdB": "player-4",
+            "teamIdA": "team-a",
+            "teamIdB": "team-b",
+            "contactType": "slide-tackle",
+            "tacklePhase": "active",
+            "duelWon": false,
+            "ballReachable": false,
+            "sourceEventId": "tackle-player-contact-536-137",
+            "attemptStartTick": 530,
+            "activeWindowStartTick": 533,
+            "activeWindowEndTick": 541,
+            "reach": 2.8,
+            "planarDistance": 2.4490006780379376,
+            "committedDirection": {
+              "x": 0.574935483516312,
+              "y": 0.818198747123133
+            }
+          }
+        }
+      ],
+      "foul_payload_validation": {
+        "errors": [],
+        "valid": true
+      },
+      "determinism": {
+        "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+        "final_state_hash": "fnv1a64-v1:0d7e73ac5794c821"
+      }
+    },
+    {
+      "id": "organic-foul-stashed",
+      "role": "the SAME organic match with detectFouls:false — stash-identity control: state-hash chain identical to the gated run, 0 injected `foul` events, byte-identical to the pre-change baseline.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "scenario_path": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "detect_fouls": false,
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/3v3-press-scenario.v1.json\"), maxTicks: 600, cpuAntiHuddle: true, lifecyclePhaseSync: \"legacy\", cpuDefensiveTackle: true, detectFouls: false })",
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "player_player_contact_count": 73,
+      "foul_count": 0,
+      "foul_events": [],
+      "foul_payload_validation": {
+        "errors": [
+          "no foul emitted"
+        ],
+        "valid": false
+      },
+      "determinism": {
+        "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+        "final_state_hash": "fnv1a64-v1:0d7e73ac5794c821"
+      },
+      "stash_identity": {
+        "injected_foul_events": 0,
+        "gated_on_state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+        "state_hash_chain_identical": true,
+        "byte_identical_to_pre_change_baseline": true,
+        "baseline_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a"
+      }
+    }
+  ],
+  "claims_not_made": [
+    "No suite verdict for FOUL-DETECT / FOUL-CLEAN-TACKLE: they are named-but-unregistered (FOULS_CARDS_SPEC §10) and belong to the next objective.",
+    "No card / advantage / free-kick implementation: those stay spec-only.",
+    "No gameplay / source / contract / adapter / spec change: src/simulation/ and src/contracts/ are EMPTY; only the runner observation extension, evidence + tests are added.",
+    "No FOUNDATION_LAB_PASS, milestone or regression PASS claim.",
+    "No PES 2017 fidelity or invented reference envelope: the foul definition is a read of the accepted machinery's own contacts (spec §5.1), and no fouls-v1 constant is hard-coded here.",
+    "No PROMOTION claim."
+  ],
+  "record_sha256": "69104ea10e14aa2607eefbd9e3206e17d025f4cea5206032867e4772bc89a272"
+}
