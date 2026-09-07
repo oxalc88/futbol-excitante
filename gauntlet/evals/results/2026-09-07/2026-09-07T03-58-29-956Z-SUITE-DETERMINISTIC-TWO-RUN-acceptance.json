@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-07T03:58:29.956Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "SUITE-DETERMINISTIC-TWO-RUN",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "f3a50ee1215b160ba4ece05107a123785eb741c1",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v31 4/4 (horizon COMPLETE): two-run deterministic attestation for both registered suites so COMMON-DETERMINISTIC evaluates (BOOKKEEPING; zero source change — git diff src/ src/adapters/ eval/runners/ eval/oracles/ eval/invariants/ eval/contracts/ eval/scenarios/ specs/ EMPTY, verified by builder, critic, AND integration; no accepted record mutated). MECHANISM: COMMON-DETERMINISTIC is a HARD_INVARIANT with no single-run oracle (deliberately excluded from CRITERION_TO_ORACLE; excluded from single-run overall reduction) — it resolves from a two-run comparison per GAMEPLAY_EVALUATION_SPEC §HARD_INVARIANT (:412) and the compare-foundation two-run shape: two runs of the same pinned run contract with identical per-tick stateHashes ⇒ PASS, divergence ⇒ FAIL with earliest_divergence_tick. SIX STREAMS ATTESTED all identical=true / earliest_divergence_tick=null: GK gk-continuous-live (1800 ticks, chain 6dbb4341…), gk-shot-fixture-live (600, 4a1aa34d…); rules rules-corner-live (400, 0306d528…), rules-full-match-live (800, 2d909500…), designation-fullmatch-live (800, 4aa1cee9…), designation-throwin-live (1800, 6e78e38e…). Disclosed exclusions (budget/redundant; the criteria not verdict-carried by attested streams are owned by the still-accepted baseline records with explicit attribution): designation-arc-live, rules-throwin-baseline, rules-goalkick-postgoal-baseline, rules-throw-in-live, rules-goal-kick-live, rules-corner-goalkick-neighbour. UPDATED TABLES: goalkeepers (suite-goalkeepers-v1) 9 PASS / 0 FAIL / 2 NOT_EVALUATED / 1 BLOCKED_MISSING_REFERENCE / 1 NEEDS_PERCEPTUAL_REVIEW — the ONLY change vs the GK-SUITE-CORE-OWNED-STATE baseline (5cd1c808…, 8/3/1/1) is COMMON-DETERMINISTIC NOT_EVALUATED→PASS; rules (suite-rules-v1) the 25 §15 MATCH-* criteria byte-unchanged 23/2/0/0 with COMMON-DETERMINISTIC added as a determinism attestation row = PASS (26-row table 24/2/0/0; attested_per_criterion_regressions empty; suite-rules-v1 has common_criterion_ids: [] so the row is additive, not a §15 upgrade). VERDICT DERIVATION: PASS strictly from byte-identity (a divergence would FAIL — the critic proved the comparison real with a cpuAntiHuddle:false divergence probe and an element-wise per-tick verifier of its own); per-run single-run COMMON-DETERMINISTIC verdicts honestly retained NOT_EVALUATED beneath the attestation row; no suite-level PASS claim (both suites retain BLOCKED/NEEDS_PERCEPTUAL_REVIEW/NOT_EVALUATED rows; binding-enforced). Evidence: record_sha256 abaf6ccdc8a07643289035e8dbfcc639a525a66955b4738f3735d24fa350a27c (no wall-clock field — keys verified; candidate_commit = HEAD 86a3a53; two consecutive ordinary-mode runs byte-identical to each other AND byte-identical to the durable record, file SHA 7e995f97…; ordinary runs leave docs/ byte-identical — the WIP_SECTION gate verified by full-tree SHA comparison); audit PASS at the tool-canonical BOOKKEEPING shape. Tests: binding 7/7 (incl. the live discriminating determinism check — same-config byte-identical, cpuAntiHuddle:false diverges) + rules gate 173/173 (10 files) + GK families 88/88 (8 files; one non-fatal vitest worker-RPC teardown error, the documented known infra artifact) + registry/provenance/hygiene 200/200 + foundation 28/28 + determinism/stateHash pins 59/59 + restart/match determinism suites 162/162; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass — ran the producer twice itself (both pin the same record_sha256 and all six chain hashes), wrote its own per-tick verifier and re-ran two attested streams twice each (gk-shot-fixture-live 600/600 identical, rules-corner-live 400/400 identical), proved the comparison real via the divergence probe, programmatically verified the deltas (exactly one GK delta; rules §15 byte-identical), confirmed the exclusion attribution; integration (glm5.3-flash) ACCEPT first pass — all batteries re-run green with counts matching the builder exactly, the invariant gate semantics matched to compare-foundation.ts and the spec, silent-consumer hunt clean (the new paths referenced only by the producer + its binding + state bookkeeping). claims_not_made: no suite-level PASS claim (both suites retain BLOCKED/NEEDS_PERCEPTUAL_REVIEW/NOT_EVALUATED rows; the accurate phrasing) / no PROMOTION / no FOUNDATION_LAB_PASS / no PES 2017 fidelity or invented reference envelope (BLOCKED_MISSING_REFERENCE stays blocked) / no criterion upgraded beyond the executed two-run attestation (COMMON-DETERMINISTIC PASS only on byte-identity, never forced) / zero gameplay change / no accepted record mutation."
+}

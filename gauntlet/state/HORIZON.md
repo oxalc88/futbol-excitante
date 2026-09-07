@@ -9,7 +9,7 @@ horizon_id: "conformance-completion-and-match-flow"
 created_from_commit: 0b5ae53
 created_at: 2026-09-06
 reason: "Horizon v30 (COMPLETE 4/4, remote-durable at 0b5ae53) closed the surfaced threads: ten serialized-fact rules criteria upgraded to executed PASS plus genuine timer-driven halftime/fulltime on a new driven timing fixture (5f29f2f), a genuine driven corner completing the per-restart conformance set with DYNAMIC_VISUAL frames (c07cebb), the core-owned team-a keeper off-arc drift root-caused (post-goal reset strands an off-arc-home keeper) and fixed at the adapter layer with rehomeKeeperToArc (e687fa9), and the goalkeepers suite honestly re-published under core-owned with COMMON-BOUNDS FAIL→PASS (de9fd3b). v31 completes the executable layer and adds a browser-facing capability: (a) serialize the adapter restart-window designation facts behind the same gate so the 3 anti-huddle restart-behavior criteria evaluate (rules suite → 23 PASS / 2 BLOCKED); (b) re-publish the rules suite state after that; (c) browser-visible full-match lifecycle flow (halftime break countdown + fulltime terminal state in the real app) as the observable capability; (d) two-run deterministic attestation so COMMON-DETERMINISTIC evaluates for the GK and rules suites. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 3
+current_index: 4
 objectives:
   - id: RESTART-DESIGNATION-FACTS-CONFORMANCE
     status: accepted
@@ -33,7 +33,9 @@ objectives:
     builder: builder-gameplay
     prerequisite: ""
   - id: SUITE-DETERMINISTIC-TWO-RUN
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-07
+    candidate_commit: f3a50ee
     reason: "Two-run deterministic attestation for the registered suites: re-run the goalkeepers and rules suites with two-run byte-identity evidence (the duels precedent extended) so COMMON-DETERMINISTIC evaluates instead of staying NOT_EVALUATED for single-run records; publish the honest updated verdicts. BOOKKEEPING; zero gameplay change."
     builder: builder-structured
     prerequisite: ""
