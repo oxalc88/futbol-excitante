@@ -1,0 +1,398 @@
+{
+  "schema_version": 1,
+  "objective_id": "GK-DRIVEN-CLOSURE",
+  "suite_id": "goalkeepers",
+  "suite_version": "suite-goalkeepers-v1",
+  "produced_by": "scripts/capture-gk-driven-closure.ts",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "1214ca71f1838f966041b447c2330430973d7c0a",
+  "record_sha256": "21a596277aac626f3612e225ced4145310e1a81631bd28552f9188d223b33d7a",
+  "gameplay_change": "none",
+  "baseline": {
+    "horizon_label": "GK-SUITE-CORE-OWNED-STATE baseline (9/0/2/1/1)",
+    "note": "The horizon labels the baseline 'GK-SUITE-CORE-OWNED-STATE (9/0/2/1/1)'. The 9/0/2/1/1 verdict_counts are the post-two-run goalkeepers table recorded by SUITE-DETERMINISTIC-TWO-RUN; GK-SUITE-CORE-OWNED-STATE's own record is 8/0/3/1/1 (single-run, COMMON-DETERMINISTIC NOT_EVALUATED), before the two-run attestation. Both records are read verbatim and disclosed; the deltas here are computed against the 9/0/2/1/1 table the horizon binds.",
+    "source_record": "docs/evidence/SUITE-DETERMINISTIC-TWO-RUN/suite-deterministic-two-run.json",
+    "source_record_sha256": "abaf6ccdc8a07643289035e8dbfcc639a525a66955b4738f3735d24fa350a27c",
+    "gk_core_owned_record": "docs/evidence/GK-SUITE-CORE-OWNED-STATE/gk-suite-core-owned-state.json",
+    "gk_core_owned_record_sha256": "5cd1c80879d400c2dabfc0ba6d9b195447fc9476f7b6ebb5329877dd2a69204a",
+    "verdict_counts": {
+      "PASS": 9,
+      "FAIL": 0,
+      "NOT_EVALUATED": 2,
+      "BLOCKED_MISSING_REFERENCE": 1,
+      "NEEDS_PERCEPTUAL_REVIEW": 1
+    },
+    "verdicts": {
+      "GK-POSITIONING-HOLD": "PASS",
+      "GK-NO-FIELD-CHASE": "PASS",
+      "GK-SAVE-CLAIM": "PASS",
+      "GK-ROLE-DESIGNATION": "PASS",
+      "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS",
+      "COMMON-FINITE": "PASS",
+      "COMMON-DETERMINISTIC": "PASS",
+      "COMMON-REFERENCES": "PASS",
+      "COMMON-BOUNDS": "PASS",
+      "ref": "BLOCKED_MISSING_REFERENCE",
+      "vis": "NEEDS_PERCEPTUAL_REVIEW",
+      "reg": "NOT_EVALUATED",
+      "causal": "NOT_EVALUATED"
+    }
+  },
+  "source_change": {
+    "src_contracts_diff_empty": true,
+    "note": "Zero gameplay / source / contract change. The gate is `git diff src/ src/contracts/` empty. The driven streams are driven via adapter initial state / scenario fixtures ONLY (eval/scenarios/5v5-keeper-shot-fixture reused, eval/scenarios/5v5-keeper-release-fixture NEW); the core + adapters + contracts + evaluator + oracles are untouched."
+  },
+  "driven_streams": [
+    {
+      "stream_id": "gk-save-driven",
+      "description": "Controlled on-target shot chain: the core's own shot contact is answered by a recorded team-b keeper save/claim contact inside the versioned reach (the accepted GK-5V5-ADAPTER-BEHAVIOR fixture geometry, reused verbatim). GK-SAVE-CLAIM evaluates with >=1 real save/claim chain.",
+      "scenario": "5v5-keeper-shot-fixture-v1",
+      "scenario_path": "eval/scenarios/5v5-keeper-shot-fixture.v1.json",
+      "ticks": 600,
+      "lifecycle": "core-owned",
+      "rehome_keeper": true,
+      "source_candidate": "1214ca71f1838f966041b447c2330430973d7c0a",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-keeper-shot-fixture.v1.json, maxTicks: 600, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' })",
+      "determinism": {
+        "run_a_state_hash_of_hashes": "4a1aa34d87e3a58829edae2416503ae7508011b6da7e8981325bd0a09bf092e0",
+        "run_b_state_hash_of_hashes": "4a1aa34d87e3a58829edae2416503ae7508011b6da7e8981325bd0a09bf092e0",
+        "run_a_observations_sha256": "347d84b1316b3a2d6bb980c68e06a56b97b7f060d97deba7b18291047475bd1c",
+        "run_b_observations_sha256": "347d84b1316b3a2d6bb980c68e06a56b97b7f060d97deba7b18291047475bd1c",
+        "state_hash_count": 600,
+        "identical": true,
+        "state_hash_chain_identical": true,
+        "observations_byte_identical": true,
+        "earliest_divergence_tick": null,
+        "final_state_hash_a": "fnv1a64-v1:bd427cdac09d7472",
+        "final_state_hash_b": "fnv1a64-v1:bd427cdac09d7472"
+      },
+      "keeper_by_team": {
+        "team-a": "player-4",
+        "team-b": "player-10"
+      },
+      "verdicts": {
+        "gk_behavior": {
+          "GK-SAVE-CLAIM": "PASS",
+          "GK-POSITIONING-HOLD": "PASS",
+          "GK-ROLE-DESIGNATION": "PASS",
+          "GK-DISTRIBUTION-NO-OMNISCIENCE": "NOT_EVALUATED",
+          "GK-NO-FIELD-CHASE": "PASS"
+        },
+        "common": {
+          "COMMON-FINITE": "PASS",
+          "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+          "COMMON-REFERENCES": "PASS",
+          "COMMON-BOUNDS": "PASS"
+        },
+        "catalog": {
+          "ref": "BLOCKED_MISSING_REFERENCE",
+          "vis": "NEEDS_PERCEPTUAL_REVIEW",
+          "reg": "NOT_EVALUATED",
+          "causal": "NOT_EVALUATED"
+        }
+      },
+      "save_chains": [
+        {
+          "teamId": "team-b",
+          "keeperPlayerId": "player-10",
+          "shotTick": 361,
+          "keeperContactTick": 362,
+          "contactKind": "player-ball-contact",
+          "recordedDistance": 1.0812744051747947,
+          "ticksFromShot": 1,
+          "withinReach": true,
+          "interruptedBy": null
+        },
+        {
+          "teamId": "team-b",
+          "keeperPlayerId": "player-10",
+          "shotTick": 370,
+          "keeperContactTick": 374,
+          "contactKind": "player-ball-contact",
+          "recordedDistance": 0.7368075471299359,
+          "ticksFromShot": 4,
+          "withinReach": true,
+          "interruptedBy": null
+        },
+        {
+          "teamId": "team-b",
+          "keeperPlayerId": "player-10",
+          "shotTick": 376,
+          "keeperContactTick": 380,
+          "contactKind": "player-ball-contact",
+          "recordedDistance": 0.5508297685166446,
+          "ticksFromShot": 4,
+          "withinReach": true,
+          "interruptedBy": null
+        },
+        {
+          "teamId": "team-b",
+          "keeperPlayerId": "player-10",
+          "shotTick": 382,
+          "keeperContactTick": 386,
+          "contactKind": "player-ball-contact",
+          "recordedDistance": 0.47298755855244956,
+          "ticksFromShot": 4,
+          "withinReach": true,
+          "interruptedBy": null
+        }
+      ],
+      "shots_on_target_faced": 19,
+      "distribution": {
+        "releases": 0,
+        "release_ticks": [],
+        "release_targets": []
+      }
+    },
+    {
+      "stream_id": "gk-release-driven",
+      "description": "Controlled keeper-release situation: the keeper secures a slow ball in its goal arc and the adapter's distribution path releases to an observed forward teammate (player-9) down a lane it is already facing. GK-DISTRIBUTION-NO-OMNISCIENCE evaluates with >=1 real release.",
+      "scenario": "5v5-keeper-release-fixture-v1",
+      "scenario_path": "eval/scenarios/5v5-keeper-release-fixture.v1.json",
+      "ticks": 300,
+      "lifecycle": "core-owned",
+      "rehome_keeper": true,
+      "source_candidate": "1214ca71f1838f966041b447c2330430973d7c0a",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-keeper-release-fixture.v1.json, maxTicks: 300, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' })",
+      "determinism": {
+        "run_a_state_hash_of_hashes": "dd03c4a1ea391089d34c99536bf4d5b84d1f4411350ae0a8e64016e73c9e056f",
+        "run_b_state_hash_of_hashes": "dd03c4a1ea391089d34c99536bf4d5b84d1f4411350ae0a8e64016e73c9e056f",
+        "run_a_observations_sha256": "631026f7f1f33a90917bc16d7bd69fd403fbbe62d830c474c9729f1cf9fad4af",
+        "run_b_observations_sha256": "631026f7f1f33a90917bc16d7bd69fd403fbbe62d830c474c9729f1cf9fad4af",
+        "state_hash_count": 300,
+        "identical": true,
+        "state_hash_chain_identical": true,
+        "observations_byte_identical": true,
+        "earliest_divergence_tick": null,
+        "final_state_hash_a": "fnv1a64-v1:9ddf137ffe905c20",
+        "final_state_hash_b": "fnv1a64-v1:9ddf137ffe905c20"
+      },
+      "keeper_by_team": {
+        "team-a": "player-4",
+        "team-b": "player-10"
+      },
+      "verdicts": {
+        "gk_behavior": {
+          "GK-SAVE-CLAIM": "NOT_EVALUATED",
+          "GK-POSITIONING-HOLD": "PASS",
+          "GK-ROLE-DESIGNATION": "PASS",
+          "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS",
+          "GK-NO-FIELD-CHASE": "PASS"
+        },
+        "common": {
+          "COMMON-FINITE": "PASS",
+          "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+          "COMMON-REFERENCES": "PASS",
+          "COMMON-BOUNDS": "PASS"
+        },
+        "catalog": {
+          "ref": "BLOCKED_MISSING_REFERENCE",
+          "vis": "NEEDS_PERCEPTUAL_REVIEW",
+          "reg": "NOT_EVALUATED",
+          "causal": "NOT_EVALUATED"
+        }
+      },
+      "save_chains": [],
+      "shots_on_target_faced": 1,
+      "distribution": {
+        "releases": 12,
+        "release_ticks": [
+          1,
+          4,
+          7,
+          10,
+          13,
+          42,
+          56,
+          58,
+          61,
+          64,
+          67,
+          70
+        ],
+        "release_targets": [
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9",
+          "player-9"
+        ]
+      }
+    }
+  ],
+  "after": {
+    "gk_behavior": {
+      "GK-POSITIONING-HOLD": {
+        "verdict": "PASS"
+      },
+      "GK-NO-FIELD-CHASE": {
+        "verdict": "PASS"
+      },
+      "GK-SAVE-CLAIM": {
+        "verdict": "PASS"
+      },
+      "GK-ROLE-DESIGNATION": {
+        "verdict": "PASS"
+      },
+      "GK-DISTRIBUTION-NO-OMNISCIENCE": {
+        "verdict": "PASS"
+      }
+    },
+    "common": {
+      "COMMON-FINITE": "PASS",
+      "COMMON-DETERMINISTIC": "PASS",
+      "COMMON-REFERENCES": "PASS",
+      "COMMON-BOUNDS": "PASS"
+    },
+    "catalog": {
+      "ref": "BLOCKED_MISSING_REFERENCE",
+      "vis": "NEEDS_PERCEPTUAL_REVIEW",
+      "reg": "NOT_EVALUATED",
+      "causal": "NOT_EVALUATED"
+    }
+  },
+  "verdict_counts": {
+    "PASS": 9,
+    "FAIL": 0,
+    "NOT_EVALUATED": 2,
+    "BLOCKED_MISSING_REFERENCE": 1,
+    "NEEDS_PERCEPTUAL_REVIEW": 1
+  },
+  "per_stream_note": "Each driven stream closes one previously NOT_EVALUATED observation: the save fixture gives GK-SAVE-CLAIM=PASS with a >=1 real save/claim chain; the release fixture gives GK-DISTRIBUTION-NO-OMNISCIENCE=PASS with a >=1 real release. The per-stream NOT_EVALUATED observations on the *other* criterion are disclosed below.",
+  "delta_vs_baseline": [
+    {
+      "criterion": "GK-POSITIONING-HOLD",
+      "from": "PASS",
+      "to": "PASS",
+      "changed": false,
+      "reason": "Unchanged (PASS); verified at the driven-stream aggregate."
+    },
+    {
+      "criterion": "GK-NO-FIELD-CHASE",
+      "from": "PASS",
+      "to": "PASS",
+      "changed": false,
+      "reason": "Unchanged (PASS); verified at the driven-stream aggregate."
+    },
+    {
+      "criterion": "GK-SAVE-CLAIM",
+      "from": "PASS",
+      "to": "PASS",
+      "changed": false,
+      "reason": "Aggregate unchanged (PASS). The remaining true point of this closure: the driven save fixture (5v5-keeper-shot-fixture) yields GK-SAVE-CLAIM=PASS from a >=1 real save/claim chain (4 keeper contacts within the versioned reach), so the previously organic 0-save-chain NOT_EVALUATED observation is answered by a controlled driven stream. The release fixture is NOT_EVALUATED on this criterion (no shot answered within the reaction window), disclosed."
+    },
+    {
+      "criterion": "GK-ROLE-DESIGNATION",
+      "from": "PASS",
+      "to": "PASS",
+      "changed": false,
+      "reason": "Unchanged (PASS); verified at the driven-stream aggregate."
+    },
+    {
+      "criterion": "GK-DISTRIBUTION-NO-OMNISCIENCE",
+      "from": "PASS",
+      "to": "PASS",
+      "changed": false,
+      "reason": "Aggregate unchanged (PASS). This closure adds a NEW controlled driven release stream (5v5-keeper-release-fixture) that yields GK-DISTRIBUTION-NO-OMNISCIENCE=PASS from a >=1 real release (the keeper releases 12 times to observed forward teammate player-9), so the previously fixture 0-release NOT_EVALUATED observation is answered by a driven stream. The save fixture is NOT_EVALUATED on this criterion (0 releases), disclosed."
+    },
+    {
+      "criterion": "COMMON-FINITE",
+      "from": "PASS",
+      "to": "PASS",
+      "changed": false,
+      "reason": "Unchanged (PASS); verified at the driven-stream aggregate."
+    },
+    {
+      "criterion": "COMMON-DETERMINISTIC",
+      "from": "PASS",
+      "to": "PASS",
+      "changed": false,
+      "reason": "Unchanged (PASS). RESOLVED HERE by the two-run byte-identity attestation over both driven streams (run A === run B per stream), the same two-run resolution the accepted SUITE-DETERMINISTIC-TWO-RUN baseline used — no single-run NOT_EVALUATED."
+    },
+    {
+      "criterion": "COMMON-REFERENCES",
+      "from": "PASS",
+      "to": "PASS",
+      "changed": false,
+      "reason": "Unchanged (PASS); verified at the driven-stream aggregate."
+    },
+    {
+      "criterion": "COMMON-BOUNDS",
+      "from": "PASS",
+      "to": "PASS",
+      "changed": false,
+      "reason": "Unchanged (PASS); verified at the driven-stream aggregate."
+    },
+    {
+      "criterion": "ref",
+      "from": "BLOCKED_MISSING_REFERENCE",
+      "to": "BLOCKED_MISSING_REFERENCE",
+      "changed": false,
+      "reason": "Unchanged (BLOCKED_MISSING_REFERENCE); verified at the driven-stream aggregate."
+    },
+    {
+      "criterion": "vis",
+      "from": "NEEDS_PERCEPTUAL_REVIEW",
+      "to": "NEEDS_PERCEPTUAL_REVIEW",
+      "changed": false,
+      "reason": "Unchanged (NEEDS_PERCEPTUAL_REVIEW); verified at the driven-stream aggregate."
+    },
+    {
+      "criterion": "reg",
+      "from": "NOT_EVALUATED",
+      "to": "NOT_EVALUATED",
+      "changed": false,
+      "reason": "Unchanged (NOT_EVALUATED); verified at the driven-stream aggregate."
+    },
+    {
+      "criterion": "causal",
+      "from": "NOT_EVALUATED",
+      "to": "NOT_EVALUATED",
+      "changed": false,
+      "reason": "Unchanged (NOT_EVALUATED); verified at the driven-stream aggregate."
+    }
+  ],
+  "delta_vs_baseline_count_change": {
+    "from": {
+      "PASS": 9,
+      "FAIL": 0,
+      "NOT_EVALUATED": 2,
+      "BLOCKED_MISSING_REFERENCE": 1,
+      "NEEDS_PERCEPTUAL_REVIEW": 1
+    },
+    "to": {
+      "PASS": 9,
+      "FAIL": 0,
+      "NOT_EVALUATED": 2,
+      "BLOCKED_MISSING_REFERENCE": 1,
+      "NEEDS_PERCEPTUAL_REVIEW": 1
+    },
+    "changed": false,
+    "note": "The aggregate verdict_counts are unchanged (9 PASS / 0 FAIL / 2 NOT_EVALUATED / 1 BLOCKED_MISSING_REFERENCE / 1 NEEDS_PERCEPTUAL_REVIEW) — both GK-SAVE-CLAIM and GK-DISTRIBUTION-NO-OMNISCIENCE were already PASS at the aggregate baseline. The closure is at the driven-evidence / per-stream level: the two criteria now each carry a real chain/release from a controlled driven MULTI_TICK stream, answering the per-stream NOT_EVALUATED observations without changing any aggregate verdict. The 2 aggregate NOT_EVALUATED rows are the catalog `reg`/`causal` keys (no versioned regression policy / unknown class) and must not be converted to PASS."
+  },
+  "disclosures": [
+    "GK-SAVE-CLAIM aggregate is PASS both before and after; the closure adds a controlled driven MULTI_TICK save stream (5v5-keeper-shot-fixture) with 4 keeper save/claim contacts inside the versioned reach (contact ticks 362/374/380/386, all withinReach, shot-to-contact gap 1-4 ticks). The release fixture on the same criterion is NOT_EVALUATED (no shot answered within the reaction window), and the organic continuous run remains NOT_EVALUATED on it (0 save chains) — an honest asymmetry, disclosed.",
+    "GK-DISTRIBUTION-NO-OMNISCIENCE aggregate is PASS both before and after; the closure adds a NEW controlled driven MULTI_TICK release stream (5v5-keeper-release-fixture) with 12 keeper-release telemetry events to observed forward teammate player-9. The save fixture on the same criterion is NOT_EVALUATED (0 releases), and the organic continuous run is the prior distribution source. Non-omniscience is read from the release event's observed target — never a hidden future state.",
+    "Aggregate verdict_counts unchanged (9/0/2/1/1). The 1 BLOCKED_MISSING_REFERENCE key (GK-*-REF) and the 1 NEEDS_PERCEPTUAL_REVIEW key (GK-*-VIS) are carried verbatim from the accepted baseline — no reference target was created and no versioned perceptual rubric exists; they must not be upgraded. The 2 aggregate NOT_EVALUATED rows (GK-*-REG, GK-*-CAUSAL) are unchanged (no regression policy / unknown class).",
+    "The horizon labels the baseline 'GK-SUITE-CORE-OWNED-STATE baseline (9/0/2/1/1)'. The 9/0/2/1/1 counts are the post-two-run goalkeepers table from SUITE-DETERMINISTIC-TWO-RUN; GK-SUITE-CORE-OWNED-STATE's own record is 8/0/3/1/1 (single-run, COMMON-DETERMINISTIC NOT_EVALUATED). The label conflation is disclosed, and both records are read verbatim.",
+    "COMMON-DETERMINISTIC is resolved here to PASS by a two-run byte-identity attestation over both driven streams (state-hash chain + observations identical run A vs run B), the same resolution the accepted baseline used, rather than the single-run NOT_EVALUATED.",
+    "Vitest may emit a non-fatal `onTaskUpdate` RPC timeout on the long-running headless hooks; tests and exit code are clean (the documented pre-existing worker-RPC artifact)."
+  ],
+  "claims_not_made": [
+    "No suite-level PASS claim for the goalkeepers suite: 2 aggregate NOT_EVALUATED catalog rows + 1 BLOCKED_MISSING_REFERENCE + 1 NEEDS_PERCEPTUAL_REVIEW remain.",
+    "No PROMOTION claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No invented reference envelope or tolerance; BLOCKED_MISSING_REFERENCE stays BLOCKED_MISSING_REFERENCE.",
+    "No criterion(s) upgraded beyond what the executed evaluator returns; GK-*-REF stays BLOCKED_MISSING_REFERENCE and GK-*-VIS stays NEEDS_PERCEPTUAL_REVIEW.",
+    "No gameplay / source / contract change: git diff src/ src/contracts/ is EMPTY. No evaluator, oracle, catalog, invariant, observation, contract, adapter or spec change.",
+    "No accepted record mutation: GK-SUITE-CORE-OWNED-STATE (5cd1c808…), SUITE-DETERMINISTIC-TWO-RUN (abaf6ccd…), and all prior GK records stay byte-untouched."
+  ]
+}
