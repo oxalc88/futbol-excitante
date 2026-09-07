@@ -9,7 +9,7 @@ horizon_id: "next-spec-phase-and-keeper-playability"
 created_from_commit: 156ecb9
 created_at: 2026-09-07
 reason: "Horizon v32 (COMPLETE 4/4, remote-durable at 156ecb9) closed the playable loop: human-directed restart destination control (5b15992) with the human-taken restart conforming through the rules suite (2a6b92c — the gate leak the critic caught hardened the freeze exemption behind the window-scoped marker), the four reviewer cleanups consolidated (fec4a35), and the fulltime dead end closed with the rematch/menu flow (3f42a50). The playable small-sided loop is complete: setup → play → all restarts (CPU + human-directed) → halftime → fulltime → rematch/menu. v33 opens the next phase on two fronts: (a) FOULS-SPEC-DRAFT — MATCH_RULES_SPEC §16 defers fouls/cards with no existence claim; the established spec→suite→conformance pipeline starts with the dedicated fouls spec draft (spec-only, zero implementation); (b) HUMAN-KEEPER-CONTROL — a real playable capability gap: the human cannot control the designated keeper in human-vs-CPU (the switch mechanism excludes it); extending the existing switch contract to the keeper slot lets the human play keeper; (c) HUMAN-BALL-SERVER-DECISION — the literal pass-button restart server is deferred behind a disclosed core change (countdown-zero auto-serve is core-owned); a deliberate decision record (implement-now plan vs defer with the core machinery analysis) instead of an open thread; (d) RELEASE-0.9.7-CONSOLIDATION — consolidate the v29-v32 playable+executable gains into the release record. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 2
+current_index: 3
 objectives:
   - id: FOULS-SPEC-DRAFT
     status: accepted
@@ -26,7 +26,9 @@ objectives:
     builder: builder-gameplay
     prerequisite: ""
   - id: HUMAN-BALL-SERVER-DECISION
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-07
+    candidate_commit: b55fa74
     reason: "Decision record for the deferred human ball-server (the literal pass-button restart server deferred behind the disclosed core change in HUMAN-RESTART-CONTROL): analyze the core machinery change needed (countdown-zero auto-serve override; a pass-reception serving path), the determinism/pin implications, and the alternatives — then DECIDE: implement-now plan (as a future objective with its own conformance path) or defer with reasons. BOOKKEEPING; zero gameplay change; the decision is recorded, not executed."
     builder: builder-structured
     prerequisite: ""

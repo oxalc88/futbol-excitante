@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-07T18:20:49.319Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "HUMAN-BALL-SERVER-DECISION",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "b55fa7438d2820cb84ae352f4a2bc4336a87f974",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v33 3/4: the decision record for the deferred literal pass-button restart server (BOOKKEEPING; zero source change — git diff src/ src/adapters/ eval/ gauntlet/ specs/ EMPTY, verified by builder, critic, AND integration; the decision is recorded, not executed). ANALYSIS (verified at source level by the critic): the countdown-zero branches (simulation.ts:1674-1681 corner → applyCornerKick, :1689-1700 throw-in → applyThrowIn, :1702-1712 goal-kick → applyGoalKick) fire UNCONDITIONALLY with no input path — a literal human ball-server needs a PASS-GATED SERVING PATH: at countdown zero, if the designated taker is human-controlled, keep the restart phase open and wait for a human PASS_BIT InputFrame within a bounded window; on the pass, derive the serve direction from input and execute; else the CPU auto-serve fires. It cannot reuse the contact-system pass path (a pass requires the player within passRadius 1.2 m — foundation.ts:159,182 — of a contactable ball, which does not hold during an out-of-play window; contact-system.ts:429 gates the candidate scan on dist <= effectiveRadius). DETERMINISM/PIN IMPLICATIONS: the auto-serve is countdown-fixed today (accepted pins computed over that fixed serve tick — spot-checked against the accepted RESTART-RULES-CONFORMANCE stream: throw-in ×2, timer_freeze_ticks 182, fixed 1800-tick run); a human-gated serve introduces a VARIABLE WAIT TICK (deterministic under a fixed input program but input-timing-dependent); the two-run DETERMINISTIC attestation runs CPU streams so unaffected as long as the CPU fallback stays byte-identical; a new human-served stream needs its own attestation; the restart-window machinery (humanWindowTaken, freeze exemption, re-arm, first-touch window close) is affected because the window closes on the pass. CONFORMANCE IMPLICATIONS: MATCH-THROW-IN-SERVE (and the goal-kick/corner analogues), the TIMER-FREEZE criteria, FREEZE-UNTIL-FIRST-TOUCH/KICKOFF-FIRST-TOUCH (window-close semantics), MATCH-TIMER-FREEZE would need re-evaluation on human-served streams. DECISION: DEFER (not_a_hedge recorded) with five concrete reasons — (1) the delivered receiver-steering realization (HUMAN-RESTART-CONTROL 5b15992) already covers the meaningful human influence on restart destination/direction for the primary restart types; (2) the literal server requires a core change with real determinism/pin costs (variable serve wait tick, new frozen phase, re-attestation of any human-served stream; CPU fallback must stay byte-identical); (3) no registered conformance path exists for a human-served stream; (4) the next horizon item (RELEASE-0.9.7-CONSOLIDATION) has higher value; (5) the receiver-steering control is not left incomplete — it is the engine-supported realization. Four alternatives enumerated (receiver-steering as-delivered with covers/does-not-cover; a minimal HUMAN-GATED SERVE WAIT core change; a full pass-reception serving path; defer indefinitely) and the HUMAN-BALL-SERVER-LITERAL future-objective outline is ACTIONABLE — it names the conformance path a future objective would need (new oracles for human-chosen serve direction, wait-phase timer freeze, window-close/first-touch semantics; re-evaluation of SERVE/TIMER-FREEZE/FIRST-TOUCH on human-served streams; CPU fallback byte-identity; its own two-run attestation). Evidence: record_sha256 5b6e391a3d8da585b4e48bfae703ec9d57b78b1ecc1e4a10cbcfeeef5891b489 (no wall-clock field; reproduced byte-exact independently by critic AND integration; two consecutive ordinary-mode runs byte-identical, scratch byte-identical to the durable record proving the gate changes location only; ordinary runs leave docs/ byte-identical — 1008-file snapshot); audit PASS at the tool-canonical BOOKKEEPING shape. Tests: binding 7/7 (real strict assertions: the DEFER verdict, not_a_hedge containing DEFER, ≥4 reasons, SHA recomputation, claims_not_made content — a changed or hedged verdict fails) + rules gate 180/180 (11 files) + restart battery + human-restart neighbors 188/188 (13 files; the known vitest worker-RPC artifact, no assertion failure) + architecture 27/27; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass — the analysis truth verified at source, the decision clarity verified (clear, not a hedge, the outline actionable), the binding discriminating; integration (glm5.3-flash) ACCEPT first pass — every battery re-run, the scope confirmed as exactly the decision-record item with no creep (one 6-file architecture run initially showed 2 toolchain-pnpm fails from the reviewer's own parallel battery contention; solo re-runs 27/27). claims_not_made: no implementation (the decision is recorded, not executed) / no suite-level PASS claim / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity or measured envelope / no invented reference envelope (blocked references stay BLOCKED_MISSING_REFERENCE) / zero gameplay/source change."
+}

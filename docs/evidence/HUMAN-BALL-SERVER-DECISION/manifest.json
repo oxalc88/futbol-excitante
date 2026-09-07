@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "HUMAN-BALL-SERVER-DECISION",
+  "accepted_at": "2026-09-07T18:20:49.319Z",
+  "candidate_commit": "b55fa7438d2820cb84ae352f4a2bc4336a87f974",
+  "evidence_class": "BOOKKEEPING",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/HUMAN-BALL-SERVER-DECISION/audit.json",
+      "sha256": "4dfdcfcf135015538db594faf0d9bf56984e3a4d63887d573859bf47c648887d",
+      "git_blob": "d47f368fd98790579434e8bb45c37e877b67088d",
+      "candidate_commit": "b55fa7438d2820cb84ae352f4a2bc4336a87f974",
+      "bytes": 2697,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T18-20-49-319Z-HUMAN-BALL-SERVER-DECISION-acceptance.json"
+}
