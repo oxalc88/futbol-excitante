@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.7",
+  "persisted_at": "2026-09-07T19:48:26.167Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "RELEASE-0.9.7-CONSOLIDATION",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "9a7cb7f45edf3512ad6fcbd2ff6550cafd2a16a9",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v33 4/4 (horizon COMPLETE): the v29-v33 gains consolidated into the release record (BOOKKEEPING; zero gameplay/source change — git diff src/ src/adapters/ eval/ gauntlet/evals/ gauntlet/roles/ specs/ EMPTY, verified; the builder's diff excluded gauntlet/evals/ per the constraint). RELEASE DOCUMENT: gauntlet/RELEASE-0.9.7.md following the established RELEASE-0.9.3/0.9.4/0.9.5/0.9.6 pattern (title + one-line summary + bulleted sections + 'No gameplay behavior changes'): (1) PLAYABLE — the complete small-sided loop: setup menu → 1v1-5v5 human-vs-CPU + CPU-vs-CPU ladder → human controls incl. the designated keeper (HUMAN-KEEPER-CONTROL) + human-directed restart destination (HUMAN-RESTART-CONTROL) → duels → GK behavior → visible full-match lifecycle (halftime/fulltime, BROWSER-FULL-MATCH-FLOW-EVIDENCE) → fulltime rematch/menu (FULLTIME-FLOW-CLOSURE); (2) EXECUTABLE/ATTESTED — rules suite suite-rules-v1 23 PASS / 2 BLOCKED / 0 NOT_EVALUATED / 0 FAIL over 25 MATCH-* criteria (+24/2 with COMMON-DETERMINISTIC as the determinism row; RULES-SUITE-STATE-RERUN 36fc77e5…); goalkeepers suite suite-goalkeepers-v1 9/0/2/1/1 (GK-SUITE-CORE-OWNED-STATE 5cd1c808…); COMMON-DETERMINISTIC two-run attested for both suites (SUITE-DETERMINISTIC-TWO-RUN abaf6ccd…); 8 protected mutant-guarded oracles; the gated designation-facts serialization (RESTART-DESIGNATION-FACTS 271b1526…); (3) SPEC'D — FOULS_CARDS_SPEC (fouls-v1, spec-only; FOULS-SPEC-DRAFT e98a1efe…); (4) DEFERRED — the pass-button ball-server DEFER decision + the HUMAN-BALL-SERVER-LITERAL actionable outline (HUMAN-BALL-SERVER-DECISION 5b6e391a…); the blocked references; GK beyond small-sided; regulation; full-match ecology; (5) HONEST LIMITATIONS — fixture-driven evidence where applicable, the anti-huddle browserParity observation-shape exclusion, the redundant-control omission, no PES fidelity, no suite-level PASS / PROMOTION / FOUNDATION_LAB_PASS. Every claim cites its accepted record (record_sha256 pinned in the record and verified by the producer, which throws on mutation). VERSION: gauntlet/VERSION.json bumped 0.9.6 → 0.9.7 (previous_system_version → 0.9.6; baseline_commit → f661b38; includes unchanged — the consolidation adds no new Gauntlet capability). ORCHESTRATOR-ROUTED MAINTENANCE (disclosed, the RELEASE-0.9.5 needle-advance precedent): the builder correctly disclosed that bumping VERSION.json breaks the prompt-gate's semver needle (gauntlet/evals/src/prompt-gate.ts pinned 'version': '0.9.6'/'previous_system_version': '0.9.5') — an out-of-scope gauntlet-evals maintenance change under the builder's zero-change constraint; the orchestrator advanced the needles (0.9.6→0.9.7, 0.9.5→0.9.6) as a separate atomic commit 2ca140c AFTER the candidate commit 9a7cb7f, and verified `gauntlet:eval` → 39 scenarios + 33 prompt checks PASS with the advanced needle. Evidence: record_sha256 94ac0110f767c5ce5a5b9507c03846fe9e8c597f3933ab2f76bbf84f9568ca6c (no wall-clock field; two consecutive ordinary-mode runs byte-identical, file sha b4628e6c…; ordinary runs leave docs/ byte-identical — the WIP_SECTION gate); audit PASS at the tool-canonical BOOKKEEPING shape. Tests: binding 10/10 + rules gate + new binding 190/190 (12 files) + registry/provenance/hygiene 70/70 + architecture 27/27; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass — every release-record claim cross-checked against its accepted record. Integration (glm5.3-flash) ACCEPT first pass — the release-document claims verified against the accepted records, the VERSION.json schema consistency checked, the needle-advance need independently confirmed. claims_not_made: no suite-level PASS claim (rules 2 BLOCKED; goalkeepers 1 BLOCKED + 1 NEEDS_PERCEPTUAL_REVIEW + 2 NOT_EVALUATED) / no PROMOTION / no FOUNDATION_LAB_PASS / no PES 2017 fidelity or measured envelope / no invented reference envelope (blocked references stay BLOCKED_MISSING_REFERENCE) / no criterion upgraded beyond the executed evaluator / every PASS cites an accepted record / zero gameplay/source change / no accepted record mutated."
+}

@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-07T18:21:00Z
+measured_at: 2026-09-07T19:50:00Z
 tracking_contract_version: 1
-last_tracked_objective: HUMAN-BALL-SERVER-DECISION
-usage_aggregates_through: HUMAN-BALL-SERVER-DECISION
-clock_aggregates_through: HUMAN-BALL-SERVER-DECISION
-model_evaluation_through: HUMAN-BALL-SERVER-DECISION
+last_tracked_objective: RELEASE-0.9.7-CONSOLIDATION
+usage_aggregates_through: RELEASE-0.9.7-CONSOLIDATION
+clock_aggregates_through: RELEASE-0.9.7-CONSOLIDATION
+model_evaluation_through: RELEASE-0.9.7-CONSOLIDATION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,18 +42,19 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 590h 22m |
+| Calendar span (first work → measurement) | 591h 51m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~188h est. |
-| Sum of per-step agent time | ~185h 33m |
+| Active work (anything running) | ~189h est. |
+| Sum of per-step agent time | ~186h 40m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-07T18:21:00Z`.
-Recomputed 2026-09-07 at the HUMAN-BALL-SERVER-DECISION acceptance
-(Horizon v33 3/4): 204 accepted per-step rows summing to ~185h 33m (the new
-objective adds ~40m: builder ~20m / critic ~13m / integration 6m /
-commit <1m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-07T19:50:00Z`.
+Recomputed 2026-09-07 at the RELEASE-0.9.7-CONSOLIDATION acceptance
+(Horizon v33 4/4): 205 accepted per-step rows summing to ~186h 40m (the new
+objective adds ~1h 07m: builder ~20m / critic ~16m / integration 30m /
+commit <1m — plus the orchestrator-routed needle advance and sanitizer fix
+committed separately). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -287,6 +288,7 @@ invoices.
 | FOULS-SPEC-DRAFT | accepted | ~52m | ~30m | 15m | 6m | <1m | n/a | n/a |
 | HUMAN-KEEPER-CONTROL | accepted | ~2h 13m | ~48m | 36m | 48m | <1m | n/a | n/a |
 | HUMAN-BALL-SERVER-DECISION | accepted | ~40m | ~20m | 13m | 6m | <1m | n/a | n/a |
+| RELEASE-0.9.7-CONSOLIDATION | accepted | ~1h 07m | ~20m | 16m | 30m | <1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -629,6 +631,7 @@ on an H task is the interesting result.
 | FOULS-SPEC-DRAFT | deepseek-v4-flash | M | Medium - the dedicated fouls/cards spec drafted (spec-only, zero implementation; the RULES-SPEC-DRAFT pattern): the foul definition grounded in the accepted duel/tackle machinery (active-window tackle contact with duelWon false = man-not-ball; fields verified against tackle-system.ts exactly; 10 real man-not-ball events in the accepted duels evidence), advantage/cards named-not-implemented, the free-kick consequence deferred forward-referencing the accepted restart machinery, fouls-v1 provisional (prose-declared, disclosed), five criteria named-but-unregistered (binding-asserted via real registry lookups, grep-confirmed), offside/penalties regulation-only, 7 BLOCKED_MISSING_REFERENCE; binding 42/42 with live constant pins (source drift necessarily fails) | 0 | A | first-pass ACCEPT; critic read all 228 spec lines (every behavior sentence grounded or explicitly deferred) and verified the grounding at source level (10 real events found); integration re-ran 376/376 + 27/27 + 8/8 + 118/118 + typecheck 0 |
 | HUMAN-KEEPER-CONTROL | deepseek-v4-flash (reroute) | M-H | Medium-High - the human can control the designated keeper in human-vs-CPU 5v5 (DYNAMIC_VISUAL): the investigation found the switch contract never excluded the keeper (Tab-reachable pre-change) — the real gap was that the keeper role (gkBehavior) was OFF for human-vs-CPU modes; the fix enables the role there (IS_KEEPER_ROLE_LIVE; CPU-vs-CPU unchanged; non-5v5 byte-identical to the pre-role path) and computeKeeperFrame yields the arc-hold positioning to the human's directional input (in-arc reposition cap) while save/claim + distribution stay on the shared rules (absent field → byte-identical CPU keeper); the designation UNCHANGED; 4 byte-distinct frames incl. a human-directed save 1.0787 m vs CPU 1.1079 m; the standard-wiring nuance honestly disclosed (the designated keeper IS the human's default slot there — verified by computation) | 0 | A | first-pass ACCEPT; critic verified the investigation from source + the yield-gate (absent field → the exact original arc-hold code) + the standard-wiring claim by computation (the designated keeper IS player-1, the human's default slot); integration's independent CPU-vs-CPU probe: all four accepted keeper chains BYTE-IDENTICAL through the post-change adapter; the shipped app does not import the new module |
 | HUMAN-BALL-SERVER-DECISION | deepseek-v4-flash | M | Medium - the decision record for the deferred literal pass-button restart server (BOOKKEEPING, zero source change): the countdown-zero branches fire unconditionally with no input path (verified at source); a literal ball-server needs a pass-gated serving path and cannot reuse the contact-system pass path (passRadius 1.2 m contact required, impossible during an out-of-play window); costs: a variable serve wait tick (fresh attestation for any human-served stream); DECISION DEFER (not_a_hedge) with five concrete reasons and the actionable HUMAN-BALL-SERVER-LITERAL future-objective outline naming its conformance path | 0 | A | first-pass ACCEPT; critic verified the analysis at source (the countdown-zero branches, the passRadius constraint, the determinism claim spot-checked against an accepted restart record) and the decision clarity (clear, not a hedge, the outline actionable); integration re-ran the batteries with counts matching exactly |
+| RELEASE-0.9.7-CONSOLIDATION | deepseek-v4-flash | M | Medium - the v29-v33 gains consolidated into gauntlet/RELEASE-0.9.7.md (the established release pattern; BOOKKEEPING, zero gameplay change): playable (the complete small-sided loop) / executable-attested (rules 23/2/0/0 +24/2; goalkeepers 9/0/2/1/1; two-run attested; 8 protected oracles; the designation-facts serialization) / spec'd (FOULS_CARDS_SPEC) / deferred (the ball-server DEFER + outline; the blocked references; GK beyond small-sided; regulation; full-match ecology) / honest limitations; every claim cites its accepted record; VERSION.json 0.9.6 → 0.9.7; the prompt-gate needle advance + the persist-acceptance sanitizer fix for dotted objective IDs routed to the orchestrator as disclosed out-of-scope maintenance | 0 | A | first-pass ACCEPT; critic recomputed all pinned SHAs (36fc77e5, abaf6ccd, 5cd1c808, 7503f9fe, 271b1526, e98a1efe, 5b6e391a) and the verdict tables from the records themselves + the version diff exact + the needle advance verified with its own gauntlet:eval run; integration re-ran 389/389 neighbors + 256/256 determinism + 30/30 architecture + gauntlet:eval:state 13/13 + the 149-manifest scan that caught the sanitizer gap |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -946,6 +949,8 @@ on an H task is the interesting result.
 | HUMAN-KEEPER-CONTROL | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | the independent CPU-vs-CPU byte-identity probe: live tree vs accepted pre-candidate chains — gkBehavior ON shot fixture 6b7fa24c… and continuous 660c075a…, gkBehavior OFF 6091de51…/6817faad… — all four BYTE-IDENTICAL; silent-consumer hunt: human-keeper-control.ts imported only by the unit test + capture script (main.ts does NOT import it — the shipped app uses the gate only through IS_KEEPER_ROLE_LIVE); non-5v5 modes evaluate IS_KEEPER_ROLE_LIVE ≡ IS_AI_MATCH_5V5 (byte-identical path); GK batteries 127/127 + human-mode suites all green (in-play control untouched) + switch suites + menu parity + full-match-flow + CPU-vs-CPU render neighbors all pass; node gates (typecheck, gauntlet:eval 39 scenarios, sim-smoke) PASS; determinism: two consecutive ordinary-mode runner runs byte-identical in both modes (0d8dfac9…/89a8cf5d…); record hash recomputed MATCH; the standard-wiring nuance confirmed by the integration's own reading (the core's findSlotForPlayer resolves the first owning slot — the human's frame drives the shared keeper body) |
 | HUMAN-BALL-SERVER-DECISION | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: the analysis truth verified at source (the three countdown-zero branches at simulation.ts:1674-1712 fire unconditionally with no input path; passRadius 1.2 confirmed at foundation.ts:159,182; the contact-system pass path gated on dist <= effectiveRadius at :429 so it cannot serve during an out-of-play window; the determinism claim spot-checked against the accepted RESTART-RULES-CONFORMANCE stream — throw-in ×2, timer_freeze_ticks 182, fixed 1800-tick run); the decision clarity verified (DEFER with five concrete reasons, not_a_hedge recorded, the HUMAN-BALL-SERVER-LITERAL outline actionable and naming its conformance path); the binding genuinely discriminating (the DEFER verdict, not_a_hedge containing DEFER, ≥4 reasons, SHA recomputation, claims_not_made content — a changed or hedged verdict fails); all four source_hashes match current file bytes; record hash recomputed exact |
 | HUMAN-BALL-SERVER-DECISION | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | every battery re-run: binding 7/7 + rules gate 180/180 (11 files) + restart battery + human-restart neighbors 188/188 (13 files; the known vitest worker-RPC artifact) + architecture 27/27 + typecheck 0 (one 6-file architecture run initially showed 2 toolchain-pnpm fails from the reviewer's own parallel battery contention; solo re-runs 27/27); silent-consumer hunt: repo-wide grep matches only the two new files; the producer WIP-gated (the scratch artifact byte-identical to the durable record — sha 3143fad0… — proving the gate changes location only, not content); record SHA recomputed MATCH with no wall-clock key; docs/ (1008 files) byte-identical pre/post; scope = exactly the horizon item (the decision recorded, not executed; no creep) |
+| RELEASE-0.9.7-CONSOLIDATION | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: all pinned SHAs recomputed and matched (36fc77e5, abaf6ccd, 5cd1c808, 7503f9fe, 271b1526, e98a1efe, 5b6e391a); the verdict tables recomputed from the records themselves (rules 23/0/0/2 over 25; 24/0/0/2 with COMMON-DETERMINISTIC; goalkeepers 9/0/2/1/1 vs the 8/0/3/1/1 core-owned baseline); the version diff verified exact (version/previous/baseline_commit; includes byte-unchanged); the needle advance verified with its own gauntlet:eval run (39+33 PASS); the 20 cited playable/attested objectives confirmed accepted in CURRENT.md with durable evidence dirs; the record reproduced byte-exact over two ordinary runs; the pre-persist anomaly flagged for orchestrator repair |
+| RELEASE-0.9.7-CONSOLIDATION | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | every battery re-run independently: binding 10/10 + neighbor batch 20 files 389/389 + architecture/CI-boundary 30/30 + determinism/replay/ball/input 256/256 + typecheck 0 + gauntlet:eval 39+33 PASS (the advanced needle) + gauntlet:eval:state 13/13; silent-consumer hunt: RELEASE-0.9.7.md parsed only by the producer + its binding; VERSION.json consumers enumerated (prompt-gate needle advanced; persist/audit-state/audit embed only); no other version-dependent gate; the dir/objective_id mismatch scan across all 149 manifests caught the sanitizer gap (the underscore draft dir first-of-kind divergence); record hash recomputed MATCH; the two commits verified in shape |
 | GK-SUITE-VERDICTS-STATE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 reproduced byte-exact in its own ephemeral producer re-run; per-run verdict table matches raw telemetry (continuous 0 releases/0 save chains -> SAVE-CLAIM/DISTRIBUTION honestly NOT_EVALUATED; fixture releases @408/433 -> PASS); all 5 provenance pins verified against the cited manifests; driven-vs-organic labeling accurate; 140/140 neighbors + typecheck 0 |
 | GK-SUITE-VERDICTS-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 151/151 neighbor tests re-run; typecheck 0; record hash recomputed byte-exact + ordinary-mode producer re-run left docs/evidence byte-identical; all 5 cited manifests read verbatim; zero evaluator/gameplay change |
 
