@@ -84,6 +84,15 @@ export interface RendererConfig {
    * that does not opt in is byte-identical to the pre-HUD baseline.
    */
   showMatchPhaseHud?: boolean;
+  /**
+   * Draw the fulltime end-of-match flow affordance on the match-phase HUD
+   * (FULLTIME-FLOW-CLOSURE): when the snapshot's `matchPhase` is `"fulltime"`
+   * the HUD additionally renders `[R] REMATCH  [M] MENU` so the browser can see
+   * that the loop is no longer a dead end.  Draw-only, reads the immutable
+   * snapshot, and is a no-op unless `showMatchPhaseHud` is also enabled so a
+   * render that does not opt in stays byte-identical to the baseline.
+   */
+  showFulltimeFlowHud?: boolean;
 }
 
 /**
@@ -110,6 +119,7 @@ export const DEFAULT_RENDERER_CONFIG: RendererConfig = {
   markerColor: 0xffcc00,
   keeperMarkerColor: 0xff33ff,
   showMatchPhaseHud: false,
+  showFulltimeFlowHud: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -705,6 +715,9 @@ export function createPresentationSession(
   let hudCanvas: HTMLCanvasElement | null = null;
   let hudTexture: THREE.CanvasTexture | null = null;
   let hudContext: CanvasRenderingContext2D | null = null;
+  // FULLTIME-FLOW-CLOSURE: resolved HUD canvas height (128 baseline, 192 when the
+  // fulltime affordance is opted in).  Read-only after initScene; draw-only.
+  let hudHeight = 128;
   // Re-anchor the HUD (and the presentation canvas) when the container resizes.
   // Presentation-only, draw-only; never affects a football outcome.
   let resizeObserver: ResizeObserver | null = null;
@@ -790,7 +803,12 @@ export function createPresentationSession(
       hudCamera.position.set(0, 0, 100);
       hudCanvas = document.createElement("canvas");
       hudCanvas.width = 512;
-      hudCanvas.height = 128;
+      // FULLTIME-FLOW-CLOSURE: when the fulltime affordance is opted-in, give
+      // the HUD canvas extra height so the `[R] REMATCH  [M] MENU` line fits
+      // below the phase/timer without touching the baseline 512x128 sprite used
+      // when the flag is off (draw-only; the snapshot is read immutably).
+      hudHeight = config.showFulltimeFlowHud ? 192 : 128;
+      hudCanvas.height = hudHeight;
       hudContext = hudCanvas.getContext("2d");
       hudTexture = new THREE.CanvasTexture(hudCanvas);
       hudTexture.minFilter = THREE.LinearFilter;
@@ -801,11 +819,11 @@ export function createPresentationSession(
         transparent: true,
       });
       hudSprite = new THREE.Sprite(material);
-      // 512x128 box anchored to the top-left corner of the viewport (with a
-      // small margin), in the conventional ortho screen space (0,0 = centre).
+      // 512xhudHeight box anchored to the top-left corner of the viewport (with
+      // a small margin), in the conventional ortho screen space (0,0 = centre).
       const margin = 12;
-      hudSprite.scale.set(512, 128, 1);
-      hudSprite.position.set(-width / 2 + margin + 256, height / 2 - margin - 64, 0);
+      hudSprite.scale.set(512, hudHeight, 1);
+      hudSprite.position.set(-width / 2 + margin + 256, height / 2 - margin - hudHeight / 2, 0);
       hudScene.add(hudSprite);
     }
 
@@ -839,7 +857,7 @@ export function createPresentationSession(
       hudCamera.bottom = -h / 2;
       hudCamera.updateProjectionMatrix();
       const margin = 12;
-      hudSprite.position.set(-w / 2 + margin + 256, h / 2 - margin - 64, 0);
+      hudSprite.position.set(-w / 2 + margin + 256, h / 2 - margin - hudHeight / 2, 0);
     }
   }
 
@@ -1027,6 +1045,16 @@ export function createPresentationSession(
     ctx.fillStyle = "#ffd700";
     ctx.font = "bold 36px monospace";
     ctx.fillText(`TIME ${timer}`, 18, 74);
+
+    // FULLTIME-FLOW-CLOSURE: at the fulltime terminal state, draw the
+    // end-of-match affordance so the browser can see the playable loop is
+    // closed (a rematch / menu return is offered, not a dead end).  Draw-only;
+    // reads the immutable snapshot phase; no-op unless opted in.
+    if (config.showFulltimeFlowHud && snapshot.matchPhase === "fulltime") {
+      ctx.fillStyle = "#8bc34a";
+      ctx.font = "bold 30px monospace";
+      ctx.fillText("[R] REMATCH   [M] MENU", 18, 140);
+    }
 
     texture.needsUpdate = true;
   }

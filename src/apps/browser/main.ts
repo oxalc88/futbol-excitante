@@ -44,6 +44,7 @@ import {
   initControlsLegendUi,
   setControlsHintText,
 } from "./controls-legend-ui.js";
+import { createFulltimeFlow, type FulltimeFlow } from "./fulltime-flow.js";
 
 // ---------------------------------------------------------------------------
 // Match mode configuration (for setup menu)
@@ -126,6 +127,23 @@ let activeFrameId: number | null = null;
 
 /** Whether a match is currently running. */
 let matchRunning = false;
+
+/**
+ * FULLTIME-FLOW-CLOSURE — the start parameters of the match that is currently
+ * (or last) running.  Kept so the end-of-match REMATCH affordance can re-enter
+ * the composition-root match-start path with the same scenario/mode/labels.
+ * Presentation-layer only; never pokes simulation state.
+ */
+interface MatchStartConfig {
+  scenario: ScenarioDefinition;
+  urlMode: string;
+  teamALabel: string;
+  teamBLabel: string;
+  controlsHint: string;
+  difficulty: DifficultyLevel;
+}
+
+let lastMatchConfig: MatchStartConfig | null = null;
 
 // ---------------------------------------------------------------------------
 // DOM elements — setup menu
@@ -424,6 +442,9 @@ function showSetupMenu(): void {
   if (hudEl) hudEl.classList.add("hidden");
   if (controlsHintEl) controlsHintEl.classList.add("hidden");
   if (backToMenuButton) backToMenuButton.classList.add("hidden");
+  // FULLTIME-FLOW-CLOSURE: returning to the setup menu also dismisses the
+  // end-of-match affordance so the app lands in a clean menu state.
+  fulltimeFlow.hide();
   closeControlsOverlay(document);
   statsPanel.style.display = "none";
   difficultyHud.style.display = "none";
@@ -463,6 +484,13 @@ function startMatch(
 ): void {
   stopMatch();
   hideSetupMenu();
+
+  // FULLTIME-FLOW-CLOSURE: remember this match's start params so the end-of-match
+  // REMATCH affordance can re-enter the composition-root path with the same
+  // scenario/mode/labels, and clear any stale fulltime affordance from a
+  // previous match.  Presentation-layer only; no simulation state poke.
+  lastMatchConfig = { scenario, urlMode, teamALabel, teamBLabel, controlsHint, difficulty };
+  fulltimeFlow.hide();
 
   // Derive mode flags from the resolved urlMode string.
   const IS_AI_MATCH = urlMode === "ai-match" || urlMode === "2v2-ai";
@@ -582,6 +610,9 @@ function startMatch(
   const session = createPresentationSession(container, {
     ...DEFAULT_RENDERER_CONFIG,
     showMatchPhaseHud: true,
+    // FULLTIME-FLOW-CLOSURE: also draw the end-of-match affordance on the HUD
+    // at the fulltime terminal state.  Draw-only; reads the immutable snapshot.
+    showFulltimeFlowHud: true,
   });
 
   // KEEPER-VISUAL-MARKER: with the keeper role live (5v5 CPU-vs-CPU only) the
@@ -757,6 +788,19 @@ function startMatch(
       if (statsPassesB) statsPassesB.textContent = String(matchStats.passes["team-b"] ?? 0);
     }
 
+    // FULLTIME-FLOW-CLOSURE: the playable loop is closed. When the core-owned
+    // "fulltime" terminal state is reached, freeze the game loop (no further
+    // stepping/rendering) and present the end-of-match affordance. Draw-only +
+    // composition-root control flow; the simulation core is untouched. The
+    // render/HUD updates above have already painted the terminal frame, so the
+    // frozen frame is the fulltime state.
+    if (!fulltimeFlow.isFulltime() && sim.presentation().matchPhase === "fulltime") {
+      fulltimeFlow.markFulltime(teamALabel, teamBLabel, scoreA, scoreB);
+      if (backToMenuButton) backToMenuButton.classList.add("hidden");
+      matchRunning = false;
+      return; // do not schedule another frame — the terminal state is frozen
+    }
+
     activeFrameId = requestAnimationFrame(gameLoop);
   }
 
@@ -775,6 +819,34 @@ function stopMatch(): void {
   // Note: we don't dispose the session here because startMatch creates a new one.
   // The old session will be garbage-collected once the game container is repopulated.
 }
+
+// ---------------------------------------------------------------------------
+// FULLTIME-FLOW-CLOSURE: end-of-match flow affordance
+// ---------------------------------------------------------------------------
+// At the core-owned "fulltime" terminal state the game loop freezes (no more
+// stepping/rendering) and a presentation-layer affordance offers a REMATCH
+// (through the composition-root match-start path) or a BACK TO MENU return.
+// The handlers run the composition root's own startMatch / stopMatch /
+// showSetupMenu; the simulation core is never touched.
+const fulltimeFlow: FulltimeFlow = createFulltimeFlow(document, {
+  onRematch: () => {
+    if (lastMatchConfig) {
+      const c = lastMatchConfig;
+      startMatch(c.scenario, c.urlMode, c.teamALabel, c.teamBLabel, c.controlsHint, c.difficulty);
+    }
+  },
+  onBackToMenu: () => {
+    stopMatch();
+    showSetupMenu();
+  },
+});
+
+// The M/R affordance keys are only live once the flow is at fulltime (the flow
+// dispatches them only while active), so the in-play human controls (WASD / Tab
+// / pass / shot / tackles) are untouched.
+window.addEventListener("keydown", (e) => {
+  if (fulltimeFlow.handleKeydown(e.key)) e.preventDefault();
+});
 
 // ---------------------------------------------------------------------------
 // Back-to-menu handler

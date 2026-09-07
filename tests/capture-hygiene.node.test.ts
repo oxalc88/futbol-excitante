@@ -94,6 +94,7 @@ const SCREENSHOT_WRITER_SUITES = [
   "cpu-tackle-screenshot-capture.browser.test.ts",
   "anti-huddle-dynamic-evidence.browser.test.ts",
   "human-arc-interaction.browser.test.ts",
+  "fulltime-flow-closure.browser.test.ts",
 ];
 
 describe("capture hygiene (0.9.2+): ordinary runs must not write docs/screenshots/**", () => {

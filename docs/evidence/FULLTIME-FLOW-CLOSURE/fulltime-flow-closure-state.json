@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "objective_id": "FULLTIME-FLOW-CLOSURE",
+  "suite_id": "fulltime-flow-closure",
+  "produced_by": "scripts/capture-fulltime-flow-closure.ts",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "lifecycle_phase_sync": "core-owned",
+  "scenario": "5v5-full-match-timing-v1",
+  "scenario_path": "eval/scenarios/5v5-full-match-timing.v1.json",
+  "play_ticks": 800,
+  "half_duration_ticks": 240,
+  "fulltime_tick": 660,
+  "fulltime_frame_tick": 660,
+  "frames": [
+    {
+      "label": "fulltime-terminal",
+      "path": "fulltime-terminal.png",
+      "tick": 660,
+      "sem": "before",
+      "matchPhase": "fulltime",
+      "matchTimer": 0,
+      "stateHash": "fnv1a64-v1:bfefe10aae129e91"
+    },
+    {
+      "label": "fulltime-affordance",
+      "path": "fulltime-affordance.png",
+      "tick": 660,
+      "sem": "event",
+      "matchPhase": "fulltime",
+      "matchTimer": 0,
+      "stateHash": "fnv1a64-v1:bfefe10aae129e91"
+    },
+    {
+      "label": "menu-return",
+      "path": "menu-return.png",
+      "tick": 660,
+      "sem": "transition",
+      "matchPhase": "fulltime",
+      "matchTimer": 0,
+      "stateHash": "fnv1a64-v1:bfefe10aae129e91"
+    },
+    {
+      "label": "new-match-start",
+      "path": "new-match-start.png",
+      "tick": 0,
+      "sem": "result",
+      "matchPhase": "playing",
+      "matchTimer": 240,
+      "stateHash": "fnv1a64-v1:f7d453722fceaa79"
+    }
+  ],
+  "semantics": {
+    "order": "fulltime terminal → affordance → menu return → new match",
+    "note": "event-centered on the end-of-match flow: the fulltime terminal state (before the flow — FULL TIME / TIME 0 HUD, no affordance), the added affordance ('[R] REMATCH  [M] MENU' drawn on the match-phase HUD), the menu return (the real shipped #setup-menu surface — the Difficulty row + the full 9-option mode ladder — reached through the shipped menu-return path), and a new match started through the composition-root match-start path."
+  },
+  "affordance": {
+    "surface": "renderer match-phase HUD (draw-only, reads the immutable snapshot) + composition-root DOM panel + M/R keyboard",
+    "draw_only": true,
+    "gate": "the affordance is drawn/dispatched only when snapshot.matchPhase === 'fulltime'; the in-play human controls (WASD / Tab / pass / shot / tackles) are untouched (the M/R keys are inert until the flow is active).",
+    "rematch_path": "startMatch(scenario, urlMode, teamALabel, teamBLabel, controlsHint, difficulty) — the existing composition-root match-start path over a fresh simulation.",
+    "menu_path": "stopMatch() + showSetupMenu() — the existing setup-menu return path; the fulltime affordance is dismissed so the app lands in a clean menu.",
+    "reset": "startMatch stores lastMatchConfig and hides the fulltime flow; showSetupMenu hides it after a menu return."
+  },
+  "correspondence": {
+    "browser_phase_sequence": [
+      "playing",
+      "throw-in",
+      "playing",
+      "halftime",
+      "playing",
+      "throw-in",
+      "playing",
+      "fulltime"
+    ],
+    "headless_phase_sequence": [
+      "playing",
+      "throw-in",
+      "playing",
+      "halftime",
+      "playing",
+      "throw-in",
+      "playing",
+      "fulltime"
+    ],
+    "phase_sequence_matches": true,
+    "note": "Both the browser composition root and the accepted headless timing stream traverse the same lifecycle phase order (playing → … → halftime → … → fulltime).  The browser reaches the terminal 'fulltime' one tick EARLIER than the headless runner in this run (browser fulltime 660 vs headless fulltime 661), not later: the headless timing stream additionally seeds a 'kickoff' tick at tick 0 that does not decrement the in-play timer, so the browser's half transitions land one tick ahead of the headless's.  The browser test records the fulltime frame at its own committed tick (fulltime_frame_tick = 660), and the node sim's browser-equivalent wiring reaches the same fulltime state at the same committed tick (fulltime_tick = 660), so the frame tick and the recorded state facts are consistent.  Per-tick committed hashes are NOT compared across runtimes."
+  },
+  "headless_timing_stream": {
+    "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-full-match-timing.v1.json\"), maxTicks: 800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: true, serializeRestartFacts: true })",
+    "transitions": [
+      {
+        "tick": 0,
+        "phase": "kickoff"
+      },
+      {
+        "tick": 1,
+        "phase": "playing"
+      },
+      {
+        "tick": 43,
+        "phase": "throw-in"
+      },
+      {
+        "tick": 103,
+        "phase": "playing"
+      },
+      {
+        "tick": 301,
+        "phase": "halftime"
+      },
+      {
+        "tick": 361,
+        "phase": "playing"
+      },
+      {
+        "tick": 387,
+        "phase": "throw-in"
+      },
+      {
+        "tick": 447,
+        "phase": "playing"
+      },
+      {
+        "tick": 661,
+        "phase": "fulltime"
+      }
+    ],
+    "final_phase": "fulltime"
+  },
+  "determinism": {
+    "note": "The record embeds only deterministic state facts (frame paths/ticks + recomputed state hashes) and NO wall-clock field and NO PNG bytes, so consecutive ordinary-mode runs produce a byte-identical record.  The element-scoped menu-return PNG (the dev-server Playwright menu script) is intentionally NOT embedded in the record; its SHA-256 lives in docs/screenshots/FULLTIME-FLOW-CLOSURE/sequence.json only."
+  },
+  "claims_not_made": [
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No suite-level PASS claim; no football outcome changed by the presentation surface.",
+    "No claim that this is an organic 90-minute match: the short-duration scenario is a DRIVEN fixture (240-tick halves) expressly chosen so the full lifecycle completes inside the browser test budget.",
+    "No per-tick browser/headless state-hash identity claim: the browser composition root and the headless runner differ in their CPU observation shape and the runner's opening kickoff seed, so the committed per-tick hashes are not byte-identical across runtimes.  The verified correspondence is the lifecycle phase sequence + the timer-driven zero-crossing.",
+    "No invented reference envelope or tolerance.",
+    "No claim that the rematch is a literal core change: it re-enters the composition-root match-start path (startMatch) over a fresh simulation; the core's 'fulltime' phase is accepted machinery."
+  ],
+  "record_sha256": "8f58216742d1cb6806e729f339730a1668191256d9c46e6f2fba131fdf459cb2"
+}

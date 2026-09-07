@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "objective_id": "FULLTIME-FLOW-CLOSURE",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-fulltime-flow-closure.ts",
+  "driver": "eval/runners/headless-match.ts with lifecyclePhaseSync:'core-owned' + browserParityObservations:true (the accepted full-match timing stream) and the browser composition root's CPU wiring for the frame anchors.",
+  "scenario": "5v5-full-match-timing-v1",
+  "scenario_path": "eval/scenarios/5v5-full-match-timing.v1.json",
+  "play_ticks": 800,
+  "fulltime_tick": 660,
+  "frame_anchors": [
+    {
+      "label": "fulltime-terminal",
+      "path": "fulltime-terminal.png",
+      "tick": 660,
+      "matchPhase": "fulltime",
+      "matchTimer": 0,
+      "sha256": "fnv1a64-v1:bfefe10aae129e91"
+    },
+    {
+      "label": "fulltime-affordance",
+      "path": "fulltime-affordance.png",
+      "tick": 660,
+      "matchPhase": "fulltime",
+      "matchTimer": 0,
+      "sha256": "fnv1a64-v1:bfefe10aae129e91"
+    },
+    {
+      "label": "menu-return",
+      "path": "menu-return.png",
+      "tick": 660,
+      "matchPhase": "fulltime",
+      "matchTimer": 0,
+      "sha256": "fnv1a64-v1:bfefe10aae129e91"
+    },
+    {
+      "label": "new-match-start",
+      "path": "new-match-start.png",
+      "tick": 0,
+      "matchPhase": "playing",
+      "matchTimer": 240,
+      "sha256": "fnv1a64-v1:f7d453722fceaa79"
+    }
+  ],
+  "lifecycle_transitions": [
+    {
+      "tick": 0,
+      "phase": "kickoff"
+    },
+    {
+      "tick": 1,
+      "phase": "playing"
+    },
+    {
+      "tick": 43,
+      "phase": "throw-in"
+    },
+    {
+      "tick": 103,
+      "phase": "playing"
+    },
+    {
+      "tick": 301,
+      "phase": "halftime"
+    },
+    {
+      "tick": 361,
+      "phase": "playing"
+    },
+    {
+      "tick": 387,
+      "phase": "throw-in"
+    },
+    {
+      "tick": 447,
+      "phase": "playing"
+    },
+    {
+      "tick": 661,
+      "phase": "fulltime"
+    }
+  ],
+  "disclosures": [
+    "The short-duration scenario (240-tick halves) is a DRIVEN fixture so the full lifecycle completes inside the browser test budget; it is not an organic 90-minute match.",
+    "The browser composition root and the headless runner differ (CPU observation shape + the runner's opening kickoff seed), so their committed per-tick hashes are not byte-identical across runtimes.  The verified correspondence here is the lifecycle phase sequence and the timer-driven fulltime zero-crossing.  In this run the browser reaches the terminal 'fulltime' one tick EARLIER than the headless (browser 660 vs headless 661), not later: the headless stream seeds an extra 'kickoff' tick at tick 0 that does not decrement the in-play timer.",
+    "Restart windows (a throw-in) freeze the in-play timer, so the nominal 240-tick half duration runs longer in wall ticks; the transition ticks are located from the run's own phase stream, never hand-transcribed.",
+    "The menu-return frame is a DOM capture of the REAL shipped #setup-menu surface (the Difficulty row + the full 9-option mode ladder), captured by the dev-server Playwright script (`scripts/capture-fulltime-flow-closure-menu.mts`) from the shipped #back-to-menu menu-return path, rather than a WebGL canvas capture.  It is element-scoped and its PNG bytes are not embedded in the record so the record stays byte-reproducible."
+  ]
+}

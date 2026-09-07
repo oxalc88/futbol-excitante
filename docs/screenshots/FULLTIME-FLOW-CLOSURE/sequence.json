@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "objective_id": "FULLTIME-FLOW-CLOSURE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "semantic_order": "fulltime terminal → affordance → menu return → new match",
+  "scenario": "5v5-full-match-timing-v1",
+  "scenario_path": "eval/scenarios/5v5-full-match-timing.v1.json",
+  "frames": [
+    {
+      "label": "fulltime-terminal",
+      "path": "fulltime-terminal.png",
+      "tick": 660,
+      "semantic": "before",
+      "note": "Terminal state as it existed before the flow: the core reaches 'fulltime' with the in-play timer at zero and no rematch/menu affordance is drawn.",
+      "pngSha256": "5fb989c045969ab30308441bd454908ea89bc5090f516396e897cd18b2fe4691"
+    },
+    {
+      "label": "fulltime-affordance",
+      "path": "fulltime-affordance.png",
+      "tick": 660,
+      "semantic": "event",
+      "note": "The added end-of-match affordance: the HUD now draws '[R] REMATCH  [M] MENU' at the fulltime terminal state, so the loop is no longer a dead end.",
+      "pngSha256": "226e987f564b49d30b5ea91facdbc795ab79667e3b7479a9a57da7c160cf8f7b"
+    },
+    {
+      "label": "menu-return",
+      "path": "menu-return.png",
+      "tick": 660,
+      "semantic": "transition",
+      "note": "The match-setup menu after the menu-return affordance, captured from the REAL shipped #setup-menu surface (the #setup-menu-card element: the PES SIMULATOR title, the full 9-option mode ladder, the Home/Away team inputs, the Difficulty row, the controls legend, and START MATCH) via the shipped #back-to-menu path.  The app lands in the clean setup menu, so the loop is closable to the menu.",
+      "pngSha256": "ba9d44731e4dc0cee05ec71da94363b3b53a509fc1dd1e32a8de98e2c1c2f2ce"
+    },
+    {
+      "label": "new-match-start",
+      "path": "new-match-start.png",
+      "tick": 0,
+      "semantic": "result",
+      "note": "A fresh match started through the composition-root match-start path after the rematch affordance: the loop is closed and a new match is underway.",
+      "pngSha256": "ae3ccf3b0888004d10e71467c0f24c53af9f16cdd78f7186a1e844658b316948"
+    }
+  ]
+}
