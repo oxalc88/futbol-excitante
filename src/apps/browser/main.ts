@@ -503,6 +503,14 @@ function startMatch(
   const IS_HUMAN_VS_CPU_5V5 = urlMode === "human-vs-ai-5v5";
   const IS_HUMAN_VS_CPU_1V1 = urlMode === "human-vs-ai-1v1";
 
+  // HUMAN-KEEPER-CONTROL: the SMALL-SIDED keeper role is live wherever the
+  // designated keeper already exists and a side can be controlled — the accepted
+  // 5v5 CPU-vs-CPU match plus the 5v5 human-vs-CPU mode, where the human can take
+  // control of their team's keeper. CPU-vs-CPU (ai-match-5v5) is unchanged; the
+  // other modes keep the role off and render byte-identically to the pre-role
+  // path.
+  const IS_KEEPER_ROLE_LIVE = IS_AI_MATCH_5V5 || IS_HUMAN_VS_CPU_5V5;
+
   const HALF_DURATION_TICKS = Math.floor(scenario.durationTicks / 2);
 
   // Update display labels.
@@ -615,16 +623,18 @@ function startMatch(
     showFulltimeFlowHud: true,
   });
 
-  // KEEPER-VISUAL-MARKER: with the keeper role live (5v5 CPU-vs-CPU only) the
-  // presentation snapshot carries `keeperRole` on each team's designated keeper
-  // so the renderer draws the kit marker.  Every other mode leaves the field
-  // absent (gkBehavior off) and renders byte-identically to the pre-marker path.
-  const keeperPids = IS_AI_MATCH_5V5 ? keeperPlayerIdsFromLayout(scenario) : {};
+  // KEEPER-VISUAL-MARKER: with the keeper role live (the accepted 5v5 CPU-vs-CPU
+  // match, and the 5v5 human-vs-CPU mode where HUMAN-KEEPER-CONTROL lets the
+  // human take their team's keeper) the presentation snapshot carries
+  // `keeperRole` on each team's designated keeper so the renderer draws the kit
+  // marker.  Every other mode leaves the field absent (gkBehavior off) and
+  // renders byte-identically to the pre-marker path.
+  const keeperPids = IS_KEEPER_ROLE_LIVE ? keeperPlayerIdsFromLayout(scenario) : {};
 
   /** Enrich a base snapshot with the keeper designation (presentation-only). */
   const displaySnapshot = (): PresentationSnapshot => {
     const base = sim.presentation();
-    return IS_AI_MATCH_5V5 ? enrichPresentationWithKeeperRoles(base, keeperPids) : base;
+    return IS_KEEPER_ROLE_LIVE ? enrichPresentationWithKeeperRoles(base, keeperPids) : base;
   };
 
   // 6. Render initial state.
@@ -661,7 +671,11 @@ function startMatch(
       // SMALL-SIDED goalkeeper role. Every other mode keeps exactly the frames
       // it emitted before any keeper existed — the role is opt-in (GK-SPEC §§4-8),
       // so gating it on `ai-match-5v5` leaves the human-control paths untouched.
-      const GK_5V5 = IS_AI_MATCH_5V5;
+      // HUMAN-KEEPER-CONTROL: the keeper role is live for the accepted 5v5
+      // CPU-vs-CPU match and for the 5v5 human-vs-CPU mode (where the human can
+      // direct their team's keeper); every other mode keeps exactly the frames it
+      // emitted before any keeper existed.
+      const GK_5V5 = IS_KEEPER_ROLE_LIVE;
       if (IS_AI_MATCH || IS_HUMAN_VS_CPU || IS_2V2 || IS_AI_MATCH_3V3 || IS_AI_MATCH_5V5 || IS_HUMAN_VS_CPU_5V3 || IS_HUMAN_VS_CPU_3V3 || IS_HUMAN_VS_CPU_5V5 || IS_HUMAN_VS_CPU_1V1) {
         const teamDecisions = new Map<string, ReturnType<typeof computeTeamDecision>>();
         const snapshot = sim.snapshot();

@@ -553,6 +553,21 @@ export interface CpuObservation {
    * Provisional — model `gk-small-sided-v1`.
    */
   recentShotEvents?: KeeperShotInfo[];
+
+  /**
+   * HUMAN-KEEPER-CONTROL: when the designated keeper of this team is controlled
+   * by the HUMAN's control slot, the human's directional input (moveX/moveY in
+   * [-1, 1]) is carried here. The keeper's arc/positioning logic YIELDS to this
+   * movement (a human directs the keeper), while the save/claim reaction and the
+   * distribution release still resolve through the same production rules, so the
+   * human-directed keeper can still answer a shot on target. When the field is
+   * absent the keeper is CPU-controlled and holds its arc exactly as before. It
+   * is not extra knowledge — it is the same input a human already reaches through
+   * the keyboard; it is present only when the human controls this body.
+   *
+   * Provisional — model `gk-small-sided-v1`.
+   */
+  humanDirectedKeeperMove?: { x: number; y: number };
 }
 
 // ---------------------------------------------------------------------------
@@ -2316,16 +2331,31 @@ function computeKeeperFrame(
 
   let moveX = 0;
   let moveY = 0;
-  const stationDx = station.x - self.x;
-  const stationDy = station.y - self.y;
-  const stationDist = Math.sqrt(stationDx * stationDx + stationDy * stationDy);
-  if (stationDist > KICKOFF_FREEZE_HOME_TOLERANCE) {
+  // HUMAN-KEEPER-CONTROL: when the human controls this keeper, the human's
+  // directional input is the keeper's commanded movement (the arc/positioning
+  // logic yields), scaled by the same in-arc speed cap so a human can still not
+  // run the keeper past its bounded goal arc at full field speed. The save/claim
+  // reaction below is unchanged and still answers a shot on target.
+  const humanMove = observation.humanDirectedKeeperMove;
+  if (humanMove !== undefined) {
     const speedScale = isInsideGoalArc({ x: self.x, y: self.y }, arcCenter)
       ? GK_SMALL_SIDED_V1.keeper_reposition_speed.value / FOUNDATION_LOCOMOTION_V1.maxSpeed.value
       : 1;
-    const magnitude = Math.min(stationDist, 1) * speedScale;
-    moveX = (stationDx / stationDist) * magnitude;
-    moveY = (stationDy / stationDist) * magnitude;
+    const humanMag = Math.min(Math.hypot(humanMove.x, humanMove.y), 1) * speedScale;
+    moveX = humanMove.x * humanMag;
+    moveY = humanMove.y * humanMag;
+  } else {
+    const stationDx = station.x - self.x;
+    const stationDy = station.y - self.y;
+    const stationDist = Math.sqrt(stationDx * stationDx + stationDy * stationDy);
+    if (stationDist > KICKOFF_FREEZE_HOME_TOLERANCE) {
+      const speedScale = isInsideGoalArc({ x: self.x, y: self.y }, arcCenter)
+        ? GK_SMALL_SIDED_V1.keeper_reposition_speed.value / FOUNDATION_LOCOMOTION_V1.maxSpeed.value
+        : 1;
+      const magnitude = Math.min(stationDist, 1) * speedScale;
+      moveX = (stationDx / stationDist) * magnitude;
+      moveY = (stationDy / stationDist) * magnitude;
+    }
   }
 
   // ------------------------------------------------------------------

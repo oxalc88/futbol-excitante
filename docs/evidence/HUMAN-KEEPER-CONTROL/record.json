@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "objective_id": "HUMAN-KEEPER-CONTROL",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "produced_by": "scripts/capture-human-keeper-control.ts",
+  "scenario": {
+    "id": "5v5-human-keeper-shot-fixture-v1",
+    "path": "eval/scenarios/5v5-human-keeper-shot-fixture.v1.json",
+    "human_team": "team-b",
+    "keeper_control_slot": "slot-10",
+    "directed_keeper": "player-10"
+  },
+  "realization": {
+    "is": "human-directed keeper control (movement-direction channel over the designated keeper, with the keeper's save/claim reaction retained)",
+    "how": "the human's control slot on the designated keeper yields the CPU arc-hold positioning to the human's directional input (CpuObservation.humanDirectedKeeperMove) while the same production save/claim reaction still arms and answers an on-target shot; switching away lets the CPU keeper logic resume (the keeper slot's observation carries no human movement).",
+    "not_a": "a new world body or a change to team cardinality: the keeper is one of the bodies the scenario already ships, designated before kickoff (spec §4).",
+    "designation": "the adapter's designateKeeperFromLayout stays the source of truth; the human never becomes the designation — they direct the already-designated body."
+  },
+  "discriminating_guards": {
+    "human_controllers_keeper": true,
+    "human_directs_keeper": true,
+    "human_directed_save_within_reach": true,
+    "cpu_keeper_save_within_reach": true,
+    "keeper_designation_unchanged": true,
+    "save_contact_happened_in_both": true
+  },
+  "runs": [
+    {
+      "id": "human-directed-keeper-save",
+      "role": "the designated keeper is the human's controlled body; the human's directional input directs the keeper (the arc-hold yields) while the save/claim reaction still answers the shot on target",
+      "scenario": "5v5-human-keeper-shot-fixture-v1",
+      "scenario_path": "eval/scenarios/5v5-human-keeper-shot-fixture.v1.json",
+      "ticks": 600,
+      "human_mode": "directed",
+      "keeper_by_team": {
+        "team-a": "player-4",
+        "team-b": "player-10"
+      },
+      "directed_keeper": "player-10",
+      "directed_keeper_team": "team-b",
+      "directed_keeper_slot": "slot-10",
+      "human_controlled_keeper": true,
+      "human_directed_move": {
+        "x": 0.005000000000000071,
+        "y": 0.6
+      },
+      "shot_tick": 343,
+      "save_tick": 364,
+      "save_contact_distance_metres": 1.0787,
+      "save_contact_kind": "dribble-touch",
+      "ticks_from_shot_to_contact": 21,
+      "within_reach": true,
+      "projected_cross_y": -2.838,
+      "keeper_at_save": {
+        "x": 52.436676310755196,
+        "y": 0.1524284586738297
+      },
+      "state_hash_of_hashes": "0d8dfac9d42c8af70fc1175ac5f0dac1e53acec87f748a698ab68db9805d8a4f",
+      "reproduction": "runHumanKeeperMatch({ scenario: load(\"eval/scenarios/5v5-human-keeper-shot-fixture.v1.json\"), maxTicks: 600, gkBehavior: true, humanTeamId: \"team-b\", keeperControlSlot: \"slot-10\", humanMode: \"directed\" })",
+      "mechanism_counters": {
+        "keeper_hold_frames": 1074,
+        "keeper_save_arms": 22,
+        "keeper_save_claim_presses": 1
+      },
+      "determinism": {
+        "replay_state_hash_of_hashes": "0d8dfac9d42c8af70fc1175ac5f0dac1e53acec87f748a698ab68db9805d8a4f",
+        "replay_identical": true
+      }
+    },
+    {
+      "id": "cpu-keeper-fallback",
+      "role": "the identical keeper-shot fixture with NO human directional input — the keeper holds its arc and auto-saves, byte-identical to the accepted CPU keeper behavior",
+      "scenario": "5v5-human-keeper-shot-fixture-v1",
+      "scenario_path": "eval/scenarios/5v5-human-keeper-shot-fixture.v1.json",
+      "ticks": 600,
+      "human_mode": "cpu",
+      "keeper_by_team": {
+        "team-a": "player-4",
+        "team-b": "player-10"
+      },
+      "directed_keeper": "player-10",
+      "directed_keeper_team": "team-b",
+      "directed_keeper_slot": "slot-10",
+      "human_controlled_keeper": true,
+      "human_directed_move": null,
+      "shot_tick": 343,
+      "save_tick": 364,
+      "save_contact_distance_metres": 1.1079,
+      "save_contact_kind": "dribble-touch",
+      "ticks_from_shot_to_contact": 21,
+      "within_reach": true,
+      "projected_cross_y": -2.838,
+      "keeper_at_save": {
+        "x": 52.499594780572934,
+        "y": -0.1716930531940793
+      },
+      "state_hash_of_hashes": "89a8cf5d7cad0c36fbfcb8d7a9d26283f65c946861e56780083d25b3168b8c9d",
+      "reproduction": "runHumanKeeperMatch({ scenario: load(\"eval/scenarios/5v5-human-keeper-shot-fixture.v1.json\"), maxTicks: 600, gkBehavior: true, humanTeamId: \"team-b\", keeperControlSlot: \"slot-10\", humanMode: \"cpu\" })",
+      "mechanism_counters": {
+        "keeper_hold_frames": 1074,
+        "keeper_save_arms": 21,
+        "keeper_save_claim_presses": 1
+      },
+      "determinism": {}
+    }
+  ],
+  "claims_not_made": [
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No invented reference envelope or tolerance; the save/claim reach is the versioned gk-small-sided-v1 value read from eval/contracts/goalkeeper-config.ts.",
+    "No claim that the human becomes the keeper designation — the adapter's designation (designateKeeperFromLayout) stays the source of truth and is unchanged.",
+    "No claim that the human's team keeper auto-saves in the STANDARD 5v5 human-vs-CPU browser wiring: there the keeper body is the human's slot and the CPU keeper adapter does not run for it, so the human directs the keeper through the movement controls and any save is the human positioning it; the reliable human-directed save is demonstrated on the driven keeper-shot fixture where the keeper slot runs the shared keeper logic with the human's movement injected."
+  ],
+  "record_sha256": "511d53df386ee634bf545abe19addfad10c419964055c2d579709ce3b2baabe0"
+}
