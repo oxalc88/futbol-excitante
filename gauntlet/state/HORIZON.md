@@ -3,44 +3,36 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 31
+horizon_version: 32
 status: ACTIVE
-horizon_id: "conformance-completion-and-match-flow"
-created_from_commit: 0b5ae53
-created_at: 2026-09-06
-reason: "Horizon v30 (COMPLETE 4/4, remote-durable at 0b5ae53) closed the surfaced threads: ten serialized-fact rules criteria upgraded to executed PASS plus genuine timer-driven halftime/fulltime on a new driven timing fixture (5f29f2f), a genuine driven corner completing the per-restart conformance set with DYNAMIC_VISUAL frames (c07cebb), the core-owned team-a keeper off-arc drift root-caused (post-goal reset strands an off-arc-home keeper) and fixed at the adapter layer with rehomeKeeperToArc (e687fa9), and the goalkeepers suite honestly re-published under core-owned with COMMON-BOUNDS FAIL→PASS (de9fd3b). v31 completes the executable layer and adds a browser-facing capability: (a) serialize the adapter restart-window designation facts behind the same gate so the 3 anti-huddle restart-behavior criteria evaluate (rules suite → 23 PASS / 2 BLOCKED); (b) re-publish the rules suite state after that; (c) browser-visible full-match lifecycle flow (halftime break countdown + fulltime terminal state in the real app) as the observable capability; (d) two-run deterministic attestation so COMMON-DETERMINISTIC evaluates for the GK and rules suites. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 4
+horizon_id: "human-restart-control-and-playable-closure"
+created_from_commit: 31605de
+created_at: 2026-09-07
+reason: "Horizon v31 (COMPLETE 4/4, remote-durable at 31605de) completed the executable layer: the gated designation-facts serialization closed the 3 anti-huddle restart-behavior criteria (0d7d76d), the rules suite aggregate re-published at 23 PASS / 2 BLOCKED / 0 NOT_EVALUATED / 0 FAIL (030c2e0), the full-match lifecycle made visible in the real browser with an opt-in match-phase HUD (72f52b2), and two-run attestation made COMMON-DETERMINISTIC evaluate for both suites (f3a50ee). Six consecutive horizons have been conformance-heavy; v32 rebalances toward playable capability while keeping the executable discipline: (a) HUMAN-RESTART-CONTROL — the human currently cannot take their team's restarts (they auto-execute); human-directed restart execution via tick-indexed InputFrames at the restart window is a genuine playable gap building directly on the accepted restart machinery; (b) HUMAN-RESTART-RULES-CONFORMANCE — the human-taken restart must conform to the same rules through the executable suite (extend the designation facts with the human-taker designation behind the same gate); (c) EVAL-HYGIENE-CONSOLIDATION — the four reviewer non-binding cleanups (dead chasers variable, mirror-offset disclosure, _keeperPressExclusions counter hygiene, HUD resize re-anchoring) with guards; (d) FULLTIME-FLOW-CLOSURE — the post-fulltime app flow (rematch/menu return) completing the playable match loop. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
+current_index: 0
 objectives:
-  - id: RESTART-DESIGNATION-FACTS-CONFORMANCE
-    status: accepted
-    accepted_at: 2026-09-06
-    candidate_commit: 0d7d76d
-    reason: "Extend the gated serializeRestartFacts injection with the adapter restart-window designation facts (designated taker / per-team presser / window anchor) — same gate discipline: default false, strictly post-loop, provably hash-neutral, chain-identity guards extended — so the 3 anti-huddle restart-behavior criteria (MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH, MATCH-RESTART-NEAREST-ONLY, MATCH-RESTART-REARM) evaluate honestly through the rules suite over driven streams. If a fact is not runner-observable or a criterion is unanswerable even with the extension, leave it honestly NOT_EVALUATED. Fold in the two reviewer non-binding notes as disclosed text fixes in the touched files (checkKickoffFirstTouch doc-comment/implementation alignment on keeper taker exclusion; tighten the inherited claims wording to 'no suite-level PASS'). No suite-level PASS claim; corner-cross + distribution stay BLOCKED."
-    builder: builder-structured
-    prerequisite: ""
-  - id: RULES-SUITE-STATE-RERUN
-    status: accepted
-    accepted_at: 2026-09-06
-    candidate_commit: 030c2e0
-    reason: "Re-publish the rules suite verdict state after the designation-facts conformance: re-run the suite over all evidence streams and publish the honest verdict table with exact delta disclosure vs the RULES-FACTS-DEPTH-CONFORMANCE baseline (17 PASS / 2 BLOCKED / 6 NOT_EVALUATED / 0 FAIL per its record ebf90831…; the 20/2/3 figure is the RESTART-DESIGNATION-FACTS aggregate — corrected in the re-published record). BOOKKEEPING; zero gameplay change."
-    builder: builder-structured
-    prerequisite: RESTART-DESIGNATION-FACTS-CONFORMANCE
-  - id: BROWSER-FULL-MATCH-FLOW-EVIDENCE
-    status: accepted
-    accepted_at: 2026-09-07
-    candidate_commit: 72f52b2
-    reason: "Browser-visible full-match lifecycle as the horizon's observable capability: drive a real-Chromium match through kickoff → halftime break countdown → fulltime terminal state and capture event-centered DYNAMIC_VISUAL frames (sequence.json with path bindings — the CORNER-DRIVEN lesson: audit at the strictest named class, never downgraded). Human modes untouched; no football outcome change; the core timer/lifecycle machinery is the accepted implementation under test."
+  - id: HUMAN-RESTART-CONTROL
+    status: pending
+    reason: "Human-directed restart execution: when the human's team wins a restart (throw-in/corner/goal-kick), let the human take it through the existing input contract (tick-indexed InputFrames — direction selection through the established human pass/shot controls at the restart window; power/timing as the adapter already models) at the adapter layer. When the human does not act within the window, the CPU fallback executes exactly as today (stash identity + discriminating guards). DYNAMIC_VISUAL event-centered frames of a human-taken restart vs the CPU-taken control; sequence.json path-bound; audit at the strictest named class. No football-rule change — the same core restart machinery executes; no core change."
     builder: builder-gameplay
     prerequisite: ""
-  - id: SUITE-DETERMINISTIC-TWO-RUN
-    status: accepted
-    accepted_at: 2026-09-07
-    candidate_commit: f3a50ee
-    reason: "Two-run deterministic attestation for the registered suites: re-run the goalkeepers and rules suites with two-run byte-identity evidence (the duels precedent extended) so COMMON-DETERMINISTIC evaluates instead of staying NOT_EVALUATED for single-run records; publish the honest updated verdicts. BOOKKEEPING; zero gameplay change."
+  - id: HUMAN-RESTART-RULES-CONFORMANCE
+    status: pending
+    reason: "Conformance of the human-taken restart: extend the gated serializeRestartFacts designation facts with the human-taker designation (same gate discipline: default false, post-loop, hash-neutral, chain-identity guards extended) and evaluate the restart criteria (placement/serve/timer-freeze/nearest-only as applicable) on human-taken streams through the rules suite — the human restart must conform to the same rules the CPU restart does. Honest NOT_EVALUATED where a fact is unanswerable; no suite-level PASS claim; blocked references stay blocked."
+    builder: builder-structured
+    prerequisite: HUMAN-RESTART-CONTROL
+  - id: EVAL-HYGIENE-CONSOLIDATION
+    status: pending
+    reason: "Consolidate the reviewer non-binding cleanups with guards: the dead `chasers` variable in checkRestartNearestOnly; the conservative mirror-offset disclosure tightened in code comments where touched; the _keeperPressExclusions diagnostics counter hygiene (document or isolate the gated-run/counter-read interaction); the HUD ortho camera resize re-anchoring (presentation-only). Zero behavior change except the disclosed HUD improvement; every cleanup guard-tested."
     builder: builder-structured
     prerequisite: ""
-observable_progress_target: "The 3 anti-huddle restart-behavior criteria evaluated through the suite via gated designation-facts serialization (rules suite → 23 PASS / 2 BLOCKED if fully successful); a re-published rules-suite state with exact deltas; a browser-visible full-match lifecycle flow as event-centered DYNAMIC_VISUAL evidence; COMMON-DETERMINISTIC evaluated for the GK and rules suites via two-run attestation. NO regulation implementation beyond suite-gated behavior, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
-last_invalidation_reason: "Horizon v30 COMPLETE 4/4: RULES-FACTS-DEPTH-CONFORMANCE (ten serialized-fact criteria upgraded to executed PASS; genuine timer-driven halftime/fulltime on a new driven timing fixture), CORNER-DRIVEN-CONFORMANCE (a genuine driven corner completes the per-restart conformance set; DYNAMIC_VISUAL frames; strictest-class audit enforced by the critic RETRY), GK-CORE-OWNED-ARC-FIX (the post-goal reset strands an off-arc-home keeper; fixed at the adapter layer with rehomeKeeperToArc; both keeper oracles PASS), GK-SUITE-CORE-OWNED-STATE (the goalkeepers suite honestly green under core-owned with the re-home; COMMON-BOUNDS FAIL→PASS the only verdict change). Remote-durable at 0b5ae53; strategic reassessment produced Horizon v31 (conformance-completion-and-match-flow). Regulation implementation, GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
+  - id: FULLTIME-FLOW-CLOSURE
+    status: pending
+    reason: "Close the playable match loop: investigate what the real app does at fulltime (does a rematch/menu-return affordance exist?); if the terminal state is a dead end, add the minimal presentation-layer flow (fulltime → rematch/menu return) — draw-only, no core change, human modes untouched — with DYNAMIC_VISUAL evidence of the flow. Disclose what already exists vs what was added."
+    builder: builder-gameplay
+    prerequisite: ""
+observable_progress_target: "The human can take their team's restarts in the real browser with CPU fallback unchanged; human-taken restarts conform through the executable rules suite; the four reviewer cleanups consolidated with guards; the post-fulltime flow closes the playable loop. NO regulation implementation beyond suite-gated behavior, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
+last_invalidation_reason: "Horizon v31 COMPLETE 4/4: RESTART-DESIGNATION-FACTS-CONFORMANCE (the gated designation-facts serialization closes the 3 anti-huddle criteria; the injection verified against production assignChaseRoles with 0/3600 mismatches), RULES-SUITE-STATE-RERUN (the aggregate re-published at 23/2/0/0 with the baseline conflation corrected), BROWSER-FULL-MATCH-FLOW-EVIDENCE (the full-match lifecycle visible in the real browser via the opt-in match-phase HUD; the entire browser project re-run green), SUITE-DETERMINISTIC-TWO-RUN (six two-run byte-identity streams; COMMON-DETERMINISTIC evaluates to PASS for both suites). Remote-durable at 31605de; strategic reassessment produced Horizon v32 (human-restart-control-and-playable-closure). Regulation implementation, GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -52,6 +44,8 @@ replan_if:
 ```
 
 ## Completed horizons
+
+Horizon v31 (conformance-completion-and-match-flow) — COMPLETE 4/4: RESTART-DESIGNATION-FACTS-CONFORMANCE accepted (the gated serializeRestartFacts injection extended with restart-designation events computed post-loop from the production assignChaseRoles — the gk-role precedent; the 3 anti-huddle restart-behavior criteria PASS through the suite; checkKickoffFirstTouch keeper exclusion folded in per spec §12.1; the injection verified against production with 0/3600 mismatches; record byte-reproducible 271b1526…). RULES-SUITE-STATE-RERUN accepted (the complete aggregate verdict table re-published: 23 PASS / 2 BLOCKED_MISSING_REFERENCE / 0 NOT_EVALUATED / 0 FAIL; the 6 upgrades source-attributed; the horizon-text baseline conflation corrected; record byte-reproducible 36fc77e5…). BROWSER-FULL-MATCH-FLOW-EVIDENCE accepted (the full-match lifecycle visible in the real browser via a minimal opt-in match-phase HUD — byte-neutral when off; 5 event-centered Chromium frames through halftime break to fulltime; the 1-tick correspondence offset traced; the entire browser project re-run green by integration; record d02a8fa6…). SUITE-DETERMINISTIC-TWO-RUN accepted (six two-run byte-identity streams so COMMON-DETERMINISTIC evaluates to PASS for both suites; goalkeepers 9/0/2/1/1, rules 24/2/0/0 with the determinism row additive; record abaf6ccd…). Remote-durable at 31605de; strategic reassessment produced Horizon v32.
 
 Horizon v30 (conformance-depth-and-core-owned-gk) — COMPLETE 4/4: RULES-FACTS-DEPTH-CONFORMANCE accepted (ten rules criteria upgraded from honest NOT_EVALUATED to executed PASS using existing serialized facts with NO injection change — placement/serve/per-restart timer-freeze/kickoff-first-touch/goal-phase/timer-decrement — plus genuine timer-driven halftime/fulltime on a new driven full-match timing fixture (5v5-full-match-timing-v1, literal 1→0 zero-crossing, runner-stamped labels rejected); 10 additive protected oracles; the 3 anti-huddle criteria honestly NOT_EVALUATED (no adapter-designation facts in committed streams); record byte-reproducible ebf90831…). CORNER-DRIVEN-CONFORMANCE accepted (a GENUINE driven corner via adapter initial state only — the core's own §8.1/§8.2 machinery awards and executes; CORNER-KICK-AWARD/PLACEMENT/TIMER-FREEZE PASS with 2 new protected oracles; CORNER-KICK-CROSS stays BLOCKED; 4 event-centered Chromium frames; critic RETRY enforced the strictest DYNAMIC_VISUAL-class audit and the sequence.json path-binding convention, fixed with the record byte-unchanged; record 21e3aa08…). GK-CORE-OWNED-ARC-FIX accepted (the core-owned team-a keeper off-arc drift root-caused — the post-goal reset re-places every body at its scenario kickoff home and strands a keeper whose home is 24.62 m off-arc, legacy masked it — and fixed at the adapter layer with deterministic rehomeKeeperToArc using versioned geometry, gated gkBehavior+core-owned with an opt-out; both keeper oracles PASS 0/600 off-arc; stash identity 4/4; record 92e4c4a3…). GK-SUITE-CORE-OWNED-STATE accepted (the goalkeepers suite re-published under core-owned: 8 PASS / 3 NOT_EVALUATED / 1 BLOCKED / 1 NEEDS_PERCEPTUAL_REVIEW / 0 FAIL; the one true verdict change COMMON-BOUNDS FAIL→PASS (legacy escape gone + the accepted 56.5 m goal-mouth bound); re-home dependency + observation-source flips disclosed; record 5cd1c808…). Remote-durable at 0b5ae53; strategic reassessment produced Horizon v31.
 
