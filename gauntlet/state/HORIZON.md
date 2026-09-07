@@ -9,7 +9,7 @@ horizon_id: "fouls-executable-and-scheduled-outlines"
 created_from_commit: a762673
 created_at: 2026-09-07
 reason: "Horizon v33 (COMPLETE 4/4, remote-durable at a762673) opened the next phase: the fouls/cards spec drafted grounded in the accepted duel/tackle machinery (b7f56e0 — a foul is man-not-ball tackle contact with duelWon false; the critic verified 10 real such events in the accepted duels evidence), the human can control the designated keeper in human-vs-CPU (3ef0edd — the keeper role was simply off for that mode; the switch contract never excluded it), and the ball-server DEFER decision recorded with the actionable HUMAN-BALL-SERVER-LITERAL outline (b55fa74). RELEASE-0.9.7 consolidated the v29-v33 gains (9a7cb7f; the needle advance 2ca140c and the persist-acceptance sanitizer fix for dotted objective IDs routed to the orchestrator). v34 executes the scheduled outlines: (a) FOUL-DETECTION-MACHINERY — the spec's §5 foul definition implemented as observation-level detection (the runner emits foul events from the accepted tackle machinery's man-not-ball contacts; zero gameplay change); (b) FOULS-SUITE-REGISTRATION — the named-but-unregistered criteria (FOUL-DETECT, FOUL-CLEAN-TACKLE) become executable protected oracles per FOULS_CARDS_SPEC §10 (the RULES-SUITE-REGISTRATION pattern); (c) HUMAN-BALL-SERVER-LITERAL — the scheduled-ready outline executed: the pass-gated serving path (a deliberate core change with its named conformance path); (d) GK-DRIVEN-CLOSURE — driven streams to close the 2 NOT_EVALUATED goalkeepers criteria. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 1
+current_index: 2
 objectives:
   - id: FOUL-DETECTION-MACHINERY
     status: accepted
@@ -17,7 +17,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: ""
   - id: FOULS-SUITE-REGISTRATION
-    status: pending
+    status: accepted
     reason: "Register the FOULS_CARDS_SPEC §10 criteria that the detection machinery makes answerable — FOUL-DETECT and FOUL-CLEAN-TACKLE — as executable protected oracles with mutant/canary guards (the RULES-SUITE-REGISTRATION pattern): a fouls evaluator suite (suite-fouls-v1), obs contract, bindings, the CRITERION_TO_ORACLE wiring; card/advantage/free-kick criteria stay named-not-registered (no machinery). Honest executed verdicts over the detection streams; the registry-hash evolution tolerated by provenance gates; no suite-level PASS claim."
     builder: builder-structured
     prerequisite: FOUL-DETECTION-MACHINERY

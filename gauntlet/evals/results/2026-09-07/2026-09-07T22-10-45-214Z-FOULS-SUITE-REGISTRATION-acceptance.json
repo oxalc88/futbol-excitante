@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.7",
+  "persisted_at": "2026-09-07T22:10:45.214Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "FOULS-SUITE-REGISTRATION",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "b7b7a1a",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v34 2/4: the two FOULS_CARDS_SPEC §10 criteria the accepted FOUL-DETECTION-MACHINERY machinery makes answerable — FOUL-DETECT and FOUL-CLEAN-TACKLE — registered as executable protected oracles (evidence class MULTI_TICK; zero gameplay change — git diff src/ src/contracts/ EMPTY and the detection producer eval/runners/foul-detection.ts unmodified, verified by builder, critic, AND integration). REGISTRATION (the RULES-SUITE-REGISTRATION pattern, field-for-field): FOULS_SUITE (suite-fouls-v1, common_criterion_ids [], impact_closure NONE); FOUL-DETECT + FOUL-CLEAN-TACKLE as HARD_INVARIANT common criteria; invariants foul-detect-evidence/foul-clean-tackle-evidence → protected oracles foul-detect-oracle-v1/foul-clean-tackle-oracle-v1 (eval/oracles/fouls.ts, wire.ts, CRITERION_TO_ORACLE — both additive, zero existing rows changed); bindings BINDING_FOULS_DETECT_001/BINDING_FOULS_CLEAN_TACKLE_001; obs-fouls-v1 (event-driven); config-fouls-v1/expansion-fouls-v1; scenario scn-fouls-lifecycle-v1. Registry 58 bindings / 8 suites / 95 criteria / 38 invariants / 52 scenarios; content_hash fnv1a64-v1:8185c0af89cf8a39 (grew for the new suite; the provenance/registry gate is the GK-SPEC-SUITE-CONTRACTS format+non-placeholder+tamper-discriminant accommodation — no literal hash pin needed, verified live by the integration reviewer). CARD-ISSUED / ADVANTAGE-PLAYED / FREE-KICK-AWARD stay named-not-registered — no criterion/oracle/invariant/binding (grep-verified by the critic; the binding tests enforce the absence both directions). EXECUTED VERDICTS over the accepted detection streams (state_hash_of_hashes reproduce the accepted FOUL-DETECTION-MACHINERY values character-for-character — driven 8c227ab4…, organic fb5e9b02…): driven-foul-live (1 foul, tick 51) FOUL-DETECT PASS + FOUL-CLEAN-TACKLE PASS; organic-foul-live (1 foul, tick 536) PASS + PASS (critic independently reproduced both); organic-foul-stashed (gate off, 0 fouls) both honestly NOT_EVALUATED — the negative control cannot be misread as confirming the complement. Oracles return [] → NOT_EVALUATED on foul-less streams; 4 mutant canaries FAIL (a non-spec contactType foul, a duelWon-true-sourced foul, a shoulder-sourced foul, plus a false-positive guard). Tests: new fouls-suite-binding 18/18; eval-registry 48/48 (binding count 56→58 updated); fouls-spec-binding 42/42 (two-registered/three-unregistered split); FOUL-DETECTION-MACHINERY binding 12/12 still green; RULES-SUITE-REGISTRATION 28/28; oracle-registry 19/19; typecheck 0; the integration reviewer ran 608 node tests across all 20 registry-consumer test files + 2 canary suites, all green (rules/goalkeepers verdict tables and pinned record SHAs unperturbed; gauntlet:eval 39+33 PASS; gauntlet:eval:state 13/13). record_sha256 5e538e5d183ee0c3c79e4981bb447a06c42d3b7be3a3ceb66f320dfb24611794 (no wall-clock field; reproduced byte-exact independently by critic AND integration; ordinary runs leave docs/ byte-identical; durable evidence under WIP_SECTION=__EVIDENCE__:FOULS-SUITE-REGISTRATION). Audit PASS MULTI_TICK (20 checks: 16 PASS + 4 NOT_APPLICABLE). Disclosures: the full tests/unit/eval battery chunked (>300s, the FOUL-DETECTION-MACHINERY precedent); one pre-existing vitest worker-RPC timeout artifact in a reviewer batch (7/7 files green); the suite is NOT wired into the browser composition root (set_by disclosed); a binding-test header typo (cosmetic); the critic's non-blocking note that specs/FOULS_CARDS_SPEC.md §10 heading wording (\"named, NOT registered\") is now factually outdated for the two registered criteria — recorded as a disclosed open thread for the next natural fouls objective (the spec text is prose and pinned by no test). claims_not_made: no card, advantage, or free-kick machinery or verdict / no suite-level PASS (2 of 5 §10 criteria registered) / no PROMOTION / no FOUNDATION_LAB_PASS / no milestone or regression PASS / no PES fidelity or invented envelope / no gameplay/source change."
+}

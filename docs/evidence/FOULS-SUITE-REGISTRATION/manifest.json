@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "FOULS-SUITE-REGISTRATION",
+  "accepted_at": "2026-09-07T22:10:45.214Z",
+  "candidate_commit": "b7b7a1a",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/FOULS-SUITE-REGISTRATION/trajectory.json",
+      "sha256": "2a16ce77db881f8360af79010d3cfe4da69799e1e278f02b3a4eed36c91d26e1",
+      "git_blob": "9782b310181d389f7d977e9e75e9db771313bd26",
+      "candidate_commit": "b7b7a1a",
+      "bytes": 13781,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/FOULS-SUITE-REGISTRATION/audit.json",
+      "sha256": "2075858ecddb6307e414069e87c08e57ed773d9502a39607f7deda781c652157",
+      "git_blob": "63cae398d996535b3cbb054f2aea3ffbd8820ed3",
+      "candidate_commit": "b7b7a1a",
+      "bytes": 2664,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T22-10-45-214Z-FOULS-SUITE-REGISTRATION-acceptance.json"
+}
