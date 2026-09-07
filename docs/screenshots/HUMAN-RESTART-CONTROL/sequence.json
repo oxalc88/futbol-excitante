@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "objective_id": "HUMAN-RESTART-CONTROL",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "semantic_order": "before → event → transition → result (+ CPU-taken control)",
+  "frames": [
+    {
+      "label": "human-before",
+      "path": "human-before.png",
+      "tick": 0,
+      "pngSha256": "3aeff545c687de90e3dd01d49a95aaf7f3bb392b7d65a654c823d7ce52ec7c8b",
+      "stateHash": "fnv1a64-v1:4d26c687e70937cb",
+      "note": "restart window open: the human's team won the throw-in; taker + receivers set"
+    },
+    {
+      "label": "human-steer",
+      "path": "human-steer.png",
+      "tick": 19,
+      "pngSha256": "16091d6326d16d7cd113d52c4dd8a253f3bbd774c9c3ce4704e3c690f47cea39",
+      "stateHash": "fnv1a64-v1:7af0fcffb0b5df59",
+      "note": "during the window the human steers the receiving body down-right toward the field"
+    },
+    {
+      "label": "human-serve",
+      "path": "human-serve.png",
+      "tick": 21,
+      "pngSha256": "c09af92752b537d1a2e265adef61e048bfa2516776d0689a77759f68ecbcb477",
+      "stateHash": "fnv1a64-v1:dab5376e28c8a126",
+      "note": "throw-in-executed: the ball is served toward the human-steered receiving body"
+    },
+    {
+      "label": "human-after",
+      "path": "human-after.png",
+      "tick": 24,
+      "pngSha256": "2bca4bb1268d8218fd1a4f58f5f02c26e16c202d7176eac5ab037236fc9518e1",
+      "stateHash": "fnv1a64-v1:29a110e9c3db1a02",
+      "note": "consequence: the ball is in flight toward the human-chosen position"
+    },
+    {
+      "label": "cpu-fallback-serve",
+      "path": "cpu-fallback-serve.png",
+      "tick": 22,
+      "pngSha256": "2869ccb524c369a7ec23047ccba86b0a714bdb2dde2a25db680f52340581f1c2",
+      "stateHash": "fnv1a64-v1:0b6b9ffe8959f0aa",
+      "note": "control: the identical window with no human input — the core serves toward the default nearest receiver"
+    }
+  ]
+}

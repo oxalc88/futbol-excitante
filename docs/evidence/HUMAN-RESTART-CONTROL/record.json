@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "objective_id": "HUMAN-RESTART-CONTROL",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "produced_by": "scripts/capture-human-restart-control.ts",
+  "realization": {
+    "is": "receiver-steering destination control (movement-direction channel)",
+    "how": "the human's directional movement of a receiving body on the awarding team re-targets the core's nearest-receiver serve destination, so the human directs WHERE the restart is served (the served target/direction change) while the SAME core applyThrowIn machinery executes the same restart.",
+    "not_a": "a pass-button ball-server — a single human pass during a throw-in window is overridden by the core's countdown-zero auto-serve, so the human is not the literal server.",
+    "deferred": "the pass-button ball-server realization is deferred behind the disclosed core change (making the countdown-zero auto-serve yield to a human pass), which the objective's no-core-change constraint forbids in this objective."
+  },
+  "discriminating_guards": {
+    "human_input_changes_serve_target": true,
+    "human_input_changes_serve_direction": true,
+    "cpu_fallback_unchanged": true,
+    "gate_live_on_human_run": true
+  },
+  "runs": [
+    {
+      "id": "human-directed",
+      "role": "the human's team won the throw-in; the human feeds a directional input during the window and the core's nearest-receiver throw-in serve re-targets toward the human-steered receiver",
+      "scenario": "5v5-human-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-restart-throwin.v1.json",
+      "ticks": 24,
+      "window_kind": "throw-in",
+      "awarding_team": "team-a",
+      "human_control_slot": "slot-1",
+      "human_controlled_player": "player-3",
+      "human_move_direction": {
+        "x": 1,
+        "y": -1
+      },
+      "human_gate_ticks": 19,
+      "serve_event": "throw-in-executed",
+      "serve_direction": {
+        "x": -0.9040101493683564,
+        "y": -0.42751099382238344
+      },
+      "serve_target": {
+        "x": 20.494974746830586,
+        "y": 29.505025253169414
+      },
+      "human_final_position": {
+        "x": 20.65407377259756,
+        "y": 29.34592622740244
+      },
+      "state_hash_of_hashes": "af6a0fdfb8c699dca68d840bbc9bc28a8fb2b843aeaae29004eb0336f20d9c7c",
+      "reproduction": "runHumanRestartWindow({ scenario: load(\"eval/scenarios/5v5-human-restart-throwin.v1.json\"), maxTicks: 24, humanMoveDirection: {\"x\":1,\"y\":-1}, window: {\"kind\":\"throw-in\",\"team\":\"team-a\",\"takerPlayerId\":\"player-1\",\"position\":{\"x\":30,\"y\":34},\"countdown\":20,\"touchlineIndex\":0} })",
+      "determinism": {
+        "replay_state_hash_of_hashes": "af6a0fdfb8c699dca68d840bbc9bc28a8fb2b843aeaae29004eb0336f20d9c7c",
+        "replay_identical": true
+      }
+    },
+    {
+      "id": "cpu-fallback",
+      "role": "the identical throw-in window with NO human directional input in the window — the core auto-serves toward the default nearest receiver, byte-identical to the accepted flow",
+      "scenario": "5v5-human-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-restart-throwin.v1.json",
+      "ticks": 24,
+      "window_kind": "throw-in",
+      "awarding_team": "team-a",
+      "human_control_slot": "slot-1",
+      "human_controlled_player": "player-3",
+      "human_move_direction": null,
+      "human_gate_ticks": 19,
+      "serve_event": "throw-in-executed",
+      "serve_direction": {
+        "x": -0.9284766908852594,
+        "y": -0.3713906763541037
+      },
+      "serve_target": {
+        "x": 20,
+        "y": 30
+      },
+      "human_final_position": {
+        "x": 20,
+        "y": 30
+      },
+      "state_hash_of_hashes": "79ef0552cf2d12ad22fb692f8c98a60663f7065c11c170d4dd52289c5a864701",
+      "reproduction": "runHumanRestartWindow({ scenario: load(\"eval/scenarios/5v5-human-restart-throwin.v1.json\"), maxTicks: 24, humanMoveDirection: null, window: {\"kind\":\"throw-in\",\"team\":\"team-a\",\"takerPlayerId\":\"player-1\",\"position\":{\"x\":30,\"y\":34},\"countdown\":20,\"touchlineIndex\":0} })",
+      "determinism": {}
+    }
+  ],
+  "claims_not_made": [
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No invented reference envelope or tolerance.",
+    "No suite-level PASS claim for the match-rules suite.",
+    "No claim that the human becomes the literal ball-server for every restart type: for the corner the cross target is a fixed penalty-area point, and a single human pass during a throw-in window is overridden by the core's countdown-zero auto-serve (the human's directional movement of a receiving body is what re-targets the serve and sticks)."
+  ],
+  "record_sha256": "42bb7ef0d5f916b0cc456e2f01a46fd8ec2c3c88b67eab7a2ff7b0b23e4f6bb5"
+}
