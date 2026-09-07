@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-07T11:10:59.975Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "EVAL-HYGIENE-CONSOLIDATION",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "fec4a35f526f4bf5a48ab7849a0c2a4e0510118c",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v32 3/4: the four reviewer non-binding cleanups consolidated with guards (BOOKKEEPING; zero verdict changes — proven directly, not just claimed). ITEM 1: the dead `chasers` Set removed from checkRestartNearestOnly (eval/oracles/rules-restart.ts) — genuinely unread (grep zero references); the enforced falsifier is the clump count, now documented; the rules gate 173/173 + the accepted-designation-stream pin replay (record_sha256 271b1526…, byte-identical state file) prove verdict-inertness. ITEM 2: the serializeRestartFacts designation comment tightened (eval/runners/headless-match.ts) — states the exact adapter-phase / POST-STEP-ball-reference pairing and that it can only shorten windows or false-fail, never fabricate a PASS (comment-truth verified against the step/snapshot ordering by the critic); comment-only, zero executable lines changed. ITEM 3: the _keeperPressExclusions counter interaction DOCUMENTED (src/adapters/input-browser/goalkeeper-role.ts + headless-match.ts — post-loop assignChaseRoles → designatePresser inflates the counter; never combine a gated designation run with a GK counter read in one process — reset between them); documentation-only (the increment path verified, no gated-path reader exists — the counter stays a diagnostics value, never gameplay). ITEM 4: the HUD ortho camera resize re-anchoring (src/adapters/renderer-three/renderer.ts — a container ResizeObserver re-anchors the HUD ortho camera + top-left sprite + renderer canvas + main camera aspect; getHudCamera() accessor; presentation-only/draw-only, no football state read/written; HUD branch null-guarded; getHudCamera() returns null when HUD off; the observer lifecycle leak-free — reset() disconnects+nulls before dispose then re-registers, no double registration, detached container simply stops firing, frustum clamped ≥1px) with the browser guard tests/browser/hud-ortho-resize.browser.test.ts 3/3 (frustum re-anchor 800×600→1200×800, canvas follows container, HUD top-left, null camera when disabled). ZERO VERDICT CHANGE proven directly: the critic re-ran the gated designation stream (record 271b1526… byte-identical, all 25 criterion verdicts identical) and the integration re-ran the 173/173 gate + all accepted-stream bindings; the render byte-identity proven by the pinned keeper-marker PRE_CHANGE_BASELINE_SHA 05e40d0117…68bc staying EXACT + the archetype identical-recapture + all screenshot families (the HUD-off default path byte-neutral; the ResizeObserver's initial observe is a no-op at default sizes since creation already uses container dimensions). Evidence: record_sha256 30d933e2b3245c0c61cbde132aed75bfc4005417cb79f2db72611044466d7675 (no wall-clock field; reproduced byte-exact independently by critic AND integration; two consecutive ordinary-mode runs byte-identical; ordinary runs leave docs/ byte-identical — full-tree sha256 sweep); audit PASS at the tool-canonical BOOKKEEPING shape. Tests: rules gate 173/173 + stateHash pins + GK/registry battery 309/309 (integration; the builder's 18-file set 288/288) + anti-huddle integration 43/43 + HUD guard 3/3 + render-sensitive batteries 63/63 across 19 files (integration extended the builder's 55) + cpu-adapter guards 45/45 + architecture 27/27; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass — every claim independently reproduced (comment-truth verified against code, the counter increment path verified, the observer lifecycle read in full); integration (glm5.3-flash) ACCEPT first pass — every battery re-executed independently (rules-oracle chunked 18+19+21+17 covering all 75 tests — full single-invocation runs exceed the 300s command cap on the 2-CPU host, a harness quirk disclosed, not a candidate defect; the state-coherence checks re-verified PASS). claims_not_made: zero verdict changes (every oracle check's semantics byte-identical post-cleanup) / no suite-level PASS claim / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity / no core change (the renderer HUD change is presentation-layer) / no accepted evidence record mutation."
+}

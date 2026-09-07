@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-07T08:51:00Z
+measured_at: 2026-09-07T11:12:00Z
 tracking_contract_version: 1
-last_tracked_objective: HUMAN-RESTART-RULES-CONFORMANCE
-usage_aggregates_through: HUMAN-RESTART-RULES-CONFORMANCE
-clock_aggregates_through: HUMAN-RESTART-RULES-CONFORMANCE
-model_evaluation_through: HUMAN-RESTART-RULES-CONFORMANCE
+last_tracked_objective: EVAL-HYGIENE-CONSOLIDATION
+usage_aggregates_through: EVAL-HYGIENE-CONSOLIDATION
+clock_aggregates_through: EVAL-HYGIENE-CONSOLIDATION
+model_evaluation_through: EVAL-HYGIENE-CONSOLIDATION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,18 +42,18 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 579h 53m |
+| Calendar span (first work → measurement) | 583h 13m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~180h est. |
-| Sum of per-step agent time | ~177h 43m |
+| Active work (anything running) | ~182h est. |
+| Sum of per-step agent time | ~179h 48m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-07T08:51:00Z`.
-Recomputed 2026-09-07 at the HUMAN-RESTART-RULES-CONFORMANCE acceptance
-(Horizon v32 2/4): 199 accepted per-step rows summing to ~177h 43m (the new
-objective adds ~2h 17m incl. the critic-RETRY cycle: builder ~90m /
-critic ~27m / integration 19m / commit <1m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-07T11:12:00Z`.
+Recomputed 2026-09-07 at the EVAL-HYGIENE-CONSOLIDATION acceptance
+(Horizon v32 3/4): 200 accepted per-step rows summing to ~179h 48m (the new
+objective adds ~2h 05m: builder ~37m / critic ~24m / integration 63m /
+commit <1m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -282,6 +282,7 @@ invoices.
 | SUITE-DETERMINISTIC-TWO-RUN | accepted | ~1h 59m | ~56m | 34m | 28m | <1m | n/a | n/a |
 | HUMAN-RESTART-CONTROL | accepted | ~1h 52m | ~52m | 44m | 15m | <1m | n/a | n/a |
 | HUMAN-RESTART-RULES-CONFORMANCE | accepted | ~2h 17m | ~90m | 27m | 19m | <1m | n/a | n/a |
+| EVAL-HYGIENE-CONSOLIDATION | accepted | ~2h 05m | ~37m | 24m | 63m | <1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -619,6 +620,7 @@ on an H task is the interesting result.
 | SUITE-DETERMINISTIC-TWO-RUN | deepseek-v4-flash | M | Medium - two-run deterministic attestation for both registered suites (BOOKKEEPING, zero source change): six streams attested byte-identical across two runs (GK 1800+600; rules 400+800+800+1800) so COMMON-DETERMINISTIC evaluates to PASS strictly from byte-identity (the duels precedent extended; the invariant is a HARD_INVARIANT with no single-run oracle); goalkeepers 9/0/2/1/1 (the only delta vs the baseline); rules §15 byte-unchanged 23/2/0/0 with the determinism row additive (24/2/0/0); six exclusions disclosed with attribution to the accepted baselines | 0 | A | first-pass ACCEPT; critic ran the producer twice itself, wrote its own per-tick verifier (600/600 and 400/400 identical), proved the comparison real with a cpuAntiHuddle:false divergence probe, programmatically verified the deltas; integration re-ran all batteries with counts matching exactly |
 | HUMAN-RESTART-CONTROL | deepseek-v4-flash (reroute) | H | High - human-directed restart destination control (DYNAMIC_VISUAL): investigation found the core auto-serves every restart at countdown zero (even a human pass at the window is overridden); the delivered realization is receiver-steering destination control (explicitly disclosed — NOT a pass-button ball-server, which is deferred behind a disclosed core change the objective's no-core-change constraint forbids): the human's directional input (only via sim.applyInputs) steers an awarding-team body during the window and the core's own nearest-receiver serve re-targets (guard (20,30)→(20.494974746830586, 29.505025253169414), gate 19/24); CPU fallback unchanged (stash probe re-derived byte-exactly); first capture was visually void (5 identical PNGs, event below frame) — critic RETRY fixed with a re-framed camera, a hardened PNG-byte frame guard, and the realization disclosure | 1 | A | RETRY→ACCEPT; critic reproduced the serve re-target exactly twice, verified the constraint analysis from core source, and confirmed the fix with pixel forensics (5 distinct frames, event legible); integration re-ran 300 tests across 19 files + a stash probe + the silent-consumer hunt (the new module imported by nothing in the shipped app) |
 | HUMAN-RESTART-RULES-CONFORMANCE | deepseek-v4-flash | H | High - the human-taken restart conforms through the rules suite: the gated designation facts extended with the WINDOW-SCOPED humanWindowTaken marker (default off, post-loop, hash-neutral) after the critic caught the freeze-exemption gate leak (fired on body-id match alone — verdict-inert only by fixture luck); the exemption now fires ONLY on marker + body-id match (CPU-fallback streams carry zero human fields BY GATE); the driven stream's load-bearing exemption (the sanctioned steering momentum over the never-closing window) documented; the natural human boundary stream passes all 7 applicable criteria identically to the CPU restart with different serve targets; binding 10/10 incl. the FAIL-direction checks | 1 | A | RETRY→ACCEPT; critic caught the leak synthetically AND live, then verified the fix mechanically (zero leak rows; the old-leak pin; the driven rationale load-bearing and documented); integration re-ran 268/268 + the strongest neighbor check — all 5 accepted gated streams re-run BYTE-IDENTICAL through the post-change runner + the exemption's four edge probes + leakRows=0 |
+| EVAL-HYGIENE-CONSOLIDATION | deepseek-v4-flash | M | Medium - the four reviewer non-binding cleanups consolidated with guards (BOOKKEEPING; zero verdict changes proven directly): the dead chasers Set removed (rules gate 173/173 + the 271b1526… pin replay prove verdict-inertness), the mirror-offset comment tightened (comment-truth verified against the step/snapshot ordering), the _keeperPressExclusions counter interaction documented (documentation-only), the HUD ortho camera resize re-anchoring (a container ResizeObserver; presentation-only/draw-only; leak-free lifecycle; browser guard 3/3); the render byte-identity proven by the keeper-marker baseline SHA staying exact | 0 | A | first-pass ACCEPT; critic independently reproduced every claim (comment-truth verified against code, the counter path verified, the observer lifecycle read in full); integration re-executed every battery independently (rules-oracle chunked to cover all 75 tests — full single-invocation runs exceed the 300s command cap on the 2-CPU host, a harness quirk disclosed) |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -927,6 +929,8 @@ on an H task is the interesting result.
 | HUMAN-RESTART-CONTROL | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | 19 files / 300 tests re-run green: new integration 10/10 + the named restart battery 142/142 (exact per-file counts) + accepted-pin adapter guards 115/115 + browser PNG-byte guard 1/1 + typecheck clean; silent-consumer hunt: the new adapter module imported only by the eval driver/capture script/tests (static + dynamic import scan; no string-built path reaches it from src/apps/); gate inertness verified by predicate tests (false on playing state, false when CPU won, false for an opposing-team body); stash probe: the recorded cpu-fallback chain reproduces byte-exactly (state_hash_of_hashes 79ef0552…) with the identical serve target in a no-frame headless variant (the only chain delta is pre-existing scheduler diagnostics, empty diff); record hash recomputed MATCH; docs/ byte-identical after all runs; zero tracked-file modification confirmed twice |
 | HUMAN-RESTART-RULES-CONFORMANCE | critic (glm5.3-flash) | glm5.3-flash | RETRY→ACCEPT | first review: outcomes/hashes/stream reproduction honest (all 4 gated streams re-executed; the natural human stream FREEZE PASS is exemption-independent with 312 body-ticks checked and non-vacuous; the exemption covers exactly one body; accepted prior streams unchanged; SERVE oracle semantics untouched) BUT the #1 priority check FAILED — the exemption fired on body-id match without requiring humanDirected=true (proven synthetically AND live on all four produced streams; the driven PASS rested on 3 ungated coast ticks); fixes verified: the window-scoped humanWindowTaken marker gates the exemption (driven 24/24 marker, 19/24 directed; CPU-fallback/natural/natural-cpu 0/0/0 by gate; old-leak pin: synthetic id-without-marker FAIL), the driven rationale load-bearing and disclosed verbatim, the binding tests real FAIL-direction checks (10/10), the record guards aligned (44c0d928… recomputed) |
 | HUMAN-RESTART-RULES-CONFORMANCE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | 16 files / 268 tests re-run green + architecture 27/27 + typecheck 0; THE STRONGEST NEIGHBOR CHECK: all 5 accepted gated streams re-run through the post-change runner with state_hash_of_hashes + final_state_hash BYTE-MATCHING their pins (6e78e38e/84c17262, d6899d77/d77d4d1f, 4aa1cee9/7640408f, 0306d528/c946848a, 4d972fd2/c4a94b8a) — the exemption is provably a no-op on accepted streams; the exemption's four edge probes (marker-true/null-id drift FAIL, marker-false/body-id FAIL, other-body drift FAIL, same-body exempt PASS) + the leak hunt (driven markerRows=24=idRows=24, leakRows=0; all CPU-fallback streams 0/0/0); load-bearing proven (stripping the human fields flips the driven FREEZE to FAIL at exactly the disclosed ticks); marker emission post-loop, index-aligned 1:1 (binding asserts countDesignations===observations.length); default-off path byte-identical; record hash recomputed MATCH |
+| EVAL-HYGIENE-CONSOLIDATION | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: items 1-3 provably behavior-inert (diff inspection + grep zero references + 173/173 rules gate + the byte-identical designation-stream re-run 6e78e38e70ea0561…/84c1726260ad3faf with all 25 verdicts identical + 34/34 stateHash pins + 288/288 GK/registry battery); item 4 presentation-only with a correct leak-free observer lifecycle (reset/dispose/initScene disconnect-and-null verified; frustum clamped; no throw with HUD disabled) and byte-identity proven by the pinned keeper-marker baseline SHA 05e40d01… staying EXACT + identical-recapture + all screenshot families; comment-truth verified against the step/snapshot ordering and the counter increment path; record hash recomputed exact; audit re-run PASS |
+| EVAL-HYGIENE-CONSOLIDATION | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | every battery re-executed independently: rules gate 173/173 (rules-oracle chunked 18+19+21+17 covering all 75 tests — full single-invocation runs exceed the 300s command cap on the 2-CPU host, a harness quirk disclosed) + stateHash pins + GK + registry/provenance/hygiene 309/309 + anti-huddle integration 43/43 + HUD guard 3/3 + render-sensitive 63/63 across 19 files (keeper-marker baseline SHA byte-parity exact) + typecheck 0 + architecture 27/27; zero-verdict-change verified directly (the 271b1526… designation pin replay byte-identical); silent-consumer hunt: getHudCamera() consumers = interface + impl + the guard test only; no resize/aspect code or assertion exists anywhere else; goalkeeper-role.ts + headless-match.ts diffs verified comment-only; the ResizeObserver's initial observe a no-op at ≥2px since creation already uses container dimensions; record hash recomputed MATCH; docs/ untouched by ordinary runs |
 | GK-SUITE-VERDICTS-STATE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 reproduced byte-exact in its own ephemeral producer re-run; per-run verdict table matches raw telemetry (continuous 0 releases/0 save chains -> SAVE-CLAIM/DISTRIBUTION honestly NOT_EVALUATED; fixture releases @408/433 -> PASS); all 5 provenance pins verified against the cited manifests; driven-vs-organic labeling accurate; 140/140 neighbors + typecheck 0 |
 | GK-SUITE-VERDICTS-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 151/151 neighbor tests re-run; typecheck 0; record hash recomputed byte-exact + ordinary-mode producer re-run left docs/evidence byte-identical; all 5 cited manifests read verbatim; zero evaluator/gameplay change |
 
