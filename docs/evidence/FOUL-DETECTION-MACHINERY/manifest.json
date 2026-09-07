@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "FOUL-DETECTION-MACHINERY",
+  "accepted_at": "2026-09-07T21:10:27.608Z",
+  "candidate_commit": "936a297b0e4b7cd4d66acb074c5bd3c8c969de43",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/FOUL-DETECTION-MACHINERY/trajectory.json",
+      "sha256": "1b4d95f5e04f3534c184c1358b977ac2d35a5b3866207543c89c0b6fd369a829",
+      "git_blob": "bdffc16b7c8c3f4bbac54dfb7e55718a9018838f",
+      "candidate_commit": "936a297b0e4b7cd4d66acb074c5bd3c8c969de43",
+      "bytes": 8790,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/FOUL-DETECTION-MACHINERY/audit.json",
+      "sha256": "04a7767f31e568e412f4a382c08ceca2d47b9cdee39d447f6c315761dc5d0a47",
+      "git_blob": "29763e9a75b43f913802e59036ed81d6ee1c99c3",
+      "candidate_commit": "936a297b0e4b7cd4d66acb074c5bd3c8c969de43",
+      "bytes": 2664,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T21-10-27-608Z-FOUL-DETECTION-MACHINERY-acceptance.json"
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.7",
+  "persisted_at": "2026-09-07T21:10:27.608Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "FOUL-DETECTION-MACHINERY",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "936a297b0e4b7cd4d66acb074c5bd3c8c969de43",
+  "builder": {
+    "builder": "builder-gameplay",
+    "model": "deepseek-v4-flash (reroute — qwen3.8-flash quota-exhausted until 2026-10-01)"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v34 1/4: FOULS_CARDS_SPEC §5 realized as observation-level detection (evidence class MULTI_TICK). Zero gameplay change — git diff src/ src/contracts/ EMPTY (verified by builder, critic, AND integration); the tackle behavior is untouched and the detection is an annotation on the ACCEPTED tackle machinery's own committed contacts, injected post-loop in the runner behind a default-false option (the gk-role/restart-designation-facts precedent). THE CHANGE: eval/runners/headless-match.ts +31 (detectFouls?: boolean default false, post-loop injection after the serializeRestartFacts block, before match stats — inputs/steps/state hashes already committed, provably unaffected); eval/runners/foul-detection.ts (pure producer detectFoulEvents/countFoulEvents/FOUL_CONTACT_TYPES/FoulEventPayload); scripts/capture-foul-detection-machinery.ts (evidence producer); tests/unit/eval/foul-detection-machinery-binding.test.ts (12 tests); package.json +1 script. PREDICATE per FOULS_CARDS_SPEC §5.1 exactly: contactType ∈ {standing-tackle, slide-tackle} && tacklePhase === \"active\" && duelWon === false (duelWon = ballReachable at tackle-system.ts:505); emitted fields mirror the committed contact payload (§4.2 — attemptStartTick, activeWindowStart/EndTick, reach, planarDistance, committedDirection) plus sourceEventId; §5.2 complement covered (duelWon true and symmetric shoulder contacts excluded, tested). EVIDENCE: driven-foul-live 1 foul (tick 51, standing-tackle, payload valid; 300 contacts examined), organic-foul-live 1 foul (tick 536, slide-tackle; 73 contacts), organic-foul-stashed detectFouls:false → 0 fouls with state_hash_chain_identical true and byte-identical to the pre-change baseline (hashOfHashes fb5e9b02…). record_sha256 69104ea10e14aa2607eefbd9e3206e17d025f4cea5206032867e4772bc89a272 (no wall-clock field; reproduced byte-exact independently by critic AND integration; ordinary runs leave docs/ byte-identical — verified by hash sweep). Tests: binding 12/12; typecheck exit 0; integration headless-match/match-set-piece/match-scoring/match-lifecycle/replay-match 102 passed; neighbor eval bindings 85 passed; runner neighbors 40 passed (batteries chunked, disclosed; no run >300s). Audit PASS MULTI_TICK (20 checks: 17 PASS + 3 NOT_APPLICABLE for the headless class). Critic (glm5.3-flash, independent) ACCEPT first pass — reproduced the predicate against tackle-system.ts:541-590 serialization, the injection at headless-match.ts:1470-1472, and the record byte-exact; non-blocking notes: the persisted audit has 20 entries (builder reported 17 PASS — cosmetic), bare tsc --noEmit shows 49 pre-existing errors outside candidate files, the organic countFoulEvents guard is >=1 (defensive looseness, the record pins the exact 1). Integration (glm5.3-flash) ACCEPT first pass — 32 files / 381 neighbor tests 0 failures (headless/restart/scoring/human/GK/duels/ball-regime/canaries all green with the gate off), zero pre-existing consumers of the new exports (strictly additive), docs/ byte-identical on an ordinary capture run, package.json script unique and running, git log unchanged at the replan commit (no builder commits); non-blocking: core-ts-isolation's tsc probe flakes under parallel vitest load (5s timeout, solo green), durability gate horizon check against the previous objective fails at post-replan HEAD as expected pre-bookkeeping. claims_not_made: no suite verdict or oracle registration for FOUL-DETECT / FOUL-CLEAN-TACKLE (named-but-unregistered per §10 — no evaluator suite, oracle, invariant, binding, or scenario registration added) / no card, advantage, or free-kick implementation (spec-only; the binding test asserts no card/advantage/free-kick event is emitted) / no PROMOTION / no FOUNDATION_LAB_PASS / no milestone or regression PASS / no PES fidelity or invented envelope (the predicate is a pure read of the accepted machinery's own contacts, no fouls-v1 constant consumed) / no gameplay/source/contract/adapter/spec change."
+}
