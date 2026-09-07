@@ -3,44 +3,36 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 33
+horizon_version: 34
 status: ACTIVE
-horizon_id: "next-spec-phase-and-keeper-playability"
-created_from_commit: 156ecb9
+horizon_id: "fouls-executable-and-scheduled-outlines"
+created_from_commit: a762673
 created_at: 2026-09-07
-reason: "Horizon v32 (COMPLETE 4/4, remote-durable at 156ecb9) closed the playable loop: human-directed restart destination control (5b15992) with the human-taken restart conforming through the rules suite (2a6b92c — the gate leak the critic caught hardened the freeze exemption behind the window-scoped marker), the four reviewer cleanups consolidated (fec4a35), and the fulltime dead end closed with the rematch/menu flow (3f42a50). The playable small-sided loop is complete: setup → play → all restarts (CPU + human-directed) → halftime → fulltime → rematch/menu. v33 opens the next phase on two fronts: (a) FOULS-SPEC-DRAFT — MATCH_RULES_SPEC §16 defers fouls/cards with no existence claim; the established spec→suite→conformance pipeline starts with the dedicated fouls spec draft (spec-only, zero implementation); (b) HUMAN-KEEPER-CONTROL — a real playable capability gap: the human cannot control the designated keeper in human-vs-CPU (the switch mechanism excludes it); extending the existing switch contract to the keeper slot lets the human play keeper; (c) HUMAN-BALL-SERVER-DECISION — the literal pass-button restart server is deferred behind a disclosed core change (countdown-zero auto-serve is core-owned); a deliberate decision record (implement-now plan vs defer with the core machinery analysis) instead of an open thread; (d) RELEASE-0.9.7-CONSOLIDATION — consolidate the v29-v32 playable+executable gains into the release record. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 4
+reason: "Horizon v33 (COMPLETE 4/4, remote-durable at a762673) opened the next phase: the fouls/cards spec drafted grounded in the accepted duel/tackle machinery (b7f56e0 — a foul is man-not-ball tackle contact with duelWon false; the critic verified 10 real such events in the accepted duels evidence), the human can control the designated keeper in human-vs-CPU (3ef0edd — the keeper role was simply off for that mode; the switch contract never excluded it), and the ball-server DEFER decision recorded with the actionable HUMAN-BALL-SERVER-LITERAL outline (b55fa74). RELEASE-0.9.7 consolidated the v29-v33 gains (9a7cb7f; the needle advance 2ca140c and the persist-acceptance sanitizer fix for dotted objective IDs routed to the orchestrator). v34 executes the scheduled outlines: (a) FOUL-DETECTION-MACHINERY — the spec's §5 foul definition implemented as observation-level detection (the runner emits foul events from the accepted tackle machinery's man-not-ball contacts; zero gameplay change); (b) FOULS-SUITE-REGISTRATION — the named-but-unregistered criteria (FOUL-DETECT, FOUL-CLEAN-TACKLE) become executable protected oracles per FOULS_CARDS_SPEC §10 (the RULES-SUITE-REGISTRATION pattern); (c) HUMAN-BALL-SERVER-LITERAL — the scheduled-ready outline executed: the pass-gated serving path (a deliberate core change with its named conformance path); (d) GK-DRIVEN-CLOSURE — driven streams to close the 2 NOT_EVALUATED goalkeepers criteria. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
+current_index: 0
 objectives:
-  - id: FOULS-SPEC-DRAFT
-    status: accepted
-    accepted_at: 2026-09-07
-    candidate_commit: b7f56e0
-    reason: "Dedicated fouls/cards spec draft per MATCH_RULES_SPEC §16 (the deferred rules with no existence claim): foul semantics grounded in the accepted duel/tackle machinery (what a foul IS in this engine — tackle outcomes, advantage, card thresholds), versioned provisional parameters, adjudicating criteria NAMED but NOT registered (the RULES-SPEC-DRAFT pattern), deferred items named (offside/penalties stay regulation-only, no existence claim), BLOCKED_MISSING_REFERENCE disclosed. SPEC ONLY — zero src/ eval/ gauntlet/ change; a binding test pins quoted constants to machine sources; the critic verifies no implementation leaked."
-    builder: builder-structured
-    prerequisite: ""
-  - id: HUMAN-KEEPER-CONTROL
-    status: accepted
-    accepted_at: 2026-09-07
-    candidate_commit: 3ef0edd
-    reason: "Playable capability: the human can control the designated keeper in human-vs-CPU modes — the existing switch contract extended to include the keeper slot (the accepted designated-keeper arc/hold behavior becomes the human's to direct through the same movement/pass controls; the adapter's keeper designation stays the source of truth). CPU fallback unchanged when the human does not switch; stash identity when unused; DYNAMIC_VISUAL frames of the human-controlled keeper making a save vs the CPU-keeper control; zero core change."
+  - id: FOUL-DETECTION-MACHINERY
+    status: pending
+    reason: "Implement FOULS_CARDS_SPEC §5 as observation-level detection: the runner emits foul events (man-not-ball tackle contact per the spec definition — active-window tackle contact with duelWon false) from the ACCEPTED tackle machinery's own contacts; zero gameplay change (the tackle behavior is untouched; the detection is an observation annotation on already-committed contacts, the gk-role/designation-facts precedent); cards/advantage/free-kicks stay spec-only (not implemented). Driven + organic evidence that real fouls are detected; stash identity when gated off."
     builder: builder-gameplay
     prerequisite: ""
-  - id: HUMAN-BALL-SERVER-DECISION
-    status: accepted
-    accepted_at: 2026-09-07
-    candidate_commit: b55fa74
-    reason: "Decision record for the deferred human ball-server (the literal pass-button restart server deferred behind the disclosed core change in HUMAN-RESTART-CONTROL): analyze the core machinery change needed (countdown-zero auto-serve override; a pass-reception serving path), the determinism/pin implications, and the alternatives — then DECIDE: implement-now plan (as a future objective with its own conformance path) or defer with reasons. BOOKKEEPING; zero gameplay change; the decision is recorded, not executed."
+  - id: FOULS-SUITE-REGISTRATION
+    status: pending
+    reason: "Register the FOULS_CARDS_SPEC §10 criteria that the detection machinery makes answerable — FOUL-DETECT and FOUL-CLEAN-TACKLE — as executable protected oracles with mutant/canary guards (the RULES-SUITE-REGISTRATION pattern): a fouls evaluator suite (suite-fouls-v1), obs contract, bindings, the CRITERION_TO_ORACLE wiring; card/advantage/free-kick criteria stay named-not-registered (no machinery). Honest executed verdicts over the detection streams; the registry-hash evolution tolerated by provenance gates; no suite-level PASS claim."
+    builder: builder-structured
+    prerequisite: FOUL-DETECTION-MACHINERY
+  - id: HUMAN-BALL-SERVER-LITERAL
+    status: pending
+    reason: "Execute the scheduled-ready outline from HUMAN-BALL-SERVER-DECISION (5b6e391a): the pass-gated serving path — at countdown zero, if the designated taker is human-controlled, the restart phase stays open and waits for the human's PASS_BIT InputFrame within a bounded window; on the pass, the serve direction derives from input and executes; else the CPU auto-serve fires. A DELIBERATE core change (the countdown-zero branches; the pass-gated wait phase) with the named conformance path: new oracles (human-chosen serve direction, wait-phase timer freeze, window-close/first-touch semantics), re-evaluation of SERVE/TIMER-FREEZE/FIRST-TOUCH on human-served streams, CPU fallback byte-identity, its own two-run attestation. Human modes' non-restart behavior untouched."
+    builder: builder-gameplay
+    prerequisite: ""
+  - id: GK-DRIVEN-CLOSURE
+    status: pending
+    reason: "Close the 2 NOT_EVALUATED goalkeepers criteria with driven streams: GK-SAVE-CLAIM (organic runs had 0 save chains — drive an on-target shot chain against the keeper) and GK-DISTRIBUTION (the fixture run had 0 releases — drive a keeper-release situation); publish the honest updated verdict table with exact deltas vs the GK-SUITE-CORE-OWNED-STATE baseline (9/0/2/1/1); the blocked + perceptual keys stay unchanged; no suite-level PASS claim. BOOKKEEPING-class evidence over the driven streams (MULTI_TICK trajectories)."
     builder: builder-structured
     prerequisite: ""
-  - id: RELEASE-0.9.7-CONSOLIDATION
-    status: accepted
-    accepted_at: 2026-09-07
-    candidate_commit: 9a7cb7f
-    reason: "Release consolidation: v29-v33 delivered the executable rules layer (suite + designation facts + aggregate state), the goalkeepers suite under core-owned, human-directed restarts, the visible full-match lifecycle, and the complete playable loop (fulltime flow). Consolidate into the release record per the established RELEASE pattern (RELEASE-0.9.7): what is playable, what is executable/attested, what stays deferred. BOOKKEEPING; zero gameplay change."
-    builder: builder-structured
-    prerequisite: ""
-observable_progress_target: "The fouls spec drafted (spec-only, no implementation); the human can play keeper in human-vs-CPU with CPU fallback unchanged; the human ball-server decision recorded; the v29-v32 gains consolidated into RELEASE-0.9.7. NO regulation implementation beyond suite-gated behavior, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
-last_invalidation_reason: "Horizon v32 COMPLETE 4/4: HUMAN-RESTART-CONTROL (human-directed restart destination control via receiver steering; the literal ball-server deferred behind a disclosed core change; critic RETRY hardened the visual-evidence guard to PNG-byte distinctness), HUMAN-RESTART-RULES-CONFORMANCE (the human-taken restart conforms through the suite; the critic RETRY caught and closed the freeze-exemption gate leak with the window-scoped marker; all 5 accepted streams re-run byte-identical), EVAL-HYGIENE-CONSOLIDATION (the four reviewer cleanups; zero verdict changes proven directly), FULLTIME-FLOW-CLOSURE (the fulltime dead end closed; the loop freeze + rematch/menu flow; the critic RETRY replaced a lookalike menu frame with the real shipped menu). Remote-durable at 156ecb9; strategic reassessment produced Horizon v33 (next-spec-phase-and-keeper-playability). Regulation implementation, GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
+observable_progress_target: "The fouls spec executable (detection machinery + a registered fouls suite with honest verdicts); the pass-button ball-server realized through the deliberate core change with its named conformance path; the 2 NOT_EVALUATED goalkeepers criteria closed with driven streams. NO regulation implementation beyond suite-gated behavior, no full-match ecology, no perceptual-rubric/networked/PES-fidelity/PROMOTION work."
+last_invalidation_reason: "Horizon v33 COMPLETE 4/4: FOULS-SPEC-DRAFT (the fouls/cards spec; zero implementation), HUMAN-KEEPER-CONTROL (the human controls the designated keeper in human-vs-CPU 5v5), HUMAN-BALL-SERVER-DECISION (the DEFER decision with the actionable outline), RELEASE-0.9.7-CONSOLIDATION (the release record + the version bump + the orchestrator-routed needle advance and sanitizer fix). Remote-durable at a762673; strategic reassessment produced Horizon v34 (fouls-executable-and-scheduled-outlines). Regulation implementation, GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -52,6 +44,8 @@ replan_if:
 ```
 
 ## Completed horizons
+
+Horizon v33 (next-spec-phase-and-keeper-playability) — COMPLETE 4/4: FOULS-SPEC-DRAFT accepted (specs/FOULS_CARDS_SPEC.md, 15 sections, spec-only: the foul definition grounded in the accepted duel/tackle machinery — active-window tackle contact with duelWon false = man-not-ball, 10 real such events in the accepted duels evidence; advantage/cards named-not-implemented; fouls-v1 provisional; five criteria named-but-unregistered; binding 42/42 with live constant pins; zero implementation). HUMAN-KEEPER-CONTROL accepted (the human can control the designated keeper in human-vs-CPU 5v5 — the keeper role was simply off for that mode (the switch contract never excluded it); the arc-hold positioning yields to the human's input while save/claim stays on the shared rules; a human-directed save 1.0787 m vs CPU 1.1079 m in 4 byte-distinct frames; the standard-wiring nuance honestly disclosed). HUMAN-BALL-SERVER-DECISION accepted (the DEFER decision for the literal pass-button restart server, not_a_hedge, with the actionable HUMAN-BALL-SERVER-LITERAL outline naming its conformance path). RELEASE-0.9.7-CONSOLIDATION accepted (gauntlet/RELEASE-0.9.7.md + VERSION 0.9.7; every claim citing its accepted record; the orchestrator-routed needle advance 2ca140c and the persist-acceptance sanitizer fix for dotted objective IDs; the orchestrator's pre-persist process error caught by the critic and repaired before the acceptance commit). Remote-durable at a762673; strategic reassessment produced Horizon v34.
 
 Horizon v32 (human-restart-control-and-playable-closure) — COMPLETE 4/4: HUMAN-RESTART-CONTROL accepted (human-directed restart DESTINATION control via receiver steering — the human's directional input steers an awarding-team body during the window and the core's own nearest-receiver serve re-targets; CPU fallback unchanged; the literal pass-button ball-server deferred behind a disclosed core change; critic RETRY hardened the visual-evidence guard to PNG-byte distinctness after the first capture was visually void; record 42bb7ef0…). HUMAN-RESTART-RULES-CONFORMANCE accepted (the human-taken restart conforms through the rules suite — the natural boundary stream passes all 7 applicable criteria identically to the CPU restart; the critic RETRY caught and closed the freeze-exemption gate leak with the window-scoped humanWindowTaken marker; all 5 accepted streams re-run byte-identical through the post-change runner; record 44c0d928…). EVAL-HYGIENE-CONSOLIDATION accepted (the four reviewer cleanups; zero verdict changes proven directly via the 271b1526… pin replay + the keeper-marker baseline SHA; record 30d933e2…). FULLTIME-FLOW-CLOSURE accepted (the fulltime dead end closed — the loop freeze at the core-owned fulltime phase + the [R] REMATCH/[M] MENU flow; the critic RETRY replaced a lookalike menu frame with the REAL shipped setup menu captured via the dev-server pattern; record 8f582167…). Remote-durable at 156ecb9; strategic reassessment produced Horizon v33.
 
