@@ -1,5 +1,9 @@
-No hay archivos ReferenceTarget en esta carpeta.
+No ReferenceTarget JSON is eligible yet.
 
-Estado: `BLOCKED_MEDIA_TRANSFER_AND_PROVENANCE`. La adquisición de la otra máquina declara tres MP4 y sus hashes, pero aquí sólo llegaron documentos y un resumen de auditoría. Faltan vídeos para comprobar los hashes, revisar frames y medir. Además, la procedencia secundaria declarada no cumple el `DIRECT_CAPTURE` del contrato vigente. No importar los metadatos, el plan de cupos o ejemplos del research como referencias.
+Training media is now verified locally. Real calibration/player annotations are in `../raw/pilot-001/`; the camera model is withheld pending pitch refit and uncertainty. Both matches have complete supplied PTS timelines and sparse images, but no dense local footage for precise contacts.
 
-Las futuras exportaciones reales deberán superar el protocolo de evidencia y el contrato existente antes de ejecutar `npm run reference:import -- <archivo.json>`. No se sobrescriben IDs.
+`ACQUISITION.md` documents secondary YouTube provenance; the unchanged contract requires `DIRECT_CAPTURE` and nonempty, supported game settings. Unknowns remain null. No scenario ID is assigned to force evaluation coverage.
+
+`../logs/reference-import.json` records zero invocations, successes and rejects. Run `npm run reference:import -- <file.json>` only for actual eligible measurements. No existing ID may be overwritten.
+
+Continuation 2026-09-07: `../raw/pilot-002/` records a provisional endpoint displacement. Its conditional uncertainty exceeds its estimate; total uncertainty and catalog equivalence remain unvalidated. It is not import-ready.

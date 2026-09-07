@@ -1,0 +1,16 @@
+{
+  "recorded_at": "2026-09-07T21:18:18.772318+00:00",
+  "endpoint_rgb_hashes_verified": 2,
+  "calibration_variants": 28,
+  "sensitivity_points": 980,
+  "independent_events": 1,
+  "metric_fields_and_units_checked": true,
+  "export_eligible": false,
+  "uncertainty_exceeds_estimate": true,
+  "protected_files_unchanged": 40,
+  "evaluation_report_unchanged": true,
+  "reference_json_files": 0,
+  "scripts_sha256": {
+    "scripts/measure-pes2017-endpoint-pilot.py": "19b7959aabcd559b45f1ac1fe4f48d08c32d17d9e7965e6a99431ce05950428f"
+  }
+}

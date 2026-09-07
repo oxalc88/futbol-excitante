@@ -1,14 +1,80 @@
 {
-  "version": "unpopulated-evidence-register-v1",
-  "status": "NOT_STARTED_NO_ADMITTED_SOURCE",
+  "version": "pes-evidence-register-v2",
+  "status": "PILOT_ANNOTATED_CALIBRATION_QC_PENDING",
   "input_known": false,
-  "note": "Empty primary records. No illustrations, guessed coordinates or planned slots count as observations.",
-  "pitch_correspondences": [],
-  "camera_solutions": [],
-  "raw_2d_tracks": [],
+  "note": "Two real annotation/camera pilots exist. The second has a provisional displacement and conditional sensitivity envelope. Neither supplies an accepted evaluator target or filled campaign event.",
+  "pitch_correspondences": [
+    {
+      "file": "raw/pilot-001/annotations.json",
+      "calibration_clicks": 14,
+      "held_out_checks": 11,
+      "operators": 1
+    },
+    {
+      "file": "raw/pilot-002/annotations.json",
+      "calibration_clicks": 24,
+      "held_out_checks": 6,
+      "operators": 1
+    }
+  ],
+  "camera_solutions": [
+    {
+      "file": "raw/pilot-001/results/diagnostics.json",
+      "count": 71,
+      "accepted": false
+    },
+    {
+      "file": "raw/pilot-002/results/observation.json",
+      "count": 2,
+      "accepted": false
+    }
+  ],
+  "raw_2d_tracks": [
+    {
+      "file": "raw/pilot-001/annotations.json",
+      "entity": "blue-player-training-attempt-01",
+      "observations": 3,
+      "independent_trajectories": 1
+    },
+    {
+      "file": "raw/pilot-002/annotations.json",
+      "entity": "blue-player-training-attempt-01",
+      "observations": 2,
+      "independent_trajectories": 1,
+      "relation": "Same attempt as pilot-001, later post-shot window"
+    }
+  ],
   "corrected_2d_tracks": [],
   "world_tracks": [],
+  "candidate_world_tracks": [
+    {
+      "file": "raw/pilot-001/results/diagnostics.json",
+      "accepted": false
+    },
+    {
+      "file": "raw/pilot-002/results/observation.json",
+      "accepted": false
+    }
+  ],
   "events": [],
-  "uncertainty_records": [],
-  "measurements": []
+  "review_windows": "located-review-windows.csv",
+  "uncertainty_records": [
+    {
+      "file": "raw/pilot-001/results/diagnostics.json",
+      "status": "NOT_ESTIMATED_CAMERA_ERROR_UNBOUNDED"
+    },
+    {
+      "file": "raw/pilot-002/results/observation.json",
+      "status": "CONDITIONAL_SENSITIVITY_EXCEEDS_ESTIMATE_NOT_TOTAL_ERROR_BOUND"
+    }
+  ],
+  "measurements": [],
+  "research_observations": [
+    {
+      "file": "raw/pilot-002/results/observation.json",
+      "metric": "distance",
+      "accepted_for_evaluation": false,
+      "campaign_slot": null
+    }
+  ]
 }

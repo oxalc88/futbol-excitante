@@ -1,7 +1,7 @@
 {
   "version": "pes-source-preflight-v1",
-  "generated_at": "2026-09-06T07:00:01.255679+00:00",
-  "status": "BLOCKED_MEDIA_TRANSFER_AND_PROVENANCE",
+  "generated_at": "2026-09-07T21:17:30.399093+00:00",
+  "status": "TRANSFER_VERIFIED_CALIBRATION_AND_IMPORT_PENDING",
   "admitted": 0,
   "pending": 3,
   "rejected_initial_set": 1,
@@ -13,18 +13,18 @@
       "uploader": "Tajae Lawrence",
       "channel_id": "UCukT9qP4DU0bOr-oPuQrDqA",
       "metadata_file": "source-audits/C4-W1u8w-yE.metadata.json",
-      "decision": "REMOTE_AUDIT_REPORTED_PENDING_TRANSFER",
+      "decision": "LOCAL_MEDIA_VERIFIED_PILOT_ONLY",
       "admitted": false,
       "decision_reasons": [
-        "The acquisition operator reports complete media; MP4 is excluded from Git and absent here",
-        "Camera/pitch and content cadence have not been visually reviewed here",
-        "Secondary public media is not eligible for the current DIRECT_CAPTURE-only import contract"
+        "Full training MP4 hash and all 1725 decoded RGB hashes/PTS verified here; a camera pilot has unbounded extrapolation error",
+        "Secondary YouTube provenance is explicitly documented in ACQUISITION.md and is not DIRECT_CAPTURE",
+        "Required configuration remains partly unknown; no eligible ReferenceTarget"
       ],
       "game_declared": "PES 2017",
       "declared_platform": "PC",
       "platform": null,
       "build": null,
-      "mode": null,
+      "mode": "Skills Training / Sprint (visible HUD)",
       "difficulty": null,
       "gameSpeed": null,
       "controller": null,
@@ -33,27 +33,37 @@
       "input_known": false,
       "controlledInputs": false,
       "inputLogSha256": null,
-      "media_sha256": null,
-      "decoded_frames": null,
-      "container_time_base": null,
-      "pts": null,
+      "media_sha256": "7c2d52bf91bd89315f352bf641c8f065c957c7bdb2d2e7166dfbc0eb8204f1fb",
+      "decoded_frames": 1725,
+      "container_time_base": {
+        "num": 1,
+        "den": 30000
+      },
+      "pts": {
+        "first": 0,
+        "last": 1725724,
+        "authority": "local_decode_verified"
+      },
       "verified_unique_content_cadence": null,
-      "pitch_markings_visible": null,
-      "camera_stability_verified": null,
+      "pitch_markings_visible": true,
+      "camera_stability_verified": false,
       "uninterrupted_windows": null,
-      "calibration": null,
+      "calibration": "PILOT_WITHHELD",
       "event_count": 0,
-      "prior_decision": "PENDING_MEDIA_ACCESS",
+      "prior_decision": "REMOTE_AUDIT_REPORTED_PENDING_TRANSFER",
       "acquisition_report": {
         "operator": "gauntlet-observer-box",
         "index": "raw/media/INDEX.csv",
         "media_sha256_reported": "7c2d52bf91bd89315f352bf641c8f065c957c7bdb2d2e7166dfbc0eb8204f1fb",
         "media_bytes_reported": 9760410,
         "reported_provenance": "SECONDARY_PUBLIC_MEDIA",
-        "byte_hash_verified_here": false,
+        "byte_hash_verified_here": true,
         "summary_file": "raw/media/C4-W1u8w-yE.ffprobe.json",
         "timing_audit_summary": "raw/audit-C4-W1u8w-yE/audit.json"
-      }
+      },
+      "supplied_timeline_frames": 1725,
+      "camera_description_observed": "Moving main gameplay view; exact preset unknown",
+      "visual_review": "source-audits/TRANSFER-REVIEW.md"
     },
     {
       "source_id": "8afTHuMZxbI",
@@ -62,18 +72,18 @@
       "uploader": "Throneful",
       "channel_id": "UCIw5rbXUrtk31t20Ap5817w",
       "metadata_file": "source-audits/8afTHuMZxbI.metadata.json",
-      "decision": "REMOTE_ACQUISITION_REPORTED_PENDING_TRANSFER_AND_AUDIT",
+      "decision": "SPARSE_VISUAL_REVIEW_ONLY",
       "admitted": false,
       "decision_reasons": [
-        "The acquisition operator reports complete media; MP4 is excluded from Git and absent here",
-        "Camera/pitch and content cadence have not been visually reviewed here",
-        "Secondary public media is not eligible for the current DIRECT_CAPTURE-only import contract"
+        "Full producer PTS audit and 181 JPEGs received; full MP4 bytes and high-cadence gameplay images remain unavailable here",
+        "Secondary YouTube provenance is explicitly documented in ACQUISITION.md and is not DIRECT_CAPTURE",
+        "Required configuration remains partly unknown; no eligible ReferenceTarget"
       ],
       "game_declared": "PES 2017",
       "declared_platform": "PC",
       "platform": null,
       "build": null,
-      "mode": null,
+      "mode": "Exhibition (visible pre-match title)",
       "difficulty": null,
       "gameSpeed": null,
       "controller": null,
@@ -84,15 +94,22 @@
       "inputLogSha256": null,
       "media_sha256": null,
       "decoded_frames": null,
-      "container_time_base": null,
-      "pts": null,
+      "container_time_base": {
+        "num": 1,
+        "den": 15360
+      },
+      "pts": {
+        "first": 0,
+        "last": 20474112,
+        "authority": "supplied_audit_not_locally_redecoded"
+      },
       "verified_unique_content_cadence": null,
-      "pitch_markings_visible": null,
-      "camera_stability_verified": null,
+      "pitch_markings_visible": true,
+      "camera_stability_verified": false,
       "uninterrupted_windows": null,
-      "calibration": null,
+      "calibration": "NOT_STARTED_SPARSE_IMAGES_ONLY",
       "event_count": 0,
-      "prior_decision": "PENDING_MEDIA_ACCESS",
+      "prior_decision": "REMOTE_ACQUISITION_REPORTED_PENDING_TRANSFER_AND_AUDIT",
       "acquisition_report": {
         "operator": "gauntlet-observer-box",
         "index": "raw/media/INDEX.csv",
@@ -101,7 +118,11 @@
         "reported_provenance": "SECONDARY_PUBLIC_MEDIA",
         "byte_hash_verified_here": false,
         "summary_file": "raw/media/8afTHuMZxbI.ffprobe.json"
-      }
+      },
+      "supplied_timeline_frames": 79978,
+      "camera_description_observed": "Moving main gameplay view; exact preset unknown",
+      "visual_review": "source-audits/TRANSFER-REVIEW.md",
+      "sequence_independence_observed": "Different fixtures: Arsenal/Barcelona versus Argentina/United States. Build/platform equivalence and original capture chain remain unverified."
     },
     {
       "source_id": "7daF_qg6B8s",
@@ -146,20 +167,27 @@
       "channel_id": null,
       "platform": null,
       "build": null,
-      "mode": null,
+      "mode": "Exhibition (visible pre-match title)",
       "difficulty": null,
       "gameSpeed": null,
       "controller": null,
       "camera": null,
       "media_sha256": null,
       "decoded_frames": null,
-      "container_time_base": null,
-      "pts": null,
+      "container_time_base": {
+        "num": 1,
+        "den": 15360
+      },
+      "pts": {
+        "first": 0,
+        "last": 10651392,
+        "authority": "supplied_audit_not_locally_redecoded"
+      },
       "verified_unique_content_cadence": null,
-      "pitch_markings_visible": null,
-      "camera_stability_verified": null,
+      "pitch_markings_visible": true,
+      "camera_stability_verified": false,
       "uninterrupted_windows": null,
-      "calibration": null,
+      "calibration": "NOT_STARTED_SPARSE_IMAGES_ONLY",
       "source_id": "LFvEnk0mcLI",
       "role": "match-held-out",
       "uri": "https://www.youtube.com/watch?v=LFvEnk0mcLI",
@@ -175,12 +203,12 @@
       "event_count": 0,
       "replaces": "7daF_qg6B8s",
       "independent_capture_verified": false,
-      "prior_decision": null,
-      "decision": "REMOTE_ACQUISITION_REPORTED_PENDING_TRANSFER_AND_AUDIT",
+      "prior_decision": "REMOTE_ACQUISITION_REPORTED_PENDING_TRANSFER_AND_AUDIT",
+      "decision": "SPARSE_VISUAL_REVIEW_ONLY",
       "decision_reasons": [
-        "The acquisition operator reports complete media; MP4 is excluded from Git and absent here",
-        "Camera/pitch and content cadence have not been visually reviewed here",
-        "Secondary public media is not eligible for the current DIRECT_CAPTURE-only import contract"
+        "Full producer PTS audit and 181 JPEGs received; full MP4 bytes and high-cadence gameplay images remain unavailable here",
+        "Secondary YouTube provenance is explicitly documented in ACQUISITION.md and is not DIRECT_CAPTURE",
+        "Required configuration remains partly unknown; no eligible ReferenceTarget"
       ],
       "acquisition_report": {
         "operator": "gauntlet-observer-box",
@@ -190,7 +218,11 @@
         "reported_provenance": "SECONDARY_PUBLIC_MEDIA",
         "byte_hash_verified_here": false,
         "summary_file": "raw/media/LFvEnk0mcLI.ffprobe.json"
-      }
+      },
+      "supplied_timeline_frames": 41608,
+      "camera_description_observed": "Moving main gameplay view; exact preset unknown",
+      "visual_review": "source-audits/TRANSFER-REVIEW.md",
+      "sequence_independence_observed": "Different fixtures: Arsenal/Barcelona versus Argentina/United States. Build/platform equivalence and original capture chain remain unverified."
     }
   ],
   "updated_at": "2026-09-06T15:48:55.704214+00:00",
@@ -200,5 +232,12 @@
   "revision_note": "Remote acquisition is documented; only metadata and one aggregate audit were transferred through Git.",
   "latest_acquisition_execution": "raw/media/ACQUISITION-RUN-ea1c074.md",
   "last_local_acquisition_status": "FAILED_NONMEDIA_RESPONSE_AND_TIMEOUTS",
-  "manual_user_transfer_available": false
+  "manual_user_transfer_available": false,
+  "local_complete_videos": 1,
+  "sources_with_frame_timelines": 3,
+  "sources_with_visual_strips": 3,
+  "calibration_pilots": 2,
+  "accepted_measurements": 0,
+  "reference_imports": 0,
+  "research_observations": 1
 }

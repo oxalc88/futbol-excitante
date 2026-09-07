@@ -1,0 +1,22 @@
+{
+  "version": "transfer-review-validation-v1",
+  "recorded_at": "2026-09-06T19:10:37.265171+00:00",
+  "timeline_rows_verified": 123311,
+  "jpeg_manifest_joins": 420,
+  "training_pts_and_rgb_hashes_reproduced": 1725,
+  "camera_frames": 71,
+  "camera_propagation_steps": 70,
+  "held_out_checks": 11,
+  "player_support_observations": 3,
+  "independent_player_trajectories": 1,
+  "largest_held_out_residual_px": 17.72272217618769,
+  "camera_accepted": false,
+  "measurement_count": 0,
+  "reference_import_invocations": 0,
+  "protected_files_unchanged": 40,
+  "evaluation_report_sha256": "65b9eb320865cf6bf12181e7e54915571f920166aa72ac12592263fc4fb9824e",
+  "scripts_sha256": {
+    "scripts/review-pes2017-camera-pilot.py": "473d87da203f3b74432419c620591f85a4777d99d1205a8376832ec66bcda309",
+    "scripts/verify-pes2017-transfer.py": "2c06e0323ec430ce122faecb01f86333841cf06a3c2ca7d5564ede0f2394eb6d"
+  }
+}

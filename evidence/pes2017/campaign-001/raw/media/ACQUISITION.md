@@ -1,6 +1,6 @@
 # Media acquisition — campaign-001 (PES 2017 YouTube secondary sources)
 
-**MP4s are not in Git.** Every developer obtains them locally with `fetch_media.py` below. Paths on one agent machine are not shared evidence.
+**Update after transfer `d8547e0`: the full training MP4 is now committed under `../../transfer/C4-W1u8w-yE/` and verified locally.** The two full match MP4s remain outside Git; their full PTS audits and sparse JPEG strips are in the transfer package. The acquisition commands below remain available for obtaining the original files.
 
 **Provenance:** secondary YouTube delivery, not player DIRECT_CAPTURE. Do not label imports as DIRECT_CAPTURE. Unknown settings stay null.
 

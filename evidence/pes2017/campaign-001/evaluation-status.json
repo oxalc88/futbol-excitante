@@ -762,5 +762,11 @@
         }
       ]
     }
-  ]
+  ],
+  "latest_campaign_review": {
+    "date": "2026-09-07T21:17:30.399093+00:00",
+    "report": "source-audits/TRANSFER-REVIEW.md",
+    "accepted_references": 0,
+    "reason": "Two training camera pilots remain withheld; the endpoint sensitivity exceeds its estimate. Dense match imagery and compatible provenance/configuration are missing. No new reference, evaluator run or changed outcome."
+  }
 }

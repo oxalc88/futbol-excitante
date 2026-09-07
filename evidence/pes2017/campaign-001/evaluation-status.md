@@ -6,7 +6,7 @@ No se ejecutó de nuevo el evaluador: no cambió el motor ni se importó ninguna
 
 Criterios: 42 BLOCKED_MISSING_REFERENCE y 18 NEEDS_PERCEPTUAL_REVIEW. Son criterios: algunos IDs tienen ambos. La precedencia hace que su resultado global sea NEEDS_PERCEPTUAL_REVIEW.
 
-- **R**: falta una captura medida elegible que corresponda al escenario; en esta campaña no hay vídeo ni mediciones. Fuera de los 15 IDs potenciales, la campaña mínima no pretende aportar cobertura.
+- **R**: falta una captura medida elegible que corresponda al escenario; el entrenamiento ya está disponible, pero el piloto de cámara sigue retenido por calibración/incertidumbre; los partidos son tiras dispersas y la procedencia/configuración impide exportar referencias. Fuera de los 15 IDs potenciales, la campaña mínima no pretende aportar cobertura.
 - **P**: faltan fotogramas renderizados del candidato y revisión humana con rúbrica. Importar referencias numéricas no completa esa revisión. Las pruebas de dispositivos enumeradas en EVALUATION.md también siguen pendientes.
 
 | ID | Global actual | Criterios pendientes | En campaña mínima, condicionado a observabilidad |
