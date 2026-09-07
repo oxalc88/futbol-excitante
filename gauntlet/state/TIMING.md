@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-07T04:00:00Z
+measured_at: 2026-09-07T06:14:00Z
 tracking_contract_version: 1
-last_tracked_objective: SUITE-DETERMINISTIC-TWO-RUN
-usage_aggregates_through: SUITE-DETERMINISTIC-TWO-RUN
-clock_aggregates_through: SUITE-DETERMINISTIC-TWO-RUN
-model_evaluation_through: SUITE-DETERMINISTIC-TWO-RUN
+last_tracked_objective: HUMAN-RESTART-CONTROL
+usage_aggregates_through: HUMAN-RESTART-CONTROL
+clock_aggregates_through: HUMAN-RESTART-CONTROL
+model_evaluation_through: HUMAN-RESTART-CONTROL
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,18 +42,18 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 575h 02m |
+| Calendar span (first work → measurement) | 577h 16m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~176h est. |
-| Sum of per-step agent time | ~173h 34m |
+| Active work (anything running) | ~178h est. |
+| Sum of per-step agent time | ~175h 26m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-07T04:00:00Z`.
-Recomputed 2026-09-07 at the SUITE-DETERMINISTIC-TWO-RUN acceptance
-(Horizon v31 4/4): 197 accepted per-step rows summing to ~173h 34m (the new
-objective adds ~1h 59m: builder ~56m / critic ~34m / integration 28m /
-commit <1m). Calendar span recomputed from session start to this measurement. Long
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-07T06:14:00Z`.
+Recomputed 2026-09-07 at the HUMAN-RESTART-CONTROL acceptance
+(Horizon v32 1/4): 198 accepted per-step rows summing to ~175h 26m (the new
+objective adds ~1h 52m incl. the critic-RETRY cycle: builder ~52m /
+critic ~44m / integration 15m / commit <1m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
 invoices.
@@ -280,6 +280,7 @@ invoices.
 | RULES-SUITE-STATE-RERUN | accepted | ~1h 52m | ~63m | 29m | 19m | <1m | n/a | n/a |
 | BROWSER-FULL-MATCH-FLOW-EVIDENCE | accepted | ~1h 46m | ~57m | 12m | 36m | <1m | n/a | n/a |
 | SUITE-DETERMINISTIC-TWO-RUN | accepted | ~1h 59m | ~56m | 34m | 28m | <1m | n/a | n/a |
+| HUMAN-RESTART-CONTROL | accepted | ~1h 52m | ~52m | 44m | 15m | <1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -615,6 +616,7 @@ on an H task is the interesting result.
 | RULES-SUITE-STATE-RERUN | deepseek-v4-flash | M | Medium - the rules suite's complete aggregate verdict state re-published across all evidence generations (BOOKKEEPING, zero source change): 23 PASS / 2 BLOCKED_MISSING_REFERENCE / 0 NOT_EVALUATED / 0 FAIL over 25 criteria (+8/8 invariants PASS) with the 6 upgrades source-attributed (3 anti-huddle from designation streams; 3 corner from the corner stream); the horizon-text baseline conflation corrected (20/2/3 is the RESTART-DESIGNATION aggregate; RULES-FACTS-DEPTH is 17/2/6); anti-huddle browserParity eligibility + the omitted redundant control disclosed | 0 | A | first-pass ACCEPT; critic's own producer runs ×2 + programmatic diff (exactly 6 changed) + aggregate recomputed 25/25 + eligibility verified from runner code + same-stream probe; integration re-ran the batteries + verify-acceptance-durability PASS at HEAD |
 | BROWSER-FULL-MATCH-FLOW-EVIDENCE | deepseek-v4-flash (reroute) | M | Medium - the full-match lifecycle made visible in the real browser app: a minimal opt-in renderer HUD label (showMatchPhaseHud, default false — byte-neutral when off, proven by the keeper-marker baseline SHA) rendering the immutable snapshot's matchPhase/matchTimer; 5 event-centered Chromium frames (kickoff PLAYING/240 → first-half-late PLAYING/1 → halftime-break HALF TIME/30 → second-half-kickoff PLAYING/220 → fulltime FULL TIME/0); the 1-tick correspondence offset honestly traced to the runner's kickoff seeding; NO per-tick hash-identity claim; draw-only, zero simulation change; audit at the strictest DYNAMIC_VISUAL class | 0 | A | first-pass ACCEPT; critic visually inspected all 5 frames, verified renderer-neutrality (additive, gated, read-only snapshot fields) and traced the offset; integration re-ran THE ENTIRE BROWSER PROJECT (48 files, 256 tests, 0 failures) + enumerated the sole createPresentationSession call sites |
 | SUITE-DETERMINISTIC-TWO-RUN | deepseek-v4-flash | M | Medium - two-run deterministic attestation for both registered suites (BOOKKEEPING, zero source change): six streams attested byte-identical across two runs (GK 1800+600; rules 400+800+800+1800) so COMMON-DETERMINISTIC evaluates to PASS strictly from byte-identity (the duels precedent extended; the invariant is a HARD_INVARIANT with no single-run oracle); goalkeepers 9/0/2/1/1 (the only delta vs the baseline); rules §15 byte-unchanged 23/2/0/0 with the determinism row additive (24/2/0/0); six exclusions disclosed with attribution to the accepted baselines | 0 | A | first-pass ACCEPT; critic ran the producer twice itself, wrote its own per-tick verifier (600/600 and 400/400 identical), proved the comparison real with a cpuAntiHuddle:false divergence probe, programmatically verified the deltas; integration re-ran all batteries with counts matching exactly |
+| HUMAN-RESTART-CONTROL | deepseek-v4-flash (reroute) | H | High - human-directed restart destination control (DYNAMIC_VISUAL): investigation found the core auto-serves every restart at countdown zero (even a human pass at the window is overridden); the delivered realization is receiver-steering destination control (explicitly disclosed — NOT a pass-button ball-server, which is deferred behind a disclosed core change the objective's no-core-change constraint forbids): the human's directional input (only via sim.applyInputs) steers an awarding-team body during the window and the core's own nearest-receiver serve re-targets (guard (20,30)→(20.494974746830586, 29.505025253169414), gate 19/24); CPU fallback unchanged (stash probe re-derived byte-exactly); first capture was visually void (5 identical PNGs, event below frame) — critic RETRY fixed with a re-framed camera, a hardened PNG-byte frame guard, and the realization disclosure | 1 | A | RETRY→ACCEPT; critic reproduced the serve re-target exactly twice, verified the constraint analysis from core source, and confirmed the fix with pixel forensics (5 distinct frames, event legible); integration re-ran 300 tests across 19 files + a stash probe + the silent-consumer hunt (the new module imported by nothing in the shipped app) |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -919,6 +921,8 @@ on an H task is the interesting result.
 | BROWSER-FULL-MATCH-FLOW-EVIDENCE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | THE ENTIRE BROWSER PROJECT re-run: 48 files, 256 tests, 0 failures (candidate 3/3 ×2; keeper guard 4/4 baseline SHA exact; byte-identity guards 7/7; render-sensitive neighbors 21/21 incl. browser↔headless per-tick hash correspondence; menu/parity 27/27; human modes 22/22; AI modes 67/67); node render-referencing guards 21/21 (incl. BUILD-VITE-RESOLVE-001 building the real app) + pnpm run build PASS; silent-consumer hunt: the sole createPresentationSession call sites enumerated (test-bridge pass-through HUD-off; main.ts the only opt-in; every other RendererConfig consumer spreads DEFAULT_RENDERER_CONFIG) — byte-neutral when off proven empirically; HUD reads only core-owned snapshot fields with formatPhaseLabel mapping the 8 MatchPhase values; record hash recomputed MATCH; two ordinary runs byte-identical; non-blocking note recorded (HUD ortho camera no resize re-anchoring — presentation-only) |
 | SUITE-DETERMINISTIC-TWO-RUN | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: producer run twice in ordinary mode itself (both pin record_sha256 abaf6ccd… and all six chain hashes byte-matching the durable record); its own verifier re-ran two attested streams twice each with element-wise per-tick comparison (gk-shot-fixture-live 600/600 identical, rules-corner-live 400/400 identical); a divergence probe (cpuAntiHuddle:false) diverged — proving the comparison real, not an assertion; invariant semantics matched to GAMEPLAY_EVALUATION_SPEC §HARD_INVARIANT + compare-foundation.ts + the deliberately-single-run exclusion in foundation-evaluator.ts; honesty programmatically verified (exactly one GK delta vs baseline 5cd1c808…; rules §15 byte-identical to 36fc77e5… with the determinism row additive; the 5 criteria not verdict-carried by attested streams owned by the accepted baselines with explicit attribution); rules gate 173/173 + GK families 88/88 + registry battery 200/200 + pins 59/59 + typecheck 0; record hash recomputed exact |
 | SUITE-DETERMINISTIC-TWO-RUN | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | typecheck 0 + binding gate 7/7 (incl. the live discriminating check — same-config byte-identical, cpuAntiHuddle:false diverges) + rules gate 173/173 + GK families 88/88 + registry/provenance/hygiene 200/200 + stateHash/determinism pins 59/59 + restart/match determinism suites 162/162 — all matching the builder's counts exactly; record SHA recomputed MATCH with no wall-clock field (candidate_commit = HEAD 86a3a53); two consecutive ordinary-mode runs byte-identical and byte-identical to the durable record (7e995f97…); silent-consumer hunt clean (the new paths referenced only by the producer + its binding + state bookkeeping; publication is data, not code; WIP gate verified by full-tree SHA comparison); scope = precisely the horizon item 4/4, extending the duels precedent that left COMMON-DETERMINISTIC NOT_EVALUATED |
+| HUMAN-RESTART-CONTROL | critic (glm5.3-flash) | glm5.3-flash | RETRY→ACCEPT | first review: the mechanism criterion PASSed (the core's applyThrowIn nearest-receiver serve re-target reproduced exactly — (20,30)→(20.494974746830586, 29.505025253169414) — twice byte-identical; input only via sim.applyInputs; the literal-server constraint analysis verified from core source: a pass needs ball contact impossible during an out-of-play window; countdown-zero execution is core-owned) BUT semantic_audit INVALID — 5/5 PNGs byte-identical (7b91b463… ×5) with the event 200-440 px below the frame bottom (the test's distinctness guard checked world-state hashes, not PNG bytes); fixes verified: the re-framed camera (~18.8 m, event legible at ~28 px/m — pixel forensics: taker (558.9,334.2), receiver ring (259,217)→(275,210), ball human-serve (559.9,319.7) vs cpu (552.1,316.7)), the PNG-byte distinctness guard executed green both modes, sequence.json byte-bound to the on-disk frames, the reporting fixes, the realization object; record hash change 5bba8a7c→42bb7ef0 adjudicated legitimate (the required realization disclosure) |
+| HUMAN-RESTART-CONTROL | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | 19 files / 300 tests re-run green: new integration 10/10 + the named restart battery 142/142 (exact per-file counts) + accepted-pin adapter guards 115/115 + browser PNG-byte guard 1/1 + typecheck clean; silent-consumer hunt: the new adapter module imported only by the eval driver/capture script/tests (static + dynamic import scan; no string-built path reaches it from src/apps/); gate inertness verified by predicate tests (false on playing state, false when CPU won, false for an opposing-team body); stash probe: the recorded cpu-fallback chain reproduces byte-exactly (state_hash_of_hashes 79ef0552…) with the identical serve target in a no-frame headless variant (the only chain delta is pre-existing scheduler diagnostics, empty diff); record hash recomputed MATCH; docs/ byte-identical after all runs; zero tracked-file modification confirmed twice |
 | GK-SUITE-VERDICTS-STATE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 reproduced byte-exact in its own ephemeral producer re-run; per-run verdict table matches raw telemetry (continuous 0 releases/0 save chains -> SAVE-CLAIM/DISTRIBUTION honestly NOT_EVALUATED; fixture releases @408/433 -> PASS); all 5 provenance pins verified against the cited manifests; driven-vs-organic labeling accurate; 140/140 neighbors + typecheck 0 |
 | GK-SUITE-VERDICTS-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 151/151 neighbor tests re-run; typecheck 0; record hash recomputed byte-exact + ordinary-mode producer re-run left docs/evidence byte-identical; all 5 cited manifests read verbatim; zero evaluator/gameplay change |
 

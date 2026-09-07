@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "HUMAN-RESTART-CONTROL",
+  "accepted_at": "2026-09-07T06:12:35.981Z",
+  "candidate_commit": "5b15992244a2855ec12093e2d268705f826d61ca",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/HUMAN-RESTART-CONTROL/cpu-fallback-serve.png",
+        "sha256": "2869ccb524c369a7ec23047ccba86b0a714bdb2dde2a25db680f52340581f1c2",
+        "git_blob": "a78472fe3383d86cc53506ecb065a78ef45679fc",
+        "candidate_commit": "5b15992244a2855ec12093e2d268705f826d61ca",
+        "bytes": 29738,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-RESTART-CONTROL/human-after.png",
+        "sha256": "2bca4bb1268d8218fd1a4f58f5f02c26e16c202d7176eac5ab037236fc9518e1",
+        "git_blob": "3870bfd54e57f5f02fa44039b4917d47c492c75e",
+        "candidate_commit": "5b15992244a2855ec12093e2d268705f826d61ca",
+        "bytes": 29724,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-RESTART-CONTROL/human-before.png",
+        "sha256": "3aeff545c687de90e3dd01d49a95aaf7f3bb392b7d65a654c823d7ce52ec7c8b",
+        "git_blob": "d8ec7236e9bc222dd5d48a2e7602be72408fe45c",
+        "candidate_commit": "5b15992244a2855ec12093e2d268705f826d61ca",
+        "bytes": 29462,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-RESTART-CONTROL/human-serve.png",
+        "sha256": "c09af92752b537d1a2e265adef61e048bfa2516776d0689a77759f68ecbcb477",
+        "git_blob": "9b2e501c70fe62f05d5fe2ff38bb97b984fca6f2",
+        "candidate_commit": "5b15992244a2855ec12093e2d268705f826d61ca",
+        "bytes": 29625,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-RESTART-CONTROL/human-steer.png",
+        "sha256": "16091d6326d16d7cd113d52c4dd8a253f3bbd774c9c3ce4704e3c690f47cea39",
+        "git_blob": "ef7520b89616fee6460fa00750f13e07e42b5da7",
+        "candidate_commit": "5b15992244a2855ec12093e2d268705f826d61ca",
+        "bytes": 29445,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "HUMAN-RESTART-CONTROL",
+        "evidence_class": "DYNAMIC_VISUAL",
+        "semantic_order": "before → event → transition → result (+ CPU-taken control)",
+        "frames": [
+          {
+            "label": "human-before",
+            "path": "human-before.png",
+            "tick": 0,
+            "pngSha256": "3aeff545c687de90e3dd01d49a95aaf7f3bb392b7d65a654c823d7ce52ec7c8b",
+            "stateHash": "fnv1a64-v1:4d26c687e70937cb",
+            "note": "restart window open: the human's team won the throw-in; taker + receivers set"
+          },
+          {
+            "label": "human-steer",
+            "path": "human-steer.png",
+            "tick": 19,
+            "pngSha256": "16091d6326d16d7cd113d52c4dd8a253f3bbd774c9c3ce4704e3c690f47cea39",
+            "stateHash": "fnv1a64-v1:7af0fcffb0b5df59",
+            "note": "during the window the human steers the receiving body down-right toward the field"
+          },
+          {
+            "label": "human-serve",
+            "path": "human-serve.png",
+            "tick": 21,
+            "pngSha256": "c09af92752b537d1a2e265adef61e048bfa2516776d0689a77759f68ecbcb477",
+            "stateHash": "fnv1a64-v1:dab5376e28c8a126",
+            "note": "throw-in-executed: the ball is served toward the human-steered receiving body"
+          },
+          {
+            "label": "human-after",
+            "path": "human-after.png",
+            "tick": 24,
+            "pngSha256": "2bca4bb1268d8218fd1a4f58f5f02c26e16c202d7176eac5ab037236fc9518e1",
+            "stateHash": "fnv1a64-v1:29a110e9c3db1a02",
+            "note": "consequence: the ball is in flight toward the human-chosen position"
+          },
+          {
+            "label": "cpu-fallback-serve",
+            "path": "cpu-fallback-serve.png",
+            "tick": 22,
+            "pngSha256": "2869ccb524c369a7ec23047ccba86b0a714bdb2dde2a25db680f52340581f1c2",
+            "stateHash": "fnv1a64-v1:0b6b9ffe8959f0aa",
+            "note": "control: the identical window with no human input — the core serves toward the default nearest receiver"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/HUMAN-RESTART-CONTROL/sequence.json",
+        "sha256": "8f7ef0341ddf3196959091478844895b072c217d2e63a4aff77364abd7cb33b3",
+        "git_blob": "7c61b20d7e4fb12b7518a72daafc72e5d7c64e6f",
+        "candidate_commit": "5b15992244a2855ec12093e2d268705f826d61ca",
+        "bytes": 1874,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/HUMAN-RESTART-CONTROL/trajectory.json",
+      "sha256": "0c72fb98da3b9f168bc8121d2905e308765be352fbb15f348c11908abd5fbe6a",
+      "git_blob": "5c6568a0712fc29d4bc3e51220d0ed27dba25377",
+      "candidate_commit": "5b15992244a2855ec12093e2d268705f826d61ca",
+      "bytes": 5631,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/HUMAN-RESTART-CONTROL/audit.json",
+      "sha256": "2d926cd4987a7f446ec1e457e94071c608d672c318a70fc9d8fa9337f8823249",
+      "git_blob": "6bdc0ab7898e5f52d08d47687f062c2b96d8d5b8",
+      "candidate_commit": "5b15992244a2855ec12093e2d268705f826d61ca",
+      "bytes": 2635,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T06-12-35-981Z-HUMAN-RESTART-CONTROL-acceptance.json"
+}
