@@ -1,0 +1,564 @@
+{
+  "schema_version": 1,
+  "objective_id": "SUITE-DETERMINISTIC-TWO-RUN",
+  "evidence_class": "BOOKKEEPING",
+  "produced_by": "scripts/capture-suite-deterministic-two-run.ts",
+  "candidate_commit": "86a3a53014d3b91f602210c9e0ed3529c23e6d73",
+  "record_sha256": "abaf6ccdc8a07643289035e8dbfcc639a525a66955b4738f3735d24fa350a27c",
+  "suites": {
+    "goalkeepers": {
+      "suite_id": "goalkeepers",
+      "suite_version": "suite-goalkeepers-v1",
+      "accepted_baseline": {
+        "objective_id": "GK-SUITE-CORE-OWNED-STATE",
+        "source_record": "docs/evidence/GK-SUITE-CORE-OWNED-STATE/gk-suite-core-owned-state.json",
+        "record_sha256": "5cd1c80879d400c2dabfc0ba6d9b195447fc9476f7b6ebb5329877dd2a69204a",
+        "verdict_counts": {
+          "PASS": 8,
+          "FAIL": 0,
+          "NOT_EVALUATED": 3,
+          "BLOCKED_MISSING_REFERENCE": 1,
+          "NEEDS_PERCEPTUAL_REVIEW": 1
+        }
+      },
+      "verified_unchanged": [
+        "GK-POSITIONING-HOLD",
+        "GK-NO-FIELD-CHASE",
+        "GK-SAVE-CLAIM",
+        "GK-ROLE-DESIGNATION",
+        "GK-DISTRIBUTION-NO-OMNISCIENCE",
+        "COMMON-FINITE",
+        "COMMON-REFERENCES",
+        "COMMON-BOUNDS",
+        "ref",
+        "vis",
+        "reg",
+        "causal"
+      ],
+      "deterministic_change": [
+        "COMMON-DETERMINISTIC"
+      ],
+      "attested_runs": [
+        {
+          "run_id": "gk-continuous-live",
+          "scenario": "5v5-continuous-play-v1",
+          "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+          "ticks": 1800,
+          "lifecycle": "core-owned",
+          "rehome_keeper": true,
+          "source_candidate": "86a3a53014d3b91f602210c9e0ed3529c23e6d73",
+          "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-continuous-play.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: \"core-owned\" })",
+          "determinism": {
+            "run_a_state_hash_of_hashes": "6dbb4341999b19915c05f4363cd5dfadc17168771311f957a8a44583c0099584",
+            "run_b_state_hash_of_hashes": "6dbb4341999b19915c05f4363cd5dfadc17168771311f957a8a44583c0099584",
+            "run_a_observations_sha256": "ecc6469fab07a7aec671f4852736b47e711c0040c63e7754727745e0c11f924b",
+            "run_b_observations_sha256": "ecc6469fab07a7aec671f4852736b47e711c0040c63e7754727745e0c11f924b",
+            "state_hash_count": 1800,
+            "identical": true,
+            "state_hash_chain_identical": true,
+            "observations_byte_identical": true,
+            "earliest_divergence_tick": null,
+            "final_state_hash_a": "fnv1a64-v1:2a19b387d2d30f36",
+            "final_state_hash_b": "fnv1a64-v1:2a19b387d2d30f36"
+          },
+          "verdicts": {
+            "gk_behavior": {
+              "GK-SAVE-CLAIM": "NOT_EVALUATED",
+              "GK-POSITIONING-HOLD": "PASS",
+              "GK-ROLE-DESIGNATION": "PASS",
+              "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS",
+              "GK-NO-FIELD-CHASE": "PASS"
+            },
+            "common": {
+              "COMMON-FINITE": "PASS",
+              "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+              "COMMON-REFERENCES": "PASS",
+              "COMMON-BOUNDS": "PASS"
+            },
+            "catalog": {
+              "ref": "BLOCKED_MISSING_REFERENCE",
+              "vis": "NEEDS_PERCEPTUAL_REVIEW",
+              "reg": "NOT_EVALUATED",
+              "causal": "NOT_EVALUATED"
+            }
+          }
+        },
+        {
+          "run_id": "gk-shot-fixture-live",
+          "scenario": "5v5-keeper-shot-fixture-v1",
+          "scenario_path": "eval/scenarios/5v5-keeper-shot-fixture.v1.json",
+          "ticks": 600,
+          "lifecycle": "core-owned",
+          "rehome_keeper": true,
+          "source_candidate": "86a3a53014d3b91f602210c9e0ed3529c23e6d73",
+          "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-keeper-shot-fixture.v1.json\"), maxTicks: 600, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: \"core-owned\" })",
+          "determinism": {
+            "run_a_state_hash_of_hashes": "4a1aa34d87e3a58829edae2416503ae7508011b6da7e8981325bd0a09bf092e0",
+            "run_b_state_hash_of_hashes": "4a1aa34d87e3a58829edae2416503ae7508011b6da7e8981325bd0a09bf092e0",
+            "run_a_observations_sha256": "347d84b1316b3a2d6bb980c68e06a56b97b7f060d97deba7b18291047475bd1c",
+            "run_b_observations_sha256": "347d84b1316b3a2d6bb980c68e06a56b97b7f060d97deba7b18291047475bd1c",
+            "state_hash_count": 600,
+            "identical": true,
+            "state_hash_chain_identical": true,
+            "observations_byte_identical": true,
+            "earliest_divergence_tick": null,
+            "final_state_hash_a": "fnv1a64-v1:bd427cdac09d7472",
+            "final_state_hash_b": "fnv1a64-v1:bd427cdac09d7472"
+          },
+          "verdicts": {
+            "gk_behavior": {
+              "GK-SAVE-CLAIM": "PASS",
+              "GK-POSITIONING-HOLD": "PASS",
+              "GK-ROLE-DESIGNATION": "PASS",
+              "GK-DISTRIBUTION-NO-OMNISCIENCE": "NOT_EVALUATED",
+              "GK-NO-FIELD-CHASE": "PASS"
+            },
+            "common": {
+              "COMMON-FINITE": "PASS",
+              "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+              "COMMON-REFERENCES": "PASS",
+              "COMMON-BOUNDS": "PASS"
+            },
+            "catalog": {
+              "ref": "BLOCKED_MISSING_REFERENCE",
+              "vis": "NEEDS_PERCEPTUAL_REVIEW",
+              "reg": "NOT_EVALUATED",
+              "causal": "NOT_EVALUATED"
+            }
+          }
+        }
+      ],
+      "verdicts": {
+        "gk_behavior": {
+          "GK-POSITIONING-HOLD": "PASS",
+          "GK-NO-FIELD-CHASE": "PASS",
+          "GK-SAVE-CLAIM": "PASS",
+          "GK-ROLE-DESIGNATION": "PASS",
+          "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS"
+        },
+        "common": {
+          "COMMON-FINITE": "PASS",
+          "COMMON-DETERMINISTIC": "PASS",
+          "COMMON-REFERENCES": "PASS",
+          "COMMON-BOUNDS": "PASS"
+        },
+        "catalog": {
+          "ref": "BLOCKED_MISSING_REFERENCE",
+          "vis": "NEEDS_PERCEPTUAL_REVIEW",
+          "reg": "NOT_EVALUATED",
+          "causal": "NOT_EVALUATED"
+        }
+      },
+      "verdict_counts": {
+        "PASS": 9,
+        "FAIL": 0,
+        "NOT_EVALUATED": 2,
+        "BLOCKED_MISSING_REFERENCE": 1,
+        "NEEDS_PERCEPTUAL_REVIEW": 1
+      },
+      "delta_vs_baseline": [
+        {
+          "criterion": "GK-POSITIONING-HOLD",
+          "from": "PASS",
+          "to": "PASS",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "GK-NO-FIELD-CHASE",
+          "from": "PASS",
+          "to": "PASS",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "GK-SAVE-CLAIM",
+          "from": "PASS",
+          "to": "PASS",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "GK-ROLE-DESIGNATION",
+          "from": "PASS",
+          "to": "PASS",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "GK-DISTRIBUTION-NO-OMNISCIENCE",
+          "from": "PASS",
+          "to": "PASS",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "COMMON-FINITE",
+          "from": "PASS",
+          "to": "PASS",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "COMMON-DETERMINISTIC",
+          "from": "NOT_EVALUATED",
+          "to": "PASS",
+          "changed": true,
+          "reason": "Only change: COMMON-DETERMINISTIC evaluates from NOT_EVALUATED (single-run) to the two-run attestation result (PASS on byte-identical runs). All GK behavior / other common / catalog verdicts are re-derived unchanged."
+        },
+        {
+          "criterion": "COMMON-REFERENCES",
+          "from": "PASS",
+          "to": "PASS",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "COMMON-BOUNDS",
+          "from": "PASS",
+          "to": "PASS",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "ref",
+          "from": "BLOCKED_MISSING_REFERENCE",
+          "to": "BLOCKED_MISSING_REFERENCE",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "vis",
+          "from": "NEEDS_PERCEPTUAL_REVIEW",
+          "to": "NEEDS_PERCEPTUAL_REVIEW",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "reg",
+          "from": "NOT_EVALUATED",
+          "to": "NOT_EVALUATED",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        },
+        {
+          "criterion": "causal",
+          "from": "NOT_EVALUATED",
+          "to": "NOT_EVALUATED",
+          "changed": false,
+          "reason": "Verdict unchanged; re-attributed to the re-derived core-owned run (two-run evidence recorded)."
+        }
+      ]
+    },
+    "rules": {
+      "suite_id": "rules",
+      "suite_version": "suite-rules-v1",
+      "accepted_baseline": {
+        "objective_id": "RULES-SUITE-STATE-RERUN",
+        "source_record": "docs/evidence/RULES-SUITE-STATE-RERUN/rules-suite-state-rerun.json",
+        "record_sha256": "36fc77e52909dbaceefa14927b37b8e533c248e451477fc579dc4952434979ef",
+        "verdict_counts": {
+          "PASS": 23,
+          "FAIL": 0,
+          "NOT_EVALUATED": 0,
+          "BLOCKED_MISSING_REFERENCE": 2,
+          "NEEDS_PERCEPTUAL_REVIEW": 0
+        }
+      },
+      "attested_streams": [
+        {
+          "stream_id": "rules-corner-live",
+          "scenario": "5v5-corner-driven-v1",
+          "scenario_path": "eval/scenarios/5v5-corner-driven.v1.json",
+          "ticks": 400,
+          "gated_serialization": true,
+          "browser_parity_observations": false,
+          "lifecycle_phase_sync": "core-owned",
+          "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-corner-driven.v1.json\"), maxTicks: 400, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: false, serializeRestartFacts: true })",
+          "determinism": {
+            "run_a_state_hash_of_hashes": "0306d528ed0926d5ffd6f7feef5333aadebd158bff0642348742a8fde8d76e1a",
+            "run_b_state_hash_of_hashes": "0306d528ed0926d5ffd6f7feef5333aadebd158bff0642348742a8fde8d76e1a",
+            "run_a_observations_sha256": "2ac9a9889710e5e73fd214a4e46e020073a257e8b49a9a5edf85346b4b8c58e7",
+            "run_b_observations_sha256": "2ac9a9889710e5e73fd214a4e46e020073a257e8b49a9a5edf85346b4b8c58e7",
+            "state_hash_count": 400,
+            "identical": true,
+            "state_hash_chain_identical": true,
+            "observations_byte_identical": true,
+            "earliest_divergence_tick": null,
+            "final_state_hash_a": "fnv1a64-v1:c946848a85cc34cc",
+            "final_state_hash_b": "fnv1a64-v1:c946848a85cc34cc"
+          },
+          "verdicts": {
+            "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "FAIL",
+            "MATCH-RESTART-NEAREST-ONLY": "PASS",
+            "MATCH-CORNER-KICK-AWARD": "PASS",
+            "MATCH-CORNER-KICK-PLACEMENT": "PASS",
+            "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+            "MATCH-CORNER-KICK-TIMER-FREEZE": "PASS",
+            "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+            "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+            "MATCH-KICKOFF-FREEZE": "PASS",
+            "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+            "MATCH-RESTART-REARM": "NOT_EVALUATED",
+            "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+            "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+            "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+            "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+            "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+            "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+            "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+            "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+            "MATCH-TIMER-DECREMENT": "PASS",
+            "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+            "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+            "MATCH-TIMER-FREEZE": "PASS"
+          }
+        },
+        {
+          "stream_id": "rules-full-match-live",
+          "scenario": "5v5-full-match-timing-v1",
+          "scenario_path": "eval/scenarios/5v5-full-match-timing.v1.json",
+          "ticks": 800,
+          "gated_serialization": true,
+          "browser_parity_observations": false,
+          "lifecycle_phase_sync": "core-owned",
+          "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-full-match-timing.v1.json\"), maxTicks: 800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: false, serializeRestartFacts: true })",
+          "determinism": {
+            "run_a_state_hash_of_hashes": "2d9095001ae2ded079a9fbe01d9bbf1a562320b51330bc43c284c20747b68d5b",
+            "run_b_state_hash_of_hashes": "2d9095001ae2ded079a9fbe01d9bbf1a562320b51330bc43c284c20747b68d5b",
+            "run_a_observations_sha256": "429098d4b91c03d75e61564255ee129cdc871764cb1bab86f92f597d97f497e8",
+            "run_b_observations_sha256": "429098d4b91c03d75e61564255ee129cdc871764cb1bab86f92f597d97f497e8",
+            "state_hash_count": 800,
+            "identical": true,
+            "state_hash_chain_identical": true,
+            "observations_byte_identical": true,
+            "earliest_divergence_tick": null,
+            "final_state_hash_a": "fnv1a64-v1:2ca89ad201c66614",
+            "final_state_hash_b": "fnv1a64-v1:2ca89ad201c66614"
+          },
+          "verdicts": {
+            "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "FAIL",
+            "MATCH-RESTART-NEAREST-ONLY": "PASS",
+            "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+            "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+            "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+            "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+            "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+            "MATCH-KICKOFF-FREEZE": "PASS",
+            "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+            "MATCH-RESTART-REARM": "FAIL",
+            "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+            "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+            "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+            "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+            "MATCH-THROW-IN-AWARD": "PASS",
+            "MATCH-THROW-IN-PLACEMENT": "PASS",
+            "MATCH-THROW-IN-SERVE": "PASS",
+            "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+            "MATCH-TIMER-DECREMENT": "PASS",
+            "MATCH-TIMER-HALFTIME": "PASS",
+            "MATCH-TIMER-FULLTIME": "PASS",
+            "MATCH-TIMER-FREEZE": "PASS"
+          }
+        },
+        {
+          "stream_id": "designation-fullmatch-live",
+          "scenario": "5v5-full-match-timing-v1",
+          "scenario_path": "eval/scenarios/5v5-full-match-timing.v1.json",
+          "ticks": 800,
+          "gated_serialization": true,
+          "browser_parity_observations": true,
+          "lifecycle_phase_sync": "core-owned",
+          "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-full-match-timing.v1.json\"), maxTicks: 800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: true, serializeRestartFacts: true })",
+          "determinism": {
+            "run_a_state_hash_of_hashes": "4aa1cee9fae2cf9b1fb53ebe3abc7b534ca80b352aea08a0ba19968a456cc9a3",
+            "run_b_state_hash_of_hashes": "4aa1cee9fae2cf9b1fb53ebe3abc7b534ca80b352aea08a0ba19968a456cc9a3",
+            "run_a_observations_sha256": "cc45f56d43ff6913cc54c4b53948a025b726af868ca42d4fc21569487c9309c9",
+            "run_b_observations_sha256": "cc45f56d43ff6913cc54c4b53948a025b726af868ca42d4fc21569487c9309c9",
+            "state_hash_count": 800,
+            "identical": true,
+            "state_hash_chain_identical": true,
+            "observations_byte_identical": true,
+            "earliest_divergence_tick": null,
+            "final_state_hash_a": "fnv1a64-v1:7640408f414fc287",
+            "final_state_hash_b": "fnv1a64-v1:7640408f414fc287"
+          },
+          "verdicts": {
+            "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+            "MATCH-RESTART-NEAREST-ONLY": "PASS",
+            "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+            "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+            "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+            "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+            "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+            "MATCH-KICKOFF-FREEZE": "PASS",
+            "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+            "MATCH-RESTART-REARM": "PASS",
+            "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+            "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+            "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+            "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+            "MATCH-THROW-IN-AWARD": "PASS",
+            "MATCH-THROW-IN-PLACEMENT": "PASS",
+            "MATCH-THROW-IN-SERVE": "PASS",
+            "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+            "MATCH-TIMER-DECREMENT": "PASS",
+            "MATCH-TIMER-HALFTIME": "PASS",
+            "MATCH-TIMER-FULLTIME": "PASS",
+            "MATCH-TIMER-FREEZE": "PASS"
+          }
+        },
+        {
+          "stream_id": "designation-throwin-live",
+          "scenario": "5v5-restart-throwin-v1",
+          "scenario_path": "eval/scenarios/5v5-restart-throwin.v1.json",
+          "ticks": 1800,
+          "gated_serialization": true,
+          "browser_parity_observations": true,
+          "lifecycle_phase_sync": "core-owned",
+          "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-throwin.v1.json\"), maxTicks: 1800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: true, serializeRestartFacts: true })",
+          "determinism": {
+            "run_a_state_hash_of_hashes": "6e78e38e70ea0561792fcce8ae387d6e3b42ac1454fea3f0037035aad2bb4858",
+            "run_b_state_hash_of_hashes": "6e78e38e70ea0561792fcce8ae387d6e3b42ac1454fea3f0037035aad2bb4858",
+            "run_a_observations_sha256": "602ddfa15bc4311f089c63d16b2a058b516b7d43031c2fefebbc8e718438e2ef",
+            "run_b_observations_sha256": "602ddfa15bc4311f089c63d16b2a058b516b7d43031c2fefebbc8e718438e2ef",
+            "state_hash_count": 1800,
+            "identical": true,
+            "state_hash_chain_identical": true,
+            "observations_byte_identical": true,
+            "earliest_divergence_tick": null,
+            "final_state_hash_a": "fnv1a64-v1:84c1726260ad3faf",
+            "final_state_hash_b": "fnv1a64-v1:84c1726260ad3faf"
+          },
+          "verdicts": {
+            "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+            "MATCH-RESTART-NEAREST-ONLY": "PASS",
+            "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+            "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+            "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+            "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+            "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+            "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+            "MATCH-KICKOFF-FREEZE": "PASS",
+            "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+            "MATCH-RESTART-REARM": "NOT_EVALUATED",
+            "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+            "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+            "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+            "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+            "MATCH-THROW-IN-AWARD": "PASS",
+            "MATCH-THROW-IN-PLACEMENT": "PASS",
+            "MATCH-THROW-IN-SERVE": "PASS",
+            "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+            "MATCH-TIMER-DECREMENT": "PASS",
+            "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+            "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+            "MATCH-TIMER-FREEZE": "PASS"
+          }
+        }
+      ],
+      "excluded_streams": [
+        {
+          "stream_id": "designation-arc-live",
+          "role": "RESTART-DESIGNATION browserParity arc / goal-kick + post-goal re-arm stream",
+          "reason": "Budget decision (1800-tick browserParity run, ~56 s per run): the goal-kick / post-goal re-arm semantics are carried by the received arc-family evidence, and the deterministic engine's determinism is already attested on the designation throw-in / full-match streams. Excluded to keep the capture within the 5-minute evidence budget."
+        },
+        {
+          "stream_id": "rules-throwin-baseline",
+          "role": "core-owned baseline fixture, no serialization (RULES-SUITE-REGISTRATION baseline)",
+          "reason": "Same scenario (5v5-restart-throwin) as the attested designation-throwin-live; a superseded control whose only non-redundant verdicts (MATCH-OUT-OF-PLAY-DETECT / MATCH-SCORING-GOAL-DEVENT) are also PASS on the attested streams. Its determinism is a property of the deterministic engine already attested on the throw-in family."
+        },
+        {
+          "stream_id": "rules-goalkick-postgoal-baseline",
+          "role": "core-owned baseline fixture, no serialization (RULES-SUITE-REGISTRATION baseline)",
+          "reason": "Same scenario (5v5-restart-arc) as the received arc family; a superseded control. Its determinism is not separately attested (budget); the engine determinism is attested on the corner / full-match / throw-in streams."
+        },
+        {
+          "stream_id": "rules-throw-in-live",
+          "role": "RULES-FACTS-DEPTH driven throw-in stream (serializeRestartFacts, non-browserParity)",
+          "reason": "Budget decision: the non-browserParity gated throw-in stream is the same scenario as designation-throwin-live with only the observation shape differing (browserParity toggles the CPU observation layout, not the core determinism). Attesting the browserParity designation stream plus the corner/full-match streams demonstrates engine determinism; the non-parity stream is excluded to keep the capture budget reasonable."
+        },
+        {
+          "stream_id": "rules-goal-kick-live",
+          "role": "RULES-FACTS-DEPTH driven goal-kick stream (serializeRestartFacts, non-browserParity)",
+          "reason": "Budget decision: same scenario as the received arc family (browserParity). Excluded for the same reason as rules-throw-in-live."
+        },
+        {
+          "stream_id": "rules-corner-goalkick-neighbour",
+          "role": "CORNER-DRIVEN goal-kick neighbour control (no corner execution)",
+          "reason": "A redundant discriminating control whose corner criteria are NOT_EVALUATED and whose goal-kick criteria are subsumed by the attested corner / goal-kick streams. Its determinism is covered by the attested corner family."
+        }
+      ],
+      "match_criteria_verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "PASS",
+        "MATCH-CORNER-KICK-AWARD": "PASS",
+        "MATCH-CORNER-KICK-PLACEMENT": "PASS",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "PASS",
+        "MATCH-GOAL-KICK-AWARD": "PASS",
+        "MATCH-GOAL-KICK-PLACEMENT": "PASS",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "PASS",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-REARM": "PASS",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "PASS",
+        "MATCH-THROW-IN-AWARD": "PASS",
+        "MATCH-THROW-IN-PLACEMENT": "PASS",
+        "MATCH-THROW-IN-SERVE": "PASS",
+        "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "PASS",
+        "MATCH-TIMER-FULLTIME": "PASS",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "common_determinism": "PASS",
+      "verdict_counts_match_criteria": {
+        "PASS": 23,
+        "FAIL": 0,
+        "NOT_EVALUATED": 0,
+        "BLOCKED_MISSING_REFERENCE": 2,
+        "NEEDS_PERCEPTUAL_REVIEW": 0
+      },
+      "verdict_counts_with_common_determinism": {
+        "PASS": 24,
+        "FAIL": 0,
+        "NOT_EVALUATED": 0,
+        "BLOCKED_MISSING_REFERENCE": 2,
+        "NEEDS_PERCEPTUAL_REVIEW": 0
+      },
+      "delta_vs_baseline": {
+        "summary": "The 25 §15 MATCH-* verdicts are unchanged (23 PASS / 2 BLOCKED_MISSING_REFERENCE / 0 NOT_EVALUATED / 0 FAIL). COMMON-DETERMINISTIC is added as a determinism attestation row and evaluates to PASS from the two-run byte-identity evidence. No §15 criterion changed; BLOCKED_MISSING_REFERENCE stays blocked.",
+        "changed": [
+          "COMMON-DETERMINISTIC (added as determinism row)"
+        ]
+      },
+      "attested_per_criterion_regressions": [],
+      "attested_per_criterion_match": true
+    }
+  },
+  "claims_not_made": [
+    "No suite-level PASS claim: the goalkeepers suite has 1 BLOCKED_MISSING_REFERENCE + 1 NEEDS_PERCEPTUAL_REVIEW + 2 NOT_EVALUATED catalog criteria; the rules suite has 2 BLOCKED_MISSING_REFERENCE criteria. Neither reduces to a suite PASS.",
+    "No PROMOTION claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No invented reference envelope or tolerance; BLOCKED_MISSING_REFERENCE stays BLOCKED_MISSING_REFERENCE.",
+    "No criterion is upgraded beyond what the two-run attestation / executed evaluator returns: COMMON-DETERMINISTIC is PASS only where run 1 and run 2 are byte-identical; it would be FAIL honestly if they diverged (never forced).",
+    "No gameplay / source / contract / adapter / spec change: git diff src/ src/adapters/ eval/runners/ eval/oracles/ eval/invariants/ eval/contracts/ eval/scenarios/ specs/ is EMPTY; only evidence + a binding test + this producer are added.",
+    "No accepted record mutation: GK-SUITE-CORE-OWNED-STATE (5cd1c808…) and RULES-SUITE-STATE-RERUN (36fc77e5…) stay byte-untouched."
+  ]
+}
