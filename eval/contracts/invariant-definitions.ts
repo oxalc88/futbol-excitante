@@ -556,6 +556,50 @@ export const INV_RULES_RESTART_REARM: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+// ---------------------------------------------------------------------------
+// fouls suite invariants
+//
+// Each invariant is bound to a registered protected foul oracle
+// (eval/oracles/fouls.ts, wired in eval/oracles/wire.ts and mapped in
+// eval/runners/foundation-evaluator.ts).  A criterion still yields NOT_EVALUATED
+// when the committed stream carries no `foul` event to judge (honest "not yet
+// observable"), never an invented PASS.
+// ---------------------------------------------------------------------------
+
+/**
+ * Foul-detect evidence: an emitted `foul` event matches the FOULS_CARDS_SPEC
+ * §5.1 definition and is a grounded read of a genuine man-not-ball contact.
+ * Bound to the protected foul-detect oracle.
+ */
+export const INV_FOUL_DETECT: InvariantDefinition = {
+  invariant_id: "foul-detect-evidence",
+  invariant_version: "invariant-foul-detect-v1",
+  input_observation_ids: ["obs-fouls-v1"],
+  oracle_id: "foul-detect-oracle-v1",
+  oracle_version: "oracle-foul-detect-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
+ * Foul-clean-tackle evidence: the §5.2 complement holds — clean tackles and
+ * symmetric shoulder contacts emit no foul.  Bound to the protected
+ * foul-clean-tackle oracle.
+ */
+export const INV_FOUL_CLEAN_TACKLE: InvariantDefinition = {
+  invariant_id: "foul-clean-tackle-evidence",
+  invariant_version: "invariant-foul-clean-tackle-v1",
+  input_observation_ids: ["obs-fouls-v1"],
+  oracle_id: "foul-clean-tackle-oracle-v1",
+  oracle_version: "oracle-foul-clean-tackle-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 /** All registered invariant definitions keyed by invariant_id. */
 export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FINITE.invariant_id]: INV_FINITE,
@@ -594,6 +638,8 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_RULES_RESTART_FREEZE.invariant_id]: INV_RULES_RESTART_FREEZE,
   [INV_RULES_RESTART_NEAREST_ONLY.invariant_id]: INV_RULES_RESTART_NEAREST_ONLY,
   [INV_RULES_RESTART_REARM.invariant_id]: INV_RULES_RESTART_REARM,
+  [INV_FOUL_DETECT.invariant_id]: INV_FOUL_DETECT,
+  [INV_FOUL_CLEAN_TACKLE.invariant_id]: INV_FOUL_CLEAN_TACKLE,
 };
 
 /**

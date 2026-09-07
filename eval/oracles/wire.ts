@@ -22,6 +22,7 @@ import { checkDeferredMutants } from "./deferred-mutants.js";
 import { checkPrngOrderOracle } from "./prng-order.js";
 import { checkPlayerContactEvidence } from "./player-contact.js";
 import { checkTacklePhaseEvidence } from "./tackle-phase.js";
+import { checkFoulDetect, checkFoulCleanTackle } from "./fouls.js";
 import { checkScoreTracker } from "./match.js";
 import { checkMatchClock } from "./match.js";
 import {
@@ -330,6 +331,20 @@ const entries: OracleEntry[] = [
     oracle_id: "rules-restart-rearm-oracle-v1",
     oracle_version: "oracle-rules-restart-rearm-v1",
     fn: checkRestartRearm,
+  },
+  // FOULS_CARDS_SPEC §10 foul oracles (FOULS-SUITE-REGISTRATION): the two
+  // criteria the accepted detection machinery makes answerable.  Additive; no
+  // existing entry is changed.  CARD-ISSUED / ADVANTAGE-PLAYED / FREE-KICK-AWARD
+  // stay named-but-unregistered (no machinery, no oracle, no verdict).
+  {
+    oracle_id: "foul-detect-oracle-v1",
+    oracle_version: "oracle-foul-detect-v1",
+    fn: checkFoulDetect,
+  },
+  {
+    oracle_id: "foul-clean-tackle-oracle-v1",
+    oracle_version: "oracle-foul-clean-tackle-v1",
+    fn: checkFoulCleanTackle,
   },
 ];
 

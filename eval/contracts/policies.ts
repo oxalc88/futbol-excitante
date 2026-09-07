@@ -172,6 +172,18 @@ export const CONFIG_RULES_V1: ConfigMatrixPolicy = {
     "Rules-suite config referencing the versioned provisional match-rules-v1 model (prose-declared; no machine config module exists yet, so this is a nominal reference only).",
 };
 
+export const CONFIG_FOULS_V1: ConfigMatrixPolicy = {
+  policy_id: "config-fouls-v1",
+  policy_version: "config-matrix-fouls-v1",
+  config_refs: {
+    foundation: "foundation-locomotion-v1",
+    tackle: "foundation-tackle-v1",
+    fouls: "fouls-v1",
+  },
+  description:
+    "Fouls-suite config referencing the versioned provisional fouls-v1 model and the accepted foundation-tackle-v1 geometry (both prose-declared; no machine fouls config module exists yet, so this is a nominal reference only).",
+};
+
 // ---------------------------------------------------------------------------
 // Resource policies (referenced by suite resource_policy_id)
 // ---------------------------------------------------------------------------
@@ -511,6 +523,32 @@ export const EXPANSION_RULES_V1: ExpansionManifest = {
   content_hash: "placeholder",
 };
 
+/**
+ * Expansion manifest for the fouls suite.
+ *
+ * impact_closure is NONE so expanded = direct set; the suite has no COMMON-*
+ * criteria (the foundation suites own the shared COMMON invariants), so the
+ * expanded tests carry only their own §10 criterion bindings.
+ */
+export const EXPANSION_FOULS_V1: ExpansionManifest = {
+  policy_id: "expansion-fouls-v1",
+  suite_id: "fouls",
+  suite_version: "suite-fouls-v1",
+  direct_test_ids: [
+    "FOULS-DETECT-001",
+    "FOULS-CLEAN-TACKLE-001",
+  ],
+  expanded_test_ids: [
+    "FOULS-CLEAN-TACKLE-001",
+    "FOULS-DETECT-001",
+  ],
+  common_criterion_ids: [],
+  impact_closure: "NONE",
+  catalog_version: "gameplay-evaluation-v2",
+  registry_set_id: "placeholder",
+  content_hash: "placeholder",
+};
+
 // ---------------------------------------------------------------------------
 // Policy registries
 // ---------------------------------------------------------------------------
@@ -530,6 +568,7 @@ export const CONFIG_POLICIES: Record<string, ConfigMatrixPolicy> = {
   [CONFIG_DUELS_V1.policy_id]: CONFIG_DUELS_V1,
   [CONFIG_GOALKEEPERS_V1.policy_id]: CONFIG_GOALKEEPERS_V1,
   [CONFIG_RULES_V1.policy_id]: CONFIG_RULES_V1,
+  [CONFIG_FOULS_V1.policy_id]: CONFIG_FOULS_V1,
 };
 
 /** Resource policies keyed by policy_id. */
@@ -557,6 +596,7 @@ export const EXPANSION_MANIFESTS: Record<string, ExpansionManifest> = {
   "expansion-duels-v1": EXPANSION_DUELS_V1,
   "expansion-goalkeepers-v1": EXPANSION_GOALKEEPERS_V1,
   "expansion-rules-v1": EXPANSION_RULES_V1,
+  "expansion-fouls-v1": EXPANSION_FOULS_V1,
 };
 
 // ---------------------------------------------------------------------------

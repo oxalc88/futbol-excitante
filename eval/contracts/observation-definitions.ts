@@ -213,6 +213,33 @@ export const OBS_RULES_RESTART: ObservationDefinition = {
   missing_data_behavior: "INVALID_RUN",
 };
 
+/**
+ * Fouls observation — the event facts the foul oracles adjudicate
+ * (FOULS_CARDS_SPEC §4.2 / §5.1): the `foul` events the observation-level
+ * detection machinery emits and the `player-player-contact` events the accepted
+ * tackle machinery commits, plus the ball's authoritative lastTouchRef per tick.
+ * These are event-driven facts; the foul semantics are read from the event
+ * stream, so this observation carries the ordered event kinds and the contact
+ * payloads that carry contactType / tacklePhase / duelWon / ballReachable /
+ * sourceEventId.
+ */
+export const OBS_FOULS: ObservationDefinition = {
+  observation_id: "obs-fouls-v1",
+  observation_version: "obs-fouls-v1",
+  source_kind: "RAW_CANONICAL",
+  producer_boundary: "SIMULATION_SERIALIZER",
+  schema_id: "fouls-observation-v1",
+  schema_version: "schema-fouls-obs-v1",
+  required_fields: [
+    "tick",
+    "ball.lastTouchRef",
+    "events",
+    "players",
+  ],
+  cadence: "PER_TICK",
+  missing_data_behavior: "INVALID_RUN",
+};
+
 /** All registered observation definitions keyed by observation_id. */
 export const OBSERVATION_DEFINITIONS: Record<string, ObservationDefinition> = {
   [OBS_PER_TICK.observation_id]: OBS_PER_TICK,
@@ -224,6 +251,7 @@ export const OBSERVATION_DEFINITIONS: Record<string, ObservationDefinition> = {
   [OBS_GK_SAVE_CLAIM.observation_id]: OBS_GK_SAVE_CLAIM,
   [OBS_GK_DISTRIBUTION.observation_id]: OBS_GK_DISTRIBUTION,
   [OBS_RULES_RESTART.observation_id]: OBS_RULES_RESTART,
+  [OBS_FOULS.observation_id]: OBS_FOULS,
 };
 
 /**

@@ -1037,6 +1037,46 @@ export const MATCH_RESTART_NEAREST_ONLY: EvaluationCriterion = {
     "team converges on the ball.",
 };
 
+// ---------------------------------------------------------------------------
+// fouls suite criteria — FOULS_CARDS_SPEC §10
+//
+// Only FOUL-DETECT and FOUL-CLEAN-TACKLE are registered here: they are the two
+// §10 criteria the accepted detection machinery makes answerable over the
+// committed detection streams.  CARD-ISSUED, ADVANTAGE-PLAYED and
+// FREE-KICK-AWARD remain NAMED-BUT-UNREGISTERED — no criterion record, oracle,
+// invariant, binding or verdict is added for them (no machinery exists).
+// ---------------------------------------------------------------------------
+
+/**
+ * FOUL-DETECT — a man-not-ball tackle contact is recognized as a `foul` event.
+ * Class: HARD_INVARIANT.  Oracle: foul-detect-oracle-v1.
+ */
+export const FOUL_DETECT: EvaluationCriterion = {
+  criterion_id: "FOUL-DETECT",
+  class: "HARD_INVARIANT",
+  rule:
+    "A defensive-tackle active-window contact by the accepted tackle machinery " +
+    "that reaches an opposing player but not the independent ball in the same " +
+    "contact (contactType ∈ {standing-tackle, slide-tackle}, " +
+    "tacklePhase === 'active', duelWon === false / ballReachable === false) is " +
+    "recognized as a foul; a clean tackle or a symmetric shoulder contact is not.",
+};
+
+/**
+ * FOUL-CLEAN-TACKLE — the §5.2 complement: clean tackles and symmetric shoulder
+ * contacts are NOT fouls.
+ * Class: HARD_INVARIANT.  Oracle: foul-clean-tackle-oracle-v1.
+ */
+export const FOUL_CLEAN_TACKLE: EvaluationCriterion = {
+  criterion_id: "FOUL-CLEAN-TACKLE",
+  class: "HARD_INVARIANT",
+  rule:
+    "A tackle that reaches the ball (ballReachable === true / duelWon === true) " +
+    "is a clean tackle or won duel and is not a foul; a symmetric " +
+    "shoulder-to-shoulder player-player contact is not a foul.  No clean or " +
+    "shoulder contact emits a foul event.",
+};
+
 /** All common criteria keyed by criterion_id. */
 export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [COMMON_FINITE.criterion_id]: COMMON_FINITE,
@@ -1143,6 +1183,10 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [MATCH_TIMER_FREEZE.criterion_id]: MATCH_TIMER_FREEZE,
   [MATCH_RESTART_FREEZE_UNTIL_FIRST_TOUCH.criterion_id]: MATCH_RESTART_FREEZE_UNTIL_FIRST_TOUCH,
   [MATCH_RESTART_NEAREST_ONLY.criterion_id]: MATCH_RESTART_NEAREST_ONLY,
+
+  // fouls suite criteria — FOULS_CARDS_SPEC §10 (registered per objective)
+  [FOUL_DETECT.criterion_id]: FOUL_DETECT,
+  [FOUL_CLEAN_TACKLE.criterion_id]: FOUL_CLEAN_TACKLE,
 };
 
 /**

@@ -249,6 +249,41 @@ export const RULES_SUITE: SuiteDefinition = {
 };
 
 /**
+ * Fouls suite — the FOULS_CARDS_SPEC §10 adjudicating criteria the accepted
+ * detection machinery makes answerable (FOULS-SUITE-REGISTRATION).
+ *
+ * Direct tests are family-level foul tests (FOULS-DETECT-001,
+ * FOULS-CLEAN-TACKLE-001).  Each binds its spec §10 criterion as its
+ * criterion_binding.  The suite has no COMMON-* criteria: the foundation suites
+ * already own the shared COMMON invariants, and this suite is dedicated to the
+ * foul semantics (the §10 registered criteria ARE its direct test set).
+ *
+ * Only FOUL-DETECT and FOUL-CLEAN-TACKLE are registered: they are the two §10
+ * criteria the accepted detection streams make answerable.  CARD-ISSUED,
+ * ADVANTAGE-PLAYED and FREE-KICK-AWARD remain NAMED-BUT-UNREGISTERED — no
+ * criterion, oracle, invariant, binding or verdict accompanies them, and the
+ * suite never claims a PASS for them.
+ */
+export const FOULS_SUITE: SuiteDefinition = {
+  suite_id: "fouls",
+  suite_version: "suite-fouls-v1",
+  direct_test_ids: [
+    "FOULS-DETECT-001",
+    "FOULS-CLEAN-TACKLE-001",
+  ],
+  common_criterion_ids: [],
+  impact_closure: "NONE",
+  prerequisite_capabilities: ["PLAYER_DUELS", "INDEPENDENT_BALL"],
+  seed_matrix_id: "seeds-family-v1",
+  config_matrix_id: "config-fouls-v1",
+  held_out_policy_id: null,
+  browser_case_ids: [],
+  resource_policy_id: "resources-family-v1",
+  outcome_reduction_profile_id: "profile-selected-v1",
+  expected_expansion_manifest_id: "expansion-fouls-v1",
+};
+
+/**
  * Normative declaration of the team suite required by SMALL_SIDED_SHAPE.
  *
  * This record mirrors GAMEPLAY_EVALUATION_SPEC.md §8, but it is deliberately
@@ -303,6 +338,7 @@ export const SUITES: Record<string, SuiteDefinition> = {
   [DUELS_SUITE.suite_id]: DUELS_SUITE,
   [GOALKEEPERS_SUITE.suite_id]: GOALKEEPERS_SUITE,
   [RULES_SUITE.suite_id]: RULES_SUITE,
+  [FOULS_SUITE.suite_id]: FOULS_SUITE,
 };
 
 /**

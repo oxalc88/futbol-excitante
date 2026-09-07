@@ -969,6 +969,43 @@ export const BINDING_RULES_ANTIHUDDLE_001: TestImplementationBinding = makeTestB
 );
 
 // ---------------------------------------------------------------------------
+// fouls suite test bindings (FOULS_CARDS_SPEC §10)
+// ---------------------------------------------------------------------------
+
+/**
+ * FOULS-DETECT-001 — a man-not-ball tackle contact is recognized as a `foul`
+ * event.  FOUL-DETECT is bound to the protected foul-detect oracle.
+ */
+export const BINDING_FOULS_DETECT_001: TestImplementationBinding = makeTestBindingWith(
+  "FOULS-DETECT-001",
+  ["scn-fouls-lifecycle-v1"],
+  [],
+  ["foul-detect-evidence"],
+  ["obs-per-tick-v1", "obs-fouls-v1"],
+  [],
+  {
+    "FOUL-DETECT": ["foul-detect-evidence"],
+  },
+);
+
+/**
+ * FOULS-CLEAN-TACKLE-001 — the §5.2 complement: clean tackles and symmetric
+ * shoulder contacts emit no foul.  FOUL-CLEAN-TACKLE is bound to the protected
+ * foul-clean-tackle oracle.
+ */
+export const BINDING_FOULS_CLEAN_TACKLE_001: TestImplementationBinding = makeTestBindingWith(
+  "FOULS-CLEAN-TACKLE-001",
+  ["scn-fouls-lifecycle-v1"],
+  [],
+  ["foul-clean-tackle-evidence"],
+  ["obs-per-tick-v1", "obs-fouls-v1"],
+  [],
+  {
+    "FOUL-CLEAN-TACKLE": ["foul-clean-tackle-evidence"],
+  },
+);
+
+// ---------------------------------------------------------------------------
 // Registry — all bindings keyed by test_id
 // ---------------------------------------------------------------------------
 
@@ -1037,6 +1074,10 @@ export const TEST_BINDINGS: Record<string, TestImplementationBinding> = {
   [BINDING_RULES_SCORING_001.test_id]: BINDING_RULES_SCORING_001,
   [BINDING_RULES_TIMING_001.test_id]: BINDING_RULES_TIMING_001,
   [BINDING_RULES_ANTIHUDDLE_001.test_id]: BINDING_RULES_ANTIHUDDLE_001,
+
+  // fouls suite bindings
+  [BINDING_FOULS_DETECT_001.test_id]: BINDING_FOULS_DETECT_001,
+  [BINDING_FOULS_CLEAN_TACKLE_001.test_id]: BINDING_FOULS_CLEAN_TACKLE_001,
 };
 
 /**

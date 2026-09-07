@@ -298,18 +298,39 @@ describe("FOULS_CARDS_SPEC names adjudicating criteria", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 7. The named criteria are NOT registered in the evaluator registry
+// 7. Registry state after FOULS-SUITE-REGISTRATION
 // ---------------------------------------------------------------------------
+//
+// FOUL-DETECT and FOUL-CLEAN-TACKLE are registered as executable protected
+// oracles (FOULS-SUITE-REGISTRATION, the `fouls` suite suite-fouls-v1); the
+// three remaining §10 criteria (CARD-ISSUED, ADVANTAGE-PLAYED, FREE-KICK-AWARD)
+// stay NAMED-BUT-UNREGISTERED — no criterion, oracle, invariant, binding or
+// verdict accompanies them (no machinery).  The spec's own wording still says
+// the criteria are named-not-registered for the SPEC milestone (it is a draft
+// spec); the registry below mirrors the current executable state.
 
-describe("FOULS_CARDS_SPEC named criteria are NOT registered", () => {
+const REGISTERED_CRITERIA = ["FOUL-DETECT", "FOUL-CLEAN-TACKLE"];
+const REMAINING_NAMED_BUT_UNREGISTERED = [
+  "CARD-ISSUED",
+  "ADVANTAGE-PLAYED",
+  "FREE-KICK-AWARD",
+];
+
+describe("FOULS_CARDS_SPEC registry state after FOULS-SUITE-REGISTRATION", () => {
   const registry = loadRegistrySet();
 
-  it("has no 'fouls' suite registered", () => {
-    expect(registry.suite_definitions["fouls"]).toBeUndefined();
+  it("registers the 'fouls' suite (FOULS-SUITE-REGISTRATION)", () => {
+    expect(registry.suite_definitions["fouls"]).toBeDefined();
   });
 
-  it("does not register any named criterion in COMMON_CRITERIA", () => {
-    for (const criterion of NAMED_CRITERIA) {
+  it("registers FOUL-DETECT and FOUL-CLEAN-TACKLE, and only those, in COMMON_CRITERIA", () => {
+    for (const criterion of REGISTERED_CRITERIA) {
+      expect(
+        registry.common_criteria[criterion],
+        `${criterion} must be registered in COMMON_CRITERIA`,
+      ).toBeDefined();
+    }
+    for (const criterion of REMAINING_NAMED_BUT_UNREGISTERED) {
       expect(
         registry.common_criteria[criterion],
         `${criterion} must NOT be registered in COMMON_CRITERIA`,
@@ -317,9 +338,16 @@ describe("FOULS_CARDS_SPEC named criteria are NOT registered", () => {
     }
   });
 
-  it("does not reference any named criterion in a test binding", () => {
+  it("binds FOUL-DETECT and FOUL-CLEAN-TACKLE, and only those, in a test binding", () => {
     const bindings = Object.values(registry.test_bindings);
-    for (const criterion of NAMED_CRITERIA) {
+    for (const criterion of REGISTERED_CRITERIA) {
+      const referenced = bindings.some((b) => criterion in b.criterion_bindings);
+      expect(
+        referenced,
+        `${criterion} must be bound in a test binding`,
+      ).toBe(true);
+    }
+    for (const criterion of REMAINING_NAMED_BUT_UNREGISTERED) {
       const referenced = bindings.some((b) => criterion in b.criterion_bindings);
       expect(
         referenced,

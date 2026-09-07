@@ -1135,6 +1135,83 @@ export const SCENARIO_RULES_LIFECYCLE_001 = makeRulesScenarioStub(
   "scn-rules-lifecycle-v1",
 );
 
+// ---------------------------------------------------------------------------
+// fouls suite scenario
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a small-sided fouls scenario stub.
+ *
+ * Places two teams on a pitch with a ball, mirroring the rules scenario stub.
+ * This is contract registry data for the fouls suite (the loader requires every
+ * suite binding's scenario_ids to resolve in SCENARIO_REGISTRY); the fouls suite
+ * is actually exercised over the committed detection streams from the accepted
+ * machinery via evaluateSuite("fouls", observations).
+ */
+function makeFoulsScenarioStub(scenarioId: string): ScenarioDefinition {
+  return {
+    scenario_id: scenarioId,
+    scenario_version: "scenario-v1",
+    capability_requirements: ["PLAYER_DUELS", "INDEPENDENT_BALL"],
+    duration_ticks: 600,
+    seed_policy: { kind: "FIXED", values_or_set_id: "seeds-family-v1" },
+    initial_state_schema: "state-v1",
+    initial_state: {
+      players: [
+        {
+          playerId: "player-a",
+          teamId: "team-a",
+          groundPosition: { x: -20, y: 0 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 0,
+          desiredHeading: 0,
+        },
+        {
+          playerId: "player-b",
+          teamId: "team-b",
+          groundPosition: { x: 20, y: 0 },
+          linearVelocity: { x: 0, y: 0 },
+          desiredVelocity: { x: 0, y: 0 },
+          bodyHeading: 3.141592653589793,
+          desiredHeading: 3.141592653589793,
+        },
+      ],
+      ball: {
+        position: { x: 0, y: 0, z: 0.11 },
+        linearVelocity: { x: 0, y: 0, z: 0 },
+        angularVelocity: { x: 0, y: 0, z: 0 },
+        regime: "ground-roll",
+      },
+    },
+    config_refs: {
+      foundation: "foundation-locomotion-v1",
+      tackle: "foundation-tackle-v1",
+      test_focus: "fouls-lifecycle",
+    },
+    input_program: {
+      schema_id: "input-frame-v1",
+      schema_version: "schema-input-v1",
+      value: {},
+    },
+    scheduled_events: [],
+    observation_windows: [
+      {
+        window_id: "full-run-v1",
+        start: { kind: "ABSOLUTE_TICK", tick: 0, offset_ticks: 0, missing_boundary_behavior: "INVALID_RUN" },
+        end: { kind: "SCENARIO_END", offset_ticks: 0, missing_boundary_behavior: "INVALID_RUN" },
+        boundary_inclusion: "CLOSED",
+        discontinuity_policy: "OBSERVE",
+      },
+    ],
+    requested_observation_ids: ["obs-per-tick-v1", "obs-fouls-v1"],
+  };
+}
+
+export const SCENARIO_FOULS_LIFECYCLE_001 = makeFoulsScenarioStub(
+  "scn-fouls-lifecycle-v1",
+);
+
 /** All registered scenario stubs keyed by scenario_id. */
 export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
   [SCENARIO_BALL_IND_001.scenario_id]: SCENARIO_BALL_IND_001,
@@ -1200,6 +1277,9 @@ export const SCENARIO_REGISTRY: Record<string, ScenarioDefinition> = {
 
   // rules suite scenario
   [SCENARIO_RULES_LIFECYCLE_001.scenario_id]: SCENARIO_RULES_LIFECYCLE_001,
+
+  // fouls suite scenario
+  [SCENARIO_FOULS_LIFECYCLE_001.scenario_id]: SCENARIO_FOULS_LIFECYCLE_001,
 };
 
 /**
