@@ -39,6 +39,7 @@ import {
 } from "../../src/adapters/input-browser/human-restart-control.js";
 import { computeTeamDecision } from "../../src/adapters/input-browser/team-decision-profile.js";
 import { detectFoulEvents } from "./foul-detection.js";
+import { PASS_BIT } from "../../src/contracts/input.js";
 import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
 import type { SimulationObserver } from "../../src/simulation/telemetry/observer.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
@@ -240,6 +241,16 @@ export interface HeadlessMatchConfig {
     humanControlSlot: string;
     /** The human's directional input during the window (moveX, moveY in [-1,1]). */
     humanMoveDirection?: { x: number; y: number };
+    /**
+     * HUMAN-BALL-SERVER-LITERAL: the tick (0-based, absolute) at which the
+     * human's control slot presses PASS_BIT. When set, the slot's frame at that
+     * tick carries a PASS_BIT press edge (in addition to the directional input),
+     * so a human-controlled restart TAKER may fire the pass-gated serve. When
+     * absent (default), the human slot never presses PASS (the receiver-steering
+     * realization: the human's pass is overridden by the core's countdown-zero
+     * auto-serve). The pass enters ONLY through the tick-indexed InputFrame.
+     */
+    humanPassAtTick?: number;
     /** Open this restart window at tick 0 from committed state (fixture-driven). */
     window?: {
       kind: "throw-in" | "goal-kick" | "corner-kick";
@@ -1081,6 +1092,13 @@ export function runHeadlessMatch(
         humanRestartControl.humanMoveDirection !== undefined && windowActive
           ? humanRestartControl.humanMoveDirection
           : null;
+      // HUMAN-BALL-SERVER-LITERAL: the human taker's frame presses PASS_BIT on
+      // the configured tick (absolute), so the pass-gated restart serve fires.
+      const passEdge =
+        humanRestartControl.humanPassAtTick !== undefined &&
+        tick === humanRestartControl.humanPassAtTick
+          ? PASS_BIT
+          : 0;
       frames.push({
         tick,
         sourceId: "keyboard",
@@ -1089,7 +1107,7 @@ export function runHeadlessMatch(
         moveY: humanMove?.y ?? 0,
         sprint: humanMove ? 1 : 0,
         heldButtons: 0,
-        pressedButtons: 0,
+        pressedButtons: passEdge,
         releasedButtons: 0,
       });
     }
@@ -1235,6 +1253,7 @@ export function runHeadlessMatch(
       "throw-in-executed",
       "goal-kick-executed",
       "corner-kick-executed",
+      "restart-serve-wait",
     ]);
     for (const ev of committedEvents) {
       if (!restartExecKinds.has(ev.kind)) continue;

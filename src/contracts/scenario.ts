@@ -49,7 +49,8 @@ export interface SimulationEvent {
     | "invariant"
     | "slot-wiring-violation"
     | "scheduler"
-    | "slot-switch";
+    | "slot-switch"
+    | "restart-serve-wait";
   /** Human-readable label. */
   label: string;
   /** Typed payload — schema depends on kind. */

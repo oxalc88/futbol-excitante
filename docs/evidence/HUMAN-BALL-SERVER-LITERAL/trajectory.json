@@ -1,0 +1,615 @@
+{
+  "schema_version": 1,
+  "objective_id": "HUMAN-BALL-SERVER-LITERAL",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-human-ball-server-literal.ts",
+  "driver": "runHeadlessMatch({ lifecyclePhaseSync:'core-owned', serializeRestartFacts:true, humanRestartControl with humanPassAtTick }) over the human-served throw-in stream; the rules suite is evaluated via evaluateSuite('rules', observations) and the new human-serve oracles via executeOracle.",
+  "activation": {
+    "field": "runHeadlessMatch({ serializeRestartFacts, humanRestartControl: { humanPassAtTick } })",
+    "meaning": "the pass-gated serving path in src/simulation/loop/simulation.ts: at countdown zero, if the designated taker is human-controlled the restart phase stays open and waits for the human's PASS_BIT InputFrame within a bounded window; on the pass the serve direction derives from the input; else the CPU auto-serve fires. The runner's serializeRestartFacts + humanRestartControl.humanPassAtTick feed the human's PASS through the tick-indexed InputFrame.",
+    "set_by": [
+      "src/simulation/loop/simulation.ts (the countdown-zero branches)",
+      "eval/runners/headless-match.ts runHeadlessMatch({ serializeRestartFacts, humanRestartControl.humanPassAtTick })",
+      "NOT the browser composition root"
+    ]
+  },
+  "trajectory": {
+    "human_serve": {
+      "window": {
+        "kind": "throw-in",
+        "team": "team-a",
+        "takerPlayerId": "player-1",
+        "position": {
+          "x": 30,
+          "y": 34
+        },
+        "countdown": 5,
+        "touchlineIndex": 0
+      },
+      "pass_tick": 7,
+      "serve_direction": {
+        "x": 1,
+        "y": 0
+      },
+      "wait_entry_tick": 5,
+      "serve_tick": 8,
+      "trace": [
+        {
+          "tick": 1,
+          "phase": "throw-in",
+          "ball_lastTouchRef": null,
+          "ball_x": 30,
+          "ball_y": 34,
+          "ball_z": 1.4973,
+          "ball_vx": 0,
+          "ball_vy": 0,
+          "timer": 600
+        },
+        {
+          "tick": 2,
+          "phase": "throw-in",
+          "ball_lastTouchRef": null,
+          "ball_x": 30,
+          "ball_y": 34,
+          "ball_z": 1.4918,
+          "ball_vx": 0,
+          "ball_vy": 0,
+          "timer": 600
+        },
+        {
+          "tick": 3,
+          "phase": "throw-in",
+          "ball_lastTouchRef": null,
+          "ball_x": 30,
+          "ball_y": 34,
+          "ball_z": 1.4837,
+          "ball_vx": 0,
+          "ball_vy": 0,
+          "timer": 600
+        },
+        {
+          "tick": 4,
+          "phase": "throw-in",
+          "ball_lastTouchRef": null,
+          "ball_x": 30,
+          "ball_y": 34,
+          "ball_z": 1.4728,
+          "ball_vx": 0,
+          "ball_vy": 0,
+          "timer": 600
+        },
+        {
+          "tick": 5,
+          "phase": "throw-in",
+          "ball_lastTouchRef": null,
+          "ball_x": 30,
+          "ball_y": 34,
+          "ball_z": 1.4591,
+          "ball_vx": 0,
+          "ball_vy": 0,
+          "timer": 600
+        },
+        {
+          "tick": 6,
+          "phase": "throw-in",
+          "ball_lastTouchRef": null,
+          "ball_x": 30,
+          "ball_y": 34,
+          "ball_z": 1.4428,
+          "ball_vx": 0,
+          "ball_vy": 0,
+          "timer": 600
+        },
+        {
+          "tick": 7,
+          "phase": "throw-in",
+          "ball_lastTouchRef": null,
+          "ball_x": 30,
+          "ball_y": 34,
+          "ball_z": 1.4237,
+          "ball_vx": 0,
+          "ball_vy": 0,
+          "timer": 600
+        },
+        {
+          "tick": 8,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 30,
+          "ball_y": 34,
+          "ball_z": 1.5,
+          "ball_vx": 12,
+          "ball_vy": 0,
+          "timer": 599
+        },
+        {
+          "tick": 9,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 30.2,
+          "ball_y": 34,
+          "ball_z": 1.5273,
+          "ball_vx": 11.9998,
+          "ball_vy": 0,
+          "timer": 598
+        },
+        {
+          "tick": 10,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 30.4,
+          "ball_y": 34,
+          "ball_z": 1.5518,
+          "ball_vx": 11.9996,
+          "ball_vy": 0,
+          "timer": 597
+        },
+        {
+          "tick": 11,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 30.6,
+          "ball_y": 34,
+          "ball_z": 1.5736,
+          "ball_vx": 11.9994,
+          "ball_vy": 0,
+          "timer": 596
+        },
+        {
+          "tick": 12,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 30.8,
+          "ball_y": 34,
+          "ball_z": 1.5927,
+          "ball_vx": 11.9992,
+          "ball_vy": 0,
+          "timer": 595
+        },
+        {
+          "tick": 13,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 31,
+          "ball_y": 34,
+          "ball_z": 1.6091,
+          "ball_vx": 11.999,
+          "ball_vy": 0,
+          "timer": 594
+        },
+        {
+          "tick": 14,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 31.1999,
+          "ball_y": 34,
+          "ball_z": 1.6228,
+          "ball_vx": 11.9988,
+          "ball_vy": 0,
+          "timer": 593
+        },
+        {
+          "tick": 15,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 31.3999,
+          "ball_y": 34,
+          "ball_z": 1.6337,
+          "ball_vx": 11.9986,
+          "ball_vy": 0,
+          "timer": 592
+        },
+        {
+          "tick": 16,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 31.5999,
+          "ball_y": 34,
+          "ball_z": 1.6419,
+          "ball_vx": 11.9984,
+          "ball_vy": 0,
+          "timer": 591
+        },
+        {
+          "tick": 17,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 31.7999,
+          "ball_y": 34,
+          "ball_z": 1.6474,
+          "ball_vx": 11.9982,
+          "ball_vy": 0,
+          "timer": 590
+        },
+        {
+          "tick": 18,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 31.9998,
+          "ball_y": 34,
+          "ball_z": 1.6501,
+          "ball_vx": 11.998,
+          "ball_vy": 0,
+          "timer": 589
+        },
+        {
+          "tick": 19,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 32.1998,
+          "ball_y": 34,
+          "ball_z": 1.6501,
+          "ball_vx": 11.9978,
+          "ball_vy": 0,
+          "timer": 588
+        },
+        {
+          "tick": 20,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 32.3997,
+          "ball_y": 34,
+          "ball_z": 1.6474,
+          "ball_vx": 11.9976,
+          "ball_vy": 0,
+          "timer": 587
+        },
+        {
+          "tick": 21,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 32.5997,
+          "ball_y": 34,
+          "ball_z": 1.642,
+          "ball_vx": 11.9974,
+          "ball_vy": 0,
+          "timer": 586
+        },
+        {
+          "tick": 22,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 32.7997,
+          "ball_y": 34,
+          "ball_z": 1.6338,
+          "ball_vx": 11.9972,
+          "ball_vy": 0,
+          "timer": 585
+        },
+        {
+          "tick": 23,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 32.9996,
+          "ball_y": 34,
+          "ball_z": 1.623,
+          "ball_vx": 11.997,
+          "ball_vy": 0,
+          "timer": 584
+        },
+        {
+          "tick": 24,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 33.1995,
+          "ball_y": 34,
+          "ball_z": 1.6094,
+          "ball_vx": 11.9968,
+          "ball_vy": 0,
+          "timer": 583
+        },
+        {
+          "tick": 25,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 33.3995,
+          "ball_y": 34,
+          "ball_z": 1.593,
+          "ball_vx": 11.9966,
+          "ball_vy": 0,
+          "timer": 582
+        },
+        {
+          "tick": 26,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 33.5994,
+          "ball_y": 34,
+          "ball_z": 1.574,
+          "ball_vx": 11.9964,
+          "ball_vy": 0,
+          "timer": 581
+        },
+        {
+          "tick": 27,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 33.7994,
+          "ball_y": 34,
+          "ball_z": 1.5522,
+          "ball_vx": 11.9962,
+          "ball_vy": 0,
+          "timer": 580
+        },
+        {
+          "tick": 28,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 33.9993,
+          "ball_y": 34,
+          "ball_z": 1.5277,
+          "ball_vx": 11.996,
+          "ball_vy": 0,
+          "timer": 579
+        },
+        {
+          "tick": 29,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 34.1992,
+          "ball_y": 34,
+          "ball_z": 1.5005,
+          "ball_vx": 11.9958,
+          "ball_vy": 0,
+          "timer": 578
+        },
+        {
+          "tick": 30,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 34.3992,
+          "ball_y": 34,
+          "ball_z": 1.4705,
+          "ball_vx": 11.9956,
+          "ball_vy": 0,
+          "timer": 577
+        },
+        {
+          "tick": 31,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 34.5991,
+          "ball_y": 34,
+          "ball_z": 1.4379,
+          "ball_vx": 11.9954,
+          "ball_vy": 0,
+          "timer": 576
+        },
+        {
+          "tick": 32,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 34.799,
+          "ball_y": 34,
+          "ball_z": 1.4025,
+          "ball_vx": 11.9952,
+          "ball_vy": 0,
+          "timer": 575
+        },
+        {
+          "tick": 33,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 34.9989,
+          "ball_y": 34,
+          "ball_z": 1.3643,
+          "ball_vx": 11.995,
+          "ball_vy": 0,
+          "timer": 574
+        },
+        {
+          "tick": 34,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 35.1988,
+          "ball_y": 34,
+          "ball_z": 1.3235,
+          "ball_vx": 11.9948,
+          "ball_vy": 0,
+          "timer": 573
+        },
+        {
+          "tick": 35,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 35.3987,
+          "ball_y": 34,
+          "ball_z": 1.2799,
+          "ball_vx": 11.9946,
+          "ball_vy": 0,
+          "timer": 572
+        },
+        {
+          "tick": 36,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 35.5986,
+          "ball_y": 34,
+          "ball_z": 1.2336,
+          "ball_vx": 11.9944,
+          "ball_vy": 0,
+          "timer": 571
+        },
+        {
+          "tick": 37,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 35.7986,
+          "ball_y": 34,
+          "ball_z": 1.1846,
+          "ball_vx": 11.9942,
+          "ball_vy": 0,
+          "timer": 570
+        },
+        {
+          "tick": 38,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 35.9985,
+          "ball_y": 34,
+          "ball_z": 1.1329,
+          "ball_vx": 11.994,
+          "ball_vy": 0,
+          "timer": 569
+        },
+        {
+          "tick": 39,
+          "phase": "playing",
+          "ball_lastTouchRef": null,
+          "ball_x": 36.1983,
+          "ball_y": 34,
+          "ball_z": 1.0784,
+          "ball_vx": 11.9938,
+          "ball_vy": 0,
+          "timer": 568
+        },
+        {
+          "tick": 40,
+          "phase": "fulltime",
+          "ball_lastTouchRef": null,
+          "ball_x": 36.3982,
+          "ball_y": 34,
+          "ball_z": 1.0212,
+          "ball_vx": 11.9936,
+          "ball_vy": 0,
+          "timer": 568
+        }
+      ]
+    }
+  },
+  "guard_state": {
+    "two_run_attestation": true,
+    "cpu_two_run_attestation": true,
+    "human_changed_behavior_versus_cpu": true,
+    "human_serve_fired_on_pass": true,
+    "cpu_serve_fired_at_countdown": true,
+    "cpu_gate_off": true,
+    "wait_window_ticks": 90,
+    "cpu_head_bytes_identity": {
+      "reproduction": "test-results/scratch-hbsl-head.ts (createSimulation-driven CPU-taker throw-in, countdown 5, 30 ticks) run on HEAD (2d72e8c) and on this branch; both state-hash-of-hashes = eb308194b83d13c9a47d582d0167ec7478c20e69c608c90b732cb950fb439ec1",
+      "state_hash_of_hashes": "eb308194b83d13c9a47d582d0167ec7478c20e69c608c90b732cb950fb439ec1",
+      "identity": "identical"
+    }
+  },
+  "disclosures": [
+    "The pass-gated serving path is a DELIBERATE core change in src/simulation/loop/simulation.ts: the three countdown-zero branches now consult a closure-held humanServeWaitTicks and an isTakerHumanControlled gate. With a CPU taker (or no HUMAN slot controlling the taker) the branch executes byte-identically to pre-change (the gate is naturally off); this is empirically attested by the HEAD-vs-branch state-hash-of-hashes equality.",
+    "The bounded wait window is a versioned provisional configuration (match-rules-v1), HUMAN_SERVE_WAIT_WINDOW_TICKS = 90 ticks (1.5 s at 60 FPS), disclosed as a deliberate provisional design value, NOT a measured PES constant. The decision record HUMAN-BALL-SERVER-DECISION named the need for a bounded window but did not fix a value.",
+    "The serve direction derives from the human's InputFrame moveX/moveY (the PASS press tick); when the stick is within a 0.05 m dead-zone the serve falls back to the taker body heading (resolveServeDirection). A dead-zone serve is NOT counted as a human-chosen direction by HUMAN-SERVE-DIRECTION (honest NOT_EVALUATED for that serve).",
+    "During the human-serve wait the ball is out of play at the set-piece placement; because the taker is within passRadius (1.2 m) of the placed ball and presses PASS, the contact system may also record a `pass` action event in the same tick. The authoritative serve is the core's match-phase serve (which runs after the contact/ball-integration stages), so the committed ball state is the served state; the extra `pass` event is an observation-level annotation and does not change the serve outcome. No change was made to the contact system (which would risk CPU byte-identity).",
+    "The two-run attestation (human-throwin-served) and the CPU-fallback determinism (human-throwin-cpu) are distinct: the FIRST is the human-served stream's own determinism under a fixed input program; the SECOND verifies the CPU gate-off stream is two-run identical. The CPU-vs-HEAD byte-identity is attested separately (see the identity reference)."
+  ],
+  "runs": [
+    {
+      "id": "human-throwin-served",
+      "scenario": "5v5-human-serve-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-serve-throwin.v1.json",
+      "ticks": 40,
+      "observation_count": 40,
+      "event_kind_counts": {
+        "core-match-phase": 40,
+        "restart-designation": 40,
+        "restart-serve-wait": 1,
+        "pass": 1,
+        "throw-in-executed": 1
+      },
+      "state_hash_of_hashes": "a3370fb4c5e9b7fe264dce1c2dd6789e30e824e0e760f42d01697125d5198607",
+      "serve_tick": 8,
+      "serve_direction": {
+        "x": 1,
+        "y": 0
+      },
+      "input_direction": {
+        "x": 1,
+        "y": 0
+      },
+      "wait_entry_tick": 5,
+      "determinism_run2_hash_of_hashes": "a3370fb4c5e9b7fe264dce1c2dd6789e30e824e0e760f42d01697125d5198607",
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "PASS",
+        "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "oracle_verdicts": {
+        "human-serve-direction-oracle-v1": "PASS",
+        "human-serve-wait-timer-freeze-oracle-v1": "PASS",
+        "human-serve-window-close-oracle-v1": "PASS"
+      }
+    },
+    {
+      "id": "human-throwin-cpu",
+      "scenario": "5v5-human-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-restart-throwin.v1.json",
+      "ticks": 40,
+      "observation_count": 40,
+      "event_kind_counts": {
+        "core-match-phase": 40,
+        "restart-designation": 40,
+        "throw-in-executed": 1
+      },
+      "state_hash_of_hashes": "ea956e7caea238f42b92aa76b70a27558a7d57d0215aa7cb5b4033270efb41bd",
+      "serve_tick": 5,
+      "serve_direction": {
+        "x": -0.9284766908852594,
+        "y": -0.3713906763541037
+      },
+      "input_direction": null,
+      "wait_entry_tick": null,
+      "determinism_run2_hash_of_hashes": "ea956e7caea238f42b92aa76b70a27558a7d57d0215aa7cb5b4033270efb41bd",
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "PASS",
+        "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "oracle_verdicts": {
+        "human-serve-direction-oracle-v1": "NOT_EVALUATED",
+        "human-serve-wait-timer-freeze-oracle-v1": "NOT_EVALUATED",
+        "human-serve-window-close-oracle-v1": "NOT_EVALUATED"
+      }
+    }
+  ]
+}

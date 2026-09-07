@@ -59,6 +59,11 @@ import {
   checkTimerHalftime,
   checkTimerFulltime,
 } from "./rules-phase.js";
+import {
+  checkHumanServeDirection,
+  checkHumanServeWaitTimerFreeze,
+  checkHumanServeWindowClose,
+} from "./human-serve.js";
 import type { OracleEntry } from "./oracle-registry.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 
@@ -345,6 +350,25 @@ const entries: OracleEntry[] = [
     oracle_id: "foul-clean-tackle-oracle-v1",
     oracle_version: "oracle-foul-clean-tackle-v1",
     fn: checkFoulCleanTackle,
+  },
+  // HUMAN-BALL-SERVER-LITERAL human-serve oracles: the pass-gated serving path
+  // conformance. Additive; no existing entry is changed. These adjudicate the
+  // human-chosen serve direction, the wait-phase timer freeze, and the
+  // window-close / first-touch semantics on a human-served stream.
+  {
+    oracle_id: "human-serve-direction-oracle-v1",
+    oracle_version: "oracle-human-serve-direction-v1",
+    fn: checkHumanServeDirection,
+  },
+  {
+    oracle_id: "human-serve-wait-timer-freeze-oracle-v1",
+    oracle_version: "oracle-human-serve-wait-timer-freeze-v1",
+    fn: checkHumanServeWaitTimerFreeze,
+  },
+  {
+    oracle_id: "human-serve-window-close-oracle-v1",
+    oracle_version: "oracle-human-serve-window-close-v1",
+    fn: checkHumanServeWindowClose,
   },
 ];
 

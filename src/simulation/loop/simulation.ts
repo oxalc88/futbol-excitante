@@ -61,7 +61,7 @@ import {
   resolveSlotMap,
   NEUTRAL_INPUT,
 } from "../input/input-system.js";
-import { SWITCH_PLAYER_BIT } from "../../contracts/input.js";
+import { SWITCH_PLAYER_BIT, PASS_BIT } from "../../contracts/input.js";
 import { stepLocomotion } from "../locomotion/locomotion-system.js";
 import { stepBall } from "../ball/ball-system.js";
 import { stepContacts } from "../contacts/contact-system.js";
@@ -273,6 +273,20 @@ export function createSimulation(
 
   // Event counter — persists across steps for total ordering.
   let eventCounter: number = 0;
+
+  // Human-gated restart serve wait (HUMAN-BALL-SERVER-LITERAL). The number of
+  // ticks the core holds a restart phase open PAST countdown zero for a
+  // HUMAN-controlled designated taker to press PASS_BIT before the CPU
+  // auto-serve fires. 0 = no wait active. Lives in the simulation closure so
+  // the CPU (gate-off) path is byte-identical: with a CPU taker (or no HUMAN
+  // slot controlling the taker) this is never set, and the countdown-zero
+  // branch executes exactly as before.
+  //
+  // Versioned provisional configuration (match-rules-v1) — the window length is
+  // a deliberate, bounded design choice, NOT a measured PES constant. Decided
+  // in HUMAN-BALL-SERVER-DECISION, executed in HUMAN-BALL-SERVER-LITERAL.
+  const HUMAN_SERVE_WAIT_WINDOW_TICKS = 90;
+  let humanServeWaitTicks: number = 0;
 
   // Per-player dribble-touch cooldown — maps playerId → last tick a dribble-touch occurred.
   // Lives in the simulation closure; does not affect world state or hashing.
@@ -517,6 +531,227 @@ export function createSimulation(
         def.desiredHeading = def.bodyHeading;
       }
     }
+  }
+
+  // ------------------------------------------------------------------
+  // Human-serve helpers (HUMAN-BALL-SERVER-LITERAL)
+  // ------------------------------------------------------------------
+
+  /**
+   * Whether a player id is the controlled body of a HUMAN-mode control slot.
+   * This is the pass-gate: only a HUMAN-controlled designated taker holds the
+   * restart phase open for a PASS_BIT serve. A CPU taker (AI_FALLBACK slot, or
+   * no slot controlling the taker) leaves the gate off so the CPU auto-serve
+   * fires exactly as pre-change.
+   */
+  function isTakerHumanControlled(playerId: string | null): boolean {
+    if (!playerId) return false;
+    if (!state.controlAssignments) return false;
+    for (const slot of Object.keys(state.controlAssignments)) {
+      const a = state.controlAssignments[slot];
+      if (!a) continue;
+      if (a.controlledPlayerId === playerId && a.mode === "HUMAN") return true;
+    }
+    return false;
+  }
+
+  /**
+   * Find the PASS_BIT edge frame for the control slot that drives the given
+   * (human-controlled) player id, if any, among the current tick's frames.
+   * The pass enters ONLY through the tick-indexed InputFrame — never a state
+   * write.
+   */
+  function findHumanPassFrame(playerId: string | null, frames: InputFrame[]): InputFrame | null {
+    if (!playerId) return null;
+    if (!state.controlAssignments) return null;
+    let slot: string | null = null;
+    for (const s of Object.keys(state.controlAssignments)) {
+      const a = state.controlAssignments[s];
+      if (!a) continue;
+      if (a.controlledPlayerId === playerId && a.mode === "HUMAN") { slot = s; break; }
+    }
+    if (!slot) return null;
+    for (const f of frames) {
+      if (f.controlSlot === slot && (f.pressedButtons & PASS_BIT) !== 0) return f;
+    }
+    return null;
+  }
+
+  /**
+   * Resolve a serve direction from a human pass frame. When the stick is
+   * deflected beyond a small dead-zone the serve follows the human's input
+   * (moveX/moveY); otherwise it falls back to the taker body heading. Always
+   * returns a unit vector (never out-of-play by construction).
+   */
+  function resolveServeDirection(frame: InputFrame, takerId: string | null): { dirX: number; dirY: number } | null {
+    const mx = frame.moveX;
+    const my = frame.moveY;
+    const mag = Math.hypot(mx, my);
+    if (mag > 0.05) {
+      return { dirX: mx / mag, dirY: my / mag };
+    }
+    const taker = state.players.find((p) => p.playerId === takerId);
+    const h = taker?.bodyHeading ?? 0;
+    return { dirX: Math.cos(h), dirY: Math.sin(h) };
+  }
+
+  /** Emit a diagnostic restart-serve-wait event (observation-level only). */
+  function emitServeWait(kind: string, takerId: string | null, waitTicks: number): void {
+    eventCounter++;
+    const ev: SimulationEvent = {
+      id: `restart-serve-wait-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "restart-serve-wait",
+      label: `Restart serve (${kind}) waiting for human PASS_BIT (${waitTicks} ticks)`,
+      payload: { kind, takerId, waitTicks },
+    };
+    state.events = [...state.events, ev];
+  }
+
+  /**
+   * Execute the throw-in toward a human-chosen direction (HUMAN-BALL-SERVER-
+   * LITERAL). Same placement / velocity as applyThrowIn, but the serve direction
+   * derives from the pass frame. Carries the input direction in the payload so
+   * the human-serve-direction oracle can adjudicate it. CPU serve is untouched.
+   */
+  function applyThrowInFromInput(frame: InputFrame): void {
+    if (!state.throwInPosition || !state.throwInAwardingTeam) return;
+    const throwPos = state.throwInPosition;
+    const dir = resolveServeDirection(frame, state.throwInTakerId);
+    if (!dir) return;
+    const { dirX, dirY } = dir;
+
+    // Place ball at the sideline exit point at chest height (provisional).
+    state.ball.position.x = throwPos.x;
+    state.ball.position.y = throwPos.y;
+    state.ball.position.z = 1.5; // provisional: chest height for throw-in (m)
+    state.ball.regime = "airborne";
+
+    const throwSpeed = 12; // provisional: throw-in speed (m/s)
+    const verticalComponent = 0.15; // provisional: slight upward arc
+    state.ball.linearVelocity.x = dirX * throwSpeed;
+    state.ball.linearVelocity.y = dirY * throwSpeed;
+    state.ball.linearVelocity.z = throwSpeed * verticalComponent;
+    state.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.lastTouchRef = null;
+
+    const targetX = throwPos.x + dirX * 10;
+    const targetY = throwPos.y + dirY * 10;
+
+    eventCounter++;
+    const throwEvent: SimulationEvent = {
+      id: `throw-in-executed-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "throw-in-executed",
+      label: `Throw-in executed by ${state.throwInTakerId} (human pass)`,
+      payload: {
+        teamId: state.throwInAwardingTeam,
+        throwTakerId: state.throwInTakerId,
+        throwPosition: { ...throwPos },
+        targetPosition: { x: targetX, y: targetY },
+        throwDirection: { x: dirX, y: dirY },
+        serveInputDirection: { x: frame.moveX, y: frame.moveY },
+        humanServed: true,
+      },
+    };
+    state.events = [...state.events, throwEvent];
+  }
+
+  /**
+   * Execute the goal kick toward a human-chosen direction. Same placement /
+   * velocity as applyGoalKick, but direction derives from the pass frame.
+   */
+  function applyGoalKickFromInput(frame: InputFrame): void {
+    if (!state.goalKickPosition || !state.goalKickAwardingTeam) return;
+    const kickPos = state.goalKickPosition;
+    const dir = resolveServeDirection(frame, state.goalKickTakerId);
+    if (!dir) return;
+    const { dirX, dirY } = dir;
+
+    state.ball.position.x = kickPos.x;
+    state.ball.position.y = kickPos.y;
+    state.ball.position.z = 0.11; // ball radius
+    state.ball.regime = "airborne";
+
+    const kickSpeed = 16; // provisional: goal kick distribution speed (m/s)
+    const verticalComponent = 0.25; // provisional: moderate loft for distribution
+    state.ball.linearVelocity.x = dirX * kickSpeed;
+    state.ball.linearVelocity.y = dirY * kickSpeed;
+    state.ball.linearVelocity.z = kickSpeed * verticalComponent;
+    state.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.lastTouchRef = null;
+
+    const targetX = kickPos.x + dirX * 20;
+    const targetY = kickPos.y + dirY * 20;
+
+    eventCounter++;
+    const kickEvent: SimulationEvent = {
+      id: `goal-kick-executed-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "goal-kick-executed",
+      label: `Goal kick executed by ${state.goalKickTakerId} (human pass)`,
+      payload: {
+        teamId: state.goalKickAwardingTeam,
+        kickTakerId: state.goalKickTakerId,
+        kickPosition: { ...kickPos },
+        targetPosition: { x: targetX, y: targetY },
+        kickDirection: { x: dirX, y: dirY },
+        serveInputDirection: { x: frame.moveX, y: frame.moveY },
+        humanServed: true,
+      },
+    };
+    state.events = [...state.events, kickEvent];
+  }
+
+  /**
+   * Execute the corner kick toward a human-chosen direction. Same placement /
+   * lofted cross velocity as applyCornerKick, but direction derives from the
+   * pass frame (overriding the fixed penalty-area cross target).
+   */
+  function applyCornerKickFromInput(frame: InputFrame): void {
+    if (!state.cornerKickPosition || !state.cornerKickAttackingTeam) return;
+    const cornerPos = state.cornerKickPosition;
+    const dir = resolveServeDirection(frame, state.cornerKickTakerId);
+    if (!dir) return;
+    const { dirX, dirY } = dir;
+
+    state.ball.position.x = cornerPos.x;
+    state.ball.position.y = cornerPos.y;
+    state.ball.position.z = 0.11; // ball radius
+    state.ball.regime = "airborne";
+
+    const crossSpeed = 14; // provisional: lofted cross speed (m/s)
+    const verticalComponent = 0.35; // provisional: loft for cross trajectory
+    state.ball.linearVelocity.x = dirX * crossSpeed;
+    state.ball.linearVelocity.y = dirY * crossSpeed;
+    state.ball.linearVelocity.z = crossSpeed * verticalComponent;
+    state.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.lastTouchRef = null;
+
+    const targetX = cornerPos.x + dirX * 10;
+    const targetY = cornerPos.y + dirY * 10;
+
+    eventCounter++;
+    const kickEvent: SimulationEvent = {
+      id: `corner-kick-executed-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "corner-kick-executed",
+      label: `Corner kick executed by ${state.cornerKickTakerId} (human pass)`,
+      payload: {
+        teamId: state.cornerKickAttackingTeam,
+        kickTakerId: state.cornerKickTakerId,
+        cornerPosition: { ...cornerPos },
+        targetPosition: { x: targetX, y: targetY },
+        crossDirection: { x: dirX, y: dirY },
+        serveInputDirection: { x: frame.moveX, y: frame.moveY },
+        humanServed: true,
+      },
+    };
+    state.events = [...state.events, kickEvent];
   }
 
   /**
@@ -1672,46 +1907,137 @@ export function createSimulation(
 
       // 6b-2. Process corner kick countdown (MATCH-CORNER-KICK).
       if (state.matchPhase === "corner-kick") {
-        state.cornerKickCountdown--;
-        if (state.cornerKickCountdown <= 0) {
-          // Execute the corner kick: place ball, position players, kick.
-          applyCornerKick();
-          state.matchPhase = "playing";
-          state.cornerKickCountdown = 0;
-          state.cornerKickPosition = null;
-          state.cornerKickAttackingTeam = null;
-          state.cornerKickTakerId = null;
-          state.cornerKickGoalIndex = null;
+        if (humanServeWaitTicks > 0) {
+          // HUMAN-BALL-SERVER-LITERAL: the designated taker is human-controlled;
+          // hold the restart phase open (matchTimer stays frozen because the
+          // phase is not "playing") and wait for the human's PASS_BIT frame in
+          // a bounded window. On the pass the serve direction derives from the
+          // input and executes; on window expiry the CPU auto-serve fires.
+          const passFrame = findHumanPassFrame(state.cornerKickTakerId, currentFrames);
+          if (passFrame) {
+            applyCornerKickFromInput(passFrame);
+            humanServeWaitTicks = 0;
+          } else {
+            humanServeWaitTicks--;
+            if (humanServeWaitTicks <= 0) {
+              applyCornerKick();
+            }
+          }
+          if (humanServeWaitTicks <= 0) {
+            state.matchPhase = "playing";
+            state.cornerKickCountdown = 0;
+            state.cornerKickPosition = null;
+            state.cornerKickAttackingTeam = null;
+            state.cornerKickTakerId = null;
+            state.cornerKickGoalIndex = null;
+          }
+        } else {
+          state.cornerKickCountdown--;
+          if (state.cornerKickCountdown <= 0) {
+            if (isTakerHumanControlled(state.cornerKickTakerId)) {
+              // Pass-gate: enter the human-serve wait, keep the phase open.
+              humanServeWaitTicks = HUMAN_SERVE_WAIT_WINDOW_TICKS;
+              state.cornerKickCountdown = 0;
+              emitServeWait("corner-kick", state.cornerKickTakerId, HUMAN_SERVE_WAIT_WINDOW_TICKS);
+            } else {
+              // CPU auto-serve (gate off): byte-identical to pre-change.
+              applyCornerKick();
+              state.matchPhase = "playing";
+              state.cornerKickCountdown = 0;
+              state.cornerKickPosition = null;
+              state.cornerKickAttackingTeam = null;
+              state.cornerKickTakerId = null;
+              state.cornerKickGoalIndex = null;
+            }
+          }
         }
       }
 
       // 6b-2b. Process throw-in countdown (MATCH-THROW-IN).
       if (state.matchPhase === "throw-in") {
-        state.throwInCountdown--;
-        if (state.throwInCountdown <= 0) {
-          // Execute the throw-in: place ball, throw into play.
-          applyThrowIn();
-          state.matchPhase = "playing";
-          state.throwInCountdown = 0;
-          state.throwInPosition = null;
-          state.throwInAwardingTeam = null;
-          state.throwInTakerId = null;
-          state.throwInTouchlineIndex = null;
+        if (humanServeWaitTicks > 0) {
+          // HUMAN-BALL-SERVER-LITERAL: human-controlled taker waits for PASS_BIT.
+          const passFrame = findHumanPassFrame(state.throwInTakerId, currentFrames);
+          if (passFrame) {
+            applyThrowInFromInput(passFrame);
+            humanServeWaitTicks = 0;
+          } else {
+            humanServeWaitTicks--;
+            if (humanServeWaitTicks <= 0) {
+              applyThrowIn();
+            }
+          }
+          if (humanServeWaitTicks <= 0) {
+            state.matchPhase = "playing";
+            state.throwInCountdown = 0;
+            state.throwInPosition = null;
+            state.throwInAwardingTeam = null;
+            state.throwInTakerId = null;
+            state.throwInTouchlineIndex = null;
+          }
+        } else {
+          state.throwInCountdown--;
+          if (state.throwInCountdown <= 0) {
+            if (isTakerHumanControlled(state.throwInTakerId)) {
+              // Pass-gate: enter the human-serve wait, keep the phase open.
+              humanServeWaitTicks = HUMAN_SERVE_WAIT_WINDOW_TICKS;
+              state.throwInCountdown = 0;
+              emitServeWait("throw-in", state.throwInTakerId, HUMAN_SERVE_WAIT_WINDOW_TICKS);
+            } else {
+              // CPU auto-serve (gate off): byte-identical to pre-change.
+              applyThrowIn();
+              state.matchPhase = "playing";
+              state.throwInCountdown = 0;
+              state.throwInPosition = null;
+              state.throwInAwardingTeam = null;
+              state.throwInTakerId = null;
+              state.throwInTouchlineIndex = null;
+            }
+          }
         }
       }
 
       // 6b-2c. Process goal kick countdown (MATCH-GOAL-KICK).
       if (state.matchPhase === "goal-kick") {
-        state.goalKickCountdown--;
-        if (state.goalKickCountdown <= 0) {
-          // Execute the goal kick: place ball at goal area, kick upfield.
-          applyGoalKick();
-          state.matchPhase = "playing";
-          state.goalKickCountdown = 0;
-          state.goalKickPosition = null;
-          state.goalKickAwardingTeam = null;
-          state.goalKickTakerId = null;
-          state.goalKickGoalIndex = null;
+        if (humanServeWaitTicks > 0) {
+          // HUMAN-BALL-SERVER-LITERAL: human-controlled taker waits for PASS_BIT.
+          const passFrame = findHumanPassFrame(state.goalKickTakerId, currentFrames);
+          if (passFrame) {
+            applyGoalKickFromInput(passFrame);
+            humanServeWaitTicks = 0;
+          } else {
+            humanServeWaitTicks--;
+            if (humanServeWaitTicks <= 0) {
+              applyGoalKick();
+            }
+          }
+          if (humanServeWaitTicks <= 0) {
+            state.matchPhase = "playing";
+            state.goalKickCountdown = 0;
+            state.goalKickPosition = null;
+            state.goalKickAwardingTeam = null;
+            state.goalKickTakerId = null;
+            state.goalKickGoalIndex = null;
+          }
+        } else {
+          state.goalKickCountdown--;
+          if (state.goalKickCountdown <= 0) {
+            if (isTakerHumanControlled(state.goalKickTakerId)) {
+              // Pass-gate: enter the human-serve wait, keep the phase open.
+              humanServeWaitTicks = HUMAN_SERVE_WAIT_WINDOW_TICKS;
+              state.goalKickCountdown = 0;
+              emitServeWait("goal-kick", state.goalKickTakerId, HUMAN_SERVE_WAIT_WINDOW_TICKS);
+            } else {
+              // CPU auto-serve (gate off): byte-identical to pre-change.
+              applyGoalKick();
+              state.matchPhase = "playing";
+              state.goalKickCountdown = 0;
+              state.goalKickPosition = null;
+              state.goalKickAwardingTeam = null;
+              state.goalKickTakerId = null;
+              state.goalKickGoalIndex = null;
+            }
+          }
         }
       }
 

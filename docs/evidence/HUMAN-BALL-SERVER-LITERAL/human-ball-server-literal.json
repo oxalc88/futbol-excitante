@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "objective_id": "HUMAN-BALL-SERVER-LITERAL",
+  "suite_id": "rules",
+  "suite_version": "suite-rules-v1",
+  "produced_by": "scripts/capture-human-ball-server-literal.ts",
+  "evidence_class": "MULTI_TICK",
+  "lifecycle_phase_sync": "core-owned",
+  "core_change": {
+    "in": "src/simulation/loop/simulation.ts",
+    "what": "the three countdown-zero branches (corner-kick / throw-in / goal-kick) now gate on isTakerHumanControlled; a closure-held humanServeWaitTicks holds the restart phase open for a human PASS_BIT within HUMAN_SERVE_WAIT_WINDOW_TICKS; apply*FromInput execute the serve along the human's input direction; CPU auto-serve is preserved byte-identically.",
+    "wait_window_ticks": 90,
+    "versioned_provisional_model": "match-rules-v1",
+    "human_input_path": "tick-indexed InputFrame via sim.applyInputs (never a state write)"
+  },
+  "guards": {
+    "two_run_attestation": true,
+    "cpu_two_run_attestation": true,
+    "human_changed_behavior_versus_cpu": true,
+    "human_serve_fired_on_pass": true,
+    "cpu_serve_fired_at_countdown": true,
+    "cpu_gate_off": true,
+    "cpu_head_bytes_identity": {
+      "reproduction": "test-results/scratch-hbsl-head.ts (createSimulation-driven CPU-taker throw-in, countdown 5, 30 ticks) run on HEAD (2d72e8c) and on this branch; both state-hash-of-hashes = eb308194b83d13c9a47d582d0167ec7478c20e69c608c90b732cb950fb439ec1",
+      "state_hash_of_hashes": "eb308194b83d13c9a47d582d0167ec7478c20e69c608c90b732cb950fb439ec1",
+      "identity": "identical"
+    }
+  },
+  "runs": [
+    {
+      "id": "human-throwin-served",
+      "scenario": "5v5-human-serve-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-serve-throwin.v1.json",
+      "ticks": 40,
+      "observation_count": 40,
+      "event_kind_counts": {
+        "core-match-phase": 40,
+        "restart-designation": 40,
+        "restart-serve-wait": 1,
+        "pass": 1,
+        "throw-in-executed": 1
+      },
+      "state_hash_of_hashes": "a3370fb4c5e9b7fe264dce1c2dd6789e30e824e0e760f42d01697125d5198607",
+      "serve_tick": 8,
+      "serve_direction": {
+        "x": 1,
+        "y": 0
+      },
+      "input_direction": {
+        "x": 1,
+        "y": 0
+      },
+      "wait_entry_tick": 5,
+      "determinism_run2_hash_of_hashes": "a3370fb4c5e9b7fe264dce1c2dd6789e30e824e0e760f42d01697125d5198607",
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "PASS",
+        "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "oracle_verdicts": {
+        "human-serve-direction-oracle-v1": "PASS",
+        "human-serve-wait-timer-freeze-oracle-v1": "PASS",
+        "human-serve-window-close-oracle-v1": "PASS"
+      }
+    },
+    {
+      "id": "human-throwin-cpu",
+      "scenario": "5v5-human-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-restart-throwin.v1.json",
+      "ticks": 40,
+      "observation_count": 40,
+      "event_kind_counts": {
+        "core-match-phase": 40,
+        "restart-designation": 40,
+        "throw-in-executed": 1
+      },
+      "state_hash_of_hashes": "ea956e7caea238f42b92aa76b70a27558a7d57d0215aa7cb5b4033270efb41bd",
+      "serve_tick": 5,
+      "serve_direction": {
+        "x": -0.9284766908852594,
+        "y": -0.3713906763541037
+      },
+      "input_direction": null,
+      "wait_entry_tick": null,
+      "determinism_run2_hash_of_hashes": "ea956e7caea238f42b92aa76b70a27558a7d57d0215aa7cb5b4033270efb41bd",
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "PASS",
+        "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "oracle_verdicts": {
+        "human-serve-direction-oracle-v1": "NOT_EVALUATED",
+        "human-serve-wait-timer-freeze-oracle-v1": "NOT_EVALUATED",
+        "human-serve-window-close-oracle-v1": "NOT_EVALUATED"
+      }
+    }
+  ],
+  "verdict_summary": {
+    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+    "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+    "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+    "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-KICKOFF-FREEZE": "PASS",
+    "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+    "MATCH-RESTART-REARM": "NOT_EVALUATED",
+    "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+    "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+    "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+    "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+    "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+    "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-THROW-IN-SERVE": "PASS",
+    "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+    "MATCH-TIMER-DECREMENT": "PASS",
+    "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+    "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+    "MATCH-TIMER-FREEZE": "PASS",
+    "human-serve-direction-oracle-v1": "PASS",
+    "human-serve-wait-timer-freeze-oracle-v1": "PASS",
+    "human-serve-window-close-oracle-v1": "PASS"
+  },
+  "claims_not_made": [
+    "No PES 2017 fidelity / measured PES envelope claim; the wait window (90 ticks) is a versioned provisional design value.",
+    "No invented reference envelope or tolerance; MATCH-GOAL-KICK-DISTRIBUTION / MATCH-CORNER-KICK-CROSS stay BLOCKED_MISSING_REFERENCE.",
+    "No PROMOTION claim. No FOUNDATION_LAB_PASS claim.",
+    "No suite-level PASS claim: the rules-suite per-test verdicts are a per-criterion collection, not a suite PASS.",
+    "No claim that human modes' non-restart behavior changed: in-play human control, switch, tackle, keeper control and receiver steering are untouched (the gate only fires at a restart countdown zero with a human-controlled designated taker).",
+    "No DYNAMIC_VISUAL claim (no real browser frames captured; evidence class is MULTI_TICK).",
+    "No claim that the contact system was modified or that the human's pass is a contact-system serve — it is a dedicated serve-execution path consuming the pass direction."
+  ],
+  "record_sha256": "85fc082d30e9120c5c12f9d9e6950dbb332fee8960affdf8852f8feb5c4734ef"
+}

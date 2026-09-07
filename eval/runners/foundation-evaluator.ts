@@ -313,6 +313,20 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "foul-clean-tackle-oracle-v1",
     oracle_version: "oracle-foul-clean-tackle-v1",
   },
+  // HUMAN-BALL-SERVER-LITERAL human-serve criteria (the pass-gated serving path
+  // conformance). Additive; no existing entry is changed.
+  "HUMAN-SERVE-DIRECTION": {
+    oracle_id: "human-serve-direction-oracle-v1",
+    oracle_version: "oracle-human-serve-direction-v1",
+  },
+  "HUMAN-SERVE-WAIT-TIMER-FREEZE": {
+    oracle_id: "human-serve-wait-timer-freeze-oracle-v1",
+    oracle_version: "oracle-human-serve-wait-timer-freeze-v1",
+  },
+  "HUMAN-SERVE-WINDOW-CLOSE": {
+    oracle_id: "human-serve-window-close-oracle-v1",
+    oracle_version: "oracle-human-serve-window-close-v1",
+  },
 };
 
 // ---------------------------------------------------------------------------
