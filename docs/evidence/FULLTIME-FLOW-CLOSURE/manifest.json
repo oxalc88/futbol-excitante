@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "FULLTIME-FLOW-CLOSURE",
+  "accepted_at": "2026-09-07T13:34:21.600Z",
+  "candidate_commit": "3f42a5099ae45102440f49abb6e317785b96a2a3",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/FULLTIME-FLOW-CLOSURE/fulltime-affordance.png",
+        "sha256": "226e987f564b49d30b5ea91facdbc795ab79667e3b7479a9a57da7c160cf8f7b",
+        "git_blob": "0c1d804df32e821037cee6fa05eb62e586594508",
+        "candidate_commit": "3f42a5099ae45102440f49abb6e317785b96a2a3",
+        "bytes": 29220,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/FULLTIME-FLOW-CLOSURE/fulltime-terminal.png",
+        "sha256": "5fb989c045969ab30308441bd454908ea89bc5090f516396e897cd18b2fe4691",
+        "git_blob": "fcba13227e6c99916532fa0077e7fa49fb410361",
+        "candidate_commit": "3f42a5099ae45102440f49abb6e317785b96a2a3",
+        "bytes": 25098,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/FULLTIME-FLOW-CLOSURE/menu-return.png",
+        "sha256": "ba9d44731e4dc0cee05ec71da94363b3b53a509fc1dd1e32a8de98e2c1c2f2ce",
+        "git_blob": "3fbcc4c39646f958e0ef17803fd882dc25576c93",
+        "candidate_commit": "3f42a5099ae45102440f49abb6e317785b96a2a3",
+        "bytes": 54617,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/FULLTIME-FLOW-CLOSURE/new-match-start.png",
+        "sha256": "ae3ccf3b0888004d10e71467c0f24c53af9f16cdd78f7186a1e844658b316948",
+        "git_blob": "658e20d7fcec18ae702df75ed44a2e1e1f60da49",
+        "candidate_commit": "3f42a5099ae45102440f49abb6e317785b96a2a3",
+        "bytes": 28005,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "FULLTIME-FLOW-CLOSURE",
+        "evidence_class": "DYNAMIC_VISUAL",
+        "semantic_order": "fulltime terminal → affordance → menu return → new match",
+        "scenario": "5v5-full-match-timing-v1",
+        "scenario_path": "eval/scenarios/5v5-full-match-timing.v1.json",
+        "frames": [
+          {
+            "label": "fulltime-terminal",
+            "path": "fulltime-terminal.png",
+            "tick": 660,
+            "semantic": "before",
+            "note": "Terminal state as it existed before the flow: the core reaches 'fulltime' with the in-play timer at zero and no rematch/menu affordance is drawn.",
+            "pngSha256": "5fb989c045969ab30308441bd454908ea89bc5090f516396e897cd18b2fe4691"
+          },
+          {
+            "label": "fulltime-affordance",
+            "path": "fulltime-affordance.png",
+            "tick": 660,
+            "semantic": "event",
+            "note": "The added end-of-match affordance: the HUD now draws '[R] REMATCH  [M] MENU' at the fulltime terminal state, so the loop is no longer a dead end.",
+            "pngSha256": "226e987f564b49d30b5ea91facdbc795ab79667e3b7479a9a57da7c160cf8f7b"
+          },
+          {
+            "label": "menu-return",
+            "path": "menu-return.png",
+            "tick": 660,
+            "semantic": "transition",
+            "note": "The match-setup menu after the menu-return affordance, captured from the REAL shipped #setup-menu surface (the #setup-menu-card element: the PES SIMULATOR title, the full 9-option mode ladder, the Home/Away team inputs, the Difficulty row, the controls legend, and START MATCH) via the shipped #back-to-menu path.  The app lands in the clean setup menu, so the loop is closable to the menu.",
+            "pngSha256": "ba9d44731e4dc0cee05ec71da94363b3b53a509fc1dd1e32a8de98e2c1c2f2ce"
+          },
+          {
+            "label": "new-match-start",
+            "path": "new-match-start.png",
+            "tick": 0,
+            "semantic": "result",
+            "note": "A fresh match started through the composition-root match-start path after the rematch affordance: the loop is closed and a new match is underway.",
+            "pngSha256": "ae3ccf3b0888004d10e71467c0f24c53af9f16cdd78f7186a1e844658b316948"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/FULLTIME-FLOW-CLOSURE/sequence.json",
+        "sha256": "8506b8d0c904c298a465f9584d003b76d64fcd5d43a20f572ad926d87e1b1ea3",
+        "git_blob": "f9734984661a21aa024a65fbe5d3046db903d874",
+        "candidate_commit": "3f42a5099ae45102440f49abb6e317785b96a2a3",
+        "bytes": 2090,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/FULLTIME-FLOW-CLOSURE/trajectory.json",
+      "sha256": "b25f939959dc1330d2b030a683280116beb0f28e0407fbb72a7d1540b94c9f3a",
+      "git_blob": "872af7e6d0c8dbd651b16a534a0561db3f2e70c8",
+      "candidate_commit": "3f42a5099ae45102440f49abb6e317785b96a2a3",
+      "bytes": 3367,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/FULLTIME-FLOW-CLOSURE/audit.json",
+      "sha256": "9c40efd11adcb81e3d59fd463f1497442625de752c5415cbbbfc1ad983d45b49",
+      "git_blob": "52803fc7b64bdd7fa28707023ad925d5d1cee942",
+      "candidate_commit": "3f42a5099ae45102440f49abb6e317785b96a2a3",
+      "bytes": 2635,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T13-34-21-600Z-FULLTIME-FLOW-CLOSURE-acceptance.json"
+}
