@@ -9,7 +9,7 @@ horizon_id: "human-restart-control-and-playable-closure"
 created_from_commit: 31605de
 created_at: 2026-09-07
 reason: "Horizon v31 (COMPLETE 4/4, remote-durable at 31605de) completed the executable layer: the gated designation-facts serialization closed the 3 anti-huddle restart-behavior criteria (0d7d76d), the rules suite aggregate re-published at 23 PASS / 2 BLOCKED / 0 NOT_EVALUATED / 0 FAIL (030c2e0), the full-match lifecycle made visible in the real browser with an opt-in match-phase HUD (72f52b2), and two-run attestation made COMMON-DETERMINISTIC evaluate for both suites (f3a50ee). Six consecutive horizons have been conformance-heavy; v32 rebalances toward playable capability while keeping the executable discipline: (a) HUMAN-RESTART-CONTROL — the human currently cannot take their team's restarts (they auto-execute); human-directed restart execution via tick-indexed InputFrames at the restart window is a genuine playable gap building directly on the accepted restart machinery; (b) HUMAN-RESTART-RULES-CONFORMANCE — the human-taken restart must conform to the same rules through the executable suite (extend the designation facts with the human-taker designation behind the same gate); (c) EVAL-HYGIENE-CONSOLIDATION — the four reviewer non-binding cleanups (dead chasers variable, mirror-offset disclosure, _keeperPressExclusions counter hygiene, HUD resize re-anchoring) with guards; (d) FULLTIME-FLOW-CLOSURE — the post-fulltime app flow (rematch/menu return) completing the playable match loop. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 1
+current_index: 2
 objectives:
   - id: HUMAN-RESTART-CONTROL
     status: accepted
@@ -19,7 +19,9 @@ objectives:
     builder: builder-gameplay
     prerequisite: ""
   - id: HUMAN-RESTART-RULES-CONFORMANCE
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-07
+    candidate_commit: 2a6b92c
     reason: "Conformance of the human-taken restart: extend the gated serializeRestartFacts designation facts with the human-taker designation (same gate discipline: default false, post-loop, hash-neutral, chain-identity guards extended) and evaluate the restart criteria (placement/serve/timer-freeze/nearest-only as applicable) on human-taken streams through the rules suite — the human restart must conform to the same rules the CPU restart does. Honest NOT_EVALUATED where a fact is unanswerable; no suite-level PASS claim; blocked references stay blocked."
     builder: builder-structured
     prerequisite: HUMAN-RESTART-CONTROL

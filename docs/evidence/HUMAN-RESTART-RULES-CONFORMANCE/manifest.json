@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "HUMAN-RESTART-RULES-CONFORMANCE",
+  "accepted_at": "2026-09-07T08:50:14.454Z",
+  "candidate_commit": "2a6b92cde01a08654b21a87f066db3d5115d657d",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/HUMAN-RESTART-RULES-CONFORMANCE/trajectory.json",
+      "sha256": "b388104c4b6eaf8ea500d3cc0bb21d2925bbff0899d43b36252a7827736db229",
+      "git_blob": "cce53236a64b6e4dbd243fa0cdb5c9b25b86a76d",
+      "candidate_commit": "2a6b92cde01a08654b21a87f066db3d5115d657d",
+      "bytes": 28518,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/HUMAN-RESTART-RULES-CONFORMANCE/audit.json",
+      "sha256": "1ae70714a4071c48540feb8eebec7251105554c4ab4306d34f928ae993d992b1",
+      "git_blob": "7e8f9f438ce042ccef8a762467cdf63d9835d930",
+      "candidate_commit": "2a6b92cde01a08654b21a87f066db3d5115d657d",
+      "bytes": 2671,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T08-50-14-454Z-HUMAN-RESTART-RULES-CONFORMANCE-acceptance.json"
+}

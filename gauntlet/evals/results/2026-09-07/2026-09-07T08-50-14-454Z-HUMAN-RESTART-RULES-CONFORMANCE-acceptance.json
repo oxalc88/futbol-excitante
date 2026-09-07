@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-07T08:50:14.454Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "HUMAN-RESTART-RULES-CONFORMANCE",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "2a6b92cde01a08654b21a87f066db3d5115d657d",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v32 2/4: the human-taken restart conforms through the rules suite — the human restart satisfies the SAME rules the CPU restart does. OUTCOMES: on the human-taken NATURAL boundary stream (5v5-restart-throwin, genuine ball-out-of-play, team-b wins) all 7 applicable criteria PASS identically to the CPU restart (PLACEMENT, SERVE, THROW-IN-TIMER-FREEZE, AWARD, FREEZE-UNTIL-FIRST-TOUCH, NEAREST-ONLY; REARM honestly NOT_EVALUATED); on the human-taken driven window (no boundary event) SERVE/TIMER-FREEZE/FREEZE-UNTIL-FIRST-TOUCH PASS with PLACEMENT/AWARD/NEAREST-ONLY/REARM honestly NOT_EVALUATED; the CPU fallback yields the SAME criteria verdicts with DIFFERENT serve targets proving the human directed the destination (driven: human (20.495, 29.505) vs CPU (20, 30); natural: human (26.224, 27.883) vs CPU (22.106, 32)). The SERVE oracle semantics are UNTOUCHED (z=1.5 chest height, upward velocity, target ≠ exit point, unit direction — attests serve legality, not receiver choice). REALIZATION: receiver-steering destination control, NOT a pass-button ball-server (the human is not the literal server; the core's countdown-zero auto-serve would override a single human pass) — disclosed in the record's realization object. THE GATED EXTENSION (after the critic RETRY — the first candidate's freeze exemption leaked, firing on body-id match without requiring humanDirected=true; fixed per 4 required fixes): restart-designation payloads now carry (humanDirected, humanTeamId, humanControlledPlayerId, humanWindowTaken) ONLY on human-taken windows — humanWindowTaken is a WINDOW-SCOPED marker computed post-loop over maximal runs of consecutive ballUntouched ticks (a run marked taken iff humanDirectedByTick is true on at least one tick); the freeze oracle's exemption fires ONLY on humanWindowTaken===true && humanControlledPlayerId!==null && body-id match — a CPU-fallback stream carries ZERO human fields BY GATE (humanWindowTicks/humanControlledTicks/humanDirectedTicks all 0 on both CPU-fallback streams, guard-attested) so its freeze behavior is byte-identical to pre-change by gate, not fixture luck. The driven stream's FREEZE PASS is load-bearing on the exemption and now DOCUMENTED: the window never closes (ball untouched, ticks 0-24); the human directed ticks 0-18; the whole untouched window is marked taken for all 24 ticks; the post-window coast (ticks 21-23, drift 0.759-0.872 m vs the 0.75 tolerance) is legitimately exempt as the human-directed window's sanctioned steering momentum — the pre-change counterfactual FAILs exactly there, and the rationale is disclosed in the record + RESULT.md (explicitly NOT a per-tick humanDirected leak). Binding tests 10/10 incl. the FAIL-direction discriminating checks: a human-marked window with a NON-human-controlled body drifting FAILs; a CPU-fallback-marked stream with the human-slot body drifting FAILs (the byte-identity pin); an id-without-marker does NOT exempt (gate-needs-both). Zero src/simulation/ src/contracts/ src/ specs/ change (2 modified eval files + 3 new paths). The natural stream carries no human marker (conservative: the designation's untouched run is the post-serve flight while the human steers during the countdown where ballUntouched=false — the stream is treated fully pre-change, human body checked and held at 0.000; the natural stream's human-directedness is evidenced by the serve-target guard) — disclosed in marker_presence_detail. Evidence: trajectory.json 8 runs; record_sha256 44c0d928a8576860a6fd36acf87f785223ef5ec837503fcdc27a2356a66bf237 (no wall-clock field; reproduced byte-exact independently by critic AND integration; two consecutive ordinary-mode runs byte-identical; ordinary runs leave docs/ byte-identical); audit PASS MULTI_TICK. Tests: binding 10/10 + rules gate 156 + stateHash pins 69 + accepted prior streams' bindings (rules-facts-depth 8, restart-designation 8, rules-suite-state-rerun 9, corner-driven 7) verdict-unchanged + restart battery + human-restart-control integration 58 + foundation/provenance 71 + architecture 27; typecheck 0. Critic (glm5.3-flash, independent) RETRY→ACCEPT — the first review caught the exemption gate leak (proven synthetically AND live on all four produced streams, verdict-inert only by fixture luck) and verified the fix mechanically (zero leak rows; the old-leak pin; the driven rationale load-bearing and documented); integration (glm5.3-flash) ACCEPT first pass — 268/268 across 16 files, the strongest neighbor check: all 5 accepted gated streams re-run byte-identical through the post-change runner (state_hash_of_hashes + final_state_hash MATCH against the RESTART-DESIGNATION-FACTS and CORNER-DRIVEN pins), the exemption's four edge probes (marker-true/null-id drift FAIL, marker-false/body-id FAIL, other-body drift FAIL, same-body exempt PASS), and the leak hunt (driven markerRows=24=idRows=24, leakRows=0). claims_not_made: the realization is receiver-steering destination control, NOT a pass-button ball-server / no suite-level PASS claim / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity or invented constant / blocked references stay blocked / no criterion upgraded beyond the executed evaluator / no core or spec change."
+}
