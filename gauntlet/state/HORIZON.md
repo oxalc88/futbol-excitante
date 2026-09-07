@@ -9,7 +9,7 @@ horizon_id: "next-spec-phase-and-keeper-playability"
 created_from_commit: 156ecb9
 created_at: 2026-09-07
 reason: "Horizon v32 (COMPLETE 4/4, remote-durable at 156ecb9) closed the playable loop: human-directed restart destination control (5b15992) with the human-taken restart conforming through the rules suite (2a6b92c — the gate leak the critic caught hardened the freeze exemption behind the window-scoped marker), the four reviewer cleanups consolidated (fec4a35), and the fulltime dead end closed with the rematch/menu flow (3f42a50). The playable small-sided loop is complete: setup → play → all restarts (CPU + human-directed) → halftime → fulltime → rematch/menu. v33 opens the next phase on two fronts: (a) FOULS-SPEC-DRAFT — MATCH_RULES_SPEC §16 defers fouls/cards with no existence claim; the established spec→suite→conformance pipeline starts with the dedicated fouls spec draft (spec-only, zero implementation); (b) HUMAN-KEEPER-CONTROL — a real playable capability gap: the human cannot control the designated keeper in human-vs-CPU (the switch mechanism excludes it); extending the existing switch contract to the keeper slot lets the human play keeper; (c) HUMAN-BALL-SERVER-DECISION — the literal pass-button restart server is deferred behind a disclosed core change (countdown-zero auto-serve is core-owned); a deliberate decision record (implement-now plan vs defer with the core machinery analysis) instead of an open thread; (d) RELEASE-0.9.7-CONSOLIDATION — consolidate the v29-v32 playable+executable gains into the release record. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 1
+current_index: 2
 objectives:
   - id: FOULS-SPEC-DRAFT
     status: accepted
@@ -19,7 +19,9 @@ objectives:
     builder: builder-structured
     prerequisite: ""
   - id: HUMAN-KEEPER-CONTROL
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-07
+    candidate_commit: 3ef0edd
     reason: "Playable capability: the human can control the designated keeper in human-vs-CPU modes — the existing switch contract extended to include the keeper slot (the accepted designated-keeper arc/hold behavior becomes the human's to direct through the same movement/pass controls; the adapter's keeper designation stays the source of truth). CPU fallback unchanged when the human does not switch; stash identity when unused; DYNAMIC_VISUAL frames of the human-controlled keeper making a save vs the CPU-keeper control; zero core change."
     builder: builder-gameplay
     prerequisite: ""

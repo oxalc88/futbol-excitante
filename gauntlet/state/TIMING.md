@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-09-07T14:42:00Z
+measured_at: 2026-09-07T17:18:00Z
 tracking_contract_version: 1
-last_tracked_objective: FOULS-SPEC-DRAFT
-usage_aggregates_through: FOULS-SPEC-DRAFT
-clock_aggregates_through: FOULS-SPEC-DRAFT
-model_evaluation_through: FOULS-SPEC-DRAFT
+last_tracked_objective: HUMAN-KEEPER-CONTROL
+usage_aggregates_through: HUMAN-KEEPER-CONTROL
+clock_aggregates_through: HUMAN-KEEPER-CONTROL
+model_evaluation_through: HUMAN-KEEPER-CONTROL
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -42,17 +42,17 @@ style meter is the live context window, not session cost.
 
 | | Duration |
 |---|---:|
-| Calendar span (first work → measurement) | 586h 43m |
+| Calendar span (first work → measurement) | 589h 19m |
 | Unexplained stop (excluded) | 5h 16m |
-| Active work (anything running) | ~185h est. |
-| Sum of per-step agent time | ~182h 40m |
+| Active work (anything running) | ~187h est. |
+| Sum of per-step agent time | ~184h 53m |
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-07T14:42:00Z`.
-Recomputed 2026-09-07 at the FOULS-SPEC-DRAFT acceptance
-(Horizon v33 1/4): 202 accepted per-step rows summing to ~182h 40m (the new
-objective adds ~52m: builder ~30m / critic ~15m / integration 6m /
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-09-07T17:18:00Z`.
+Recomputed 2026-09-07 at the HUMAN-KEEPER-CONTROL acceptance
+(Horizon v33 2/4): 203 accepted per-step rows summing to ~184h 53m (the new
+objective adds ~2h 13m: builder ~48m / critic ~36m / integration 48m /
 commit <1m). Calendar span recomputed from session start to this measurement. Long
 session gaps are NOT itemized as orchestrator thinking; they are intersession
 idle. Step times remain estimates from subagent wall-clock, not provider
@@ -285,6 +285,7 @@ invoices.
 | EVAL-HYGIENE-CONSOLIDATION | accepted | ~2h 05m | ~37m | 24m | 63m | <1m | n/a | n/a |
 | FULLTIME-FLOW-CLOSURE | accepted | ~2h 00m | ~65m | 32m | 22m | <1m | n/a | n/a |
 | FOULS-SPEC-DRAFT | accepted | ~52m | ~30m | 15m | 6m | <1m | n/a | n/a |
+| HUMAN-KEEPER-CONTROL | accepted | ~2h 13m | ~48m | 36m | 48m | <1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -625,6 +626,7 @@ on an H task is the interesting result.
 | EVAL-HYGIENE-CONSOLIDATION | deepseek-v4-flash | M | Medium - the four reviewer non-binding cleanups consolidated with guards (BOOKKEEPING; zero verdict changes proven directly): the dead chasers Set removed (rules gate 173/173 + the 271b1526… pin replay prove verdict-inertness), the mirror-offset comment tightened (comment-truth verified against the step/snapshot ordering), the _keeperPressExclusions counter interaction documented (documentation-only), the HUD ortho camera resize re-anchoring (a container ResizeObserver; presentation-only/draw-only; leak-free lifecycle; browser guard 3/3); the render byte-identity proven by the keeper-marker baseline SHA staying exact | 0 | A | first-pass ACCEPT; critic independently reproduced every claim (comment-truth verified against code, the counter path verified, the observer lifecycle read in full); integration re-executed every battery independently (rules-oracle chunked to cover all 75 tests — full single-invocation runs exceed the 300s command cap on the 2-CPU host, a harness quirk disclosed) |
 | FULLTIME-FLOW-CLOSURE | deepseek-v4-flash (reroute) | M | Medium-High - the fulltime dead end closed (DYNAMIC_VISUAL): the investigation found the real-time loop kept simulating PAST fulltime (reproduced from HEAD — sim.step() fired every frame, no rematch affordance); the fix (presentation layer only) freezes the loop at the core-owned fulltime phase and offers an opt-in [R] REMATCH / [M] MENU affordance (the M/R dispatcher gated so in-play controls are never intercepted); onRematch/onBackToMenu go through the composition-root paths (ladder parity green — the panel is a runtime overlay); the critic RETRY caught the first menu-return frame as a rebuilt lookalike — replaced with a genuine capture of the REAL shipped setup menu via a dev-server Playwright script | 1 | A | RETRY→ACCEPT; critic reproduced the dead-end claim from HEAD, verified the freeze scoping + control isolation, and confirmed the real-menu fix (the Difficulty row + full ladder cross-checked against DEFAULT_KEYBOARD_CONFIG); integration re-ran all human-mode suites (in-play keys unaffected) + the composition-root wiring + a 990-file docs/ SHA sweep |
 | FOULS-SPEC-DRAFT | deepseek-v4-flash | M | Medium - the dedicated fouls/cards spec drafted (spec-only, zero implementation; the RULES-SPEC-DRAFT pattern): the foul definition grounded in the accepted duel/tackle machinery (active-window tackle contact with duelWon false = man-not-ball; fields verified against tackle-system.ts exactly; 10 real man-not-ball events in the accepted duels evidence), advantage/cards named-not-implemented, the free-kick consequence deferred forward-referencing the accepted restart machinery, fouls-v1 provisional (prose-declared, disclosed), five criteria named-but-unregistered (binding-asserted via real registry lookups, grep-confirmed), offside/penalties regulation-only, 7 BLOCKED_MISSING_REFERENCE; binding 42/42 with live constant pins (source drift necessarily fails) | 0 | A | first-pass ACCEPT; critic read all 228 spec lines (every behavior sentence grounded or explicitly deferred) and verified the grounding at source level (10 real events found); integration re-ran 376/376 + 27/27 + 8/8 + 118/118 + typecheck 0 |
+| HUMAN-KEEPER-CONTROL | deepseek-v4-flash (reroute) | M-H | Medium-High - the human can control the designated keeper in human-vs-CPU 5v5 (DYNAMIC_VISUAL): the investigation found the switch contract never excluded the keeper (Tab-reachable pre-change) — the real gap was that the keeper role (gkBehavior) was OFF for human-vs-CPU modes; the fix enables the role there (IS_KEEPER_ROLE_LIVE; CPU-vs-CPU unchanged; non-5v5 byte-identical to the pre-role path) and computeKeeperFrame yields the arc-hold positioning to the human's directional input (in-arc reposition cap) while save/claim + distribution stay on the shared rules (absent field → byte-identical CPU keeper); the designation UNCHANGED; 4 byte-distinct frames incl. a human-directed save 1.0787 m vs CPU 1.1079 m; the standard-wiring nuance honestly disclosed (the designated keeper IS the human's default slot there — verified by computation) | 0 | A | first-pass ACCEPT; critic verified the investigation from source + the yield-gate (absent field → the exact original arc-hold code) + the standard-wiring claim by computation (the designated keeper IS player-1, the human's default slot); integration's independent CPU-vs-CPU probe: all four accepted keeper chains BYTE-IDENTICAL through the post-change adapter; the shipped app does not import the new module |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -939,6 +941,7 @@ on an H task is the interesting result.
 | FULLTIME-FLOW-CLOSURE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | all re-run independently: candidate suite 7/7 ×3 + ladder-menu-parity 9/9 + hud-ortho-resize 3/3 + keeper-marker 4/4 (baseline SHA pinned in-suite, exact) + full-match-flow 3/3 + render-sensitive 24/24 + human-mode suites 23/23 + 26/26 + 2/2 + 17/17 + 13/13 (in-play keys unaffected — none collide with M/R) + node gates 8/8 + typecheck 0; the freeze sits after the terminal frame's render before the next rAF (scoped exactly to fulltime; accepted pins/hashes unchanged); fulltime-flow.ts zero imports, consumed only by main.ts + its test; both paths through the composition root (the wiring guard asserted against the real main.ts; the new-match-start frame shows a fresh kickoff); the capture-hygiene writer-gate change a single added line (enforcement, not weakening); the menu-return frame visually confirmed the real shipped surface (Difficulty row + 10-row controls legend + 9-option ladder); record hash recomputed byte-exact; a 990-file docs/ SHA sweep byte-identical across its reproduction cycles |
 | FOULS-SPEC-DRAFT | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: no-implementation-leak verified (all 228 spec lines read; every behavior sentence either grounded in verified machinery or explicitly named/deferred future semantics); engine-grounding truth verified at source level (the foul definition's fields match tackle-system.ts:505 exactly — duelWon = ballReachable; contactType/tacklePhase/ballReachable/duelWon/planarDistance/reach/committedDirection/active-window ticks all confirmed; 10 real man-not-ball slide-tackle events found in the accepted duels-suite evidence; the clean complement's 65 duelWon:true events confirmed; PHY-SHLD-001-CONT confirmed); constant-pinning integrity verified (42/42 with live pins + 10 unpinned values hand-verified); fouls-v1 disclosure honest (no contracts file, VERSIONED_PROVISIONAL, §9.1 forbids PES framing); all 10 cross-references verified; record hash reproduced byte-exact over two ordinary runs; ~683 targeted tests re-run + typecheck 0 |
 | FOULS-SPEC-DRAFT | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | zero implementation confirmed (git diff over tracked files EMPTY); binding 42/42 with real registry lookups (loadRegistrySet); neighbor batteries 376/376 (13 files) + architecture 27/27 + hygiene/scope 8/8 + determinism/replay 118/118; typecheck clean; record SHA recomputed MATCH (the regex probe's only hit was a "candidate_commit" false positive); candidate_commit = HEAD 6739646; two consecutive ordinary runs byte-identical with docs/ checksum-identical; silent-consumer hunt: no file outside the 4 new paths references the spec/producer/binding and no doc-lint/spec-check pipeline exists for the spec to break; source spot-check: spec §4-§5 matches tackle-system.ts exactly and all §9.2 quoted values (18) match foundation.ts |
+| HUMAN-KEEPER-CONTROL | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | the independent CPU-vs-CPU byte-identity probe: live tree vs accepted pre-candidate chains — gkBehavior ON shot fixture 6b7fa24c… and continuous 660c075a…, gkBehavior OFF 6091de51…/6817faad… — all four BYTE-IDENTICAL; silent-consumer hunt: human-keeper-control.ts imported only by the unit test + capture script (main.ts does NOT import it — the shipped app uses the gate only through IS_KEEPER_ROLE_LIVE); non-5v5 modes evaluate IS_KEEPER_ROLE_LIVE ≡ IS_AI_MATCH_5V5 (byte-identical path); GK batteries 127/127 + human-mode suites all green (in-play control untouched) + switch suites + menu parity + full-match-flow + CPU-vs-CPU render neighbors all pass; node gates (typecheck, gauntlet:eval 39 scenarios, sim-smoke) PASS; determinism: two consecutive ordinary-mode runner runs byte-identical in both modes (0d8dfac9…/89a8cf5d…); record hash recomputed MATCH; the standard-wiring nuance confirmed by the integration's own reading (the core's findSlotForPlayer resolves the first owning slot — the human's frame drives the shared keeper body) |
 | GK-SUITE-VERDICTS-STATE | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; record_sha256 reproduced byte-exact in its own ephemeral producer re-run; per-run verdict table matches raw telemetry (continuous 0 releases/0 save chains -> SAVE-CLAIM/DISTRIBUTION honestly NOT_EVALUATED; fixture releases @408/433 -> PASS); all 5 provenance pins verified against the cited manifests; driven-vs-organic labeling accurate; 140/140 neighbors + typecheck 0 |
 | GK-SUITE-VERDICTS-STATE | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | first pass clean; 151/151 neighbor tests re-run; typecheck 0; record hash recomputed byte-exact + ordinary-mode producer re-run left docs/evidence byte-identical; all 5 cited manifests read verbatim; zero evaluator/gameplay change |
 

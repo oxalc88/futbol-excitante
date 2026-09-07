@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "HUMAN-KEEPER-CONTROL",
+  "accepted_at": "2026-09-07T17:17:35.865Z",
+  "candidate_commit": "3ef0edd667f232065eb12e892c351482448e60c4",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/HUMAN-KEEPER-CONTROL/cpu-keeper-control.png",
+        "sha256": "1ef3988f31cd57033927f137b8e6c1be7445eb0d021d94cda3750ab2f9f0e4b8",
+        "git_blob": "69e6cabde541cd48c8610c0421593b4e333235b5",
+        "candidate_commit": "3ef0edd667f232065eb12e892c351482448e60c4",
+        "bytes": 21008,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-KEEPER-CONTROL/human-keepers-directed.png",
+        "sha256": "0e5db5fa782f4f6ab8f70b52250bd14e2636afef38dff2013f185fd36333fcba",
+        "git_blob": "b4158dc9961db219033715fe2044db2a58cf65a7",
+        "candidate_commit": "3ef0edd667f232065eb12e892c351482448e60c4",
+        "bytes": 20222,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-KEEPER-CONTROL/save-contact.png",
+        "sha256": "d42d199f498c38b03e4d1df0d749dbb8903fb1df33dcd0dfea372c763132a39c",
+        "git_blob": "7d85a6f0968ac39f646a5dc2796de4ced1ebcb37",
+        "candidate_commit": "3ef0edd667f232065eb12e892c351482448e60c4",
+        "bytes": 20978,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/HUMAN-KEEPER-CONTROL/shot-on-target.png",
+        "sha256": "e0f030a2be9f30359d9f44a4a4b6d44b6aabbee7b85b9712fa849e92b38feb65",
+        "git_blob": "91b542314f33ea45dca75b8a749d5e3351d8f393",
+        "candidate_commit": "3ef0edd667f232065eb12e892c351482448e60c4",
+        "bytes": 20294,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "HUMAN-KEEPER-CONTROL",
+        "evidence_class": "DYNAMIC_VISUAL",
+        "semantic_order": "human directs the keeper -> shot on target -> human-directed keeper save contact -> CPU-keeper control",
+        "durable_capture": true,
+        "scenario": {
+          "id": "5v5-human-keeper-shot-fixture-v1",
+          "path": "eval/scenarios/5v5-human-keeper-shot-fixture.v1.json",
+          "browser_mode": "human-vs-cpu-5v5-fixture"
+        },
+        "arc": {
+          "keeper_team_id": "team-b",
+          "keeper_player_id": "player-10",
+          "shot_tick": 343,
+          "save_tick": 364,
+          "save_contact_distance_metres": 1.0787,
+          "within_reach": true,
+          "ticks_from_shot_to_contact": 21,
+          "projected_cross_y": -2.8378403124387632
+        },
+        "reproduction": {
+          "capture_test": "tests/browser/human-keeper-control.browser.test.ts",
+          "wiring": "browser composition root per-slot CPU wiring with CpuObservation.cpuAntiHuddle + cpuDefensiveTackle + gkBehavior; the keeper slot carries the human's directional movement (CpuObservation.humanDirectedKeeperMove) in the human-directed run",
+          "scenario_path": "eval/scenarios/5v5-human-keeper-shot-fixture.v1.json",
+          "play_ticks": 600
+        },
+        "cross_runtime_note": "The keeper designation (team-a -> player-4, team-b -> player-10) and the shot -> keep contact chain structure match the pinned Node artifacts; per-tick floats are not compared across runtimes.",
+        "frames": [
+          {
+            "index": 1,
+            "label": "human-keepers-directed",
+            "tick": 331,
+            "semantic": "before",
+            "description": "Human directs the keeper: the designated keeper (player-10) holds its goal arc under the human's directional input — the CPU arc-hold yields to the human's movement",
+            "path": "human-keepers-directed.png",
+            "sha256": "0e5db5fa782f4f6ab8f70b52250bd14e2636afef38dff2013f185fd36333fcba"
+          },
+          {
+            "index": 2,
+            "label": "shot-on-target",
+            "tick": 343,
+            "semantic": "event",
+            "description": "Shot on target: the shooting body strikes the ball toward the keeper's goal (projected cross at y=-2.84)",
+            "path": "shot-on-target.png",
+            "sha256": "e0f030a2be9f30359d9f44a4a4b6d44b6aabbee7b85b9712fa849e92b38feb65"
+          },
+          {
+            "index": 3,
+            "label": "save-contact",
+            "tick": 364,
+            "semantic": "result",
+            "description": "Save contact: the human-directed keeper answers the shot 21 ticks later, 1.0787 m off it (within save_claim_reach_radius); the ball stays independent",
+            "path": "save-contact.png",
+            "sha256": "d42d199f498c38b03e4d1df0d749dbb8903fb1df33dcd0dfea372c763132a39c"
+          },
+          {
+            "index": 4,
+            "label": "cpu-keeper-control",
+            "tick": 364,
+            "semantic": "comparison",
+            "description": "CPU-keeper control: the identical keeper-shot fixture with no human directional input — the keeper holds its arc and auto-saves the same shot",
+            "path": "cpu-keeper-control.png",
+            "sha256": "1ef3988f31cd57033927f137b8e6c1be7445eb0d021d94cda3750ab2f9f0e4b8"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/HUMAN-KEEPER-CONTROL/sequence.json",
+        "sha256": "73ae9392ba28ddf2d938ab750fe08df6e003e0101ecafc8b19ea206b37ec5a8c",
+        "git_blob": "569217b81402a4f585fa7b6f54c61e6dda78723f",
+        "candidate_commit": "3ef0edd667f232065eb12e892c351482448e60c4",
+        "bytes": 3018,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/HUMAN-KEEPER-CONTROL/trajectory.json",
+      "sha256": "b90ed00f1b0af0bb74c0de19b0582ab1dfc1910ebc17056eda239ea84d69cfa6",
+      "git_blob": "5b489d6e9738b2c4d611f5092930bef103c4e5bc",
+      "candidate_commit": "3ef0edd667f232065eb12e892c351482448e60c4",
+      "bytes": 203666,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/HUMAN-KEEPER-CONTROL/audit.json",
+      "sha256": "df96368a8324a26f34abe8ed0ef6588684ee8bd9b442c3c0c36b12da60f6b7c0",
+      "git_blob": "66028c76430801accb21324891673c53663f2265",
+      "candidate_commit": "3ef0edd667f232065eb12e892c351482448e60c4",
+      "bytes": 2634,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T17-17-35-865Z-HUMAN-KEEPER-CONTROL-acceptance.json"
+}
