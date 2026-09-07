@@ -19,6 +19,7 @@ import { createSimulation } from "../../simulation/loop/simulation.js";
 import {
   createPresentationSession,
   enrichPresentationWithKeeperRoles,
+  DEFAULT_RENDERER_CONFIG,
 } from "../../adapters/renderer-three/renderer.js";
 import {
   createKeyboardAdapter,
@@ -574,7 +575,14 @@ function startMatch(
   // 5. Create presentation session (Three.js renderer).
   const container = document.getElementById("game-container");
   if (!container) throw new Error("Game container element not found");
-  const session = createPresentationSession(container);
+  // BROWSER-FULL-MATCH-FLOW-EVIDENCE: the app draws the core-owned
+  // matchPhase + matchTimer as a screen-space HUD label so the halftime
+  // break countdown and the fulltime terminal state are distinguishable in
+  // the UI.  Draw-only; the renderer consumes immutable snapshots.
+  const session = createPresentationSession(container, {
+    ...DEFAULT_RENDERER_CONFIG,
+    showMatchPhaseHud: true,
+  });
 
   // KEEPER-VISUAL-MARKER: with the keeper role live (5v5 CPU-vs-CPU only) the
   // presentation snapshot carries `keeperRole` on each team's designated keeper

@@ -77,6 +77,13 @@ export interface RendererConfig {
   markerColor: number;
   /** Designated-keeper kit marker color (presentation-only role legibility). */
   keeperMarkerColor: number;
+  /**
+   * Draw the core-owned match-phase + match-timer as a screen-space HUD label
+   * (BROWSER-FULL-MATCH-FLOW-EVIDENCE).  Reads `matchPhase` + `matchTimer` from
+   * the immutable `PresentationSnapshot` only.  Default false, so every render
+   * that does not opt in is byte-identical to the pre-HUD baseline.
+   */
+  showMatchPhaseHud?: boolean;
 }
 
 /**
@@ -102,6 +109,7 @@ export const DEFAULT_RENDERER_CONFIG: RendererConfig = {
   ballColor: 0xffffff,
   markerColor: 0xffcc00,
   keeperMarkerColor: 0xff33ff,
+  showMatchPhaseHud: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -638,6 +646,25 @@ function createBallShadow(config: RendererConfig): THREE.Mesh {
 }
 
 // ---------------------------------------------------------------------------
+// Match-phase HUD (BROWSER-FULL-MATCH-FLOW-EVIDENCE, opt-in)
+// ---------------------------------------------------------------------------
+
+/** Human-readable label for a core-owned match phase. */
+function formatPhaseLabel(matchPhase: string): string {
+  switch (matchPhase) {
+    case "playing": return "PLAYING";
+    case "halftime": return "HALF TIME";
+    case "fulltime": return "FULL TIME";
+    case "goal": return "GOAL";
+    case "kickoff": return "KICKOFF";
+    case "corner-kick": return "CORNER KICK";
+    case "throw-in": return "THROW IN";
+    case "goal-kick": return "GOAL KICK";
+    default: return matchPhase.toUpperCase();
+  }
+}
+
+// ---------------------------------------------------------------------------
 // PresentationSession implementation
 // ---------------------------------------------------------------------------
 
@@ -664,6 +691,13 @@ export function createPresentationSession(
   const keeperMarkerMeshes = new Map<string, THREE.Mesh>();
   let ballMesh: THREE.Mesh | null = null;
   let ballShadowMesh: THREE.Mesh | null = null;
+
+  // --- Match-phase HUD (opt-in, BROWSER-FULL-MATCH-FLOW-EVIDENCE) ---
+  let hudScene: THREE.Scene | null = null;
+  let hudCamera: THREE.OrthographicCamera | null = null;
+  let hudCanvas: HTMLCanvasElement | null = null;
+  let hudTexture: THREE.CanvasTexture | null = null;
+  let hudContext: CanvasRenderingContext2D | null = null;
 
   // --- Interpolation state ---
   const interpState: InterpolationState = {
@@ -736,6 +770,34 @@ export function createPresentationSession(
     markerMesh = createControlledMarker(config);
     markerMesh.visible = false;
     scene.add(markerMesh);
+
+    // Match-phase HUD overlay (opt-in) — a screen-space sprite over the pitch.
+    if (config.showMatchPhaseHud) {
+      const width = Math.max(1, container.clientWidth);
+      const height = Math.max(1, container.clientHeight);
+      hudScene = new THREE.Scene();
+      hudCamera = new THREE.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, 0.1, 1000);
+      hudCamera.position.set(0, 0, 100);
+      hudCanvas = document.createElement("canvas");
+      hudCanvas.width = 512;
+      hudCanvas.height = 128;
+      hudContext = hudCanvas.getContext("2d");
+      hudTexture = new THREE.CanvasTexture(hudCanvas);
+      hudTexture.minFilter = THREE.LinearFilter;
+      const material = new THREE.SpriteMaterial({
+        map: hudTexture,
+        depthTest: false,
+        depthWrite: false,
+        transparent: true,
+      });
+      const hudSprite = new THREE.Sprite(material);
+      // 512x128 box anchored to the top-left corner of the viewport (with a
+      // small margin), in the conventional ortho screen space (0,0 = centre).
+      const margin = 12;
+      hudSprite.scale.set(512, 128, 1);
+      hudSprite.position.set(-width / 2 + margin + 256, height / 2 - margin - 64, 0);
+      hudScene.add(hudSprite);
+    }
 
     sceneVersion++;
   }
@@ -887,6 +949,45 @@ export function createPresentationSession(
       const shadowOpacity = Math.max(0.1, 0.4 - ballHeight * 0.05);
       (ballShadowMesh.material as THREE.MeshBasicMaterial).opacity = shadowOpacity;
     }
+
+    // --- Match-phase HUD (opt-in): draw the core-owned phase + timer ---
+    if (config.showMatchPhaseHud && hudContext && hudTexture) {
+      drawMatchPhaseHud(hudContext, hudTexture, snapshot);
+    }
+  }
+
+  /**
+   * Draw the core-owned match-phase + match-timer onto the HUD canvas texture.
+   * Reads only immutable snapshot fields; never mutates simulation state.
+   */
+  function drawMatchPhaseHud(
+    ctx: CanvasRenderingContext2D,
+    texture: THREE.CanvasTexture,
+    snapshot: PresentationSnapshot,
+  ): void {
+    const width = hudCanvas?.width ?? 512;
+    const height = hudCanvas?.height ?? 128;
+
+    ctx.clearRect(0, 0, width, height);
+
+    // Semi-transparent background box.
+    ctx.fillStyle = "rgba(0, 0, 0, 0.72)";
+    ctx.fillRect(0, 0, width, height);
+
+    // Phase label.
+    const phase = formatPhaseLabel(snapshot.matchPhase);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 44px monospace";
+    ctx.textBaseline = "top";
+    ctx.fillText(phase, 18, 14);
+
+    // Timer (core-owned remaining ticks in the current half / countdown).
+    const timer = String(snapshot.matchTimer);
+    ctx.fillStyle = "#ffd700";
+    ctx.font = "bold 36px monospace";
+    ctx.fillText(`TIME ${timer}`, 18, 74);
+
+    texture.needsUpdate = true;
   }
 
   /**
@@ -909,6 +1010,11 @@ export function createPresentationSession(
       ballMesh = null;
       ballShadowMesh = null;
       pitchGroup = null;
+      hudScene = null;
+      hudCamera = null;
+      hudCanvas = null;
+      hudTexture = null;
+      hudContext = null;
 
       // Reset interpolation.
       interpState.previous = null;
@@ -936,7 +1042,16 @@ export function createPresentationSession(
     },
 
     render(): void {
-      renderer.render(scene, camera);
+      if (config.showMatchPhaseHud && hudScene && hudCamera) {
+        // Render the pitch first, then the screen-space HUD without clearing it.
+        renderer.autoClear = false;
+        renderer.clear();
+        renderer.render(scene, camera);
+        renderer.render(hudScene, hudCamera);
+        renderer.autoClear = true;
+      } else {
+        renderer.render(scene, camera);
+      }
     },
 
     getRenderer(): THREE.WebGLRenderer {

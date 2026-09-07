@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "objective_id": "BROWSER-FULL-MATCH-FLOW-EVIDENCE",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-browser-full-match-flow-evidence.ts",
+  "driver": "eval/runners/headless-match.ts with lifecyclePhaseSync:'core-owned' + browserParityObservations:true (the accepted full-match timing stream) and the browser composition root's CPU wiring for the frame anchors.",
+  "scenario": "5v5-full-match-timing-v1",
+  "scenario_path": "eval/scenarios/5v5-full-match-timing.v1.json",
+  "play_ticks": 800,
+  "frame_anchors": [
+    {
+      "label": "kickoff",
+      "path": "kickoff.png",
+      "tick": 0,
+      "matchPhase": "playing",
+      "matchTimer": 240,
+      "sha256": "fnv1a64-v1:f7d453722fceaa79"
+    },
+    {
+      "label": "first-half-late",
+      "path": "first-half-late.png",
+      "tick": 299,
+      "matchPhase": "playing",
+      "matchTimer": 1,
+      "sha256": "fnv1a64-v1:e9bd8132f4805974"
+    },
+    {
+      "label": "halftime-break",
+      "path": "halftime-break.png",
+      "tick": 330,
+      "matchPhase": "halftime",
+      "matchTimer": 30,
+      "sha256": "fnv1a64-v1:83214a0e74268d88"
+    },
+    {
+      "label": "second-half-kickoff",
+      "path": "second-half-kickoff.png",
+      "tick": 380,
+      "matchPhase": "playing",
+      "matchTimer": 220,
+      "sha256": "fnv1a64-v1:6eb605bc4e563fba"
+    },
+    {
+      "label": "fulltime",
+      "path": "fulltime.png",
+      "tick": 660,
+      "matchPhase": "fulltime",
+      "matchTimer": 0,
+      "sha256": "fnv1a64-v1:dd11685c9249b003"
+    }
+  ],
+  "lifecycle_transitions": [
+    {
+      "tick": 0,
+      "phase": "kickoff"
+    },
+    {
+      "tick": 1,
+      "phase": "playing"
+    },
+    {
+      "tick": 43,
+      "phase": "throw-in"
+    },
+    {
+      "tick": 103,
+      "phase": "playing"
+    },
+    {
+      "tick": 301,
+      "phase": "halftime"
+    },
+    {
+      "tick": 361,
+      "phase": "playing"
+    },
+    {
+      "tick": 387,
+      "phase": "throw-in"
+    },
+    {
+      "tick": 447,
+      "phase": "playing"
+    },
+    {
+      "tick": 661,
+      "phase": "fulltime"
+    }
+  ],
+  "disclosures": [
+    "The short-duration scenario (240-tick halves) is a DRIVEN fixture so the full lifecycle completes inside the browser test budget; it is not an organic 90-minute match.",
+    "The browser composition root and the headless runner differ (CPU observation shape + the runner's opening kickoff seed), so their committed per-tick hashes are not byte-identical across runtimes.  The verified correspondence here is the lifecycle phase sequence and the timer-driven halftime/fulltime zero-crossings.",
+    "Restart windows (a throw-in at tick 43-102 and tick 387-446 in the headless stream) freeze the in-play timer, so the nominal 240-tick half duration runs longer in wall ticks; the transition ticks are located from the run's own phase stream, never hand-transcribed."
+  ]
+}

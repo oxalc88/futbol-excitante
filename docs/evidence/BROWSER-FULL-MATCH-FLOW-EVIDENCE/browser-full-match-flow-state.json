@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "objective_id": "BROWSER-FULL-MATCH-FLOW-EVIDENCE",
+  "suite_id": "full-match-lifecycle",
+  "produced_by": "scripts/capture-browser-full-match-flow-evidence.ts",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "lifecycle_phase_sync": "core-owned",
+  "scenario": "5v5-full-match-timing-v1",
+  "scenario_path": "eval/scenarios/5v5-full-match-timing.v1.json",
+  "play_ticks": 800,
+  "half_duration_ticks": 240,
+  "frames": [
+    {
+      "label": "kickoff",
+      "path": "kickoff.png",
+      "tick": 0,
+      "matchPhase": "playing",
+      "matchTimer": 240,
+      "hash": "fnv1a64-v1:f7d453722fceaa79",
+      "note": "Opening kickoff: the core is in the 'playing' phase with the in-play timer at the half duration"
+    },
+    {
+      "label": "first-half-late",
+      "path": "first-half-late.png",
+      "tick": 299,
+      "matchPhase": "playing",
+      "matchTimer": 1,
+      "hash": "fnv1a64-v1:e9bd8132f4805974",
+      "note": "First half winding down: the in-play timer is near zero (the last playing tick before the core transitions to halftime)"
+    },
+    {
+      "label": "halftime-break",
+      "path": "halftime-break.png",
+      "tick": 330,
+      "matchPhase": "halftime",
+      "matchTimer": 30,
+      "hash": "fnv1a64-v1:83214a0e74268d88",
+      "note": "Halftime break: the core-owned 'halftime' phase with the §9.4 countdown ticking down in the HUD"
+    },
+    {
+      "label": "second-half-kickoff",
+      "path": "second-half-kickoff.png",
+      "tick": 380,
+      "matchPhase": "playing",
+      "matchTimer": 220,
+      "hash": "fnv1a64-v1:6eb605bc4e563fba",
+      "note": "Second half resumed: the timer-driven reset opened a fresh 'playing' phase and the timer reset to the half duration; the frame is a few ticks in so the resumed half is visibly underway"
+    },
+    {
+      "label": "fulltime",
+      "path": "fulltime.png",
+      "tick": 660,
+      "matchPhase": "fulltime",
+      "matchTimer": 0,
+      "hash": "fnv1a64-v1:dd11685c9249b003",
+      "note": "Full time: the terminal 'fulltime' phase after the timer's literal 1→0 zero-crossing in half 2"
+    }
+  ],
+  "semantics": {
+    "order": "kickoff → first-half late → halftime break → second-half kickoff → fulltime",
+    "note": "event-centered on the core-owned full-match lifecycle: the opening kickoff, the first half winding down, the halftime break countdown, the second half resuming, and the terminal fulltime state.  The HUD label (showMatchPhaseHud) renders the immutable snapshot's matchPhase + matchTimer, so the countdown and fulltime are visually distinguishable."
+  },
+  "correspondence": {
+    "browser_phase_sequence": [
+      "playing",
+      "throw-in",
+      "playing",
+      "halftime",
+      "playing",
+      "throw-in",
+      "playing",
+      "fulltime"
+    ],
+    "headless_phase_sequence": [
+      "playing",
+      "throw-in",
+      "playing",
+      "halftime",
+      "playing",
+      "throw-in",
+      "playing",
+      "fulltime"
+    ],
+    "phase_sequence_matches": true,
+    "note": "Both the browser composition root and the accepted headless timing stream traverse the same lifecycle phase order (playing → … → halftime → … → fulltime).  The headless runner additionally seeds a 'kickoff' tick at tick 0 that does not decrement the in-play timer, so the browser's halftime/fulltime zero-crossing ticks are one earlier than the headless's (browser halftime at tick 300, fulltime at tick 660; headless at 301 / 661 in this run).  This 1-tick offset is disclosed, not hidden.  Per-tick committed hashes are NOT compared across runtimes."
+  },
+  "headless_timing_stream": {
+    "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-full-match-timing.v1.json\"), maxTicks: 800, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: true, serializeRestartFacts: true })",
+    "transitions": [
+      {
+        "tick": 0,
+        "phase": "kickoff"
+      },
+      {
+        "tick": 1,
+        "phase": "playing"
+      },
+      {
+        "tick": 43,
+        "phase": "throw-in"
+      },
+      {
+        "tick": 103,
+        "phase": "playing"
+      },
+      {
+        "tick": 301,
+        "phase": "halftime"
+      },
+      {
+        "tick": 361,
+        "phase": "playing"
+      },
+      {
+        "tick": 387,
+        "phase": "throw-in"
+      },
+      {
+        "tick": 447,
+        "phase": "playing"
+      },
+      {
+        "tick": 661,
+        "phase": "fulltime"
+      }
+    ],
+    "final_phase": "fulltime",
+    "disclosure": "This headless reproduction uses browserParityObservations:true to match the browser composition root's CPU observation shape (the correspondence the frames verify).  The ACCEPTED RULES-FACTS-DEPTH-CONFORMANCE timing stream used the runner's default observation shape, whose first-half throw-in window differs (tick 70-130 vs 43-103 here); both runs land the SAME timer-driven zero-crossing ticks — halftime at 301, fulltime at 661 — so the accepted halftime/fulltime lifecycle is reproduced."
+  },
+  "claims_not_made": [
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No suite-level PASS claim; no football outcome changed by the presentation surface.",
+    "No claim that this is an organic 90-minute match: the short-duration scenario is a DRIVEN fixture (240-tick halves) expressly chosen so the full lifecycle completes inside the browser test budget.  That is disclosed, not masked.",
+    "No per-tick browser/headless state-hash identity claim: the browser composition root and the headless runner differ in their CPU observation shape and the runner's opening kickoff seed, so the committed per-tick hashes are not byte-identical across runtimes (the known pinned-runtime gap).  The correspondence verified here is the lifecycle phase sequence + the timer-driven zero-crossings.",
+    "No invented reference envelope or tolerance.",
+    "No src/simulation/ change rendering the outcome: only the opt-in renderer HUD label (showMatchPhaseHud) was added."
+  ],
+  "record_sha256": "d02a8fa6de7b2daaa5d9360b27cbb8b36e8c0c5920a25cf14b4a00192cf403ba"
+}
