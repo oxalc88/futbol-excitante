@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-07T01:46:06.113Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "BROWSER-FULL-MATCH-FLOW-EVIDENCE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+  "builder": {
+    "builder": "builder-gameplay",
+    "model": "deepseek-v4-flash (reroute — qwen3.8-flash quota-exhausted until 2026-10-01)"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v31 3/4: the full-match lifecycle is now VISIBLE in the real browser app — the horizon's observable browser-facing capability (evidence class DYNAMIC_VISUAL, audited at the strictest named class per the CORNER-DRIVEN lesson). BEFORE: the app's DOM scoreboard showed a tick-derived MM:SS clock + a '1ST'/'2ND' indicator (both derived from sim.tick) with a transient HALF TIME / FULL TIME overlay fading after ~1 s — the halftime-break countdown and the fulltime terminal state were NOT distinguishable (during the break the indicator already read '2ND' and the clock kept counting; at fulltime the same). AFTER: a minimal OPT-IN renderer screen-space label (`RendererConfig.showMatchPhaseHud`, default FALSE — in DEFAULT_RENDERER_CONFIG; only main.ts:584 opts in) renders the immutable snapshot's pre-existing matchPhase/matchTimer fields (src/contracts/presentation.ts:31-33, read-only) top-left; formatPhaseLabel maps exactly the 8 core-owned MatchPhase values with an uppercase fallback, no invented constants; draw-only (own canvas/texture created once per session; the off-branch is the byte-equal original single renderer.render call). CAPTURED FRAMES (5 event-centered Chromium frames, all path-bound in sequence.json written by the test source — never hand-patched): kickoff (tick 0, PLAYING/240) → first-half-late (299, PLAYING/1) → halftime-break (330, HALF TIME/30) → second-half-kickoff (380, PLAYING/220) → fulltime (660, FULL TIME/0), distinct SHAs. CORRESPONDENCE (honestly disclosed, no over-claim): phase_sequence_matches=true re-derived live from actual runs (browser and headless traverse the same lifecycle order with timer-driven zero-crossings); a 1-tick offset disclosed and TRACED (eval/runners/headless-match.ts:792-810 seeds a non-decrementing kickoff tick 0 — headless halftime 301/fulltime 661 vs browser 300/660); NO per-tick browser/headless hash-identity claim anywhere (explicit negative disclosures; the known pinned-runtime gap disclosed). The 240-tick-half scenario (accepted 5v5-full-match-timing.v1) is fixture-driven and disclosed — no organic 90-minute claim. Zero simulation change (git diff src/simulation/ src/contracts/ EMPTY). Evidence: record_sha256 d02a8fa6de7b2daaa5d9360b27cbb8b36e8c0c5920a25cf14b4a00192cf403ba (no wall-clock field in hashed content; reproduced byte-exact independently by critic AND integration; two consecutive ordinary-mode runs byte-identical; ordinary runs leave docs/ byte-identical — the WIP_SECTION gate verified over the 956-file docs tree); audit PASS at --class DYNAMIC_VISUAL (semantic visual sequence PASS, screenshot SHA uniqueness PASS). Tests: browser test 3/3 + keeper-visual-marker 4/4 with the PRE_CHANGE_BASELINE_SHA 05e40d0117…68bc EXACT (byte-neutral when not opted in) + render-sensitive neighbors 24/24 + byte-identity guards (archetype-render-difference 6/6, archetype-identical-recapture 1/1) + menu/parity 27/27 + human modes 22/22 + THE ENTIRE BROWSER PROJECT re-run by the integration reviewer: 48 files, 256 tests, 0 failures + node render-referencing guards 21/21 (incl. BUILD-VITE-RESOLVE-001 building the real app) + pnpm run build PASS; typecheck 0. Critic (glm5.3-flash, independent) ACCEPT first pass — renderer-neutrality verified (strictly additive, gated, read-only snapshot fields, human control untouched), all 5 PNGs visually inspected legible/event-centered/distinct, the 1-tick offset traced to the runner source; integration (glm5.3-flash) ACCEPT first pass — every render-sensitive and browser suite re-run green, the sole createPresentationSession call sites enumerated (test-bridge pass-through HUD-off; main.ts the only opt-in), presentation_authority PASS. Non-blocking observation recorded: the HUD ortho camera anchors to container dimensions at session creation with no resize re-anchoring (presentation-only, same class as the fixed main camera; no outcome or guard impact). claims_not_made: no PES fidelity / no FOUNDATION_LAB_PASS / no suite-level PASS / no organic 90-minute claim (fixture-driven, disclosed) / no per-tick browser-headless hash-identity claim (disclosed negative) / no football-outcome change (draw-only; simulation and contracts byte-identical) / no invented constants (formatPhaseLabel maps the core-owned MatchPhase values)."
+}

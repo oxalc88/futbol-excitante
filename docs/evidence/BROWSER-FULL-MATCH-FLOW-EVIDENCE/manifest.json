@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.6",
+  "objective_id": "BROWSER-FULL-MATCH-FLOW-EVIDENCE",
+  "accepted_at": "2026-09-07T01:46:06.113Z",
+  "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/BROWSER-FULL-MATCH-FLOW-EVIDENCE/first-half-late.png",
+        "sha256": "ff6284b68eac28a3c7259167d35796fce574c8bde1b5fded7077fffc33ad047f",
+        "git_blob": "115759931c5f8dc185ab2a6200b4b84c86459caf",
+        "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+        "bytes": 25420,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/BROWSER-FULL-MATCH-FLOW-EVIDENCE/fulltime.png",
+        "sha256": "5e5f846f6f831e1e4637d1d7d7f739d57f34dfb4a38e395c2b3cac6fedb36639",
+        "git_blob": "c479e9f7d2c886656f17d0c8cf25fdd40cd3455c",
+        "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+        "bytes": 24183,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/BROWSER-FULL-MATCH-FLOW-EVIDENCE/halftime-break.png",
+        "sha256": "3cc39937a5876207e6c596ce8a56bf82d752abbfc2867639b3956f8eea451141",
+        "git_blob": "237f0a35492d2621999ebef67190dff624e8055b",
+        "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+        "bytes": 25306,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/BROWSER-FULL-MATCH-FLOW-EVIDENCE/kickoff.png",
+        "sha256": "db9a4f3f3a3a1eebda2643669d2c41ada34fd7cf646eb7a0759b1db98975e393",
+        "git_blob": "c5e3c1f3adbe7ad539a75950b4cb8985aa5240f3",
+        "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+        "bytes": 27217,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/BROWSER-FULL-MATCH-FLOW-EVIDENCE/second-half-kickoff.png",
+        "sha256": "60241ebf2aa3bbf5421879f2ed043a96642a2bf4b965e7ba726cc97931b4bf17",
+        "git_blob": "19242894099c3d78f0b0145dace2ee7a85fdfba9",
+        "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+        "bytes": 27330,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "BROWSER-FULL-MATCH-FLOW-EVIDENCE",
+        "evidence_class": "DYNAMIC_VISUAL",
+        "semantic_order": "kickoff → first-half late → halftime break → second-half kickoff → fulltime",
+        "scenario": "5v5-full-match-timing-v1",
+        "scenario_path": "eval/scenarios/5v5-full-match-timing.v1.json",
+        "frames": [
+          {
+            "label": "kickoff",
+            "path": "kickoff.png",
+            "tick": 0,
+            "matchPhase": "playing",
+            "matchTimer": 240,
+            "hash": "fnv1a64-v1:f7d453722fceaa79",
+            "note": "Opening kickoff: the core is in the 'playing' phase with the in-play timer at the half duration"
+          },
+          {
+            "label": "first-half-late",
+            "path": "first-half-late.png",
+            "tick": 299,
+            "matchPhase": "playing",
+            "matchTimer": 1,
+            "hash": "fnv1a64-v1:e9bd8132f4805974",
+            "note": "First half winding down: the in-play timer is near zero (the last playing tick before the core transitions to halftime)"
+          },
+          {
+            "label": "halftime-break",
+            "path": "halftime-break.png",
+            "tick": 330,
+            "matchPhase": "halftime",
+            "matchTimer": 30,
+            "hash": "fnv1a64-v1:83214a0e74268d88",
+            "note": "Halftime break: the core-owned 'halftime' phase with the §9.4 countdown ticking down in the HUD"
+          },
+          {
+            "label": "second-half-kickoff",
+            "path": "second-half-kickoff.png",
+            "tick": 380,
+            "matchPhase": "playing",
+            "matchTimer": 220,
+            "hash": "fnv1a64-v1:6eb605bc4e563fba",
+            "note": "Second half resumed: the timer-driven reset opened a fresh 'playing' phase and the timer reset to the half duration; the frame is a few ticks in so the resumed half is visibly underway"
+          },
+          {
+            "label": "fulltime",
+            "path": "fulltime.png",
+            "tick": 660,
+            "matchPhase": "fulltime",
+            "matchTimer": 0,
+            "hash": "fnv1a64-v1:dd11685c9249b003",
+            "note": "Full time: the terminal 'fulltime' phase after the timer's literal 1→0 zero-crossing in half 2"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/BROWSER-FULL-MATCH-FLOW-EVIDENCE/sequence.json",
+        "sha256": "157e810595dd3facd534d86d2b442f40192c0e27011c0ba0dd33da4cd471c227",
+        "git_blob": "a3f3302f8a37a525504a6cb7543051d4f3c7a209",
+        "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+        "bytes": 2018,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/BROWSER-FULL-MATCH-FLOW-EVIDENCE/trajectory.json",
+      "sha256": "16170a3971f0c63b0cdb69ffb9853d15e6e6ec68bea14a19a68cb544642b9a56",
+      "git_blob": "98400a21a51594d8aad81f974a596c26c6e13da7",
+      "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+      "bytes": 2939,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/BROWSER-FULL-MATCH-FLOW-EVIDENCE/audit.json",
+      "sha256": "7a808759805d8f62406630ff074b493fa3e57021dfebe3052002b820b0830efa",
+      "git_blob": "a7f2f9bf5f8be7ebac3bb96dac7b8536461294bf",
+      "candidate_commit": "72f52b21b83ce5b7ed638643fc4d3ab3b42189af",
+      "bytes": 2646,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T01-46-06-113Z-BROWSER-FULL-MATCH-FLOW-EVIDENCE-acceptance.json"
+}
