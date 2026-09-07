@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.7",
+  "persisted_at": "2026-09-07T23:53:41.834Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "GK-DRIVEN-CLOSURE",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "32b540e7809fe02842a86a24dd2d039c5111f905",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v34 4/4: the 2 per-stream goalkeepers gaps the horizon targeted closed with driven streams (evidence class BOOKKEEPING — the accurate class per gauntlet/evidence-classes.md: a deterministic suite-state re-run/publication over existing + new MULTI_TICK streams with zero source change; the trajectory-level attestation is embedded in the record as per-stream state-hash chains + two-run byte identities + chain/release facts; the audit's required-trajectory check is NOT_APPLICABLE for the class). ZERO SOURCE CHANGE: git diff src/ src/contracts/ EMPTY and no evaluator/oracle/catalog/contract/adapter/runner/spec change (verified by builder, critic, AND integration); only 4 additive paths (a driven fixture, the capture producer, a 9-test binding suite, the evidence dir). THE TWO DRIVEN STREAMS: (a) gk-save-driven reuses the accepted 5v5-keeper-shot-fixture.v1.json (600 ticks, core-owned, gkBehavior, browserParity) — 4 real save/claim chains within the versioned save_claim_reach_radius 1.2 m: shot@361→contact@362 (1.081 m), @370→@374 (0.737 m), @376→@380 (0.551 m), @382→@386 (0.473 m); gaps 1–4 ticks ≤ the 12-tick reaction window; GK-SAVE-CLAIM PASS on the stream. (b) gk-release-driven uses the NEW 5v5-keeper-release-fixture.v1.json (300 ticks; fixture purity verified: empty inputProgram/scheduledEvents, adapter initial state only, all slots AI_FALLBACK, no scripted teleports) — 12 keeper-release events (ticks 1,4,7,10,13,42,56,58,61,64,67,70), every target the observed forward teammate player-9 (no omniscience; the release is emitted by the adapter's own distribution path KeeperReleaseRecord); GK-DISTRIBUTION-NO-OMNISCIENCE PASS on the stream. Both streams two-run byte-identical. HONEST BASELINE-CONFLATION DISCLOSURE (the critic read both records verbatim and adjudicated the handling honest): the horizon text labeled the 9/0/2/1/1 table as the GK-SUITE-CORE-OWNED-STATE baseline, but 9/0/2/1/1 is the post-two-run goalkeepers table in SUITE-DETERMINISTIC-TWO-RUN (abaf6ccd…) in which GK-SAVE-CLAIM and GK-DISTRIBUTION-NO-OMNISCIENCE are ALREADY PASS; the true GK-SUITE-CORE-OWNED-STATE record (5cd1c808…) is 8/0/3/1/1 single-run; the 2 aggregate NOT_EVALUATED rows are GK-*-REG and GK-*-CAUSAL (must not be converted per AGENTS.md). So the horizon's parentheticals (\"organic runs had 0 save chains\", \"the fixture run had 0 releases\") name exactly the two per-stream observations this objective answered with controlled driven streams; the aggregate verdict_counts are honestly UNCHANGED at 9 PASS / 0 FAIL / 2 NOT_EVALUATED (reg+causal) / 1 BLOCKED_MISSING_REFERENCE (GK-*-REF) / 1 NEEDS_PERCEPTUAL_REVIEW (GK-*-VIS); delta_vs_baseline_count_change.changed = false; no oracle widened, no criterion upgraded beyond the executed evaluator, blocked + perceptual keys carried verbatim. ORCHESTRATOR BOOKKEEPING REPAIR (this horizon): the horizon text's baseline conflation corrected in place per the v31 precedent — the disclosure lives in the durable record (baseline.note + disclosure #4) and in HISTORY iter 195. Tests: typecheck 0; binding 9/9 (incl. the not-hand-written live reproduction running both streams through runHeadlessMatch + evaluateSuite); GK/stateHash/rules battery 196/196 (15 files, ~173 s); evaluator/hygiene battery 153/153 (8 files); critic spot battery 42/42; integration GK battery 131 + rules/registry/hygiene 179; typecheck 0; gauntlet:eval 39+33 (the new eval/scenarios fixture is consumed-by-path only — the gauntlet gate reads gauntlet/evals/scenarios/ and stays 39; explicitly resolved by the integration reviewer); eval:state 13/13. record_sha256 21a596277aac626f3612e225ced4145310e1a81631bd28552f9188d223b33d7a (no wall-clock field; reproduced byte-exact independently by critic AND integration; docs/ byte-identical on ordinary runs; durable writes under WIP_SECTION=__EVIDENCE__:GK-DRIVEN-CLOSURE). Audit PASS BOOKKEEPING. claims_not_made: no suite-level PASS (reg/causal NOT_EVALUATED + BLOCKED + NEEDS_PERCEPTUAL_REVIEW remain) / no reference-target invention (GK-*-REF stays blocked; GK-*-VIS stays perceptual) / no gameplay or evaluator change / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity / no accepted-record mutation / no aggregate-count inflation."
+}

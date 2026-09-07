@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "GK-DRIVEN-CLOSURE",
+  "accepted_at": "2026-09-07T23:53:41.834Z",
+  "candidate_commit": "32b540e7809fe02842a86a24dd2d039c5111f905",
+  "evidence_class": "BOOKKEEPING",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/GK-DRIVEN-CLOSURE/audit.json",
+      "sha256": "58e945591d31ed5841559d697b362eaafad6f5b7a69c9da6a13af8cc33f632bb",
+      "git_blob": "a03b20bd0a9954efe1ae248e2ba1dd02a3f9eb0f",
+      "candidate_commit": "32b540e7809fe02842a86a24dd2d039c5111f905",
+      "bytes": 2688,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T23-53-41-834Z-GK-DRIVEN-CLOSURE-acceptance.json"
+}
