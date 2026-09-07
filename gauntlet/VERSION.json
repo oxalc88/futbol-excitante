@@ -1,10 +1,10 @@
 {
-  "version": "0.9.6",
+  "version": "0.9.7",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.9.5",
+  "previous_system_version": "0.9.6",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
-  "baseline_commit": "a13439ca235805a97a9c7955213058005fb9bbdc",
+  "baseline_commit": "f661b38b068f884f5ed5a079d76babe3cc70b8eb",
   "includes": [
     "prompts",
     "agents",
