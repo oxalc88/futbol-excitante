@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.7",
+  "persisted_at": "2026-09-07T23:17:10.146Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "HUMAN-BALL-SERVER-LITERAL",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "9a04158b3633436781658ec6f64b7f60642ed651",
+  "builder": {
+    "builder": "builder-gameplay",
+    "model": "deepseek-v4-flash (reroute — qwen3.8-flash quota-exhausted until 2026-10-01)"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v34 3/4: the scheduled-ready outline from HUMAN-BALL-SERVER-DECISION (record 5b6e391a…) executed — the pass-gated serving path (evidence class MULTI_TICK; the horizon's DELIBERATE core change). THE CHANGE: src/simulation/loop/simulation.ts — the three countdown-zero restart branches (corner-kick/throw-in/goal-kick) gate on a closure-held humanServeWaitTicks + isTakerHumanControlled (state.controlAssignments HUMAN-mode scan); when the designated taker is human-controlled the restart phase stays open (matchTimer frozen — decrement only under playing) and a findHumanPassFrame scan consumes the tick's PASS_BIT; applyThrowInFromInput/applyGoalKickFromInput/applyCornerKickFromInput serve along the human's input direction (taker bodyHeading fallback); on window expiry or a CPU taker the exact pre-change CPU auto-serve statements execute. HUMAN_SERVE_WAIT_WINDOW_TICKS=90 (1.5 s @60 FPS) declared match-rules-v1 VERSIONED_PROVISIONAL in the core with a doc comment (a design companion to the spec's countdown values, not a PES constant). src/contracts/scenario.ts +1 event kind restart-serve-wait (additive; emitted only on human-serve streams — grep-verified absent from every other evidence stream). Eval/observability: eval/oracles/human-serve.ts (3 protected oracles: human-serve-direction-v1, human-serve-wait-timer-freeze-v1, human-serve-window-close-v1) + wire.ts + CRITERION_TO_ORACLE (additive); headless-match.ts humanRestartControl.humanPassAtTick (PASS edge through tick-indexed InputFrame via sim.applyInputs) + restart-serve-wait injection into serializeRestartFacts (default-off, hash-neutral); scenario 5v5-human-serve-throwin.v1.json; 3 new test files. CRITICAL GATE-SEMANTICS VERIFICATION (the critic): the gate activates unconditionally whenever the taker is a HUMAN-mode controlled body — the intended deliberate product behavior per the outline, not a hidden switch; and NO accepted human-mode stream is altered (verified per family: HUMAN-RESTART-CONTROL/RULES-CONFORMANCE human controls player-3 while the designated taker player-1 is CPU-driven → gate off; HUMAN-KEEPER-CONTROL and SMALL-SIDED-5V5-HUMAN-VS-CPU trajectories contain zero restart events; kickoff branches untouched). CPU FALLBACK BYTE-IDENTITY: the critic reproduced HEAD-vs-branch identity on the accepted stream shape (hash-of-hashes ea956e7c…); the builder's createSimulation scratch reproduces eb308194… identically on HEAD and branch. HUMAN-SERVED TWO-RUN ATTESTATION: a3370fb4c5e9b7fe264dce1c2dd6789e30e824e0e760f42d01697125d5198607 byte-identical across two runs (fixed input program); distinct from both CPU hashes (gate not a no-op; binding-asserted). CONFORMANCE ON THE HUMAN-SERVED STREAM: MATCH-THROW-IN-SERVE, MATCH-THROW-IN-TIMER-FREEZE, MATCH-TIMER-FREEZE, MATCH-TIMER-DECREMENT, MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH, MATCH-KICKOFF-FREEZE PASS; honest NOT_EVALUATED for MATCH-KICKOFF-FIRST-TOUCH/RESTART-NEAREST-ONLY/THROW-IN-AWARD/PLACEMENT (driven window — window-close semantics covered by the new oracle); BLOCKED_MISSING_REFERENCE unchanged (GOAL-KICK-DISTRIBUTION, CORNER-KICK-CROSS). Tests: typecheck 0; new 3+7+1; registry-affected bindings 101/101; restart battery 158/158; architecture 27/27; core subsystems 490/490; rules-gate bindings 140/140; fouls bindings 54/54; integration reviewer ran ~1000+ tests across pins/two-run/replay/canaries/rules/GK/restart/human/browser-parity batteries with NO accepted pin moved (one 6-fail batch under triple-concurrent vitest load re-ran standalone 115/115 — harness contention, disclosed); gauntlet:eval 39+33; eval:state 13/13. record_sha256 85fc082d30e9120c5c12f9d9e6950dbb332fee8960affdf8852f8feb5c4734ef (no wall-clock field; reproduced byte-exact independently by critic AND integration; docs/ byte-identical on ordinary runs; durable writes under WIP_SECTION=__EVIDENCE__:HUMAN-BALL-SERVER-LITERAL). Audit PASS MULTI_TICK. Disclosures: the contact system records an annotation-only pass event on the serve tick (the taker is within passRadius of the placed ball; the authoritative serve is the match-phase serve with committed ball velocity exactly dir×12 — no double impulse, no contact-system change); vitest batches split under the wrapper timeout; the 90-tick window is a literal in simulation.ts (provenance disclosed; a candidate for the eventual match-rules-v1 config surface); the new oracles have no dedicated mutant/canary guards (not required by the outline; the binding suite covers PASS/NOT_EVALUATED asymmetry + gate-not-a-no-op); the capture script is run via tsx directly (not yet a package.json script); a wait-phase gravity drift z 1.5→1.42 on the out-of-play ball is deterministic and cosmetic. claims_not_made: no PES fidelity or measured envelope (the window is a versioned provisional design value) / no invented reference envelope (BLOCKED refs stay blocked) / no suite-level PASS (per-criterion verdicts only) / no DYNAMIC_VISUAL claim (no browser frames; MULTI_TICK) / no claim that in-play human control, switch, tackle, keeper control, or receiver steering changed / no contact-system modification."
+}

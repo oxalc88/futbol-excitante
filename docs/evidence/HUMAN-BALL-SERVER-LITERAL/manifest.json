@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "HUMAN-BALL-SERVER-LITERAL",
+  "accepted_at": "2026-09-07T23:17:10.146Z",
+  "candidate_commit": "9a04158b3633436781658ec6f64b7f60642ed651",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/HUMAN-BALL-SERVER-LITERAL/trajectory.json",
+      "sha256": "213d3ba424c547af8aca18ee6c30418abe934b34c45a6af07b682e19aadcd329",
+      "git_blob": "c2f55f29fc5c26e91f03fa057905cb6e15109f2b",
+      "candidate_commit": "9a04158b3633436781658ec6f64b7f60642ed651",
+      "bytes": 19845,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/HUMAN-BALL-SERVER-LITERAL/audit.json",
+      "sha256": "282bd9f4e3a1802c5df76ac21b52009f75a5cbea397d3de5987216cfe33ca12d",
+      "git_blob": "0b031d461b4a96b895a4bc8d26ca9685a225a981",
+      "candidate_commit": "9a04158b3633436781658ec6f64b7f60642ed651",
+      "bytes": 2665,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-07/2026-09-07T23-17-10-146Z-HUMAN-BALL-SERVER-LITERAL-acceptance.json"
+}

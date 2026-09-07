@@ -9,7 +9,7 @@ horizon_id: "fouls-executable-and-scheduled-outlines"
 created_from_commit: a762673
 created_at: 2026-09-07
 reason: "Horizon v33 (COMPLETE 4/4, remote-durable at a762673) opened the next phase: the fouls/cards spec drafted grounded in the accepted duel/tackle machinery (b7f56e0 — a foul is man-not-ball tackle contact with duelWon false; the critic verified 10 real such events in the accepted duels evidence), the human can control the designated keeper in human-vs-CPU (3ef0edd — the keeper role was simply off for that mode; the switch contract never excluded it), and the ball-server DEFER decision recorded with the actionable HUMAN-BALL-SERVER-LITERAL outline (b55fa74). RELEASE-0.9.7 consolidated the v29-v33 gains (9a7cb7f; the needle advance 2ca140c and the persist-acceptance sanitizer fix for dotted objective IDs routed to the orchestrator). v34 executes the scheduled outlines: (a) FOUL-DETECTION-MACHINERY — the spec's §5 foul definition implemented as observation-level detection (the runner emits foul events from the accepted tackle machinery's man-not-ball contacts; zero gameplay change); (b) FOULS-SUITE-REGISTRATION — the named-but-unregistered criteria (FOUL-DETECT, FOUL-CLEAN-TACKLE) become executable protected oracles per FOULS_CARDS_SPEC §10 (the RULES-SUITE-REGISTRATION pattern); (c) HUMAN-BALL-SERVER-LITERAL — the scheduled-ready outline executed: the pass-gated serving path (a deliberate core change with its named conformance path); (d) GK-DRIVEN-CLOSURE — driven streams to close the 2 NOT_EVALUATED goalkeepers criteria. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 2
+current_index: 3
 objectives:
   - id: FOUL-DETECTION-MACHINERY
     status: accepted
@@ -22,7 +22,7 @@ objectives:
     builder: builder-structured
     prerequisite: FOUL-DETECTION-MACHINERY
   - id: HUMAN-BALL-SERVER-LITERAL
-    status: pending
+    status: accepted
     reason: "Execute the scheduled-ready outline from HUMAN-BALL-SERVER-DECISION (5b6e391a): the pass-gated serving path — at countdown zero, if the designated taker is human-controlled, the restart phase stays open and waits for the human's PASS_BIT InputFrame within a bounded window; on the pass, the serve direction derives from input and executes; else the CPU auto-serve fires. A DELIBERATE core change (the countdown-zero branches; the pass-gated wait phase) with the named conformance path: new oracles (human-chosen serve direction, wait-phase timer freeze, window-close/first-touch semantics), re-evaluation of SERVE/TIMER-FREEZE/FIRST-TOUCH on human-served streams, CPU fallback byte-identity, its own two-run attestation. Human modes' non-restart behavior untouched."
     builder: builder-gameplay
     prerequisite: ""
