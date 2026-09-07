@@ -1014,6 +1014,20 @@ interface RestartDesignation {
   rearmed: boolean;
   teams: Record<string, string | null>;
   anchors: Record<string, { x: number; y: number }> | null;
+  /**
+   * HUMAN-RESTART-RULES-CONFORMANCE: when a human genuinely took a restart
+   * window, the designation carries the window-scoped `humanWindowTaken` marker
+   * (true only on windows where the human's directional input was actually
+   * applied on at least one tick), the per-tick `humanDirected` gate, and the
+   * human's controlled player id. The human-controlled body is driven by the
+   * human's InputFrame, so it is not adapter-frozen; the anti-huddle freeze rule
+   * exempts it ONLY when the window was genuinely taken (see
+   * checkRestartFreezeUntilFirstTouch). A CPU-fallback stream carries none of
+   * these fields, so no exemption ever fires there.
+   */
+  humanWindowTaken?: boolean;
+  humanDirected?: boolean;
+  humanControlledPlayerId?: string | null;
 }
 
 /** Collect every `restart-designation` fact in tick order. */
@@ -1034,6 +1048,10 @@ function collectRestartDesignations(
         rearmed: p.rearmed === true,
         teams: p.teams ?? {},
         anchors: p.anchors ?? null,
+        humanWindowTaken: p.humanWindowTaken === true,
+        humanDirected: typeof p.humanDirected === "boolean" ? p.humanDirected : undefined,
+        humanControlledPlayerId:
+          typeof p.humanControlledPlayerId === "string" ? p.humanControlledPlayerId : null,
       });
     }
   }
@@ -1173,6 +1191,16 @@ export function checkRestartFreezeUntilFirstTouch(
       if (!o) continue;
       for (const p of o.players) {
         if (p.playerId === d.takerId) continue;
+        // HUMAN-RESTART-RULES-CONFORMANCE: the human-controlled body is driven by
+        // the human's InputFrame during a window the human GENUINELY took (the
+        // receiver-steering realization), so it is not adapter-frozen — the
+        // anti-huddle freeze rule exempts it ONLY on such a window, and ONLY for
+        // that body. The `humanWindowTaken` marker is emitted solely on windows
+        // where the human's directional input was applied, so a CPU-fallback
+        // stream (no applied input) carries NO exemption-activating field and its
+        // freeze behavior is byte-identical to pre-change by gate, not by fixture
+        // luck. Every other non-taker body must still hold its anchor.
+        if (d.humanWindowTaken === true && d.humanControlledPlayerId !== null && p.playerId === d.humanControlledPlayerId) continue;
         const distToBall = Math.hypot(
           p.groundPosition.x - o.ball.position.x,
           p.groundPosition.y - o.ball.position.y,

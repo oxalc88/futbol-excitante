@@ -1,0 +1,636 @@
+{
+  "schema_version": 1,
+  "objective_id": "HUMAN-RESTART-RULES-CONFORMANCE",
+  "suite_id": "rules",
+  "suite_version": "suite-rules-v1",
+  "produced_by": "scripts/capture-human-restart-rules-conformance.ts",
+  "evidence_class": "MULTI_TICK",
+  "lifecycle_phase_sync": "core-owned",
+  "realization": {
+    "is": "receiver-steering destination control (movement-direction channel)",
+    "not_a": "a pass-button ball-server — the human is not the literal server; the core's countdown-zero auto-serve would override a single human pass"
+  },
+  "discriminating_guards": {
+    "human_input_changes_serve_target_driven": true,
+    "human_input_changes_serve_target_natural": true,
+    "human_marker_present_on_human_taken": true,
+    "human_marker_absent_on_cpu_fallback": true,
+    "marker_presence_detail": {
+      "driven_human_window_ticks": 24,
+      "driven_human_controlled_ticks": 24,
+      "natural_human_window_ticks": 0,
+      "natural_human_controlled_ticks": 0
+    },
+    "driven_freeze_gate": {
+      "human_window_ticks": 24,
+      "human_controlled_ticks": 24,
+      "human_directed_ticks": 19,
+      "cpu_human_window_ticks": 0,
+      "cpu_human_controlled_ticks": 0,
+      "cpu_human_directed_ticks": 0
+    }
+  },
+  "runs": [
+    {
+      "id": "human-throwin-driven",
+      "scenario": "5v5-human-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-restart-throwin.v1.json",
+      "ticks": 24,
+      "gated_serialization": true,
+      "browser_parity": false,
+      "human_move_direction": {
+        "x": 1,
+        "y": -1
+      },
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-human-restart-throwin.v1.json\"), maxTicks: 24, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: false, serializeRestartFacts: true, humanRestartControl: { humanTeamId: \"team-a\", humanControlledPlayerId: \"player-3\", humanControlSlot: \"slot-1\", humanMoveDirection: {\"x\":1,\"y\":-1}, window: {\"kind\":\"throw-in\",\"team\":\"team-a\",\"takerPlayerId\":\"player-1\",\"position\":{\"x\":30,\"y\":34},\"countdown\":20,\"touchlineIndex\":0}, })",
+      "observation_count": 24,
+      "human_directed_ticks": 19,
+      "human_window_ticks": 24,
+      "human_controlled_ticks": 24,
+      "serve_target": {
+        "x": 20.494974746830586,
+        "y": 29.505025253169414
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "PASS",
+        "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "b9c2fb64af52b897904fb774d128bd94823147fd3ae7ae0cdb27b9cc34a80fa1",
+        "final_state_hash": "fnv1a64-v1:b98f34243cbbbb63"
+      }
+    },
+    {
+      "id": "human-throwin-driven-stashed",
+      "scenario": "5v5-human-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-restart-throwin.v1.json",
+      "ticks": 24,
+      "gated_serialization": false,
+      "browser_parity": false,
+      "human_move_direction": {
+        "x": 1,
+        "y": -1
+      },
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-human-restart-throwin.v1.json\"), maxTicks: 24, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: false, serializeRestartFacts: false, humanRestartControl: { humanTeamId: \"team-a\", humanControlledPlayerId: \"player-3\", humanControlSlot: \"slot-1\", humanMoveDirection: {\"x\":1,\"y\":-1}, window: {\"kind\":\"throw-in\",\"team\":\"team-a\",\"takerPlayerId\":\"player-1\",\"position\":{\"x\":30,\"y\":34},\"countdown\":20,\"touchlineIndex\":0}, })",
+      "observation_count": 24,
+      "human_directed_ticks": 0,
+      "human_window_ticks": 0,
+      "human_controlled_ticks": 0,
+      "serve_target": null,
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "b9c2fb64af52b897904fb774d128bd94823147fd3ae7ae0cdb27b9cc34a80fa1",
+        "final_state_hash": "fnv1a64-v1:b98f34243cbbbb63"
+      },
+      "stash_identity": {
+        "injected_facts_total": 0,
+        "gated_on_state_hash_of_hashes": "b9c2fb64af52b897904fb774d128bd94823147fd3ae7ae0cdb27b9cc34a80fa1",
+        "state_hash_chain_identical": true
+      }
+    },
+    {
+      "id": "human-throwin-driven-cpu",
+      "scenario": "5v5-human-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-restart-throwin.v1.json",
+      "ticks": 24,
+      "gated_serialization": true,
+      "browser_parity": false,
+      "human_move_direction": null,
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-human-restart-throwin.v1.json\"), maxTicks: 24, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: false, serializeRestartFacts: true, humanRestartControl: { humanTeamId: \"team-a\", humanControlledPlayerId: \"player-3\", humanControlSlot: \"slot-1\", window: {\"kind\":\"throw-in\",\"team\":\"team-a\",\"takerPlayerId\":\"player-1\",\"position\":{\"x\":30,\"y\":34},\"countdown\":20,\"touchlineIndex\":0}, })",
+      "observation_count": 24,
+      "human_directed_ticks": 0,
+      "human_window_ticks": 0,
+      "human_controlled_ticks": 0,
+      "serve_target": {
+        "x": 20,
+        "y": 30
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "PASS",
+        "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "e81eb7580b1fdec8f344cce2df00f96ad86f648d3398288d35de554284e89b19",
+        "final_state_hash": "fnv1a64-v1:365fac2ee11e7d3a"
+      }
+    },
+    {
+      "id": "human-throwin-driven-cpu-stashed",
+      "scenario": "5v5-human-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-human-restart-throwin.v1.json",
+      "ticks": 24,
+      "gated_serialization": false,
+      "browser_parity": false,
+      "human_move_direction": null,
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-human-restart-throwin.v1.json\"), maxTicks: 24, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: false, serializeRestartFacts: false, humanRestartControl: { humanTeamId: \"team-a\", humanControlledPlayerId: \"player-3\", humanControlSlot: \"slot-1\", window: {\"kind\":\"throw-in\",\"team\":\"team-a\",\"takerPlayerId\":\"player-1\",\"position\":{\"x\":30,\"y\":34},\"countdown\":20,\"touchlineIndex\":0}, })",
+      "observation_count": 24,
+      "human_directed_ticks": 0,
+      "human_window_ticks": 0,
+      "human_controlled_ticks": 0,
+      "serve_target": null,
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "e81eb7580b1fdec8f344cce2df00f96ad86f648d3398288d35de554284e89b19",
+        "final_state_hash": "fnv1a64-v1:365fac2ee11e7d3a"
+      },
+      "stash_identity": {
+        "injected_facts_total": 0,
+        "gated_on_state_hash_of_hashes": "e81eb7580b1fdec8f344cce2df00f96ad86f648d3398288d35de554284e89b19",
+        "state_hash_chain_identical": true
+      }
+    },
+    {
+      "id": "human-throwin-natural",
+      "scenario": "5v5-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-throwin.v1.json",
+      "ticks": 200,
+      "gated_serialization": true,
+      "browser_parity": true,
+      "human_move_direction": {
+        "x": 1,
+        "y": -1
+      },
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-throwin.v1.json\"), maxTicks: 200, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: true, serializeRestartFacts: true, humanRestartControl: { humanTeamId: \"team-b\", humanControlledPlayerId: \"player-6\", humanControlSlot: \"slot-6\", humanMoveDirection: {\"x\":1,\"y\":-1}, })",
+      "observation_count": 200,
+      "human_directed_ticks": 0,
+      "human_window_ticks": 0,
+      "human_controlled_ticks": 0,
+      "serve_target": {
+        "x": 26.223749692840773,
+        "y": 27.8825744815507
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "PASS",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "PASS",
+        "MATCH-THROW-IN-PLACEMENT": "PASS",
+        "MATCH-THROW-IN-SERVE": "PASS",
+        "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "20308e780699a94a7b8921976c4ad214330926efc9171fac1479f1b1c13afc3a",
+        "final_state_hash": "fnv1a64-v1:7d06b3edbff049d2"
+      }
+    },
+    {
+      "id": "human-throwin-natural-stashed",
+      "scenario": "5v5-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-throwin.v1.json",
+      "ticks": 200,
+      "gated_serialization": false,
+      "browser_parity": true,
+      "human_move_direction": {
+        "x": 1,
+        "y": -1
+      },
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-throwin.v1.json\"), maxTicks: 200, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: true, serializeRestartFacts: false, humanRestartControl: { humanTeamId: \"team-b\", humanControlledPlayerId: \"player-6\", humanControlSlot: \"slot-6\", humanMoveDirection: {\"x\":1,\"y\":-1}, })",
+      "observation_count": 200,
+      "human_directed_ticks": 0,
+      "human_window_ticks": 0,
+      "human_controlled_ticks": 0,
+      "serve_target": null,
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "20308e780699a94a7b8921976c4ad214330926efc9171fac1479f1b1c13afc3a",
+        "final_state_hash": "fnv1a64-v1:7d06b3edbff049d2"
+      },
+      "stash_identity": {
+        "injected_facts_total": 0,
+        "gated_on_state_hash_of_hashes": "20308e780699a94a7b8921976c4ad214330926efc9171fac1479f1b1c13afc3a",
+        "state_hash_chain_identical": true
+      }
+    },
+    {
+      "id": "human-throwin-natural-cpu",
+      "scenario": "5v5-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-throwin.v1.json",
+      "ticks": 200,
+      "gated_serialization": true,
+      "browser_parity": true,
+      "human_move_direction": null,
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-throwin.v1.json\"), maxTicks: 200, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: true, serializeRestartFacts: true, humanRestartControl: { humanTeamId: \"team-b\", humanControlledPlayerId: \"player-6\", humanControlSlot: \"slot-6\", })",
+      "observation_count": 200,
+      "human_directed_ticks": 0,
+      "human_window_ticks": 0,
+      "human_controlled_ticks": 0,
+      "serve_target": {
+        "x": 22.106324174391474,
+        "y": 32
+      },
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "PASS",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "PASS",
+        "MATCH-THROW-IN-PLACEMENT": "PASS",
+        "MATCH-THROW-IN-SERVE": "PASS",
+        "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "446f232c728ebd0c38dccdf8b1bcafcdace7ea8bccfae11257b3a94da5e6cc94",
+        "final_state_hash": "fnv1a64-v1:aa1e01e75e84700f"
+      }
+    },
+    {
+      "id": "human-throwin-natural-cpu-stashed",
+      "scenario": "5v5-restart-throwin-v1",
+      "scenario_path": "eval/scenarios/5v5-restart-throwin.v1.json",
+      "ticks": 200,
+      "gated_serialization": false,
+      "browser_parity": true,
+      "human_move_direction": null,
+      "reproduction": "runHeadlessMatch({ scenario: load(\"eval/scenarios/5v5-restart-throwin.v1.json\"), maxTicks: 200, cpuAntiHuddle: true, lifecyclePhaseSync: \"core-owned\", browserParityObservations: true, serializeRestartFacts: false, humanRestartControl: { humanTeamId: \"team-b\", humanControlledPlayerId: \"player-6\", humanControlSlot: \"slot-6\", })",
+      "observation_count": 200,
+      "human_directed_ticks": 0,
+      "human_window_ticks": 0,
+      "human_controlled_ticks": 0,
+      "serve_target": null,
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      },
+      "determinism": {
+        "state_hash_of_hashes": "446f232c728ebd0c38dccdf8b1bcafcdace7ea8bccfae11257b3a94da5e6cc94",
+        "final_state_hash": "fnv1a64-v1:aa1e01e75e84700f"
+      },
+      "stash_identity": {
+        "injected_facts_total": 0,
+        "gated_on_state_hash_of_hashes": "446f232c728ebd0c38dccdf8b1bcafcdace7ea8bccfae11257b3a94da5e6cc94",
+        "state_hash_chain_identical": true
+      }
+    }
+  ],
+  "by_criterion": {
+    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": [
+      "human-throwin-driven=PASS",
+      "human-throwin-driven-cpu=PASS",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-RESTART-NEAREST-ONLY": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-CORNER-KICK-AWARD": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-CORNER-KICK-PLACEMENT": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-CORNER-KICK-CROSS": [
+      "human-throwin-driven=BLOCKED_MISSING_REFERENCE",
+      "human-throwin-driven-cpu=BLOCKED_MISSING_REFERENCE",
+      "human-throwin-natural=BLOCKED_MISSING_REFERENCE",
+      "human-throwin-natural-cpu=BLOCKED_MISSING_REFERENCE"
+    ],
+    "MATCH-CORNER-KICK-TIMER-FREEZE": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-GOAL-KICK-AWARD": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-GOAL-KICK-PLACEMENT": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-GOAL-KICK-DISTRIBUTION": [
+      "human-throwin-driven=BLOCKED_MISSING_REFERENCE",
+      "human-throwin-driven-cpu=BLOCKED_MISSING_REFERENCE",
+      "human-throwin-natural=BLOCKED_MISSING_REFERENCE",
+      "human-throwin-natural-cpu=BLOCKED_MISSING_REFERENCE"
+    ],
+    "MATCH-GOAL-KICK-TIMER-FREEZE": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-KICKOFF-FREEZE": [
+      "human-throwin-driven=PASS",
+      "human-throwin-driven-cpu=PASS",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-KICKOFF-FIRST-TOUCH": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-RESTART-REARM": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-OUT-OF-PLAY-DETECT": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-SCORING-GOAL-DEVENT": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-SCORING-GOAL-PHASE": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-THROW-IN-AWARD": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-THROW-IN-PLACEMENT": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-THROW-IN-SERVE": [
+      "human-throwin-driven=PASS",
+      "human-throwin-driven-cpu=PASS",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-THROW-IN-TIMER-FREEZE": [
+      "human-throwin-driven=PASS",
+      "human-throwin-driven-cpu=PASS",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-TIMER-DECREMENT": [
+      "human-throwin-driven=PASS",
+      "human-throwin-driven-cpu=PASS",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ],
+    "MATCH-TIMER-HALFTIME": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-TIMER-FULLTIME": [
+      "human-throwin-driven=NOT_EVALUATED",
+      "human-throwin-driven-cpu=NOT_EVALUATED",
+      "human-throwin-natural=NOT_EVALUATED",
+      "human-throwin-natural-cpu=NOT_EVALUATED"
+    ],
+    "MATCH-TIMER-FREEZE": [
+      "human-throwin-driven=PASS",
+      "human-throwin-driven-cpu=PASS",
+      "human-throwin-natural=PASS",
+      "human-throwin-natural-cpu=PASS"
+    ]
+  },
+  "verdict_summary": {
+    "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+    "MATCH-RESTART-NEAREST-ONLY": "PASS",
+    "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+    "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+    "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+    "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+    "MATCH-KICKOFF-FREEZE": "PASS",
+    "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+    "MATCH-RESTART-REARM": "NOT_EVALUATED",
+    "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+    "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "PASS",
+    "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+    "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+    "MATCH-THROW-IN-AWARD": "PASS",
+    "MATCH-THROW-IN-PLACEMENT": "PASS",
+    "MATCH-THROW-IN-SERVE": "PASS",
+    "MATCH-THROW-IN-TIMER-FREEZE": "PASS",
+    "MATCH-TIMER-DECREMENT": "PASS",
+    "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+    "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+    "MATCH-TIMER-FREEZE": "PASS"
+  },
+  "claims_not_made": [
+    "No suite-level PASS claim: the per-test overall for the rules suite is a per-test verdict collection, not a suite PASS.",
+    "No PROMOTION claim.",
+    "No PES 2017 fidelity / measured PES envelope claim; MATCH-GOAL-KICK-DISTRIBUTION and MATCH-CORNER-KICK-CROSS stay BLOCKED_MISSING_REFERENCE (§14).",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No invented reference envelope or tolerance.",
+    "No claim that the human becomes the literal ball-server for every restart type: the realization is receiver-steering destination control (the accepted HUMAN-RESTART-CONTROL).",
+    "No gameplay / source / contract / adapter-flow / spec change: src/simulation/, src/contracts/ and specs/ are EMPTY; the changes are the gated runner option + the protected rules oracle human-body exemption (both observation-level / additive)."
+  ],
+  "record_sha256": "44c0d928a8576860a6fd36acf87f785223ef5ec837503fcdc27a2356a66bf237"
+}

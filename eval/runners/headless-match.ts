@@ -33,6 +33,10 @@ import {
   isInsideGoalArc,
   keeperArcSetPoint,
 } from "../../src/adapters/input-browser/goalkeeper-role.js";
+import {
+  isHumanDirectedRestartActive,
+  describeHumanRestartWindow,
+} from "../../src/adapters/input-browser/human-restart-control.js";
 import { computeTeamDecision } from "../../src/adapters/input-browser/team-decision-profile.js";
 import { NO_OP_OBSERVER } from "../../src/simulation/telemetry/observer.js";
 import type { SimulationObserver } from "../../src/simulation/telemetry/observer.js";
@@ -202,6 +206,36 @@ export interface HeadlessMatchConfig {
    * every accepted non-gated run.
    */
   serializeRestartFacts?: boolean;
+  /**
+   * Drive a human-taken restart through the SAME core machinery and observation
+   * extension (HUMAN-RESTART-RULES-CONFORMANCE). When present, the runner
+   * opens the given restart window at tick 0 from committed state (the same
+   * technique the accepted HUMAN-RESTART-CONTROL driver uses) and feeds the
+   * human's directional input to the given control slot every tick the
+   * human-directed-restart gate is live. The human's input enters ONLY through
+   * the tick-indexed InputFrame; the core executes the same restart. When
+   * absent, no human slot is driven and the run is the CPU fallback.
+   */
+  humanRestartControl?: {
+    /** The team the human controls. */
+    humanTeamId: string;
+    /** The player the human's control slot drives. */
+    humanControlledPlayerId: string;
+    /** The control slot that carries the human's input frames. */
+    humanControlSlot: string;
+    /** The human's directional input during the window (moveX, moveY in [-1,1]). */
+    humanMoveDirection?: { x: number; y: number };
+    /** Open this restart window at tick 0 from committed state (fixture-driven). */
+    window?: {
+      kind: "throw-in" | "goal-kick" | "corner-kick";
+      team: string;
+      takerPlayerId: string;
+      position: { x: number; y: number };
+      countdown: number;
+      touchlineIndex?: 0 | 1;
+      goalIndex?: 0 | 1;
+    };
+  };
   /**
    * Re-home a designated keeper whose kickoff home is off its own goal arc onto
    * that arc (GK-CORE-OWNED-ARC-FIX). Under the core-owned lifecycle a
@@ -656,6 +690,7 @@ export function runHeadlessMatch(
     browserParityObservations = false,
     lifecyclePhaseSync = DEFAULT_LIFECYCLE_PHASE_SYNC,
     serializeRestartFacts = false,
+    humanRestartControl,
     rehomeKeeper,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
@@ -703,6 +738,42 @@ export function runHeadlessMatch(
 
   const sim = createSimulation(world, collectObserver, undefined, undefined, undefined, undefined, goalResetConfig);
 
+  // HUMAN-RESTART-RULES-CONFORMANCE: open the human's restart window at tick 0
+  // from the committed state (the same fixture-driven technique the accepted
+  // HUMAN-RESTART-CONTROL driver uses), so the core's own restart machinery
+  // runs the window and the human's directional input steers it.
+  if (humanRestartControl?.window) {
+    const window = humanRestartControl.window;
+    const mutable = deepClone(sim.snapshot()) as WorldState;
+    switch (window.kind) {
+      case "throw-in":
+        mutable.matchPhase = "throw-in";
+        mutable.throwInPosition = { ...window.position };
+        mutable.throwInAwardingTeam = window.team;
+        mutable.throwInCountdown = window.countdown;
+        mutable.throwInTakerId = window.takerPlayerId;
+        mutable.throwInTouchlineIndex = window.touchlineIndex ?? 0;
+        break;
+      case "goal-kick":
+        mutable.matchPhase = "goal-kick";
+        mutable.goalKickPosition = { ...window.position };
+        mutable.goalKickAwardingTeam = window.team;
+        mutable.goalKickCountdown = window.countdown;
+        mutable.goalKickTakerId = window.takerPlayerId;
+        mutable.goalKickGoalIndex = window.goalIndex ?? 0;
+        break;
+      case "corner-kick":
+        mutable.matchPhase = "corner-kick";
+        mutable.cornerKickPosition = { ...window.position };
+        mutable.cornerKickAttackingTeam = window.team;
+        mutable.cornerKickCountdown = window.countdown;
+        mutable.cornerKickTakerId = window.takerPlayerId;
+        mutable.cornerKickGoalIndex = window.goalIndex ?? 0;
+        break;
+    }
+    sim.restore(mutable);
+  }
+
   // 2. Create a CPU adapter per AI_FALLBACK control slot.
   //    Each adapter has its own internal state (hasPossession, ballWasInRange),
   //    so they don't interfere with each other.
@@ -716,6 +787,11 @@ export function runHeadlessMatch(
   for (const [slotId, assignment] of Object.entries(scenario.controlAssignments)) {
     const mode = (assignment as { mode?: string }).mode;
     if (mode === "AI_FALLBACK") {
+      // HUMAN-RESTART-RULES-CONFORMANCE: when a human drives the restart, its
+      // control slot is NOT an AI_FALLBACK slot — the human's InputFrame
+      // supplies the intent, so no CPU adapter is created for it (a duplicate
+      // (tick, controlSlot) frame would make the core throw).
+      if (humanRestartControl?.humanControlSlot === slotId) continue;
       slotCpus.push({
         adapter: createCpuAdapter(),
         controlSlot: slotId,
@@ -786,6 +862,12 @@ export function runHeadlessMatch(
   // the loop. Never affects inputs / steps / hashes.
   const postStepPhases: SimMatchPhase[] = [];
   const postStepTimers: number[] = [];
+  // HUMAN-RESTART-RULES-CONFORMANCE: per-tick post-step human-directed gate,
+  // index-aligned with the observations. Populated only when `humanRestartControl`
+  // is set; the value is the ACTUAL `isHumanDirectedRestartActive` gate over the
+  // committed post-step state, so the serializeRestartFacts injection carries the
+  // real human-taker designation rather than a re-derivation.
+  const humanDirectedByTick: boolean[] = [];
 
   // Phase tracking.
   let hadGoal = false;
@@ -970,6 +1052,32 @@ export function runHeadlessMatch(
       frames.push(frame);
     }
 
+    // HUMAN-RESTART-RULES-CONFORMANCE: feed the human's directional input for the
+    // control slot, but ONLY while the human's team won the active restart window
+    // (so the human directs THEIR team's restart; otherwise the input is inert and
+    // the CPU fallback is the whole run). The human's input enters ONLY through the
+    // tick-indexed InputFrame — never a state write.
+    if (humanRestartControl) {
+      const windowNow = describeHumanRestartWindow(snapshot);
+      const windowActive =
+        windowNow !== null && windowNow.awardingTeam === humanRestartControl.humanTeamId;
+      const humanMove =
+        humanRestartControl.humanMoveDirection !== undefined && windowActive
+          ? humanRestartControl.humanMoveDirection
+          : null;
+      frames.push({
+        tick,
+        sourceId: "keyboard",
+        controlSlot: humanRestartControl.humanControlSlot,
+        moveX: humanMove?.x ?? 0,
+        moveY: humanMove?.y ?? 0,
+        sprint: humanMove ? 1 : 0,
+        heldButtons: 0,
+        pressedButtons: 0,
+        releasedButtons: 0,
+      });
+    }
+
     // d. Apply all input frames to the simulation.
     sim.applyInputs(frames);
 
@@ -978,6 +1086,27 @@ export function runHeadlessMatch(
 
     // f. Collect results.
     stateHashes.push(stepResult.stateHash);
+    // HUMAN-RESTART-RULES-CONFORMANCE: capture the post-step human-directed gate
+    // from the committed state so the serializeRestartFacts injection carries the
+    // ACTUAL human-taker designation. `humanDirected` is the gate AND the human's
+    // directional input was actually applied this tick: the marker distinguishes a
+    // human-TAKEN restart (the human steered) from a CPU-fallback (the human's
+    // slot is set up but the human did not act).
+    if (humanRestartControl) {
+      const post = sim.snapshot();
+      const windowNow = describeHumanRestartWindow(post);
+      const humanMoveApplied =
+        humanRestartControl.humanMoveDirection !== undefined &&
+        windowNow !== null &&
+        windowNow.awardingTeam === humanRestartControl.humanTeamId;
+      humanDirectedByTick.push(
+        isHumanDirectedRestartActive(
+          post,
+          humanRestartControl.humanTeamId,
+          humanRestartControl.humanControlledPlayerId,
+        ) && humanMoveApplied,
+      );
+    }
     for (const evt of stepResult.events) {
       events.push(evt);
       if (evt.kind === "goal") {
@@ -1229,6 +1358,33 @@ export function runHeadlessMatch(
         });
       }
 
+      // HUMAN-RESTART-RULES-CONFORMANCE: compute the window-scoped human-taken
+      // marker. A restart window is a maximal run of consecutive ballUntouched
+      // ticks. A window is genuinely TAKEN by the human only if the human's
+      // directional input was actually applied during it (humanDirectedByTick
+      // is true on at least one tick). The marker gates the anti-huddle freeze
+      // exemption: it is emitted ONLY on windows the human genuinely took, so a
+      // CPU-fallback stream (humanRestartControl set but no applied input) carries
+      // NO exemption-activating field and its freeze behavior is byte-identical to
+      // pre-change by gate, not by fixture luck.
+      const humanWindowTaken: boolean[] = new Array(observations.length).fill(false);
+      if (humanRestartControl) {
+        let wi = 0;
+        while (wi < designations.length) {
+          if (!designations[wi].ballUntouched) {
+            wi++;
+            continue;
+          }
+          let wj = wi;
+          while (wj + 1 < designations.length && designations[wj + 1].ballUntouched) wj++;
+          const taken = humanDirectedByTick.slice(wi, wj + 1).some(Boolean);
+          if (taken) {
+            for (let k = wi; k <= wj; k++) humanWindowTaken[k] = true;
+          }
+          wi = wj + 1;
+        }
+      }
+
       for (let i = 0; i < observations.length; i++) {
         const o = observations[i];
         const d = designations[i];
@@ -1239,7 +1395,7 @@ export function runHeadlessMatch(
           tick: o.tick,
           sequence: maxSeq + 1,
           kind: "restart-designation",
-          label: `restart designation tick ${o.tick} untouched=${d.ballUntouched} taker=${String(d.takerId)}`,
+          label: `restart designation tick ${o.tick} untouched=${d.ballUntouched} taker=${String(d.takerId)} humanWindowTaken=${humanRestartControl && humanWindowTaken[i] ? "true" : "-"}`,
           payload: {
             ballUntouched: d.ballUntouched,
             takerId: d.takerId,
@@ -1247,6 +1403,21 @@ export function runHeadlessMatch(
             rearmed: d.rearmed,
             teams: d.teams,
             anchors: d.anchors,
+            // HUMAN-RESTART-RULES-CONFORMANCE: the human-taker designation. Emitted
+            // ONLY on windows the human genuinely took (humanWindowTaken), carrying
+            // the per-tick human-directed gate and the human's team / controlled
+            // body id. A CPU-fallback stream (no applied input) carries NO human
+            // fields, so the oracles/auditor can distinguish the two AND the
+            // anti-huddle freeze exemption is scoped to genuinely human-taken
+            // windows (never a CPU-fallback).
+            ...(humanRestartControl && humanWindowTaken[i]
+              ? {
+                  humanDirected: humanDirectedByTick[i] ?? false,
+                  humanWindowTaken: true,
+                  humanTeamId: humanRestartControl.humanTeamId,
+                  humanControlledPlayerId: humanRestartControl.humanControlledPlayerId,
+                }
+              : {}),
           },
         });
       }
