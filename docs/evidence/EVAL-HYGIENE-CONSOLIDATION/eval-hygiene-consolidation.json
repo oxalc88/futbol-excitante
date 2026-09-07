@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "objective_id": "EVAL-HYGIENE-CONSOLIDATION",
+  "evidence_class": "BOOKKEEPING",
+  "produced_by": "scripts/capture-eval-hygiene-consolidation.ts",
+  "description": "Consolidation of the four reviewer non-binding cleanups with guards. Zero verdict changes anywhere: every oracle check's semantics are byte-identical post-cleanup; the HUD re-anchoring changes only presentation at resize.",
+  "cleanups": [
+    {
+      "id": "dead-chasers-variable",
+      "file": "eval/oracles/rules-restart.ts",
+      "change": "Dropped the dead `chasers` Set in checkRestartNearestOnly. It was computed from the per-team designated chaser but never read; the enforced falsifier for the §12 rule 2 'only one designated chaser converges' criterion is the clump count (a team clump >2 bodies within the huddle radius FAILs).",
+      "verdict_change": false,
+      "source_check": {
+        "dead_chasers_absent": true
+      },
+      "guard": "No new test — the existing rules gate must stay green (173/173)."
+    },
+    {
+      "id": "mirror-offset-disclosure",
+      "file": "eval/runners/headless-match.ts",
+      "change": "Tightened the serializeRestartFacts designation comment to state precisely that the designation mirror pairs the exact adapter phase (`coreMatchPhases[i]`) with the POST-STEP ball reference (`observations[i].ball.lastTouchRef`), a conservative one-tick offset that can only shorten a restart window or false-fail the anti-huddle criteria — never fabricate a PASS.",
+      "verdict_change": false,
+      "source_check": {
+        "mirror_offset_disclosed": true
+      },
+      "guard": "Comment-only; no runtime change. The rules gate must stay green."
+    },
+    {
+      "id": "keeper-press-exclusions-counter-hygiene",
+      "file": "src/adapters/input-browser/goalkeeper-role.ts",
+      "change": "Documented the gated-run/counter-read interaction: the post-loop serializeRestartFacts designation serialization calls `assignChaseRoles` → `designatePresser`, which increments `_keeperPressExclusions`. Never combine a gated designation run with a `getKeeperPressExclusionActivations()` read in one process (reset via `resetKeeperMechanismCounters()` between them, or read in a fresh process).",
+      "verdict_change": false,
+      "source_check": {
+        "counter_hygiene_doc": true,
+        "counter_hygiene_call_doc": true
+      },
+      "guard": "Documentation-only; no test required. This is a diagnostics counter, not a gameplay value."
+    },
+    {
+      "id": "hud-ortho-camera-resize-re-anchoring",
+      "file": "src/adapters/renderer-three/renderer.ts",
+      "change": "Added a container resize re-anchor (ResizeObserver) for the opt-in match-phase HUD ortho camera + top-left sprite, plus the renderer canvas + main camera aspect. Presentation-only and draw-only; never reads or writes a football outcome.",
+      "verdict_change": false,
+      "source_check": {
+        "hud_resize_observer": true,
+        "hud_resize_handle": true,
+        "hud_resize_disposed": true
+      },
+      "guard": "Browser-test guard (tests/browser/hud-ortho-resize.browser.test.ts): frustum re-anchor, canvas follows container, HUD present at top-left, null HUD camera when not enabled."
+    }
+  ],
+  "source_hashes": {
+    "eval/oracles/rules-restart.ts": "b5f173e326874f2b1eb91b2e0b01e72ed6e1614bc5a06fbff0ecbc9c78dac351",
+    "eval/runners/headless-match.ts": "001fd51f0aadc560f2ef7bfbe899a4f82ab94f2c4ab0e71a399cb8284d6375e6",
+    "src/adapters/input-browser/goalkeeper-role.ts": "f6840aa50fbcbf2ae5db877b4c6425fb259afed4c315c5f097cbf9b0335b1d4a",
+    "src/adapters/renderer-three/renderer.ts": "82cbbf516ecabbb4ca06e3563966034265d246c40fcc752873dabf1fd909ea12"
+  },
+  "claims_not_made": [
+    "Zero verdict changes: the dead variable was unread, the mirror-offset change is a comment, the counter-hygiene change is documentation-only, and the HUD change is presentation-only/draw-only.",
+    "No suite-level PASS claim.",
+    "No PROMOTION claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No PES 2017 fidelity / measured PES envelope claim.",
+    "No invented reference envelope or tolerance.",
+    "No accepted evidence record mutation; no core/simulation/contracts change (the renderer HUD change is presentation-layer)."
+  ],
+  "record_sha256": "30d933e2b3245c0c61cbde132aed75bfc4005417cb79f2db72611044466d7675"
+}

@@ -448,6 +448,17 @@ export function advanceKeeperReaction(
  * Module-level counters for the keeper paths. Stash `gkBehavior` and every one
  * of them stays 0 while the match still runs, which is what makes the
  * discriminating guards executable rather than rhetorical.
+ *
+ * COUNTER HYGIENE (EVAL-HYGIENE-CONSOLIDATION): `_keeperPressExclusions` is
+ * also incremented by `designatePresser` (team-decision-profile.ts), which the
+ * gated post-loop `serializeRestartFacts` designation serialization in
+ * eval/runners/headless-match.ts calls via `assignChaseRoles`. A gated
+ * designation run therefore inflates this diagnostics counter above the
+ * genuine per-tick adapter exclusions. Never combine a gated designation run
+ * with a `getKeeperPressExclusionActivations()` read in one process — reset via
+ * `resetKeeperMechanismCounters()` between them (or read it in a fresh
+ * process). This is a diagnostics counter, not a gameplay value: the gated
+ * path never reads it and the adapter-layer exclusion is unaffected.
  */
 let _keeperHoldTicks = 0;
 let _keeperSaveArms = 0;

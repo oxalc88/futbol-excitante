@@ -1266,12 +1266,11 @@ export function checkRestartNearestOnly(
       if (isHoldPhase(matchPhase.get(d.tick))) continue;
       const o = observationByTick(observations, d.tick);
       if (!o) continue;
-      // Exactly one designated chaser per team (the shared press designation).
-      const chasers = new Set<string>();
-      for (const chaserId of Object.values(d.teams)) {
-        if (chaserId) chasers.add(chaserId);
-      }
       // No clump: at most 2 same-team bodies inside the huddle radius of the ball.
+      // This is the enforced falsifier for the §12 rule 2 "only one designated
+      // chaser converges" criterion: a team clump (>2 bodies within the huddle
+      // radius) is what FAILs. The per-team designated chaser is carried by the
+      // `restart-designation` facts but is not itself the enforced check here.
       const within = new Map<string, number>();
       for (const p of o.players) {
         const dist = Math.hypot(

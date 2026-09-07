@@ -293,6 +293,12 @@ export interface PresentationSession {
   getCamera(): THREE.PerspectiveCamera;
 
   /**
+   * Get the opt-in match-phase HUD orthographic camera (for diagnostics), or
+   * null when the HUD is not enabled. Presentation-only.
+   */
+  getHudCamera(): THREE.OrthographicCamera | null;
+
+  /**
    * Dispose all GPU resources.
    */
   dispose(): void;
@@ -695,9 +701,13 @@ export function createPresentationSession(
   // --- Match-phase HUD (opt-in, BROWSER-FULL-MATCH-FLOW-EVIDENCE) ---
   let hudScene: THREE.Scene | null = null;
   let hudCamera: THREE.OrthographicCamera | null = null;
+  let hudSprite: THREE.Sprite | null = null;
   let hudCanvas: HTMLCanvasElement | null = null;
   let hudTexture: THREE.CanvasTexture | null = null;
   let hudContext: CanvasRenderingContext2D | null = null;
+  // Re-anchor the HUD (and the presentation canvas) when the container resizes.
+  // Presentation-only, draw-only; never affects a football outcome.
+  let resizeObserver: ResizeObserver | null = null;
 
   // --- Interpolation state ---
   const interpState: InterpolationState = {
@@ -790,7 +800,7 @@ export function createPresentationSession(
         depthWrite: false,
         transparent: true,
       });
-      const hudSprite = new THREE.Sprite(material);
+      hudSprite = new THREE.Sprite(material);
       // 512x128 box anchored to the top-left corner of the viewport (with a
       // small margin), in the conventional ortho screen space (0,0 = centre).
       const margin = 12;
@@ -799,7 +809,38 @@ export function createPresentationSession(
       hudScene.add(hudSprite);
     }
 
+    // Re-anchor the presentation on container resize (HUD ortho camera +
+    // sprite, plus the renderer canvas + main camera aspect). Presentation-only
+    // and draw-only; the simulation is never touched.
+    if (resizeObserver) resizeObserver.disconnect();
+    resizeObserver = new ResizeObserver(() => handleResize());
+    resizeObserver.observe(container);
+
     sceneVersion++;
+  }
+
+  /**
+   * Re-anchor the presentation surface when the container resizes. This keeps
+   * the renderer canvas, the main camera aspect, and the opt-in match-phase HUD
+   * ortho camera + top-left sprite following the container's client size. It is
+   * presentation-only and draw-only — it never reads or writes a football
+   * outcome.
+   */
+  function handleResize(): void {
+    const w = Math.max(1, container.clientWidth);
+    const h = Math.max(1, container.clientHeight);
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    if (config.showMatchPhaseHud && hudCamera && hudSprite) {
+      hudCamera.left = -w / 2;
+      hudCamera.right = w / 2;
+      hudCamera.top = h / 2;
+      hudCamera.bottom = -h / 2;
+      hudCamera.updateProjectionMatrix();
+      const margin = 12;
+      hudSprite.position.set(-w / 2 + margin + 256, h / 2 - margin - 64, 0);
+    }
   }
 
   /**
@@ -998,6 +1039,12 @@ export function createPresentationSession(
   // --- Public API ---
   const session: PresentationSession = {
     async reset(): Promise<void> {
+      // Stop observing before disposing the renderer so a stale resize
+      // callback cannot touch a disposed renderer mid-reset.
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+        resizeObserver = null;
+      }
       // Dispose GPU resources and remove canvas from DOM.
       renderer.dispose();
       container.removeChild(renderer.domElement);
@@ -1012,6 +1059,7 @@ export function createPresentationSession(
       pitchGroup = null;
       hudScene = null;
       hudCamera = null;
+      hudSprite = null;
       hudCanvas = null;
       hudTexture = null;
       hudContext = null;
@@ -1066,7 +1114,15 @@ export function createPresentationSession(
       return camera;
     },
 
+    getHudCamera(): THREE.OrthographicCamera | null {
+      return hudCamera;
+    },
+
     dispose(): void {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+        resizeObserver = null;
+      }
       renderer.dispose();
       container.removeChild(renderer.domElement);
     },

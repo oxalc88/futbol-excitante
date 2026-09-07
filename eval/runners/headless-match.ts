@@ -1272,6 +1272,17 @@ export function runHeadlessMatch(
     // restart hold (post-goal / halftime reset). The latter is only possible
     // when `browserParityObservations` is on, because that is the only wiring
     // in which the adapter observes matchPhase and can arm the re-arm baseline.
+    //
+    // MIRROR OFFSET (conservative, disclosed): this pairing joins the exact
+    // adapter phase (`coreMatchPhases[i]`, the phase the core ran tick i with)
+    // with the POST-STEP ball reference (`observations[i].ball.lastTouchRef`,
+    // the reference at the start of tick i+1). The one-tick offset can only
+    // shorten a restart window or false-fail the anti-huddle criteria — the
+    // later reference is more likely to be non-null, so it can never fabricate
+    // an untouched window / a PASS. It is accepted as-is and disclosed rather
+    // than re-derived, because re-deriving the pre-step reference would have
+    // the runner own football state.
+    //
     // Post-loop, gated, and additive (observation-level annotations).
     {
       const identities = new Map<string, { formationRole?: "defender" | "midfielder" | "attacker" }>();
@@ -1334,6 +1345,11 @@ export function runHeadlessMatch(
             o, identities, scenario.pitchLength, scenario.pitchWidth,
             teamId, cpuAntiHuddle, gkBehavior, keeperRoles,
           );
+          // COUNTER HYGIENE (EVAL-HYGIENE-CONSOLIDATION): this post-loop call
+          // goes through `assignChaseRoles` → `designatePresser`, which can
+          // increment `_keeperPressExclusions`. See goalkeeper-role.ts — never
+          // combine a gated designation run with a GK counter read in one
+          // process (reset the counters between them).
           const roles = assignChaseRoles(teamObs, teamId, untouched);
           if (roles.kickoffTakerId !== undefined && roles.kickoffTakerId !== null) takerId = roles.kickoffTakerId;
           teams[teamId] = roles.chaserPlayerId ?? null;
