@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOULS-SPEC-DRAFT",
+  "spec_path": "specs/FOULS_CARDS_SPEC.md",
+  "spec_model_id": "fouls-v1",
+  "produced_by": "scripts/capture-fouls-spec-record.ts",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "6739646f5083e9abba556c56f3b93a6c2557d4c0",
+  "spec_sections": [
+    "1. Purpose and authority",
+    "2. Scope and explicit exclusions (2.1 in scope / 2.2 out of scope)",
+    "3. Normative vocabulary and configuration model",
+    "4. The duel/tackle machinery the foul grounds on (accepted, immutable)",
+    "5. What a foul IS in this engine (5.1 foul definition / 5.2 NOT a foul / 5.3 carrier identity)",
+    "6. Advantage semantics (named, NOT implemented)",
+    "7. Card / disciplinary semantics (named, NOT implemented)",
+    "8. Set-piece consequence of a foul (free kick, deferred, references accepted machinery)",
+    "9. Versioned provisional configuration (fouls-v1)",
+    "10. Adjudicating telemetry / suite criteria (named, NOT registered)",
+    "11. BLOCKED_MISSING_REFERENCE values",
+    "12. Keeper interaction",
+    "13. Declaration of limitations",
+    "14. Relation to GAMEPLAY_EVALUATION_SPEC",
+    "15. Deferred rule behaviors (future-with-prerequisites)"
+  ],
+  "referenced_accepted_models": [
+    "foundation-tackle-v1",
+    "foundation-cpu-tackle-v1",
+    "foundation-player-contact-v1",
+    "foundation-contact-v1",
+    "foundation-config-v1",
+    "foundation-fixed-dt-v1",
+    "match-rules-v1",
+    "anti-huddle-v1",
+    "gk-small-sided-v1"
+  ],
+  "fouls_v1_provisional_keys": [
+    "foul_detect_contact_severity_threshold",
+    "fouls_yellow_accumulation_count",
+    "fouls_red_accumulation_count",
+    "foul_card_direct_red_severity_threshold",
+    "advantage_window_ticks",
+    "foul_caution_pending_ticks",
+    "foul_ball_carrier_contest_distance"
+  ],
+  "blocked_references": [
+    "foul_card_threshold_ref",
+    "foul_severity_distribution_ref",
+    "foul_ball_carrier_identity_ref",
+    "advantage_window_ref_ms",
+    "free_kick_trajectory_ref",
+    "disciplinary_scale_ref",
+    "card_display_visual_ref"
+  ],
+  "named_criteria": [
+    "FOUL-DETECT",
+    "FOUL-CLEAN-TACKLE",
+    "CARD-ISSUED",
+    "ADVANTAGE-PLAYED",
+    "FREE-KICK-AWARD"
+  ],
+  "named_criteria_registered": [],
+  "binding_test": {
+    "path": "tests/unit/eval/fouls-spec-binding.test.ts",
+    "test_count": 42
+  },
+  "quoted_constant_drift": [],
+  "model_id_drift": [],
+  "claims_not_made": [
+    "No implementation claim: no foul, card, advantage, or free-kick machinery exists in src/; the spec names future semantics only.",
+    "No adjudicating criterion (FOUL-DETECT / FOUL-CLEAN-TACKLE / CARD-ISSUED / ADVANTAGE-PLAYED / FREE-KICK-AWARD) is registered in the evaluator registry.",
+    "No fouls behavior exists in the engine.",
+    "No PES 2017 fidelity or invented constant: fouls-v1 parameters are VERSIONED_PROVISIONAL, not PES magnitudes; referenced accepted values come from machine sources.",
+    "Offside and penalty kicks stay regulation-only with no existence claim.",
+    "No PROMOTION claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "Blocked references stay BLOCKED_MISSING_REFERENCE (never converted into invented envelopes or tolerances)."
+  ],
+  "record_sha256": "e98a1efe08f1c8ec68c5b957a801e9035c70a132e3f5d354e3dd30b8767b0716"
+}
