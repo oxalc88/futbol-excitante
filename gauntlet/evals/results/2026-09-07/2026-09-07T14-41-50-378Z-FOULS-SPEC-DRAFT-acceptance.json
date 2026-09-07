@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.6",
+  "persisted_at": "2026-09-07T14:41:50.378Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "FOULS-SPEC-DRAFT",
+  "evidence_class": "HEADLESS",
+  "candidate_commit": "b7f56e075f0c61b24e66ec9f25d082c06e3f8652",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v33 1/4: the dedicated fouls/cards spec drafted (spec-only; git diff src/ eval/ gauntlet/ EMPTY — zero implementation, verified by builder, critic, AND integration). SPEC: specs/FOULS_CARDS_SPEC.md (15 sections; the naming decision disclosed — FOULS_CARDS_SPEC because MATCH_RULES_SPEC §16 groups fouls/cards/free-kicks) following the RULES-SPEC-DRAFT pattern: the foul definition GROUNDED in the accepted duel/tackle machinery (a defensive-tackle active-window player-player-contact with contactType ∈ {standing-tackle, slide-tackle}, tacklePhase === 'active', and duelWon === false (ballReachable === false) — the man-not-ball contact the existing tackle system already produces; duelWon = ballReachable at tackle-system.ts:505; the critic verified the fields match the source EXACTLY and found 10 real man-not-ball slide-tackle events in the accepted duels-suite evidence, with the clean complement's 65 duelWon:true events confirming the exclusion and PHY-SHLD-001-CONT the shoulder-contact reference); the NOT-a-foul complement (a tackle that reaches the ball + symmetric shoulder-to-shoulder contact); carrier identity (§5.3 honestly discloses the tackle event does not serialize carrier distance); advantage semantics NAMED-NOT-IMPLEMENTED; card/disciplinary semantics NAMED-NOT-IMPLEMENTED; the free-kick set-piece consequence DEFERRED and forward-referencing the ACCEPTED restart machinery (no new machinery invented); fouls-v1 VERSIONED_PROVISIONAL config (prose-declared — no eval/contracts/fouls-config.ts, disclosed; §9.1 forbids describing the values as PES magnitudes); FIVE adjudicating criteria NAMED-but-NOT-REGISTERED (FOUL-DETECT, FOUL-CLEAN-TACKLE, CARD-ISSUED, ADVANTAGE-PLAYED, FREE-KICK-AWARD) with the §10 'No PASS may be reported' guard; offside/penalties explicitly regulation-only with no existence claim; 7 BLOCKED_MISSING_REFERENCE disclosed (none inventive); all 10 cross-referenced spec sections verified to exist and say what the draft claims. BINDING: tests/unit/eval/fouls-spec-binding.test.ts 42/42 — every quoted §9.2 constant pinned to its machine source (structurally live: the producer recomputes constant_drift=[] live, so source drift necessarily fails; the critic additionally hand-verified the 10 unpinned values incl. ballDeflectionLift 0.06, reactionTicks 3, commitMargin 0.3) and the named-criteria-unregistered assertions as REAL registry lookups (loadRegistrySet over common_criteria, test_bindings.criterion_bindings, all suite criteria lists, plus the absence of a fouls suite; independently confirmed by grep — zero occurrences of the five ids anywhere in eval/ src/ gauntlet/). Evidence: record_sha256 e98a1efe08f1c8ec68c5b957a801e9035c70a132e3f5d354e3dd30b8767b0716 (no wall-clock field; reproduced byte-exact independently by critic AND integration; two consecutive ordinary-mode runs byte-identical, scratch 2550ca44… == durable record; ordinary runs leave docs/ byte-identical); audit PASS HEADLESS. Tests: binding 42 + neighbor batteries (integration re-ran 376/376 across 13 files + 27/27 architecture + 8/8 hygiene/scope + 118/118 determinism/replay; critic re-ran ~683 targeted tests incl. core units 246/246); typecheck 0. Disclosed gap: a full `pnpm run test` exceeds the 5-minute tool window and was not run to completion (mitigated by the empty tracked diff + ~683 reproduced passing tests — honestly disclosed by the builder, reproduced by the critic, and accepted as negligible-residual by the integration reviewer). Critic (glm5.3-flash, independent) ACCEPT first pass — no-implementation-leak verified (all 228 spec lines read; every behavior sentence either grounded in verified machinery or explicitly named/deferred future semantics); integration (glm5.3-flash) ACCEPT first pass — the silent-consumer hunt found no doc-lint/spec-check pipeline the spec could break. claims_not_made: no implementation claim (no foul/card/advantage/free-kick machinery exists in src/) / no adjudicating criterion registered / no fouls behavior exists (the spec names the future semantics) / no PES fidelity or invented constant (fouls-v1 is VERSIONED_PROVISIONAL) / offside/penalties stay regulation-only with no existence claim / no PROMOTION / no FOUNDATION_LAB_PASS / blocked references stay BLOCKED_MISSING_REFERENCE."
+}

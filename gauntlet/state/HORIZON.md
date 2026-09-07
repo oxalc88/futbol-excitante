@@ -9,10 +9,12 @@ horizon_id: "next-spec-phase-and-keeper-playability"
 created_from_commit: 156ecb9
 created_at: 2026-09-07
 reason: "Horizon v32 (COMPLETE 4/4, remote-durable at 156ecb9) closed the playable loop: human-directed restart destination control (5b15992) with the human-taken restart conforming through the rules suite (2a6b92c — the gate leak the critic caught hardened the freeze exemption behind the window-scoped marker), the four reviewer cleanups consolidated (fec4a35), and the fulltime dead end closed with the rematch/menu flow (3f42a50). The playable small-sided loop is complete: setup → play → all restarts (CPU + human-directed) → halftime → fulltime → rematch/menu. v33 opens the next phase on two fronts: (a) FOULS-SPEC-DRAFT — MATCH_RULES_SPEC §16 defers fouls/cards with no existence claim; the established spec→suite→conformance pipeline starts with the dedicated fouls spec draft (spec-only, zero implementation); (b) HUMAN-KEEPER-CONTROL — a real playable capability gap: the human cannot control the designated keeper in human-vs-CPU (the switch mechanism excludes it); extending the existing switch contract to the keeper slot lets the human play keeper; (c) HUMAN-BALL-SERVER-DECISION — the literal pass-button restart server is deferred behind a disclosed core change (countdown-zero auto-serve is core-owned); a deliberate decision record (implement-now plan vs defer with the core machinery analysis) instead of an open thread; (d) RELEASE-0.9.7-CONSOLIDATION — consolidate the v29-v32 playable+executable gains into the release record. Strictly small-sided; no regulation implementation beyond what suites gate, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 0
+current_index: 1
 objectives:
   - id: FOULS-SPEC-DRAFT
-    status: pending
+    status: accepted
+    accepted_at: 2026-09-07
+    candidate_commit: b7f56e0
     reason: "Dedicated fouls/cards spec draft per MATCH_RULES_SPEC §16 (the deferred rules with no existence claim): foul semantics grounded in the accepted duel/tackle machinery (what a foul IS in this engine — tackle outcomes, advantage, card thresholds), versioned provisional parameters, adjudicating criteria NAMED but NOT registered (the RULES-SPEC-DRAFT pattern), deferred items named (offside/penalties stay regulation-only, no existence claim), BLOCKED_MISSING_REFERENCE disclosed. SPEC ONLY — zero src/ eval/ gauntlet/ change; a binding test pins quoted constants to machine sources; the critic verifies no implementation leaked."
     builder: builder-structured
     prerequisite: ""
