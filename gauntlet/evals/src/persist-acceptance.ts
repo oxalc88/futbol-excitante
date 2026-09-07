@@ -33,7 +33,7 @@ const now = new Date();
 const acceptedAt = now.toISOString();
 const day = acceptedAt.slice(0, 10);
 const stamp = acceptedAt.replace(/[:.]/g, "-");
-const safeObjective = String(input.objective_id).replace(/[^A-Za-z0-9_-]/g, "_");
+const safeObjective = String(input.objective_id).replace(/[^A-Za-z0-9._-]/g, "_");
 const dir = path.join(repoRoot, "gauntlet/evals/results", day);
 await mkdir(dir, { recursive: true });
 const file = path.join(dir, `${stamp}-${safeObjective}-acceptance.json`);
