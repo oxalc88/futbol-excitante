@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "CARD-ISSUED-SUITE-REGISTRATION",
+  "accepted_at": "2026-09-08T14:15:36.575Z",
+  "candidate_commit": "793572c6f00a2a9543c22b1ebd3ea72fa88f5e18",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/CARD-ISSUED-SUITE-REGISTRATION/trajectory.json",
+      "sha256": "646d81fe121ed729e7cf9a6e7477dd81bb7a5fb17ef5448b3afcd1f763d14d8c",
+      "git_blob": "5cf06a332a578c64da9cfb6c412e0476b1ba8517",
+      "candidate_commit": "793572c6f00a2a9543c22b1ebd3ea72fa88f5e18",
+      "bytes": 8855,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/CARD-ISSUED-SUITE-REGISTRATION/audit.json",
+      "sha256": "03f0735e555d10fef5f7dc09d843379b1b31b4ae219f37e8b6c55974f0cdf0e6",
+      "git_blob": "d460b8b6a4be8f5f46c5fa74a4c1df2a516a54fe",
+      "candidate_commit": "793572c6f00a2a9543c22b1ebd3ea72fa88f5e18",
+      "bytes": 2670,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-08/2026-09-08T14-15-36-575Z-CARD-ISSUED-SUITE-REGISTRATION-acceptance.json"
+}

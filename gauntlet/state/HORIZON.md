@@ -9,7 +9,7 @@ horizon_id: "referee-cards-and-aggregate-honesty"
 created_from_commit: 32995ba
 created_at: 2026-09-08
 reason: "Horizon v35 (COMPLETE 4/4, remote-durable at 32995ba) made the fouls loop executable end to end: FOUL-CONSEQUENCE-MACHINERY (83622cb — a detected foul awards a free-kick restart through the accepted restart machinery; the shared foul-predicate single source of truth; the deliberate core change with CPU-fallback byte-identity), FREE-KICK-SUITE-REGISTRATION (1eec4eb — FREE-KICK-AWARD the third suite-fouls protected oracle with power guards; the §10 wording resolved), GK-REGRESSION-POLICY-REGISTRATION (5dd2c1e — the gk-regression canary converting the six GK-*-REG to executed PASS; the critic RETRY closed a text–enforcement mismatch by correct-the-prose; GOALKEEPER_SPEC §11.2), FOUL-FREEKICK-BROWSER-EVIDENCE (bba7bef — 4 byte-distinct real-Chromium frames with an exact 0/0 correspondence). Two consequences now outrank the rest: (1) the goalkeepers aggregate verdict table still reads 9/0/2/1/1 while the registered canary has converted GK-*-REG to executed PASS — the honest aggregate state is un-published; (2) CARD-ISSUED is the highest-value remaining FOULS_CARDS_SPEC §10 criterion: a booking state over the accepted foul machinery makes repeated fouls consequential in play, is browser-visible, and has a named registration target — while ADVANTAGE-PLAYED stays deferred (its spec semantics involve playing the advantage window, a materially harder core change). v36 executes: (a) FOULS-AGGREGATE-HONESTY-RERUN — re-publish the goalkeepers + fouls aggregate verdict tables with exact deltas (GK-*-REG NOT_EVALUATED→PASS; the fouls suite's 3-of-5 registered state) and fold the accumulated disclosed cosmetic threads (the 0.5 m tolerance prose disclosure line, the two stale test comments, the FOULS_CARDS_SPEC §2.1/§2.2 staleness, the missing package.json capture-script registrations) with zero verdict changes proven directly; (b) CARD-MACHINERY — card issuance per FOULS_CARDS_SPEC's card definition over the accepted foul machinery (a gated deliberate change with the named-conformance-path pattern; any card-worthy threshold the spec leaves undefined is BLOCKED_MISSING_REFERENCE, not invented; advantage stays spec-only); (c) CARD-ISSUED-SUITE-REGISTRATION — register CARD-ISSUED as the fourth suite-fouls oracle (the established pattern); ADVANTAGE-PLAYED stays named-not-registered; (d) CARD-BROWSER-EVIDENCE — the booking visible in the real browser (DYNAMIC_VISUAL). Strictly small-sided; no regulation implementation, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 2
+current_index: 3
 objectives:
   - id: FOULS-AGGREGATE-HONESTY-RERUN
     status: accepted
@@ -22,7 +22,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: ""
   - id: CARD-ISSUED-SUITE-REGISTRATION
-    status: pending
+    status: accepted
     reason: "Register CARD-ISSUED (FOULS_CARDS_SPEC §10) as the fourth executable protected oracle in suite-fouls-v1 over the accepted card streams (the RULES-SUITE-REGISTRATION pattern; mutant/canary guards: a card without a qualifying foul FAILs; a qualifying foul without a card is honest NOT_EVALUATED; a card to the wrong player FAILs). ADVANTAGE-PLAYED stays named-not-registered. Update the spec's registered/unregistered counts (four registered / one named-not-registered) and the binding pins accordingly. No suite-level PASS claim."
     builder: builder-structured
     prerequisite: CARD-MACHINERY
