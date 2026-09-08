@@ -27,7 +27,7 @@ import { createWorld } from "../../simulation/world/create.js";
 import { createSimulation } from "../../simulation/loop/simulation.js";
 import { createPresentationSession } from "../../adapters/renderer-three/renderer.js";
 import { FOUNDATION_SCENARIO } from "./foundation-scenario.js";
-import type { Simulation, FreeKickConfig } from "../../simulation/loop/simulation.js";
+import type { Simulation, FreeKickConfig, CardConfig } from "../../simulation/loop/simulation.js";
 import type { PresentationSession } from "../../adapters/renderer-three/renderer.js";
 import type { InputFrame } from "../../contracts/input.js";
 import type { WorldState } from "../../contracts/state.js";
@@ -152,6 +152,11 @@ export interface TestBridge {
  *   exactly as before, so every accepted browser stream is byte-identical.
  *   It is a test-harness pass-through of an accepted core gate; the simulation
  *   core itself is untouched and the gate stays off by default.
+ * @param cardConfig - Optional CARD-MACHINERY gate (CardConfig).  When omitted
+ *   (the default) the simulation is created exactly as before, so every
+ *   accepted browser stream is byte-identical.  It is a test-harness
+ *   pass-through of an accepted core gate; the simulation core itself is
+ *   untouched and the gate stays off by default.
  * @returns A TestBridge instance.
  */
 export function createTestBridge(
@@ -160,6 +165,7 @@ export function createTestBridge(
   difficulty?: DifficultyLevel,
   rendererConfig?: import("../../adapters/renderer-three/renderer.js").RendererConfig,
   freeKickConfig?: FreeKickConfig,
+  cardConfig?: CardConfig,
 ): TestBridge {
   let sim: Simulation;
   let session: PresentationSession;
@@ -169,7 +175,7 @@ export function createTestBridge(
    */
   function initSimulation(): void {
     const world = createWorld({ scenario: scenario ?? FOUNDATION_SCENARIO });
-    sim = createSimulation(world, undefined, undefined, undefined, undefined, undefined, undefined, freeKickConfig);
+    sim = createSimulation(world, undefined, undefined, undefined, undefined, undefined, undefined, freeKickConfig, cardConfig);
     session = createPresentationSession(container, rendererConfig);
   }
 

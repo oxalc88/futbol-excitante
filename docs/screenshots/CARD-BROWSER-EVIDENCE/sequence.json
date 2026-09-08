@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "objective_id": "CARD-BROWSER-EVIDENCE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "semantic_order": "qualifying foul contact -> caution (yellow) issued -> continued fouls -> 4th foul -> expulsion (red) issued",
+  "durable_capture": true,
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "rendering": {
+    "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium)",
+    "hud": "showMatchPhaseHud:true + showCardHud:true (curated card booking notice, presentation-only enrichment)"
+  },
+  "arc": {
+    "foul_ticks": [
+      66,
+      116,
+      173,
+      276,
+      371
+    ],
+    "fouling_player_id": "player-1",
+    "caution": {
+      "tick": 116,
+      "cardType": "caution",
+      "accumulatedFouls": 2,
+      "fouledPlayerId": "player-10"
+    },
+    "expulsion": {
+      "tick": 371,
+      "cardType": "expulsion",
+      "accumulatedFouls": 5,
+      "fouledPlayerId": "player-9"
+    },
+    "booking_state": {
+      "player-1": {
+        "fouls": 5,
+        "cautions": 1,
+        "expulsions": 1
+      }
+    }
+  },
+  "frames": [
+    {
+      "label": "foul-1-contact",
+      "path": "foul-1-contact.png",
+      "tick": 66,
+      "semantic": "before",
+      "description": "Qualifying foul contact: the offending body (player-1) commits a man-not-ball standing tackle on the carrier — both in contact, the ball still in play (PLAYING), and no card yet (1st accumulated foul)",
+      "sha256": "91e601d58544047cc9a79aad5407b664ccda35829933e33ccee3ff0c1e959131"
+    },
+    {
+      "label": "caution",
+      "path": "caution.png",
+      "tick": 116,
+      "semantic": "event",
+      "description": "Caution (yellow) issued on the 2nd accumulated foul: the shared predicate recognizes the man-not-ball contact and the card consequence issues a caution to player-1 (fouled player-10, accumulated 2); the card HUD shows the yellow booking",
+      "sha256": "9cc756d01798688feeb16cd0ca7550afeb8a68932854922d01604f4092cb86c9"
+    },
+    {
+      "label": "continued-foul",
+      "path": "continued-foul.png",
+      "tick": 173,
+      "semantic": "transition",
+      "description": "Continued fouls: the player commits a further man-not-ball tackle (the 3rd accumulated foul) while still booked — the accumulation continues toward the red threshold",
+      "sha256": "b592d4e386afd5ba259dcc632800fe405ef93b15d698b9efa24a1ee37d1a0d23"
+    },
+    {
+      "label": "foul-4-contact",
+      "path": "foul-4-contact.png",
+      "tick": 276,
+      "semantic": "transition",
+      "description": "The 4th accumulated foul: the recurring man-not-ball tackle contact keeps the booking state live (still one yellow), one foul short of the expulsion",
+      "sha256": "b09bb6b337e4cfeecb431522df6b803cef040e8b094005c6ba9959933a049569"
+    },
+    {
+      "label": "expulsion",
+      "path": "expulsion.png",
+      "tick": 371,
+      "semantic": "result",
+      "description": "Expulsion (red) issued on the 5th accumulated foul: the card consequence issues an expulsion to player-1 (fouled player-9, accumulated 5); the card HUD shows the red booking",
+      "sha256": "84d8fd293be810fa93ffa97ffb81d4fdb65a1f430ea23a444c152c3ec67908b0"
+    }
+  ]
+}

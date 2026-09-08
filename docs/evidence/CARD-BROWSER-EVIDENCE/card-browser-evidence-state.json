@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "objective_id": "CARD-BROWSER-EVIDENCE",
+  "produced_by": "scripts/capture-card-browser-evidence.ts",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "spec_sections": [
+    "FOULS_CARDS_SPEC §5.1",
+    "FOULS_CARDS_SPEC §7",
+    "FOULS_CARDS_SPEC §9.1",
+    "FOULS_CARDS_SPEC §10",
+    "FOULS_CARDS_SPEC §11"
+  ],
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "play_ticks": 420,
+  "rendering": {
+    "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium)",
+    "hud": "showMatchPhaseHud:true + showCardHud:true (curated card booking notice, presentation-only enrichment)"
+  },
+  "semantics": {
+    "order": "qualifying foul contact -> caution (yellow) issued -> continued fouls -> 4th foul -> expulsion (red) issued",
+    "note": "event-centered on the booking consequence: the qualifying man-not-ball foul contact, the caution (yellow) at the 2nd accumulated foul, continued fouls, the 4th foul, and the expulsion (red) at the 5th accumulated foul — the card HUD notice reads the committed card-issued events from the persistent committed state."
+  },
+  "frames": [
+    {
+      "label": "foul-1-contact",
+      "path": "foul-1-contact.png",
+      "tick": 66,
+      "semantic": "before",
+      "description": "Qualifying foul contact: the offending body (player-1) commits a man-not-ball standing tackle on the carrier — both in contact, the ball still in play (PLAYING), and no card yet (1st accumulated foul)",
+      "sha256": "91e601d58544047cc9a79aad5407b664ccda35829933e33ccee3ff0c1e959131"
+    },
+    {
+      "label": "caution",
+      "path": "caution.png",
+      "tick": 116,
+      "semantic": "event",
+      "description": "Caution (yellow) issued on the 2nd accumulated foul: the shared predicate recognizes the man-not-ball contact and the card consequence issues a caution to player-1 (fouled player-10, accumulated 2); the card HUD shows the yellow booking",
+      "sha256": "9cc756d01798688feeb16cd0ca7550afeb8a68932854922d01604f4092cb86c9"
+    },
+    {
+      "label": "continued-foul",
+      "path": "continued-foul.png",
+      "tick": 173,
+      "semantic": "transition",
+      "description": "Continued fouls: the player commits a further man-not-ball tackle (the 3rd accumulated foul) while still booked — the accumulation continues toward the red threshold",
+      "sha256": "b592d4e386afd5ba259dcc632800fe405ef93b15d698b9efa24a1ee37d1a0d23"
+    },
+    {
+      "label": "foul-4-contact",
+      "path": "foul-4-contact.png",
+      "tick": 276,
+      "semantic": "transition",
+      "description": "The 4th accumulated foul: the recurring man-not-ball tackle contact keeps the booking state live (still one yellow), one foul short of the expulsion",
+      "sha256": "b09bb6b337e4cfeecb431522df6b803cef040e8b094005c6ba9959933a049569"
+    },
+    {
+      "label": "expulsion",
+      "path": "expulsion.png",
+      "tick": 371,
+      "semantic": "result",
+      "description": "Expulsion (red) issued on the 5th accumulated foul: the card consequence issues an expulsion to player-1 (fouled player-9, accumulated 5); the card HUD shows the red booking",
+      "sha256": "84d8fd293be810fa93ffa97ffb81d4fdb65a1f430ea23a444c152c3ec67908b0"
+    }
+  ],
+  "arc": {
+    "foul_ticks": [
+      66,
+      116,
+      173,
+      276,
+      371
+    ],
+    "fouling_player_id": "player-1",
+    "caution": {
+      "tick": 116,
+      "cardType": "caution",
+      "accumulatedFouls": 2,
+      "fouledPlayerId": "player-10"
+    },
+    "expulsion": {
+      "tick": 371,
+      "cardType": "expulsion",
+      "accumulatedFouls": 5,
+      "fouledPlayerId": "player-9"
+    },
+    "booking_state": {
+      "player-1": {
+        "fouls": 5,
+        "cautions": 1,
+        "expulsions": 1
+      }
+    }
+  },
+  "correspondence": {
+    "browser_caution_tick": 116,
+    "browser_expulsion_tick": 371,
+    "browser_fouling_player": "player-1",
+    "browser_booking_state": {
+      "player-1": {
+        "fouls": 5,
+        "cautions": 1,
+        "expulsions": 1
+      }
+    },
+    "headless_foul_ticks": [
+      66,
+      116,
+      173,
+      276,
+      371
+    ],
+    "headless_caution_tick": 116,
+    "headless_expulsion_tick": 371,
+    "headless_fouling_player": "player-1",
+    "headless_booking_state": {
+      "player-1": {
+        "fouls": 5,
+        "cautions": 1,
+        "expulsions": 1
+      }
+    },
+    "caution_tick_offset": 0,
+    "expulsion_tick_offset": 0,
+    "foul_tick_offsets": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "offsets_traced": true
+  },
+  "drives": {
+    "fixture": "5v5-human-vs-cpu.v1.json + withProximateHumanDefence (the accepted driven-duel shape)",
+    "policy": "repeated scripted standing-tackle (commitDistance 3.0, earliestTicks 44..400 step 16) on the HUMAN slot; CPU slots through the same adapter + team-decision profile the browser composition root uses",
+    "capture_test": "tests/browser/card-browser-evidence.browser.test.ts",
+    "rendering_surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium), showMatchPhaseHud:true + showCardHud:true"
+  },
+  "disclosures": [
+    "The fouls and cards are REAL core events: the core commits man-not-ball tackle contacts (spec §5.1) and, with the accepted issueCards gate, the in-core card consequence issues a caution on the 2nd accumulated foul and an expulsion on the 5th. The driven-duel script reproduces the headless defensive-duel driver's standing-tackle policy; nothing is forced or synthesized.",
+    "The card-issued event is commit-only to the core's persistent state (the accepted serialization limitation), so the browser test reads it from the snapshot's committed events rather than the per-step event array. The card HUD reads the same committed events through the presentation-only enrichment.",
+    "The renderer card HUD is a new, OPTIONAL, draw-only presentation affordance (showCardHud, default false). It reads the immutable snapshot's events array. When gated off (the default) the HUD height and the draw path are unchanged, so every non-opted-in render is byte-identical to the pre-change baseline; when the snapshot carries no card events (issueCards off) it draws nothing.",
+    "The driven fixture is a DRIVEN duel (short observation window, a repeated scripted standing-tackle sequence), not an organic 90-minute match; the fouling sequence is disclosed, not masked.",
+    "The booking thresholds (accumulated 2 → caution, accumulated 5 → expulsion) and the in-core card consequence are fouls-v1 VERSIONED_PROVISIONAL design choices, NOT measured PES 2017 constants."
+  ],
+  "claims_not_made": [
+    "No suite-level PASS claim: this is DYNAMIC_VISUAL browser-visible evidence; the CARD-ISSUED suite criterion was registered and executed in the CARD-ISSUED-SUITE-REGISTRATION objective (3/4), not here.",
+    "No direct-red-by-contact-severity claim: the severity discriminator is BLOCKED_MISSING_REFERENCE (§7 / §11); the card consequence issues cards by equal-fouls accumulation only.",
+    "No advantage implementation: ADVANTAGE-PLAYED stays spec-only (§6), deferred.",
+    "No PES 2017 fidelity or measured PES envelope claim: The booking thresholds (accumulated 2 → caution, accumulated 5 → expulsion) and the in-core card consequence are fouls-v1 VERSIONED_PROVISIONAL design choices, NOT measured PES 2017 constants.",
+    "No gameplay / simulation-core / contracts change: git diff src/simulation/ and src/contracts/ are EMPTY. The only src changes are the test-bridge optional cardConfig pass-through (default-undefined) and the opt-in renderer card-HUD affordance (showCardHud, default-off, byte-neutral when off), plus a presentation-only snapshot enrichment (enrichPresentationWithCards).",
+    "No claim that the booking was forced: each card is issued by the in-core card consequence over the shared foul predicate on a REAL committed man-not-ball tackle contact; the driven-duel script only reproduces the headless defensive-duel driver's repeated standing-tackle policy.",
+    "No claim that the browser composition root and the headless runner are per-tick byte-identical: the verified correspondence is the event structure (foul ticks, caution/expulsion ticks, offender, accumulated counts, booking state), never per-tick floats (the known pinned-runtime gap).",
+    "The card is commit-only to the core's persistent state (state.events): the simulation's derived presentation leaves `events` empty, so the card HUD reads the committed card events through an explicit presentation-only enrichment. The renderer affordance is draw-only and gated; with no card events (gate off) it draws nothing."
+  ],
+  "record_sha256": "bc9daf1fff3167eed5e7d14a6c7a739c3210e4fa449268b5bef76de9384069d0"
+}

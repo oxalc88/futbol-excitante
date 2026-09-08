@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "objective_id": "CARD-BROWSER-EVIDENCE",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-card-browser-evidence.ts",
+  "driver": "eval/runners/defensive-duel-driver.ts runDefensiveDuel({ cardConfig:{ issueCards:true } }) with repeated scripted standing tackles — the accepted driven-duel shape reproducing the browser run's event structure.",
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "play_ticks": 420,
+  "frame_anchors": [
+    {
+      "label": "foul-1-contact",
+      "path": "foul-1-contact.png",
+      "tick": 66,
+      "semantic": "before",
+      "sha256": "91e601d58544047cc9a79aad5407b664ccda35829933e33ccee3ff0c1e959131"
+    },
+    {
+      "label": "caution",
+      "path": "caution.png",
+      "tick": 116,
+      "semantic": "event",
+      "sha256": "9cc756d01798688feeb16cd0ca7550afeb8a68932854922d01604f4092cb86c9"
+    },
+    {
+      "label": "continued-foul",
+      "path": "continued-foul.png",
+      "tick": 173,
+      "semantic": "transition",
+      "sha256": "b592d4e386afd5ba259dcc632800fe405ef93b15d698b9efa24a1ee37d1a0d23"
+    },
+    {
+      "label": "foul-4-contact",
+      "path": "foul-4-contact.png",
+      "tick": 276,
+      "semantic": "transition",
+      "sha256": "b09bb6b337e4cfeecb431522df6b803cef040e8b094005c6ba9959933a049569"
+    },
+    {
+      "label": "expulsion",
+      "path": "expulsion.png",
+      "tick": 371,
+      "semantic": "result",
+      "sha256": "84d8fd293be810fa93ffa97ffb81d4fdb65a1f430ea23a444c152c3ec67908b0"
+    }
+  ],
+  "arc": {
+    "foul_ticks": [
+      66,
+      116,
+      173,
+      276,
+      371
+    ],
+    "fouling_player_id": "player-1",
+    "caution": {
+      "tick": 116,
+      "cardType": "caution",
+      "accumulatedFouls": 2,
+      "fouledPlayerId": "player-10"
+    },
+    "expulsion": {
+      "tick": 371,
+      "cardType": "expulsion",
+      "accumulatedFouls": 5,
+      "fouledPlayerId": "player-9"
+    },
+    "booking_state": {
+      "player-1": {
+        "fouls": 5,
+        "cautions": 1,
+        "expulsions": 1
+      }
+    }
+  },
+  "correspondence": {
+    "browser_caution_tick": 116,
+    "browser_expulsion_tick": 371,
+    "browser_fouling_player": "player-1",
+    "browser_booking_state": {
+      "player-1": {
+        "fouls": 5,
+        "cautions": 1,
+        "expulsions": 1
+      }
+    },
+    "headless_foul_ticks": [
+      66,
+      116,
+      173,
+      276,
+      371
+    ],
+    "headless_caution_tick": 116,
+    "headless_expulsion_tick": 371,
+    "headless_fouling_player": "player-1",
+    "headless_booking_state": {
+      "player-1": {
+        "fouls": 5,
+        "cautions": 1,
+        "expulsions": 1
+      }
+    },
+    "caution_tick_offset": 0,
+    "expulsion_tick_offset": 0,
+    "foul_tick_offsets": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "offsets_traced": true
+  },
+  "foul_count": 5,
+  "card_count": 2,
+  "disclosures": [
+    "The trajectory is the accepted headless card-driven-duel stream (active foul ticks 66/116/173/276/371, caution at tick 116, expulsion at tick 371). The browser run locates the same event structure from its own committed event log; per-tick floats are not compared across runtimes (the known pinned-runtime gap).",
+    "The booking thresholds (accumulated 2 → caution, accumulated 5 → expulsion) and the in-core card consequence are fouls-v1 VERSIONED_PROVISIONAL design choices, NOT measured PES 2017 constants."
+  ]
+}

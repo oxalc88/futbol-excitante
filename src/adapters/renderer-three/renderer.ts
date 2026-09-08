@@ -93,6 +93,16 @@ export interface RendererConfig {
    * render that does not opt in stays byte-identical to the baseline.
    */
   showFulltimeFlowHud?: boolean;
+  /**
+   * Draw the committed booking (card) notices on the match-phase HUD
+   * (CARD-BROWSER-EVIDENCE): when the snapshot's `events` carry `card-issued`
+   * entries (a presentation-only enrichment that copies the core's committed
+   * card events into the snapshot's presentation-event array) the HUD renders
+   * a yellow/red card notice per booking.  Draw-only, reads the immutable
+   * snapshot, and is a no-op unless `showMatchPhaseHud` is also enabled so a
+   * render that does not opt in stays byte-identical to the baseline.
+   */
+  showCardHud?: boolean;
 }
 
 /**
@@ -120,6 +130,7 @@ export const DEFAULT_RENDERER_CONFIG: RendererConfig = {
   keeperMarkerColor: 0xff33ff,
   showMatchPhaseHud: false,
   showFulltimeFlowHud: false,
+  showCardHud: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -232,6 +243,39 @@ export function enrichPresentationWithKeeperRoles(
       : player,
   );
   return { ...snapshot, players };
+}
+
+/**
+ * Return a copy of a presentation snapshot whose `events` array carries the
+ * committed `card-issued` events (CARD-BROWSER-EVIDENCE).
+ *
+ * The simulation's derived presentation leaves `events` empty (a card event is
+ * commit-only to the core's persistent state), so the composition layer passes
+ * the committed card events through this presentation-only post-process to make
+ * the booking legible to the opt-in card HUD.  The base snapshot is never
+ * mutated; a snapshot with no card events returns the input unchanged (and
+ * renders byte-identically), so the off-path is byte-neutral.
+ *
+ * @param snapshot - The immutable base presentation snapshot.
+ * @param cards - The committed `card-issued` events, read from the accepted
+ *   committed-events surface (`sim.snapshot().events` filtered to
+ *   `kind === "card-issued"`).  Each carries the core's own id/tick/kind/label.
+ * @returns A shallow copy with `events` set to the card events.
+ */
+export function enrichPresentationWithCards(
+  snapshot: PresentationSnapshot,
+  cards: ReadonlyArray<{ id: string; tick: number; kind: string; label: string }>,
+): PresentationSnapshot {
+  if (cards.length === 0) return snapshot;
+  return {
+    ...snapshot,
+    events: cards.map((card) => ({
+      id: card.id,
+      tick: card.tick,
+      kind: card.kind,
+      label: card.label,
+    })),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -681,6 +725,25 @@ function formatPhaseLabel(matchPhase: string): string {
   }
 }
 
+/**
+ * Compact HUD notice for a committed `card-issued` event (CARD-BROWSER-EVIDENCE).
+ *
+ * Parses the core's deterministic card label (e.g. "Caution: player-1
+ * accumulated 2 fouls (foul vs player-10)") into a short, legible booking line.
+ * Draw-only; never a simulation value.
+ */
+function formatCardNotice(label: string): { text: string; color: string } | null {
+  const isCaution = label.startsWith("Caution");
+  const isExpulsion = label.startsWith("Expulsion");
+  if (!isCaution && !isExpulsion) return null;
+  const player = /player-\d+/.exec(label)?.[0] ?? "?";
+  const count = /accumulated (\d+) fouls/.exec(label)?.[1] ?? "?";
+  return {
+    text: `${isExpulsion ? "RED CARD" : "YELLOW CARD"} ${player} (${count})`,
+    color: isExpulsion ? "#ff4040" : "#ffd700",
+  };
+}
+
 // ---------------------------------------------------------------------------
 // PresentationSession implementation
 // ---------------------------------------------------------------------------
@@ -808,7 +871,11 @@ export function createPresentationSession(
       // the HUD canvas extra height so the `[R] REMATCH  [M] MENU` line fits
       // below the phase/timer without touching the baseline 512x128 sprite used
       // when the flag is off (draw-only; the snapshot is read immutably).
-      hudHeight = config.showFulltimeFlowHud ? 192 : 128;
+      hudHeight = config.showFulltimeFlowHud
+        ? 192
+        : config.showCardHud
+          ? 176
+          : 128;
       hudCanvas.height = hudHeight;
       hudContext = hudCanvas.getContext("2d");
       hudTexture = new THREE.CanvasTexture(hudCanvas);
@@ -1055,6 +1122,25 @@ export function createPresentationSession(
       ctx.fillStyle = "#8bc34a";
       ctx.font = "bold 30px monospace";
       ctx.fillText("[R] REMATCH   [M] MENU", 18, 140);
+    }
+
+    // CARD-BROWSER-EVIDENCE: the booking notices.  The snapshot's `events`
+    // carry the committed card events only when a presentation-only enrichment
+    // copied them in (sim.presentation() leaves `events` empty); when present
+    // and `showCardHud` is opted in, draw one yellow/red line per booking.
+    // Draw-only; reads the immutable snapshot; no-op unless opted in.
+    if (config.showCardHud) {
+      let cardY = 108;
+      ctx.textBaseline = "top";
+      for (const ev of snapshot.events) {
+        if (ev.kind !== "card-issued") continue;
+        const notice = formatCardNotice(ev.label);
+        if (!notice) continue;
+        ctx.fillStyle = notice.color;
+        ctx.font = "bold 20px monospace";
+        ctx.fillText(notice.text, 18, cardY);
+        cardY += 26;
+      }
     }
 
     texture.needsUpdate = true;
