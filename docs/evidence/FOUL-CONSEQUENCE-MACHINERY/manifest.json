@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "FOUL-CONSEQUENCE-MACHINERY",
+  "accepted_at": "2026-09-08T02:52:36.295Z",
+  "candidate_commit": "83622cbb68627341ded3130696a7bcbc4e41e5c0",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/FOUL-CONSEQUENCE-MACHINERY/trajectory.json",
+      "sha256": "1c61d5c0f96dc1a52d037ad2f5b76a642423648e6cc13b7e0a81f37e7b71a315",
+      "git_blob": "6d0b62d39e92d86897126669c29e48886e86d386",
+      "candidate_commit": "83622cbb68627341ded3130696a7bcbc4e41e5c0",
+      "bytes": 19391,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/FOUL-CONSEQUENCE-MACHINERY/audit.json",
+      "sha256": "581c8dac909bf1f5bee9222e3c2d238dff200699aeb401f48925be6548ef9506",
+      "git_blob": "40f3acfe7e683fb4b826e9166372165182d5e5e4",
+      "candidate_commit": "83622cbb68627341ded3130696a7bcbc4e41e5c0",
+      "bytes": 2671,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-08/2026-09-08T02-52-36-295Z-FOUL-CONSEQUENCE-MACHINERY-acceptance.json"
+}
