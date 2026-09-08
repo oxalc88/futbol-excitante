@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.7",
+  "persisted_at": "2026-09-08T10:09:40.797Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "FOULS-AGGREGATE-HONESTY-RERUN",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "7fc796999940c5369a23a3b175b05a56fbfb6b39",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v36 1/4: the honest aggregate verdict state re-published after the GK-*-REG conversion + the accumulated cosmetic threads folded (evidence class BOOKKEEPING, the RULES-SUITE-STATE-RERUN pattern; zero gameplay/source change — git diff src/ src/contracts/ EMPTY; verified by builder, critic, AND integration). THE AGGREGATES (executed, not asserted): the goalkeepers suite with the registered canary live over its accepted streams -> 10 PASS / 0 FAIL / 1 NOT_EVALUATED (causal) / 1 BLOCKED_MISSING_REFERENCE (ref) / 1 NEEDS_PERCEPTUAL_REVIEW (vis) — exactly ONE criterion changed vs the pinned 9/0/2/1/1 baseline (abaf6ccd…, loaded verbatim and diffed, not hand-computed): reg NOT_EVALUATED -> PASS through the registered gk-regression canary over gk-continuous-live / gk-shot-fixture-live / gk-release-fixture-live; COMMON-DETERMINISTIC carried by the real two-run byte-identity attestation (per-run state_hash_chain_identical + observations_byte_identical true on all three streams), not forced; the 9 behavior/common keys unchanged. The fouls suite (suite-fouls-v1): 3 of the 5 §10 criteria registered and all executed PASS (FOUL-DETECT + FOUL-CLEAN-TACKLE on four streams; FREE-KICK-AWARD on freekick-organic); the two power-guard streams (freekick-antihuddle-window, freekick-human-serve — a free kick with no detected foul -> FAIL) deliberately excluded from the genuine aggregate AND reported as executed FAILs (the eligibility-exclusion precedent); the driven-duel serialization limit disclosed as honest NOT_EVALUATED rather than promoted; CARD-ISSUED / ADVANTAGE-PLAYED stay named-not-registered; no suite-level PASS. COSMETIC FOLD (all five threads, each verdict-neutral): (1) the FREE_KICK_POSITION_TOLERANCE prose disclosure added to the FREE-KICK-AWARD criterion JSDoc (8 lines, doc-only — mirrors the rules-restart 0.2 m precedent); (2) fouls-suite-binding:45 comment -> \"the three registered\"; (3) the foul-consequence binding test TITLE corrected (\"…the RULES suite does not carry FREE-KICK-AWARD (a fouls-suite criterion)\") with the assertion body untouched; (4) FOULS_CARDS_SPEC §2.1/§2.2 updated to the accurate 3-registered/2-named-not-registered + accepted-machinery state — the fouls-spec-binding phrase assertions stayed green before AND after (stash-verified both directions by the critic; integration re-ran 42/42); (5) package.json: capture-human-ball-server-literal + capture-foul-consequence-machinery registered, both smoke-checked and reproducing their accepted record SHAs (85fc082d…, 39da80ad…); capture-foul-freekick-browser-evidence already exists as the browser-frames test (the record producer lives under capture-foul-freekick-browser-record — a duplicate name is impossible without overwriting, disclosed). Tests: the new binding 9/9; fouls-suite 24 + fouls-spec 42 + foul-consequence 7 (before AND after); GK/fouls/rules/registry batteries green (integration: 82 + 175 + 76 + 51 + 31 + 89); typecheck 0; gauntlet:eval 39+33; eval:state 13/13. record_sha256 c8b3b63edd57f6acd15e91f4daa0bdb8d35e239155ee51b6975cc76f59acaa21 (no wall-clock field; reproduced byte-exact by the critic AND integration; docs/ byte-identical on ordinary runs; durable writes under WIP_SECTION=__EVIDENCE__:FOULS-AGGREGATE-HONESTY-RERUN). Audit PASS BOOKKEEPING. Disclosures: the residual FOULS_CARDS_SPEC Status/Scope preamble staleness (\"NO foul machinery yet\") is pinned verbatim by fouls-spec-binding.test.ts:83 and lies outside the §2.1/§2.2 scope — left in place (conservative direction; under-claims), to fold when the registered-count language is next legitimately updated (CARD-ISSUED-SUITE-REGISTRATION); two stale header comments outside the scoped lines remain (cosmetic, assertions correct); the organic-foul-stashed / freekick-gate-off controls cited from accepted records rather than re-run (runtime bounding; cannot affect any aggregate); the vitest worker-RPC artifact non-fatal. claims_not_made: no suite-level PASS claim for either suite / no PROMOTION / no FOUNDATION_LAB_PASS / no milestone or regression PASS / no PES fidelity / no invented reference envelope (GK-*-REF stay BLOCKED_MISSING_REFERENCE) / no criterion upgraded beyond the executed evaluator / no gameplay/source/contract change."
+}
