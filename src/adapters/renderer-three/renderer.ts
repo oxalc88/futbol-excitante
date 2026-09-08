@@ -676,6 +676,7 @@ function formatPhaseLabel(matchPhase: string): string {
     case "corner-kick": return "CORNER KICK";
     case "throw-in": return "THROW IN";
     case "goal-kick": return "GOAL KICK";
+    case "free-kick": return "FREE KICK";
     default: return matchPhase.toUpperCase();
   }
 }

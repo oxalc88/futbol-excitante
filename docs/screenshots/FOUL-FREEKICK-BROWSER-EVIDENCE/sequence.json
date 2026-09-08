@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-FREEKICK-BROWSER-EVIDENCE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "semantic_order": "tackle contact (the foul) -> free-kick award -> set-piece placement -> served free kick",
+  "durable_capture": true,
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "rendering": {
+    "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium)",
+    "hud": "showMatchPhaseHud:true (curated FREE KICK label)"
+  },
+  "arc": {
+    "foul_tick": 51,
+    "awarding_team": "team-b",
+    "free_kick_executed_tick": 111,
+    "free_kick_position": {
+      "x": -1.81289661272071,
+      "y": 0.007171422293912808
+    },
+    "kick_taker": "player-10",
+    "kick_direction": {
+      "x": 0,
+      "y": -1
+    },
+    "match_timer_at_award": 5350
+  },
+  "frames": [
+    {
+      "label": "tackle-contact",
+      "path": "tackle-contact.png",
+      "tick": 50,
+      "semantic": "before",
+      "description": "Tackle contact (the foul): the defending body commits a man-not-ball standing tackle on the carrier — both in contact, the ball still in play (PLAYING) before the free kick is awarded",
+      "sha256": "36ea577ecbda31d1e05652e4f866bff90ce95bb1e67bdee563aa1e38ed1b022c"
+    },
+    {
+      "label": "freekick-award",
+      "path": "freekick-award.png",
+      "tick": 51,
+      "semantic": "event",
+      "description": "Free kick awarded: the phase turns FREE KICK after the man-not-ball contact; the ball is re-placed at the contact position and the set piece is arranged (awarded to team-b)",
+      "sha256": "cf522fae2947fd6f30cc448cc58f7f69e0aaf080033accca3c43d7977f704e21"
+    },
+    {
+      "label": "freekick-placement",
+      "path": "freekick-placement.png",
+      "tick": 91,
+      "semantic": "transition",
+      "description": "Set-piece placement: the taker on the re-placed ball at the contact spot, the fouled-team receivers spread, the opposing team marking, the in-play clock frozen (FREE KICK)",
+      "sha256": "f31f80e037468ea890a7c2f0a132f1310a76e4c6a4d9559f2de83008464fd3d0"
+    },
+    {
+      "label": "freekick-served",
+      "path": "freekick-served.png",
+      "tick": 114,
+      "semantic": "result",
+      "description": "Served free kick: the ball is back in play off the contact spot along the committed kick direction (player-10), the phase is PLAYING again",
+      "sha256": "f1bbe9b8bc284efbb08657820f7df1cf812b62bcf0d6915c75810858c3cb1b34"
+    }
+  ]
+}

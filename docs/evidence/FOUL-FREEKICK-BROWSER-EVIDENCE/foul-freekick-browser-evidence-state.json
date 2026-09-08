@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-FREEKICK-BROWSER-EVIDENCE",
+  "produced_by": "scripts/capture-foul-freekick-browser-evidence.ts",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "spec_sections": [
+    "FOULS_CARDS_SPEC §5.1",
+    "FOULS_CARDS_SPEC §8",
+    "FOULS_CARDS_SPEC §10"
+  ],
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "play_ticks": 200,
+  "rendering": {
+    "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium)",
+    "hud": "showMatchPhaseHud:true (curated FREE KICK label)"
+  },
+  "semantics": {
+    "order": "tackle contact (the foul) -> free-kick award -> set-piece placement -> served free kick",
+    "note": "event-centered on the foul → free-kick consequence: the man-not-ball tackle contact, the free-kick award (the phase turns FREE KICK), the set-piece placement at the contact spot, and the served free kick back in play."
+  },
+  "frames": [
+    {
+      "label": "tackle-contact",
+      "path": "tackle-contact.png",
+      "tick": 50,
+      "semantic": "before",
+      "description": "Tackle contact (the foul): the defending body commits a man-not-ball standing tackle on the carrier — both in contact, the ball still in play (PLAYING) before the free kick is awarded",
+      "sha256": "36ea577ecbda31d1e05652e4f866bff90ce95bb1e67bdee563aa1e38ed1b022c"
+    },
+    {
+      "label": "freekick-award",
+      "path": "freekick-award.png",
+      "tick": 51,
+      "semantic": "event",
+      "description": "Free kick awarded: the phase turns FREE KICK after the man-not-ball contact; the ball is re-placed at the contact position and the set piece is arranged (awarded to team-b)",
+      "sha256": "cf522fae2947fd6f30cc448cc58f7f69e0aaf080033accca3c43d7977f704e21"
+    },
+    {
+      "label": "freekick-placement",
+      "path": "freekick-placement.png",
+      "tick": 91,
+      "semantic": "transition",
+      "description": "Set-piece placement: the taker on the re-placed ball at the contact spot, the fouled-team receivers spread, the opposing team marking, the in-play clock frozen (FREE KICK)",
+      "sha256": "f31f80e037468ea890a7c2f0a132f1310a76e4c6a4d9559f2de83008464fd3d0"
+    },
+    {
+      "label": "freekick-served",
+      "path": "freekick-served.png",
+      "tick": 114,
+      "semantic": "result",
+      "description": "Served free kick: the ball is back in play off the contact spot along the committed kick direction (player-10), the phase is PLAYING again",
+      "sha256": "f1bbe9b8bc284efbb08657820f7df1cf812b62bcf0d6915c75810858c3cb1b34"
+    }
+  ],
+  "arc": {
+    "foul_tick": 51,
+    "awarding_team": "team-b",
+    "free_kick_executed_tick": 111,
+    "free_kick_position": {
+      "x": -1.81289661272071,
+      "y": 0.007171422293912808
+    },
+    "kick_taker": "player-10",
+    "kick_direction": {
+      "x": 0,
+      "y": -1
+    },
+    "match_timer_at_award": 5350
+  },
+  "correspondence": {
+    "browser_foul_tick": 51,
+    "browser_free_kick_tick": 111,
+    "browser_awarding_team": "team-b",
+    "browser_contact_position": {
+      "x": -1.81289661272071,
+      "y": 0.007171422293912808
+    },
+    "headless_foul_tick": 51,
+    "headless_free_kick_tick": 111,
+    "headless_awarding_team": "team-b",
+    "headless_contact_position": {
+      "x": -1.81289661272071,
+      "y": 0.007171422293912808
+    },
+    "foul_tick_offset": 0,
+    "free_kick_tick_offset": 0,
+    "free_kick_countdown": 60,
+    "offsets_traced": true
+  },
+  "drives": {
+    "fixture": "5v5-human-vs-cpu.v1.json + withProximateHumanDefence (the accepted driven-duel shape)",
+    "policy": "scripted standing-tackle (commitDistance 3, earliestTick 48) on the HUMAN slot; CPU slots through the same adapter + team-decision profile the browser composition root uses",
+    "capture_test": "tests/browser/foul-freekick-browser-evidence.browser.test.ts",
+    "rendering_surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium), showMatchPhaseHud:true"
+  },
+  "disclosures": [
+    "The foul and free kick are REAL core events: the core commits a man-not-ball tackle contact (spec §5.1) and, with the accepted awardFreeKicks gate, awards a free kick to the fouled team at the contact position. The driven-duel script reproduces the headless defensive-duel driver's standing-tackle policy; nothing is forced or synthesized.",
+    "The free-kick-executed event is committed to the core's persistent state (the accepted serialization limitation), so the browser test reads it from the snapshot rather than the per-step event array.",
+    "The driven fixture is a DRIVEN duel (short observation window, exactly one scripted standing tackle), not an organic 90-minute match; the fouling sequence is disclosed, not masked.",
+    "The free-kick countdown is 60; applyFreeKick's serve speed (14 m/s) and loft (0.18) and ball-z (0.11) are VERSIONED_PROVISIONAL match-rules-v1-kind design choices, NOT measured PES 2017 constants."
+  ],
+  "claims_not_made": [
+    "No card or advantage implementation or evidence: cards and advantage stay spec-only (FOULS_CARDS_SPEC §7 / §6).",
+    "No suite-level PASS claim: this is DYNAMIC_VISUAL browser-visible evidence; the FREE-KICK-AWARD suite criterion was registered and executed in the FREE-KICK-SUITE-REGISTRATION objective (1/4's sibling), not here.",
+    "No PROMOTION claim. No FOUNDATION_LAB_PASS claim.",
+    "No PES 2017 fidelity or measured PES envelope claim: applyFreeKick's serve speed (14 m/s) and loft (0.18) and ball-z (0.11) are VERSIONED_PROVISIONAL match-rules-v1-kind design choices, NOT measured PES 2017 constants.",
+    "No gameplay / simulation-core / contracts change: git diff src/simulation/ and src/contracts/ are EMPTY. The only presentation-facing change is the curated 'FREE KICK' renderer HUD label (additive, opt-in via showMatchPhaseHud, byte-neutral when off).",
+    "No claim that the free kick was forced: the foul is a REAL core man-not-ball contact (the shared foul predicate) that organises the acceptance of the scripted standing-tackle policy; the award/placement/serve are the core's own accepted restart machinery.",
+    "No claim that the browser composition root and the headless runner are per-tick byte-identical: the verified correspondence is the event structure (foul tick, free-kick tick, awarding team, contact position), never per-tick floats (the known pinned-runtime gap)."
+  ],
+  "record_sha256": "e65c3618369a1474eb2c094714b41fb85986e68d3a6e6f19011fd7ed4cb6188c"
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-FREEKICK-BROWSER-EVIDENCE",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-foul-freekick-browser-evidence.ts",
+  "driver": "eval/runners/defensive-duel-driver.ts runDefensiveDuel({ freeKickConfig:{ awardFreeKicks:true } }) — the accepted driven-duel shape reproducing the browser run's event structure.",
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "play_ticks": 200,
+  "frame_anchors": [
+    {
+      "label": "tackle-contact",
+      "path": "tackle-contact.png",
+      "tick": 50,
+      "semantic": "before",
+      "sha256": "36ea577ecbda31d1e05652e4f866bff90ce95bb1e67bdee563aa1e38ed1b022c"
+    },
+    {
+      "label": "freekick-award",
+      "path": "freekick-award.png",
+      "tick": 51,
+      "semantic": "event",
+      "sha256": "cf522fae2947fd6f30cc448cc58f7f69e0aaf080033accca3c43d7977f704e21"
+    },
+    {
+      "label": "freekick-placement",
+      "path": "freekick-placement.png",
+      "tick": 91,
+      "semantic": "transition",
+      "sha256": "f31f80e037468ea890a7c2f0a132f1310a76e4c6a4d9559f2de83008464fd3d0"
+    },
+    {
+      "label": "freekick-served",
+      "path": "freekick-served.png",
+      "tick": 114,
+      "semantic": "result",
+      "sha256": "f1bbe9b8bc284efbb08657820f7df1cf812b62bcf0d6915c75810858c3cb1b34"
+    }
+  ],
+  "correspondence": {
+    "browser_foul_tick": 51,
+    "browser_free_kick_tick": 111,
+    "browser_awarding_team": "team-b",
+    "browser_contact_position": {
+      "x": -1.81289661272071,
+      "y": 0.007171422293912808
+    },
+    "headless_foul_tick": 51,
+    "headless_free_kick_tick": 111,
+    "headless_awarding_team": "team-b",
+    "headless_contact_position": {
+      "x": -1.81289661272071,
+      "y": 0.007171422293912808
+    },
+    "foul_tick_offset": 0,
+    "free_kick_tick_offset": 0,
+    "free_kick_countdown": 60,
+    "offsets_traced": true
+  },
+  "free_kick_countdown": 60,
+  "disclosures": [
+    "The trajectory is the accepted headless defensive-duel stream (foul at tick 51, free kick at tick 111). The browser run locates the same event structure from its own event log; per-tick floats are not compared across runtimes (the known pinned-runtime gap).",
+    "The free-kick countdown is 60; applyFreeKick's serve speed (14 m/s) and loft (0.18) and ball-z (0.11) are VERSIONED_PROVISIONAL match-rules-v1-kind design choices, NOT measured PES 2017 constants."
+  ]
+}
