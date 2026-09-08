@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "CARD-BROWSER-EVIDENCE",
+  "accepted_at": "2026-09-08T17:44:53.892Z",
+  "candidate_commit": "9d8a1a4aebdb8396c6a83bf130c0970c62e7e2b2",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/CARD-BROWSER-EVIDENCE/caution.png",
+        "sha256": "9cc756d01798688feeb16cd0ca7550afeb8a68932854922d01604f4092cb86c9",
+        "git_blob": "9df2e4ca8acc256d4853a159cfd20a54e2d78ab8",
+        "candidate_commit": "9d8a1a4aebdb8396c6a83bf130c0970c62e7e2b2",
+        "bytes": 36197,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CARD-BROWSER-EVIDENCE/continued-foul.png",
+        "sha256": "b592d4e386afd5ba259dcc632800fe405ef93b15d698b9efa24a1ee37d1a0d23",
+        "git_blob": "55f3c7777587875d3410cf1eade4c32a58a5090d",
+        "candidate_commit": "9d8a1a4aebdb8396c6a83bf130c0970c62e7e2b2",
+        "bytes": 35551,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CARD-BROWSER-EVIDENCE/expulsion.png",
+        "sha256": "84d8fd293be810fa93ffa97ffb81d4fdb65a1f430ea23a444c152c3ec67908b0",
+        "git_blob": "9fb3b69aa910c7b4bf8307b171322040e69d7df3",
+        "candidate_commit": "9d8a1a4aebdb8396c6a83bf130c0970c62e7e2b2",
+        "bytes": 41433,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CARD-BROWSER-EVIDENCE/foul-1-contact.png",
+        "sha256": "91e601d58544047cc9a79aad5407b664ccda35829933e33ccee3ff0c1e959131",
+        "git_blob": "b6e600fa5fcaa930a43d30ffbba3ed12de9761b1",
+        "candidate_commit": "9d8a1a4aebdb8396c6a83bf130c0970c62e7e2b2",
+        "bytes": 30826,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/CARD-BROWSER-EVIDENCE/foul-4-contact.png",
+        "sha256": "b09bb6b337e4cfeecb431522df6b803cef040e8b094005c6ba9959933a049569",
+        "git_blob": "f977475891e1214cf09b3d733a30c6676b652479",
+        "candidate_commit": "9d8a1a4aebdb8396c6a83bf130c0970c62e7e2b2",
+        "bytes": 35457,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "CARD-BROWSER-EVIDENCE",
+        "evidence_class": "DYNAMIC_VISUAL",
+        "semantic_order": "qualifying foul contact -> caution (yellow) issued -> continued fouls -> 4th foul -> expulsion (red) issued",
+        "durable_capture": true,
+        "scenario": "5v5-human-vs-cpu-v1",
+        "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+        "rendering": {
+          "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium)",
+          "hud": "showMatchPhaseHud:true + showCardHud:true (curated card booking notice, presentation-only enrichment)"
+        },
+        "arc": {
+          "foul_ticks": [
+            66,
+            116,
+            173,
+            276,
+            371
+          ],
+          "fouling_player_id": "player-1",
+          "caution": {
+            "tick": 116,
+            "cardType": "caution",
+            "accumulatedFouls": 2,
+            "fouledPlayerId": "player-10"
+          },
+          "expulsion": {
+            "tick": 371,
+            "cardType": "expulsion",
+            "accumulatedFouls": 5,
+            "fouledPlayerId": "player-9"
+          },
+          "booking_state": {
+            "player-1": {
+              "fouls": 5,
+              "cautions": 1,
+              "expulsions": 1
+            }
+          }
+        },
+        "frames": [
+          {
+            "label": "foul-1-contact",
+            "path": "foul-1-contact.png",
+            "tick": 66,
+            "semantic": "before",
+            "description": "Qualifying foul contact: the offending body (player-1) commits a man-not-ball standing tackle on the carrier — both in contact, the ball still in play (PLAYING), and no card yet (1st accumulated foul)",
+            "sha256": "91e601d58544047cc9a79aad5407b664ccda35829933e33ccee3ff0c1e959131"
+          },
+          {
+            "label": "caution",
+            "path": "caution.png",
+            "tick": 116,
+            "semantic": "event",
+            "description": "Caution (yellow) issued on the 2nd accumulated foul: the shared predicate recognizes the man-not-ball contact and the card consequence issues a caution to player-1 (fouled player-10, accumulated 2); the card HUD shows the yellow booking",
+            "sha256": "9cc756d01798688feeb16cd0ca7550afeb8a68932854922d01604f4092cb86c9"
+          },
+          {
+            "label": "continued-foul",
+            "path": "continued-foul.png",
+            "tick": 173,
+            "semantic": "transition",
+            "description": "Continued fouls: the player commits a further man-not-ball tackle (the 3rd accumulated foul) while still booked — the accumulation continues toward the red threshold",
+            "sha256": "b592d4e386afd5ba259dcc632800fe405ef93b15d698b9efa24a1ee37d1a0d23"
+          },
+          {
+            "label": "foul-4-contact",
+            "path": "foul-4-contact.png",
+            "tick": 276,
+            "semantic": "transition",
+            "description": "The 4th accumulated foul: the recurring man-not-ball tackle contact keeps the booking state live (still one yellow), one foul short of the expulsion",
+            "sha256": "b09bb6b337e4cfeecb431522df6b803cef040e8b094005c6ba9959933a049569"
+          },
+          {
+            "label": "expulsion",
+            "path": "expulsion.png",
+            "tick": 371,
+            "semantic": "result",
+            "description": "Expulsion (red) issued on the 5th accumulated foul: the card consequence issues an expulsion to player-1 (fouled player-9, accumulated 5); the card HUD shows the red booking",
+            "sha256": "84d8fd293be810fa93ffa97ffb81d4fdb65a1f430ea23a444c152c3ec67908b0"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/CARD-BROWSER-EVIDENCE/sequence.json",
+        "sha256": "17fc0e83b1e4a9cd77e7d376187cc8dee65f3d4f35979ccac801c5d9c4d7636f",
+        "git_blob": "f92d501bc658492e1f6c761f1f606a820ee29932",
+        "candidate_commit": "9d8a1a4aebdb8396c6a83bf130c0970c62e7e2b2",
+        "bytes": 3229,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/CARD-BROWSER-EVIDENCE/trajectory.json",
+      "sha256": "43207a0f18b9b8644bb4369109a36242ae1508e3d950eb059b160832330c5258",
+      "git_blob": "8ad073092bc82ae20fa9dfa0d2c3e338bab48d66",
+      "candidate_commit": "9d8a1a4aebdb8396c6a83bf130c0970c62e7e2b2",
+      "bytes": 3508,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/CARD-BROWSER-EVIDENCE/audit.json",
+      "sha256": "3be8201f310294499d51e76c9fa6125b65c78b34ae7cc72b754fb3e256605631",
+      "git_blob": "fdb03982166680530b4a01ee8c8eda5981fd3e51",
+      "candidate_commit": "9d8a1a4aebdb8396c6a83bf130c0970c62e7e2b2",
+      "bytes": 2635,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-08/2026-09-08T17-44-53-892Z-CARD-BROWSER-EVIDENCE-acceptance.json"
+}
