@@ -219,6 +219,30 @@ export const INV_GK_DISTRIBUTION: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+/**
+ * GK regression evidence: the suite-level regression policy (specs/
+ * GOALKEEPER_SPEC.md §11.2) that FAILs when an accepted GK behavior pin div-
+ * erges without a model-version bump.
+ * Bound to the protected gk-regression-canary oracle.
+ */
+export const INV_GK_REGRESSION: InvariantDefinition = {
+  invariant_id: "gk-regression-evidence",
+  invariant_version: "invariant-gk-regression-v1",
+  input_observation_ids: [
+    "obs-gk-role-v1",
+    "obs-gk-positioning-v1",
+    "obs-gk-chase-v1",
+    "obs-gk-save-claim-v1",
+    "obs-gk-distribution-v1",
+  ],
+  oracle_id: "gk-regression-canary-v1",
+  oracle_version: "oracle-gk-regression-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 // ---------------------------------------------------------------------------
 // rules suite invariants
 //
@@ -632,6 +656,7 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_GK_NO_FIELD_CHASE.invariant_id]: INV_GK_NO_FIELD_CHASE,
   [INV_GK_SAVE_CLAIM.invariant_id]: INV_GK_SAVE_CLAIM,
   [INV_GK_DISTRIBUTION.invariant_id]: INV_GK_DISTRIBUTION,
+  [INV_GK_REGRESSION.invariant_id]: INV_GK_REGRESSION,
   [INV_RULES_OUT_OF_PLAY_DETECT.invariant_id]: INV_RULES_OUT_OF_PLAY_DETECT,
   [INV_RULES_OUT_OF_PLAY_NO_LAST_TOUCH.invariant_id]: INV_RULES_OUT_OF_PLAY_NO_LAST_TOUCH,
   [INV_RULES_THROW_IN_AWARD.invariant_id]: INV_RULES_THROW_IN_AWARD,

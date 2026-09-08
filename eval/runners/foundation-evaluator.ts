@@ -201,6 +201,35 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "gk-distribution-oracle-v1",
     oracle_version: "oracle-gk-distribution-v1",
   },
+  // GK REGRESSION-class criteria (GK-REGRESSION-POLICY-REGISTRATION): the six
+  // GK-*-REG catalog criteria bind to the suite-level regression canary so the
+  // goalkeepers suite produces a real regression verdict.  Additive; the
+  // duels/foundation REGRESSION criteria keep no oracle mapping and stay honest
+  // NOT_EVALUATED.
+  "GK-REA-001-REG": {
+    oracle_id: "gk-regression-canary-v1",
+    oracle_version: "oracle-gk-regression-v1",
+  },
+  "GK-WF-001-REG": {
+    oracle_id: "gk-regression-canary-v1",
+    oracle_version: "oracle-gk-regression-v1",
+  },
+  "GK-LEG-001-REG": {
+    oracle_id: "gk-regression-canary-v1",
+    oracle_version: "oracle-gk-regression-v1",
+  },
+  "GK-PARRY-001-REG": {
+    oracle_id: "gk-regression-canary-v1",
+    oracle_version: "oracle-gk-regression-v1",
+  },
+  "GK-REC-001-REG": {
+    oracle_id: "gk-regression-canary-v1",
+    oracle_version: "oracle-gk-regression-v1",
+  },
+  "GK-HIGH-001-REG": {
+    oracle_id: "gk-regression-canary-v1",
+    oracle_version: "oracle-gk-regression-v1",
+  },
   // MATCH_RULES_SPEC §15 rules criteria (RULES-SUITE-REGISTRATION): the
   // protected rules oracles.  Additive; no existing entry is changed and the
   // duels/foundation/GK criteria keep their existing bindings.
@@ -420,9 +449,29 @@ function computeOutcome(
     return "BLOCKED_MISSING_REFERENCE";
   }
 
-  // REGRESSION: NOT_EVALUATED (no versioned regression policy).
+  // REGRESSION: with a registered regression-policy oracle (GK-REGRESSION-
+  // POLICY-REGISTRATION) judge on what the canary actually observes — FAIL on a
+  // diverged/weakened pin, PASS on a preserved run, NOT_EVALUATED when the
+  // policy has nothing observable or the pin was deliberately version-bumped.
+  // A REGRESSION criterion with no registered regression oracle stays honest
+  // NOT_EVALUATED (no versioned regression policy exists for it).
   if (criterionClass === "REGRESSION") {
-    return "NOT_EVALUATED";
+    if (oracleResults.length === 0) {
+      return "NOT_EVALUATED";
+    }
+    const anyFail = oracleResults.some((r) => r.status === "fail");
+    if (anyFail) {
+      return "FAIL";
+    }
+    const anyNotEval = oracleResults.some((r) => r.status === "not_evaluated");
+    if (anyNotEval) {
+      return "NOT_EVALUATED";
+    }
+    const allPass = oracleResults.every((r) => r.status === "pass");
+    if (allPass) {
+      return "PASS";
+    }
+    return "FAIL";
   }
 
   // ENGINE_DESIGN_TARGET: the verdict comes from the bound oracle's own result.

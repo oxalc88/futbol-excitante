@@ -145,6 +145,24 @@ The executable half of this specification is the `goalkeepers` evaluator suite (
 
 Because no keeper behavior is implemented in this specification milestone, every GK-specific criterion is honestly registrable as not yet observable and MUST NOT claim `PASS` on gameplay. The suite wiring is executable (`evaluateSuite("goalkeepers", ...)` runs) and the registry validates, but no criterion passes gameplay.
 
+### 11.2 Regression policy (GK-*-REG)
+
+The REGRESSION-class criteria of the `goalkeepers` suite (`GK-REA-001-REG`, `GK-WF-001-REG`, `GK-LEG-001-REG`, `GK-PARRY-001-REG`, `GK-REC-001-REG`, `GK-HIGH-001-REG`) are candidate-versus-immutable-best preservation criteria governed by GAMEPLAY_EVALUATION_SPEC §5.5. They are registered to a single suite-level protected regression oracle (`gk-regression-canary-v1`) that reads the committed observation stream and FAILs when an accepted GK behavior pin diverges without a corresponding model-version bump.
+
+The protected behavior pins are the ACCEPTED, committed facts this specification and the accepted GK records establish:
+
+- gk-small-sided-v1 constants as consumed (the adapter's `GK_SMALL_SIDED_V1` and the versioned record `GK_PROVISIONAL_VALUES` must each carry the owning version id `gk-small-sided-v1` and the §9 accepted values — a silent value change with an identical version id is an un-versioned divergence and is `FAIL`);
+- the keeper-marker designation baseline (exactly one designated keeper per team, §4, stable for the run);
+- the goal-arc-hold behavior (§5) and the no-field-chase bound (§6);
+- the save/claim reaction (§7): a keeper contact within the versioned `save_claim_reach_radius` AND within the `keeper_reaction_window_ticks` after an opposing shot is the observed save/claim pin (preserved); a keeper contact within the window but outside `save_claim_reach_radius` is a weakened-divergence `FAIL`. A contact that occurs beyond the reaction window, or an opposing shot that is answered by no recorded keeper contact within the window, is `NOT_EVALUATED` per the accepted GK-SAVE-CLAIM oracle (the shot may legitimately score); the regression pin never converts a legitimately unanswered shot into a `FAIL`;
+- the distribution release behavior (§8): a release to a non-observed or non-teammate target (omniscience) is a `FAIL`, never an invented envelope.
+
+The oracle also verifies the committed per-tick state-hash chain is intact (monotonic ticks, non-empty committed `stateHash`/`prngStateHash`/`observationCoreHash`); a discontinuity is a `FAIL`. A stream that is not a two-team keeper match, or that carries no observable behavior pin, is the honest `NOT_EVALUATED` — never a `PASS` by silence.
+
+A behavior pin that diverges together with a model-version bump is a deliberate, versioned change: the oracle reports `NOT_EVALUATED` so the re-pin (a new version) is made explicit and never silently accepted. Without such a bump the pin must hold.
+
+This is an `ENGINE_DESIGN_TARGET`-independent regression contract: it makes no PES 2017 claim, invents no reference envelope, and never converts `BLOCKED_MISSING_REFERENCE` or `NEEDS_PERCEPTUAL_REVIEW` criteria into `PASS`. GK-*-REF stay `BLOCKED_MISSING_REFERENCE`, GK-*-VIS stay `NEEDS_PERCEPTUAL_REVIEW`, and GK-*-CAUSAL stay `NOT_EVALUATED` under their own criteria.
+
 ## 12. Declaration of limitations
 
 - This spec defines behavior, not implementation. No `src/` keeper subsystem exists yet.

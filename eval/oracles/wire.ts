@@ -32,6 +32,7 @@ import {
   checkGkSaveClaim,
   checkGkDistributionNoOmniscience,
 } from "./gk-role.js";
+import { checkGkRegression } from "./gk-regression.js";
 import {
   checkOutOfPlayDetection,
   checkOutOfPlayNoLastTouch,
@@ -212,6 +213,13 @@ const entries: OracleEntry[] = [
     oracle_id: "gk-distribution-oracle-v1",
     oracle_version: "oracle-gk-distribution-v1",
     fn: checkGkDistributionNoOmniscience,
+  },
+  // GK suite-level regression canary (GK-REGRESSION-POLICY-REGISTRATION):
+  // guards the accepted GK behavior pins against silent (un-versioned) divergence.
+  {
+    oracle_id: "gk-regression-canary-v1",
+    oracle_version: "oracle-gk-regression-v1",
+    fn: checkGkRegression,
   },
   // MATCH_RULES_SPEC §15 rules oracles (protected; read committed telemetry).
   {

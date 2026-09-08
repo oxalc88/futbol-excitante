@@ -694,7 +694,7 @@ export const BINDING_GK_REA_001: TestImplementationBinding = makeTestBindingWith
   {
     "GK-REA-001-REF": [],
     "GK-REA-001-VIS": [],
-    "GK-REA-001-REG": [],
+    "GK-REA-001-REG": ["gk-regression-evidence"],
     "GK-POSITIONING-HOLD": ["gk-positioning-evidence"],
     "GK-SAVE-CLAIM": ["gk-save-claim-evidence"],
     "GK-ROLE-DESIGNATION": ["gk-role-designation-evidence"],
@@ -716,7 +716,7 @@ export const BINDING_GK_WF_001: TestImplementationBinding = makeTestBindingWith(
   {
     "GK-WF-001-CAUSAL": [],
     "GK-WF-001-VIS": [],
-    "GK-WF-001-REG": [],
+    "GK-WF-001-REG": ["gk-regression-evidence"],
     "GK-NO-FIELD-CHASE": ["gk-no-field-chase-evidence"],
     "GK-POSITIONING-HOLD": ["gk-positioning-evidence"],
   },
@@ -738,7 +738,7 @@ export const BINDING_GK_LEG_001: TestImplementationBinding = makeTestBindingWith
     "GK-LEG-001-CONTACT": ["gk-save-claim-evidence"],
     "GK-LEG-001-REF": [],
     "GK-LEG-001-VIS": [],
-    "GK-LEG-001-REG": [],
+    "GK-LEG-001-REG": ["gk-regression-evidence"],
     "GK-SAVE-CLAIM": ["gk-save-claim-evidence"],
   },
 );
@@ -759,7 +759,7 @@ export const BINDING_GK_PARRY_001: TestImplementationBinding = makeTestBindingWi
     "GK-PARRY-001-CONTACT": ["gk-save-claim-evidence"],
     "GK-PARRY-001-REF": [],
     "GK-PARRY-001-VIS": [],
-    "GK-PARRY-001-REG": [],
+    "GK-PARRY-001-REG": ["gk-regression-evidence"],
     "GK-SAVE-CLAIM": ["gk-save-claim-evidence"],
   },
 );
@@ -779,7 +779,7 @@ export const BINDING_GK_REC_001: TestImplementationBinding = makeTestBindingWith
   {
     "GK-REC-001-REF": [],
     "GK-REC-001-VIS": [],
-    "GK-REC-001-REG": [],
+    "GK-REC-001-REG": ["gk-regression-evidence"],
     "GK-POSITIONING-HOLD": ["gk-positioning-evidence"],
     "GK-DISTRIBUTION-NO-OMNISCIENCE": ["gk-distribution-evidence"],
   },
@@ -801,7 +801,7 @@ export const BINDING_GK_HIGH_001: TestImplementationBinding = makeTestBindingWit
     "GK-HIGH-001-REACH": ["gk-save-claim-evidence"],
     "GK-HIGH-001-REF": [],
     "GK-HIGH-001-VIS": [],
-    "GK-HIGH-001-REG": [],
+    "GK-HIGH-001-REG": ["gk-regression-evidence"],
     "GK-SAVE-CLAIM": ["gk-save-claim-evidence"],
     "GK-POSITIONING-HOLD": ["gk-positioning-evidence"],
   },

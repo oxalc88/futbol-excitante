@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "objective_id": "GK-REGRESSION-POLICY-REGISTRATION",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-gk-regression-policy-registration.ts",
+  "driver": "eval/runners/headless-match.ts runHeadlessMatch (gkBehavior:true, core-owned lifecycle, re-home on, browserParityObservations:true) over the accepted organic + driven GK streams; each stream evaluated with the registered `goalkeepers` suite (evaluateSuite('goalkeepers', observations)) so the six GK-*-REG criteria resolve through the suite-level regression canary (specs/GOALKEEPER_SPEC.md §11.2).",
+  "activation": {
+    "field": "evaluateSuite('goalkeepers', observations) over the accepted + driven GK streams",
+    "meaning": "the registered `goalkeepers` suite (suite-goalkeepers-v1) evaluates the six GK-*-REG REGRESSION criteria through the registered gk-regression-canary oracle. The canary FAILs when an accepted GK behavior pin (gk-small-sided-v1 constants as consumed, keeper-marker designation baseline, arc-hold / no-field-chase, save/claim reaction, distribution release, committed state-hash chain) diverges without a model-version bump; PASS when the pins hold; honest NOT_EVALUATED when the stream carries no observable pin (e.g. a non-GK stream).",
+    "set_by": [
+      "eval/contracts/common-criteria.ts (GK-*-REG, class REGRESSION)",
+      "eval/contracts/bindings.ts (each GK-*-REG criterion binds gk-regression-evidence)",
+      "eval/contracts/invariant-definitions.ts INV_GK_REGRESSION (gk-regression-evidence)",
+      "eval/oracles/gk-regression.ts checkGkRegression (gk-regression-canary-v1)",
+      "eval/oracles/wire.ts + eval/runners/foundation-evaluator.ts CRITERION_TO_ORACLE + computeOutcome(REGRESSION)",
+      "NOT the browser composition root"
+    ]
+  },
+  "disclosures": [
+    "The regression canary reuses the accepted protected keeper oracles (gk-role.ts) for the behavior pins; its UNIQUE contribution is the version/provenance pin (constants as consumed + model version id continuity) and the committed state-hash chain integrity guard, giving it power beyond the individual behavior oracles.",
+    "GK-*-REF stay BLOCKED_MISSING_REFERENCE, GK-*-VIS stay NEEDS_PERCEPTUAL_REVIEW, GK-*-CAUSAL stay NOT_EVALUATED under their own criteria — none is converted by this registration.",
+    "The canary is wired only to the six GK-*-REG criteria; the duels/foundation REGRESSION criteria keep no regression oracle and stay honest NOT_EVALUATED.",
+    "No suite-level PASS: the goalkeepers suite remains partial (declared in the existing GK suite state); these verdicts are per-criterion (the six GK-*-REG) over per-stream MULTI_TICK evidence. No FOUNDATION_LAB_PASS, PES fidelity, or invented reference envelope claim."
+  ],
+  "runs": [
+    {
+      "id": "gk-continuous-live",
+      "role": "",
+      "scenario": "5v5-continuous-play-v1",
+      "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+      "ticks": 1800,
+      "lifecycle": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-continuous-play.v1.json, maxTicks: 1800, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' }) + evaluateSuite('goalkeepers', observations)",
+      "observation_count": 1800,
+      "event_kind_counts": {
+        "player-ball-contact": 37,
+        "gk-role": 2,
+        "shot": 17,
+        "player-player-contact": 642,
+        "pass": 10,
+        "second-touch": 77,
+        "tackle-phase": 36,
+        "pitch-contact": 1,
+        "keeper-release": 8,
+        "input-rejection": 3
+      },
+      "determinism": {
+        "state_hash_of_hashes": "6dbb4341999b19915c05f4363cd5dfadc17168771311f957a8a44583c0099584",
+        "final_state_hash": "fnv1a64-v1:2a19b387d2d30f36"
+      },
+      "suite_verdict": {
+        "suite_id": "goalkeepers",
+        "suite_version": "suite-goalkeepers-v1",
+        "gk_reg": {
+          "GK-HIGH-001-REG": "PASS",
+          "GK-LEG-001-REG": "PASS",
+          "GK-PARRY-001-REG": "PASS",
+          "GK-REA-001-REG": "PASS",
+          "GK-REC-001-REG": "PASS",
+          "GK-WF-001-REG": "PASS"
+        },
+        "gk_behavior": {
+          "GK-SAVE-CLAIM": "NOT_EVALUATED",
+          "GK-POSITIONING-HOLD": "PASS",
+          "GK-ROLE-DESIGNATION": "PASS",
+          "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS",
+          "GK-NO-FIELD-CHASE": "PASS"
+        },
+        "common": {
+          "COMMON-FINITE": "PASS",
+          "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+          "COMMON-REFERENCES": "PASS",
+          "COMMON-BOUNDS": "PASS"
+        },
+        "catalog": {
+          "ref": "BLOCKED_MISSING_REFERENCE",
+          "vis": "NEEDS_PERCEPTUAL_REVIEW",
+          "reg": "PASS",
+          "causal": "NOT_EVALUATED"
+        }
+      }
+    },
+    {
+      "id": "gk-shot-fixture-live",
+      "role": "",
+      "scenario": "5v5-keeper-shot-fixture-v1",
+      "scenario_path": "eval/scenarios/5v5-keeper-shot-fixture.v1.json",
+      "ticks": 600,
+      "lifecycle": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-keeper-shot-fixture.v1.json, maxTicks: 600, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' }) + evaluateSuite('goalkeepers', observations)",
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "gk-role": 2,
+        "shot": 19,
+        "second-touch": 5,
+        "player-player-contact": 9,
+        "goal": 1,
+        "pitch-contact": 1
+      },
+      "determinism": {
+        "state_hash_of_hashes": "4a1aa34d87e3a58829edae2416503ae7508011b6da7e8981325bd0a09bf092e0",
+        "final_state_hash": "fnv1a64-v1:bd427cdac09d7472"
+      },
+      "suite_verdict": {
+        "suite_id": "goalkeepers",
+        "suite_version": "suite-goalkeepers-v1",
+        "gk_reg": {
+          "GK-HIGH-001-REG": "PASS",
+          "GK-LEG-001-REG": "PASS",
+          "GK-PARRY-001-REG": "PASS",
+          "GK-REA-001-REG": "PASS",
+          "GK-REC-001-REG": "PASS",
+          "GK-WF-001-REG": "PASS"
+        },
+        "gk_behavior": {
+          "GK-SAVE-CLAIM": "PASS",
+          "GK-POSITIONING-HOLD": "PASS",
+          "GK-ROLE-DESIGNATION": "PASS",
+          "GK-DISTRIBUTION-NO-OMNISCIENCE": "NOT_EVALUATED",
+          "GK-NO-FIELD-CHASE": "PASS"
+        },
+        "common": {
+          "COMMON-FINITE": "PASS",
+          "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+          "COMMON-REFERENCES": "PASS",
+          "COMMON-BOUNDS": "PASS"
+        },
+        "catalog": {
+          "ref": "BLOCKED_MISSING_REFERENCE",
+          "vis": "NEEDS_PERCEPTUAL_REVIEW",
+          "reg": "PASS",
+          "causal": "NOT_EVALUATED"
+        }
+      }
+    },
+    {
+      "id": "gk-release-fixture-live",
+      "role": "",
+      "scenario": "5v5-keeper-release-fixture-v1",
+      "scenario_path": "eval/scenarios/5v5-keeper-release-fixture.v1.json",
+      "ticks": 300,
+      "lifecycle": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-keeper-release-fixture.v1.json, maxTicks: 300, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' }) + evaluateSuite('goalkeepers', observations)",
+      "observation_count": 300,
+      "event_kind_counts": {
+        "player-ball-contact": 4,
+        "gk-role": 2,
+        "keeper-release": 12,
+        "pass": 9,
+        "shot": 1,
+        "second-touch": 19,
+        "player-player-contact": 9
+      },
+      "determinism": {
+        "state_hash_of_hashes": "dd03c4a1ea391089d34c99536bf4d5b84d1f4411350ae0a8e64016e73c9e056f",
+        "final_state_hash": "fnv1a64-v1:9ddf137ffe905c20"
+      },
+      "suite_verdict": {
+        "suite_id": "goalkeepers",
+        "suite_version": "suite-goalkeepers-v1",
+        "gk_reg": {
+          "GK-HIGH-001-REG": "PASS",
+          "GK-LEG-001-REG": "PASS",
+          "GK-PARRY-001-REG": "PASS",
+          "GK-REA-001-REG": "PASS",
+          "GK-REC-001-REG": "PASS",
+          "GK-WF-001-REG": "PASS"
+        },
+        "gk_behavior": {
+          "GK-SAVE-CLAIM": "NOT_EVALUATED",
+          "GK-POSITIONING-HOLD": "PASS",
+          "GK-ROLE-DESIGNATION": "PASS",
+          "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS",
+          "GK-NO-FIELD-CHASE": "PASS"
+        },
+        "common": {
+          "COMMON-FINITE": "PASS",
+          "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+          "COMMON-REFERENCES": "PASS",
+          "COMMON-BOUNDS": "PASS"
+        },
+        "catalog": {
+          "ref": "BLOCKED_MISSING_REFERENCE",
+          "vis": "NEEDS_PERCEPTUAL_REVIEW",
+          "reg": "PASS",
+          "causal": "NOT_EVALUATED"
+        }
+      }
+    }
+  ]
+}

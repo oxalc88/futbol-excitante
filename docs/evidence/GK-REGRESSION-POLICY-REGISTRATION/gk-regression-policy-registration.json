@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "objective_id": "GK-REGRESSION-POLICY-REGISTRATION",
+  "suite_id": "goalkeepers",
+  "suite_version": "suite-goalkeepers-v1",
+  "produced_by": "scripts/capture-gk-regression-policy-registration.ts",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "caeca8da26efe11519a8453c5507a48001810b66",
+  "record_sha256": "fc7d1b97b3b1a78613b571610e3bdbc53aa076b5ae42f828555a4110e037e60e",
+  "normative_source": {
+    "decision": "spec-prose-addition (option b)",
+    "section": "specs/GOALKEEPER_SPEC.md §11.2 'Regression policy (GK-*-REG)'",
+    "basis": "GAMEPLAY_EVALUATION_SPEC §5.5 (candidate-versus-immutable-best under an identical comparison condition) applies, but the GK-specific regression policy (the pins, the version-bump rule, the canary behavior) was NOT defined in GOALKEEPER_SPEC.md (it names no GK-*-REG and no regression policy). The catalog prose (common-criteria.ts) only describes each GK-*-REG rule at class REGRESSION, not a policy. Per the horizon decision (a) vs (b): (a) does not hold (catalog prose is not a policy), so (b) a versioned GOALKEEPER_SPEC §11.2 regression-policy section is added to establish the provenance. Disclosed.",
+    "spec_sections": [
+      "specs/GOALKEEPER_SPEC.md §5",
+      "specs/GOALKEEPER_SPEC.md §11.2",
+      "specs/GAMEPLAY_EVALUATION_SPEC.md §5.5"
+    ]
+  },
+  "registration_chain": {
+    "oracle": {
+      "oracle_id": "gk-regression-canary-v1",
+      "oracle_version": "oracle-gk-regression-v1"
+    },
+    "invariant": {
+      "invariant_id": "gk-regression-evidence",
+      "invariant_version": "invariant-gk-regression-v1",
+      "input_observation_ids": [
+        "obs-gk-role-v1",
+        "obs-gk-positioning-v1",
+        "obs-gk-chase-v1",
+        "obs-gk-save-claim-v1",
+        "obs-gk-distribution-v1"
+      ],
+      "definition_present": true
+    },
+    "criterion_bindings": [
+      {
+        "criterion_id": "GK-REA-001-REG",
+        "class": "REGRESSION",
+        "invariant_id": "gk-regression-evidence",
+        "oracle_id": "gk-regression-canary-v1",
+        "oracle_version": "oracle-gk-regression-v1",
+        "bound_rule": "Preserve wrong-foot, leg-save, and recovery behavior."
+      },
+      {
+        "criterion_id": "GK-WF-001-REG",
+        "class": "REGRESSION",
+        "invariant_id": "gk-regression-evidence",
+        "oracle_id": "gk-regression-canary-v1",
+        "oracle_version": "oracle-gk-regression-v1",
+        "bound_rule": "Preserve ordinary reaction and reach."
+      },
+      {
+        "criterion_id": "GK-LEG-001-REG",
+        "class": "REGRESSION",
+        "invariant_id": "gk-regression-evidence",
+        "oracle_id": "gk-regression-canary-v1",
+        "oracle_version": "oracle-gk-regression-v1",
+        "bound_rule": "Preserve reaction, parry, and recovery."
+      },
+      {
+        "criterion_id": "GK-PARRY-001-REG",
+        "class": "REGRESSION",
+        "invariant_id": "gk-regression-evidence",
+        "oracle_id": "gk-regression-canary-v1",
+        "oracle_version": "oracle-gk-regression-v1",
+        "bound_rule": "Preserve ball continuity and keeper recovery."
+      },
+      {
+        "criterion_id": "GK-REC-001-REG",
+        "class": "REGRESSION",
+        "invariant_id": "gk-regression-evidence",
+        "oracle_id": "gk-regression-canary-v1",
+        "oracle_version": "oracle-gk-regression-v1",
+        "bound_rule": "Preserve first-save contact/rebound behavior."
+      },
+      {
+        "criterion_id": "GK-HIGH-001-REG",
+        "class": "REGRESSION",
+        "invariant_id": "gk-regression-evidence",
+        "oracle_id": "gk-regression-canary-v1",
+        "oracle_version": "oracle-gk-regression-v1",
+        "bound_rule": "Preserve crosses, headers, and keeper ground actions."
+      }
+    ],
+    "compute_outcome_path": "eval/runners/foundation-evaluator.ts computeOutcome(REGRESSION): with a registered regression oracle → FAIL/PASS/NOT_EVALUATED from the canary; without one → honest NOT_EVALUATED"
+  },
+  "pins_guarded": {
+    "version_pin": "gk-small-sided-v1 constants as consumed (adapter GK_SMALL_SIDED_V1 + versioned record GK_PROVISIONAL_VALUES) must carry version id 'gk-small-sided-v1' and the §9 accepted values; a silent value change with an identical version id is FAIL",
+    "keeper_marker_designation": "exactly one designated keeper per team (§4), stable for the run",
+    "arc_hold": "goal-arc-hold with bounded lateral drift (§5)",
+    "no_field_chase": "no-field-chase bound (§6)",
+    "save_claim": "keeper contact within save_claim_reach_radius AND within keeper_reaction_window_ticks after an opposing shot = observed pin (preserved); an in-window contact outside save_claim_reach_radius = FAIL. A beyond-window contact or an unanswered opposing shot = NOT_EVALUATED per the accepted GK-SAVE-CLAIM oracle (the shot may legitimately score; this pin never turns a legitimately unanswered shot into a FAIL) (§7)",
+    "distribution": "release to an observed teammate, no omniscience (§8)",
+    "state_hash_chain": "committed per-tick stateHash/prngStateHash/observationCoreHash intact, monotonic ticks"
+  },
+  "version_bump_rule": "A behavior pin that diverges together with a model-version bump is a deliberate versioned change and returns NOT_EVALUATED (re-pin must be explicit); a divergence WITHOUT a bump is FAIL.",
+  "before": {
+    "reg_aggregate": "NOT_EVALUATED",
+    "notes": [
+      "accepted GK-SUITE-CORE-OWNED-STATE record `after.catalog.reg` = NOT_EVALUATED (no versioned regression policy existed)",
+      "accepted GK-DRIVEN-CLOSURE record `after.catalog.reg` = NOT_EVALUATED"
+    ],
+    "source_records": {
+      "gk_core_owned_record_sha256": "5cd1c80879d400c2dabfc0ba6d9b195447fc9476f7b6ebb5329877dd2a69204a",
+      "gk_driven_closure_record_sha256": "21a596277aac626f3612e225ced4145310e1a81631bd28552f9188d223b33d7a",
+      "keeper_marker_baseline_sha": {
+        "value": "511d53df386ee634bf545abe19addfad10c419964055c2d579709ce3b2baabe0",
+        "role": "referenced provenance (HUMAN-KEEPER-CONTROL record SHA) — cited as the accepted keeper-marker baseline source; NOT an enforced pin. The enforced keeper-marker fact is the designation (exactly one designated keeper per team, §4) that the canary checks. Not implied as enforced."
+      }
+    }
+  },
+  "after": {
+    "reg_aggregate": "PASS",
+    "gk_reg": {
+      "gk-continuous-live": {
+        "GK-HIGH-001-REG": "PASS",
+        "GK-LEG-001-REG": "PASS",
+        "GK-PARRY-001-REG": "PASS",
+        "GK-REA-001-REG": "PASS",
+        "GK-REC-001-REG": "PASS",
+        "GK-WF-001-REG": "PASS"
+      },
+      "gk-shot-fixture-live": {
+        "GK-HIGH-001-REG": "PASS",
+        "GK-LEG-001-REG": "PASS",
+        "GK-PARRY-001-REG": "PASS",
+        "GK-REA-001-REG": "PASS",
+        "GK-REC-001-REG": "PASS",
+        "GK-WF-001-REG": "PASS"
+      },
+      "gk-release-fixture-live": {
+        "GK-HIGH-001-REG": "PASS",
+        "GK-LEG-001-REG": "PASS",
+        "GK-PARRY-001-REG": "PASS",
+        "GK-REA-001-REG": "PASS",
+        "GK-REC-001-REG": "PASS",
+        "GK-WF-001-REG": "PASS"
+      }
+    },
+    "per_run_catalog": {
+      "gk-continuous-live": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "PASS",
+        "causal": "NOT_EVALUATED"
+      },
+      "gk-shot-fixture-live": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "PASS",
+        "causal": "NOT_EVALUATED"
+      },
+      "gk-release-fixture-live": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "PASS",
+        "causal": "NOT_EVALUATED"
+      }
+    }
+  },
+  "runs": [
+    {
+      "run_id": "gk-continuous-live",
+      "role": "",
+      "scenario": "5v5-continuous-play-v1",
+      "scenario_path": "eval/scenarios/5v5-continuous-play.v1.json",
+      "ticks": 1800,
+      "lifecycle": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-continuous-play.v1.json, maxTicks: 1800, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' }) + evaluateSuite('goalkeepers', observations)",
+      "observation_count": 1800,
+      "goals": 0,
+      "event_kind_counts": {
+        "player-ball-contact": 37,
+        "gk-role": 2,
+        "shot": 17,
+        "player-player-contact": 642,
+        "pass": 10,
+        "second-touch": 77,
+        "tackle-phase": 36,
+        "pitch-contact": 1,
+        "keeper-release": 8,
+        "input-rejection": 3
+      },
+      "determinism": {
+        "state_hash_of_hashes": "6dbb4341999b19915c05f4363cd5dfadc17168771311f957a8a44583c0099584",
+        "final_state_hash": "fnv1a64-v1:2a19b387d2d30f36"
+      },
+      "gk_reg": {
+        "GK-HIGH-001-REG": "PASS",
+        "GK-LEG-001-REG": "PASS",
+        "GK-PARRY-001-REG": "PASS",
+        "GK-REA-001-REG": "PASS",
+        "GK-REC-001-REG": "PASS",
+        "GK-WF-001-REG": "PASS"
+      },
+      "gk_behavior": {
+        "GK-SAVE-CLAIM": "NOT_EVALUATED",
+        "GK-POSITIONING-HOLD": "PASS",
+        "GK-ROLE-DESIGNATION": "PASS",
+        "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS",
+        "GK-NO-FIELD-CHASE": "PASS"
+      },
+      "common": {
+        "COMMON-FINITE": "PASS",
+        "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+        "COMMON-REFERENCES": "PASS",
+        "COMMON-BOUNDS": "PASS"
+      },
+      "catalog": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "PASS",
+        "causal": "NOT_EVALUATED"
+      }
+    },
+    {
+      "run_id": "gk-shot-fixture-live",
+      "role": "",
+      "scenario": "5v5-keeper-shot-fixture-v1",
+      "scenario_path": "eval/scenarios/5v5-keeper-shot-fixture.v1.json",
+      "ticks": 600,
+      "lifecycle": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-keeper-shot-fixture.v1.json, maxTicks: 600, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' }) + evaluateSuite('goalkeepers', observations)",
+      "observation_count": 600,
+      "goals": 1,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "gk-role": 2,
+        "shot": 19,
+        "second-touch": 5,
+        "player-player-contact": 9,
+        "goal": 1,
+        "pitch-contact": 1
+      },
+      "determinism": {
+        "state_hash_of_hashes": "4a1aa34d87e3a58829edae2416503ae7508011b6da7e8981325bd0a09bf092e0",
+        "final_state_hash": "fnv1a64-v1:bd427cdac09d7472"
+      },
+      "gk_reg": {
+        "GK-HIGH-001-REG": "PASS",
+        "GK-LEG-001-REG": "PASS",
+        "GK-PARRY-001-REG": "PASS",
+        "GK-REA-001-REG": "PASS",
+        "GK-REC-001-REG": "PASS",
+        "GK-WF-001-REG": "PASS"
+      },
+      "gk_behavior": {
+        "GK-SAVE-CLAIM": "PASS",
+        "GK-POSITIONING-HOLD": "PASS",
+        "GK-ROLE-DESIGNATION": "PASS",
+        "GK-DISTRIBUTION-NO-OMNISCIENCE": "NOT_EVALUATED",
+        "GK-NO-FIELD-CHASE": "PASS"
+      },
+      "common": {
+        "COMMON-FINITE": "PASS",
+        "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+        "COMMON-REFERENCES": "PASS",
+        "COMMON-BOUNDS": "PASS"
+      },
+      "catalog": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "PASS",
+        "causal": "NOT_EVALUATED"
+      }
+    },
+    {
+      "run_id": "gk-release-fixture-live",
+      "role": "",
+      "scenario": "5v5-keeper-release-fixture-v1",
+      "scenario_path": "eval/scenarios/5v5-keeper-release-fixture.v1.json",
+      "ticks": 300,
+      "lifecycle": "core-owned",
+      "reproduction": "runHeadlessMatch({ scenario: eval/scenarios/5v5-keeper-release-fixture.v1.json, maxTicks: 300, cpuAntiHuddle: true, cpuDefensiveTackle: true, gkBehavior: true, browserParityObservations: true, lifecyclePhaseSync: 'core-owned' }) + evaluateSuite('goalkeepers', observations)",
+      "observation_count": 300,
+      "goals": 0,
+      "event_kind_counts": {
+        "player-ball-contact": 4,
+        "gk-role": 2,
+        "keeper-release": 12,
+        "pass": 9,
+        "shot": 1,
+        "second-touch": 19,
+        "player-player-contact": 9
+      },
+      "determinism": {
+        "state_hash_of_hashes": "dd03c4a1ea391089d34c99536bf4d5b84d1f4411350ae0a8e64016e73c9e056f",
+        "final_state_hash": "fnv1a64-v1:9ddf137ffe905c20"
+      },
+      "gk_reg": {
+        "GK-HIGH-001-REG": "PASS",
+        "GK-LEG-001-REG": "PASS",
+        "GK-PARRY-001-REG": "PASS",
+        "GK-REA-001-REG": "PASS",
+        "GK-REC-001-REG": "PASS",
+        "GK-WF-001-REG": "PASS"
+      },
+      "gk_behavior": {
+        "GK-SAVE-CLAIM": "NOT_EVALUATED",
+        "GK-POSITIONING-HOLD": "PASS",
+        "GK-ROLE-DESIGNATION": "PASS",
+        "GK-DISTRIBUTION-NO-OMNISCIENCE": "PASS",
+        "GK-NO-FIELD-CHASE": "PASS"
+      },
+      "common": {
+        "COMMON-FINITE": "PASS",
+        "COMMON-DETERMINISTIC": "NOT_EVALUATED",
+        "COMMON-REFERENCES": "PASS",
+        "COMMON-BOUNDS": "PASS"
+      },
+      "catalog": {
+        "ref": "BLOCKED_MISSING_REFERENCE",
+        "vis": "NEEDS_PERCEPTUAL_REVIEW",
+        "reg": "PASS",
+        "causal": "NOT_EVALUATED"
+      }
+    }
+  ],
+  "registry_hash_evolution": {
+    "before": "fnv1a64-v1:44ebd3e8c224d6e7",
+    "after": "fnv1a64-v1:e31411fbf274f66f",
+    "note": "The registry content_hash grows because the GK regression canary, its gk-regression-evidence invariant definition and the six GK-*-REG criterion bindings are added. The before value is the content_hash at HEAD (caeca8d)."
+  },
+  "disclosures": [
+    "NORMATIVE SOURCE (option b): GOALKEEPER_SPEC.md did not define a GK regression policy; a versioned §11.2 regression-policy section is added (the FOULS-SPEC-DRAFT pattern). The catalog prose only names each GK-*-REG rule as class REGRESSION; it is not a policy.",
+    "The canary reuses the accepted protected keeper oracles (gk-role.ts) for the behavior pins; its UNIQUE contribution is the version/provenance pin (constants as consumed + version id continuity) and the committed state-hash chain integrity guard, giving it power beyond the individual behavior oracles. Non-circular: the pinned baseline is a fixed set of committed acceptance facts, not a recomputed hash of the same data it compares against.",
+    "gk-continuous-live, gk-shot-fixture-live and gk-release-fixture-live all produce GK-*-REG PASS (the accepted behavior pins hold; the guard does not false-positive). The regression canary returns honest NOT_EVALUATED over a non-GK stream (no observable behavior pin), never PASS by silence.",
+    "The aggregate catalog.reg converts NOT_EVALUATED -> PASS ONLY through this registered evaluator. GK-*-REF stay BLOCKED_MISSING_REFERENCE, GK-*-VIS stay NEEDS_PERCEPTUAL_REVIEW and GK-*-CAUSAL stay NOT_EVALUATED under their own criteria (untouched). The canary is wired only to the six GK-*-REG criteria; duels/foundation REG criteria keep no regression oracle and stay honest NOT_EVALUATED.",
+    "The six GK-*-REG criteria describe preserve-behavior catalog rules; they PASS through the suite-level canary because the canary confirms the pinned GK behavior is preserved. This is a suite-level regression policy, not a per-catalog-behavior measurement (wrong-foot/parry/recovery/crosses are not separately observable and are not claimed as measured).",
+    "No gameplay change: git diff src/ src/contracts/ src/simulation/ src/adapters/ eval/scenarios/ is EMPTY. The normative §11.2 spec prose is the only spec edit (disclosed).",
+    "TEXT-ENFORCEMENT CORRECTION (critic RETRY path, option b — correct-the-prose): the save/claim pin prose NO LONGER claims a beyond-window contact is FAIL. The accepted GK-SAVE-CLAIM oracle (eval/oracles/gk-role.ts) breaks its search at keeper_reaction_window_ticks, so an in-window in-reach contact is the preserved pin, an in-window OUT-of-reach contact is FAIL, and a beyond-window contact or an unanswered opposing shot is honest NOT_EVALUATED (the shot may legitimately score). The prose was corrected to match this enforced semantics rather than implementing a FAIL for late/missing reactions, which would (1) require altering the accepted GK-SAVE-CLAIM oracle and (2) wrongly turns a legitimately scoring shot into a regression FAIL. Both options were considered; this is the honest, non-weakening choice.",
+    "STREAM-COVERAGE CAVEAT (critic non-blocking note): the REG evidence is carried by three streams (gk-continuous-live, gk-shot-fixture-live, gk-release-fixture-live). No single stream is guaranteed to exercise every guarded pin; a pin a given stream never triggers is left unobservable and returns honest NOT_EVALUATED (never PASS or FAIL) for that run. The canary only FAILs a pin that is actually observed to diverge; absent direct observation the pin is not treated as proven-hold and is not reported as FAIL. This is a suite-level disclosure and not a pass-by-silence claim.",
+    "The accepted GK suite records (GK-SUITE-CORE-OWNED-STATE, GK-DRIVEN-CLOSURE, etc.) are immutable and stay byte-untouched; they remain the honest before-state and are not rewritten."
+  ],
+  "claims_not_made": [
+    "No suite-level PASS claim for the goalkeepers suite: reg/ is one criterion; BLOCKED (GK-*-REF), NEEDS_PERCEPTUAL_REVIEW (GK-*-VIS) and NOT_EVALUATED (GK-*-CAUSAL) catalog keys remain.",
+    "No PROMOTION / FOUNDATION_LAB_PASS / milestone PASS claim.",
+    "No PES 2017 fidelity or invented reference envelope; reaction latency / save probability / wrong-foot reversal / high-cross claim threshold / parry energy ratio stay BLOCKED_MISSING_REFERENCE.",
+    "No criterion is upgraded beyond what the executed evaluator returns; only the REGRESSION-class GK-*-REG criteria resolve through the registered canary.",
+    "No accepted record mutation; existing GK records stay byte-untouched."
+  ]
+}
