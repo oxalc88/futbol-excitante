@@ -9,7 +9,7 @@ horizon_id: "fouls-consequence-and-referee-guards"
 created_from_commit: bf3a073
 created_at: 2026-09-08
 reason: "Horizon v34 (COMPLETE 4/4, remote-durable at bf3a073) made the fouls spec executable in its detection half and realized the human ball-server: FOUL-DETECTION-MACHINERY (936a297 — observation-level foul events from the accepted tackle machinery, zero gameplay change), FOULS-SUITE-REGISTRATION (b7b7a1a — FOUL-DETECT + FOUL-CLEAN-TACKLE executable protected oracles in suite-fouls-v1, executed PASS over driven + organic streams with the stashed negative control), HUMAN-BALL-SERVER-LITERAL (9a04158 — the pass-gated human restart serve with its named conformance path; CPU fallback byte-identity), GK-DRIVEN-CLOSURE (32b540e — driven save-claim + distribution streams; the horizon-text baseline conflation corrected in place). A detected foul currently changes nothing on the pitch — the most valuable missing piece is the consequence, and the restart machinery it needs is mature (throw-in/goal-kick/corner/kickoff restarts, the pass-gated human serve, anti-huddle designation, timer-freeze, and the registered restart conformance suites all accepted). v35 executes the consequence phase: (a) FOUL-CONSEQUENCE-MACHINERY — a detected foul awards a free-kick restart to the fouled team at the contact position through the accepted restart machinery (the named-conformance-path pattern of HUMAN-BALL-SERVER-LITERAL: a deliberate but bounded change with CPU-fallback byte-identity, its own two-run attestation, and re-evaluation of the affected restart criteria); (b) FREE-KICK-SUITE-REGISTRATION — FREE-KICK-AWARD becomes the third registered suite-fouls criterion over the consequence streams, and the disclosed FOULS_CARDS_SPEC §10 heading-wording open thread is resolved in the same objective; CARD-ISSUED and ADVANTAGE-PLAYED stay named-not-registered until their machinery exists; (c) GK-REGRESSION-POLICY-REGISTRATION — GK-*-REG is honestly NOT_EVALUATED because no regression policy exists; the ingredients are already accepted (the GK-CORE-OWNED-ARC-FIX guard + the keeper-marker baseline SHA + the gk-small-sided-v1 pins), so register an executable GK regression canary criterion and convert GK-*-REG honestly via the executed evaluator; (d) FOUL-FREEKICK-BROWSER-EVIDENCE — the foul → free-kick flow visible in the real browser (the horizon's observable playable capability). Strictly small-sided; no regulation implementation, no full-match ecology, no PES envelopes; blocked references stay blocked."
-current_index: 1
+current_index: 2
 objectives:
   - id: FOUL-CONSEQUENCE-MACHINERY
     status: accepted
@@ -17,7 +17,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: ""
   - id: FREE-KICK-SUITE-REGISTRATION
-    status: pending
+    status: accepted
     reason: "Register FREE-KICK-AWARD (FOULS_CARDS_SPEC §10) as the third executable protected oracle in suite-fouls-v1 over the accepted consequence streams (the RULES-SUITE-REGISTRATION pattern; mutant/canary guards): a real detected foul yields a real free-kick restart award; no-foul and gate-off streams yield honest NOT_EVALUATED. CARD-ISSUED and ADVANTAGE-PLAYED stay named-not-registered (their machinery does not exist). Fold in the disclosed spec open thread: update the FOULS_CARDS_SPEC §10 heading wording (named-not-registered → the accurate two-registered/three-unregistered state) — a spec prose edit pinned by the existing fouls-spec-binding test, not a re-spec."
     builder: builder-structured
     prerequisite: FOUL-CONSEQUENCE-MACHINERY

@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.7",
+  "persisted_at": "2026-09-08T03:50:45.586Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "FREE-KICK-SUITE-REGISTRATION",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "1eec4ebba2c220725dff66c81516975e078eb11c",
+  "builder": {
+    "builder": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v35 2/4: FREE-KICK-AWARD (FOULS_CARDS_SPEC §10 — \"the set-piece consequence of a called foul\") registered as the third executable protected oracle in suite-fouls-v1 over the accepted FOUL-CONSEQUENCE-MACHINERY streams (evidence class MULTI_TICK; zero gameplay change — git diff src/ src/contracts/ eval/runners/ EMPTY, verified by builder, critic, AND integration; the RULES-SUITE-REGISTRATION pattern, all additions with zero pre-existing rows changed). REGISTRATION CHAIN: FREE_KICK_AWARD (HARD_INVARIANT) → INV_FOUL_FREE_KICK_AWARD → foul-free-kick-award-oracle-v1 (eval/oracles/fouls.ts checkFoulFreeKickAward importing the SHARED src/simulation/foul-predicate.ts — the same single source of truth the in-core consequence evaluates) → wire.ts → CRITERION_TO_ORACLE → BINDING_FOULS_FREE_KICK_AWARD_001 → FOULS-FREE-KICK-AWARD-001 in FOULS_SUITE → EXPANSION_FOULS_V1. Registry: bindings 58→59, criteria 95→96, invariants 38→39, suites 8; content_hash fnv1a64-v1:8185c0af89cf8a39 → fnv1a64-v1:44ebd3e8c224d6e7 (both the critic and the integration reviewer computed it independently via loadRegistrySet; validation 0 errors; no literal hash pin anywhere — the GK-SPEC-SUITE-CONTRACTS provenance format accommodation holds). GUARDS mapped to §10's definition: (a) POWER GUARD FAIL — a free-kick-executed with NO detected man-not-ball foul (both the anti-huddle-window control 63063b34… and the human-serve 428a4df5… streams FAIL — a free kick is only the consequence of a called foul); (b) honest NOT_EVALUATED — detected foul with no observable free-kick-executed (the driven-duel 5f3bc337… shape commits the FK in core state at tick 111, not the per-step observations — the runner serialization limit NOT worked around); (c) honest NOT_EVALUATED — no-foul/no-FK (gate-off fb5e9b02…); (d) FAIL — both observable but wrong team or placement >0.5 m from the contact position (the 0.5 m is disclosed evaluator-side comparison slack — both compared sides derive from the SAME committed field, measured delta exactly 0 on the PASS stream; the accepted-precedent class of the rules suite's 0.2 m PLACEMENT_TOLERANCE; the critic recommends tightening at the next natural touch). EXECUTED VERDICTS: organic 47674adf… (foul tick 233 → FK tick 293 in observations, team-b at the contact position) PASS; driven NOT_EVALUATED; both power-guard streams FAIL; gate-off NOT_EVALUATED. FOUL-DETECT/FOUL-CLEAN-TACKLE unchanged (PASS on the foul-bearing streams, NOT_EVALUATED on controls). All five stream state_hash_of_hashes values cross-checked character-identical to the accepted FOUL-CONSEQUENCE pins; the ACCEPTED FOUL-CONSEQUENCE-MACHINERY record re-verified byte-exact (39da80ad…). SPEC OPEN THREAD RESOLVED: specs/FOULS_CARDS_SPEC.md §10 heading/wording updated to the accurate state (three registered / two named-not-registered; CARD-ISSUED + ADVANTAGE-PLAYED stay NAMED-NOT-REGISTERED, grep-verified + binding-enforced; the §10 no-PASS rule kept and re-scoped to the unregistered criteria; the phrase assertions \"NOT registered\" and \"No PASS may be reported\" still present and green; fouls-spec-binding updated — FREE-KICK-AWARD moved into REGISTERED_CRITERIA — disclosed). Tests: fouls-suite-binding 24/24 (three new canary guards incl. wrong-team and placement-offset); fouls-spec-binding 42/42; eval-registry 48/48 (59 bindings); oracle-registry 19/19; foul-detection 12/12 + foul-consequence 7/7 + sim 4/4 (the accepted bindings still green); rules/GK/restart/duels/hygiene batteries green (integration: 28 registry-consumer files / 523 node tests + 5 sim/integration neighbors, all green); typecheck 0; gauntlet:eval 39+33; eval:state 13/13. record_sha256 86a34acb5f7336ac339c91fced93246c52f1f6beadb5407ae916cae7e6b425f2 (no wall-clock field; reproduced byte-exact twice by the critic and re-reproduced by the integration reviewer; docs/ byte-identical on ordinary runs; durable writes under WIP_SECTION=__EVIDENCE__:FREE-KICK-SUITE-REGISTRATION). Audit PASS MULTI_TICK. Disclosures: no suite-level PASS (3 of 5 §10 criteria registered); the 0.5 m tolerance dead slack on current streams (measured delta 0; worth an explicit prose disclosure line at the next natural fouls objective); two cosmetic test comments stale (fouls-suite-binding line 45 \"only the two registered\"; the foul-consequence binding title \"registers no FREE-KICK-AWARD criterion\" whose rules-suite assertion remains true); the §2.1/§2.2 prose staleness in the spec pre-dates this candidate and stays outside its assigned scope (fold into the next natural fouls objective). claims_not_made: no card or advantage machinery or verdicts / no suite-level PASS / no PROMOTION / no FOUNDATION_LAB_PASS / no milestone or regression PASS / no PES fidelity or invented reference envelope (the criterion is a self-consistency invariant over committed streams, not a MEASURED_TARGET comparison) / no gameplay, runner, or consequence-machinery change."
+}

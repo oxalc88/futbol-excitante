@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "FREE-KICK-SUITE-REGISTRATION",
+  "accepted_at": "2026-09-08T03:50:45.586Z",
+  "candidate_commit": "1eec4ebba2c220725dff66c81516975e078eb11c",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/FREE-KICK-SUITE-REGISTRATION/trajectory.json",
+      "sha256": "369fe54c37f78f7134153155db722b078e0bb7aca92a0d52dfdb49a6bd5fd242",
+      "git_blob": "f5ff9025ecd3cc2a07733e27d6d84a3b347f5ab6",
+      "candidate_commit": "1eec4ebba2c220725dff66c81516975e078eb11c",
+      "bytes": 11363,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/FREE-KICK-SUITE-REGISTRATION/audit.json",
+      "sha256": "8cbcf8b234db1a431a611908cc5611228c5f7ad33027e54ca7448eecf2a0cc67",
+      "git_blob": "f360f7c7b6d0f876f5fec0cf5da66b0d203b09f9",
+      "candidate_commit": "1eec4ebba2c220725dff66c81516975e078eb11c",
+      "bytes": 2668,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-08/2026-09-08T03-50-45-586Z-FREE-KICK-SUITE-REGISTRATION-acceptance.json"
+}
