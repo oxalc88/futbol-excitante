@@ -25,14 +25,13 @@ This document is normative. `MUST`, `MUST NOT`, `SHOULD`, and `MAY` carry their 
 - The **engine-grounded definition of a foul**: a defensive-tackle contact that reaches an opposing player but not the independent ball in the same active-window contact.
 - The **clean-tackle complement**: what is NOT a foul (a tackle that reaches the ball, and a symmetric shoulder-to-shoulder player contact).
 - **Versioned provisional configuration** for every unmeasured fouls/cards value, under model id `fouls-v1`, referencing accepted config where it overlaps.
-- The **adjudicating criteria**
-  names (`FOUL-DETECT`, `CARD-ISSUED`, `ADVANTAGE-PLAYED`, `FOUL-CLEAN-TACKLE`, `FREE-KICK-AWARD`) specified for a future suite but **NOT registered**.
+- The **adjudicating criteria** — `FOUL-DETECT`, `FOUL-CLEAN-TACKLE` and `FREE-KICK-AWARD` are registered as executable protected oracles in the `fouls` suite (`suite-fouls-v1`); `CARD-ISSUED` and `ADVANTAGE-PLAYED` are specified for a future suite but **NOT registered**.
 - **BLOCKED_MISSING_REFERENCE** disclosures for every value needing a reference target that does not exist.
 - The **deferred set-piece consequence** of a foul (a free kick), which references the accepted restart machinery rather than inventing a new one.
 
 ### 2.2 Out of scope (explicit exclusions)
 
-- **No foul/card/advantage/free-kick implementation.** This spec names future semantics; the engine has no foul machinery. No `src/`, `eval/`, `gauntlet/` or existing-spec change accompanies it.
+- **No card or advantage implementation.** The engine's foul semantics are grounded in the accepted foul-detection and consequence machinery (FOUL-DETECTION-MACHINERY / FOUL-CONSEQUENCE-MACHINERY) and registered as the executable protected oracles `FOUL-DETECT`, `FOUL-CLEAN-TACKLE` and `FREE-KICK-AWARD` in the `fouls` suite. `CARD-ISSUED` and `ADVANTAGE-PLAYED` remain named-but-not-implemented, and no `src/`, `eval/`, `gauntlet/` or existing-spec change accompanies them.
 - **Offside** and **penalty kicks** stay regulation-only and are **conditionally deferred** (see §16). Neither is specified here beyond confirmation that they remain deferred with no existence claim.
 - **Full-match ecology / referee** interaction, stoppage-time, ball-in-play accounting, and a full regulation ruleset.
 - **Any PES 2017 fidelity claim.** `fouls-v1` values are `VERSIONED_PROVISIONAL`, never PES magnitudes; missing references stay `BLOCKED_MISSING_REFERENCE`.

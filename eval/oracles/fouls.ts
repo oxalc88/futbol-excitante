@@ -312,6 +312,14 @@ function contactPositionAt(
  * foul IS (the SAME function the in-core consequence evaluates), so the oracle
  * never duplicates the §5.1 definition.
  *
+ * Placement matching uses a 0.5 m position tolerance
+ * (FREE_KICK_POSITION_TOLERANCE): the executed free kick must sit within 0.5 m
+ * of the fouled player's planar position at the foul tick.  This is a disclosed
+ * provisional tolerance — small relative to the ~105 m pitch, so it still
+ * rejects a genuinely misplaced/mutated award while tolerating the per-tick
+ * integration drift of the contact position.  It mirrors the accepted rules
+ * placement-oracle tolerance pattern (rules-restart PLACEMENT_TOLERANCE = 0.2 m).
+ *
  * Guards, mapped to the §10 definition:
  *   - a free kick awarded with NO detected foul (the freeKickWindow anti-huddle
  *     control shape) FAILs — that is exactly what the criterion forbids: a free

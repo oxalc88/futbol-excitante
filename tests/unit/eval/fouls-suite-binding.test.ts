@@ -42,7 +42,7 @@ import { evaluateSuite } from "../../../eval/runners/foundation-evaluator.js";
 import type { TelemetryObservation } from "../../../src/contracts/telemetry.js";
 
 // ---------------------------------------------------------------------------
-// The §10 criteria bound to a protected foul oracle (only the two registered).
+// The §10 criteria bound to a protected foul oracle (the three registered).
 // ---------------------------------------------------------------------------
 
 const FOULS_ORACLE_CRITERIA: Record<string, string> = {

@@ -184,7 +184,7 @@ describe("FOUL-CONSEQUENCE-MACHINERY criteria re-evaluation (honest)", () => {
     expect(countKinds(windowRun.observations)["free-kick-executed"]).toBeGreaterThanOrEqual(1);
   });
 
-  it("emits no card or advantage event, and registers no FREE-KICK-AWARD criterion", () => {
+  it("emits no card or advantage event, and the RULES suite does not carry FREE-KICK-AWARD (a fouls-suite criterion)", () => {
     for (const o of organicOn.observations) {
       for (const ev of o.events) {
         expect(["card", "advantage"]).not.toContain(ev.kind);

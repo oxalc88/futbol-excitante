@@ -28,6 +28,8 @@
     "capture-fouls-suite-evidence": "tsx scripts/capture-fouls-suite-registration.ts",
     "capture-freekick-suite-evidence": "tsx scripts/capture-freekick-suite-registration.ts",
     "capture-gk-regression-policy-evidence": "tsx scripts/capture-gk-regression-policy-registration.ts",
+    "capture-human-ball-server-literal": "tsx scripts/capture-human-ball-server-literal.ts",
+    "capture-foul-consequence-machinery": "tsx scripts/capture-foul-consequence-machinery.ts",
     "capture-5v5-anti-huddle-frames": "WIP_SECTION=__EVIDENCE__:BROWSER-5V5-ANTI-HUDDLE-DYNAMIC-EVIDENCE vitest run tests/browser/anti-huddle-dynamic-evidence.browser.test.ts --project browser",
     "capture-human-vs-cpu-arc-frames": "WIP_SECTION=__EVIDENCE__:HUMAN-VS-CPU-ARC-INTERACTION vitest run tests/browser/human-arc-interaction.browser.test.ts --project browser",
     "capture-gk-browser-dynamic-evidence": "WIP_SECTION=__EVIDENCE__:GK-BROWSER-DYNAMIC-EVIDENCE vitest run tests/browser/gk-browser-dynamic-evidence.browser.test.ts --project browser",
