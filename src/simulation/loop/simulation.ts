@@ -70,6 +70,7 @@ import { stepDribble } from "../contacts/second-touch-system.js";
 import type { DribbleState } from "../contacts/second-touch-system.js";
 import { stepTackle, replayTackleEvent } from "../contacts/tackle-system.js";
 import type { TackleState } from "../contacts/tackle-system.js";
+import { isFoulCandidateEvent } from "../foul-predicate.js";
 import {
   FOUNDATION_LOCOMOTION_V1,
   FOUNDATION_BALL_V1,
@@ -117,6 +118,23 @@ export interface GoalResetConfig {
    * Set to 0 to disable automatic restart (manual reset required).
    */
   goalResetTicks?: number;
+}
+
+/**
+ * Foul-consequence configuration (FOUL-CONSEQUENCE-MACHINERY).
+ *
+ * Controls the default-OFF gate that awards a free kick to the fouled team at
+ * the contact position when the core commits a man-not-ball tackle contact
+ * (FOULS_CARDS_SPEC §5.1). Off by default: with the gate off (or no foul) the
+ * core is byte-identical to pre-change on every accepted stream.
+ *
+ * Versioned provisional configuration — the free-kick countdown, serve speed
+ * and vertical component are `match-rules-v1`-kind deliberate design choices,
+ * NOT measured PES 2017 constants.
+ */
+export interface FreeKickConfig {
+  /** Gate: award free kicks on committed foul contacts (off by default). */
+  awardFreeKicks?: boolean;
 }
 
 /**
@@ -262,6 +280,7 @@ export function createSimulation(
   shotConfigOverride?: ShotConfigOverride,
   ballConfigOverride?: BallConfigOverride,
   goalResetConfig?: GoalResetConfig,
+  freeKickConfig?: FreeKickConfig,
 ): Simulation {
   const obs = observer ?? NO_OP_OBSERVER;
 
@@ -287,6 +306,21 @@ export function createSimulation(
   // in HUMAN-BALL-SERVER-DECISION, executed in HUMAN-BALL-SERVER-LITERAL.
   const HUMAN_SERVE_WAIT_WINDOW_TICKS = 90;
   let humanServeWaitTicks: number = 0;
+
+  // FOUL-CONSEQUENCE-MACHINERY: the default-OFF gate that awards a free kick to
+  // the fouled team at the contact position when the core commits a man-not-ball
+  // tackle contact (spec §5.1). Lives in the simulation closure (like
+  // humanServeWaitTicks) so it never enters the WorldState; with the gate off
+  // (or no foul) the free-kick branch never runs and the core is byte-identical
+  // to pre-change on every accepted stream.
+  const awardFreeKicks = freeKickConfig?.awardFreeKicks === true;
+
+  // Free-kick serve values (FOUL-CONSEQUENCE-MACHINERY, VERSIONED_PROVISIONAL
+  // `match-rules-v1`-kind design choices, NOT measured PES 2017 constants).
+  const defaultFreeKickCountdown = 60;
+  const FREE_KICK_BALL_Z = 0.11; // ball radius (foundation-ball-v1)
+  const FREE_KICK_SPEED = 14; // provisional: free-kick serve speed (m/s)
+  const FREE_KICK_VERTICAL_COMPONENT = 0.18; // provisional: serve loft
 
   // Per-player dribble-touch cooldown — maps playerId → last tick a dribble-touch occurred.
   // Lives in the simulation closure; does not affect world state or hashing.
@@ -1183,6 +1217,254 @@ export function createSimulation(
   }
 
   // ------------------------------------------------------------------
+  // Free-kick helpers (FOUL-CONSEQUENCE-MACHINERY)
+  // ------------------------------------------------------------------
+
+  /**
+   * Set matchPhase to "free-kick" and start the countdown.
+   *
+   * Called when a committed man-not-ball tackle contact (spec §5.1) is detected
+   * at the match-phase layer. The free kick is awarded to the FOULED team (the
+   * contacted player's team) at the CONTACT POSITION (the fouled player's planar
+   * position at the contact tick). This mirrors the accepted restart-WINDOW
+   * pattern (onCornerKickEvent / onThrowInEvent / onGoalKickEvent): the ball is
+   * re-placed at the spot, the taker is the closest awarding-team player, the
+   * awarding-team receivers are spread near the spot, and the opposing team is
+   * positioned marking — the freeze-until-first-touch / nearest-only anti-huddle
+   * contract then applies unchanged (the phase is a non-playing restart hold).
+   */
+  function onFreeKickEvent(
+    awardingTeam: string,
+    contactPosition: { x: number; y: number },
+  ): void {
+    if (state.matchPhase !== "playing") return;
+    state.matchPhase = "free-kick";
+    state.freeKickCountdown = defaultFreeKickCountdown;
+    state.freeKickPosition = { ...contactPosition };
+    state.freeKickAwardingTeam = awardingTeam;
+
+    // Select the taker: closest fouled-team player to the contact position.
+    let bestPlayer: string | null = null;
+    let bestDist = Infinity;
+    for (const p of state.players) {
+      if (p.teamId !== awardingTeam) continue;
+      const dx = p.groundPosition.x - contactPosition.x;
+      const dy = p.groundPosition.y - contactPosition.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestPlayer = p.playerId;
+      }
+    }
+    state.freeKickTakerId = bestPlayer;
+
+    // Position the taker at the contact position (the set-piece freeze anchor).
+    if (bestPlayer) {
+      const player = state.players.find((p) => p.playerId === bestPlayer);
+      if (player) {
+        player.groundPosition = { x: contactPosition.x, y: contactPosition.y };
+        player.linearVelocity = { x: 0, y: 0 };
+        player.desiredVelocity = { x: 0, y: 0 };
+        // Face toward the opponent goal.
+        const facingX = awardingTeam === "team-a" ? 1 : -1;
+        player.bodyHeading = Math.atan2(0, facingX);
+        player.desiredHeading = player.bodyHeading;
+      }
+    }
+
+    // Position fouled-team receivers near the spot (provisional, deterministic).
+    const defendingTeam = awardingTeam === "team-a" ? "team-b" : "team-a";
+    const facingX = awardingTeam === "team-a" ? 1 : -1;
+    let recvIdx = 0;
+    for (const p of state.players) {
+      if (p.teamId !== awardingTeam) continue;
+      if (p.playerId === bestPlayer) continue;
+      const offsetX = (recvIdx % 3) * 5 - 5;
+      const offsetY = Math.floor(recvIdx / 3) * 6 - 3;
+      p.groundPosition = {
+        x: contactPosition.x + offsetX,
+        y: contactPosition.y + offsetY,
+      };
+      // Clamp inside the pitch.
+      p.groundPosition.x = Math.max(-GOAL_LINE_X + 2, Math.min(GOAL_LINE_X - 2, p.groundPosition.x));
+      p.groundPosition.y = Math.max(-PITCH_HALF_WIDTH + 2, Math.min(PITCH_HALF_WIDTH - 2, p.groundPosition.y));
+      p.linearVelocity = { x: 0, y: 0 };
+      p.desiredVelocity = { x: 0, y: 0 };
+      p.bodyHeading = Math.atan2(0, facingX);
+      p.desiredHeading = p.bodyHeading;
+      recvIdx++;
+    }
+
+    // Position the opposing team to mark the fouled-team receivers.
+    const defenders = state.players.filter((p) => p.teamId === defendingTeam);
+    const receivers = state.players.filter(
+      (p) => p.teamId === awardingTeam && p.playerId !== bestPlayer,
+    );
+    for (let i = 0; i < defenders.length; i++) {
+      const def = defenders[i];
+      const target = receivers[i % receivers.length];
+      if (target) {
+        const goalX = defendingTeam === "team-a" ? -GOAL_LINE_X : GOAL_LINE_X;
+        const markX = (target.groundPosition.x + goalX) / 2;
+        const markY = target.groundPosition.y;
+        def.groundPosition = { x: markX, y: markY };
+        def.linearVelocity = { x: 0, y: 0 };
+        def.desiredVelocity = { x: 0, y: 0 };
+        def.bodyHeading = defendingTeam === "team-a" ? Math.PI : 0;
+        def.desiredHeading = def.bodyHeading;
+      }
+    }
+
+    // Re-place the ball at the contact position as the untouched set-piece ball,
+    // so the anti-huddle designation (nearest body to the ball) and the core's
+    // taker agree, and the freeze-until-first-touch contract applies.
+    state.ball.position.x = contactPosition.x;
+    state.ball.position.y = contactPosition.y;
+    state.ball.position.z = FREE_KICK_BALL_Z;
+    state.ball.regime = "ground-roll";
+    state.ball.linearVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.lastTouchRef = null;
+  }
+
+  /**
+   * Execute the free kick: place the ball at the contact position and serve it
+   * toward the nearest awarding-team receiver (or a default upfield target).
+   * This is the CPU auto-serve, called at countdown zero when the taker is not a
+   * human-controlled body.
+   */
+  function applyFreeKick(): void {
+    if (!state.freeKickPosition || !state.freeKickAwardingTeam) return;
+    const kickPos = state.freeKickPosition;
+    const awardingTeam = state.freeKickAwardingTeam;
+    const aimX = awardingTeam === "team-a" ? 1 : -1;
+
+    // Find the nearest awarding-team receiver (not the taker) to serve to.
+    let bestReceiver: { x: number; y: number } | null = null;
+    let bestDist = Infinity;
+    for (const p of state.players) {
+      if (p.teamId !== awardingTeam) continue;
+      if (p.playerId === state.freeKickTakerId) continue;
+      const dx = p.groundPosition.x - kickPos.x;
+      const dy = p.groundPosition.y - kickPos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 0.5 && dist < bestDist) {
+        bestDist = dist;
+        bestReceiver = { x: p.groundPosition.x, y: p.groundPosition.y };
+      }
+    }
+
+    const targetX = bestReceiver ? bestReceiver.x : kickPos.x + aimX * 15;
+    const targetY = bestReceiver ? bestReceiver.y : 0;
+    const dx = targetX - kickPos.x;
+    const dy = targetY - kickPos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 0.001) return;
+    const dirX = dx / dist;
+    const dirY = dy / dist;
+
+    state.ball.position.x = kickPos.x;
+    state.ball.position.y = kickPos.y;
+    state.ball.position.z = FREE_KICK_BALL_Z;
+    state.ball.regime = "airborne";
+    state.ball.linearVelocity.x = dirX * FREE_KICK_SPEED;
+    state.ball.linearVelocity.y = dirY * FREE_KICK_SPEED;
+    state.ball.linearVelocity.z = FREE_KICK_SPEED * FREE_KICK_VERTICAL_COMPONENT;
+    state.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.lastTouchRef = null;
+
+    eventCounter++;
+    const kickEvent: SimulationEvent = {
+      id: `free-kick-executed-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "free-kick-executed",
+      label: `Free kick executed by ${state.freeKickTakerId}`,
+      payload: {
+        teamId: awardingTeam,
+        kickTakerId: state.freeKickTakerId,
+        freeKickPosition: { ...kickPos },
+        targetPosition: { x: targetX, y: targetY },
+        kickDirection: { x: dirX, y: dirY },
+      },
+    };
+    state.events = [...state.events, kickEvent];
+  }
+
+  /**
+   * Execute the free kick toward a human-chosen direction (the pass-gated
+   * human-serve window from HUMAN-BALL-SERVER-LITERAL, applied unchanged). Same
+   * placement / velocity as applyFreeKick, but the serve direction derives from
+   * the human's PASS_BIT InputFrame.
+   */
+  function applyFreeKickFromInput(frame: InputFrame): void {
+    if (!state.freeKickPosition || !state.freeKickAwardingTeam) return;
+    const kickPos = state.freeKickPosition;
+    const dir = resolveServeDirection(frame, state.freeKickTakerId ?? null);
+    if (!dir) return;
+    const { dirX, dirY } = dir;
+
+    state.ball.position.x = kickPos.x;
+    state.ball.position.y = kickPos.y;
+    state.ball.position.z = FREE_KICK_BALL_Z;
+    state.ball.regime = "airborne";
+    state.ball.linearVelocity.x = dirX * FREE_KICK_SPEED;
+    state.ball.linearVelocity.y = dirY * FREE_KICK_SPEED;
+    state.ball.linearVelocity.z = FREE_KICK_SPEED * FREE_KICK_VERTICAL_COMPONENT;
+    state.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    state.ball.lastTouchRef = null;
+
+    const targetX = kickPos.x + dirX * 15;
+    const targetY = kickPos.y + dirY * 15;
+
+    eventCounter++;
+    const kickEvent: SimulationEvent = {
+      id: `free-kick-executed-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "free-kick-executed",
+      label: `Free kick executed by ${state.freeKickTakerId} (human pass)`,
+      payload: {
+        teamId: state.freeKickAwardingTeam,
+        kickTakerId: state.freeKickTakerId,
+        freeKickPosition: { ...kickPos },
+        targetPosition: { x: targetX, y: targetY },
+        kickDirection: { x: dirX, y: dirY },
+        serveInputDirection: { x: frame.moveX, y: frame.moveY },
+        humanServed: true,
+      },
+    };
+    state.events = [...state.events, kickEvent];
+  }
+
+  /**
+   * Find the first committed man-not-ball foul contact in this tick's events
+   * (FOUL-CONSEQUENCE-MACHINERY). Returns the fouled team (the contacted
+   * player's team) and the CONTACT POSITION (the fouled player's planar
+   * position at the contact tick — the players have not moved since the tackle
+   * stage, so this is exactly the contact spot). Only considered when the core
+   * is in `playing` (the caller gates it).
+   */
+  function findFoulContact(
+    stepEvents: readonly SimulationEvent[],
+  ): { awardingTeam: string; contactPosition: { x: number; y: number } } | null {
+    for (const ev of stepEvents) {
+      if (!isFoulCandidateEvent(ev)) continue;
+      const p = ev.payload as Record<string, unknown>;
+      const fouledPlayerId = p.playerIdB as string | undefined;
+      const awardingTeam = p.teamIdB as string | undefined;
+      if (!fouledPlayerId || !awardingTeam) continue;
+      const fouled = state.players.find((pl) => pl.playerId === fouledPlayerId);
+      if (!fouled) continue;
+      return {
+        awardingTeam,
+        contactPosition: { x: fouled.groundPosition.x, y: fouled.groundPosition.y },
+      };
+    }
+    return null;
+  }
+
+  // ------------------------------------------------------------------
   // Internal: drain all buffers into a single flat array (ordered by tick, then insertion).
   // ------------------------------------------------------------------
 
@@ -2041,6 +2323,51 @@ export function createSimulation(
         }
       }
 
+      // 6b-2d. Process free-kick countdown (FOUL-CONSEQUENCE-MACHINERY).
+      if (state.matchPhase === "free-kick") {
+        if (humanServeWaitTicks > 0) {
+          // HUMAN-BALL-SERVER-LITERAL (applied unchanged): a human-controlled
+          // free-kick taker holds the phase open for a PASS_BIT InputFrame; on
+          // the pass the serve direction derives from the input, else the CPU
+          // auto-serve fires on window expiry.
+          const passFrame = findHumanPassFrame(state.freeKickTakerId ?? null, currentFrames);
+          if (passFrame) {
+            applyFreeKickFromInput(passFrame);
+            humanServeWaitTicks = 0;
+          } else {
+            humanServeWaitTicks--;
+            if (humanServeWaitTicks <= 0) {
+              applyFreeKick();
+            }
+          }
+          if (humanServeWaitTicks <= 0) {
+            state.matchPhase = "playing";
+            state.freeKickCountdown = 0;
+            state.freeKickPosition = null;
+            state.freeKickAwardingTeam = null;
+            state.freeKickTakerId = null;
+          }
+        } else {
+          state.freeKickCountdown = (state.freeKickCountdown ?? defaultFreeKickCountdown) - 1;
+          if ((state.freeKickCountdown ?? 0) <= 0) {
+            if (isTakerHumanControlled(state.freeKickTakerId ?? null)) {
+              // Pass-gate: enter the human-serve wait, keep the phase open.
+              humanServeWaitTicks = HUMAN_SERVE_WAIT_WINDOW_TICKS;
+              state.freeKickCountdown = 0;
+              emitServeWait("free-kick", state.freeKickTakerId ?? null, HUMAN_SERVE_WAIT_WINDOW_TICKS);
+            } else {
+              // CPU auto-serve (gate off): byte-identical to pre-change.
+              applyFreeKick();
+              state.matchPhase = "playing";
+              state.freeKickCountdown = 0;
+              state.freeKickPosition = null;
+              state.freeKickAwardingTeam = null;
+              state.freeKickTakerId = null;
+            }
+          }
+        }
+      }
+
       // 6b-3. Detect ball-out-of-play events and trigger corner kick phase.
       if (state.matchPhase === "playing") {
         for (const ev of allStepEvents) {
@@ -2099,6 +2426,28 @@ export function createSimulation(
             onThrowInEvent(awardingTeam, payload.ballPosition, touchlineIndex);
             break;
           }
+        }
+      }
+
+      // 6b-4. Foul consequence (FOUL-CONSEQUENCE-MACHINERY): award a free kick to
+      // the fouled team at the contact position through the accepted restart
+      // WINDOW machinery. Gated on `awardFreeKicks` (off by default). When the
+      // gate is off OR no man-not-ball contact occurred, this is a no-op and the
+      // stream is byte-identical to pre-change.
+      //
+      // The predicate is the SAME single-source-of-truth function the runner-level
+      // detection uses (src/simulation/foul-predicate.ts), evaluated here on the
+      // core's own committed `player-player-contact` events at the match-phase
+      // layer — the core already computes the foul fact during play, so the
+      // consequence never depends on a post-loop runner annotation.
+      //
+      // Same-tick arbitration (spec §2.2): this runs only when matchPhase is still
+      // "playing"; if a ball-out-of-play restart already claimed the phase this
+      // tick, the out-of-play restart wins (a deliberate deterministic priority).
+      if (awardFreeKicks && state.matchPhase === "playing") {
+        const foul = findFoulContact(allStepEvents);
+        if (foul) {
+          onFreeKickEvent(foul.awardingTeam, foul.contactPosition);
         }
       }
 

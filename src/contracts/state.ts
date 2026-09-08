@@ -175,6 +175,7 @@ export interface WorldState {
    * - "corner-kick": ball went out over the goal line, corner kick set piece.
    * - "throw-in": ball went out over the touchline, throw-in set piece.
    * - "goal-kick": ball went out over the goal line, goal kick set piece.
+   * - "free-kick": a foul was awarded, free-kick set piece at the contact spot.
    *
    * Only "playing" allows regular tick progression with countdown.
    * During "goal", the `goalResetCountdown` field drives the automatic
@@ -329,6 +330,40 @@ export interface WorldState {
    * where the goal kick occurred. Used for goal-area positioning.
    */
   goalKickGoalIndex: 0 | 1 | null;
+
+  // -----------------------------------------------------------------
+  // Free-kick state (FOUL-CONSEQUENCE-MACHINERY)
+  // -----------------------------------------------------------------
+
+  /**
+   * Ball placement position for the free-kick restart (the contact position).
+   * Set when matchPhase transitions to "free-kick". Optional and ABSENT (not
+   * `null`) when no free kick has ever been awarded, so a default-off run's
+   * WorldState is byte-identical to the pre-change shape. Cleared to `null`
+   * when the free-kick window closes (a gate-on run, which legitimately
+   * diverges, may carry these fields afterwards).
+   */
+  freeKickPosition?: { x: number; y: number } | null;
+
+  /**
+   * Team awarded the free kick (the fouled team). Set when matchPhase
+   * transitions to "free-kick".
+   */
+  freeKickAwardingTeam?: string | null;
+
+  /**
+   * Player ID of the free-kick taker (closest fouled-team player to the
+   * contact position). Set when matchPhase transitions to "free-kick".
+   */
+  freeKickTakerId?: string | null;
+
+  /**
+   * Countdown ticks before the free kick is auto-executed. Set when matchPhase
+   * transitions to "free-kick". Decremented each tick while
+   * matchPhase === "free-kick". When zero, the ball is served and phase returns
+   * to "playing".
+   */
+  freeKickCountdown?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -346,4 +381,4 @@ export interface WorldState {
  * kick. Match lifecycle phases (first-half, etc.) are tracked by the
  * match runner; the simulation core only needs "playing" vs "goal".
  */
-export type MatchPhase = "playing" | "goal" | "halftime" | "fulltime" | "kickoff" | "corner-kick" | "throw-in" | "goal-kick";
+export type MatchPhase = "playing" | "goal" | "halftime" | "fulltime" | "kickoff" | "corner-kick" | "throw-in" | "goal-kick" | "free-kick";

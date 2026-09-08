@@ -20,11 +20,17 @@
  */
 
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
+import {
+  isFoulCandidatePayload,
+  FOUL_CONTACT_TYPES,
+} from "../../src/simulation/foul-predicate.js";
 
-/**
- * The contact kinds the foul definition applies to (FOULS_CARDS_SPEC §5.1).
- */
-export const FOUL_CONTACT_TYPES = new Set<string>(["standing-tackle", "slide-tackle"]);
+// FOUL-DETECTION-MACHINERY single-source-of-truth: the predicate lives in
+// src/simulation/foul-predicate.ts (the SAME function the in-core foul
+// consequence evaluates), so the runner-level detection and the consequence
+// hook cannot disagree about what a foul IS. Re-export the contact-kinds set so
+// the evidence-binding tests keep their accepted import path.
+export { FOUL_CONTACT_TYPES } from "../../src/simulation/foul-predicate.js";
 
 /**
  * Payload of a `foul` observation event. Every field mirrors a field the
@@ -52,14 +58,6 @@ export interface FoulEventPayload {
   committedDirection: { x: number; y: number };
 }
 
-function isFoulCandidate(payload: Record<string, unknown>): boolean {
-  return (
-    FOUL_CONTACT_TYPES.has(payload.contactType as string) &&
-    payload.tacklePhase === "active" &&
-    payload.duelWon === false
-  );
-}
-
 /**
  * Inject a `foul` observation event for every man-not-ball tackle contact in the
  * stream, appended to the matching-tick observation (sequence computed after the
@@ -77,7 +75,7 @@ export function detectFoulEvents(observations: TelemetryObservation[]): number {
     for (const ev of o.events) {
       if (ev.kind !== "player-player-contact") continue;
       const payload = (ev.payload ?? {}) as Record<string, unknown>;
-      if (!isFoulCandidate(payload)) continue;
+      if (!isFoulCandidatePayload(payload)) continue;
       const p = payload as unknown as FoulEventPayload;
       count++;
       o.events.push({

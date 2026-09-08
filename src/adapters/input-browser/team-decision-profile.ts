@@ -753,7 +753,8 @@ export function computeTeamDecision(
   const phase = observation.matchPhase;
   const isNonPlayingPhase = phase === "goal" || phase === "halftime" ||
     phase === "fulltime" || phase === "corner-kick" ||
-    phase === "throw-in" || phase === "goal-kick";
+    phase === "throw-in" || phase === "goal-kick" ||
+    phase === "free-kick";
   const isKickoff = phase === "kickoff";
 
   let strategy: TeamStrategy;

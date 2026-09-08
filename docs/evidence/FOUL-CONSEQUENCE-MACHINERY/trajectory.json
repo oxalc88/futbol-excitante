@@ -1,0 +1,512 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-CONSEQUENCE-MACHINERY",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-foul-consequence-machinery.ts",
+  "driver": "eval/runners/headless-match.ts (awardFreeKicks gate, core-owned lifecycle, serializeRestartFacts, freeKickWindow) + eval/runners/defensive-duel-driver.ts (scripted standing tackle, freeKickConfig) + the shared foul predicate.",
+  "activation": {
+    "field": "runHeadlessMatch({ awardFreeKicks, detectFouls }) + runDefensiveDuel({ freeKickConfig })",
+    "meaning": "the in-core free-kick consequence in src/simulation/loop/simulation.ts: a committed man-not-ball tackle contact (the SAME predicate the runner-level detection uses, evaluated on the core's own events at the match-phase layer) awards a free kick to the fouled team at the contact position through the accepted restart countdown/serve machinery. Off (the default) or with no foul, the stream is byte-identical to pre-change.",
+    "set_by": [
+      "src/simulation/loop/simulation.ts (free-kick branch + awardFreeKicks gate + default-off FreeKickConfig)",
+      "src/simulation/foul-predicate.ts (single-source-of-truth predicate, shared with eval/runners/foul-detection.ts)",
+      "eval/runners/headless-match.ts runHeadlessMatch({ awardFreeKicks, serializeRestartFacts, freeKickWindow })",
+      "eval/runners/defensive-duel-driver.ts runDefensiveDuel({ freeKickConfig })",
+      "NOT the browser composition root"
+    ]
+  },
+  "guard_state": {
+    "driven_two_run_attestation": true,
+    "organic_two_run_attestation": true,
+    "gate_off_byte_identity_to_pre_change": true,
+    "baseline_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+    "organic_foul_to_free_kick_chain": true,
+    "driven_foul_to_free_kick_chain": true
+  },
+  "trajectory": {
+    "organic": {
+      "sample": [
+        {
+          "tick": 1,
+          "phase": "kickoff",
+          "ball_lastTouchRef": "player-ball-contact-1-1",
+          "ball_x": -30.5353,
+          "ball_y": 2.4963
+        },
+        {
+          "tick": 2,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.6276,
+          "ball_y": 2.4769
+        },
+        {
+          "tick": 3,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.6951,
+          "ball_y": 2.4625
+        },
+        {
+          "tick": 4,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.7471,
+          "ball_y": 2.4519
+        },
+        {
+          "tick": 5,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.7898,
+          "ball_y": 2.4433
+        },
+        {
+          "tick": 6,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.8275,
+          "ball_y": 2.4367
+        },
+        {
+          "tick": 7,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.8631,
+          "ball_y": 2.4313
+        },
+        {
+          "tick": 8,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.8986,
+          "ball_y": 2.4275
+        },
+        {
+          "tick": 9,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.9345,
+          "ball_y": 2.4225
+        },
+        {
+          "tick": 10,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.972,
+          "ball_y": 2.4168
+        },
+        {
+          "tick": 11,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.0118,
+          "ball_y": 2.4102
+        },
+        {
+          "tick": 12,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.0544,
+          "ball_y": 2.4042
+        },
+        {
+          "tick": 13,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.0999,
+          "ball_y": 2.3979
+        },
+        {
+          "tick": 14,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.1485,
+          "ball_y": 2.3928
+        },
+        {
+          "tick": 15,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.2004,
+          "ball_y": 2.3884
+        },
+        {
+          "tick": 16,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.2547,
+          "ball_y": 2.3815
+        },
+        {
+          "tick": 17,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.3116,
+          "ball_y": 2.3722
+        },
+        {
+          "tick": 18,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.3713,
+          "ball_y": 2.3627
+        },
+        {
+          "tick": 19,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.4339,
+          "ball_y": 2.353
+        },
+        {
+          "tick": 20,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.4995,
+          "ball_y": 2.3451
+        }
+      ],
+      "foul_facts": [
+        {
+          "tick": 233,
+          "teamIdB": "team-b"
+        }
+      ],
+      "free_kick_events": [
+        {
+          "tick": 293,
+          "teamId": "team-b",
+          "position": {
+            "x": -43.04129282311101,
+            "y": 2.7667015550856524
+          },
+          "direction": {
+            "x": -0.4680553259721733,
+            "y": -0.8836991636462505
+          },
+          "humanServed": false
+        }
+      ]
+    }
+  },
+  "disclosures": [
+    "FOUL-CONSEQUENCE-MACHINERY is a DELIBERATE core change in src/simulation/loop/simulation.ts: a default-off awardFreeKicks gate opens a free-kick restart window at a committed man-not-ball contact. With the gate OFF (the default) the free-kick branch never runs and the core is byte-identical to pre-change; this is attested by the gate-off legacy pin reproducing the pre-change baseline hash-of-hashes byte-for-byte.",
+    "The free-kick predicate is a single source of truth (src/simulation/foul-predicate.ts): the runner-level detection (eval/runners/foul-detection.ts) and the in-core consequence evaluate the SAME function, so they cannot disagree about what a foul IS. The refactor is additive and hash-neutral when gated off (the detection gate is off by default).",
+    "The free-kick placement is the contact position (the fouled player's planar position at the contact tick); the serve reuses the accepted restart countdown/serve path, and the timer freezes during the non-playing free-kick phase. Placement and serve re-use the accepted restart machinery, not a new set-piece system.",
+    "The organic 3v3-press free-kick stream runs under cpuAntiHuddle:false. Under this shape the anti-huddle nearest-only contract is disabled, so MATCH-RESTART-NEAREST-ONLY would FAIL there (honest: the anti-huddle was explicitly off for that organic run). The anti-huddle interaction is instead adjudicated on the driven free-kick window (freekick-antihuddle-window, cpuAntiHuddle:true, serializeRestartFacts), where FREEZE-UNTIL-FIRST-TOUCH holds PASS.",
+    "Same-tick arbitration (spec §2.2) is a deliberate deterministic priority: the foul consequence runs only when the phase is still 'playing', so a ball-out-of-play restart in the same tick wins. This deferred-arbitration behavior is disclosed, not specified as a defined matrix.",
+    "Cards and advantage stay spec-only: no card, advantage or discipline event is emitted. FREE-KICK-AWARD remains named-but-unregistered (FOULS_CARDS_SPEC §10) — it is NOT registered (objective 2/4)."
+  ],
+  "runs": [
+    {
+      "id": "freekick-driven-duel",
+      "role": "",
+      "ticks": 200,
+      "observation_count": 200,
+      "event_kind_counts": {
+        "player-player-contact": 218,
+        "player-ball-contact": 2,
+        "pass": 2,
+        "tackle-phase": 4,
+        "foul": 1,
+        "second-touch": 2,
+        "pitch-contact": 1
+      },
+      "state_hash_of_hashes": "5f3bc337c1e928eb084f2beb5cea6bdde39668aea71f58b809ee831c1443454d",
+      "determinism_run2_hash_of_hashes": "5f3bc337c1e928eb084f2beb5cea6bdde39668aea71f58b809ee831c1443454d",
+      "foul_count": 1,
+      "free_kick_count": 0,
+      "free_kick_events": [],
+      "committed_free_kick_events": [
+        {
+          "tick": 111,
+          "teamId": "team-b",
+          "position": {
+            "x": -1.81289661272071,
+            "y": 0.007171422293912808
+          }
+        }
+      ],
+      "foul_facts": [
+        {
+          "tick": 51,
+          "teamIdB": "team-b"
+        }
+      ],
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "freekick-organic",
+      "role": "",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 15,
+        "core-match-phase": 600,
+        "restart-designation": 600,
+        "pass": 4,
+        "tackle-phase": 24,
+        "shot": 18,
+        "second-touch": 21,
+        "player-player-contact": 657,
+        "foul": 1,
+        "free-kick-executed": 1,
+        "pitch-contact": 1
+      },
+      "state_hash_of_hashes": "47674adfb1cd411bc5bdc0d03c4744861df7953cd2f0cc4a63a8b13cd172a036",
+      "determinism_run2_hash_of_hashes": "47674adfb1cd411bc5bdc0d03c4744861df7953cd2f0cc4a63a8b13cd172a036",
+      "foul_count": 1,
+      "free_kick_count": 1,
+      "free_kick_events": [
+        {
+          "tick": 293,
+          "teamId": "team-b",
+          "position": {
+            "x": -43.04129282311101,
+            "y": 2.7667015550856524
+          },
+          "direction": {
+            "x": -0.4680553259721733,
+            "y": -0.8836991636462505
+          },
+          "humanServed": false
+        }
+      ],
+      "committed_free_kick_events": [],
+      "foul_facts": [
+        {
+          "tick": 233,
+          "teamIdB": "team-b"
+        }
+      ],
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "FAIL",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      }
+    },
+    {
+      "id": "freekick-antihuddle-window",
+      "role": "",
+      "ticks": 60,
+      "observation_count": 60,
+      "event_kind_counts": {
+        "core-match-phase": 60,
+        "restart-designation": 60,
+        "free-kick-executed": 1,
+        "pitch-contact": 2
+      },
+      "state_hash_of_hashes": "63063b342f658c862bdbed296a86cd7c1ed4190f73d639be7d21a4878f0ec8c0",
+      "determinism_run2_hash_of_hashes": null,
+      "foul_count": 0,
+      "free_kick_count": 1,
+      "free_kick_events": [
+        {
+          "tick": 5,
+          "teamId": "team-a",
+          "position": {
+            "x": 30,
+            "y": 10
+          },
+          "direction": {
+            "x": 0.6246950475544243,
+            "y": 0.7808688094430304
+          },
+          "humanServed": false
+        }
+      ],
+      "committed_free_kick_events": [],
+      "foul_facts": [],
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      }
+    },
+    {
+      "id": "freekick-human-serve",
+      "role": "",
+      "ticks": 40,
+      "observation_count": 40,
+      "event_kind_counts": {
+        "core-match-phase": 40,
+        "restart-designation": 40,
+        "restart-serve-wait": 1,
+        "pass": 1,
+        "free-kick-executed": 1,
+        "pitch-contact": 1
+      },
+      "state_hash_of_hashes": "428a4df583fcaeafb6525fd2c161971f5183ed049ecd850e9fbfabd91ac0b86d",
+      "determinism_run2_hash_of_hashes": null,
+      "foul_count": 0,
+      "free_kick_count": 1,
+      "free_kick_events": [
+        {
+          "tick": 8,
+          "teamId": "team-a",
+          "position": {
+            "x": 30,
+            "y": 10
+          },
+          "direction": {
+            "x": 1,
+            "y": 0
+          },
+          "humanServed": true
+        }
+      ],
+      "committed_free_kick_events": [],
+      "foul_facts": [],
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "PASS",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "PASS",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "PASS",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "PASS"
+      }
+    },
+    {
+      "id": "freekick-gate-off",
+      "role": "",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "determinism_run2_hash_of_hashes": null,
+      "foul_count": 0,
+      "free_kick_count": 0,
+      "free_kick_events": [],
+      "committed_free_kick_events": [],
+      "foul_facts": [],
+      "verdicts": {
+        "MATCH-RESTART-FREEZE-UNTIL-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-NEAREST-ONLY": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-CORNER-KICK-CROSS": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-CORNER-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-AWARD": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-GOAL-KICK-DISTRIBUTION": "BLOCKED_MISSING_REFERENCE",
+        "MATCH-GOAL-KICK-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FREEZE": "NOT_EVALUATED",
+        "MATCH-KICKOFF-FIRST-TOUCH": "NOT_EVALUATED",
+        "MATCH-RESTART-REARM": "NOT_EVALUATED",
+        "MATCH-OUT-OF-PLAY-DETECT": "PASS",
+        "MATCH-OUT-OF-PLAY-NO-LAST-TOUCH": "NOT_EVALUATED",
+        "MATCH-SCORING-GOAL-DEVENT": "PASS",
+        "MATCH-SCORING-GOAL-PHASE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-AWARD": "NOT_EVALUATED",
+        "MATCH-THROW-IN-PLACEMENT": "NOT_EVALUATED",
+        "MATCH-THROW-IN-SERVE": "NOT_EVALUATED",
+        "MATCH-THROW-IN-TIMER-FREEZE": "NOT_EVALUATED",
+        "MATCH-TIMER-DECREMENT": "NOT_EVALUATED",
+        "MATCH-TIMER-HALFTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FULLTIME": "NOT_EVALUATED",
+        "MATCH-TIMER-FREEZE": "NOT_EVALUATED"
+      }
+    }
+  ]
+}

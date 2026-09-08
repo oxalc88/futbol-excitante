@@ -440,7 +440,7 @@ export interface CpuObservation {
    * - "corner-kick"/"throw-in"/"goal-kick": hold during set pieces.
    * Provisional — not a measured PES 2017 concept.
    */
-  matchPhase?: "playing" | "goal" | "halftime" | "fulltime" | "kickoff" | "corner-kick" | "throw-in" | "goal-kick";
+  matchPhase?: "playing" | "goal" | "halftime" | "fulltime" | "kickoff" | "corner-kick" | "throw-in" | "goal-kick" | "free-kick";
 
   /**
    * Current half number (1 or 2).

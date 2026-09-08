@@ -49,6 +49,7 @@ export const HUMAN_RESTART_WINDOW_PHASES: readonly MatchPhase[] = [
   "throw-in",
   "goal-kick",
   "corner-kick",
+  "free-kick",
 ];
 
 /** A restart window the human's team is awarded, read from committed state. */
@@ -76,6 +77,8 @@ export function restartAwardingTeam(state: WorldState): string | null {
       return state.goalKickAwardingTeam;
     case "corner-kick":
       return state.cornerKickAttackingTeam;
+    case "free-kick":
+      return state.freeKickAwardingTeam ?? null;
     default:
       return null;
   }
@@ -93,6 +96,8 @@ export function restartTakerPlayerId(state: WorldState): string | null {
       return state.goalKickTakerId;
     case "corner-kick":
       return state.cornerKickTakerId;
+    case "free-kick":
+      return state.freeKickTakerId ?? null;
     default:
       return null;
   }
@@ -113,7 +118,9 @@ export function describeHumanRestartWindow(state: WorldState): HumanRestartWindo
         ? state.throwInCountdown
         : state.matchPhase === "goal-kick"
           ? state.goalKickCountdown
-          : state.cornerKickCountdown,
+          : state.matchPhase === "corner-kick"
+            ? state.cornerKickCountdown
+            : state.freeKickCountdown ?? 0,
   };
 }
 

@@ -39,7 +39,7 @@ import {
 import type { InputFrame } from "../../src/contracts/input.js";
 import type { SimulationEvent, ScenarioDefinition } from "../../src/contracts/scenario.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
-import type { Simulation } from "../../src/simulation/loop/simulation.js";
+import type { Simulation, FreeKickConfig } from "../../src/simulation/loop/simulation.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,6 +82,12 @@ export interface DefensiveDuelConfig {
    * `false` so the historical CPU configuration is reproduced byte-for-byte.
    */
   cpuAntiHuddle?: boolean;
+  /**
+   * FOUL-CONSEQUENCE-MACHINERY: the default-OFF gate for the in-core free-kick
+   * consequence, passed through to the simulation. With it off (default) the
+   * core never opens a free-kick window and is byte-identical to pre-change.
+   */
+  freeKickConfig?: FreeKickConfig;
 }
 
 /** A press the human policy actually issued, with its tick and bit mask. */
@@ -120,6 +126,12 @@ export interface DefensiveDuelResult {
   humanControlSlot: string;
   /** Player id controlled by the HUMAN slot at the start of the run. */
   humanPlayerId: string;
+  /**
+   * FOUL-CONSEQUENCE-MACHINERY: the committed `free-kick-executed` events from
+   * the core's persistent state (the same serialization-limit the restart rules
+   * oracles close via serializeRestartFacts). Empty for a gate-off run.
+   */
+  freeKickEvents: SimulationEvent[];
 }
 
 // ---------------------------------------------------------------------------
@@ -147,6 +159,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
   const attempts = config.attempts ?? [];
   const sprint = config.sprint ?? 1;
   const cpuAntiHuddle = config.cpuAntiHuddle ?? true;
+  const freeKickConfig = config.freeKickConfig;
 
   const world = createWorld({ scenario });
   const observations: TelemetryObservation[] = [];
@@ -154,7 +167,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
     onObservation(obs) {
       observations.push(obs);
     },
-  });
+  }, undefined, undefined, undefined, undefined, undefined, freeKickConfig);
 
   // --- HUMAN slot resolution (the match declares exactly one) ------------
   let humanControlSlot = "";
@@ -345,6 +358,15 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
 
   for (const entry of cpuSlots) entry.adapter.reset();
 
+  // FOUL-CONSEQUENCE-MACHINERY: capture the committed free-kick-executed events
+  // from the core's persistent state so the driven foul→free-kick chain is
+  // observable (the per-step event array never carries them — the same
+  // serialization limitation serializeRestartFacts closes).
+  const finalState = sim.snapshot();
+  const freeKickEvents = finalState.events.filter(
+    (ev) => ev.kind === "free-kick-executed",
+  );
+
   return {
     tick: sim.tick,
     stateHashes,
@@ -354,5 +376,6 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
     humanPresses,
     humanControlSlot,
     humanPlayerId,
+    freeKickEvents,
   };
 }

@@ -45,7 +45,7 @@ import type { SimulationObserver } from "../../src/simulation/telemetry/observer
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { SimulationEvent } from "../../src/contracts/scenario.js";
 import type { ScenarioDefinition } from "../../src/contracts/scenario.js";
-import type { GoalResetConfig } from "../../src/simulation/loop/simulation.js";
+import type { GoalResetConfig, FreeKickConfig } from "../../src/simulation/loop/simulation.js";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -274,6 +274,36 @@ export interface HeadlessMatchConfig {
    * reproduces the pre-fix drift (the before-state for the evidence record).
    */
   rehomeKeeper?: boolean;
+  /**
+   * Award a free kick to the fouled team at the contact position when the core
+   * commits a man-not-ball tackle contact (FOUL-CONSEQUENCE-MACHINERY). This is
+   * the default-OFF gate for the in-core free-kick consequence: it is passed
+   * through to the simulation (`freeKickConfig.awardFreeKicks`). With the gate
+   * off (default) — or when no foul is committed — the core is byte-identical to
+   * pre-change on every accepted stream. Cards, advantage and any FREE-KICK-AWARD
+   * criterion registration stay spec-only.
+   */
+  awardFreeKicks?: boolean;
+  /**
+   * Open a free-kick restart window at tick 0 from committed state
+   * (FOUL-CONSEQUENCE-MACHINERY, driven anti-huddle adjudication). This is the
+   * fixture-driven technique the accepted HUMAN-RESTART-CONTROL driver uses for
+   * throw-in / goal-kick / corner-kick, extended to a free kick, so the
+   * free-kick restart's freeze-until-first-touch / nearest-only / re-arm
+   * anti-huddle interaction can be adjudicated WITHOUT depending on a natural
+   * foul. It does not create a foul event; it only opens the already-accepted
+   * free-kick restart window. When absent, no free-kick window is opened.
+   */
+  freeKickWindow?: {
+    /** Team awarded the free kick (the fouled team). */
+    team: string;
+    /** Player id of the free-kick taker (closest fouled-team player to the spot). */
+    takerPlayerId: string;
+    /** Ball/contact placement position. */
+    position: { x: number; y: number };
+    /** Countdown ticks before the auto-serve. */
+    countdown: number;
+  };
 }
 
 /**
@@ -644,13 +674,19 @@ export function rehomeKeeperToArc(scenario: ScenarioDefinition): ScenarioDefinit
   return changed ? { ...scenario, players } : scenario;
 }
 
-/** Core phases that hold play while a restart is prepared (RESTART-ANTI-HUDDLE-COHERENCE). */
+/**
+ * Core phases that hold play while a restart is prepared
+ * (RESTART-ANTI-HUDDLE-COHERENCE). "free-kick" is the FOUL-CONSEQUENCE-MACHINERY
+ * restart window; a default-off run never enters it, so this membership is
+ * inert for every accepted byte-pinned stream.
+ */
 const RESTART_HOLD_PHASES = new Set<string>([
   "goal",
   "corner-kick",
   "throw-in",
   "goal-kick",
   "halftime",
+  "free-kick",
 ]);
 
 /**
@@ -719,6 +755,8 @@ export function runHeadlessMatch(
     detectFouls = false,
     humanRestartControl,
     rehomeKeeper,
+    awardFreeKicks = false,
+    freeKickWindow,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
 
@@ -763,7 +801,14 @@ export function runHeadlessMatch(
     ? { goalResetTicks: 60 }
     : undefined;
 
-  const sim = createSimulation(world, collectObserver, undefined, undefined, undefined, undefined, goalResetConfig);
+  // FOUL-CONSEQUENCE-MACHINERY: pass the default-OFF free-kick gate through to
+  // the simulation core. With it off (default) the core never opens a free-kick
+  // window and is byte-identical to pre-change.
+  const freeKickConfig: FreeKickConfig | undefined = awardFreeKicks
+    ? { awardFreeKicks: true }
+    : undefined;
+
+  const sim = createSimulation(world, collectObserver, undefined, undefined, undefined, undefined, goalResetConfig, freeKickConfig);
 
   // HUMAN-RESTART-RULES-CONFORMANCE: open the human's restart window at tick 0
   // from the committed state (the same fixture-driven technique the accepted
@@ -798,6 +843,37 @@ export function runHeadlessMatch(
         mutable.cornerKickGoalIndex = window.goalIndex ?? 0;
         break;
     }
+    sim.restore(mutable);
+  }
+
+  // FOUL-CONSEQUENCE-MACHINERY: open a free-kick restart window at tick 0 from
+  // committed state (the driven anti-huddle adjudication). The free-kick
+  // restart runs through the SAME core machinery a foul would award. This is a
+  // fixture-driven window, NOT a foul event (it is the anti-huddle-interaction
+  // control; the foul→free-kick chain is attested separately).
+  if (freeKickWindow) {
+    const mutable = deepClone(sim.snapshot()) as WorldState;
+    mutable.matchPhase = "free-kick";
+    mutable.freeKickPosition = { ...freeKickWindow.position };
+    mutable.freeKickAwardingTeam = freeKickWindow.team;
+    mutable.freeKickTakerId = freeKickWindow.takerPlayerId;
+    mutable.freeKickCountdown = freeKickWindow.countdown;
+    // Position the taker at the spot and place the untouched ball there, exactly
+    // as onFreeKickEvent would, so the anti-huddle designation (nearest body to
+    // the ball) and the core's taker agree for the freeze adjudication.
+    const taker = mutable.players.find((p) => p.playerId === freeKickWindow.takerPlayerId);
+    if (taker) {
+      taker.groundPosition = { x: freeKickWindow.position.x, y: freeKickWindow.position.y };
+      taker.linearVelocity = { x: 0, y: 0 };
+      taker.desiredVelocity = { x: 0, y: 0 };
+    }
+    mutable.ball.position.x = freeKickWindow.position.x;
+    mutable.ball.position.y = freeKickWindow.position.y;
+    mutable.ball.position.z = 0.11;
+    mutable.ball.regime = "ground-roll";
+    mutable.ball.linearVelocity = { x: 0, y: 0, z: 0 };
+    mutable.ball.angularVelocity = { x: 0, y: 0, z: 0 };
+    mutable.ball.lastTouchRef = null;
     sim.restore(mutable);
   }
 
@@ -1253,6 +1329,7 @@ export function runHeadlessMatch(
       "throw-in-executed",
       "goal-kick-executed",
       "corner-kick-executed",
+      "free-kick-executed",
       "restart-serve-wait",
     ]);
     for (const ev of committedEvents) {
