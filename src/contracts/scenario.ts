@@ -37,6 +37,7 @@ export interface SimulationEvent {
     | "throw-in-executed"
     | "goal-kick-executed"
     | "free-kick-executed"
+    | "card-issued"
     | "player-ball-contact"
     | "player-player-contact"
     | "tackle-phase"

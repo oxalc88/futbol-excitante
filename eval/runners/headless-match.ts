@@ -45,7 +45,7 @@ import type { SimulationObserver } from "../../src/simulation/telemetry/observer
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { SimulationEvent } from "../../src/contracts/scenario.js";
 import type { ScenarioDefinition } from "../../src/contracts/scenario.js";
-import type { GoalResetConfig, FreeKickConfig } from "../../src/simulation/loop/simulation.js";
+import type { GoalResetConfig, FreeKickConfig, CardConfig } from "../../src/simulation/loop/simulation.js";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -284,6 +284,18 @@ export interface HeadlessMatchConfig {
    * criterion registration stay spec-only.
    */
   awardFreeKicks?: boolean;
+  /**
+   * Issue a caution / expulsion to the offending player when the core commits a
+   * man-not-ball tackle contact and that player's accumulated foul count reaches
+   * the `fouls-v1` thresholds (CARD-MACHINERY, FOULS_CARDS_SPEC §7 / §9.1).
+   * This is the default-OFF gate for the in-core card consequence: it is passed
+   * through to the simulation (`cardConfig.issueCards`). With the gate off
+   * (default) — or when no qualifying foul is committed — no booking field is
+   * added and no card event is emitted, so the core is byte-identical to
+   * pre-change on every accepted stream. No CARD-ISSUED criterion registration
+   * here (a later objective registers it).
+   */
+  issueCards?: boolean;
   /**
    * Open a free-kick restart window at tick 0 from committed state
    * (FOUL-CONSEQUENCE-MACHINERY, driven anti-huddle adjudication). This is the
@@ -756,6 +768,7 @@ export function runHeadlessMatch(
     humanRestartControl,
     rehomeKeeper,
     awardFreeKicks = false,
+    issueCards = false,
     freeKickWindow,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
@@ -808,7 +821,14 @@ export function runHeadlessMatch(
     ? { awardFreeKicks: true }
     : undefined;
 
-  const sim = createSimulation(world, collectObserver, undefined, undefined, undefined, undefined, goalResetConfig, freeKickConfig);
+  // CARD-MACHINERY: pass the default-OFF card gate through to the simulation
+  // core. With it off (default) no booking field is added and no card event is
+  // emitted, so the core is byte-identical to pre-change.
+  const cardConfig: CardConfig | undefined = issueCards
+    ? { issueCards: true }
+    : undefined;
+
+  const sim = createSimulation(world, collectObserver, undefined, undefined, undefined, undefined, goalResetConfig, freeKickConfig, cardConfig);
 
   // HUMAN-RESTART-RULES-CONFORMANCE: open the human's restart window at tick 0
   // from the committed state (the same fixture-driven technique the accepted
@@ -1331,6 +1351,7 @@ export function runHeadlessMatch(
       "corner-kick-executed",
       "free-kick-executed",
       "restart-serve-wait",
+      "card-issued",
     ]);
     for (const ev of committedEvents) {
       if (!restartExecKinds.has(ev.kind)) continue;

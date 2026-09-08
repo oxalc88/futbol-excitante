@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "objective_id": "CARD-MACHINERY",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-card-machinery.ts",
+  "driver": "eval/runners/headless-match.ts (issueCards gate, core-owned lifecycle + serializeRestartFacts + free kick) + eval/runners/defensive-duel-driver.ts (scripted standing tackles, cardConfig) + the shared foul predicate.",
+  "activation": {
+    "field": "runDefensiveDuel({ cardConfig }) / runHeadlessMatch({ issueCards })",
+    "meaning": "the in-core card consequence in src/simulation/loop/simulation.ts: a committed man-not-ball tackle contact (the SAME predicate the runner-level detection uses, evaluated on the core's own events at the match-phase layer) accumulates a caution / expulsion for the offending player at the fouls-v1 accumulation thresholds. Off (the default) or with no qualifying foul, no booking field is added and no card event is emitted, so the stream is byte-identical to pre-change.",
+    "set_by": [
+      "src/simulation/loop/simulation.ts (card branch + issueCards gate + default-off CardConfig + state.bookings)",
+      "src/contracts/state.ts (WorldState.bookings / PlayerBooking)",
+      "src/contracts/scenario.ts (card-issued event kind)",
+      "src/simulation/foul-predicate.ts (single-source-of-truth predicate, shared with eval/runners/foul-detection.ts)",
+      "eval/runners/headless-match.ts runHeadlessMatch({ issueCards, serializeRestartFacts })",
+      "eval/runners/defensive-duel-driver.ts runDefensiveDuel({ cardConfig })",
+      "NOT the browser composition root"
+    ]
+  },
+  "guard_state": {
+    "driven_two_run_attestation": true,
+    "gate_off_byte_identity_to_pre_change": true,
+    "baseline_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+    "driven_caution_at_accumulated_two": true,
+    "driven_expulsion_at_accumulated_five": true,
+    "driven_booking_accumulates": true,
+    "combined_card_and_free_kick_coexist": true,
+    "organic_card_count": 0
+  },
+  "trajectory": {
+    "organic": {
+      "sample": [
+        {
+          "tick": 1,
+          "phase": "kickoff",
+          "ball_lastTouchRef": "player-ball-contact-1-1",
+          "ball_x": -30.5353,
+          "ball_y": 2.4963
+        },
+        {
+          "tick": 2,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.6276,
+          "ball_y": 2.4769
+        },
+        {
+          "tick": 3,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.6951,
+          "ball_y": 2.4625
+        },
+        {
+          "tick": 4,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.7471,
+          "ball_y": 2.4519
+        },
+        {
+          "tick": 5,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.7898,
+          "ball_y": 2.4433
+        },
+        {
+          "tick": 6,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.8275,
+          "ball_y": 2.4367
+        },
+        {
+          "tick": 7,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.8631,
+          "ball_y": 2.4313
+        },
+        {
+          "tick": 8,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.8986,
+          "ball_y": 2.4275
+        },
+        {
+          "tick": 9,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.9345,
+          "ball_y": 2.4225
+        },
+        {
+          "tick": 10,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.972,
+          "ball_y": 2.4168
+        },
+        {
+          "tick": 11,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.0118,
+          "ball_y": 2.4102
+        },
+        {
+          "tick": 12,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.0544,
+          "ball_y": 2.4042
+        },
+        {
+          "tick": 13,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.0999,
+          "ball_y": 2.3979
+        },
+        {
+          "tick": 14,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.1485,
+          "ball_y": 2.3928
+        },
+        {
+          "tick": 15,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.2004,
+          "ball_y": 2.3884
+        },
+        {
+          "tick": 16,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.2547,
+          "ball_y": 2.3815
+        },
+        {
+          "tick": 17,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.3116,
+          "ball_y": 2.3722
+        },
+        {
+          "tick": 18,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.3713,
+          "ball_y": 2.3627
+        },
+        {
+          "tick": 19,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.4339,
+          "ball_y": 2.353
+        },
+        {
+          "tick": 20,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.4995,
+          "ball_y": 2.3451
+        }
+      ]
+    },
+    "driven": {
+      "card_events": [
+        {
+          "tick": 116,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "fouledPlayerId": "player-10",
+          "accumulatedFouls": 2,
+          "foulSourceEventId": "tackle-player-contact-116-440",
+          "foulTick": 116
+        },
+        {
+          "tick": 371,
+          "cardType": "expulsion",
+          "playerId": "player-1",
+          "fouledPlayerId": "player-9",
+          "accumulatedFouls": 5,
+          "foulSourceEventId": "tackle-player-contact-371-1409",
+          "foulTick": 371
+        }
+      ],
+      "booking_state": {
+        "player-1": {
+          "fouls": 5,
+          "cautions": 1,
+          "expulsions": 1
+        }
+      },
+      "foul_ticks": [
+        66,
+        116,
+        173,
+        276,
+        371
+      ]
+    }
+  },
+  "disclosures": [
+    "CARD-MACHINERY is a DELIBERATE core change in src/simulation/loop/simulation.ts: a default-off issueCards gate accumulates a caution / expulsion for the offending player at the fouls-v1 accumulation thresholds. With the gate OFF (the default) the card branch never runs and the core is byte-identical to pre-change; this is attested by the gate-off legacy pin reproducing the pre-change baseline hash-of-hashes byte-for-byte.",
+    "The card predicate is a single source of truth (src/simulation/foul-predicate.ts): the runner-level detection (eval/runners/foul-detection.ts) and the in-core card consequence evaluate the SAME function, so they cannot disagree about what a foul IS. No duplicated predicate exists.",
+    "Direct-red-by-contact-severity is NOT implemented. FOULS_CARDS_SPEC §9.1 gives the numeric threshold `foul_card_direct_red_severity_threshold` (0.85), but §7 only NAMES an 'optional contact-severity discriminator' and never defines how the normalized severity is computed from the accepted tackle contact; §11 declares `foul_severity_distribution_ref` and `disciplinary_scale_ref` BLOCKED_MISSING_REFERENCE. Equal-fouls accumulation (2 → caution, 5 → expulsion) is fully specified and implemented; the severity path is surfaced as BLOCKED_MISSING_REFERENCE and NOT invented.",
+    "Second-card (a second yellow → red) semantics are NOT specified by the spec: §7 defines two INDEPENDENT accumulation thresholds (yellow 2, red 5), and §11 declares `disciplinary_scale_ref` BLOCKED_MISSING_REFERENCE. The machinery issues a caution when the accumulated count reaches the yellow threshold and an expulsion when it reaches the red threshold; it does NOT implement a yellow-accumulation-to-expulsion relationship.",
+    "ADVANTAGE-PLAYED stays spec-only (FOULS_CARDS_SPEC §6): no advantage-window withholding is implemented; a recognized foul issues the card unconditionally (there is no advantage gate).",
+    "No CARD-ISSUED criterion is registered (objective 3/4). The card-issued event is structurallly commit-only (it lives in state.events and is surfaced through the accepted serializeRestartFacts committed-events copy when that gate is on), matching the free-kick-executed precedent.",
+    "Same-tick arbitration (spec §2.2) is a deliberate deterministic priority: the card branch evaluates only while matchPhase is still 'playing', and runs before the free-kick branch, so a ball-out-of-play / goal restart that claimed the phase wins, and a card + free kick can coexist on the same foul tick (the card never changes the phase).",
+    "The organic 3v3-press run is under cpuAntiHuddle:false; under that shape the anti-huddle nearest-only contract is disabled. The card consequence is independent of the anti-huddle contract (it only reads committed foul contacts).",
+    "The card-organic run reports booking_state:null because runHeadlessMatch returns observation streams, not the final WorldState bookings. The organic stream committed one man-not-ball foul (below the caution threshold), so the in-core branch materialized a booking (fouls:1, 0 cards) but that is not surfaced through runHeadlessMatch; the driven runs expose booking state directly via runDefensiveDuel.bookingState."
+  ],
+  "runs": [
+    {
+      "id": "card-driven-duel",
+      "role": "proximate 5v5 human-vs-CPU (defensive-duel-driver) with repeated scripted standing tackles: player-1 accumulates 5 man-not-ball fouls (duelWon false, ballReachable false, tacklePhase active) and receives a caution at the 2nd and an expulsion at the 5th.",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 420,
+      "observation_count": 420,
+      "event_kind_counts": {
+        "player-player-contact": 1470,
+        "player-ball-contact": 9,
+        "pass": 3,
+        "tackle-phase": 59,
+        "input-rejection": 4,
+        "foul": 5,
+        "second-touch": 15
+      },
+      "foul_count": 5,
+      "card_count": 2,
+      "card_events": [
+        {
+          "tick": 116,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "fouledPlayerId": "player-10",
+          "accumulatedFouls": 2,
+          "foulSourceEventId": "tackle-player-contact-116-440",
+          "foulTick": 116
+        },
+        {
+          "tick": 371,
+          "cardType": "expulsion",
+          "playerId": "player-1",
+          "fouledPlayerId": "player-9",
+          "accumulatedFouls": 5,
+          "foulSourceEventId": "tackle-player-contact-371-1409",
+          "foulTick": 371
+        }
+      ],
+      "free_kick_count": 0,
+      "booking_state": {
+        "player-1": {
+          "fouls": 5,
+          "cautions": 1,
+          "expulsions": 1
+        }
+      },
+      "state_hash_of_hashes": "a53e18277fec9da4469284420c333743061648791c7a0d2cecd5bc182886138b",
+      "determinism_run2_hash_of_hashes": "a53e18277fec9da4469284420c333743061648791c7a0d2cecd5bc182886138b",
+      "verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "card-combined",
+      "role": "the same driven shape with BOTH the free-kick gate (awardFreeKicks) and the card gate (issueCards) on: the card branch runs first then the free-kick branch opens the restart, so the caution and the free-kick-executed coexist on the same committed foul tick.",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 420,
+      "observation_count": 420,
+      "event_kind_counts": {
+        "player-player-contact": 359,
+        "player-ball-contact": 7,
+        "pass": 3,
+        "tackle-phase": 16,
+        "input-rejection": 1,
+        "foul": 2,
+        "second-touch": 13,
+        "pitch-contact": 2
+      },
+      "foul_count": 2,
+      "card_count": 1,
+      "card_events": [
+        {
+          "tick": 290,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "fouledPlayerId": "player-10",
+          "accumulatedFouls": 2,
+          "foulSourceEventId": "tackle-player-contact-290-383",
+          "foulTick": 290
+        }
+      ],
+      "free_kick_count": 2,
+      "booking_state": {
+        "player-1": {
+          "fouls": 2,
+          "cautions": 1,
+          "expulsions": 0
+        }
+      },
+      "state_hash_of_hashes": "df5a1b00e383c3100bf77d4a562bbee273fa07ead163e6240d412632173d8b94",
+      "determinism_run2_hash_of_hashes": null,
+      "verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "card-organic",
+      "role": "coherent 3v3 CPU-vs-CPU (3v3-press) under cpuDefensiveTackle:true + detectFouls:true + issueCards:true, core-owned + serializeRestartFacts: a man-not-ball contact emerges organically; the registered fouls suite is re-evaluated.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 20,
+        "core-match-phase": 600,
+        "restart-designation": 600,
+        "pass": 3,
+        "tackle-phase": 12,
+        "shot": 22,
+        "second-touch": 22,
+        "player-player-contact": 72,
+        "foul": 1,
+        "goal": 1
+      },
+      "foul_count": 1,
+      "card_count": 0,
+      "card_events": [],
+      "free_kick_count": 0,
+      "booking_state": null,
+      "state_hash_of_hashes": "88a08d2786a29c4dead92e4201d63fa5719f43f464938f1595c1f5cac83c243f",
+      "determinism_run2_hash_of_hashes": null,
+      "verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "card-gate-off",
+      "role": "the CPU gate-off byte-identity control: the accepted legacy 3v3-press pin reproduces byte-for-byte (equal to the pre-change baseline hash-of-hashes), proving the card machinery is hash-neutral when gated off.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "foul_count": 0,
+      "card_count": 0,
+      "card_events": [],
+      "free_kick_count": 0,
+      "booking_state": null,
+      "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "determinism_run2_hash_of_hashes": null,
+      "verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "NOT_EVALUATED"
+      }
+    }
+  ]
+}

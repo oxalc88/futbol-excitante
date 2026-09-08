@@ -90,6 +90,27 @@ export interface BallState {
 }
 
 // ---------------------------------------------------------------------------
+// Booking / disciplinary state (CARD-MACHINERY, FOULS_CARDS_SPEC §7 / §9.1)
+// ---------------------------------------------------------------------------
+
+/**
+ * Per-player booking state for a match, keyed by player id. Only present when
+ * the in-core card gate is on AND a qualifying foul has been committed by a
+ * player; ABSENT otherwise so the default-off path stays byte-identical to
+ * pre-change. The accumulated counts are `fouls-v1` VERSIONED_PROVISIONAL
+ * accumulation thresholds (a caution at `fouls_yellow_accumulation_count`, an
+ * expulsion at `fouls_red_accumulation_count`) — NOT measured PES constants.
+ */
+export interface PlayerBooking {
+  /** Accumulated recognized fouls committed by this player. */
+  fouls: number;
+  /** Cautions (yellow) shown to this player. */
+  cautions: number;
+  /** Expulsions (red) shown to this player. */
+  expulsions: number;
+}
+
+// ---------------------------------------------------------------------------
 // World state
 // ---------------------------------------------------------------------------
 
@@ -364,6 +385,18 @@ export interface WorldState {
    * to "playing".
    */
   freeKickCountdown?: number;
+
+  // -----------------------------------------------------------------
+  // Booking state (CARD-MACHINERY, FOULS_CARDS_SPEC §7)
+  // -----------------------------------------------------------------
+
+  /**
+   * Per-player booking state (accumulated fouls / cautions / expulsions),
+   * keyed by player id. Optional and ABSENT (not `null`) when the card gate is
+   * off (default) or no qualifying foul has been committed, so a default-off
+   * run's WorldState is byte-identical to the pre-change shape.
+   */
+  bookings?: Record<string, PlayerBooking>;
 }
 
 // ---------------------------------------------------------------------------

@@ -39,7 +39,7 @@ import {
 import type { InputFrame } from "../../src/contracts/input.js";
 import type { SimulationEvent, ScenarioDefinition } from "../../src/contracts/scenario.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
-import type { Simulation, FreeKickConfig } from "../../src/simulation/loop/simulation.js";
+import type { Simulation, FreeKickConfig, CardConfig } from "../../src/simulation/loop/simulation.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -88,6 +88,13 @@ export interface DefensiveDuelConfig {
    * core never opens a free-kick window and is byte-identical to pre-change.
    */
   freeKickConfig?: FreeKickConfig;
+  /**
+   * CARD-MACHINERY: the default-OFF gate for the in-core card consequence,
+   * passed through to the simulation. With it off (default) no booking field is
+   * added and no card event is emitted, so the core is byte-identical to
+   * pre-change.
+   */
+  cardConfig?: CardConfig;
 }
 
 /** A press the human policy actually issued, with its tick and bit mask. */
@@ -132,6 +139,17 @@ export interface DefensiveDuelResult {
    * oracles close via serializeRestartFacts). Empty for a gate-off run.
    */
   freeKickEvents: SimulationEvent[];
+  /**
+   * CARD-MACHINERY: the committed `card-issued` events from the core's
+   * persistent state. Empty for a gate-off run.
+   */
+  cardEvents: SimulationEvent[];
+  /**
+   * CARD-MACHINERY: the final committed per-player booking state (the core's
+   * `state.bookings`), keyed by player id. Absent (undefined) for a gate-off
+   * run or when no qualifying foul was committed.
+   */
+  bookingState?: Record<string, { fouls: number; cautions: number; expulsions: number }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -160,6 +178,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
   const sprint = config.sprint ?? 1;
   const cpuAntiHuddle = config.cpuAntiHuddle ?? true;
   const freeKickConfig = config.freeKickConfig;
+  const cardConfig = config.cardConfig;
 
   const world = createWorld({ scenario });
   const observations: TelemetryObservation[] = [];
@@ -167,7 +186,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
     onObservation(obs) {
       observations.push(obs);
     },
-  }, undefined, undefined, undefined, undefined, undefined, freeKickConfig);
+  }, undefined, undefined, undefined, undefined, undefined, freeKickConfig, cardConfig);
 
   // --- HUMAN slot resolution (the match declares exactly one) ------------
   let humanControlSlot = "";
@@ -366,6 +385,11 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
   const freeKickEvents = finalState.events.filter(
     (ev) => ev.kind === "free-kick-executed",
   );
+  // CARD-MACHINERY: capture the committed card-issued events from the core's
+  // persistent state so the driven foul→card chain is observable.
+  const cardEvents = finalState.events.filter(
+    (ev) => ev.kind === "card-issued",
+  );
 
   return {
     tick: sim.tick,
@@ -377,5 +401,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
     humanControlSlot,
     humanPlayerId,
     freeKickEvents,
+    cardEvents,
+    bookingState: finalState.bookings,
   };
 }

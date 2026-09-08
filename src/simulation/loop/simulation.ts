@@ -71,6 +71,7 @@ import type { DribbleState } from "../contacts/second-touch-system.js";
 import { stepTackle, replayTackleEvent } from "../contacts/tackle-system.js";
 import type { TackleState } from "../contacts/tackle-system.js";
 import { isFoulCandidateEvent } from "../foul-predicate.js";
+import { resolveCardForAccumulatedFouls } from "../card-policy.js";
 import {
   FOUNDATION_LOCOMOTION_V1,
   FOUNDATION_BALL_V1,
@@ -135,6 +136,24 @@ export interface GoalResetConfig {
 export interface FreeKickConfig {
   /** Gate: award free kicks on committed foul contacts (off by default). */
   awardFreeKicks?: boolean;
+}
+
+/**
+ * Card-consequence configuration (CARD-MACHINERY, FOULS_CARDS_SPEC §7 / §9.1).
+ *
+ * Controls the default-OFF gate that issues a caution / expulsion to the
+ * offending player when the core commits a man-not-ball tackle contact (spec
+ * §5.1) and the player's accumulated foul count reaches the versioned
+ * provisional `fouls-v1` thresholds (§9.1). Off by default: with the gate off
+ * (or no qualifying foul) the core is byte-identical to pre-change on every
+ * accepted stream.
+ *
+ * Versioned provisional configuration — the accumulation thresholds are
+ * `fouls-v1` deliberate design choices, NOT measured PES 2017 constants.
+ */
+export interface CardConfig {
+  /** Gate: issue cards on committed foul contacts (off by default). */
+  issueCards?: boolean;
 }
 
 /**
@@ -270,6 +289,12 @@ export interface Simulation {
  *   need different ball physics (e.g., curveCoefficient 0.0005 vs 0.003).
  * @param goalResetConfig - Optional goal reset configuration.
  *   Controls automatic restart behavior after a goal event.
+ * @param freeKickConfig - Optional free-kick consequence configuration.
+ *   Controls the default-OFF gate that awards a free kick on a committed foul
+ *   contact (FOUL-CONSEQUENCE-MACHINERY).
+ * @param cardConfig - Optional card-consequence configuration.
+ *   Controls the default-OFF gate that issues a caution / expulsion to the
+ *   offending player on a committed foul contact (CARD-MACHINERY).
  * @returns A simulation instance.
  */
 export function createSimulation(
@@ -281,6 +306,7 @@ export function createSimulation(
   ballConfigOverride?: BallConfigOverride,
   goalResetConfig?: GoalResetConfig,
   freeKickConfig?: FreeKickConfig,
+  cardConfig?: CardConfig,
 ): Simulation {
   const obs = observer ?? NO_OP_OBSERVER;
 
@@ -321,6 +347,15 @@ export function createSimulation(
   const FREE_KICK_BALL_Z = 0.11; // ball radius (foundation-ball-v1)
   const FREE_KICK_SPEED = 14; // provisional: free-kick serve speed (m/s)
   const FREE_KICK_VERTICAL_COMPONENT = 0.18; // provisional: serve loft
+
+  // CARD-MACHINERY: the default-OFF gate that issues a caution / expulsion to
+  // the offending player when the core commits a man-not-ball tackle contact
+  // (spec §5.1) and the player's accumulated foul count reaches the versioned
+  // provisional `fouls-v1` thresholds. Lives in the simulation closure so the
+  // booking state is only materialized lazily in WorldState when a qualifying
+  // foul is committed; with the gate off (or no qualifying foul) no booking
+  // field is added and no card event is emitted — byte-identical to pre-change.
+  const issueCards = cardConfig?.issueCards === true;
 
   // Per-player dribble-touch cooldown — maps playerId → last tick a dribble-touch occurred.
   // Lives in the simulation closure; does not affect world state or hashing.
@@ -1464,6 +1499,57 @@ export function createSimulation(
     return null;
   }
 
+  /**
+   * Issue a card consequence for one committed man-not-ball foul contact
+   * (CARD-MACHINERY, FOULS_CARDS_SPEC §7 / §9.1). The offender is the tackler
+   * (`playerIdA` / `teamIdA`); the fouled player is the contacted opponent
+   * (`playerIdB` / `teamIdB`). Every recognized foul increments that player's
+   * accumulated foul count; a caution is issued when it reaches the yellow
+   * accumulation count, an expulsion when it reaches the red accumulation count.
+   *
+   * Booking state is materialized lazily in `state.bookings` only once a
+   * qualifying foul is committed, so the off-path (gate off or no foul) never
+   * adds a field and stays byte-identical to pre-change.
+   */
+  function issueCardForFoul(ev: SimulationEvent): void {
+    const p = ev.payload as Record<string, unknown>;
+    const offenderId = p.playerIdA as string | undefined;
+    const teamId = p.teamIdA as string | undefined;
+    const fouledPlayerId = p.playerIdB as string | undefined;
+    if (!offenderId || !teamId || !fouledPlayerId) return;
+
+    const bookings = state.bookings ?? (state.bookings = {});
+    const booking = bookings[offenderId] ?? (bookings[offenderId] = { fouls: 0, cautions: 0, expulsions: 0 });
+    booking.fouls += 1;
+
+    const cardType = resolveCardForAccumulatedFouls(booking.fouls);
+    if (cardType === null) return;
+
+    if (cardType === "caution") booking.cautions += 1;
+    if (cardType === "expulsion") booking.expulsions += 1;
+
+    eventCounter++;
+    const cardEvent: SimulationEvent = {
+      id: `card-issued-${state.tick}-${eventCounter}-${offenderId}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind: "card-issued",
+      label:
+        `${cardType === "caution" ? "Caution" : "Expulsion"}: ${offenderId} ` +
+        `accumulated ${booking.fouls} fouls (foul vs ${fouledPlayerId})`,
+      payload: {
+        cardType,
+        playerId: offenderId,
+        teamId,
+        fouledPlayerId,
+        accumulatedFouls: booking.fouls,
+        foulSourceEventId: ev.id,
+        foulTick: ev.tick,
+      },
+    };
+    state.events = [...state.events, cardEvent];
+  }
+
   // ------------------------------------------------------------------
   // Internal: drain all buffers into a single flat array (ordered by tick, then insertion).
   // ------------------------------------------------------------------
@@ -2426,6 +2512,28 @@ export function createSimulation(
             onThrowInEvent(awardingTeam, payload.ballPosition, touchlineIndex);
             break;
           }
+        }
+      }
+
+      // 6b-3c. Card consequence (CARD-MACHINERY): issue a caution / expulsion to
+      // the offending player per FOULS_CARDS_SPEC §7 / §9.1 when a committed
+      // man-not-ball tackle contact reaches the accumulated-foul thresholds.
+      // Gated on `issueCards` (off by default). The predicate is the SAME
+      // single-source-of-truth function the runner-level detection uses
+      // (src/simulation/foul-predicate.ts), evaluated here on the core's own
+      // committed `player-player-contact` events at the match-phase layer, so a
+      // card never depends on a post-loop runner annotation. When the gate is
+      // off OR no qualifying foul occurred, no booking field is added and no
+      // card event is emitted — byte-identical to pre-change. ADJUDICATION:
+      // a card is a referee consequence of a recognized foul; it does not itself
+      // change the match phase (the free-kick consequence below may). Same-tick
+      // arbitration (spec §2.2) is a deliberate deterministic priority: cards
+      // are also evaluated only while matchPhase is still "playing", so a
+      // ball-out-of-play / goal restart that claimed the phase wins.
+      if (issueCards && state.matchPhase === "playing") {
+        for (const ev of allStepEvents) {
+          if (!isFoulCandidateEvent(ev)) continue;
+          issueCardForFoul(ev);
         }
       }
 
