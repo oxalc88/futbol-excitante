@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.7",
+  "persisted_at": "2026-09-08T08:07:16.262Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "FOUL-FREEKICK-BROWSER-EVIDENCE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "candidate_commit": "bba7befabfd9dd3411c92a2e43f11f4b4ddbdec4",
+  "builder": {
+    "builder": "builder-gameplay",
+    "model": "deepseek-v4-flash (reroute — qwen3.8-flash quota-exhausted until 2026-10-01)"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v35 4/4: the foul → free-kick consequence visible in the real browser (evidence class DYNAMIC_VISUAL, audited at the named class — no downgrade; the horizon's observable playable capability). ZERO GAMEPLAY CHANGE: git diff src/simulation/ src/contracts/ EMPTY (verified by builder, critic, AND integration); the only src changes are presentation/harness: src/adapters/renderer-three/renderer.ts +1 case \"free-kick\" → \"FREE KICK\" in formatPhaseLabel (presentation-only, reachable only under the off-by-default showMatchPhaseHud flag — the curated label the 1/4 critic deferred here) and src/apps/browser/test-bridge.ts optional freeKickConfig passthrough (default undefined; all ~125 pre-existing createTestBridge call sites across 33 files pass at most 4 positional args — verified consumer-enumerated; main.ts unchanged). THE DRIVE: real Chromium via test-bridge + the real Three renderer (showMatchPhaseHud:true) over the accepted FOUL-CONSEQUENCE driven-duel shape (5v5-human-vs-cpu + withProximateHumanDefence; the accepted defensive-duel scripted standing-tackle policy; freeKickConfig:{awardFreeKicks:true}) — the foul and free kick are REAL core events via the shared foul-predicate. THE FRAMES (4 event-centered, byte-distinct PNGs over the captured bytes): tackle-contact@50 (36ea577e…, PLAYING/TIME 5350, the man-not-ball contact) → freekick-award@51 (cf522fae…, the phase flips to the curated FREE KICK HUD label, the ball re-placed at the contact spot, white ball pixels at the projected spot) → freekick-placement@91 (f31f80e0…, FREE KICK, TIME frozen at 5350; pixel-difference forensics show only two small player-drift regions — the ball region pixel-unchanged → stationary at the spot) → freekick-served@114 (f1bbe9b8…, back to PLAYING, TIME 5346 = the remaining-ticks countdown resumed at the tick-111 serve — correct frozen-restart semantics); sequence.json binds path/tick/semantic/sha256 (4/4 verified against actual PNG bytes). CORRESPONDENCE: browser foul@51 → FK@111, team-b, contact (−1.813, 0.007) — headless reproduction identical → offset 0/0 EXACT (reproduced three times by the critic). record_sha256 e65c3618369a1474eb2c094714b41fb85986e68d3a6e6f19011fd7ed4cb6188c (no wall-clock field; reproduced byte-exact by the critic twice AND the integration reviewer; docs/ byte-identical on ordinary runs — 1045 files hashed; durable writes under WIP_SECTION=__EVIDENCE__:FOUL-FREEKICK-BROWSER-EVIDENCE). Audit PASS DYNAMIC_VISUAL (20 checks incl. screenshot-SHA-uniqueness). Tests: browser capture 3/3 + integration 2/2; typecheck 0 + build 0; byte-neutrality verified via keeper-visual-marker 4/4 (incl. the byte-identity parity guard) + fulltime-flow-closure 7/7 + archetype-identical-recapture + the byte-sensitive browser evidence suites; the accepted-machinery bindings green (fouls-suite 24 + foul-consequence 7+4+1 + foul-detection 12 + fouls-spec 42); INTEGRATION COVERAGE: 32 browser files / 253 tests all PASS (the 8 uncovered files are pure screenshot-capture/archetype suites on HUD-off paths — the byte-identity risk surface covered by keeper-visual-marker + archetype-identical-recapture, both green; disclosed), node-side 92 + 50 + 48 + the state bindings all green; gauntlet:eval 39+33; eval:state 13/13. Disclosures: the fixture is a DRIVEN duel (one scripted standing tackle in a short window), not an organic match; free-kick-executed lives in the core's persistent state (accepted serialization limit), read from the snapshot; the free-kick countdown 60 / speed 14 / loft 0.18 / z 0.11 are VERSIONED_PROVISIONAL design values, not PES constants; the capture-foul-freekick-browser-record package script self-sets WIP_SECTION (durable-by-design; a true ordinary run is tsx without the env var); the pre-existing vitest onTaskUpdate worker-RPC artifact (non-fatal; one spurious fail-mark on GK-REGRESSION-POLICY-REGISTRATION in a combined run re-ran solo 42/42); the full node battery and the entire ~53-file browser suite not run in a single pass (the 300 s budget) — the renderer-risk surface covered by the byte-sensitive subset + typecheck + build. claims_not_made: no card or advantage implementation or evidence / no FREE-KICK-AWARD registration here (the sibling objective) / no suite-level PASS claim / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity or measured envelope / no per-tick float identity claim across runtimes (correspondence is event-structure only) / no gameplay or consequence-machinery change."
+}
