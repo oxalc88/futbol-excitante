@@ -537,10 +537,12 @@ export const EXPANSION_FOULS_V1: ExpansionManifest = {
   direct_test_ids: [
     "FOULS-DETECT-001",
     "FOULS-CLEAN-TACKLE-001",
+    "FOULS-FREE-KICK-AWARD-001",
   ],
   expanded_test_ids: [
     "FOULS-CLEAN-TACKLE-001",
     "FOULS-DETECT-001",
+    "FOULS-FREE-KICK-AWARD-001",
   ],
   common_criterion_ids: [],
   impact_closure: "NONE",

@@ -1040,11 +1040,11 @@ export const MATCH_RESTART_NEAREST_ONLY: EvaluationCriterion = {
 // ---------------------------------------------------------------------------
 // fouls suite criteria — FOULS_CARDS_SPEC §10
 //
-// Only FOUL-DETECT and FOUL-CLEAN-TACKLE are registered here: they are the two
-// §10 criteria the accepted detection machinery makes answerable over the
-// committed detection streams.  CARD-ISSUED, ADVANTAGE-PLAYED and
-// FREE-KICK-AWARD remain NAMED-BUT-UNREGISTERED — no criterion record, oracle,
-// invariant, binding or verdict is added for them (no machinery exists).
+// FOUL-DETECT, FOUL-CLEAN-TACKLE and FREE-KICK-AWARD are registered here: the
+// §10 criteria the accepted machinery makes answerable over the committed
+// detection / consequence streams.  CARD-ISSUED and ADVANTAGE-PLAYED remain
+// NAMED-BUT-UNREGISTERED — no criterion record, oracle, invariant, binding or
+// verdict is added for them (no machinery exists).
 // ---------------------------------------------------------------------------
 
 /**
@@ -1075,6 +1075,24 @@ export const FOUL_CLEAN_TACKLE: EvaluationCriterion = {
     "is a clean tackle or won duel and is not a foul; a symmetric " +
     "shoulder-to-shoulder player-player contact is not a foul.  No clean or " +
     "shoulder contact emits a foul event.",
+};
+
+/**
+ * FREE-KICK-AWARD — the set-piece consequence of a called foul, grounded in the
+ * accepted restart machinery per FOULS_CARDS_SPEC §8.  A detected foul yields a
+ * free kick to the fouled team at the contact position; a free kick awarded
+ * without a detected foul is invalid.
+ * Class: HARD_INVARIANT.  Oracle: foul-free-kick-award-oracle-v1.
+ */
+export const FREE_KICK_AWARD: EvaluationCriterion = {
+  criterion_id: "FREE-KICK-AWARD",
+  class: "HARD_INVARIANT",
+  rule:
+    "A detected man-not-ball foul yields to the fouled team a free-kick restart " +
+    "award placed at the contact position, executed through the accepted restart " +
+    "machinery (§8).  A free kick awarded with no detected foul — or a foul with " +
+    "no free-kick awarded — violates the consequence; a free kick to the wrong " +
+    "team or at a non-contact position violates the placement.",
 };
 
 /** All common criteria keyed by criterion_id. */
@@ -1187,6 +1205,7 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   // fouls suite criteria — FOULS_CARDS_SPEC §10 (registered per objective)
   [FOUL_DETECT.criterion_id]: FOUL_DETECT,
   [FOUL_CLEAN_TACKLE.criterion_id]: FOUL_CLEAN_TACKLE,
+  [FREE_KICK_AWARD.criterion_id]: FREE_KICK_AWARD,
 };
 
 /**

@@ -1005,6 +1005,23 @@ export const BINDING_FOULS_CLEAN_TACKLE_001: TestImplementationBinding = makeTes
   },
 );
 
+/**
+ * FOULS-FREE-KICK-AWARD-001 — a detected foul awards a free kick to the fouled
+ * team at the contact position.  FREE-KICK-AWARD is bound to the protected
+ * foul-free-kick-award oracle.
+ */
+export const BINDING_FOULS_FREE_KICK_AWARD_001: TestImplementationBinding = makeTestBindingWith(
+  "FOULS-FREE-KICK-AWARD-001",
+  ["scn-fouls-lifecycle-v1"],
+  [],
+  ["foul-free-kick-award-evidence"],
+  ["obs-per-tick-v1", "obs-fouls-v1"],
+  [],
+  {
+    "FREE-KICK-AWARD": ["foul-free-kick-award-evidence"],
+  },
+);
+
 // ---------------------------------------------------------------------------
 // Registry — all bindings keyed by test_id
 // ---------------------------------------------------------------------------
@@ -1078,6 +1095,7 @@ export const TEST_BINDINGS: Record<string, TestImplementationBinding> = {
   // fouls suite bindings
   [BINDING_FOULS_DETECT_001.test_id]: BINDING_FOULS_DETECT_001,
   [BINDING_FOULS_CLEAN_TACKLE_001.test_id]: BINDING_FOULS_CLEAN_TACKLE_001,
+  [BINDING_FOULS_FREE_KICK_AWARD_001.test_id]: BINDING_FOULS_FREE_KICK_AWARD_001,
 };
 
 /**

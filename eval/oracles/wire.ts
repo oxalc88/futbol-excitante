@@ -22,7 +22,7 @@ import { checkDeferredMutants } from "./deferred-mutants.js";
 import { checkPrngOrderOracle } from "./prng-order.js";
 import { checkPlayerContactEvidence } from "./player-contact.js";
 import { checkTacklePhaseEvidence } from "./tackle-phase.js";
-import { checkFoulDetect, checkFoulCleanTackle } from "./fouls.js";
+import { checkFoulDetect, checkFoulCleanTackle, checkFoulFreeKickAward } from "./fouls.js";
 import { checkScoreTracker } from "./match.js";
 import { checkMatchClock } from "./match.js";
 import {
@@ -337,10 +337,12 @@ const entries: OracleEntry[] = [
     oracle_version: "oracle-rules-restart-rearm-v1",
     fn: checkRestartRearm,
   },
-  // FOULS_CARDS_SPEC §10 foul oracles (FOULS-SUITE-REGISTRATION): the two
-  // criteria the accepted detection machinery makes answerable.  Additive; no
-  // existing entry is changed.  CARD-ISSUED / ADVANTAGE-PLAYED / FREE-KICK-AWARD
-  // stay named-but-unregistered (no machinery, no oracle, no verdict).
+  // FOULS_CARDS_SPEC §10 foul oracles (FOULS-SUITE-REGISTRATION +
+  // FREE-KICK-SUITE-REGISTRATION): the three criteria the accepted machinery
+  // makes answerable.  Additive; no existing entry is changed.
+  // CARD-ISSUED / ADVANTAGE-PLAYED stay named-but-unregistered (no machinery,
+  // no oracle, no verdict).  FREE-KICK-AWARD reads the committed
+  // free-kick-executed events and the shared foul predicate.
   {
     oracle_id: "foul-detect-oracle-v1",
     oracle_version: "oracle-foul-detect-v1",
@@ -350,6 +352,11 @@ const entries: OracleEntry[] = [
     oracle_id: "foul-clean-tackle-oracle-v1",
     oracle_version: "oracle-foul-clean-tackle-v1",
     fn: checkFoulCleanTackle,
+  },
+  {
+    oracle_id: "foul-free-kick-award-oracle-v1",
+    oracle_version: "oracle-foul-free-kick-award-v1",
+    fn: checkFoulFreeKickAward,
   },
   // HUMAN-BALL-SERVER-LITERAL human-serve oracles: the pass-gated serving path
   // conformance. Additive; no existing entry is changed. These adjudicate the

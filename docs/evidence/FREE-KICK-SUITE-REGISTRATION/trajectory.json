@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "objective_id": "FREE-KICK-SUITE-REGISTRATION",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-freekick-suite-registration.ts",
+  "driver": "eval/runners/headless-match.ts (awardFreeKicks gate, core-owned lifecycle, serializeRestartFacts, freeKickWindow) + eval/runners/defensive-duel-driver.ts (scripted standing tackle, freeKickConfig) + the shared foul predicate; each stream evaluated with the registered `fouls` suite (evaluateSuite('fouls', observations)).",
+  "activation": {
+    "field": "evaluateSuite('fouls', observations) over the committed consequence streams",
+    "meaning": "the registered `fouls` suite (suite-fouls-v1) evaluates FOUL-DETECT, FOUL-CLEAN-TACKLE and FREE-KICK-AWARD over the accepted consequence streams. FREE-KICK-AWARD verifies the §10 set-piece consequence: a real detected foul yields a free kick to the fouled team at the contact position; a free kick awarded with no detected foul FAILs; a no-foul / gate-off stream is honest NOT_EVALUATED; and a stream carrying a foul but no observable free-kick-executed (the driven shape, which commits the free kick in the core's persistent state, not the per-step observation array) is honest NOT_EVALUATED.",
+    "set_by": [
+      "eval/contracts/suites.ts FOULS_SUITE (suite-fouls-v1, +FOULS-FREE-KICK-AWARD-001)",
+      "eval/contracts/bindings.ts BINDING_FOULS_FREE_KICK_AWARD_001",
+      "eval/contracts/common-criteria.ts FREE_KICK_AWARD",
+      "eval/contracts/invariant-definitions.ts INV_FOUL_FREE_KICK_AWARD",
+      "eval/oracles/fouls.ts checkFoulFreeKickAward (imports the shared src/simulation/foul-predicate.ts predicate)",
+      "eval/oracles/wire.ts + eval/runners/foundation-evaluator.ts CRITERION_TO_ORACLE",
+      "NOT the browser composition root"
+    ]
+  },
+  "disclosures": [
+    "FREE-KICK-AWARD reads only the committed observation fields: the `foul` events, the `player-player-contact` provenance contacts, the `free-kick-executed` events (FOUL-CONSEQUENCE-MACHINERY), and the per-tick player positions used to verify the contact placement. CARD-ISSUED and ADVANTAGE-PLAYED remain NAMED-BUT-UNREGISTERED (no machinery) — no criterion, oracle, invariant, binding or verdict accompanies them.",
+    "The driven-duel shape carries its free-kick in the CORE's persistent state, not the per-step observation array (runner serialization limit). The FREE-KICK-AWARD oracle therefore cannot confirm or deny the award from the driven stream's observations and reports honest NOT_EVALUATED — it never invents a PASS or a false FAIL. The runner serialization is NOT changed to make the oracle's job easier.",
+    "The anti-huddle freeKickWindow control and the human-serve free-kick window are deliberate no-foul negative pressures: they award a free kick with no detected foul, which FREE-KICK-AWARD FAILs (a free kick is only the consequence of a called foul, §10).",
+    "Each reproduced stream is character-identical to its accepted FOUL-CONSEQUENCE-MACHINERY state-hash-of-hashes pin (record 39da80ad…), so the verdicts are honest over the accepted streams, not over a re-shaped stream.",
+    "NO suite-level PASS: the fouls suite is partial (3 of the 5 §10 criteria registered); verdicts are reported per criterion and per stream. No FOUNDATION_LAB_PASS, PES fidelity, or invented reference envelope claim."
+  ],
+  "runs": [
+    {
+      "id": "freekick-driven-duel",
+      "role": "proximate 5v5 human-vs-CPU (defensive-duel-driver) with a scripted standing tackle and the in-core free-kick gate on: a committed man-not-ball contact (duelWon false, ballReachable false, tacklePhase active) emits the `foul`, and the core awards a free kick to the fouled team at the contact position. The free-kick-executed is committed in the CORE's persistent state (the driven shape does not serialize restart facts), not the per-step observation array, so FREE-KICK-AWARD is honestly NOT_EVALUATED (the oracle cannot confirm the award from the observations it receives).",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 200,
+      "observation_count": 200,
+      "event_kind_counts": {
+        "player-player-contact": 218,
+        "player-ball-contact": 2,
+        "pass": 2,
+        "tackle-phase": 4,
+        "foul": 1,
+        "second-touch": 2,
+        "pitch-contact": 1
+      },
+      "state_hash_of_hashes": "5f3bc337c1e928eb084f2beb5cea6bdde39668aea71f58b809ee831c1443454d",
+      "accepted_state_hash_of_hashes": "5f3bc337c1e928eb084f2beb5cea6bdde39668aea71f58b809ee831c1443454d",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 1,
+      "free_kick_count": 0,
+      "foul_events": [
+        {
+          "tick": 51,
+          "id": "foul-51-193",
+          "sourceEventId": "tackle-player-contact-51-192"
+        }
+      ],
+      "free_kick_events": [],
+      "committed_free_kick_events": [
+        {
+          "tick": 111,
+          "teamId": "team-b",
+          "position": {
+            "x": -1.81289661272071,
+            "y": 0.007171422293912808
+          }
+        }
+      ],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED"
+      },
+      "free_kick_award_outcome": "NOT_EVALUATED"
+    },
+    {
+      "id": "freekick-organic",
+      "role": "coherent 3v3 CPU-vs-CPU (3v3-press) under cpuDefensiveTackle:true + detectFouls:true + awardFreeKicks:true, core-owned lifecycle + serializeRestartFacts — a real man-not-ball contact emerges organically, the `foul` and the consequence `free-kick-executed` both sit in the observation stream at the contact position → FREE-KICK-AWARD PASS.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 15,
+        "core-match-phase": 600,
+        "restart-designation": 600,
+        "pass": 4,
+        "tackle-phase": 24,
+        "shot": 18,
+        "second-touch": 21,
+        "player-player-contact": 657,
+        "foul": 1,
+        "free-kick-executed": 1,
+        "pitch-contact": 1
+      },
+      "state_hash_of_hashes": "47674adfb1cd411bc5bdc0d03c4744861df7953cd2f0cc4a63a8b13cd172a036",
+      "accepted_state_hash_of_hashes": "47674adfb1cd411bc5bdc0d03c4744861df7953cd2f0cc4a63a8b13cd172a036",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 1,
+      "free_kick_count": 1,
+      "foul_events": [
+        {
+          "tick": 233,
+          "id": "foul-233-55",
+          "sourceEventId": "tackle-player-contact-233-51"
+        }
+      ],
+      "free_kick_events": [
+        {
+          "tick": 293,
+          "id": "free-kick-executed-293-88",
+          "teamId": "team-b",
+          "position": {
+            "x": -43.04129282311101,
+            "y": 2.7667015550856524
+          }
+        }
+      ],
+      "committed_free_kick_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "PASS"
+      },
+      "free_kick_award_outcome": "PASS"
+    },
+    {
+      "id": "freekick-antihuddle-window",
+      "role": "a driven freeKickWindow restart window (cpuAntiHuddle:true, serializeRestartFacts) with NO detected foul. A free kick awarded with no detected foul is exactly what FREE-KICK-AWARD forbids (the set-piece consequence of a called foul) → FAIL (power guard).",
+      "scenario": "eval/scenarios/5v5-human-restart-throwin.v1.json",
+      "ticks": 60,
+      "observation_count": 60,
+      "event_kind_counts": {
+        "core-match-phase": 60,
+        "restart-designation": 60,
+        "free-kick-executed": 1,
+        "pitch-contact": 2
+      },
+      "state_hash_of_hashes": "63063b342f658c862bdbed296a86cd7c1ed4190f73d639be7d21a4878f0ec8c0",
+      "accepted_state_hash_of_hashes": "63063b342f658c862bdbed296a86cd7c1ed4190f73d639be7d21a4878f0ec8c0",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 0,
+      "free_kick_count": 1,
+      "foul_events": [],
+      "free_kick_events": [
+        {
+          "tick": 5,
+          "id": "free-kick-executed-5-1",
+          "teamId": "team-a",
+          "position": {
+            "x": 30,
+            "y": 10
+          }
+        }
+      ],
+      "committed_free_kick_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "FAIL"
+      },
+      "free_kick_award_outcome": "FAIL"
+    },
+    {
+      "id": "freekick-human-serve",
+      "role": "a human-served free-kick window (the pass-gated human restart serve) with NO detected foul → FAIL (the same power guard: a free kick without a detected foul).",
+      "scenario": "eval/scenarios/5v5-human-serve-throwin.v1.json",
+      "ticks": 40,
+      "observation_count": 40,
+      "event_kind_counts": {
+        "core-match-phase": 40,
+        "restart-designation": 40,
+        "restart-serve-wait": 1,
+        "pass": 1,
+        "free-kick-executed": 1,
+        "pitch-contact": 1
+      },
+      "state_hash_of_hashes": "428a4df583fcaeafb6525fd2c161971f5183ed049ecd850e9fbfabd91ac0b86d",
+      "accepted_state_hash_of_hashes": "428a4df583fcaeafb6525fd2c161971f5183ed049ecd850e9fbfabd91ac0b86d",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 0,
+      "free_kick_count": 1,
+      "foul_events": [],
+      "free_kick_events": [
+        {
+          "tick": 8,
+          "id": "free-kick-executed-8-3",
+          "teamId": "team-a",
+          "position": {
+            "x": 30,
+            "y": 10
+          }
+        }
+      ],
+      "committed_free_kick_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "FAIL"
+      },
+      "free_kick_award_outcome": "FAIL"
+    },
+    {
+      "id": "freekick-gate-off",
+      "role": "the accepted legacy gate-off control (detectFouls:false, awardFreeKicks:false): neither a `foul` nor a `free-kick-executed` — honest NOT_EVALUATED (nothing to judge), byte-identical to the pre-change baseline.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "accepted_state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 0,
+      "free_kick_count": 0,
+      "foul_events": [],
+      "free_kick_events": [],
+      "committed_free_kick_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "NOT_EVALUATED"
+      },
+      "free_kick_award_outcome": "NOT_EVALUATED"
+    }
+  ],
+  "guard_state": {
+    "all_streams_character_identical_to_accepted": true
+  }
+}

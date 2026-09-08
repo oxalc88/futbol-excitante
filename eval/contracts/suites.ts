@@ -253,16 +253,17 @@ export const RULES_SUITE: SuiteDefinition = {
  * detection machinery makes answerable (FOULS-SUITE-REGISTRATION).
  *
  * Direct tests are family-level foul tests (FOULS-DETECT-001,
- * FOULS-CLEAN-TACKLE-001).  Each binds its spec §10 criterion as its
- * criterion_binding.  The suite has no COMMON-* criteria: the foundation suites
- * already own the shared COMMON invariants, and this suite is dedicated to the
- * foul semantics (the §10 registered criteria ARE its direct test set).
+ * FOULS-CLEAN-TACKLE-001, FOULS-FREE-KICK-AWARD-001).  Each binds its spec §10
+ * criterion as its criterion_binding.  The suite has no COMMON-* criteria: the
+ * foundation suites already own the shared COMMON invariants, and this suite is
+ * dedicated to the foul semantics (the §10 registered criteria ARE its direct
+ * test set).
  *
- * Only FOUL-DETECT and FOUL-CLEAN-TACKLE are registered: they are the two §10
- * criteria the accepted detection streams make answerable.  CARD-ISSUED,
- * ADVANTAGE-PLAYED and FREE-KICK-AWARD remain NAMED-BUT-UNREGISTERED — no
- * criterion, oracle, invariant, binding or verdict accompanies them, and the
- * suite never claims a PASS for them.
+ * FOUL-DETECT, FOUL-CLEAN-TACKLE and FREE-KICK-AWARD are registered: the three
+ * §10 criteria the accepted machinery makes answerable.  CARD-ISSUED and
+ * ADVANTAGE-PLAYED remain NAMED-BUT-UNREGISTERED — no criterion, oracle,
+ * invariant, binding or verdict accompanies them, and the suite never claims a
+ * PASS for them.
  */
 export const FOULS_SUITE: SuiteDefinition = {
   suite_id: "fouls",
@@ -270,6 +271,7 @@ export const FOULS_SUITE: SuiteDefinition = {
   direct_test_ids: [
     "FOULS-DETECT-001",
     "FOULS-CLEAN-TACKLE-001",
+    "FOULS-FREE-KICK-AWARD-001",
   ],
   common_criterion_ids: [],
   impact_closure: "NONE",

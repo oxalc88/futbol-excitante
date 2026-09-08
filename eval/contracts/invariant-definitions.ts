@@ -600,6 +600,23 @@ export const INV_FOUL_CLEAN_TACKLE: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+/**
+ * Foul free-kick-award evidence: a detected foul yields a free kick to the
+ * fouled team at the contact position.  Bound to the protected
+ * foul-free-kick-award oracle.
+ */
+export const INV_FOUL_FREE_KICK_AWARD: InvariantDefinition = {
+  invariant_id: "foul-free-kick-award-evidence",
+  invariant_version: "invariant-foul-free-kick-award-v1",
+  input_observation_ids: ["obs-fouls-v1"],
+  oracle_id: "foul-free-kick-award-oracle-v1",
+  oracle_version: "oracle-foul-free-kick-award-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 /** All registered invariant definitions keyed by invariant_id. */
 export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FINITE.invariant_id]: INV_FINITE,
@@ -640,6 +657,7 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_RULES_RESTART_REARM.invariant_id]: INV_RULES_RESTART_REARM,
   [INV_FOUL_DETECT.invariant_id]: INV_FOUL_DETECT,
   [INV_FOUL_CLEAN_TACKLE.invariant_id]: INV_FOUL_CLEAN_TACKLE,
+  [INV_FOUL_FREE_KICK_AWARD.invariant_id]: INV_FOUL_FREE_KICK_AWARD,
 };
 
 /**

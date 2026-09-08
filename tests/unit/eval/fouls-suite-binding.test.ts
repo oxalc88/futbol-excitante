@@ -48,18 +48,19 @@ import type { TelemetryObservation } from "../../../src/contracts/telemetry.js";
 const FOULS_ORACLE_CRITERIA: Record<string, string> = {
   "FOUL-DETECT": "foul-detect-oracle-v1",
   "FOUL-CLEAN-TACKLE": "foul-clean-tackle-oracle-v1",
+  "FREE-KICK-AWARD": "foul-free-kick-award-oracle-v1",
 };
 
-// The three §10 criteria that must remain NAMED-BUT-UNREGISTERED (no machinery).
+// The two §10 criteria that must remain NAMED-BUT-UNREGISTERED (no machinery).
 const NAMED_BUT_UNREGISTERED = [
   "CARD-ISSUED",
   "ADVANTAGE-PLAYED",
-  "FREE-KICK-AWARD",
 ];
 
 const FOULS_TEST_IDS = [
   "FOULS-DETECT-001",
   "FOULS-CLEAN-TACKLE-001",
+  "FOULS-FREE-KICK-AWARD-001",
 ];
 
 // ---------------------------------------------------------------------------
@@ -129,6 +130,40 @@ function noFoulStream(): TelemetryObservation[] {
   ];
 }
 
+/** A free-kick-executed event payload (FREE-KICK-AWARD reads it). */
+function freeKickEvent(
+  id: string,
+  teamId: string,
+  position: { x: number; y: number },
+): TelemetryObservation["events"][number] {
+  return {
+    id,
+    tick: 11,
+    sequence: 1,
+    kind: "free-kick-executed",
+    label: `free kick for ${teamId}`,
+    payload: {
+      teamId,
+      kickTakerId: "carrier-1",
+      freeKickPosition: position,
+      targetPosition: { x: position.x + 10, y: position.y },
+      kickDirection: { x: 1, y: 0 },
+    },
+  };
+}
+
+/**
+ * A foul-bearing stream that ALSO carries the consequence-free kick: a genuine
+ * man-not-ball foul (contact at tick 10) matched by a free-kick-executed for the
+ * fouled team at the contact position (the fouled player carrier-1 at (8, 0)).
+ */
+function foulFreeKickStream(): TelemetryObservation[] {
+  const obs = [mk(10, [contactEvent("ppc-10-1", MAN_NOT_BALL)])];
+  detectFoulEvents(obs);
+  const fk = mk(11, [freeKickEvent("fk-11-1", "team-b", { x: 8, y: 0 })]);
+  return [...obs, fk];
+}
+
 // ---------------------------------------------------------------------------
 // 1. Criterion_bindings → invariant → registered oracle chain
 // ---------------------------------------------------------------------------
@@ -175,7 +210,7 @@ describe("§10 criterion bindings resolve to registered protected oracles", () =
     }
   });
 
-  it("the named-but-unregistered criteria (card/advantage/free-kick) have NO criterion, oracle or binding", () => {
+  it("the named-but-unregistered criteria (card/advantage) have NO criterion, oracle or binding", () => {
     for (const id of NAMED_BUT_UNREGISTERED) {
       expect(COMMON_CRITERIA[id], `${id} must not be a registered criterion`).toBeUndefined();
       expect(FOUL_CONTACT_TYPES.has(id)).toBe(false);
@@ -184,7 +219,6 @@ describe("§10 criterion bindings resolve to registered protected oracles", () =
     }
     expect(getOracle("foul-card-issued-oracle-v1", "oracle-foul-card-issued-v1")).toBeUndefined();
     expect(getOracle("foul-advantage-oracle-v1", "oracle-foul-advantage-v1")).toBeUndefined();
-    expect(getOracle("foul-free-kick-oracle-v1", "oracle-foul-free-kick-v1")).toBeUndefined();
   });
 });
 
@@ -200,7 +234,7 @@ describe("fouls suite registration", () => {
     expect(SUITES["fouls"]).toBe(FOULS_SUITE);
   });
 
-  it("fouls suite has exactly the two §10 registered test ids", () => {
+  it("fouls suite has exactly the three §10 registered test ids", () => {
     expect(FOULS_SUITE.direct_test_ids).toEqual(FOULS_TEST_IDS);
   });
 
@@ -260,6 +294,26 @@ describe("evaluateSuite('fouls', ...) produces real verdicts", () => {
       }
     }
     expect(sawAny).toBe(true);
+  });
+
+  it("a genuine foul + consequence free-kick stream yields FREE-KICK-AWARD PASS", () => {
+    const result = evaluateSuite("fouls", foulFreeKickStream());
+    const fkTest = result.tests.find((t) => t.test_id === "FOULS-FREE-KICK-AWARD-001");
+    expect(fkTest).toBeDefined();
+    const fk = fkTest!.criteria.find((c) => c.criterion_id === "FREE-KICK-AWARD");
+    expect(fk!.outcome).toBe("PASS");
+  });
+
+  it("a foul with NO observable free-kick-executed is FREE-KICK-AWARD NOT_EVALUATED (honest absence)", () => {
+    // A foul-bearing stream: the foul is detected but the free-kick-executed
+    // event is not carried in the observation stream (the accepted driven shape
+    // commits the free kick in the core's persistent state).  The oracle must
+    // not PASS or FAIL — honest NOT_EVALUATED.
+    const result = evaluateSuite("fouls", foulStream());
+    const fk = result.tests
+      .find((t) => t.test_id === "FOULS-FREE-KICK-AWARD-001")!
+      .criteria.find((c) => c.criterion_id === "FREE-KICK-AWARD");
+    expect(fk!.outcome).toBe("NOT_EVALUATED");
   });
 });
 
@@ -371,6 +425,40 @@ describe("mutant / canary guards", () => {
     expect(detect!.outcome).toBe("PASS");
     expect(cleanT!.outcome).toBe("PASS");
   });
+
+  it("FREE-KICK-AWARD FAILs when a free kick is awarded with NO detected foul (power guard)", () => {
+    // A free-kick-executed event with no man-not-ball foul behind it (the
+    // freeKickWindow anti-huddle control shape): under §10 a free kick is only
+    // the consequence of a called foul, so this is an invalid award.
+    const obs = mk(11, [freeKickEvent("fk-11-1", "team-b", { x: 8, y: 0 })]);
+    const result = evaluateSuite("fouls", [obs]);
+    const fk = result.tests
+      .find((t) => t.test_id === "FOULS-FREE-KICK-AWARD-001")!
+      .criteria.find((c) => c.criterion_id === "FREE-KICK-AWARD");
+    expect(fk!.outcome).toBe("FAIL");
+  });
+
+  it("FREE-KICK-AWARD FAILs when a foul's free kick goes to the WRONG team", () => {
+    const obs = [mk(10, [contactEvent("ppc-10-1", MAN_NOT_BALL)]), mk(11, [freeKickEvent("fk-11-1", "team-a", { x: 8, y: 0 })])];
+    detectFoulEvents(obs);
+    const result = evaluateSuite("fouls", obs);
+    const fk = result.tests
+      .find((t) => t.test_id === "FOULS-FREE-KICK-AWARD-001")!
+      .criteria.find((c) => c.criterion_id === "FREE-KICK-AWARD");
+    expect(fk!.outcome).toBe("FAIL");
+  });
+
+  it("FREE-KICK-AWARD FAILs when a foul's free kick is placed away from the contact position", () => {
+    // The foul's contact position is carrier-1 at (8, 0); a free kick placed at
+    // (8, 5) is not at the contact spot (beyond the 0.5 m placement tolerance).
+    const obs = [mk(10, [contactEvent("ppc-10-1", MAN_NOT_BALL)]), mk(11, [freeKickEvent("fk-11-1", "team-b", { x: 8, y: 5 })])];
+    detectFoulEvents(obs);
+    const result = evaluateSuite("fouls", obs);
+    const fk = result.tests
+      .find((t) => t.test_id === "FOULS-FREE-KICK-AWARD-001")!
+      .criteria.find((c) => c.criterion_id === "FREE-KICK-AWARD");
+    expect(fk!.outcome).toBe("FAIL");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -386,6 +474,7 @@ describe("registry integrity", () => {
     expect(registry.config_policies["config-fouls-v1"]).toBeDefined();
     expect(registry.invariant_definitions["foul-detect-evidence"]).toBeDefined();
     expect(registry.invariant_definitions["foul-clean-tackle-evidence"]).toBeDefined();
+    expect(registry.invariant_definitions["foul-free-kick-award-evidence"]).toBeDefined();
     expect(registry.observation_definitions["obs-fouls-v1"]).toBeDefined();
   });
 });

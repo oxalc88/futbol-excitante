@@ -1,22 +1,27 @@
 /**
  * @module eval/oracles/fouls
  *
- * Protected foul oracles (objective FOULS-SUITE-REGISTRATION), adjudicating the
- * FOULS_CARDS_SPEC §10 criteria that the accepted detection machinery makes
- * answerable over committed observation streams:
+ * Protected foul oracles (objective FOULS-SUITE-REGISTRATION and
+ * FREE-KICK-SUITE-REGISTRATION), adjudicating the FOULS_CARDS_SPEC §10 criteria
+ * that the accepted machinery makes answerable over committed observation
+ * streams:
  *   - FOUL-DETECT          -> checkFoulDetect
  *   - FOUL-CLEAN-TACKLE    -> checkFoulCleanTackle
+ *   - FREE-KICK-AWARD      -> checkFoulFreeKickAward
  *
  * Each oracle is a pure `TelemetryObservation[] → InvariantResult[]` function
  * and reads only committed, observable fields: the `foul` events emitted by the
- * observation-level detector and the `player-player-contact` events the accepted
+ * observation-level detector, the `free-kick-executed` events the accepted
+ * restart machinery commits, and the `player-player-contact` events the accepted
  * tackle machinery commits.  The detection predicate is exactly the spec §5.1
  * read: a `player-player-contact` with `contactType` ∈
  * {`standing-tackle`, `slide-tackle`}, `tacklePhase === "active"`, and
  * `duelWon === false` (equivalently `ballReachable === false`) is a man-not-ball
- * foul candidate; the ball stays an independent 3D entity.
+ * foul candidate; the ball stays an independent 3D entity.  FREE-KICK-AWARD
+ * imports the SINGLE-SOURCE-OF-TRUTH predicate
+ * (src/simulation/foul-predicate.ts) exactly as the in-core consequence does.
  *
- * CARD-ISSUED, ADVANTAGE-PLAYED and FREE-KICK-AWARD remain NAMED-BUT-UNREGISTERED
+ * CARD-ISSUED and ADVANTAGE-PLAYED remain NAMED-BUT-UNREGISTERED
  * (FOULS_CARDS_SPEC §10): no oracle, invariant, binding or criterion registration
  * accompanies them here and no verdict is reported for them.
  *
@@ -35,6 +40,7 @@
 
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { InvariantResult } from "../../src/contracts/telemetry.js";
+import { isFoulCandidatePayload } from "../../src/simulation/foul-predicate.js";
 
 /** The spec §5.1 contact kinds that constitute a tackle contact. */
 const TACKLE_CONTACT_TYPES = new Set<string>(["standing-tackle", "slide-tackle"]);
@@ -241,3 +247,190 @@ export function checkFoulCleanTackle(
     },
   ];
 }
+
+/**
+ * A `free-kick-executed` observation event as recorded by the accepted restart
+ * machinery (FOUL-CONSEQUENCE-MACHINERY / MATCH_RULES_SPEC §8): the fact the
+ * FREE-KICK-AWARD oracle reads.
+ */
+interface FreeKickEvent {
+  tick: number;
+  id: string;
+  teamId: string | null;
+  position: { x: number; y: number } | null;
+}
+
+/** Gather every `free-kick-executed` event in the window. */
+function freeKickEvents(
+  observations: TelemetryObservation[],
+): FreeKickEvent[] {
+  const out: FreeKickEvent[] = [];
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "free-kick-executed") continue;
+      const p = (ev.payload ?? {}) as Record<string, unknown>;
+      out.push({
+        tick: ev.tick,
+        id: ev.id,
+        teamId: typeof p.teamId === "string" ? p.teamId : null,
+        position:
+          typeof p.freeKickPosition === "object" && p.freeKickPosition !== null
+            ? {
+                x: Number((p.freeKickPosition as { x?: unknown }).x),
+                y: Number((p.freeKickPosition as { y?: unknown }).y),
+              }
+            : null,
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * The fouled player's planar ground position at the foul tick — the accepted
+ * free-kick placement ("the contact position", FOUL-CONSEQUENCE-MACHINERY).
+ * Returns null when the observation or the player cannot be resolved.
+ */
+function contactPositionAt(
+  observations: TelemetryObservation[],
+  foulTick: number,
+  fouledPlayerId: string,
+): { x: number; y: number } | null {
+  const obs = observations.find((o) => o.tick === foulTick);
+  if (!obs) return null;
+  const player = obs.players.find((p) => p.playerId === fouledPlayerId);
+  if (!player) return null;
+  return { x: player.groundPosition.x, y: player.groundPosition.y };
+}
+
+/**
+ * FREE-KICK-AWARD — the set-piece consequence of a called foul (FOULS_CARDS_SPEC
+ * §10, grounded in the accepted restart machinery per §8): a real detected foul
+ * yields a real free-kick restart award to the fouled team, placed at the
+ * contact position.  The shared foul predicate
+ * (src/simulation/foul-predicate.ts) is the single source of truth for what a
+ * foul IS (the SAME function the in-core consequence evaluates), so the oracle
+ * never duplicates the §5.1 definition.
+ *
+ * Guards, mapped to the §10 definition:
+ *   - a free kick awarded with NO detected foul (the freeKickWindow anti-huddle
+ *     control shape) FAILs — that is exactly what the criterion forbids: a free
+ *     kick is only the consequence of a called foul;
+ *   - a no-foul, no-free-kick stream is honest NOT_EVALUATED (nothing to judge);
+ *   - a stream carrying a detected foul but NO observable free-kick-executed is
+ *     NOT_EVALUATED, never a false PASS or FAIL: the accepted driven-duel shape
+ *     commits the free kick in the CORE's persistent state, not the per-step
+ *     observation array (runner serialization limit), so the oracle cannot
+ *     confirm or deny the award from the observations it receives;
+ *   - when both a foul and a free kick are observable, every detected foul must
+ *     be matched by a free kick to the fouled team at the contact position —
+ *     any mismatch (wrong team, wrong placement, or an unclaimed free kick)
+ *     FAILs.
+ */
+export function checkFoulFreeKickAward(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const fouls = foulSourceIds(observations);
+  const contactsById = new Map(
+    contactEvents(observations).map((c) => [c.id, c]),
+  );
+  // A genuine detected foul is one whose source contact passes the SHARED
+  // single-source-of-truth predicate (spec §5.1) — not a duplicated read.
+  const candidates = fouls.filter((foul) => {
+    const source = contactsById.get(foul.sourceEventId);
+    return source ? isFoulCandidatePayload(source.payload) : false;
+  });
+  const freeKicks = freeKickEvents(observations);
+
+  // Nothing to judge: no foul and no free kick (the no-foul / gate-off control).
+  if (candidates.length === 0 && freeKicks.length === 0) {
+    return [];
+  }
+
+  // Power guard: a free kick awarded with no detected foul.  Under the §10
+  // definition a free kick is ONLY the consequence of a called foul, so this is
+  // an invalid award.
+  if (candidates.length === 0) {
+    return [
+      {
+        id: "foul-free-kick-award-invalid",
+        status: "fail",
+        description:
+          `${freeKicks.length} free-kick-executed event(s) were awarded with no detected man-not-ball foul — ` +
+          `a free kick is the consequence of a called foul (FOULS_CARDS_SPEC §10), so a free kick without a foul is invalid`,
+        details: { freeKickCount: freeKicks.length, fouledEventCount: candidates.length },
+      },
+    ];
+  }
+
+  // A detected foul with no observable free-kick-executed: the accepted driven
+  // shape commits the free kick in the core's persistent state, not the
+  // observation array, so the oracle cannot confirm or deny the award.  Honest
+  // absence (NOT_EVALUATED via the empty-result path), never a false PASS/FAIL.
+  if (freeKicks.length === 0) {
+    return [];
+  }
+
+  const failures: string[] = [];
+  const usedFreeKickIds = new Set<string>();
+  for (const foul of candidates) {
+    const p = foul.payload;
+    const fouledPlayerId = p.playerIdB as string | undefined;
+    const fouledTeam = p.teamIdB as string | undefined;
+    const contactPosition =
+      fouledPlayerId !== undefined
+        ? contactPositionAt(observations, foul.tick, fouledPlayerId)
+        : null;
+    const fk = freeKicks.find(
+      (k) =>
+        !usedFreeKickIds.has(k.id) &&
+        k.teamId === fouledTeam &&
+        k.position !== null &&
+        contactPosition !== null &&
+        Math.abs(k.position!.x - contactPosition.x) <= FREE_KICK_POSITION_TOLERANCE &&
+        Math.abs(k.position!.y - contactPosition.y) <= FREE_KICK_POSITION_TOLERANCE,
+    );
+    if (fk) {
+      usedFreeKickIds.add(fk.id);
+    } else {
+      const contactStr = contactPosition
+        ? `(${contactPosition.x.toFixed(3)}, ${contactPosition.y.toFixed(3)})`
+        : "unresolvable";
+      failures.push(
+        `${foul.id} (${foul.tick}): no free-kick to ${fouledTeam ?? "?"} placed at the contact position ${contactStr}`,
+      );
+    }
+  }
+  const extraFreeKicks = freeKicks.filter((k) => !usedFreeKickIds.has(k.id));
+  for (const k of extraFreeKicks) {
+    failures.push(`${k.id} (${k.tick}): free-kick awarded with no corresponding detected foul`);
+  }
+
+  if (failures.length > 0) {
+    return [
+      {
+        id: "foul-free-kick-award-invalid",
+        status: "fail",
+        description:
+          `${failures.length} FOULS_CARDS_SPEC §10 FREE-KICK-AWARD violation(s): ${failures.join("; ")}`,
+        details: { fouledEventCount: candidates.length, freeKickCount: freeKicks.length, failures },
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "foul-free-kick-award-ok",
+      status: "pass",
+      description:
+        `${candidates.length} detected man-not-ball foul(s) each awarded a free kick to the fouled team ` +
+        `at the contact position (${freeKicks.length} free-kick-executed event(s); FOULS_CARDS_SPEC §10)`,
+      details: { fouledEventCount: candidates.length, freeKickCount: freeKicks.length },
+    },
+  ];
+}
+
+/** Tolerance (m) for "placed at the contact position": a free kick is at the
+ * fouled player's planar position at the foul tick.  Small relative to the
+ * pitch (~105 m), so it still rejects a misplaced/mutated award. */
+const FREE_KICK_POSITION_TOLERANCE = 0.5;

@@ -172,17 +172,17 @@ These are deliberate, versioned design choices for a fictional capability. They 
 | `anti-huddle-v1` | RESTART_HOLD_MIN_TICKS `2`, KICKOFF_FREEZE_HOME_TOLERANCE `0.75` m, CHASE_NEAREST_HOME_TOLERANCE `0.75` m | `src/adapters/input-browser/cpu-adapter.ts` |
 | `gk-small-sided-v1` | keeper role model id; restart-taker exclusion / no-field-chase | `eval/contracts/goalkeeper-config.ts` |
 
-## 10. Adjudicating telemetry / suite criteria (named, NOT registered)
+## 10. Adjudicating telemetry / suite criteria (three registered, two named-not-registered)
 
-The following criteria would adjudicate the fouls semantics in this specification. They are **named here for intent only** and are **NOT registered** in any evaluator suite: no evaluator, oracle, invariant-definition, observation-definition, binding, or scenario change accompanies this specification milestone. A future `fouls` suite milestone may register them once the corresponding executable material exists.
+The following criteria adjudicate the fouls semantics in this specification. **FOUL-DETECT** and **FOUL-CLEAN-TACKLE** (registered by FOULS-SUITE-REGISTRATION) and **FREE-KICK-AWARD** (registered by FREE-KICK-SUITE-REGISTRATION) are registered as executable protected oracles in the `fouls` evaluator suite (`suite-fouls-v1`): each carries a criterion record, a protected oracle, an invariant-definition, an observation-definition, a binding, and a scenario. **CARD-ISSUED** and **ADVANTAGE-PLAYED** remain **NAMED-NOT-REGISTERED** — no criterion, oracle, invariant, binding, or verdict accompanies them (no card or advantage machinery exists), and they are NOT registered in any evaluator suite.
 
 - **Foul detection:** `FOUL-DETECT` (a `player-player-contact` with `contactType` ∈ {`standing-tackle`, `slide-tackle`}, `tacklePhase === "active"`, and `duelWon === false` is recognized as a foul candidate; a clean tackle or a shoulder-to-shoulder contact is not).
 - **Clean-tackle complement:** `FOUL-CLEAN-TACKLE` (a tackle that reaches the ball — `ballReachable === true` — is not a foul).
-- **Card issuing:** `CARD-ISSUED` (given a recognized foul and the `fouls-v1` accumulation / severity thresholds, the correct caution / expulsion is awarded to the offending player).
-- **Advantage:** `ADVANTAGE-PLAYED` (play continues when the fouled team retains a playable advantage within `advantage_window_ticks`; the pending whistle/card is withheld).
+- **Card issuing:** `CARD-ISSUED` (given a recognized foul and the `fouls-v1` accumulation / severity thresholds, the correct caution / expulsion is awarded to the offending player) — remains NAMED-NOT-REGISTERED.
+- **Advantage:** `ADVANTAGE-PLAYED` (play continues when the fouled team retains a playable advantage within `advantage_window_ticks`; the pending whistle/card is withheld) — remains NAMED-NOT-REGISTERED.
 - **Free-kick award:** `FREE-KICK-AWARD` (the set-piece consequence of a called foul, grounded in the accepted restart machinery per §8).
 
-No `PASS` may be reported by any of these until they are registered with the required registry objects and bindings. A `MEASURED_TARGET` comparison of a foul/card sequence would be `BLOCKED_MISSING_REFERENCE` (see §11); a `PERCEPTUAL_TARGET` foul-render or card-display criterion would be `NEEDS_PERCEPTUAL_REVIEW` pending a versioned rubric.
+No `PASS` may be reported for the two NOT-registered criteria (`CARD-ISSUED`, `ADVANTAGE-PLAYED`) until they are registered with the required registry objects and bindings. A `MEASURED_TARGET` comparison of a foul/card sequence would be `BLOCKED_MISSING_REFERENCE` (see §11); a `PERCEPTUAL_TARGET` foul-render or card-display criterion would be `NEEDS_PERCEPTUAL_REVIEW` pending a versioned rubric.
 
 ## 11. BLOCKED_MISSING_REFERENCE values
 
