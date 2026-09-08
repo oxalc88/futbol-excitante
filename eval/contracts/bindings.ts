@@ -1022,6 +1022,23 @@ export const BINDING_FOULS_FREE_KICK_AWARD_001: TestImplementationBinding = make
   },
 );
 
+/**
+ * FOULS-CARD-ISSUED-001 — a committed card-issued event matches the §7 / §9.1
+ * accumulation semantics.  CARD-ISSUED is bound to the protected
+ * foul-card-issued oracle.
+ */
+export const BINDING_FOULS_CARD_ISSUED_001: TestImplementationBinding = makeTestBindingWith(
+  "FOULS-CARD-ISSUED-001",
+  ["scn-fouls-lifecycle-v1"],
+  [],
+  ["foul-card-issued-evidence"],
+  ["obs-per-tick-v1", "obs-fouls-v1"],
+  [],
+  {
+    "CARD-ISSUED": ["foul-card-issued-evidence"],
+  },
+);
+
 // ---------------------------------------------------------------------------
 // Registry — all bindings keyed by test_id
 // ---------------------------------------------------------------------------
@@ -1096,6 +1113,7 @@ export const TEST_BINDINGS: Record<string, TestImplementationBinding> = {
   [BINDING_FOULS_DETECT_001.test_id]: BINDING_FOULS_DETECT_001,
   [BINDING_FOULS_CLEAN_TACKLE_001.test_id]: BINDING_FOULS_CLEAN_TACKLE_001,
   [BINDING_FOULS_FREE_KICK_AWARD_001.test_id]: BINDING_FOULS_FREE_KICK_AWARD_001,
+  [BINDING_FOULS_CARD_ISSUED_001.test_id]: BINDING_FOULS_CARD_ISSUED_001,
 };
 
 /**

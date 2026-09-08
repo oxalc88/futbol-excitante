@@ -1040,11 +1040,11 @@ export const MATCH_RESTART_NEAREST_ONLY: EvaluationCriterion = {
 // ---------------------------------------------------------------------------
 // fouls suite criteria — FOULS_CARDS_SPEC §10
 //
-// FOUL-DETECT, FOUL-CLEAN-TACKLE and FREE-KICK-AWARD are registered here: the
-// §10 criteria the accepted machinery makes answerable over the committed
-// detection / consequence streams.  CARD-ISSUED and ADVANTAGE-PLAYED remain
-// NAMED-BUT-UNREGISTERED — no criterion record, oracle, invariant, binding or
-// verdict is added for them (no machinery exists).
+// FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD and CARD-ISSUED are
+// registered here: the §10 criteria the accepted machinery makes answerable over
+// the committed detection / consequence / card streams.  ADVANTAGE-PLAYED
+// remains NAMED-BUT-UNREGISTERED — no criterion record, oracle, invariant,
+// binding or verdict is added for it (no advantage machinery exists).
 // ---------------------------------------------------------------------------
 
 /**
@@ -1093,6 +1093,25 @@ export const FREE_KICK_AWARD: EvaluationCriterion = {
     "machinery (§8).  A free kick awarded with no detected foul — or a foul with " +
     "no free-kick awarded — violates the consequence; a free kick to the wrong " +
     "team or at a non-contact position violates the placement.",
+};
+
+/**
+ * CARD-ISSUED — the set-piece card consequence of a recognized foul, grounded on
+ * the accumulation semantics the accepted card machinery implements (FOULS_CARDS_SPEC
+ * §7 / §9.1).  A recognized man-not-ball foul accrues to the offending player (the
+ * tackler, playerIdA) and a caution / expulsion is issued when the accumulated
+ * count reaches the yellow / red accumulation count.
+ * Class: HARD_INVARIANT.  Oracle: foul-card-issued-oracle-v1.
+ */
+export const CARD_ISSUED: EvaluationCriterion = {
+  criterion_id: "CARD-ISSUED",
+  class: "HARD_INVARIANT",
+  rule:
+    "Given a recognized man-not-ball foul and the fouls-v1 accumulation " +
+    "thresholds, the correct caution / expulsion is awarded to the offending " +
+    "player (the tackler) at the correct accumulated count.  A card issued with " +
+    "no qualifying foul, to the wrong player, or of the wrong type at the count " +
+    "violates the card consequence.",
 };
 
 /** All common criteria keyed by criterion_id. */
@@ -1206,6 +1225,7 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [FOUL_DETECT.criterion_id]: FOUL_DETECT,
   [FOUL_CLEAN_TACKLE.criterion_id]: FOUL_CLEAN_TACKLE,
   [FREE_KICK_AWARD.criterion_id]: FREE_KICK_AWARD,
+  [CARD_ISSUED.criterion_id]: CARD_ISSUED,
 };
 
 /**

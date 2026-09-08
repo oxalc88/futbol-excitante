@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "objective_id": "CARD-ISSUED-SUITE-REGISTRATION",
+  "produced_by": "scripts/capture-card-issued-suite-registration.ts",
+  "evidence_class": "MULTI_TICK",
+  "spec_sections": [
+    "FOULS_CARDS_SPEC §5.1",
+    "FOULS_CARDS_SPEC §7",
+    "FOULS_CARDS_SPEC §9.1",
+    "FOULS_CARDS_SPEC §10"
+  ],
+  "lifecycle_phase_sync": "core-owned (organic); legacy (gate-off pin); driven (core-committed card)",
+  "runs": [
+    {
+      "id": "card-driven-duel",
+      "role": "proximate 5v5 human-vs-CPU (defensive-duel-driver) with repeated scripted standing tackles and the in-core card gate on (issueCards): player-1 accumulates 5 man-not-ball fouls and receives a caution at the 2nd and an expulsion at the 5th. The card-issued events are committed in the CORE's persistent state (the driven shape does not serialize committed events into the per-step observation array) and are exposed only via runDefensiveDuel.cardEvents, so CARD-ISSUED is honestly NOT_EVALUATED (the oracle cannot confirm the card from the observations it receives).",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 420,
+      "observation_count": 420,
+      "event_kind_counts": {
+        "player-player-contact": 1470,
+        "player-ball-contact": 9,
+        "pass": 3,
+        "tackle-phase": 59,
+        "input-rejection": 4,
+        "foul": 5,
+        "second-touch": 15
+      },
+      "state_hash_of_hashes": "a53e18277fec9da4469284420c333743061648791c7a0d2cecd5bc182886138b",
+      "accepted_state_hash_of_hashes": "a53e18277fec9da4469284420c333743061648791c7a0d2cecd5bc182886138b",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 5,
+      "card_count": 0,
+      "card_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED"
+      },
+      "card_issued_outcome": "NOT_EVALUATED"
+    },
+    {
+      "id": "card-combined",
+      "role": "the same driven shape with BOTH the free-kick gate (awardFreeKicks) and the card gate (issueCards) on. The caution and the free-kick-executed coexist on the committed foul tick, but the card-issued again lives in core committed state, not the per-step observation array → CARD-ISSUED NOT_EVALUATED.",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 420,
+      "observation_count": 420,
+      "event_kind_counts": {
+        "player-player-contact": 359,
+        "player-ball-contact": 7,
+        "pass": 3,
+        "tackle-phase": 16,
+        "input-rejection": 1,
+        "foul": 2,
+        "second-touch": 13,
+        "pitch-contact": 2
+      },
+      "state_hash_of_hashes": "df5a1b00e383c3100bf77d4a562bbee273fa07ead163e6240d412632173d8b94",
+      "accepted_state_hash_of_hashes": "df5a1b00e383c3100bf77d4a562bbee273fa07ead163e6240d412632173d8b94",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 2,
+      "card_count": 0,
+      "card_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED"
+      },
+      "card_issued_outcome": "NOT_EVALUATED"
+    },
+    {
+      "id": "card-organic",
+      "role": "coherent 3v3 CPU-vs-CPU (3v3-press) under cpuDefensiveTackle:true + detectFouls:true + issueCards:true, core-owned lifecycle + serializeRestartFacts. One man-not-ball contact emerges organically (below the caution threshold), so no card-issued is committed and the observation stream carries none → CARD-ISSUED NOT_EVALUATED (honest below-threshold no-card; the oracle cannot observe the accumulation semantic).",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 20,
+        "core-match-phase": 600,
+        "restart-designation": 600,
+        "pass": 3,
+        "tackle-phase": 12,
+        "shot": 22,
+        "second-touch": 22,
+        "player-player-contact": 72,
+        "foul": 1,
+        "goal": 1
+      },
+      "state_hash_of_hashes": "88a08d2786a29c4dead92e4201d63fa5719f43f464938f1595c1f5cac83c243f",
+      "accepted_state_hash_of_hashes": "88a08d2786a29c4dead92e4201d63fa5719f43f464938f1595c1f5cac83c243f",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 1,
+      "card_count": 0,
+      "card_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED"
+      },
+      "card_issued_outcome": "NOT_EVALUATED"
+    },
+    {
+      "id": "card-gate-off",
+      "role": "the accepted legacy gate-off control (detectFouls:false, issueCards:false): neither a `foul` nor a `card-issued` — honest NOT_EVALUATED (nothing to judge), byte-identical to the pre-change baseline.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "accepted_state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 0,
+      "card_count": 0,
+      "card_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED"
+      },
+      "card_issued_outcome": "NOT_EVALUATED"
+    }
+  ],
+  "claims_not_made": [
+    "No suite-level PASS: the fouls suite is partial (FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD and CARD-ISSUED registered; ADVANTAGE-PLAYED named-not-registered).",
+    "No CARD-ISSUED PASS claim on any accepted stream: the accepted card streams carry no observable card-issued event (the driven shape is commit-only; the organic shape is below threshold), so CARD-ISSUED is honestly NOT_EVALUATED over all four. The oracle's PASS/FAIL guards are proven by the canary tests, not by a re-shaped accepted stream.",
+    "No advantage machinery or verdict: ADVANTAGE-PLAYED stays named-not-registered (no machinery).",
+    "No PROMOTION claim. No FOUNDATION_LAB_PASS, milestone or regression PASS claim. No PES 2017 fidelity or invented reference envelope.",
+    "No gameplay / source / contract / adapter change: git diff src/ and src/contracts/ is EMPTY and the runner serialization is UNCHANGED (the card-issued event is not re-serialized into the observation array to make the oracle's job easier)."
+  ],
+  "record_sha256": "3dac8a48cae826d846e58c16ec487cc40187b645b9b17bc385ae2f64dc16bd3c"
+}

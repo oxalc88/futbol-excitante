@@ -14,9 +14,10 @@
  * and confirm evaluateSuite("fouls", observations) turns those bindings into real
  * verdicts over a constructed foul-bearing stream (PASS), returns the honest
  * NOT_EVALUATED over a stream with no emitted `foul` event, and FAILs on a
- * mutated / weakened stream (canary guards).  CARD-ISSUED / ADVANTAGE-PLAYED /
- * FREE-KICK-AWARD stay named-but-unregistered — no criterion, oracle, invariant
- * or binding is added for them, and no verdict is claimed for them.
+ * mutated / weakened stream (canary guards).  FREE-KICK-AWARD and CARD-ISSUED
+ * are registered by their suite-registration objectives; ADVANTAGE-PLAYED stays
+ * named-but-unregistered — no criterion, oracle, invariant or binding is added
+ * for it, and no verdict is claimed for it.
  *
  * No gameplay PASS is claimed beyond what the executed evaluator returns.
  * No PES reference is invented.
@@ -42,18 +43,18 @@ import { evaluateSuite } from "../../../eval/runners/foundation-evaluator.js";
 import type { TelemetryObservation } from "../../../src/contracts/telemetry.js";
 
 // ---------------------------------------------------------------------------
-// The §10 criteria bound to a protected foul oracle (the three registered).
+// The §10 criteria bound to a protected foul oracle (the four registered).
 // ---------------------------------------------------------------------------
 
 const FOULS_ORACLE_CRITERIA: Record<string, string> = {
   "FOUL-DETECT": "foul-detect-oracle-v1",
   "FOUL-CLEAN-TACKLE": "foul-clean-tackle-oracle-v1",
   "FREE-KICK-AWARD": "foul-free-kick-award-oracle-v1",
+  "CARD-ISSUED": "foul-card-issued-oracle-v1",
 };
 
-// The two §10 criteria that must remain NAMED-BUT-UNREGISTERED (no machinery).
+// The §10 criterion that must remain NAMED-BUT-UNREGISTERED (no machinery).
 const NAMED_BUT_UNREGISTERED = [
-  "CARD-ISSUED",
   "ADVANTAGE-PLAYED",
 ];
 
@@ -61,6 +62,7 @@ const FOULS_TEST_IDS = [
   "FOULS-DETECT-001",
   "FOULS-CLEAN-TACKLE-001",
   "FOULS-FREE-KICK-AWARD-001",
+  "FOULS-CARD-ISSUED-001",
 ];
 
 // ---------------------------------------------------------------------------
@@ -164,6 +166,47 @@ function foulFreeKickStream(): TelemetryObservation[] {
   return [...obs, fk];
 }
 
+/** A card-issued event payload (CARD-ISSUED reads it). */
+function cardIssuedEvent(
+  id: string,
+  payload: Record<string, unknown>,
+  tick: number,
+): TelemetryObservation["events"][number] {
+  return {
+    id,
+    tick,
+    sequence: 1,
+    kind: "card-issued",
+    label: "card issued",
+    payload,
+  };
+}
+
+/**
+ * A card-bearing stream: two genuine man-not-ball fouls for def-1 (the tackler),
+ * with a caution issued at the 2nd accumulated count (fouls_yellow=2).  The
+ * `card-issued` event is present in the observation stream (the
+ * serializeRestartFacts committed-events shape).
+ */
+function cardIssuedStream(): TelemetryObservation[] {
+  const obs = [
+    mk(10, [contactEvent("ppc-10-1", MAN_NOT_BALL)]),
+    mk(20, [contactEvent("ppc-20-2", { ...MAN_NOT_BALL, attemptStartTick: 18, activeWindowStartTick: 20, activeWindowEndTick: 23 })]),
+  ];
+  detectFoulEvents(obs);
+  // The 2nd foul (tick 20) accumulates to 2 → caution at accumulation count 2.
+  const card = cardIssuedEvent("card-20-1", {
+    cardType: "caution",
+    playerId: "def-1",
+    teamId: "team-a",
+    fouledPlayerId: "carrier-1",
+    accumulatedFouls: 2,
+    foulSourceEventId: "ppc-20-2",
+    foulTick: 20,
+  }, 20);
+  return [...obs, mk(20, [card])];
+}
+
 // ---------------------------------------------------------------------------
 // 1. Criterion_bindings → invariant → registered oracle chain
 // ---------------------------------------------------------------------------
@@ -210,14 +253,13 @@ describe("§10 criterion bindings resolve to registered protected oracles", () =
     }
   });
 
-  it("the named-but-unregistered criteria (card/advantage) have NO criterion, oracle or binding", () => {
+  it("the named-but-unregistered advantage criterion has NO criterion, oracle or binding", () => {
     for (const id of NAMED_BUT_UNREGISTERED) {
       expect(COMMON_CRITERIA[id], `${id} must not be a registered criterion`).toBeUndefined();
       expect(FOUL_CONTACT_TYPES.has(id)).toBe(false);
       const binding = Object.entries(TEST_BINDINGS).find(([, b]) => b.criterion_bindings[id] !== undefined);
       expect(binding, `${id} must not be bound in any test binding`).toBeUndefined();
     }
-    expect(getOracle("foul-card-issued-oracle-v1", "oracle-foul-card-issued-v1")).toBeUndefined();
     expect(getOracle("foul-advantage-oracle-v1", "oracle-foul-advantage-v1")).toBeUndefined();
   });
 });
@@ -234,7 +276,7 @@ describe("fouls suite registration", () => {
     expect(SUITES["fouls"]).toBe(FOULS_SUITE);
   });
 
-  it("fouls suite has exactly the three §10 registered test ids", () => {
+  it("fouls suite has exactly the four §10 registered test ids", () => {
     expect(FOULS_SUITE.direct_test_ids).toEqual(FOULS_TEST_IDS);
   });
 
@@ -459,6 +501,89 @@ describe("mutant / canary guards", () => {
       .criteria.find((c) => c.criterion_id === "FREE-KICK-AWARD");
     expect(fk!.outcome).toBe("FAIL");
   });
+
+  it("CARD-ISSUED PASSes when each card matches the accumulation semantics", () => {
+    // Two genuine man-not-ball fouls for def-1; a caution issued at accumulated
+    // count 2 to the offender with a backing foul → PASS.
+    const result = evaluateSuite("fouls", cardIssuedStream());
+    const card = result.tests
+      .find((t) => t.test_id === "FOULS-CARD-ISSUED-001")!
+      .criteria.find((c) => c.criterion_id === "CARD-ISSUED");
+    expect(card!.outcome).toBe("PASS");
+  });
+
+  it("CARD-ISSUED is NOT_EVALUATED over a no-card stream (below threshold / gate off)", () => {
+    // A single genuine foul (below the caution threshold) with no observable
+    // `card-issued` event: the oracle cannot confirm the accumulation semantic,
+    // so it is honest NOT_EVALUATED — never an invented PASS or a false FAIL.
+    const result = evaluateSuite("fouls", foulStream());
+    const card = result.tests
+      .find((t) => t.test_id === "FOULS-CARD-ISSUED-001")!
+      .criteria.find((c) => c.criterion_id === "CARD-ISSUED");
+    expect(card!.outcome).toBe("NOT_EVALUATED");
+  });
+
+  it("CARD-ISSUED FAILs when a card is issued with NO qualifying foul (power guard)", () => {
+    // A `card-issued` event whose foulSourceEventId does not resolve to a genuine
+    // man-not-ball foul → the card is not the consequence of a recognized foul.
+    const obs = mk(10, [cardIssuedEvent("card-10-1", {
+      cardType: "caution",
+      playerId: "def-1",
+      teamId: "team-a",
+      fouledPlayerId: "carrier-1",
+      accumulatedFouls: 2,
+      foulSourceEventId: "ppc-nonexistent",
+      foulTick: 10,
+    }, 10)]);
+    const result = evaluateSuite("fouls", [obs]);
+    const card = result.tests
+      .find((t) => t.test_id === "FOULS-CARD-ISSUED-001")!
+      .criteria.find((c) => c.criterion_id === "CARD-ISSUED");
+    expect(card!.outcome).toBe("FAIL");
+  });
+
+  it("CARD-ISSUED FAILs when a card goes to the WRONG player", () => {
+    // A genuine foul for def-1, but the card is issued to carrier-1 (a bystander,
+    // not the offending tackler) → FAIL.
+    const obs = [mk(10, [contactEvent("ppc-10-1", MAN_NOT_BALL)])];
+    detectFoulEvents(obs);
+    const card = cardIssuedEvent("card-10-1", {
+      cardType: "caution",
+      playerId: "carrier-1",
+      teamId: "team-b",
+      fouledPlayerId: "carrier-1",
+      accumulatedFouls: 2,
+      foulSourceEventId: "ppc-10-1",
+      foulTick: 10,
+    }, 10);
+    const result = evaluateSuite("fouls", [...obs, mk(10, [card])]);
+    const crit = result.tests
+      .find((t) => t.test_id === "FOULS-CARD-ISSUED-001")!
+      .criteria.find((c) => c.criterion_id === "CARD-ISSUED");
+    expect(crit!.outcome).toBe("FAIL");
+  });
+
+  it("CARD-ISSUED FAILs when the card type is wrong at the accumulated count", () => {
+    // Two genuine fouls for def-1 reach accumulated count 2 (a caution is
+    // warranted), but the card claims an expulsion → wrong card type at the
+    // count → FAIL.
+    const obs = [mk(10, [contactEvent("ppc-10-1", MAN_NOT_BALL)]), mk(20, [contactEvent("ppc-20-2", { ...MAN_NOT_BALL, attemptStartTick: 18, activeWindowStartTick: 20, activeWindowEndTick: 23 })])];
+    detectFoulEvents(obs);
+    const card = cardIssuedEvent("card-20-1", {
+      cardType: "expulsion",
+      playerId: "def-1",
+      teamId: "team-a",
+      fouledPlayerId: "carrier-1",
+      accumulatedFouls: 2,
+      foulSourceEventId: "ppc-20-2",
+      foulTick: 20,
+    }, 20);
+    const result = evaluateSuite("fouls", [...obs, mk(20, [card])]);
+    const crit = result.tests
+      .find((t) => t.test_id === "FOULS-CARD-ISSUED-001")!
+      .criteria.find((c) => c.criterion_id === "CARD-ISSUED");
+    expect(crit!.outcome).toBe("FAIL");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -475,6 +600,7 @@ describe("registry integrity", () => {
     expect(registry.invariant_definitions["foul-detect-evidence"]).toBeDefined();
     expect(registry.invariant_definitions["foul-clean-tackle-evidence"]).toBeDefined();
     expect(registry.invariant_definitions["foul-free-kick-award-evidence"]).toBeDefined();
+    expect(registry.invariant_definitions["foul-card-issued-evidence"]).toBeDefined();
     expect(registry.observation_definitions["obs-fouls-v1"]).toBeDefined();
   });
 });

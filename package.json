@@ -27,6 +27,7 @@
     "capture-foul-detection-evidence": "tsx scripts/capture-foul-detection-machinery.ts",
     "capture-fouls-suite-evidence": "tsx scripts/capture-fouls-suite-registration.ts",
     "capture-freekick-suite-evidence": "tsx scripts/capture-freekick-suite-registration.ts",
+    "capture-card-issued-suite-evidence": "tsx scripts/capture-card-issued-suite-registration.ts",
     "capture-gk-regression-policy-evidence": "tsx scripts/capture-gk-regression-policy-registration.ts",
     "capture-human-ball-server-literal": "tsx scripts/capture-human-ball-server-literal.ts",
     "capture-foul-consequence-machinery": "tsx scripts/capture-foul-consequence-machinery.ts",

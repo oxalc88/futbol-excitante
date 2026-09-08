@@ -79,8 +79,11 @@ describe("FOULS_CARDS_SPEC declares its owning model id and config model", () =>
     expect(SPEC).toContain("Model version");
   });
 
-  it("states it is a draft spec with no implementation", () => {
-    expect(SPEC).toContain("NO foul, card, advantage, or free-kick behavior is implemented");
+  it("states it is a draft spec with partial implementation (foul/card/free-kick registered, advantage not)", () => {
+    expect(SPEC).toContain(
+      "The engine has foul recognition, the card consequence and the free-kick consequence",
+    );
+    expect(SPEC).toContain("The engine has NO advantage machinery");
   });
 });
 
@@ -298,30 +301,30 @@ describe("FOULS_CARDS_SPEC names adjudicating criteria", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 7. Registry state after FREE-KICK-SUITE-REGISTRATION
+// 7. Registry state after CARD-ISSUED-SUITE-REGISTRATION
 // ---------------------------------------------------------------------------
 //
-// FOUL-DETECT, FOUL-CLEAN-TACKLE (FOULS-SUITE-REGISTRATION) and FREE-KICK-AWARD
-// (FREE-KICK-SUITE-REGISTRATION) are registered as executable protected oracles
-// in the `fouls` suite suite-fouls-v1; the two remaining §10 criteria
-// (CARD-ISSUED, ADVANTAGE-PLAYED) stay NAMED-NOT-REGISTERED — no criterion,
-// oracle, invariant, binding or verdict accompanies them (no machinery).  The
-// registry below mirrors the current executable state.
+// FOUL-DETECT, FOUL-CLEAN-TACKLE (FOULS-SUITE-REGISTRATION), FREE-KICK-AWARD
+// (FREE-KICK-SUITE-REGISTRATION) and CARD-ISSUED (CARD-ISSUED-SUITE-REGISTRATION)
+// are registered as executable protected oracles in the `fouls` suite
+// suite-fouls-v1; the remaining §10 criterion (ADVANTAGE-PLAYED) stays
+// NAMED-NOT-REGISTERED — no criterion, oracle, invariant, binding or verdict
+// accompanies it (no advantage machinery).  The registry below mirrors the
+// current executable state.
 
-const REGISTERED_CRITERIA = ["FOUL-DETECT", "FOUL-CLEAN-TACKLE", "FREE-KICK-AWARD"];
+const REGISTERED_CRITERIA = ["FOUL-DETECT", "FOUL-CLEAN-TACKLE", "FREE-KICK-AWARD", "CARD-ISSUED"];
 const REMAINING_NAMED_BUT_UNREGISTERED = [
-  "CARD-ISSUED",
   "ADVANTAGE-PLAYED",
 ];
 
-describe("FOULS_CARDS_SPEC registry state after FREE-KICK-SUITE-REGISTRATION", () => {
+describe("FOULS_CARDS_SPEC registry state after CARD-ISSUED-SUITE-REGISTRATION", () => {
   const registry = loadRegistrySet();
 
   it("registers the 'fouls' suite (FOULS-SUITE-REGISTRATION)", () => {
     expect(registry.suite_definitions["fouls"]).toBeDefined();
   });
 
-  it("registers FOUL-DETECT, FOUL-CLEAN-TACKLE and FREE-KICK-AWARD, and no more, in COMMON_CRITERIA", () => {
+  it("registers FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD and CARD-ISSUED, and no more, in COMMON_CRITERIA", () => {
     for (const criterion of REGISTERED_CRITERIA) {
       expect(
         registry.common_criteria[criterion],
@@ -336,7 +339,7 @@ describe("FOULS_CARDS_SPEC registry state after FREE-KICK-SUITE-REGISTRATION", (
     }
   });
 
-  it("binds FOUL-DETECT, FOUL-CLEAN-TACKLE and FREE-KICK-AWARD, and no more, in a test binding", () => {
+  it("binds FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD and CARD-ISSUED, and no more, in a test binding", () => {
     const bindings = Object.values(registry.test_bindings);
     for (const criterion of REGISTERED_CRITERIA) {
       const referenced = bindings.some((b) => criterion in b.criterion_bindings);

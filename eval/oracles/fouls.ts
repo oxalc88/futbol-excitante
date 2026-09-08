@@ -1,29 +1,34 @@
 /**
  * @module eval/oracles/fouls
  *
- * Protected foul oracles (objective FOULS-SUITE-REGISTRATION and
- * FREE-KICK-SUITE-REGISTRATION), adjudicating the FOULS_CARDS_SPEC §10 criteria
- * that the accepted machinery makes answerable over committed observation
- * streams:
+ * Protected foul oracles (objective FOULS-SUITE-REGISTRATION,
+ * FREE-KICK-SUITE-REGISTRATION and CARD-ISSUED-SUITE-REGISTRATION), adjudicating
+ * the FOULS_CARDS_SPEC §10 criteria that the accepted machinery makes answerable
+ * over committed observation streams:
  *   - FOUL-DETECT          -> checkFoulDetect
  *   - FOUL-CLEAN-TACKLE    -> checkFoulCleanTackle
  *   - FREE-KICK-AWARD      -> checkFoulFreeKickAward
+ *   - CARD-ISSUED          -> checkFoulCardIssued
  *
  * Each oracle is a pure `TelemetryObservation[] → InvariantResult[]` function
  * and reads only committed, observable fields: the `foul` events emitted by the
  * observation-level detector, the `free-kick-executed` events the accepted
- * restart machinery commits, and the `player-player-contact` events the accepted
- * tackle machinery commits.  The detection predicate is exactly the spec §5.1
- * read: a `player-player-contact` with `contactType` ∈
- * {`standing-tackle`, `slide-tackle`}, `tacklePhase === "active"`, and
- * `duelWon === false` (equivalently `ballReachable === false`) is a man-not-ball
- * foul candidate; the ball stays an independent 3D entity.  FREE-KICK-AWARD
- * imports the SINGLE-SOURCE-OF-TRUTH predicate
- * (src/simulation/foul-predicate.ts) exactly as the in-core consequence does.
+ * restart machinery commits, the `card-issued` events the accepted card
+ * machinery commits (surfaced into the observation stream only through the
+ * committed-events injection / serializeRestartFacts gate), and the
+ * `player-player-contact` events the accepted tackle machinery commits.  The
+ * detection predicate is exactly the spec §5.1 read: a `player-player-contact`
+ * with `contactType` ∈ {`standing-tackle`, `slide-tackle`},
+ * `tacklePhase === "active"`, and `duelWon === false` (equivalently
+ * `ballReachable === false`) is a man-not-ball foul candidate; the ball stays an
+ * independent 3D entity.  FREE-KICK-AWARD and CARD-ISSUED import the
+ * SINGLE-SOURCE-OF-TRUTH predicate (src/simulation/foul-predicate.ts) and the
+ * card-policy threshold (src/simulation/card-policy.ts) exactly as the in-core
+ * consequence does; neither duplicates the spec §5.1 / §9.1 definition.
  *
- * CARD-ISSUED and ADVANTAGE-PLAYED remain NAMED-BUT-UNREGISTERED
- * (FOULS_CARDS_SPEC §10): no oracle, invariant, binding or criterion registration
- * accompanies them here and no verdict is reported for them.
+ * ADVANTAGE-PLAYED remains NAMED-BUT-UNREGISTERED (FOULS_CARDS_SPEC §10): no
+ * oracle, invariant, binding or criterion registration accompanies it and no
+ * verdict is reported for it.
  *
  * Where the stream genuinely cannot carry a verdict (no `foul` event was emitted
  * to judge against) the oracle returns [] so the shared computeOutcome maps it to
@@ -41,6 +46,7 @@
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { InvariantResult } from "../../src/contracts/telemetry.js";
 import { isFoulCandidatePayload } from "../../src/simulation/foul-predicate.js";
+import { resolveCardForAccumulatedFouls } from "../../src/simulation/card-policy.js";
 
 /** The spec §5.1 contact kinds that constitute a tackle contact. */
 const TACKLE_CONTACT_TYPES = new Set<string>(["standing-tackle", "slide-tackle"]);
@@ -434,6 +440,177 @@ export function checkFoulFreeKickAward(
         `${candidates.length} detected man-not-ball foul(s) each awarded a free kick to the fouled team ` +
         `at the contact position (${freeKicks.length} free-kick-executed event(s); FOULS_CARDS_SPEC §10)`,
       details: { fouledEventCount: candidates.length, freeKickCount: freeKicks.length },
+    },
+  ];
+}
+
+/** A `card-issued` observation event as committed by the accepted card machinery
+ * (CARD-MACHINERY, FOULS_CARDS_SPEC §7 / §9.1): the fact the CARD-ISSUED oracle
+ * reads.  The card is issued to the offending player (the tackler, playerIdA) at
+ * the accumulation threshold the card-policy declares. */
+interface CardIssuedEvent {
+  tick: number;
+  id: string;
+  cardType: string;
+  playerId: string;
+  fouledPlayerId: string;
+  accumulatedFouls: number;
+  foulSourceEventId: string;
+  foulTick: number;
+}
+
+/** Gather every `card-issued` event in the window. */
+function cardIssuedEvents(
+  observations: TelemetryObservation[],
+): CardIssuedEvent[] {
+  const out: CardIssuedEvent[] = [];
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "card-issued") continue;
+      const p = (ev.payload ?? {}) as Record<string, unknown>;
+      out.push({
+        tick: ev.tick,
+        id: ev.id,
+        cardType: typeof p.cardType === "string" ? p.cardType : "",
+        playerId: typeof p.playerId === "string" ? p.playerId : "",
+        fouledPlayerId: typeof p.fouledPlayerId === "string" ? p.fouledPlayerId : "",
+        accumulatedFouls: typeof p.accumulatedFouls === "number" ? p.accumulatedFouls : NaN,
+        foulSourceEventId: typeof p.foulSourceEventId === "string" ? p.foulSourceEventId : "",
+        foulTick: typeof p.foulTick === "number" ? p.foulTick : NaN,
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * CARD-ISSUED — the FOULS_CARDS_SPEC §10 card consequence, grounded on the
+ * accumulation semantics the accepted card machinery implements (FOULS_CARDS_SPEC
+ * §7 / §9.1): a recognized man-not-ball foul accrues to the offending player
+ * (the tackler, playerIdA) and a caution / expulsion is issued when the
+ * accumulated count reaches the yellow / red accumulation count.  The oracle
+ * imports the SINGLE-SOURCE-OF-TRUTH threshold
+ * (src/simulation/card-policy.ts resolveCardForAccumulatedFouls) exactly as the
+ * in-core card branch does, so it never duplicates the §9.1 thresholds.
+ *
+ * The card-issued event is commit-only to state.events; it surfaces into the
+ * observation stream only through the committed-events injection (the
+ * serializeRestartFacts gate).  The oracle reads what the stream ACTUALLY
+ * carries — it does not re-serialize the runner or work around the serialization
+ * limit.
+ *
+ * Guards, mapped to the §10 definition:
+ *   - a card issued with NO qualifying man-not-ball foul (the card's
+ *     foulSourceEventId does not resolve to a genuine §5.1 foul) FAILs — that is
+ *     exactly what the criterion forbids: a card is only the consequence of a
+ *     recognized foul;
+ *   - a card issued to a player other than the offending player (the tackler)
+ *     FAILs — §10 says the card is awarded to the offending player;
+ *   - a wrong card type at the accumulated count FAILs — the card type must equal
+ *     what the card-policy warrants at the player's genuine accumulated foul
+ *     count at the card's foul tick;
+ *   - no observable card (below threshold, gate off, or a commit-only card the
+ *     observation stream does not carry) is honest NOT_EVALUATED — nothing to
+ *     judge, and the oracle never invents a PASS or a false FAIL.
+ */
+export function checkFoulCardIssued(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const cards = cardIssuedEvents(observations);
+  if (cards.length === 0) {
+    return [];
+  }
+
+  // Genuine §5.1 man-not-ball fouls (resolved through the accepted contacts),
+  // each with its offender (playerIdA) and tick, for the accumulation count.
+  const contactsById = new Map(
+    contactEvents(observations).map((c) => [c.id, c]),
+  );
+  const genuineFouls: Array<{ sourceEventId: string; offender: string; tick: number }> = [];
+  for (const foul of foulSourceIds(observations)) {
+    const source = contactsById.get(foul.sourceEventId);
+    if (!source || !isFoulCandidate(source.payload)) continue;
+    genuineFouls.push({
+      sourceEventId: foul.sourceEventId,
+      offender: typeof foul.payload.playerIdA === "string" ? (foul.payload.playerIdA as string) : "",
+      tick: foul.tick,
+    });
+  }
+  // Genuine fouls keyed by sourceEventId, for the backing-foul check.
+  const genuineBySource = new Map(genuineFouls.map((g) => [g.sourceEventId, g]));
+
+  // Count of genuine man-not-ball fouls for a player up to and including a tick
+  // (the player's accumulated foul count at that point).
+  function accumulatedCountFor(offender: string, upToTick: number): number {
+    let n = 0;
+    for (const g of genuineFouls) {
+      if (g.offender === offender && g.tick <= upToTick) n += 1;
+    }
+    return n;
+  }
+
+  const failures: string[] = [];
+  const usedFoulSources = new Set<string>();
+  for (const card of cards) {
+    const foul = genuineBySource.get(card.foulSourceEventId);
+    // Power guard: a card with no qualifying man-not-ball foul.
+    if (!foul) {
+      failures.push(
+        `${card.id} (tick ${card.tick}): card-issued with no qualifying man-not-ball foul (source ${card.foulSourceEventId})`,
+      );
+      continue;
+    }
+    // A second card for the same foul is an invalid duplicate.
+    if (usedFoulSources.has(card.foulSourceEventId)) {
+      failures.push(`${card.id}: duplicate card-issued for foul ${card.foulSourceEventId}`);
+      continue;
+    }
+    usedFoulSources.add(card.foulSourceEventId);
+    // Guard: the card must go to the offending player (the tackler, playerIdA).
+    if (card.playerId !== foul.offender) {
+      failures.push(
+        `${card.id}: card-issued to ${card.playerId} but the offending player is ${foul.offender}`,
+      );
+      continue;
+    }
+    // Guard: the card type must be the one warranted at the player's accumulated
+    // foul count at the card's foul tick (§7 / §9.1 accumulation).
+    const count = accumulatedCountFor(foul.offender, card.foulTick);
+    if (count !== card.accumulatedFouls) {
+      failures.push(
+        `${card.id}: accumulatedFouls ${card.accumulatedFouls} does not match ${count} qualifying foul(s) for ${card.playerId} up to tick ${card.foulTick}`,
+      );
+      continue;
+    }
+    const expected = resolveCardForAccumulatedFouls(count);
+    if (expected !== card.cardType) {
+      failures.push(
+        `${card.id}: card type ${card.cardType} is not the card warranted at accumulated count ${count} (expected ${expected ?? "none"})`,
+      );
+      continue;
+    }
+  }
+
+  if (failures.length > 0) {
+    return [
+      {
+        id: "foul-card-issued-invalid",
+        status: "fail",
+        description:
+          `${failures.length} FOULS_CARDS_SPEC §10 CARD-ISSUED violation(s): ${failures.join("; ")}`,
+        details: { cardEventCount: cards.length, fouledEventCount: genuineFouls.length, failures },
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "foul-card-issued-ok",
+      status: "pass",
+      description:
+        `${cards.length} card-issued event(s) each match the FOULS_CARDS_SPEC §7 / §9.1 accumulation semantics: ` +
+        `the correct card type at the correct accumulated count for the correct offending player`,
+      details: { cardEventCount: cards.length, fouledEventCount: genuineFouls.length },
     },
   ];
 }

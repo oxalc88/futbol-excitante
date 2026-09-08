@@ -587,7 +587,10 @@ export const INV_RULES_RESTART_REARM: InvariantDefinition = {
 // (eval/oracles/fouls.ts, wired in eval/oracles/wire.ts and mapped in
 // eval/runners/foundation-evaluator.ts).  A criterion still yields NOT_EVALUATED
 // when the committed stream carries no `foul` event to judge (honest "not yet
-// observable"), never an invented PASS.
+// observable"), never an invented PASS.  CARD-ISSUED is NOT_EVALUATED when the
+// observation stream carries no `card-issued` event (the card is commit-only and
+// surfaces only through the serializeRestartFacts committed-events gate), while
+// FOUL-DETECT / FOUL-CLEAN-TACKLE / FREE-KICK-AWARD need a `foul` event.
 // ---------------------------------------------------------------------------
 
 /**
@@ -641,6 +644,24 @@ export const INV_FOUL_FREE_KICK_AWARD: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+/**
+ * Foul card-issued evidence: a committed card-issued event matches the
+ * FOULS_CARDS_SPEC §7 / §9.1 accumulation semantics — the correct card type at
+ * the correct accumulated count for the correct offending player.  Bound to the
+ * protected foul-card-issued oracle.
+ */
+export const INV_FOUL_CARD_ISSUED: InvariantDefinition = {
+  invariant_id: "foul-card-issued-evidence",
+  invariant_version: "invariant-foul-card-issued-v1",
+  input_observation_ids: ["obs-fouls-v1"],
+  oracle_id: "foul-card-issued-oracle-v1",
+  oracle_version: "oracle-foul-card-issued-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 /** All registered invariant definitions keyed by invariant_id. */
 export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FINITE.invariant_id]: INV_FINITE,
@@ -683,6 +704,7 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FOUL_DETECT.invariant_id]: INV_FOUL_DETECT,
   [INV_FOUL_CLEAN_TACKLE.invariant_id]: INV_FOUL_CLEAN_TACKLE,
   [INV_FOUL_FREE_KICK_AWARD.invariant_id]: INV_FOUL_FREE_KICK_AWARD,
+  [INV_FOUL_CARD_ISSUED.invariant_id]: INV_FOUL_CARD_ISSUED,
 };
 
 /**

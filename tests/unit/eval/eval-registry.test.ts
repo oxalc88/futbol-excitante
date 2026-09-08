@@ -79,8 +79,8 @@ describe("loader accept", () => {
     expect(registry.suite_definitions).toHaveProperty("ball");
   });
 
-  it("contains all 59 test bindings (42 prior + 6 goalkeepers + 8 rules + 3 fouls)", () => {
-    expect(ALL_TEST_IDS).toHaveLength(59);
+  it("contains all 60 test bindings (42 prior + 6 goalkeepers + 8 rules + 4 fouls)", () => {
+    expect(ALL_TEST_IDS).toHaveLength(60);
   });
 });
 
