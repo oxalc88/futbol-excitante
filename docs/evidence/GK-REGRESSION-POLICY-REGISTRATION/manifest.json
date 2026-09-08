@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "GK-REGRESSION-POLICY-REGISTRATION",
+  "accepted_at": "2026-09-08T06:16:25.485Z",
+  "candidate_commit": "5dd2c1e07e5c6ac1f3ecb3729b9ad8e6a6f088b0",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/GK-REGRESSION-POLICY-REGISTRATION/trajectory.json",
+      "sha256": "0eb6f651bd81d1f39e60573cbf6d8f687d4f1af4bd50f36cd734b16f0db12471",
+      "git_blob": "113cdca20e31f2ede1c63fabb395f78d4c35f8b2",
+      "candidate_commit": "5dd2c1e07e5c6ac1f3ecb3729b9ad8e6a6f088b0",
+      "bytes": 8827,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/GK-REGRESSION-POLICY-REGISTRATION/audit.json",
+      "sha256": "04f2f091d6fb60856c73253dbfd068e05cfb9bd8247fc5548e434aee9f28f171",
+      "git_blob": "034ef276a1a887c96e1faee8b933d419b95a6117",
+      "candidate_commit": "5dd2c1e07e5c6ac1f3ecb3729b9ad8e6a6f088b0",
+      "bytes": 2673,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-08/2026-09-08T06-16-25-485Z-GK-REGRESSION-POLICY-REGISTRATION-acceptance.json"
+}
