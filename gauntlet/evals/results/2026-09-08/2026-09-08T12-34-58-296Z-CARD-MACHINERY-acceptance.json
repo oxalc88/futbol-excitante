@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.7",
+  "persisted_at": "2026-09-08T12:34:58.296Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "CARD-MACHINERY",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "081c9277e4a5df4522974c89b2647ff6465649e1",
+  "builder": {
+    "builder": "builder-gameplay",
+    "model": "deepseek-v4-flash (reroute — qwen3.8-flash quota-exhausted until 2026-10-01)"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "notes": "Horizon v36 2/4: card issuance per FOULS_CARDS_SPEC's card definition over the accepted foul machinery (evidence class MULTI_TICK; a gated deliberate core change in the FOUL-CONSEQUENCE/HUMAN-BALL-SERVER-LITERAL named-conformance-path pattern). THE SPEC GATE (the critic re-read §5.1/§6/§7/§9.1/§10/§11 verbatim and judged the reading correct and complete): IMPLEMENTED — exactly the accumulation path §7 defines (per-player per-match card accumulation counts; a versioned provisional accumulation number before a caution (yellow) and before an expulsion (red)) with §9.1's fouls-v1 VERSIONED_PROVISIONAL pins fouls_yellow_accumulation_count=2 and fouls_red_accumulation_count=5 pinned exactly in the new src/simulation/card-policy.ts (FOULS_YELLOW_ACCUMULATION_COUNT=2, FOULS_RED_ACCUMULATION_COUNT=5, resolveCardForAccumulatedFouls — the card-threshold single source of truth); the offender is the tackler (playerIdA/teamIdA per tackle-system.ts:546; §10's \"awarded to the offending player\"); the card event (card type, offender, fouled player, accumulated count, foul source id) committed to state.events via the card branch at 6b-3c evaluated BEFORE the free-kick branch (a card and a free kick coexist on the same foul tick — attested) and only while \"playing\"; the booking state lazy-materialized (state.bookings ??= {} only on a qualifying foul; optional WorldState fields absent when gated off). BLOCKED_MISSING_REFERENCE surfaced with ZERO implementation (never invented): direct-red-by-contact-severity (§9.1 names foul_card_direct_red_severity_threshold=0.85 but §7 never defines the normalized severity computation and the accepted contacts carry no severity field; §11 foul_severity_distribution_ref + disciplinary_scale_ref are BLOCKED) and second-yellow→red (§7 defines two INDEPENDENT thresholds, no yellow→expulsion relationship; §11 disciplinary_scale_ref BLOCKED). ADVANTAGE-PLAYED stays spec-only (§6). THE CHANGE: simulation.ts +108 (CardConfig{issueCards} default-off closure gate; the optional 9th createSimulation param — all 131 call sites enumerated by the integration reviewer, every pre-existing call ≤2 args and default-identical; main.ts unchanged); card-policy.ts NEW; scenario.ts +1 event kind card-issued (grep-verified absent from every other accepted evidence stream); state.ts +33 (PlayerBooking + optional bookings); headless-match.ts +25 (issueCards default false, cardConfig passthrough, card-issued in the committed-events serialize set, hash-neutral gated off); defensive-duel-driver.ts +30 (cardConfig; committed cardEvents + bookingState). BYTE-IDENTITY: the gate-off legacy 3v3-press pin fb5e9b02… reproduced byte-for-byte (critic AND integration); the card-driven-duel stream two-run a53e18277fec9da4469284420c333743061648791c7a0d2cecd5bc182886138b byte-identical. RESULTS: card-driven-duel → caution at accumulated 2 (tick 116) + expulsion at accumulated 5 (tick 371), booking player-1 {fouls:5, cautions:1, expulsions:1}; card-combined → caution@2 (tick 290) + 2 committed free kicks coexisting; card-organic → 1 foul / 0 cards (below threshold, honest); card-gate-off → 0/0 with the pin reproduced. CRITERIA RE-EVALUATION: FOUL-DETECT + FOUL-CLEAN-TACKLE PASS on the three live card streams; FREE-KICK-AWARD honest NOT_EVALUATED (gates off or the driven-serialization limit); CARD-ISSUED + ADVANTAGE-PLAYED correctly not claimed; no card registration (objective 3/4); no suite-level PASS. record_sha256 01d731ada16b2451b1a939bf9d20af66da8bdc07445fbcd150cd41062a2cba66 (no wall-clock field; reproduced byte-exact by the critic — full JSON diff — AND the integration reviewer three ways; docs/ byte-identical on ordinary runs — 1,060 files hashed; durable writes under WIP_SECTION=__EVIDENCE__:CARD-MACHINERY). Audit PASS MULTI_TICK. Tests: new sim 4/4; typecheck 0 + build 0; the integration reviewer re-ran 631 neighbor tests (determinism 107, rules+fouls 209, GK family 154, restart family 197, human/loop 133, architecture 27) — zero behavioral regressions, no accepted pin moved; gauntlet:eval 39+33; eval:state 13/13. Disclosures: the post-expulsion accumulation (fouls > 5 → no card) is the honest \"spec defines no further threshold\" behavior, documented in the test; card-issued is commit-only into observation streams via the accepted committed-events injection (disclosed); the organic run's booking_state is null because runHeadlessMatch returns observation streams not final WorldState bookings (disclosed); the trajectory capture_mode durable/ephemeral distinction; the pre-existing vitest onTaskUpdate worker-RPC artifact (non-fatal); chunked batteries (the full node suite >300s). claims_not_made: no severity path, no second-card rule, no advantage implementation / no CARD-ISSUED registration or evaluation (objective 3/4) / no suite-level PASS / no PROMOTION / no FOUNDATION_LAB_PASS / no PES fidelity or invented envelope (2/5 are fouls-v1 provisional design values) / no ungated behavior change / no DYNAMIC_VISUAL claim."
+}

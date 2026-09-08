@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.7",
+  "objective_id": "CARD-MACHINERY",
+  "accepted_at": "2026-09-08T12:34:58.296Z",
+  "candidate_commit": "081c9277e4a5df4522974c89b2647ff6465649e1",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/CARD-MACHINERY/trajectory.json",
+      "sha256": "fff7baf3d7dd18f50a81d53847aa63830bac687dd8d4fd56a51456526dde47a3",
+      "git_blob": "3864a0909ca69932ed5c77a8b4e0eefa5bb7df26",
+      "candidate_commit": "081c9277e4a5df4522974c89b2647ff6465649e1",
+      "bytes": 15268,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/CARD-MACHINERY/audit.json",
+      "sha256": "db6e2e10088a04775ff7d24cd699c430f9267a3b02dfe8c26184f51eede853ed",
+      "git_blob": "1038fa9264cca2e53d5ea5844804f080e9f64f3c",
+      "candidate_commit": "081c9277e4a5df4522974c89b2647ff6465649e1",
+      "bytes": 2654,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-09-08/2026-09-08T12-34-58-296Z-CARD-MACHINERY-acceptance.json"
+}
