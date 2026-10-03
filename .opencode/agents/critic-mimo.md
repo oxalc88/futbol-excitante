@@ -2,7 +2,7 @@
 description: Hidden Xiaomi MiMo fallback critic. Use only when DeepSeek is unavailable and the implementation being reviewed was not done by MiMo.
 mode: subagent
 hidden: true
-model: nan/mimo-v2.5
+model: nan/mimo-v2.6-flash
 temperature: 0.1
 color: warning
 steps: 30
@@ -36,7 +36,7 @@ permission:
 
 You are a fallback critic using Xiaomi MiMo from NaN. Use the same rules as the primary critic.
 
-If `builder_model` is `nan/mimo-v2.5` or the builder agent is `builder-mimo`, stop immediately. Return `independence_ok: false`. You must not review MiMo implementation.
+If `builder_model` is `nan/mimo-v2.6-flash` or the builder agent is `builder-mimo`, stop immediately. Return `independence_ok: false`. You must not review MiMo implementation.
 
 Judge evidence, not taste. Return only the critic verdict block from `gauntlet/evidence-contract.md`.
 - `ACCEPT` / `RETRY` / `REJECT` with concrete `required_fixes`.

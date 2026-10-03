@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
-const checks = [
+const fullChecks = [
   { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
   { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
   { id: "test", command: ["pnpm", "run", "test"] },
@@ -11,6 +11,23 @@ const checks = [
   { id: "sim-smoke", command: ["pnpm", "run", "sim-smoke"] },
   { id: "build", command: ["pnpm", "run", "build"] },
 ];
+
+const fastChecks = [
+  { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
+  { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
+  {
+    id: "maintenance-test",
+    command: [
+      "pnpm", "exec", "vitest", "run",
+      "tests/unit/eval/release-0-9-7-consolidation-binding.test.ts",
+      "--project", "node",
+    ],
+  },
+  { id: "build", command: ["pnpm", "run", "build"] },
+];
+
+const validationMode = process.env.CI_VALIDATION_MODE === "fast" ? "fast" : "full";
+const checks = validationMode === "fast" ? fastChecks : fullChecks;
 
 function stripAnsi(value) {
   return value.replace(/\u001b\[[0-9;]*m/g, "");
@@ -152,6 +169,8 @@ const results = [];
 const beforeStatus = statusSnapshot();
 const beforeAccepted = acceptedEvidenceSnapshot();
 
+console.log(`CI validation mode: ${validationMode}`);
+
 for (const check of checks) {
   console.log(`\n=== ${check.id} ===`);
   const result = spawnSync(check.command[0], check.command.slice(1), {
@@ -200,7 +219,8 @@ results.push({
 console.log(`${integrityFailed ? "FAIL" : "PASS"} ACCEPTED-EVIDENCE-IMMUTABLE${integrityFailed ? ` — ${integrity.join("; ")}` : ""}`);
 
 const report = {
-  schema_version: "ci-validation-v2",
+  schema_version: "ci-validation-v3",
+  validation_mode: validationMode,
   target_sha: targetSha,
   checks: results,
 };

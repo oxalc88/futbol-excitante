@@ -14,9 +14,9 @@ All Gauntlet agents, skills, routing, deterministic evals, and contracts live in
 
 `gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-Current candidate: **0.9.6** over 0.9.5.
+Current candidate: **0.9.8** over 0.9.7.
 
-0.9.6 does not change gameplay or model assignments. It makes the three orchestrator entry points equivalent for persisted-work continuation, fixes the GLM route, and synchronizes agent-role documentation with `gauntlet-models-v7`.
+0.9.8 changes strategic planning from technical-first to product-first. A normal horizon has 2–4 objectives, starts from one player-visible outcome, and includes technical/spec work only when it directly enables or protects that outcome. It also defines GitHub issues as an optional durable work queue/context index, allows safe parallel objectives on separate branches/worktrees, and adds product-flow observations without weakening the existing critic, evidence, acceptance, or remote-durability pipeline.
 
 `gauntlet/state/CURRENT.md` uses `gauntlet_version: gauntlet-loop-v1` as the persisted loop/state protocol identifier; it is not the Gauntlet system SemVer. The canonical release version remains `gauntlet/VERSION.json`.
 
@@ -90,14 +90,14 @@ Two deterministic checks protect this split: wrappers must reference an existing
 | `builder-gameplay` | subagent | `qwen3.8-flash` | gameplay, ball/control/team behavior, presentation-facing integration |
 | `critic` | subagent | `glm5.3-flash` | primary independent qualitative critic |
 | `critic-qwen` | fallback critic | `qwen3.6` | independent critic fallback |
-| `critic-mimo` | fallback critic | `mimo-v2.5` | independent critic fallback |
+| `critic-mimo` | fallback critic | `mimo-v2.6-flash` | independent critic fallback |
 | `integration-reviewer` | subagent | `glm5.3-flash` | primary integration/neighbouring-regression review |
 | `integration-reviewer-qwen` | fallback integration | `qwen3.6` | independent integration fallback |
-| `integration-reviewer-mimo` | fallback integration | `mimo-v2.5` | independent integration fallback |
+| `integration-reviewer-mimo` | fallback integration | `mimo-v2.6-flash` | independent integration fallback |
 | `aux` | subagent | `gemma4` | cheap summaries and bounded semantic audit |
 | `git-committer` | subagent | `gemma4` | atomic conventional commits and requested publication |
 
-Exact IDs and fallback ordering live in `gauntlet/models.json`.
+Exact IDs and fallback ordering live in `gauntlet/models.json`. Routing generation for 0.9.8 is `gauntlet-models-v8`. The same file also declares harness routes for Grok, OMP, and OpenCode; `gauntlet/harness-contract.md` defines how adapters consume them.
 
 ## Model routing
 
@@ -107,7 +107,7 @@ Current registered model IDs used by the Gauntlet are:
 - `qwen3.8-flash`
 - `glm5.3-flash`
 - `qwen3.6`
-- `mimo-v2.5`
+- `mimo-v2.6-flash`
 - `gemma4`
 - `grok-4.6` for the parent orchestrator
 
@@ -147,6 +147,30 @@ Choose one builder by responsibility, not provider:
 
 If an objective spans both, choose the dominant responsibility or decompose it. Do not add another builder role merely to switch models.
 
+## Harness adapters
+
+Gauntlet core is harness-neutral. Canonical roles, evidence rules, product policy, and acceptance rules live under `gauntlet/`. Runtime directories such as `.grok/`, `.omp/`, and `.opencode/` are adapters.
+
+The current orchestrator routes are:
+
+- Grok: `grok-4.6`;
+- OMP: `glm5.3-flash` with high reasoning;
+- OpenCode: `grok-4.6`.
+
+OMP has no Grok dependency. Its project adapter uses NaN models only. See `.omp/README.md`.
+
+## Product-first planning
+
+Read `gauntlet/product-flow-contract.md`.
+
+A normal horizon starts from one player-visible result. The orchestrator then selects 2–4 objectives that deliver or protect that result. A feature is not product-complete if it exists only in fixtures, test bridges, capture paths, or gated code that normal shipped play does not use.
+
+GitHub issues can hold compact task context, dependencies, acceptance criteria, and links to evidence. They are a work queue and context index. Canonical execution and acceptance state remain in `gauntlet/state/**` and accepted evidence.
+
+Independent objectives may run in parallel only when they have no acceptance dependency and do not overlap in file ownership. Each objective uses a separate branch/worktree and keeps its own review and acceptance chain.
+
+0.9.8 does not manually rewrite execution-owned `gauntlet/state/**`. On the first orchestrator run after this upgrade, the changed planning policy is material evidence to invalidate an active horizon selected under the old policy and create a new product-first horizon while preserving history.
+
 ## Acceptance pipeline
 
 ```text
@@ -183,7 +207,7 @@ Deterministic and bounded semantic audits may invalidate or request more evidenc
 
 ## Timing bookkeeping
 
-`gauntlet/state/TIMING.md` is acceptance persistence. 0.9.6 requires all four tracking markers to reach the latest accepted objective:
+`gauntlet/state/TIMING.md` is acceptance persistence. 0.9.8 requires all four tracking markers to reach the latest accepted objective:
 
 ```yaml
 last_tracked_objective: <objective-id>

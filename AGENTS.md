@@ -32,13 +32,13 @@ The Gauntlet loop lives in `gauntlet/`. Launch and model routing are documented 
 
 The repo may start empty. `BOOTSTRAP-01` is the initial objective only while there is no toolchain or `src/`.
 
-Strategic prioritization uses the temporary rolling horizon in `gauntlet/state/HORIZON.md`. At startup, handoff, horizon exhaustion, or material invalidation, inspect actual project state, evidence, research, specs, and `gauntlet/objectives.md`, then select roughly 4–8 candidate objectives. The horizon is not a fixed backlog.
+Strategic prioritization uses the temporary rolling horizon in `gauntlet/state/HORIZON.md`. At startup, handoff, horizon exhaustion, or material invalidation, inspect actual project state, evidence, research, specs, `gauntlet/objectives.md`, and relevant open GitHub issues. Select 2–4 objectives around one player-visible outcome. Technical or spec-only work is valid only when it directly enables or protects that outcome. The horizon is not a fixed backlog.
 
 Every horizon must have unique objective IDs, coherent prerequisites, and a zero-based `current_index` pointing to the next applicable non-accepted objective. Already accepted objectives must not reappear as pending. Acceptance updates the existing entry in place; validate candidate horizon/current state before persisting. Repair ordinary bookkeeping errors without another agent, historical rewrites, or global replanning.
 
 After an accepted objective, continue the next applicable horizon objective without a global reprioritization pass unless the horizon is invalidated by a blocker, architectural constraint, dependency change, inapplicable planned objective, unsafe newly discovered defect, materially higher-value evidence, or a human-needed spec/legal blocker.
 
-Where technically reasonable, each horizon should lead toward at least one observable playable/browser-facing capability. Infrastructure-only horizons must justify why that work must precede visible gameplay progress.
+Each normal product horizon must name an observable playable/browser-facing outcome. A feature is not product-complete while it exists only in fixtures, test bridges, capture paths, or gated code that normal shipped play does not use. Independent objectives may run in parallel only on separate branches/worktrees with non-overlapping file ownership and no acceptance dependency.
 
 Do not skip the architecture boundaries to jump to 11v11, tactics, polished art, networking, Rapier, workers, WASM, or WebGPU.
 

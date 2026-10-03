@@ -2,7 +2,9 @@
 
 This is prioritization guidance, not a fixed implementation backlog.
 
-After each accepted objective the orchestrator must inspect the actual repository, evidence, research, and specs, then choose the highest-value next gap. Milestone names may inform that choice. They must not force a predetermined order when evidence says another objective is more important.
+At each strategic reassessment, the orchestrator must inspect the actual repository, evidence, research, specs, and relevant open GitHub issues. It must first identify one player-visible product outcome, then choose the smallest 2–4 objective horizon that delivers or protects that outcome. Milestone names may inform that choice. They must not force a predetermined order when product evidence says another gap is more important.
+
+Prioritize work in this order: player-visible blocker → gameplay feel/readability → broken match flow → missing core mechanic → supporting eval/spec work. A technical or spec-only objective is valid only when it directly enables or protects the selected product outcome.
 
 `BOOTSTRAP-01` is the valid initial objective only while the repository has no pinned toolchain or `src/`.
 

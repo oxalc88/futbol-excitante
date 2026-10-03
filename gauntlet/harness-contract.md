@@ -1,0 +1,72 @@
+# Harness contract
+
+Gauntlet core defines work. A harness adapter defines how that work runs.
+
+## Canonical core
+
+The following are harness-neutral:
+
+- `gauntlet/PROMPT.md`;
+- `gauntlet/principles.md`;
+- `gauntlet/product-flow-contract.md`;
+- `gauntlet/roles/**`;
+- `gauntlet/models.json`;
+- evidence, acceptance, and state contracts.
+
+Canonical role contracts must not require Grok, OMP, OpenCode, or another harness command.
+
+## Harness route
+
+`gauntlet/models.json.harness_routes` maps each supported harness to concrete provider/model routes.
+
+A harness may use a different orchestrator model when the preferred model is not available in that harness. The logical role does not change.
+
+Current orchestrator routes:
+
+- Grok -> `grok-4.6`;
+- OMP -> `glm5.3-flash` with high reasoning;
+- OpenCode -> `grok-4.6`.
+
+## Adapter responsibility
+
+An adapter can define:
+
+- agent file syntax;
+- model-role syntax;
+- tool permissions;
+- launch commands;
+- worktree or subagent mechanics;
+- provider configuration references.
+
+An adapter must not redefine:
+
+- product priority;
+- acceptance criteria;
+- evidence semantics;
+- critic independence;
+- canonical project state.
+
+## Model independence
+
+The reviewer used for a candidate must use a model different from the builder model when the role contract requires independence.
+
+If a route is unavailable, select the next compatible fallback from the same harness route. Do not change the logical objective.
+
+## Parallel execution
+
+The core decides whether objectives are independent. The harness decides how to spawn them.
+
+Parallel objectives require:
+
+- no acceptance dependency between them;
+- non-overlapping expected file ownership;
+- isolated branches/worktrees when they edit files;
+- separate tests, evidence, review, and acceptance records.
+
+Canonical state transitions are serialized.
+
+## Adapter consistency
+
+CI must verify that committed harness adapters resolve to the model intent in `gauntlet/models.json`.
+
+Historical records keep the exact model and harness that produced them. Do not rewrite old provenance after a routing change.

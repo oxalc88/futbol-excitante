@@ -1,0 +1,27 @@
+# Project-local OMP settings for Gauntlet.
+# Provider credentials stay outside the repository.
+modelRoleStorage: project
+
+modelRoles:
+  default: nan/glm5.3-flash:high
+  plan: nan/glm5.3-flash:high
+  gauntlet-orchestrator: nan/glm5.3-flash:high
+  gauntlet-builder-structured: nan/deepseek-v4-flash
+  gauntlet-builder-gameplay: nan/qwen3.8-flash
+  gauntlet-critic: nan/deepseek-v4-flash
+  gauntlet-critic-mimo: nan/mimo-v2.6-flash
+  gauntlet-integration: nan/glm5.3-flash
+  gauntlet-integration-mimo: nan/mimo-v2.6-flash
+  gauntlet-aux: nan/gemma4
+  gauntlet-commit: nan/gemma4
+
+task:
+  agentModelOverrides:
+    builder-structured: "@gauntlet-builder-structured"
+    builder-gameplay: "@gauntlet-builder-gameplay"
+    critic: "@gauntlet-critic"
+    critic-mimo: "@gauntlet-critic-mimo"
+    integration-reviewer: "@gauntlet-integration"
+    integration-reviewer-mimo: "@gauntlet-integration-mimo"
+    aux: "@gauntlet-aux"
+    git-committer: "@gauntlet-commit"
