@@ -1,0 +1,497 @@
+{
+  "schema_version": 1,
+  "objective_id": "ADVANTAGE-SUITE-REGISTRATION",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-advantage-suite-registration.ts",
+  "driver": "the registered `fouls` suite (suite-fouls-v1) evaluated over the accepted ADVANTAGE-MACHINERY streams via evaluateSuite('fouls', observations); the streams are reproduced with eval/runners/headless-match.ts (playAdvantage gate + serializeRestartFacts) and eval/runners/defensive-duel-driver.ts (scripted standing tackles, advantageConfig). ADVANTAGE-PLAYED reads the committed advantage-opened / advantage-cancelled / advantage-expired decisions and the shared src/simulation/advantage-policy.ts + src/simulation/foul-predicate.ts modules.",
+  "activation": {
+    "field": "evaluateSuite('fouls', observations) over the committed advantage streams",
+    "meaning": "the registered `fouls` suite (suite-fouls-v1) evaluates FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD, CARD-ISSUED and ADVANTAGE-PLAYED over the accepted advantage streams. ADVANTAGE-PLAYED verifies the §6.2–§6.4 window semantics: every window open/call must be grounded in a recognized §5.1 man-not-ball foul, every close must carry a recognized reason (cancelled-last-touch-loss / cancelled-stoppage / expired) with a matching open and agree with the shared advantage policy. A window decision with no recognized foul FAILs; a stream with no observable advantage decision is honest NOT_EVALUATED; the unimplemented §6.2a judged-retained path is reported as BLOCKED_MISSING_REFERENCE (advantage_retention_ref) and never PASSed.",
+    "set_by": [
+      "eval/contracts/suites.ts FOULS_SUITE (suite-fouls-v1, +FOULS-ADVANTAGE-PLAYED-001)",
+      "eval/contracts/bindings.ts BINDING_FOULS_ADVANTAGE_PLAYED_001",
+      "eval/contracts/common-criteria.ts ADVANTAGE_PLAYED",
+      "eval/contracts/invariant-definitions.ts INV_FOUL_ADVANTAGE_PLAYED",
+      "eval/oracles/fouls.ts checkFoulAdvantagePlayed (imports the shared src/simulation/foul-predicate.ts predicate and src/simulation/advantage-policy.ts window policy)",
+      "eval/oracles/wire.ts + eval/runners/foundation-evaluator.ts CRITERION_TO_ORACLE",
+      "NOT the browser composition root"
+    ]
+  },
+  "guard_state": {
+    "all_streams_character_identical_to_accepted": true,
+    "driven_two_run_attestation": true,
+    "organic_two_run_attestation": true,
+    "driven_gate_off_two_run_attestation": true,
+    "gate_off_byte_identity_to_pre_change": true,
+    "baseline_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+    "organic_advantage_decision_observable": true,
+    "organic_advantage_played_pass": true,
+    "driven_advantage_played_not_evaluated": true,
+    "gate_off_advantage_played_not_evaluated": true,
+    "retained_path_implemented": false,
+    "retained_path_reference": "advantage_retention_ref",
+    "retained_path_status": "BLOCKED_MISSING_REFERENCE"
+  },
+  "runs": [
+    {
+      "id": "advantage-driven-gate-off",
+      "role": "gate-off driven control: no advantage event, pre-change path",
+      "stream": "5v5 human-vs-CPU defensive duel (scripted standing tackles, advantage off)",
+      "ticks": 200,
+      "observation_count": 200,
+      "event_kind_counts": {
+        "player-player-contact": 770,
+        "player-ball-contact": 6,
+        "pass": 2,
+        "tackle-phase": 24,
+        "input-rejection": 3,
+        "foul": 3,
+        "second-touch": 8
+      },
+      "state_hash_of_hashes": "87fdd04de37556c7e43310b29049ef37c70d3a382181e9d8f3581318609e073b",
+      "accepted_state_hash_of_hashes": "87fdd04de37556c7e43310b29049ef37c70d3a382181e9d8f3581318609e073b",
+      "state_hash_chain_identical_to_accepted": true,
+      "determinism_run2_hash_of_hashes": "87fdd04de37556c7e43310b29049ef37c70d3a382181e9d8f3581318609e073b",
+      "two_run_attested": true,
+      "foul_count": 3,
+      "advantage_decisions_observable_in_stream": false,
+      "advantage_opened": [],
+      "advantage_closed": [],
+      "committed_advantage_decisions": null,
+      "cards": [],
+      "free_kicks": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      },
+      "advantage_played_outcome": "NOT_EVALUATED"
+    },
+    {
+      "id": "advantage-driven-cancelled",
+      "role": "driven foul → window → §6.3 last-touch-loss cancellation → deferred card (commit-only decisions)",
+      "stream": "5v5 human-vs-CPU defensive duel (scripted standing tackles, playAdvantage on)",
+      "ticks": 200,
+      "observation_count": 200,
+      "event_kind_counts": {
+        "player-player-contact": 770,
+        "player-ball-contact": 6,
+        "pass": 2,
+        "tackle-phase": 24,
+        "input-rejection": 3,
+        "foul": 3,
+        "second-touch": 8
+      },
+      "state_hash_of_hashes": "e230d2404135f4a738dc14d6f58ff1c0c77b121aac4d6ed0331e503a9d09a17e",
+      "accepted_state_hash_of_hashes": "e230d2404135f4a738dc14d6f58ff1c0c77b121aac4d6ed0331e503a9d09a17e",
+      "state_hash_chain_identical_to_accepted": true,
+      "determinism_run2_hash_of_hashes": "e230d2404135f4a738dc14d6f58ff1c0c77b121aac4d6ed0331e503a9d09a17e",
+      "two_run_attested": true,
+      "foul_count": 3,
+      "advantage_decisions_observable_in_stream": false,
+      "advantage_opened": [],
+      "advantage_closed": [],
+      "committed_advantage_decisions": [
+        {
+          "tick": 66,
+          "id": "advantage-opened-66-260",
+          "kind": "advantage-opened",
+          "openTick": 66,
+          "reason": null
+        },
+        {
+          "tick": 67,
+          "id": "advantage-cancelled-67-265",
+          "kind": "advantage-cancelled",
+          "openTick": 66,
+          "reason": "cancelled-last-touch-loss"
+        },
+        {
+          "tick": 116,
+          "id": "advantage-opened-116-443",
+          "kind": "advantage-opened",
+          "openTick": 116,
+          "reason": null
+        },
+        {
+          "tick": 135,
+          "id": "advantage-cancelled-135-513",
+          "kind": "advantage-cancelled",
+          "openTick": 116,
+          "reason": "cancelled-last-touch-loss"
+        },
+        {
+          "tick": 173,
+          "id": "advantage-opened-173-716",
+          "kind": "advantage-opened",
+          "openTick": 173,
+          "reason": null
+        },
+        {
+          "tick": 174,
+          "id": "advantage-cancelled-174-722",
+          "kind": "advantage-cancelled",
+          "openTick": 173,
+          "reason": "cancelled-last-touch-loss"
+        }
+      ],
+      "cards": [],
+      "free_kicks": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      },
+      "advantage_played_outcome": "NOT_EVALUATED"
+    },
+    {
+      "id": "advantage-driven-close-tick-free-kick",
+      "role": "driven deferred call: free kick + card at the close tick (commit-only decisions)",
+      "stream": "5v5 human-vs-CPU defensive duel (longer run, awardFreeKicks + playAdvantage on)",
+      "ticks": 380,
+      "observation_count": 380,
+      "event_kind_counts": {
+        "player-player-contact": 375,
+        "player-ball-contact": 8,
+        "pass": 3,
+        "tackle-phase": 20,
+        "input-rejection": 2,
+        "foul": 2,
+        "second-touch": 11,
+        "pitch-contact": 1
+      },
+      "state_hash_of_hashes": "77a9aa470661c32ce71daec6c4cfdf0cc27aff5c80dfb3545173c1a69786483a",
+      "accepted_state_hash_of_hashes": "77a9aa470661c32ce71daec6c4cfdf0cc27aff5c80dfb3545173c1a69786483a",
+      "state_hash_chain_identical_to_accepted": true,
+      "determinism_run2_hash_of_hashes": null,
+      "two_run_attested": false,
+      "foul_count": 2,
+      "advantage_decisions_observable_in_stream": false,
+      "advantage_opened": [],
+      "advantage_closed": [],
+      "committed_advantage_decisions": [
+        {
+          "tick": 66,
+          "id": "advantage-opened-66-260",
+          "kind": "advantage-opened",
+          "openTick": 66,
+          "reason": null
+        },
+        {
+          "tick": 67,
+          "id": "advantage-cancelled-67-265",
+          "kind": "advantage-cancelled",
+          "openTick": 66,
+          "reason": "cancelled-last-touch-loss"
+        },
+        {
+          "tick": 289,
+          "id": "advantage-opened-289-387",
+          "kind": "advantage-opened",
+          "openTick": 289,
+          "reason": null
+        },
+        {
+          "tick": 308,
+          "id": "advantage-cancelled-308-409",
+          "kind": "advantage-cancelled",
+          "openTick": 289,
+          "reason": "cancelled-last-touch-loss"
+        }
+      ],
+      "cards": [],
+      "free_kicks": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      },
+      "advantage_played_outcome": "NOT_EVALUATED"
+    },
+    {
+      "id": "advantage-driven-stoppage",
+      "role": "driven half ending inside the window: §6.3 new-stoppage cancellation (commit-only decisions)",
+      "stream": "5v5 human-vs-CPU defensive duel (first half ends inside the window)",
+      "ticks": 200,
+      "observation_count": 200,
+      "event_kind_counts": {
+        "player-player-contact": 775,
+        "player-ball-contact": 5,
+        "pass": 2,
+        "tackle-phase": 20,
+        "input-rejection": 1,
+        "foul": 3,
+        "second-touch": 3
+      },
+      "state_hash_of_hashes": "c2630deb47b1c9544415e24df60c0159ba54bb6bf782aa83e44c19c6c155eb13",
+      "accepted_state_hash_of_hashes": "c2630deb47b1c9544415e24df60c0159ba54bb6bf782aa83e44c19c6c155eb13",
+      "state_hash_chain_identical_to_accepted": true,
+      "determinism_run2_hash_of_hashes": null,
+      "two_run_attested": false,
+      "foul_count": 3,
+      "advantage_decisions_observable_in_stream": false,
+      "advantage_opened": [],
+      "advantage_closed": [],
+      "committed_advantage_decisions": [
+        {
+          "tick": 66,
+          "id": "advantage-opened-66-260",
+          "kind": "advantage-opened",
+          "openTick": 66,
+          "reason": null
+        },
+        {
+          "tick": 67,
+          "id": "advantage-cancelled-67-265",
+          "kind": "advantage-cancelled",
+          "openTick": 66,
+          "reason": "cancelled-last-touch-loss"
+        },
+        {
+          "tick": 116,
+          "id": "advantage-opened-116-443",
+          "kind": "advantage-opened",
+          "openTick": 116,
+          "reason": null
+        },
+        {
+          "tick": 121,
+          "id": "advantage-cancelled-121-461",
+          "kind": "advantage-cancelled",
+          "openTick": 116,
+          "reason": "cancelled-stoppage"
+        }
+      ],
+      "cards": [],
+      "free_kicks": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      },
+      "advantage_played_outcome": "NOT_EVALUATED"
+    },
+    {
+      "id": "advantage-organic-expired",
+      "role": "organic foul → window → §6.2c expiry at 24 ticks → free kick at the close (observable decisions)",
+      "stream": "3v3-press CPU-vs-CPU (detectFouls + awardFreeKicks + issueCards + playAdvantage + serializeRestartFacts)",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 12,
+        "core-match-phase": 600,
+        "restart-designation": 600,
+        "pass": 1,
+        "tackle-phase": 16,
+        "shot": 10,
+        "second-touch": 2,
+        "player-player-contact": 471,
+        "advantage-opened": 1,
+        "foul": 1,
+        "advantage-expired": 1,
+        "free-kick-executed": 1,
+        "pitch-contact": 2,
+        "ball-out-of-play": 1
+      },
+      "state_hash_of_hashes": "76a982759e2e14d1c4f2a2eccb82b4d53b1b283dd734c0e9e1f59c9111998930",
+      "accepted_state_hash_of_hashes": "76a982759e2e14d1c4f2a2eccb82b4d53b1b283dd734c0e9e1f59c9111998930",
+      "state_hash_chain_identical_to_accepted": true,
+      "determinism_run2_hash_of_hashes": "76a982759e2e14d1c4f2a2eccb82b4d53b1b283dd734c0e9e1f59c9111998930",
+      "two_run_attested": true,
+      "foul_count": 1,
+      "advantage_decisions_observable_in_stream": true,
+      "advantage_opened": [
+        {
+          "tick": 233,
+          "id": "advantage-opened-233-53",
+          "foulTick": 233,
+          "fouledTeam": "team-b",
+          "windowTicks": 24
+        }
+      ],
+      "advantage_closed": [
+        {
+          "tick": 257,
+          "id": "advantage-expired-257-56",
+          "kind": "advantage-expired",
+          "openTick": 233,
+          "reason": "expired",
+          "windowTicks": 24
+        }
+      ],
+      "committed_advantage_decisions": null,
+      "cards": [],
+      "free_kicks": [
+        {
+          "tick": 317,
+          "id": "free-kick-executed-317-82",
+          "teamId": "team-b",
+          "position": {
+            "x": -43.04129282311101,
+            "y": 2.7667015550856524
+          }
+        }
+      ],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "PASS",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "PASS"
+      },
+      "advantage_played_outcome": "PASS"
+    },
+    {
+      "id": "advantage-organic-stoppage",
+      "role": "organic window cancelled by a goal (§6.3 new stoppage), caution at the close (observable decisions)",
+      "stream": "3v3-press CPU-vs-CPU (1440 ticks, playAdvantage + serializeRestartFacts)",
+      "ticks": 1440,
+      "observation_count": 1440,
+      "event_kind_counts": {
+        "player-ball-contact": 22,
+        "core-match-phase": 1440,
+        "restart-designation": 1440,
+        "pass": 3,
+        "tackle-phase": 31,
+        "shot": 25,
+        "second-touch": 20,
+        "player-player-contact": 1232,
+        "advantage-opened": 2,
+        "foul": 2,
+        "advantage-expired": 1,
+        "free-kick-executed": 1,
+        "pitch-contact": 4,
+        "ball-out-of-play": 1,
+        "goal": 2,
+        "advantage-cancelled": 1,
+        "card-issued": 1
+      },
+      "state_hash_of_hashes": "bd296c7ab3851df56394b43dbfbb52c5a453e0733c0cdc7591e74b139281c831",
+      "accepted_state_hash_of_hashes": "bd296c7ab3851df56394b43dbfbb52c5a453e0733c0cdc7591e74b139281c831",
+      "state_hash_chain_identical_to_accepted": true,
+      "determinism_run2_hash_of_hashes": null,
+      "two_run_attested": false,
+      "foul_count": 2,
+      "advantage_decisions_observable_in_stream": true,
+      "advantage_opened": [
+        {
+          "tick": 233,
+          "id": "advantage-opened-233-53",
+          "foulTick": 233,
+          "fouledTeam": "team-b",
+          "windowTicks": 24
+        },
+        {
+          "tick": 1430,
+          "id": "advantage-opened-1430-1342",
+          "foulTick": 1430,
+          "fouledTeam": "team-b",
+          "windowTicks": 24
+        }
+      ],
+      "advantage_closed": [
+        {
+          "tick": 257,
+          "id": "advantage-expired-257-56",
+          "kind": "advantage-expired",
+          "openTick": 233,
+          "reason": "expired",
+          "windowTicks": 24
+        },
+        {
+          "tick": 1436,
+          "id": "advantage-cancelled-1436-1344",
+          "kind": "advantage-cancelled",
+          "openTick": 1430,
+          "reason": "cancelled-stoppage",
+          "windowTicks": 24
+        }
+      ],
+      "committed_advantage_decisions": null,
+      "cards": [
+        {
+          "tick": 1436,
+          "id": "card-issued-1436-1345-player-1",
+          "cardType": "caution",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "foulSourceEventId": "tackle-player-contact-1430-1341"
+        }
+      ],
+      "free_kicks": [
+        {
+          "tick": 317,
+          "id": "free-kick-executed-317-82",
+          "teamId": "team-b",
+          "position": {
+            "x": -43.04129282311101,
+            "y": 2.7667015550856524
+          }
+        }
+      ],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "FAIL",
+        "CARD-ISSUED": "PASS",
+        "ADVANTAGE-PLAYED": "PASS"
+      },
+      "advantage_played_outcome": "PASS"
+    },
+    {
+      "id": "advantage-gate-off-pin",
+      "role": "gate-off legacy control reproducing the pre-change pin byte-for-byte",
+      "stream": "3v3-press CPU-vs-CPU (legacy gate-off pin)",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "accepted_state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "state_hash_chain_identical_to_accepted": true,
+      "determinism_run2_hash_of_hashes": null,
+      "two_run_attested": false,
+      "foul_count": 0,
+      "advantage_decisions_observable_in_stream": false,
+      "advantage_opened": [],
+      "advantage_closed": [],
+      "committed_advantage_decisions": null,
+      "cards": [],
+      "free_kicks": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      },
+      "advantage_played_outcome": "NOT_EVALUATED"
+    }
+  ],
+  "disclosures": [
+    "ADVANTAGE-PLAYED is registered as the fifth executable protected oracle in suite-fouls-v1: criterion record ADVANTAGE_PLAYED (HARD_INVARIANT) -> INV_FOUL_ADVANTAGE_PLAYED (foul-advantage-played-evidence) -> foul-advantage-played-oracle-v1 (eval/oracles/fouls.ts checkFoulAdvantagePlayed). The registration's observation-definition and scenario are the SHARED registered obs-fouls-v1 and scn-fouls-lifecycle-v1, exactly as the three prior foul registrations — the advantage-window facts are carried by the same committed event stream the other foul oracles read.",
+    "The §6.2a judged-retained path is NOT implemented and advantage_retention_ref is BLOCKED_MISSING_REFERENCE (§11). No accepted stream carries a retained-advantage decision, so no retained verdict is produced; the oracle reports a retained-path input honestly as blocked (status not_evaluated + blockedReference) and NEVER PASSes it. No retention envelope (territory / distance / possession) is invented.",
+    "The driven-shape advantage decisions live in the CORE's persistent state (runDefensiveDuel.advantageEvents), not the per-step observation array (the runner serialization limit); the oracle therefore reports honest NOT_EVALUATED there and never invents a PASS. The runner serialization is NOT changed to make the oracle's job easier.",
+    "Each reproduced stream is character-identical to its accepted ADVANTAGE-MACHINERY state-hash-of-hashes pin, so the verdicts are honest over the accepted streams, not over a re-shaped stream. NO suite-level PASS: verdicts are reported per criterion and per stream.",
+    "Adding the fifth criterion is ADDITIVE: the four pre-existing foul criteria keep their unchanged oracles and produce the same verdicts on every stream the fouls suite previously evaluated. The only non-PASS verdict this objective newly records on an advantage stream is FREE-KICK-AWARD=FAIL on `advantage-organic-stoppage`: there the §6.3 new-stoppage cancellation (a goal at tick 1436) wins over the pending advantage, so the cancelled window's pending free-kick consequence cannot open a restart (the documented same-tick arbitration of §2.2 / ADVANTAGE-MACHINERY). The unchanged FREE-KICK-AWARD oracle — which requires every detected foul to be matched by a free kick — honestly FAILs that stream. That is a pre-existing criterion's honest read of an ADVANTAGE-MACHINERY-only stream, not a regression introduced by this objective; no free-kick stream's verdict changed.",
+    "No PES fidelity claim: the window length (24 ticks) and pending-caution budget (12 ticks) are fouls-v1 VERSIONED_PROVISIONAL engine-tick budgets at foundation-fixed-dt-v1, not measured wall-clock latencies (advantage_window_ref_ms stays BLOCKED_MISSING_REFERENCE). No FOUNDATION_LAB_PASS or invented reference envelope."
+  ]
+}

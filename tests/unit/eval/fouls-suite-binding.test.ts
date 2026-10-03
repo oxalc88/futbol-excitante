@@ -14,10 +14,11 @@
  * and confirm evaluateSuite("fouls", observations) turns those bindings into real
  * verdicts over a constructed foul-bearing stream (PASS), returns the honest
  * NOT_EVALUATED over a stream with no emitted `foul` event, and FAILs on a
- * mutated / weakened stream (canary guards).  FREE-KICK-AWARD and CARD-ISSUED
- * are registered by their suite-registration objectives; ADVANTAGE-PLAYED stays
- * named-but-unregistered — no criterion, oracle, invariant or binding is added
- * for it, and no verdict is claimed for it.
+ * mutated / weakened stream (canary guards).  FREE-KICK-AWARD, CARD-ISSUED and
+ * ADVANTAGE-PLAYED are registered by their suite-registration objectives.  The
+ * §6.2a judged-retained advantage path is NOT implemented: a retained-path input
+ * is reported honestly as BLOCKED_MISSING_REFERENCE (advantage_retention_ref)
+ * and never PASSed.
  *
  * No gameplay PASS is claimed beyond what the executed evaluator returns.
  * No PES reference is invented.
@@ -32,6 +33,7 @@ import { describe, it, expect } from "vitest";
 import "../../../eval/oracles/wire.js";
 import { getOracle } from "../../../eval/oracles/oracle-registry.js";
 import { detectFoulEvents, FOUL_CONTACT_TYPES } from "../../../eval/runners/foul-detection.js";
+import { checkFoulAdvantagePlayed } from "../../../eval/oracles/fouls.js";
 import { TEST_BINDINGS } from "../../../eval/contracts/bindings.js";
 import { INVARIANT_DEFINITIONS } from "../../../eval/contracts/invariant-definitions.js";
 import { COMMON_CRITERIA } from "../../../eval/contracts/common-criteria.js";
@@ -51,18 +53,23 @@ const FOULS_ORACLE_CRITERIA: Record<string, string> = {
   "FOUL-CLEAN-TACKLE": "foul-clean-tackle-oracle-v1",
   "FREE-KICK-AWARD": "foul-free-kick-award-oracle-v1",
   "CARD-ISSUED": "foul-card-issued-oracle-v1",
+  "ADVANTAGE-PLAYED": "foul-advantage-played-oracle-v1",
 };
 
-// The §10 criterion that must remain NAMED-BUT-UNREGISTERED (no machinery).
-const NAMED_BUT_UNREGISTERED = [
-  "ADVANTAGE-PLAYED",
-];
+/**
+ * §6.2a judged-retained inputs are NOT registered as a passing criterion: the
+ * retained-advantage predicate is unimplemented and its reference
+ * (advantage_retention_ref) is BLOCKED_MISSING_REFERENCE.  The oracle reports a
+ * retained-path input honestly as blocked and never PASSes it.
+ */
+const RETAINED_PATH_REFERENCE = "advantage_retention_ref";
 
 const FOULS_TEST_IDS = [
   "FOULS-DETECT-001",
   "FOULS-CLEAN-TACKLE-001",
   "FOULS-FREE-KICK-AWARD-001",
   "FOULS-CARD-ISSUED-001",
+  "FOULS-ADVANTAGE-PLAYED-001",
 ];
 
 // ---------------------------------------------------------------------------
@@ -207,6 +214,93 @@ function cardIssuedStream(): TelemetryObservation[] {
   return [...obs, mk(20, [card])];
 }
 
+/** A per-tick observation with an explicit ball lastTouchRef. */
+function mkRef(
+  tick: number,
+  events: TelemetryObservation["events"],
+  lastTouchRef: string | null,
+): TelemetryObservation {
+  const obs = mk(tick, events);
+  obs.ball = { ...obs.ball, lastTouchRef };
+  return obs;
+}
+
+/** A committed touch event carrying a teamId (resolves a lastTouchRef). */
+function touchEvent(id: string, teamId: string, tick: number): TelemetryObservation["events"][number] {
+  return { id, tick, sequence: 1, kind: "pass", label: "touch", payload: { playerId: "carrier-1", teamId } };
+}
+
+/** A core-match-phase event (the phase the shared advantage policy reads). */
+function phaseEvent(tick: number, matchPhase: string): TelemetryObservation["events"][number] {
+  return { id: `core-match-phase-${tick}-1`, tick, sequence: 2, kind: "core-match-phase", label: "phase", payload: { matchPhase } };
+}
+
+/** A committed advantage-window decision event. */
+function advantageEvent(
+  id: string,
+  kind: "advantage-opened" | "advantage-cancelled" | "advantage-expired",
+  payload: Record<string, unknown>,
+  tick: number,
+): TelemetryObservation["events"][number] {
+  return { id, tick, sequence: 1, kind, label: "advantage window", payload };
+}
+
+/** The opened payload of the accepted ADVANTAGE-MACHINERY shape (§6.2). */
+function advantageOpenedPayload(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    openTick: 10,
+    windowTicks: 24,
+    pendingFoulCount: 1,
+    foulSourceEventId: "ppc-10-1",
+    foulTick: 10,
+    fouledTeam: "team-b",
+    offenderId: "def-1",
+    fouledPlayerId: "carrier-1",
+    ...overrides,
+  };
+}
+
+/** The close payload of the accepted ADVANTAGE-MACHINERY shape (§6.2–§6.4). */
+function advantageClosedPayload(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    openTick: 10,
+    closeTick: 34,
+    windowTicks: 24,
+    reason: "expired",
+    pendingFoulCount: 1,
+    cautionPendingBudgetTicks: 12,
+    cautionPendingTicksUsed: 0,
+    foulSourceEventId: "ppc-10-1",
+    foulTick: 10,
+    fouledTeam: "team-b",
+    offenderId: "def-1",
+    fouledPlayerId: "carrier-1",
+    ...overrides,
+  };
+}
+
+/**
+ * A stream carrying a genuine man-not-ball foul and the committed §6.2–§6.4
+ * window decisions: the window opens on the contact tick (10) and expires at the
+ * 24-tick budget (tick 34), with the fouled team still in possession.
+ */
+function advantageStream(): TelemetryObservation[] {
+  const open = mk(10, [
+    contactEvent("ppc-10-1", MAN_NOT_BALL),
+    advantageEvent("advantage-opened-10-1", "advantage-opened", advantageOpenedPayload(), 10),
+  ]);
+  detectFoulEvents([open]);
+  return [
+    open,
+    mkRef(20, [touchEvent("pass-20-1", "team-b", 20)], "pass-20-1"),
+    mkRef(33, [], "pass-20-1"),
+    mkRef(34, [
+      advantageEvent("advantage-expired-34-1", "advantage-expired", advantageClosedPayload(), 34),
+      phaseEvent(34, "playing"),
+    ], "pass-20-1"),
+  ];
+}
+
 // ---------------------------------------------------------------------------
 // 1. Criterion_bindings → invariant → registered oracle chain
 // ---------------------------------------------------------------------------
@@ -253,14 +347,19 @@ describe("§10 criterion bindings resolve to registered protected oracles", () =
     }
   });
 
-  it("the named-but-unregistered advantage criterion has NO criterion, oracle or binding", () => {
-    for (const id of NAMED_BUT_UNREGISTERED) {
-      expect(COMMON_CRITERIA[id], `${id} must not be a registered criterion`).toBeUndefined();
-      expect(FOUL_CONTACT_TYPES.has(id)).toBe(false);
-      const binding = Object.entries(TEST_BINDINGS).find(([, b]) => b.criterion_bindings[id] !== undefined);
-      expect(binding, `${id} must not be bound in any test binding`).toBeUndefined();
-    }
-    expect(getOracle("foul-advantage-oracle-v1", "oracle-foul-advantage-v1")).toBeUndefined();
+  it("registers ADVANTAGE-PLAYED as a criterion bound to the protected advantage oracle", () => {
+    const criterion = COMMON_CRITERIA["ADVANTAGE-PLAYED"];
+    expect(criterion, "ADVANTAGE-PLAYED must be a registered criterion").toBeDefined();
+    expect(criterion!.class).toBe("HARD_INVARIANT");
+    // ADVANTAGE-PLAYED is a criterion, never a tackle contact kind.
+    expect(FOUL_CONTACT_TYPES.has("ADVANTAGE-PLAYED")).toBe(false);
+    const binding = Object.entries(TEST_BINDINGS).find(
+      ([, b]) => b.criterion_bindings["ADVANTAGE-PLAYED"] !== undefined,
+    );
+    expect(binding, "ADVANTAGE-PLAYED must be bound in a test binding").toBeDefined();
+    expect(getOracle("foul-advantage-played-oracle-v1", "oracle-foul-advantage-played-v1")).toBeDefined();
+    // The unimplemented retained path is not a registered oracle.
+    expect(getOracle("foul-advantage-retained-oracle-v1", "oracle-foul-advantage-retained-v1")).toBeUndefined();
   });
 });
 
@@ -356,6 +455,25 @@ describe("evaluateSuite('fouls', ...) produces real verdicts", () => {
       .find((t) => t.test_id === "FOULS-FREE-KICK-AWARD-001")!
       .criteria.find((c) => c.criterion_id === "FREE-KICK-AWARD");
     expect(fk!.outcome).toBe("NOT_EVALUATED");
+  });
+
+  it("a committed advantage window (open → §6.2c expiry) yields ADVANTAGE-PLAYED PASS", () => {
+    const result = evaluateSuite("fouls", advantageStream());
+    const advantage = result.tests
+      .find((t) => t.test_id === "FOULS-ADVANTAGE-PLAYED-001")!
+      .criteria.find((c) => c.criterion_id === "ADVANTAGE-PLAYED");
+    expect(advantage!.outcome).toBe("PASS");
+  });
+
+  it("a detected foul with NO observable advantage decision is ADVANTAGE-PLAYED NOT_EVALUATED (never PASS)", () => {
+    // The accepted driven shape commits its window decisions in the core's
+    // persistent state, not the per-step observation array; the oracle must not
+    // invent a PASS from the absence of a decision.
+    const result = evaluateSuite("fouls", foulStream());
+    const advantage = result.tests
+      .find((t) => t.test_id === "FOULS-ADVANTAGE-PLAYED-001")!
+      .criteria.find((c) => c.criterion_id === "ADVANTAGE-PLAYED");
+    expect(advantage!.outcome).toBe("NOT_EVALUATED");
   });
 });
 
@@ -584,10 +702,104 @@ describe("mutant / canary guards", () => {
       .criteria.find((c) => c.criterion_id === "CARD-ISSUED");
     expect(crit!.outcome).toBe("FAIL");
   });
+
+  it("ADVANTAGE-PLAYED FAILs when the window decision is not grounded in a recognized foul (power guard)", () => {
+    // A clean tackle (duelWon true) is not a §5.1 foul candidate, so an
+    // advantage window opened off it is invalid: the advantage decision is only
+    // the consequence of a recognized man-not-ball foul.
+    const clean = { ...MAN_NOT_BALL, duelWon: true, ballReachable: true };
+    const obs = mk(10, [
+      contactEvent("clean-10-1", clean),
+      advantageEvent("advantage-opened-10-1", "advantage-opened", advantageOpenedPayload({ foulSourceEventId: "clean-10-1" }), 10),
+    ]);
+    const result = evaluateSuite("fouls", [obs]);
+    const advantage = result.tests
+      .find((t) => t.test_id === "FOULS-ADVANTAGE-PLAYED-001")!
+      .criteria.find((c) => c.criterion_id === "ADVANTAGE-PLAYED");
+    expect(advantage!.outcome).toBe("FAIL");
+  });
+
+  it("ADVANTAGE-PLAYED FAILs on a close with an unrecognized reason", () => {
+    const open = mk(10, [
+      contactEvent("ppc-10-1", MAN_NOT_BALL),
+      advantageEvent("advantage-opened-10-1", "advantage-opened", advantageOpenedPayload(), 10),
+    ]);
+    detectFoulEvents([open]);
+    const close = mk(34, [
+      advantageEvent("advantage-cancelled-34-1", "advantage-cancelled", advantageClosedPayload({ reason: "cancelled-unknown" }), 34),
+    ]);
+    const result = evaluateSuite("fouls", [open, close]);
+    const advantage = result.tests
+      .find((t) => t.test_id === "FOULS-ADVANTAGE-PLAYED-001")!
+      .criteria.find((c) => c.criterion_id === "ADVANTAGE-PLAYED");
+    expect(advantage!.outcome).toBe("FAIL");
+  });
+
+  it("ADVANTAGE-PLAYED FAILs on a close with no matching opening window", () => {
+    const obs = [
+      mk(10, [contactEvent("ppc-10-1", MAN_NOT_BALL)]),
+      mk(34, [advantageEvent("advantage-expired-34-1", "advantage-expired", advantageClosedPayload({ openTick: 5 }), 34)]),
+    ];
+    detectFoulEvents(obs);
+    const result = evaluateSuite("fouls", obs);
+    const advantage = result.tests
+      .find((t) => t.test_id === "FOULS-ADVANTAGE-PLAYED-001")!
+      .criteria.find((c) => c.criterion_id === "ADVANTAGE-PLAYED");
+    expect(advantage!.outcome).toBe("FAIL");
+  });
+
+  it("ADVANTAGE-PLAYED FAILs when a close disagrees with the shared §6.2–§6.3 policy", () => {
+    // The fouled team still holds the ball and the window budget is not reached,
+    // so the shared policy leaves the window open (null); a committed
+    // cancelled-last-touch-loss close contradicts it.
+    const open = mk(10, [
+      contactEvent("ppc-10-1", MAN_NOT_BALL),
+      advantageEvent("advantage-opened-10-1", "advantage-opened", advantageOpenedPayload(), 10),
+    ]);
+    detectFoulEvents([open]);
+    const obs = [
+      open,
+      mkRef(12, [touchEvent("pass-12-1", "team-b", 12)], "pass-12-1"),
+      mkRef(14, [], "pass-12-1"),
+      mkRef(15, [
+        advantageEvent("advantage-cancelled-15-1", "advantage-cancelled", advantageClosedPayload({ closeTick: 15, reason: "cancelled-last-touch-loss" }), 15),
+        phaseEvent(15, "playing"),
+      ], "pass-12-1"),
+    ];
+    const result = evaluateSuite("fouls", obs);
+    const advantage = result.tests
+      .find((t) => t.test_id === "FOULS-ADVANTAGE-PLAYED-001")!
+      .criteria.find((c) => c.criterion_id === "ADVANTAGE-PLAYED");
+    expect(advantage!.outcome).toBe("FAIL");
+  });
+
+  it("ADVANTAGE-PLAYED reports a §6.2a retained-path input as BLOCKED_MISSING_REFERENCE, never PASS", () => {
+    const open = mk(10, [
+      contactEvent("ppc-10-1", MAN_NOT_BALL),
+      advantageEvent("advantage-opened-10-1", "advantage-opened", advantageOpenedPayload(), 10),
+    ]);
+    detectFoulEvents([open]);
+    const retainedClose = mk(20, [
+      advantageEvent("advantage-cancelled-20-1", "advantage-cancelled", advantageClosedPayload({ closeTick: 20, reason: "judged-retained" }), 20),
+    ]);
+    const stream = [open, retainedClose];
+    const result = evaluateSuite("fouls", stream);
+    const advantage = result.tests
+      .find((t) => t.test_id === "FOULS-ADVANTAGE-PLAYED-001")!
+      .criteria.find((c) => c.criterion_id === "ADVANTAGE-PLAYED");
+    expect(advantage!.outcome, "a retained judgment must never PASS").not.toBe("PASS");
+    expect(advantage!.outcome).toBe("NOT_EVALUATED");
+
+    const direct = checkFoulAdvantagePlayed(stream);
+    expect(direct).toHaveLength(1);
+    expect(direct[0].status).toBe("not_evaluated");
+    expect(direct[0].description).toContain("BLOCKED_MISSING_REFERENCE");
+    expect(direct[0].details?.blockedReference).toBe(RETAINED_PATH_REFERENCE);
+  });
 });
 
 // ---------------------------------------------------------------------------
-// 5. Registry integrity: content hash + named-but-unregistered absence
+// 5. Registry integrity: content hash + the registered foul artefacts
 // ---------------------------------------------------------------------------
 
 describe("registry integrity", () => {
@@ -601,6 +813,7 @@ describe("registry integrity", () => {
     expect(registry.invariant_definitions["foul-clean-tackle-evidence"]).toBeDefined();
     expect(registry.invariant_definitions["foul-free-kick-award-evidence"]).toBeDefined();
     expect(registry.invariant_definitions["foul-card-issued-evidence"]).toBeDefined();
+    expect(registry.invariant_definitions["foul-advantage-played-evidence"]).toBeDefined();
     expect(registry.observation_definitions["obs-fouls-v1"]).toBeDefined();
   });
 });

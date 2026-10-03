@@ -1040,11 +1040,12 @@ export const MATCH_RESTART_NEAREST_ONLY: EvaluationCriterion = {
 // ---------------------------------------------------------------------------
 // fouls suite criteria — FOULS_CARDS_SPEC §10
 //
-// FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD and CARD-ISSUED are
-// registered here: the §10 criteria the accepted machinery makes answerable over
-// the committed detection / consequence / card streams.  ADVANTAGE-PLAYED
-// remains NAMED-BUT-UNREGISTERED — no criterion record, oracle, invariant,
-// binding or verdict is added for it (no advantage machinery exists).
+// FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD, CARD-ISSUED and
+// ADVANTAGE-PLAYED are registered here: the §10 criteria the accepted machinery
+// makes answerable over the committed detection / consequence / card / advantage
+// streams.  ADVANTAGE-PLAYED's §6.2a judged-retained predicate is NOT
+// implemented and its reference (advantage_retention_ref) stays
+// BLOCKED_MISSING_REFERENCE, so no retained judgment is PASSed.
 // ---------------------------------------------------------------------------
 
 /**
@@ -1112,6 +1113,33 @@ export const CARD_ISSUED: EvaluationCriterion = {
     "player (the tackler) at the correct accumulated count.  A card issued with " +
     "no qualifying foul, to the wrong player, or of the wrong type at the count " +
     "violates the card consequence.",
+};
+
+/**
+ * ADVANTAGE-PLAYED — the FOULS_CARDS_SPEC §10 advantage criterion over the
+ * committed §6.2–§6.4 advantage-window decisions.  A recognized man-not-ball
+ * foul contact opens the bounded window (advantage_window_ticks); the window
+ * closes at the earliest of the §6.3 cancellations (lastTouchRef loss, new
+ * stoppage) or §6.2c expiry, and the pending foul is called at the close tick.
+ * The §6.2a judged-retained path is NOT implemented and its reference
+ * (advantage_retention_ref) stays BLOCKED_MISSING_REFERENCE — no retained
+ * judgment is PASSed.
+ * Class: HARD_INVARIANT.  Oracle: foul-advantage-played-oracle-v1.
+ */
+export const ADVANTAGE_PLAYED: EvaluationCriterion = {
+  criterion_id: "ADVANTAGE-PLAYED",
+  class: "HARD_INVARIANT",
+  rule:
+    "On a recognized man-not-ball foul contact the §6.2 advantage window opens " +
+    "for advantage_window_ticks and closes at the earliest of a §6.3 " +
+    "cancellation (loss of lastTouchRef to the fouled team, or a new stoppage " +
+    "that leaves playing) or §6.2c expiry, whereupon the pending foul is called " +
+    "at the close tick (§6.4, deferred not retroactive).  A window open or call " +
+    "with no recognized foul, a close with an unrecognized reason or no opening " +
+    "window, and a close that disagrees with the shared advantage policy violate " +
+    "the criterion.  The §6.2a judged-retained judgment is not implemented: its " +
+    "retention predicate is BLOCKED_MISSING_REFERENCE (advantage_retention_ref) " +
+    "and is never a passing criterion.",
 };
 
 /** All common criteria keyed by criterion_id. */
@@ -1226,6 +1254,7 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [FOUL_CLEAN_TACKLE.criterion_id]: FOUL_CLEAN_TACKLE,
   [FREE_KICK_AWARD.criterion_id]: FREE_KICK_AWARD,
   [CARD_ISSUED.criterion_id]: CARD_ISSUED,
+  [ADVANTAGE_PLAYED.criterion_id]: ADVANTAGE_PLAYED,
 };
 
 /**

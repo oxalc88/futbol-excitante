@@ -20,12 +20,13 @@
  *     future-with-prerequisites and the free-kick set piece as referencing
  *     the accepted restart machinery;
  *  7. names adjudicating criteria (FOUL-DETECT, FOUL-CLEAN-TACKLE,
- *     CARD-ISSUED, ADVANTAGE-PLAYED, FREE-KICK-AWARD) but does NOT register
- *     them in the evaluator registry, and does not claim a PASS through them;
+ *     CARD-ISSUED, ADVANTAGE-PLAYED, FREE-KICK-AWARD) and registers all five
+ *     in the evaluator registry, while never claiming a PASS for the
+ *     unimplemented retained-advantage judgment;
  *  8. specifies the advantage-window semantics (§6: the bounded window, what
- *     cancels it, the deferred consequence) while keeping ADVANTAGE-PLAYED
- *     named-not-registered and the retained-advantage predicate
- *     BLOCKED_MISSING_REFERENCE (no advantage machinery).
+ *     cancels it, the deferred consequence), implemented behind a default-OFF
+ *     gate with ADVANTAGE-PLAYED registered, while the retained-advantage
+ *     predicate stays BLOCKED_MISSING_REFERENCE (no advantage is played).
  *
  * This is a binding/consistency test, not an evaluator change.  It does not
  * claim any gameplay PASS and makes no PES fidelity claim.
@@ -83,11 +84,12 @@ describe("FOULS_CARDS_SPEC declares its owning model id and config model", () =>
     expect(SPEC).toContain("Model version");
   });
 
-  it("states it is a draft spec with partial implementation (foul/card/free-kick registered, advantage not)", () => {
+  it("states it is a draft spec with partial implementation (foul/card/free-kick registered, advantage window gated, no advantage played)", () => {
     expect(SPEC).toContain(
       "The engine has foul recognition, the card consequence and the free-kick consequence",
     );
-    expect(SPEC).toContain("The engine has NO advantage machinery");
+    expect(SPEC).toContain("The engine has no advantage-*play* subsystem");
+    expect(SPEC).toContain("registered as an executable protected oracle");
   });
 });
 
@@ -273,7 +275,7 @@ describe("FOULS_CARDS_SPEC lists deferred regulation behaviors", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. Adjudicating criteria named but NOT registered
+// 6. Adjudicating criteria (all five registered)
 // ---------------------------------------------------------------------------
 
 const NAMED_CRITERIA = [
@@ -291,8 +293,9 @@ describe("FOULS_CARDS_SPEC names adjudicating criteria", () => {
     }
   });
 
-  it("explicitly states the criteria are NOT registered in any suite", () => {
-    expect(SPEC).toContain("NOT registered");
+  it("explicitly states all five criteria are registered and none stays named-not-registered", () => {
+    expect(SPEC).toContain("registered as executable protected oracles");
+    expect(SPEC).toContain("No §10 criterion remains named-not-registered");
   });
 
   it("does not claim a PASS through this spec", () => {
@@ -306,45 +309,43 @@ describe("FOULS_CARDS_SPEC names adjudicating criteria", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 7. Registry state after CARD-ISSUED-SUITE-REGISTRATION
+// 7. Registry state after ADVANTAGE-SUITE-REGISTRATION
 // ---------------------------------------------------------------------------
 //
 // FOUL-DETECT, FOUL-CLEAN-TACKLE (FOULS-SUITE-REGISTRATION), FREE-KICK-AWARD
-// (FREE-KICK-SUITE-REGISTRATION) and CARD-ISSUED (CARD-ISSUED-SUITE-REGISTRATION)
-// are registered as executable protected oracles in the `fouls` suite
-// suite-fouls-v1; the remaining §10 criterion (ADVANTAGE-PLAYED) stays
-// NAMED-NOT-REGISTERED — no criterion, oracle, invariant, binding or verdict
-// accompanies it (no advantage machinery).  The registry below mirrors the
-// current executable state.
+// (FREE-KICK-SUITE-REGISTRATION), CARD-ISSUED (CARD-ISSUED-SUITE-REGISTRATION)
+// and ADVANTAGE-PLAYED (ADVANTAGE-SUITE-REGISTRATION) are registered as
+// executable protected oracles in the `fouls` suite suite-fouls-v1.  The
+// registry below mirrors the current executable state: all five §10 criteria are
+// registered and none remains named-not-registered.  The §6.2a judged-retained
+// advantage judgment is NOT implemented and is never PASSed (its reference,
+// advantage_retention_ref, stays BLOCKED_MISSING_REFERENCE).
 
-const REGISTERED_CRITERIA = ["FOUL-DETECT", "FOUL-CLEAN-TACKLE", "FREE-KICK-AWARD", "CARD-ISSUED"];
-const REMAINING_NAMED_BUT_UNREGISTERED = [
+const REGISTERED_CRITERIA = [
+  "FOUL-DETECT",
+  "FOUL-CLEAN-TACKLE",
+  "FREE-KICK-AWARD",
+  "CARD-ISSUED",
   "ADVANTAGE-PLAYED",
 ];
 
-describe("FOULS_CARDS_SPEC registry state after CARD-ISSUED-SUITE-REGISTRATION", () => {
+describe("FOULS_CARDS_SPEC registry state after ADVANTAGE-SUITE-REGISTRATION", () => {
   const registry = loadRegistrySet();
 
   it("registers the 'fouls' suite (FOULS-SUITE-REGISTRATION)", () => {
     expect(registry.suite_definitions["fouls"]).toBeDefined();
   });
 
-  it("registers FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD and CARD-ISSUED, and no more, in COMMON_CRITERIA", () => {
+  it("registers all five §10 criteria (including ADVANTAGE-PLAYED) in COMMON_CRITERIA", () => {
     for (const criterion of REGISTERED_CRITERIA) {
       expect(
         registry.common_criteria[criterion],
         `${criterion} must be registered in COMMON_CRITERIA`,
       ).toBeDefined();
     }
-    for (const criterion of REMAINING_NAMED_BUT_UNREGISTERED) {
-      expect(
-        registry.common_criteria[criterion],
-        `${criterion} must NOT be registered in COMMON_CRITERIA`,
-      ).toBeUndefined();
-    }
   });
 
-  it("binds FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD and CARD-ISSUED, and no more, in a test binding", () => {
+  it("binds all five §10 criteria (including ADVANTAGE-PLAYED) in a test binding", () => {
     const bindings = Object.values(registry.test_bindings);
     for (const criterion of REGISTERED_CRITERIA) {
       const referenced = bindings.some((b) => criterion in b.criterion_bindings);
@@ -352,13 +353,6 @@ describe("FOULS_CARDS_SPEC registry state after CARD-ISSUED-SUITE-REGISTRATION",
         referenced,
         `${criterion} must be bound in a test binding`,
       ).toBe(true);
-    }
-    for (const criterion of REMAINING_NAMED_BUT_UNREGISTERED) {
-      const referenced = bindings.some((b) => criterion in b.criterion_bindings);
-      expect(
-        referenced,
-        `${criterion} must NOT be bound in any test binding`,
-      ).toBe(false);
     }
   });
 
@@ -376,14 +370,15 @@ describe("FOULS_CARDS_SPEC registry state after CARD-ISSUED-SUITE-REGISTRATION",
 });
 
 // ---------------------------------------------------------------------------
-// 8. Advantage-window semantics after ADVANTAGE-WINDOW-SPEC
+// 8. Advantage-window semantics after ADVANTAGE-SUITE-REGISTRATION
 // ---------------------------------------------------------------------------
 //
 // §6 specifies the advantage-window semantics (the bounded window, what
-// cancels it, the deferred consequence) as a design contract only.  The
-// engine has no advantage machinery, so ADVANTAGE-PLAYED stays
-// NAMED-NOT-REGISTERED; the retained-advantage predicate is unreferenced and
-// MUST stay BLOCKED_MISSING_REFERENCE.
+// cancels it, the deferred consequence); the window machinery is implemented
+// behind a default-OFF gate (ADVANTAGE-MACHINERY) and ADVANTAGE-PLAYED is
+// registered (ADVANTAGE-SUITE-REGISTRATION).  No advantage is ever played:
+// the retained-advantage predicate is unimplemented and stays
+// BLOCKED_MISSING_REFERENCE.
 
 describe("FOULS_CARDS_SPEC specifies the advantage-window semantics", () => {
   it("specifies the bounded window open/close on the fouls-v1 tick budget", () => {
@@ -409,8 +404,9 @@ describe("FOULS_CARDS_SPEC specifies the advantage-window semantics", () => {
     expect(SPEC).toContain("BLOCKED_MISSING_REFERENCE");
   });
 
-  it("keeps the window semantics a design contract with no machinery", () => {
-    expect(SPEC).toContain("The engine has NO advantage machinery");
-    expect(SPEC).toContain("design contract");
+  it("registers the criterion while no advantage is ever played (window gated, retained path blocked)", () => {
+    expect(SPEC).toContain("The engine has no advantage-*play* subsystem");
+    expect(SPEC).toContain("No advantage is ever played");
+    expect(SPEC).toContain("advantage_retention_ref");
   });
 });

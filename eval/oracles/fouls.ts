@@ -1,34 +1,40 @@
 /**
  * @module eval/oracles/fouls
  *
- * Protected foul oracles (objective FOULS-SUITE-REGISTRATION,
- * FREE-KICK-SUITE-REGISTRATION and CARD-ISSUED-SUITE-REGISTRATION), adjudicating
- * the FOULS_CARDS_SPEC §10 criteria that the accepted machinery makes answerable
- * over committed observation streams:
+ * Protected foul oracles (objectives FOULS-SUITE-REGISTRATION,
+ * FREE-KICK-SUITE-REGISTRATION, CARD-ISSUED-SUITE-REGISTRATION and
+ * ADVANTAGE-SUITE-REGISTRATION), adjudicating the FOULS_CARDS_SPEC §10 criteria
+ * that the accepted machinery makes answerable over committed observation
+ * streams:
  *   - FOUL-DETECT          -> checkFoulDetect
  *   - FOUL-CLEAN-TACKLE    -> checkFoulCleanTackle
  *   - FREE-KICK-AWARD      -> checkFoulFreeKickAward
  *   - CARD-ISSUED          -> checkFoulCardIssued
+ *   - ADVANTAGE-PLAYED     -> checkFoulAdvantagePlayed
  *
  * Each oracle is a pure `TelemetryObservation[] → InvariantResult[]` function
  * and reads only committed, observable fields: the `foul` events emitted by the
  * observation-level detector, the `free-kick-executed` events the accepted
  * restart machinery commits, the `card-issued` events the accepted card
- * machinery commits (surfaced into the observation stream only through the
- * committed-events injection / serializeRestartFacts gate), and the
- * `player-player-contact` events the accepted tackle machinery commits.  The
- * detection predicate is exactly the spec §5.1 read: a `player-player-contact`
- * with `contactType` ∈ {`standing-tackle`, `slide-tackle`},
- * `tacklePhase === "active"`, and `duelWon === false` (equivalently
- * `ballReachable === false`) is a man-not-ball foul candidate; the ball stays an
- * independent 3D entity.  FREE-KICK-AWARD and CARD-ISSUED import the
- * SINGLE-SOURCE-OF-TRUTH predicate (src/simulation/foul-predicate.ts) and the
- * card-policy threshold (src/simulation/card-policy.ts) exactly as the in-core
- * consequence does; neither duplicates the spec §5.1 / §9.1 definition.
+ * machinery commits, the `advantage-opened` / `advantage-cancelled` /
+ * `advantage-expired` window decisions the accepted ADVANTAGE-MACHINERY commits
+ * (all surfaced into the observation stream only through the committed-events
+ * injection / serializeRestartFacts gate), and the `player-player-contact`
+ * events the accepted tackle machinery commits.  The detection predicate is
+ * exactly the spec §5.1 read: a `player-player-contact` with `contactType` ∈
+ * {`standing-tackle`, `slide-tackle`}, `tacklePhase === "active"`, and
+ * `duelWon === false` (equivalently `ballReachable === false`) is a man-not-ball
+ * foul candidate; the ball stays an independent 3D entity.  FREE-KICK-AWARD,
+ * CARD-ISSUED and ADVANTAGE-PLAYED import the SINGLE-SOURCE-OF-TRUTH predicate
+ * (src/simulation/foul-predicate.ts), the card-policy threshold
+ * (src/simulation/card-policy.ts) and the advantage-window policy
+ * (src/simulation/advantage-policy.ts) exactly as the in-core consequence does;
+ * none duplicates the spec §5.1 / §9.1 / §6.2–§6.3 definition.
  *
- * ADVANTAGE-PLAYED remains NAMED-BUT-UNREGISTERED (FOULS_CARDS_SPEC §10): no
- * oracle, invariant, binding or criterion registration accompanies it and no
- * verdict is reported for it.
+ * ADVANTAGE-PLAYED's retained path (§6.2a judged retained) is NOT implemented
+ * and `advantage_retention_ref` is BLOCKED_MISSING_REFERENCE (§11): the oracle
+ * can never award a PASS to a retained judgment — a retained-path input is
+ * reported honestly as blocked, never invented.
  *
  * Where the stream genuinely cannot carry a verdict (no `foul` event was emitted
  * to judge against) the oracle returns [] so the shared computeOutcome maps it to
@@ -47,6 +53,11 @@ import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { InvariantResult } from "../../src/contracts/telemetry.js";
 import { isFoulCandidatePayload } from "../../src/simulation/foul-predicate.js";
 import { resolveCardForAccumulatedFouls } from "../../src/simulation/card-policy.js";
+import {
+  ADVANTAGE_WINDOW_TICKS,
+  resolveAdvantageClose,
+} from "../../src/simulation/advantage-policy.js";
+import type { MatchPhase } from "../../src/contracts/state.js";
 
 /** The spec §5.1 contact kinds that constitute a tackle contact. */
 const TACKLE_CONTACT_TYPES = new Set<string>(["standing-tackle", "slide-tackle"]);
@@ -619,3 +630,442 @@ export function checkFoulCardIssued(
  * fouled player's planar position at the foul tick.  Small relative to the
  * pitch (~105 m), so it still rejects a misplaced/mutated award. */
 const FREE_KICK_POSITION_TOLERANCE = 0.5;
+
+// ---------------------------------------------------------------------------
+// ADVANTAGE-PLAYED (FOULS_CARDS_SPEC §6 / §10, ADVANTAGE-SUITE-REGISTRATION)
+// ---------------------------------------------------------------------------
+
+/**
+ * The committed advantage-window decision kinds the ADVANTAGE-MACHINERY core
+ * (src/simulation/loop/simulation.ts, §6.2–§6.4) appends to its persistent
+ * state and that the serializeRestartFacts gate surfaces into the committed
+ * observation stream.  There is deliberately NO `advantage-played` kind: the
+ * §6.2a judged-retained path is NOT implemented (`advantage_retention_ref` is
+ * BLOCKED_MISSING_REFERENCE, §11), so a stream can only carry the window
+ * open/close decisions.
+ */
+const ADVANTAGE_OPEN_KIND = "advantage-opened";
+const ADVANTAGE_CLOSED_KINDS: ReadonlySet<string> = new Set<string>([
+  "advantage-cancelled",
+  "advantage-expired",
+]);
+
+/**
+ * The recognized §6.2–§6.3 window close reasons — the same closed set the
+ * SHARED policy src/simulation/advantage-policy.ts declares as
+ * `AdvantageCloseReason`.  §6.2a (judged retained) is NOT representable.
+ */
+const ADVANTAGE_CLOSE_REASONS: ReadonlySet<string> = new Set<string>([
+  "cancelled-last-touch-loss",
+  "cancelled-stoppage",
+  "expired",
+]);
+
+/**
+ * Reason / flag shapes that would assert a judged-retained advantage.  The
+ * engine emits none of these; a stream that carries one is the unimplemented
+ * §6.2a path, whose reference is BLOCKED_MISSING_REFERENCE — never a PASS.
+ */
+const ADVANTAGE_RETAINED_REASONS: ReadonlySet<string> = new Set<string>([
+  "judged-retained",
+  "retained",
+  "advantage-played",
+]);
+const ADVANTAGE_RETAINED_EVENT_KIND = "advantage-played";
+
+/** One committed advantage-window decision event. */
+interface AdvantageDecision {
+  tick: number;
+  id: string;
+  kind: string;
+  payload: Record<string, unknown>;
+  retained: boolean;
+}
+
+/** Gather every advantage-window decision event in the window. */
+function advantageDecisions(
+  observations: TelemetryObservation[],
+): AdvantageDecision[] {
+  const out: AdvantageDecision[] = [];
+  for (const o of observations) {
+    for (const ev of o.events) {
+      const kind: string = ev.kind;
+      if (
+        kind !== ADVANTAGE_OPEN_KIND &&
+        !ADVANTAGE_CLOSED_KINDS.has(kind) &&
+        kind !== ADVANTAGE_RETAINED_EVENT_KIND
+      ) {
+        continue;
+      }
+      const payload = (ev.payload ?? {}) as Record<string, unknown>;
+      const reason = typeof payload.reason === "string" ? payload.reason : null;
+      out.push({
+        tick: ev.tick,
+        id: ev.id,
+        kind,
+        payload,
+        retained:
+          kind === ADVANTAGE_RETAINED_EVENT_KIND ||
+          payload.retained === true ||
+          (reason !== null && ADVANTAGE_RETAINED_REASONS.has(reason)),
+      });
+    }
+  }
+  return out;
+}
+
+/** The committed `player-player-contact` contacts keyed by event id. */
+function contactsById(
+  observations: TelemetryObservation[],
+): Map<string, { tick: number; payload: Record<string, unknown> }> {
+  const map = new Map<string, { tick: number; payload: Record<string, unknown> }>();
+  for (const o of observations) {
+    for (const ev of o.events) {
+      if (ev.kind !== "player-player-contact") continue;
+      map.set(ev.id, { tick: ev.tick, payload: (ev.payload ?? {}) as Record<string, unknown> });
+    }
+  }
+  return map;
+}
+
+/** The committed match phase at a tick (from a `core-match-phase` event), or
+ * null when the stream does not carry the phase for that tick. */
+function matchPhaseAt(observations: TelemetryObservation[], tick: number): string | null {
+  const obs = observations.find((o) => o.tick === tick);
+  if (!obs) return null;
+  for (const ev of obs.events) {
+    if (ev.kind !== "core-match-phase") continue;
+    const p = (ev.payload ?? {}) as Record<string, unknown>;
+    if (typeof p.matchPhase === "string") return p.matchPhase;
+  }
+  return null;
+}
+
+/**
+ * The team the ball's accepted `lastTouchRef` resolves to at a tick — the same
+ * read the SHARED policy consumes.
+ *   - a team string  => the reference resolves to that team;
+ *   - null           => the reference is null or resolves to no team (a loss);
+ *   - undefined      => the referenced touch event is not observable in this
+ *                      stream, so the policy cannot be re-evaluated (skip).
+ */
+function lastTouchTeamAt(
+  observations: TelemetryObservation[],
+  tick: number,
+  eventTeamById: Map<string, string>,
+  knownEventIds: Set<string>,
+): string | null | undefined {
+  const obs = observations.find((o) => o.tick === tick);
+  if (!obs) return undefined;
+  const ref = obs.ball.lastTouchRef;
+  if (ref === null || ref === undefined) return null;
+  if (!knownEventIds.has(ref)) return undefined;
+  return eventTeamById.get(ref) ?? null;
+}
+
+/**
+ * The ball-contact event kinds that claim the ball's authoritative
+ * `lastTouchRef` in the accepted engine (the contact system's ordered ball
+ * contacts plus the tackle system's ball contact).
+ */
+const TOUCH_EVENT_KINDS: ReadonlySet<string> = new Set<string>([
+  "pass",
+  "lofted-pass",
+  "through-ball",
+  "shot",
+  "player-ball-contact",
+  "first-touch",
+  "dribble-touch",
+]);
+
+/**
+ * The team the ball's `lastTouchRef` resolved to for the §6.2–§6.3 decision made
+ * ON `tick`.  The committed observation at `tick` is the POST-step state: when
+ * the window closes, the close's own §6.4 consequence resets `lastTouchRef` to
+ * null on that same tick, so the decision tick's own reference cannot be read
+ * directly.  The committed facts reconstruct it:
+ *   - a ball contact committed on `tick` updates `lastTouchRef` before the
+ *     advantage decision — the LAST such contact's team wins;
+ *   - otherwise the reference is unchanged from the previous committed tick;
+ *   - null  => a loss; undefined => not observable (skip the re-evaluation).
+ */
+function lastTouchTeamAtDecision(
+  observations: TelemetryObservation[],
+  tick: number,
+  eventTeamById: Map<string, string>,
+  knownEventIds: Set<string>,
+): string | null | undefined {
+  const obs = observations.find((o) => o.tick === tick);
+  if (!obs) return undefined;
+  let touchedTeam: string | null | undefined;
+  for (const ev of obs.events) {
+    if (!TOUCH_EVENT_KINDS.has(ev.kind as string)) continue;
+    const t = ((ev.payload ?? {}) as Record<string, unknown>).teamId;
+    touchedTeam = typeof t === "string" ? t : null;
+  }
+  if (touchedTeam !== undefined) return touchedTeam;
+  const previous = lastTouchTeamAt(observations, tick - 1, eventTeamById, knownEventIds);
+  return previous === undefined ? undefined : previous;
+}
+
+/**
+ * ADVANTAGE-PLAYED — the FOULS_CARDS_SPEC §10 advantage criterion over the
+ * committed ADVANTAGE-MACHINERY decision stream (§6.2–§6.4).  The oracle reads
+ * the committed `advantage-opened` / `advantage-cancelled` / `advantage-expired`
+ * decisions and adjudicates them against the SHARED single-source-of-truth
+ * modules: the §5.1 foul predicate (src/simulation/foul-predicate.ts) grounds
+ * every decision in a recognized man-not-ball contact, and the §6.2–§6.3 window
+ * policy (src/simulation/advantage-policy.ts, `resolveAdvantageClose` and
+ * `ADVANTAGE_WINDOW_TICKS`) validates the close decision.
+ *
+ * Guards, mapped to the §10 definition:
+ *   - a window open or close (the §6.4 call) with NO recognized §5.1 man-not-ball
+ *     foul behind it FAILs — an advantage decision is only the consequence of a
+ *     recognized foul;
+ *   - a decision whose carried facts disagree with its source contact
+ *     (foulTick / fouledTeam / offenderId / fouledPlayerId) FAILs, as does a
+ *     window budget other than the fouls-v1 `advantage_window_ticks`;
+ *   - a close with an unrecognized reason, a close with no matching open, or a
+ *     close that disagrees with the shared policy resolution FAILs;
+ *   - a stream with no observable advantage decision (no foul, gate off, or the
+ *     accepted driven shape whose window decisions are commit-only to the core's
+ *     persistent state) is honest NOT_EVALUATED — never an invented PASS/FAIL;
+ *   - a retained-judgment input (§6.2a) is reported honestly as
+ *     BLOCKED_MISSING_REFERENCE (`advantage_retention_ref`, §11): the oracle
+ *     never PASSes the unimplemented retained path.
+ */
+export function checkFoulAdvantagePlayed(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const decisions = advantageDecisions(observations);
+
+  // §6.2a judged-retained: not implemented, unreferenced.  Never PASS.
+  const retainedInputs = decisions.filter((d) => d.retained);
+  if (retainedInputs.length > 0) {
+    return [
+      {
+        id: "foul-advantage-played-blocked",
+        status: "not_evaluated",
+        description:
+          `${retainedInputs.length} retained-advantage decision input(s) cannot be adjudicated: the ` +
+          `§6.2a judged-retained predicate is not implemented and its reference is ` +
+          `BLOCKED_MISSING_REFERENCE (advantage_retention_ref, FOULS_CARDS_SPEC §11) — no PASS is ` +
+          `claimed for the retained path`,
+        details: {
+          blockedReference: "advantage_retention_ref",
+          retainedDecisionInputs: retainedInputs.map((d) => ({ id: d.id, tick: d.tick, kind: d.kind })),
+        },
+      },
+    ];
+  }
+
+  // Nothing observable: no advantage decision was carried by the stream.  Covers
+  // a detected foul whose window decisions are commit-only (the driven shape) and
+  // the gate-off control: honest NOT_EVALUATED, never an invented PASS.
+  if (decisions.length === 0) {
+    return [];
+  }
+
+  const contacts = contactsById(observations);
+  const knownEventIds = new Set<string>();
+  const eventTeamById = new Map<string, string>();
+  for (const o of observations) {
+    for (const ev of o.events) {
+      knownEventIds.add(ev.id);
+      const t = ((ev.payload ?? {}) as Record<string, unknown>).teamId;
+      if (typeof t === "string") eventTeamById.set(ev.id, t);
+    }
+  }
+
+  const opens = decisions.filter((d) => d.kind === ADVANTAGE_OPEN_KIND);
+  const closes = decisions.filter((d) => ADVANTAGE_CLOSED_KINDS.has(d.kind));
+  const failures: string[] = [];
+
+  // Power guard: every advantage decision (window open or the §6.4 call at
+  // close) MUST be grounded in a recognized §5.1 man-not-ball foul contact, and
+  // its carried facts MUST agree with that contact.
+  for (const d of decisions) {
+    const sourceEventId =
+      typeof d.payload.foulSourceEventId === "string" ? d.payload.foulSourceEventId : "";
+    const source = contacts.get(sourceEventId);
+    if (!source) {
+      failures.push(
+        `${d.id}: advantage decision is not grounded in a committed man-not-ball contact ` +
+          `(sourceEventId ${sourceEventId || "<missing>"})`,
+      );
+      continue;
+    }
+    if (!isFoulCandidatePayload(source.payload)) {
+      failures.push(
+        `${d.id}: source contact ${sourceEventId} is not a recognized §5.1 man-not-ball foul candidate`,
+      );
+      continue;
+    }
+    if (d.payload.foulTick !== source.tick) {
+      failures.push(
+        `${d.id}: foulTick ${String(d.payload.foulTick)} does not match source contact tick ${source.tick}`,
+      );
+    }
+    if (d.payload.fouledTeam !== source.payload.teamIdB) {
+      failures.push(
+        `${d.id}: fouledTeam ${String(d.payload.fouledTeam)} does not match the source contact team ${String(source.payload.teamIdB)}`,
+      );
+    }
+    if (d.payload.offenderId !== undefined && d.payload.offenderId !== source.payload.playerIdA) {
+      failures.push(
+        `${d.id}: offenderId ${String(d.payload.offenderId)} does not match the source tackler ${String(source.payload.playerIdA)}`,
+      );
+    }
+    if (d.payload.fouledPlayerId !== undefined && d.payload.fouledPlayerId !== source.payload.playerIdB) {
+      failures.push(
+        `${d.id}: fouledPlayerId ${String(d.payload.fouledPlayerId)} does not match the source fouled player ${String(source.payload.playerIdB)}`,
+      );
+    }
+    if (d.payload.windowTicks !== ADVANTAGE_WINDOW_TICKS) {
+      failures.push(
+        `${d.id}: windowTicks ${String(d.payload.windowTicks)} does not match the fouls-v1 advantage_window_ticks ${ADVANTAGE_WINDOW_TICKS}`,
+      );
+    }
+  }
+
+  // Close-specific guards: a recognized reason, a matching open, the §6.2c
+  // expiry arithmetic, and agreement with the shared §6.2–§6.3 policy.
+  const policyRecomputeSkipped: string[] = [];
+  for (const close of closes) {
+    const reason = typeof close.payload.reason === "string" ? close.payload.reason : "";
+    if (!ADVANTAGE_CLOSE_REASONS.has(reason)) {
+      failures.push(
+        `${close.id}: unrecognized advantage close reason ${JSON.stringify(reason)} ` +
+          `(expected one of ${[...ADVANTAGE_CLOSE_REASONS].join(", ")})`,
+      );
+      continue;
+    }
+    const openTick = close.payload.openTick;
+    if (typeof openTick !== "number") {
+      failures.push(`${close.id}: missing numeric openTick`);
+      continue;
+    }
+    if (!opens.some((o) => o.tick === openTick)) {
+      failures.push(
+        `${close.id}: advantage ${close.kind} at tick ${close.tick} has no matching advantage-opened at tick ${openTick}`,
+      );
+      continue;
+    }
+    const delta = close.tick - openTick;
+    if (delta < 1) {
+      failures.push(`${close.id}: advantage window closed on its opening tick (delta ${delta})`);
+    }
+    if (reason === "expired") {
+      if (delta < ADVANTAGE_WINDOW_TICKS) {
+        failures.push(
+          `${close.id}: expired before the ${ADVANTAGE_WINDOW_TICKS}-tick window budget (delta ${delta})`,
+        );
+      }
+    } else if (delta >= ADVANTAGE_WINDOW_TICKS) {
+      failures.push(
+        `${close.id}: ${reason} at delta ${delta} >= window budget ${ADVANTAGE_WINDOW_TICKS} (would have expired)`,
+      );
+    }
+
+    // Re-evaluate the close with the SHARED policy from the committed facts the
+    // stream genuinely carries.  The committed `core-match-phase` at the close
+    // tick is the POST-step phase, so it is `playing` for an expired /
+    // last-touch-loss close whose own consequence opened a restart on the same
+    // tick; the policy checks the phase first, so those two reasons can only be
+    // returned while the phase was `playing` (a sound inference).  A
+    // cancelled-stoppage close is the only one that reads the phase, and there
+    // the post-step phase has left `playing`.
+    const lastTouchTeam = lastTouchTeamAtDecision(observations, close.tick, eventTeamById, knownEventIds);
+    const fouledTeam = typeof close.payload.fouledTeam === "string" ? close.payload.fouledTeam : "";
+    if (reason === "cancelled-stoppage") {
+      const observedPhase = matchPhaseAt(observations, close.tick);
+      if (observedPhase === null) {
+        policyRecomputeSkipped.push(close.id);
+        continue;
+      }
+      const expected = resolveAdvantageClose({
+        openTick,
+        currentTick: close.tick,
+        phase: observedPhase as MatchPhase,
+        lastTouchTeam: lastTouchTeam === undefined ? null : lastTouchTeam,
+        fouledTeam,
+      });
+      if (expected !== reason) {
+        failures.push(
+          `${close.id}: the shared §6.2–§6.3 policy resolves ${JSON.stringify(expected)} at tick ${close.tick} ` +
+            `(committed phase ${observedPhase}), not the committed ${JSON.stringify(reason)}`,
+        );
+      }
+    } else {
+      if (lastTouchTeam === undefined) {
+        policyRecomputeSkipped.push(close.id);
+        continue;
+      }
+      const expected = resolveAdvantageClose({
+        openTick,
+        currentTick: close.tick,
+        phase: "playing",
+        lastTouchTeam,
+        fouledTeam,
+      });
+      if (expected !== reason) {
+        failures.push(
+          `${close.id}: the shared §6.2–§6.3 policy resolves ${JSON.stringify(expected)} at tick ${close.tick} ` +
+            `(fouled team ${fouledTeam}, last touch team ${String(lastTouchTeam)}), not the committed ${JSON.stringify(reason)}`,
+        );
+      }
+    }
+  }
+
+  if (failures.length > 0) {
+    return [
+      {
+        id: "foul-advantage-played-invalid",
+        status: "fail",
+        description:
+          `${failures.length} FOULS_CARDS_SPEC §6 / §10 ADVANTAGE-PLAYED violation(s): ${failures.join("; ")}`,
+        details: {
+          advantageDecisionCount: decisions.length,
+          openCount: opens.length,
+          closeCount: closes.length,
+          failures,
+        },
+      },
+    ];
+  }
+
+  const closeReasonCounts: Record<string, number> = {};
+  for (const c of closes) {
+    const r = typeof c.payload.reason === "string" ? c.payload.reason : "<missing>";
+    closeReasonCounts[r] = (closeReasonCounts[r] ?? 0) + 1;
+  }
+
+  return [
+    {
+      id: "foul-advantage-played-ok",
+      status: "pass",
+      description:
+        `${decisions.length} committed advantage-window decision(s) match the FOULS_CARDS_SPEC §6.2–§6.4 machinery: ` +
+        `every window open/call is grounded in a recognized §5.1 man-not-ball foul, every close carries a recognized ` +
+        `reason (${Object.keys(closeReasonCounts).sort().join(", ") || "none"}) and no retained judgment (` +
+        `judged-retained) is claimed`,
+      details: {
+        advantageDecisionCount: decisions.length,
+        openCount: opens.length,
+        closeCount: closes.length,
+        closeReasonCounts,
+        windows: opens.map((o) => {
+          const close = closes.find((c) => c.payload.openTick === o.tick);
+          return {
+            openTick: o.tick,
+            closeTick: close ? close.tick : null,
+            reason: close && typeof close.payload.reason === "string" ? close.payload.reason : null,
+          };
+        }),
+        retainedPathStatus: "BLOCKED_MISSING_REFERENCE",
+        retainedPathReference: "advantage_retention_ref",
+        policyRecomputeSkipped,
+      },
+    },
+  ];
+}

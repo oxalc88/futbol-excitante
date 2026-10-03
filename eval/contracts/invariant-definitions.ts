@@ -589,8 +589,11 @@ export const INV_RULES_RESTART_REARM: InvariantDefinition = {
 // when the committed stream carries no `foul` event to judge (honest "not yet
 // observable"), never an invented PASS.  CARD-ISSUED is NOT_EVALUATED when the
 // observation stream carries no `card-issued` event (the card is commit-only and
-// surfaces only through the serializeRestartFacts committed-events gate), while
-// FOUL-DETECT / FOUL-CLEAN-TACKLE / FREE-KICK-AWARD need a `foul` event.
+// surfaces only through the serializeRestartFacts committed-events gate);
+// ADVANTAGE-PLAYED is NOT_EVALUATED when the stream carries no advantage-window
+// decision (the same commit-only gate) and reports the unimplemented §6.2a
+// retained path honestly as BLOCKED_MISSING_REFERENCE; FOUL-DETECT /
+// FOUL-CLEAN-TACKLE / FREE-KICK-AWARD need a `foul` event.
 // ---------------------------------------------------------------------------
 
 /**
@@ -662,6 +665,26 @@ export const INV_FOUL_CARD_ISSUED: InvariantDefinition = {
   output_schema_version: "schema-invariant-result-v1",
 };
 
+/**
+ * Foul advantage-played evidence: the committed §6.2–§6.4 advantage-window
+ * decisions — every window open/call grounded in a recognized §5.1 man-not-ball
+ * foul, every close a recognized §6.2–§6.3 reason that agrees with the shared
+ * advantage policy.  The §6.2a judged-retained predicate is not implemented and
+ * is reported honestly as BLOCKED_MISSING_REFERENCE (advantage_retention_ref).
+ * Bound to the protected foul-advantage-played oracle.
+ */
+export const INV_FOUL_ADVANTAGE_PLAYED: InvariantDefinition = {
+  invariant_id: "foul-advantage-played-evidence",
+  invariant_version: "invariant-foul-advantage-played-v1",
+  input_observation_ids: ["obs-fouls-v1"],
+  oracle_id: "foul-advantage-played-oracle-v1",
+  oracle_version: "oracle-foul-advantage-played-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
 /** All registered invariant definitions keyed by invariant_id. */
 export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FINITE.invariant_id]: INV_FINITE,
@@ -705,6 +728,7 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FOUL_CLEAN_TACKLE.invariant_id]: INV_FOUL_CLEAN_TACKLE,
   [INV_FOUL_FREE_KICK_AWARD.invariant_id]: INV_FOUL_FREE_KICK_AWARD,
   [INV_FOUL_CARD_ISSUED.invariant_id]: INV_FOUL_CARD_ISSUED,
+  [INV_FOUL_ADVANTAGE_PLAYED.invariant_id]: INV_FOUL_ADVANTAGE_PLAYED,
 };
 
 /**

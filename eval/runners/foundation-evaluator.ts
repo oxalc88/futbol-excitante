@@ -331,9 +331,9 @@ const CRITERION_TO_ORACLE: Record<
     oracle_version: "oracle-rules-restart-rearm-v1",
   },
   // FOULS_CARDS_SPEC §10 foul criteria (FOULS-SUITE-REGISTRATION +
-  // FREE-KICK-SUITE-REGISTRATION + CARD-ISSUED-SUITE-REGISTRATION): the four
-  // registered protected foul oracles.  Additive; no existing entry is changed.
-  // ADVANTAGE-PLAYED stays named-but-unregistered (no oracle produced for it).
+  // FREE-KICK-SUITE-REGISTRATION + CARD-ISSUED-SUITE-REGISTRATION +
+  // ADVANTAGE-SUITE-REGISTRATION): the five registered protected foul oracles.
+  // Additive; no existing entry is changed.
   "FOUL-DETECT": {
     oracle_id: "foul-detect-oracle-v1",
     oracle_version: "oracle-foul-detect-v1",
@@ -349,6 +349,10 @@ const CRITERION_TO_ORACLE: Record<
   "CARD-ISSUED": {
     oracle_id: "foul-card-issued-oracle-v1",
     oracle_version: "oracle-foul-card-issued-v1",
+  },
+  "ADVANTAGE-PLAYED": {
+    oracle_id: "foul-advantage-played-oracle-v1",
+    oracle_version: "oracle-foul-advantage-played-v1",
   },
   // HUMAN-BALL-SERVER-LITERAL human-serve criteria (the pass-gated serving path
   // conformance). Additive; no existing entry is changed.

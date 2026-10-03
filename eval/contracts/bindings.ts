@@ -1039,6 +1039,24 @@ export const BINDING_FOULS_CARD_ISSUED_001: TestImplementationBinding = makeTest
   },
 );
 
+/**
+ * FOULS-ADVANTAGE-PLAYED-001 — the committed §6.2–§6.4 advantage-window
+ * decisions are grounded in a recognized man-not-ball foul and close with a
+ * recognized reason that agrees with the shared advantage policy.
+ * ADVANTAGE-PLAYED is bound to the protected foul-advantage-played oracle.
+ */
+export const BINDING_FOULS_ADVANTAGE_PLAYED_001: TestImplementationBinding = makeTestBindingWith(
+  "FOULS-ADVANTAGE-PLAYED-001",
+  ["scn-fouls-lifecycle-v1"],
+  [],
+  ["foul-advantage-played-evidence"],
+  ["obs-per-tick-v1", "obs-fouls-v1"],
+  [],
+  {
+    "ADVANTAGE-PLAYED": ["foul-advantage-played-evidence"],
+  },
+);
+
 // ---------------------------------------------------------------------------
 // Registry — all bindings keyed by test_id
 // ---------------------------------------------------------------------------
@@ -1114,6 +1132,7 @@ export const TEST_BINDINGS: Record<string, TestImplementationBinding> = {
   [BINDING_FOULS_CLEAN_TACKLE_001.test_id]: BINDING_FOULS_CLEAN_TACKLE_001,
   [BINDING_FOULS_FREE_KICK_AWARD_001.test_id]: BINDING_FOULS_FREE_KICK_AWARD_001,
   [BINDING_FOULS_CARD_ISSUED_001.test_id]: BINDING_FOULS_CARD_ISSUED_001,
+  [BINDING_FOULS_ADVANTAGE_PLAYED_001.test_id]: BINDING_FOULS_ADVANTAGE_PLAYED_001,
 };
 
 /**

@@ -253,17 +253,17 @@ export const RULES_SUITE: SuiteDefinition = {
  * detection machinery makes answerable (FOULS-SUITE-REGISTRATION).
  *
  * Direct tests are family-level foul tests (FOULS-DETECT-001,
- * FOULS-CLEAN-TACKLE-001, FOULS-FREE-KICK-AWARD-001, FOULS-CARD-ISSUED-001).
- * Each binds its spec §10 criterion as its criterion_binding.  The suite has no
- * COMMON-* criteria: the foundation suites already own the shared COMMON
- * invariants, and this suite is dedicated to the foul semantics (the §10
- * registered criteria ARE its direct test set).
+ * FOULS-CLEAN-TACKLE-001, FOULS-FREE-KICK-AWARD-001, FOULS-CARD-ISSUED-001,
+ * FOULS-ADVANTAGE-PLAYED-001).  Each binds its spec §10 criterion as its
+ * criterion_binding.  The suite has no COMMON-* criteria: the foundation suites
+ * already own the shared COMMON invariants, and this suite is dedicated to the
+ * foul semantics (the §10 registered criteria ARE its direct test set).
  *
- * FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD and CARD-ISSUED are
- * registered: the four §10 criteria the accepted machinery makes answerable.
- * ADVANTAGE-PLAYED remains NAMED-BUT-UNREGISTERED — no criterion, oracle,
- * invariant, binding or verdict accompanies it, and the suite never claims a
- * PASS for it.
+ * FOUL-DETECT, FOUL-CLEAN-TACKLE, FREE-KICK-AWARD, CARD-ISSUED and
+ * ADVANTAGE-PLAYED are registered: the five §10 criteria the accepted machinery
+ * makes answerable.  ADVANTAGE-PLAYED's §6.2a judged-retained path is NOT
+ * implemented (advantage_retention_ref, BLOCKED_MISSING_REFERENCE) and the suite
+ * never claims a PASS for a retained outcome.
  */
 export const FOULS_SUITE: SuiteDefinition = {
   suite_id: "fouls",
@@ -273,6 +273,7 @@ export const FOULS_SUITE: SuiteDefinition = {
     "FOULS-CLEAN-TACKLE-001",
     "FOULS-FREE-KICK-AWARD-001",
     "FOULS-CARD-ISSUED-001",
+    "FOULS-ADVANTAGE-PLAYED-001",
   ],
   common_criterion_ids: [],
   impact_closure: "NONE",

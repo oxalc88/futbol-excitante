@@ -22,7 +22,7 @@ import { checkDeferredMutants } from "./deferred-mutants.js";
 import { checkPrngOrderOracle } from "./prng-order.js";
 import { checkPlayerContactEvidence } from "./player-contact.js";
 import { checkTacklePhaseEvidence } from "./tackle-phase.js";
-import { checkFoulDetect, checkFoulCleanTackle, checkFoulFreeKickAward, checkFoulCardIssued } from "./fouls.js";
+import { checkFoulDetect, checkFoulCleanTackle, checkFoulFreeKickAward, checkFoulCardIssued, checkFoulAdvantagePlayed } from "./fouls.js";
 import { checkScoreTracker } from "./match.js";
 import { checkMatchClock } from "./match.js";
 import {
@@ -346,12 +346,14 @@ const entries: OracleEntry[] = [
     fn: checkRestartRearm,
   },
   // FOULS_CARDS_SPEC §10 foul oracles (FOULS-SUITE-REGISTRATION +
-  // FREE-KICK-SUITE-REGISTRATION + CARD-ISSUED-SUITE-REGISTRATION): the four
-  // criteria the accepted machinery makes answerable.  Additive; no existing
-  // entry is changed.  ADVANTAGE-PLAYED stays named-but-unregistered (no
-  // machinery, no oracle, no verdict).  FREE-KICK-AWARD reads the committed
-  // free-kick-executed events and the shared foul predicate; CARD-ISSUED reads
-  // the committed card-issued events and the shared card-policy threshold.
+  // FREE-KICK-SUITE-REGISTRATION + CARD-ISSUED-SUITE-REGISTRATION +
+  // ADVANTAGE-SUITE-REGISTRATION): the five criteria the accepted machinery
+  // makes answerable.  Additive; no existing entry is changed.  FREE-KICK-AWARD
+  // reads the committed free-kick-executed events and the shared foul predicate;
+  // CARD-ISSUED reads the committed card-issued events and the shared
+  // card-policy threshold; ADVANTAGE-PLAYED reads the committed
+  // advantage-opened / advantage-cancelled / advantage-expired window decisions
+  // and the shared advantage-policy + foul-predicate modules.
   {
     oracle_id: "foul-detect-oracle-v1",
     oracle_version: "oracle-foul-detect-v1",
@@ -371,6 +373,11 @@ const entries: OracleEntry[] = [
     oracle_id: "foul-card-issued-oracle-v1",
     oracle_version: "oracle-foul-card-issued-v1",
     fn: checkFoulCardIssued,
+  },
+  {
+    oracle_id: "foul-advantage-played-oracle-v1",
+    oracle_version: "oracle-foul-advantage-played-v1",
+    fn: checkFoulAdvantagePlayed,
   },
   // HUMAN-BALL-SERVER-LITERAL human-serve oracles: the pass-gated serving path
   // conformance. Additive; no existing entry is changed. These adjudicate the
