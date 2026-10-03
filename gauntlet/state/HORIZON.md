@@ -9,7 +9,7 @@ horizon_id: "referee-shipping-and-advantage-spec"
 created_from_commit: 3553e64
 created_at: 2026-09-08
 reason: "Horizon v36 (COMPLETE 4/4, remote-durable at 3553e64) completed the referee machinery: FOULS-AGGREGATE-HONESTY-RERUN (7fc7969 — the goalkeepers aggregate re-published at 10/0/1/1/1 with exactly one criterion changed; the cosmetic threads folded), CARD-MACHINERY (081c927 — card issuance per FOULS_CARDS_SPEC §7/§9.1, caution at 2 / expulsion at 5, the severity and second-yellow paths BLOCKED not invented), CARD-ISSUED-SUITE-REGISTRATION (793572c — the fourth suite-fouls oracle; the spec folded to four registered / one named-not-registered), CARD-BROWSER-EVIDENCE (9d8a1a4 — 5 byte-distinct real-Chromium frames with an exact 0/0 correspondence). The decisive gap now: every piece of the referee machinery is GATED and exercised only through driven fixtures and the test bridge — the shipped app (main.ts) never enables issueCards/awardFreeKicks/detectFouls, so a real player never sees a foul, a free kick, or a card in normal play. v36's browser evidence is capture-path-only by design. v37 closes that: (a) REFEREE-SHIPPED-WIRING — enable the referee consequence in the shipped app composition root for the appropriate modes (a menu-visible toggle or mode default, chosen by evidence of what the established menu/ladder pattern supports), with parity guards and real-browser evidence of fouls/free-kicks/cards in normal play; (b) ADVANTAGE-WINDOW-SPEC — the advantage-window semantics drafted in FOULS_CARDS_SPEC (the last fouls criterion's normative path; named-but-unregistered until machinery exists; the §6/§11 blocked refs stay blocked); (c) RELEASE-0.9.8-CONSOLIDATION — the v34-v37 gains consolidated into the release record with the version bump, following the established RELEASE-0.9.7 pattern. Strictly small-sided; ADVANTAGE-PLAYED machinery, the severity path, second-yellow→red, regulation implementation, GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
-current_index: 1
+current_index: 2
 objectives:
   - id: REFEREE-SHIPPED-WIRING
     status: accepted
@@ -17,7 +17,7 @@ objectives:
     builder: builder-gameplay
     prerequisite: ""
   - id: ADVANTAGE-WINDOW-SPEC
-    status: pending
+    status: accepted
     reason: "Draft the advantage-window semantics in FOULS_CARDS_SPEC (spec-first for the last §10 criterion): when the referee plays advantage after a recognized foul (the §6 named-but-unimplemented semantics), the bounded window, what cancels it, and the deferral/registration criteria — the FOULS-SPEC-DRAFT/ADVANTAGE precedent (named-but-unregistered until machinery; any unmeasurable condition BLOCKED_MISSING_REFERENCE, never invented). The spec prose fold coordinated with the fouls-spec-binding pins (the CARD-ISSUED-SUITE preamble fold precedent). No machinery, no registration."
     builder: builder-structured
     prerequisite: ""

@@ -7,7 +7,7 @@ orchestrator_in_use: orchestrator
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: ADVANTAGE-WINDOW-SPEC
+next_objective_id: RELEASE-0.9.8-CONSOLIDATION
 
 
 
@@ -208,12 +208,22 @@ accepted:
   - CARD-ISSUED-SUITE-REGISTRATION
   - CARD-BROWSER-EVIDENCE
   - REFEREE-SHIPPED-WIRING
+  - ADVANTAGE-WINDOW-SPEC
 
 blocked: []
 
-selection_note: "Horizon v37 (referee-shipping-and-advantage-spec) ACTIVE 1/3 — created 2026-09-08 after Horizon v36 COMPLETE 4/4 (remote-durable at 3553e64). REFEREE-SHIPPED-WIRING accepted 2026-10-03 (candidate 7e9adde): the shipped composition root now exposes a menu-visible Referee toggle; the accepted awardFreeKicks/issueCards gates flow through the SAME createSimulation config surface with EMPTY core/contracts diff; 5 event-centered real-Chromium frames (fouls@66/290, FK@126, caution@290) with exact browser↔headless correspondence and a gate-off byte-identity guard. Remaining: (2) ADVANTAGE-WINDOW-SPEC (builder-structured, spec-only) — §6 advantage-window semantics, no machinery; (3) RELEASE-0.9.8-CONSOLIDATION (builder-structured) — the v34-v37 release record, VERSION 0.9.7 → 0.9.8."
+selection_note: "Horizon v37 (referee-shipping-and-advantage-spec) ACTIVE 2/3 — created 2026-09-08 after Horizon v36 COMPLETE 4/4 (remote-durable at 3553e64). REFEREE-SHIPPED-WIRING accepted (candidate 7e9adde): the shipped Referee toggle + gates through the SAME createSimulation config surface, EMPTY core diff, 5 real-Chromium frames, exact correspondence, gate-off byte-identity. ADVANTAGE-WINDOW-SPEC accepted (candidate 0acbd65): FOULS_CARDS_SPEC §6 promoted to the §6.1–§6.5 advantage-window design contract (window/cancellation/deferral/registration criteria) with advantage_retention_ref BLOCKED_MISSING_REFERENCE and ADVANTAGE-PLAYED still named-not-registered; fouls-spec-binding re-pinned 42→47 (96/96 across the fouls binding suites). Remaining: (3) RELEASE-0.9.8-CONSOLIDATION (builder-structured) — the v34-v37 release record, VERSION 0.9.7 → 0.9.8. PUBLICATION NOTE: origin/main is at 16263da; the two acceptance commits (477e39f, and this objective's) are local pending publication — push auth is blocked (missing SSH key / no push-scoped token), see gauntlet/state/PUBLICATION-BLOCKER.md."
 
 ## Last accepted objective
+ADVANTAGE-WINDOW-SPEC - Horizon v37 2/3 (BOOKKEEPING, spec-only). FOULS_CARDS_SPEC §6 ("Advantage semantics — named, NOT implemented") promoted from a three-bullet stub to the §6.1–§6.5 normative design contract: §6.1 playing advantage after a recognized foul (the same §5.1 man-not-ball contact; no new collider/event/possession model); §6.2 the bounded window (opens at the committed contact tick; advantage_window_ticks=24 at foundation-fixed-dt-v1; closes at earliest of judged-retained/cancelled/expired — expiry is a standing call); §6.3 cancellation (loss of lastTouchRef to the fouled team; the match phase leaves `playing`; expiry; continued fouled-team possession does NOT cancel); §6.4 the deferred consequence (free kick + card deferred, discarded when retained, applied at the close tick when called; bounded pending caution foul_caution_pending_ticks=12); §6.5 ADVANTAGE-PLAYED registration preconditions. The retained-advantage predicate is advantage_retention_ref, BLOCKED_MISSING_REFERENCE (§11) — no territory/distance/possession envelope invented. ADVANTAGE-PLAYED stays NAMED-NOT-REGISTERED (§10 header unchanged; live registry dump: 97 criteria, zero advantage-family entries, the fouls suite exactly the four registered oracles). Coordinated folds in Status, §2.1, §2.2, §7, §9.1, §10, §13, §15. Zero src/contracts/eval change. fouls-spec-binding 42→47 assertions; 96/96 across the four fouls binding suites.
+
+- builder: builder-structured / deepseek-v4-flash
+- critic: critic / glm5.3-flash — ACCEPT (first pass)
+- integration: integration-reviewer / glm5.3-flash — ACCEPT (first pass; shared binding suites 68/68; no pre-existing pin weakened)
+- Evidence: durable acceptance manifest + record; deterministic audit PASS, BOOKKEEPING
+- Candidate: 0acbd65
+
+Previously accepted:
 REFEREE-SHIPPED-WIRING - Horizon v37 1/3 (DYNAMIC_VISUAL). The referee loop playable in the shipped app: a menu-visible "Referee — fouls, free kicks & cards" toggle (a real checkbox in the shipped #setup-menu; a `referee=1` URL param covers the auto-start path; the fulltime rematch threads refereeOptIn) resolves through the new src/apps/browser/referee-config.ts to the SAME accepted createSimulation config surface ({awardFreeKicks:true} / {issueCards:true}) — git diff src/simulation/ src/contracts/ EMPTY. Real-browser evidence: 5 event-centered byte-distinct real-Chromium frames (foul-contact@65 → freekick-award@67 FREE KICK → freekick-served@128 PLAYING → foul-2-contact@289 → caution@290 with the card HUD "YELLOW CARD player-1 (2)"), sequence.json SHA bindings verified against the PNG bytes, an EXACT browser↔headless correspondence (foul ticks [66,290]; FK@126 offset 0; caution@290 offset 0), and the gate-off path byte-identical by construction (explicit-undefined call === createSimulation(world) state-hash chain; gates-off run: 0 free kicks / 0 cards).
 
 - builder: builder-gameplay / qwen3.8-flash (candidate pre-existed in the working tree from the prior builder session; adopted and re-verified by the orchestrator before review)

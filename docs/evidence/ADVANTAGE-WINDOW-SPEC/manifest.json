@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.9",
+  "objective_id": "ADVANTAGE-WINDOW-SPEC",
+  "accepted_at": "2026-10-03T10:13:50.054Z",
+  "candidate_commit": "0acbd6547c9422e7f446bd91acdfac489e417fa2",
+  "evidence_class": "BOOKKEEPING",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/ADVANTAGE-WINDOW-SPEC/audit.json",
+      "sha256": "1608f247fa974049375c89c197725927adbcbed2563291be1fbc79bd0f5b9f5a",
+      "git_blob": "ffee5a0dbdd794d87d2bbe65915141dfd1b73c6d",
+      "candidate_commit": "0acbd6547c9422e7f446bd91acdfac489e417fa2",
+      "bytes": 2692,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "FOULS_CARDS_SPEC §6 promoted from named stub to §6.1–§6.5 normative design contract (window/cancellation/deferral/registration criteria)",
+      "advantage_window_ticks=24 and foul_caution_pending_ticks=12 pre-existing fouls-v1 VERSIONED_PROVISIONAL, re-characterized as foundation-fixed-dt-v1 engine-tick budgets",
+      "advantage_retention_ref BLOCKED_MISSING_REFERENCE — no invented retention envelope",
+      "fouls-spec-binding 42→47 assertions; sibling binding suites green (96/96 total)"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "artifact": "docs/evidence/ADVANTAGE-WINDOW-SPEC/audit.json",
+      "note": "BOOKKEEPING class; rerun after reviews"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT",
+      "pass": 1,
+      "note": "spec-only containment verified (src/ eval/ diff empty); both numerics pre-existing VERSIONED_PROVISIONAL fouls-v1 tick budgets; advantage_retention_ref BLOCKED_MISSING_REFERENCE, no invented envelope; ADVANTAGE-PLAYED named-not-registered invariant held with live registry dump; binding pins verified by executing all four suites 96/96 exit 0; cross-references resolve; no false current-behavior claim"
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT",
+      "pass": 1,
+      "note": "shared binding suites re-run 68/68 exit 0; no pre-existing binding expectation weakened (diff audit: additive only); evaluator integrity PASS with live registry dump (97 criteria, zero advantage-family entries, fouls suite exactly the four registered oracles); no src/contracts change so all core surfaces unmodified"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-10-03/2026-10-03T10-13-50-054Z-ADVANTAGE-WINDOW-SPEC-acceptance.json"
+}

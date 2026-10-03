@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.9",
+  "persisted_at": "2026-10-03T10:13:50.054Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "ADVANTAGE-WINDOW-SPEC",
+  "evidence_class": "BOOKKEEPING",
+  "candidate_commit": "0acbd6547c9422e7f446bd91acdfac489e417fa2",
+  "horizon": "referee-shipping-and-advantage-spec (Horizon v37 2/3)",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS",
+    "artifact": "docs/evidence/ADVANTAGE-WINDOW-SPEC/audit.json",
+    "note": "BOOKKEEPING class; rerun after reviews"
+  },
+  "semantic_audit": null,
+  "critic": {
+    "agent": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT",
+    "pass": 1,
+    "note": "spec-only containment verified (src/ eval/ diff empty); both numerics pre-existing VERSIONED_PROVISIONAL fouls-v1 tick budgets; advantage_retention_ref BLOCKED_MISSING_REFERENCE, no invented envelope; ADVANTAGE-PLAYED named-not-registered invariant held with live registry dump; binding pins verified by executing all four suites 96/96 exit 0; cross-references resolve; no false current-behavior claim"
+  },
+  "integration": {
+    "agent": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT",
+    "pass": 1,
+    "note": "shared binding suites re-run 68/68 exit 0; no pre-existing binding expectation weakened (diff audit: additive only); evaluator integrity PASS with live registry dump (97 criteria, zero advantage-family entries, fouls suite exactly the four registered oracles); no src/contracts change so all core surfaces unmodified"
+  },
+  "metrics": [
+    "FOULS_CARDS_SPEC §6 promoted from named stub to §6.1–§6.5 normative design contract (window/cancellation/deferral/registration criteria)",
+    "advantage_window_ticks=24 and foul_caution_pending_ticks=12 pre-existing fouls-v1 VERSIONED_PROVISIONAL, re-characterized as foundation-fixed-dt-v1 engine-tick budgets",
+    "advantage_retention_ref BLOCKED_MISSING_REFERENCE — no invented retention envelope",
+    "fouls-spec-binding 42→47 assertions; sibling binding suites green (96/96 total)"
+  ]
+}
