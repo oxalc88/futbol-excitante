@@ -1,6 +1,6 @@
 # Football Simulation Engine — Fouls and Cards Specification (Draft)
 
-**Status:** Normative *draft* specification for small-sided fouls / cards semantics. The engine has foul recognition, the card consequence and the free-kick consequence; advantage is not implemented (ADVANTAGE-PLAYED stays named-not-registered) and this is not a full regulation ruleset. This document names what a foul IS in this engine and declares the versioned provisional parameters and the adjudicating criteria a `fouls` suite registers. The engine has NO advantage machinery.
+**Status:** Normative *draft* specification for small-sided fouls / cards semantics. The engine has foul recognition, the card consequence and the free-kick consequence; advantage is not implemented (ADVANTAGE-PLAYED stays named-not-registered; §6 specifies the advantage-window semantics as a design contract only) and this is not a full regulation ruleset. This document names what a foul IS in this engine and declares the versioned provisional parameters and the adjudicating criteria a `fouls` suite registers. The engine has NO advantage machinery.
 
 **Date:** 2026-09-07
 
@@ -26,12 +26,13 @@ This document is normative. `MUST`, `MUST NOT`, `SHOULD`, and `MAY` carry their 
 - The **clean-tackle complement**: what is NOT a foul (a tackle that reaches the ball, and a symmetric shoulder-to-shoulder player contact).
 - **Versioned provisional configuration** for every unmeasured fouls/cards value, under model id `fouls-v1`, referencing accepted config where it overlaps.
 - The **adjudicating criteria** — `FOUL-DETECT`, `FOUL-CLEAN-TACKLE`, `FREE-KICK-AWARD` and `CARD-ISSUED` are registered as executable protected oracles in the `fouls` suite (`suite-fouls-v1`); `ADVANTAGE-PLAYED` is specified for a future suite but **NOT registered**.
+- The **advantage-window semantics** — when a future referee plays advantage after a recognized foul, the bounded window in which that judgment is live, what cancels it, and the consequence it defers (§6). This is a design contract only; the engine has no advantage machinery.
 - **BLOCKED_MISSING_REFERENCE** disclosures for every value needing a reference target that does not exist.
 - The **deferred set-piece consequence** of a foul (a free kick), which references the accepted restart machinery rather than inventing a new one.
 
 ### 2.2 Out of scope (explicit exclusions)
 
-- **No advantage implementation; cards are implemented.** The engine's foul semantics are grounded in the accepted foul-detection and consequence machinery (FOUL-DETECTION-MACHINERY / FOUL-CONSEQUENCE-MACHINERY / CARD-MACHINERY) and registered as the executable protected oracles `FOUL-DETECT`, `FOUL-CLEAN-TACKLE`, `FREE-KICK-AWARD` and `CARD-ISSUED` in the `fouls` suite. `ADVANTAGE-PLAYED` remains named-but-not-implemented, and no `src/`, `eval/`, `gauntlet/` or existing-spec change accompanies it.
+- **No advantage implementation; cards are implemented.** The engine's foul semantics are grounded in the accepted foul-detection and consequence machinery (FOUL-DETECTION-MACHINERY / FOUL-CONSEQUENCE-MACHINERY / CARD-MACHINERY) and registered as the executable protected oracles `FOUL-DETECT`, `FOUL-CLEAN-TACKLE`, `FREE-KICK-AWARD` and `CARD-ISSUED` in the `fouls` suite. `ADVANTAGE-PLAYED` remains named-but-not-implemented; §6 specifies only its window semantics (window, cancellation, deferred consequence) as a design contract, and no advantage machinery, criterion record, oracle, or registration accompanies it.
 - **Offside** and **penalty kicks** stay regulation-only and are **conditionally deferred** (see §16). Neither is specified here beyond confirmation that they remain deferred with no existence claim.
 - **Full-match ecology / referee** interaction, stoppage-time, ball-in-play accounting, and a full regulation ruleset.
 - **Any PES 2017 fidelity claim.** `fouls-v1` values are `VERSIONED_PROVISIONAL`, never PES magnitudes; missing references stay `BLOCKED_MISSING_REFERENCE`.
@@ -114,12 +115,54 @@ The accepted engine distinguishes a ball-carrier from a bystander at the decisio
 
 ## 6. Advantage semantics (named, NOT implemented)
 
-When a foul candidate is recognized, the referee (in a future implementation) decides whether to play advantage. The engine has **no** advantage machinery. This spec names:
+A recognized foul candidate (§5.1) has exactly one disposition in the implemented engine: it is **called** — the §8 free-kick consequence and the §7 card consequence apply. The engine has **no** advantage machinery and emits no advantage event. This section specifies, as a design contract for a future referee implementation, the **advantage-window semantics**: when the referee plays advantage, the bounded window in which that judgment is live, what cancels it, and the deferral it implies. `ADVANTAGE-PLAYED` is the criterion for that disposition and is deliberately **NOT registered** (§10).
 
-- an **advantage window**: the tick budget within which the fouled team may either be judged to retain a playable advantage (and the pending whistle/card is withheld) or lose it (and the foul is then called).
-- the advantage window is a `fouls-v1` `VERSIONED_PROVISIONAL` value (`advantage_window_ticks`, see §9). It is not a measured PES latency.
+### 6.1 Playing advantage after a recognized foul
 
-Advantage is a **named criterion** (`ADVANTAGE-PLAYED`, §10) and is deliberately **NOT registered**. A same-tick arbitration matrix for "the foul occurred but the fouled team kept the ball" is deferred per §2.2 and [TECHNICAL_SPEC §6.2](./TECHNICAL_SPEC.md#62-versioned-provisional-scheduler).
+When a foul candidate is recognized (§5.1 — a `player-player-contact` with `contactType` ∈ {`standing-tackle`, `slide-tackle`}, `tacklePhase === "active"` and `duelWon === false`), a future referee MAY, instead of calling the foul immediately, **play advantage**: withhold the pending whistle and the pending §7 card, and allow play to continue, on the judgment that the fouled team retains a *playable advantage*. The trigger is the same single committed man-not-ball contact the foul read is grounded in; advantage adds no collider, event, action, or contact rule. The **fouled team** is the team of the contacted player in that man-not-ball contact.
+
+The judgment *"the fouled team retains a playable advantage"* is a qualitative condition here, not a threshold. Its numeric envelope has no reference and MUST NOT be invented: `advantage_retention_ref` is `BLOCKED_MISSING_REFERENCE` (§11).
+
+### 6.2 The bounded advantage window
+
+The **advantage window** is the bounded tick budget during which that judgment is live:
+
+- The window **opens** on the tick the recognized foul candidate's `player-player-contact` event is committed — the same tick on which the foul would otherwise be called.
+- The window is `advantage_window_ticks` ticks long (§9.1, `VERSIONED_PROVISIONAL`). It is an engine-tick budget at `foundation-fixed-dt-v1`; it is **not** a measured PES latency and MUST NOT be read as wall-clock milliseconds. The corresponding measured latency is `advantage_window_ref_ms`, `BLOCKED_MISSING_REFERENCE` (§11).
+- The window **closes** at the earliest of:
+  - **(a) judged retained** — the referee judges the fouled team to retain the playable advantage: advantage is played and the pending whistle/card is withheld;
+  - **(b) cancelled** — a cancellation trigger fires (§6.3): advantage is not played and the foul is called;
+  - **(c) expired** — the window reaches `advantage_window_ticks` with neither a retained-advantage judgment nor a prior cancellation: the window expires and the foul is called. Expiry is a standing call, never a silent no-decision.
+
+### 6.3 What cancels the advantage window
+
+The window MUST be cancelled — the foul is called and the advantage is not played — when any of the following observable conditions holds:
+
+- **Loss of control.** The ball's `lastTouchRef` (§4.2) no longer resolves to the fouled team before the window closes (the fouled team gave the ball away, or a defending touch intervened). This reads the accepted `lastTouchRef` fact; it introduces no possession model.
+- **New stoppage.** The match phase leaves `playing` before the window closes (a boundary out-of-play, a goal, or any restart claims the phase). Per the deferred same-tick arbitration matrix (§2.2 and [TECHNICAL_SPEC §6.2](./TECHNICAL_SPEC.md#62-versioned-provisional-scheduler)), a stoppage wins over a pending advantage; the pending advantage does not survive into the restart window.
+- **Window expiry.** The window reaches `advantage_window_ticks` without a retained-advantage judgment (§6.2c).
+
+Continued fouled-team possession does **not** cancel the window: successive touches by the fouled team that keep `lastTouchRef` resolved to that team are exactly the condition under which advantage MAY be judged retained. No numeric gain (territory, distance, or elapsed possession) is defined; any such envelope is unreferenced and MUST NOT be invented (`advantage_retention_ref`, `BLOCKED_MISSING_REFERENCE`, §11).
+
+### 6.4 Deferred consequence while the window is open
+
+While the window is open, the §8 free-kick consequence and the §7 card consequence are **deferred**, not cancelled: the foul was recognized, so its consequence is pending the window resolution.
+
+- **Judged retained (a):** the pending whistle and card are discarded — the foul is not called, so no free kick and no card follow.
+- **Cancelled (b) or expired (c):** the foul is called at the close tick and the pending consequence applies from that tick; it is not applied retroactively at the foul tick, which is why the same-tick arbitration matrix for "the foul occurred but the fouled team kept the ball" is deferred (§2.2).
+- **Bounded pending caution:** in a future advantage-enabled implementation the pending caution is withheld for at most `foul_caution_pending_ticks` ticks (§9.1, `VERSIONED_PROVISIONAL`) after the window closes before the §7 card consequence applies. This budget is a `fouls-v1` design choice, not a measured latency.
+
+This deferral is exactly why an advantage implementation is not a local read: it interleaves two consequences that today fire unconditionally on the foul tick.
+
+### 6.5 Deferral / registration criteria for `ADVANTAGE-PLAYED`
+
+Advantage is a **named criterion** (`ADVANTAGE-PLAYED`, §10) and is deliberately **NOT registered**: no criterion, oracle, invariant-definition, observation-definition, binding, or scenario accompanies it. It MAY be registered only when all of the following exist:
+
+- advantage machinery producing an observable advantage-played / advantage-cancelled decision from the accepted `player-player-contact` and ball `lastTouchRef` facts (no new collider and no new possession model);
+- a criterion record, a protected oracle, an invariant-definition, an observation-definition, a binding, and a scenario, per the registered-criterion pattern of §10; and
+- either a referenced retention envelope, or the retention predicate reported honestly as `BLOCKED_MISSING_REFERENCE` — an unreferenced numeric retention threshold MUST NOT be registered as a passing criterion.
+
+Until then `ADVANTAGE-PLAYED` stays **NAMED-NOT-REGISTERED** and no `PASS` may be reported for it (§10).
 
 ## 7. Card / disciplinary semantics (implemented; no advantage)
 
@@ -128,7 +171,7 @@ A card is a referee consequence of a recognized foul. The card consequence is im
 - **card accumulation** counts per player per match: a versioned provisional number of accumulated fouls before a caution (yellow) and before an expulsion (red). The card thresholds are `fouls-v1` `VERSIONED_PROVISIONAL` values (`fouls_yellow_accumulation_count`, `fouls_red_accumulation_count`, `foul_card_direct_red_severity_threshold`, see §9).
 - an optional **contact-severity** discriminator: a normalized value that would distinguish a hard/late challenge (direct red candidate) from a routine one. It is `fouls-v1` `VERSIONED_PROVISIONAL` and is NOT a PES magnitude.
 
-The card is a **registered criterion** (`CARD-ISSUED`, §10) and is an executable protected oracle. There is no advantage machinery: a recognized foul issues the card unconditionally and ADVANTAGE-PLAYED remains deferred (§6).
+The card is a **registered criterion** (`CARD-ISSUED`, §10) and is an executable protected oracle. There is no advantage machinery: in the implemented engine a recognized foul issues the card unconditionally, and ADVANTAGE-PLAYED remains named-but-not-registered (§6 specifies the window semantics only).
 
 ## 8. Set-piece consequence of a foul (free kick, deferred, references accepted machinery)
 
@@ -155,7 +198,7 @@ The unmeasured values a future fouls implementation may reference are enumerated
 | `foul_caution_pending_ticks` | `12` | ticks | `VERSIONED_PROVISIONAL` |
 | `foul_ball_carrier_contest_distance` | `2.5` | m | `foundation-cpu-tackle-v1` (referenced) |
 
-These are deliberate, versioned design choices for a fictional capability. They MUST NOT be described as PES magnitudes or provider-rating mappings.
+These are deliberate, versioned design choices for a fictional capability. They MUST NOT be described as PES magnitudes or provider-rating mappings. `advantage_window_ticks` is the §6.2 advantage-window budget and `foul_caution_pending_ticks` the §6.4 bounded pending-caution budget; both are engine-tick budgets at `foundation-fixed-dt-v1`, not measured wall-clock latencies.
 
 ### 9.2 Referenced accepted config (not re-declared)
 
@@ -178,7 +221,7 @@ The following criteria adjudicate the fouls semantics in this specification. **F
 - **Foul detection:** `FOUL-DETECT` (a `player-player-contact` with `contactType` ∈ {`standing-tackle`, `slide-tackle`}, `tacklePhase === "active"`, and `duelWon === false` is recognized as a foul candidate; a clean tackle or a shoulder-to-shoulder contact is not).
 - **Clean-tackle complement:** `FOUL-CLEAN-TACKLE` (a tackle that reaches the ball — `ballReachable === true` — is not a foul).
 - **Card issuing:** `CARD-ISSUED` (given a recognized foul and the `fouls-v1` accumulation / severity thresholds, the correct caution / expulsion is awarded to the offending player) — registered as an executable protected oracle.
-- **Advantage:** `ADVANTAGE-PLAYED` (play continues when the fouled team retains a playable advantage within `advantage_window_ticks`; the pending whistle/card is withheld) — remains NAMED-NOT-REGISTERED.
+- **Advantage:** `ADVANTAGE-PLAYED` (play continues when the fouled team retains a playable advantage within the `advantage_window_ticks` window; the pending whistle/card is withheld, and the window is cancelled by a loss of `lastTouchRef`, a new stoppage, or expiry per §6.2–§6.4) — remains NAMED-NOT-REGISTERED.
 - **Free-kick award:** `FREE-KICK-AWARD` (the set-piece consequence of a called foul, grounded in the accepted restart machinery per §8).
 
 No `PASS` may be reported for the NOT-registered criterion (`ADVANTAGE-PLAYED`) until it is registered with the required registry objects and bindings. A `MEASURED_TARGET` comparison of a foul/card sequence would be `BLOCKED_MISSING_REFERENCE` (see §11); a `PERCEPTUAL_TARGET` foul-render or card-display criterion would be `NEEDS_PERCEPTUAL_REVIEW` pending a versioned rubric.
@@ -193,6 +236,7 @@ The following values would need a real reference measurement that does not exist
 | `foul_severity_distribution_ref` | No eligible `ReferenceTarget` for a foul-contact-severity distribution. |
 | `foul_ball_carrier_identity_ref` | No measured PES reference for the man-versus-ball discrimination ("playing the ball" vs "contacting the man") at PES fidelity. |
 | `advantage_window_ref_ms` | No controlled PES capture of the foul-to-advantage-decision latency exists. |
+| `advantage_retention_ref` | No reference for the retained-playable-advantage predicate (the judgment that the fouled team kept a playable advantage inside the window) exists; an invented territory / distance / possession envelope is prohibited. |
 | `free_kick_trajectory_ref` | No qualified PES reference of a free-kick launch profile exists (the free-kick set-piece is itself deferred, §8). |
 | `disciplinary_scale_ref` | No qualified PES reference of the disciplinary scale (direct red vs cumulative yellow thresholds) exists. |
 | `card_display_visual_ref` | No perceptual/reference target for card-display visuals exists; a visual card criterion would be `NEEDS_PERCEPTUAL_REVIEW` pending a versioned rubric. |
@@ -206,6 +250,7 @@ The accepted designated small-sided keeper (`gk-small-sided-v1`) is excluded fro
 ## 13. Declaration of limitations
 
 - This spec defines behavior, not implementation. The foul recognition, card consequence and free-kick consequence are implemented and registered; no advantage subsystem exists yet and the engine is not a full regulation ruleset.
+- The §6 advantage-window semantics (window open/close, cancellation, deferred consequence) are a **design contract**, not an implementation: no advantage machinery, advantage event, or observable advantage decision exists. The retained-advantage predicate is unreferenced and stays `BLOCKED_MISSING_REFERENCE` (`advantage_retention_ref`, §11).
 - No `FOUNDATION_LAB_PASS`, milestone `PASS`, or PES fidelity claim is made here or by any registered suite through this specification.
 - The fouls/cards model is deliberately narrower than full regulation / 11v11 rules (see §2.2).
 - The tick rate for `advantage_window_ticks` and `foul_caution_pending_ticks` is itself `foundation-fixed-dt-v1`; these must not be read as measured wall-clock milliseconds.
@@ -222,6 +267,6 @@ The following behaviors are **not implemented** and are explicitly deferred unti
 - **Offside.** Requires an offside snapshot at the moment the ball is played, positional eligibility evaluation, and an offside restart. Deferred until a dedicated offside spec + suite exists. It stays **regulation-only**: this fouls spec makes no offside existence claim.
 - **Penalty kicks.** Requires an infraction-and-area rule, a penalty-placement rule, and a penalty-taker sequence. Deferred until a dedicated penalty spec + suite exists. It stays **regulation-only**: this fouls spec makes no penalty existence claim.
 - **Free-kick set piece.** Requires its own restart variant (placement, serve, taker sequence) and a same-tick arbitration matrix; it is named in §8 as referencing the accepted restart machinery but is not specified here.
-- **Advantage ordering and ball-in-play accounting, stoppage-time, drop ball, and referee interaction.** Deferred.
+- **Advantage ordering and ball-in-play accounting, stoppage-time, drop ball, and referee interaction.** Deferred. §6 specifies the advantage-window *semantics* (the bounded window, its cancellation, and the deferred consequence) as a design contract; the advantage *machinery*, the retained-advantage predicate, and the same-tick arbitration matrix for foul/advantage ordering remain deferred.
 
 Per [GAMEPLAY_EVALUATION_SPEC §2.3](./GAMEPLAY_EVALUATION_SPEC.md#23-milestone-applicability-and-promotion), a regulation / full-match milestone MUST NOT be published until dedicated goalkeeper and deterministic rules specifications exist and their executable suites cover goal validity, boundaries, restart placement, offside snapshots, foul/advantage ordering, match phase/clock and ball-in-play accounting, and same-tick event arbitration. This fouls spec covers the engine-grounded foul definition and its named-but-unregistered criteria; the rest remain deferred.

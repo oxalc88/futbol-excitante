@@ -21,7 +21,11 @@
  *     the accepted restart machinery;
  *  7. names adjudicating criteria (FOUL-DETECT, FOUL-CLEAN-TACKLE,
  *     CARD-ISSUED, ADVANTAGE-PLAYED, FREE-KICK-AWARD) but does NOT register
- *     them in the evaluator registry, and does not claim a PASS through them.
+ *     them in the evaluator registry, and does not claim a PASS through them;
+ *  8. specifies the advantage-window semantics (§6: the bounded window, what
+ *     cancels it, the deferred consequence) while keeping ADVANTAGE-PLAYED
+ *     named-not-registered and the retained-advantage predicate
+ *     BLOCKED_MISSING_REFERENCE (no advantage machinery).
  *
  * This is a binding/consistency test, not an evaluator change.  It does not
  * claim any gameplay PASS and makes no PES fidelity claim.
@@ -221,6 +225,7 @@ describe("FOULS_CARDS_SPEC declares BLOCKED_MISSING_REFERENCE values", () => {
       "foul_severity_distribution_ref",
       "foul_ball_carrier_identity_ref",
       "advantage_window_ref_ms",
+      "advantage_retention_ref",
       "free_kick_trajectory_ref",
       "disciplinary_scale_ref",
       "card_display_visual_ref",
@@ -367,5 +372,45 @@ describe("FOULS_CARDS_SPEC registry state after CARD-ISSUED-SUITE-REGISTRATION",
         ).toBe(false);
       }
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 8. Advantage-window semantics after ADVANTAGE-WINDOW-SPEC
+// ---------------------------------------------------------------------------
+//
+// §6 specifies the advantage-window semantics (the bounded window, what
+// cancels it, the deferred consequence) as a design contract only.  The
+// engine has no advantage machinery, so ADVANTAGE-PLAYED stays
+// NAMED-NOT-REGISTERED; the retained-advantage predicate is unreferenced and
+// MUST stay BLOCKED_MISSING_REFERENCE.
+
+describe("FOULS_CARDS_SPEC specifies the advantage-window semantics", () => {
+  it("specifies the bounded window open/close on the fouls-v1 tick budget", () => {
+    expect(SPEC).toContain("advantage window");
+    expect(SPEC).toContain("opens");
+    expect(SPEC).toContain("closes");
+    expect(SPEC).toContain("advantage_window_ticks");
+  });
+
+  it("specifies what cancels the window", () => {
+    expect(SPEC).toContain("cancelled");
+    expect(SPEC).toContain("lastTouchRef");
+    expect(SPEC).toContain("leaves `playing`");
+  });
+
+  it("specifies the deferred consequence and the bounded pending caution", () => {
+    expect(SPEC).toContain("deferred");
+    expect(SPEC).toContain("foul_caution_pending_ticks");
+  });
+
+  it("marks the unmeasured retained-advantage predicate BLOCKED_MISSING_REFERENCE", () => {
+    expect(SPEC).toContain("advantage_retention_ref");
+    expect(SPEC).toContain("BLOCKED_MISSING_REFERENCE");
+  });
+
+  it("keeps the window semantics a design contract with no machinery", () => {
+    expect(SPEC).toContain("The engine has NO advantage machinery");
+    expect(SPEC).toContain("design contract");
   });
 });
