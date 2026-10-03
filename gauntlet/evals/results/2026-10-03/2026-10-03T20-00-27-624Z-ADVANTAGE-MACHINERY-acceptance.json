@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "record_type": "candidate_acceptance",
+  "gauntlet_version": "0.9.9",
+  "persisted_at": "2026-10-03T20:00:27.624Z",
+  "state_audit_required": true,
+  "objective_manifest_required": true,
+  "objective_id": "ADVANTAGE-MACHINERY",
+  "evidence_class": "MULTI_TICK",
+  "candidate_commit": "9072d09322a4c863af6981886a17d5e2fdab41f6",
+  "builder": {
+    "agent": "builder-structured",
+    "model": "deepseek-v4-flash"
+  },
+  "deterministic_audit": {
+    "status": "PASS"
+  },
+  "semantic_audit": null,
+  "critic": {
+    "critic": "critic",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "integration": {
+    "reviewer": "integration-reviewer",
+    "model": "glm5.3-flash",
+    "verdict": "ACCEPT"
+  },
+  "metrics": {}
+}

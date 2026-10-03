@@ -3,31 +3,31 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 37
-status: COMPLETE
-horizon_id: "referee-shipping-and-advantage-spec"
-created_from_commit: 3553e64
-created_at: 2026-09-08
-reason: "Horizon v36 (COMPLETE 4/4, remote-durable at 3553e64) completed the referee machinery: FOULS-AGGREGATE-HONESTY-RERUN (7fc7969 — the goalkeepers aggregate re-published at 10/0/1/1/1 with exactly one criterion changed; the cosmetic threads folded), CARD-MACHINERY (081c927 — card issuance per FOULS_CARDS_SPEC §7/§9.1, caution at 2 / expulsion at 5, the severity and second-yellow paths BLOCKED not invented), CARD-ISSUED-SUITE-REGISTRATION (793572c — the fourth suite-fouls oracle; the spec folded to four registered / one named-not-registered), CARD-BROWSER-EVIDENCE (9d8a1a4 — 5 byte-distinct real-Chromium frames with an exact 0/0 correspondence). The decisive gap now: every piece of the referee machinery is GATED and exercised only through driven fixtures and the test bridge — the shipped app (main.ts) never enables issueCards/awardFreeKicks/detectFouls, so a real player never sees a foul, a free kick, or a card in normal play. v36's browser evidence is capture-path-only by design. v37 closes that: (a) REFEREE-SHIPPED-WIRING — enable the referee consequence in the shipped app composition root for the appropriate modes (a menu-visible toggle or mode default, chosen by evidence of what the established menu/ladder pattern supports), with parity guards and real-browser evidence of fouls/free-kicks/cards in normal play; (b) ADVANTAGE-WINDOW-SPEC — the advantage-window semantics drafted in FOULS_CARDS_SPEC (the last fouls criterion's normative path; named-but-unregistered until machinery exists; the §6/§11 blocked refs stay blocked); (c) RELEASE-0.9.8-CONSOLIDATION — the v34-v37 gains consolidated into the release record with the version bump, following the established RELEASE-0.9.7 pattern. Strictly small-sided; ADVANTAGE-PLAYED machinery, the severity path, second-yellow→red, regulation implementation, GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
-current_index: 3
+horizon_version: 38
+status: ACTIVE
+horizon_id: "advantage-machinery-in-ship"
+created_from_commit: 7d5add9
+created_at: 2026-10-03
+reason: "Horizon v37 (COMPLETE 3/3, remote-durable at 026106a, publication verified 7d5add9) shipped the referee loop into the app and promoted the advantage window to the §6.1–§6.5 design contract. The decisive gap: the shipped referee still calls every recognized foul immediately — advantage, the last fouls disposition, is machinery-free while its design contract is accepted and actionable. The deterministic realization is bounded: window open/close/cancel/expiry per §6.2–§6.3, deferred free-kick/card consequence per §6.4, the retention predicate honestly BLOCKED (advantage_retention_ref) with no invented envelope, ADVANTAGE-PLAYED registrable per §6.5 once observable advantage-cancelled/expired decisions exist."
+current_index: 1
 objectives:
-  - id: REFEREE-SHIPPED-WIRING
+  - id: ADVANTAGE-MACHINERY
     status: accepted
-    reason: "Wire the accepted referee machinery into the shipped app composition root (main.ts): enable the fouls/free-kicks/cards gates for the appropriate shipped modes — a menu-visible toggle or a mode default, chosen by what the established small-sided-ladder/menu pattern supports (the SMALL-SIDED-LADDER-MENU-COMPLETION precedent). The shipped loop must pass the gates through the SAME accepted createSimulation config surface (no core change; git diff src/simulation/ src/contracts/ EMPTY). Real-browser DYNAMIC_VISUAL evidence of fouls/free-kicks/cards occurring in normal shipped play (the established capture pattern; PNG-byte distinctness; sequence.json bindings; the correspondence traced). Parity guards byte-neutral for untouched modes; the menu pattern's parity test updated; the renderers' gated affordances (showMatchPhaseHud/showCardHud) enabled only where the mode opts in."
+    reason: "accepted 2026-10-03 — candidate 9072d09, critic glm5.3-flash ACCEPT (first pass), integration glm5.3-flash ACCEPT (first pass)"
+    builder: builder-structured
+    prerequisite: ""
+  - id: ADVANTAGE-SUITE-REGISTRATION
+    status: pending
+    reason: "Register the advantage criterion as an executable protected oracle in suite-fouls-v1 per §6.5 (criterion record, protected oracle, invariant-definition, observation-definition, binding, scenario — the FREE-KICK/CARD-ISSUED additive pattern): an advantage close without a recognized foul FAILs (power guards); honest NOT_EVALUATED/BLOCKED verdicts where the retained path has no reference; the FOULS_CARDS_SPEC §6.5/§10/§13 status text folded to the new registration state. No pre-existing row changed."
+    builder: builder-structured
+    prerequisite: ADVANTAGE-MACHINERY
+  - id: ADVANTAGE-BROWSER-EVIDENCE
+    status: pending
+    reason: "The advantage window visible in the shipped app through the existing menu-visible Referee toggle: event-centered byte-distinct real-Chromium frames (foul contact → play continues while the window is open → the close tick calls the foul with the FREE KICK HUD), sequence.json bindings, exact browser↔headless correspondence, gate-off byte-identity. Zero gameplay change beyond the accepted machinery gate; the shipped wiring consumes the SAME createSimulation config surface. Evidence class DYNAMIC_VISUAL."
     builder: builder-gameplay
-    prerequisite: ""
-  - id: ADVANTAGE-WINDOW-SPEC
-    status: accepted
-    reason: "Draft the advantage-window semantics in FOULS_CARDS_SPEC (spec-first for the last §10 criterion): when the referee plays advantage after a recognized foul (the §6 named-but-unimplemented semantics), the bounded window, what cancels it, and the deferral/registration criteria — the FOULS-SPEC-DRAFT/ADVANTAGE precedent (named-but-unregistered until machinery; any unmeasurable condition BLOCKED_MISSING_REFERENCE, never invented). The spec prose fold coordinated with the fouls-spec-binding pins (the CARD-ISSUED-SUITE preamble fold precedent). No machinery, no registration."
-    builder: builder-structured
-    prerequisite: ""
-  - id: RELEASE-0.9.8-CONSOLIDATION
-    status: accepted
-    reason: "The v34-v37 gains consolidated into gauntlet/RELEASE-0.9.8.md following the established RELEASE-0.9.7 pattern: the playable (the referee loop in the shipped app — fouls, free kicks, cards in normal play), the executable-attested (suite-fouls-v1 4-of-5 registered with executed verdicts; the gk-regression canary; the goalkeepers 10/0/1/1/1; the aggregate honesty republication), the spec'd (the card/advantage spec state), the deferred (ADVANTAGE-PLAYED machinery, the severity path, second-yellow→red, the blocked references, regulation, full-match ecology, PES fidelity), and honest limitations — every claim citing its accepted record, the producer throwing on mutation. VERSION.json 0.9.7 → 0.9.8 with the prompt-gate needle advance routed to the orchestrator if the deterministic gate requires it."
-    builder: builder-structured
-    prerequisite: REFEREE-SHIPPED-WIRING
-observable_progress_target: "The referee loop playable in the shipped app (fouls, free kicks, and cards occurring in normal play with browser evidence); the advantage-window semantics spec'd; the 0.9.8 release record. NO advantage machinery, no regulation implementation, no full-match ecology, no perceptual-rubric/networked/PES-fidelity work; blocked references stay blocked."
-last_invalidation_reason: "Horizon v36 COMPLETE 4/4 remote-durable at 3553e64; strategic reassessment at exhaustion selected the referee-shipping phase: three horizons of referee machinery exist but the shipped app never enables any of the gates — the playable payoff is the wiring, plus the advantage spec (the last criterion's normative path) and the 0.9.8 release record. No invalidation of the deferred set: ADVANTAGE-PLAYED machinery, the severity path, second-yellow→red, regulation implementation, GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity remain deferred."
+    prerequisite: ADVANTAGE-MACHINERY
+observable_progress_target: "Advantage playable in the shipped app (play continuing after a foul within the bounded window, the close-tick call visible with browser evidence); the advantage oracle registered with honest verdicts. NO invented retention envelope, no direct-red severity path, no second-yellow→red, no regulation implementation, no full-match ecology, no PES fidelity; blocked references stay blocked."
+last_invalidation_reason: "Horizon v37 COMPLETE 3/3 remote-durable at 026106a (verified 7d5add9); strategic reassessment at exhaustion selected advantage machinery: the §6 design contract is accepted, the deferred set names ADVANTAGE-PLAYED machinery as the actionable next fouls item, and the shipped referee currently calls every foul immediately — the playable payoff is the bounded window with deferred consequences. No invalidation of the remaining deferred set: direct-red severity, second-yellow→red, regulation, GK beyond small-sided, full-match ecology, PES fidelity remain deferred."
 replan_if:
   - objective_blocked
   - architectural_invalidation

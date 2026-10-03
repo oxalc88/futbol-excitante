@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.9",
+  "objective_id": "ADVANTAGE-MACHINERY",
+  "accepted_at": "2026-10-03T20:00:27.624Z",
+  "candidate_commit": "9072d09322a4c863af6981886a17d5e2fdab41f6",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/ADVANTAGE-MACHINERY/trajectory.json",
+      "sha256": "36204ec116146081d22d509c19229fd3a5a3146856b0862a3bc9354dfd5c5ece",
+      "git_blob": "909441c8b6c384408c86b349cc7dbb61f76af6cb",
+      "candidate_commit": "9072d09322a4c863af6981886a17d5e2fdab41f6",
+      "bytes": 23422,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/ADVANTAGE-MACHINERY/audit.json",
+      "sha256": "1a600799d6734d01f1609d76b9cab41bfc4baefc62ac2729ea10cc3756335623",
+      "git_blob": "56e7e8276d3974a9f994ac0ec023d8f747626b28",
+      "candidate_commit": "9072d09322a4c863af6981886a17d5e2fdab41f6",
+      "bytes": 2659,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-10-03/2026-10-03T20-00-27-624Z-ADVANTAGE-MACHINERY-acceptance.json"
+}
