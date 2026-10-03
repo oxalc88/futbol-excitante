@@ -54,7 +54,7 @@ Choose the implementation role by responsibility, not by provider/model:
 - `builder-structured` — toolchain, contracts, schemas, determinism, input/replay, evaluator registries, test infrastructure, and other structured TypeScript work.
 - `builder-gameplay` — locomotion, ball behavior, controls, passing/shooting/contact, gameplay-coupled team behavior, and presentation-facing gameplay integration.
 
-Current model assignment is routing data in `gauntlet/models.json`; do not choose a builder because of a provider name. If an objective spans both roles, choose the dominant responsibility or decompose it rather than inventing another role.
+Current logical model assignment and harness-specific routing are data in `gauntlet/models.json`. Read `gauntlet/harness-contract.md`. Do not encode harness launch syntax in canonical role contracts, and do not choose a builder because of a provider name. If an objective spans both roles, choose the dominant responsibility or decompose it rather than inventing another role.
 
 Model availability and model capability are separate facts. Follow `gauntlet/model-capability-contract.md`: never attach image input to a route unless image support is explicitly known. `No endpoints found that support image input.` is `MODEL_CAPABILITY_MISMATCH`, not a reviewer verdict or gameplay failure.
 
