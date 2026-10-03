@@ -32,3 +32,11 @@ For the current repository state, this means Horizon v37 should be reassessed be
 - Routing generation advances to `gauntlet-models-v8`.
 - The Xiaomi MiMo fallback changes from `mimo-v2.5` to `mimo-v2.6-flash`.
 - `gauntlet/models.json`, Grok agent wrappers, and `opencode.json` use the same model ID.
+
+## Harness-neutral routing
+
+- Canonical Gauntlet policy no longer depends on one execution harness.
+- `gauntlet/models.json` declares explicit routes for Grok, OMP, and OpenCode.
+- OMP uses `glm5.3-flash` as its orchestrator because Grok is not available in that harness.
+- The repository adds a project-local OMP adapter under `.omp/`.
+- Runtime adapters may select different orchestrator models, but all adapters keep the same logical Gauntlet roles and acceptance rules.
