@@ -1,7 +1,7 @@
 ---
 description: Xiaomi MiMo implementation builder. Use for locomotion, independent-ball integration, later presentation, or large-spec gameplay work. Must execute the change and return evidence. Do not review your own work.
 mode: subagent
-model: nan/mimo-v2.5
+model: nan/mimo-v2.6-flash
 temperature: 0.25
 color: "#9b59b6"
 steps: 50
