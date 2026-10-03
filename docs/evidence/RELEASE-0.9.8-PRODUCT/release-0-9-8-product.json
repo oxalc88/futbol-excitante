@@ -1,0 +1,305 @@
+{
+  "schema_version": 1,
+  "objective_id": "RELEASE-0.9.8-PRODUCT",
+  "evidence_class": "BOOKKEEPING",
+  "produced_by": "scripts/capture-release-0-9-8-product.ts",
+  "product_release_version": "0.9.8",
+  "previous_product_release_version": "0.9.7",
+  "release_doc": "gauntlet/RELEASE-0.9.8-PRODUCT.md",
+  "name_collision_resolution": {
+    "note": "The horizon objective id RELEASE-0.9.8-CONSOLIDATION collides with the already-released 0.9.8 Gauntlet SYSTEM release notes. The product consolidation record is therefore written as gauntlet/RELEASE-0.9.8-PRODUCT.md (evidence under docs/evidence/RELEASE-0.9.8-PRODUCT/) and the system notes are left untouched.",
+    "system_release_notes": "gauntlet/RELEASE-0.9.8.md",
+    "system_release_notes_sha256": "91e9641393925b1a518074e3a64a6bd590cde8a8c33b26ed4a211ec049baa000",
+    "previous_product_release_doc": "gauntlet/RELEASE-0.9.7.md",
+    "previous_product_release_doc_sha256": "3a2f91b4a3aa9446eeb3943682c4b3afe496f5f4cfaa1e8ef8a51b4a6eda0da9"
+  },
+  "version_json": {
+    "version": "0.9.9",
+    "schema_version": 1,
+    "semver": true,
+    "previous_system_version": "0.9.8"
+  },
+  "version_snapshot_note": "The live VERSION.json is the SYSTEM version (0.9.9) and is deliberately NOT modified by this BOOKKEEPING objective; the horizon's 'VERSION.json 0.9.7 → 0.9.8' language is read as product-release-record naming. The snapshot below is history and is not re-checked against the mutable live file.",
+  "description": "Product consolidation of the v34-v37 delivered capability into the RELEASE-0.9.8 record: what is playable (the referee loop in the shipped app: menu-visible Referee toggle, fouls/free kicks/cards in normal play), what is executable/attested (suite-fouls-v1 4-of-5 registered with executed verdicts, the gk-regression canary, the goalkeepers 10/0/1/1/1, the aggregate-honesty republication, the designation-facts serialization), what is spec'd (the FOULS_CARDS_SPEC card/advantage design contract), what stays deferred, and the honest limitations. BOOKKEEPING; zero gameplay/source change.",
+  "playable": [
+    "The referee loop in the shipped app: a menu-visible Referee toggle (plus the referee=1 URL param) gates fouls, free kicks and cards through the SAME createSimulation config surface the shipped composition root uses (REFEREE-SHIPPED-WIRING).",
+    "Five event-centered real-Chromium frames (foul-contact@65, freekick-award@67, freekick-served@128, foul-2-contact@289, caution@290) show the man-not-ball foul -> free-kick award (phase FREE KICK) -> served free kick -> second foul -> caution (yellow) in one match (REFEREE-SHIPPED-WIRING).",
+    "Browser<->headless correspondence is exact: foul ticks [66, 290], free-kick tick 126 offset 0, caution tick 290 offset 0, offender player-1 accumulated 2 (REFEREE-SHIPPED-WIRING) — the verified correspondence is the event structure, never per-tick floats.",
+    "Earlier accepted browser arcs: the foul -> free-kick arc (FOUL-FREEKICK-BROWSER-EVIDENCE) and the caution(2)/expulsion(5) arc (CARD-BROWSER-EVIDENCE), both with exact 0/0 tick correspondence.",
+    "Gate-off byte-identity: the referee toggle off (an explicit-undefined call === createSimulation(world) hash chain) is byte-identical to the pre-change stream (REFEREE-SHIPPED-WIRING)."
+  ],
+  "executable_attested": {
+    "fouls_suite": {
+      "suite_id": "fouls",
+      "suite_version": "suite-fouls-v1",
+      "criteria_named": 5,
+      "criteria_registered": 4,
+      "named_not_registered": [
+        "ADVANTAGE-PLAYED"
+      ],
+      "per_criterion": {
+        "FOUL-DETECT": "PASS",
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FREE-KICK-AWARD": "PASS",
+        "CARD-ISSUED": "NOT_EVALUATED"
+      },
+      "verdict_counts_over_registered": {
+        "PASS": 3,
+        "FAIL": 0,
+        "NOT_EVALUATED": 1,
+        "BLOCKED_MISSING_REFERENCE": 0,
+        "NEEDS_PERCEPTUAL_REVIEW": 0
+      },
+      "note": "Four of the five FOULS_CARDS_SPEC §10 criteria are registered protected oracles and each was executed by the evaluator over the accepted streams; CARD-ISSUED is honestly NOT_EVALUATED on every accepted stream and its PASS/FAIL power is carried by canary tests.",
+      "source_records": {
+        "docs/evidence/FOULS-SUITE-REGISTRATION/fouls-suite-registration.json": "5e538e5d183ee0c3c79e4981bb447a06c42d3b7be3a3ceb66f320dfb24611794",
+        "docs/evidence/FREE-KICK-SUITE-REGISTRATION/freekick-suite-registration.json": "86a34acb5f7336ac339c91fced93246c52f1f6beadb5407ae916cae7e6b425f2",
+        "docs/evidence/CARD-ISSUED-SUITE-REGISTRATION/card-issued-suite-registration.json": "3dac8a48cae826d846e58c16ec487cc40187b645b9b17bc385ae2f64dc16bd3c",
+        "docs/evidence/FOULS-AGGREGATE-HONESTY-RERUN/fouls-aggregate-honesty-rerun.json": "c8b3b63edd57f6acd15e91f4daa0bdb8d35e239155ee51b6975cc76f59acaa21"
+      },
+      "power_guard_note": "The two FREE-KICK-AWARD power-guard streams (a free kick with NO detected foul) deliberately FAIL and are excluded-and-reported from the genuine aggregate (FOULS-AGGREGATE-HONESTY-RERUN)."
+    },
+    "gk_regression_canary": {
+      "oracle_id": "gk-regression-canary-v1",
+      "oracle_version": "oracle-gk-regression-v1",
+      "invariant_id": "gk-regression-evidence",
+      "criteria": 6,
+      "reg_aggregate_before": "NOT_EVALUATED",
+      "reg_aggregate_after": "PASS",
+      "note": "FAILs a GK behavior pin that diverges without a model-version bump, PASSes when the pins hold, and returns honest NOT_EVALUATED when a stream never triggers a pin (never PASS by silence).",
+      "source_record": "docs/evidence/GK-REGRESSION-POLICY-REGISTRATION/gk-regression-policy-registration.json",
+      "source_record_sha256": "fc7d1b97b3b1a78613b571610e3bdbc53aa076b5ae42f828555a4110e037e60e"
+    },
+    "goalkeepers_suite": {
+      "suite_id": "goalkeepers",
+      "suite_version": "suite-goalkeepers-v1",
+      "verdict_counts": {
+        "PASS": 10,
+        "FAIL": 0,
+        "NOT_EVALUATED": 1,
+        "BLOCKED_MISSING_REFERENCE": 1,
+        "NEEDS_PERCEPTUAL_REVIEW": 1
+      },
+      "baseline_verdict_counts": {
+        "PASS": 9,
+        "FAIL": 0,
+        "NOT_EVALUATED": 2,
+        "BLOCKED_MISSING_REFERENCE": 1,
+        "NEEDS_PERCEPTUAL_REVIEW": 1
+      },
+      "note": "Exactly one criterion changed versus the 9/0/2/1/1 baseline: the catalog `reg` key NOT_EVALUATED -> PASS through the registered gk-regression canary.",
+      "source_record": "docs/evidence/FOULS-AGGREGATE-HONESTY-RERUN/fouls-aggregate-honesty-rerun.json",
+      "source_record_sha256": "c8b3b63edd57f6acd15e91f4daa0bdb8d35e239155ee51b6975cc76f59acaa21"
+    },
+    "driven_gk_closure": {
+      "save_chains": 4,
+      "release_count": 12,
+      "note": "The driven save/release fixtures close the previously NOT_EVALUATED GK observations with real chains (4 keeper save/claim contacts; 12 releases to an observed teammate).",
+      "source_record": "docs/evidence/GK-DRIVEN-CLOSURE/gk-driven-closure.json",
+      "source_record_sha256": "21a596277aac626f3612e225ced4145310e1a81631bd28552f9188d223b33d7a"
+    },
+    "aggregate_honesty_republication": {
+      "goalkeepers_verdict_counts": {
+        "PASS": 10,
+        "FAIL": 0,
+        "NOT_EVALUATED": 1,
+        "BLOCKED_MISSING_REFERENCE": 1,
+        "NEEDS_PERCEPTUAL_REVIEW": 1
+      },
+      "goalkeepers_baseline_verdict_counts": {
+        "PASS": 9,
+        "FAIL": 0,
+        "NOT_EVALUATED": 2,
+        "BLOCKED_MISSING_REFERENCE": 1,
+        "NEEDS_PERCEPTUAL_REVIEW": 1
+      },
+      "changed": [
+        {
+          "criterion": "reg",
+          "from": "NOT_EVALUATED",
+          "to": "PASS"
+        }
+      ],
+      "fouls_registered_at_republication": 3,
+      "streams_character_identical_to_accepted": true,
+      "note": "The goalkeepers and fouls aggregate verdict state re-published with every stream asserted character-identical to its accepted state-hash pin; the power-guard FAILs are excluded AND reported.",
+      "source_record": "docs/evidence/FOULS-AGGREGATE-HONESTY-RERUN/fouls-aggregate-honesty-rerun.json",
+      "source_record_sha256": "c8b3b63edd57f6acd15e91f4daa0bdb8d35e239155ee51b6975cc76f59acaa21"
+    },
+    "designation_facts_serialization": {
+      "gated_flag": "serializeRestartFacts",
+      "default": false,
+      "note": "The gated, strictly post-loop, hash-neutral serialization surfaces the committed restart-designation and consequence events (restart-designation, free-kick-executed, card-issued) so the fouls-suite oracles can observe the consequences on organic streams.",
+      "reused_by": [
+        "docs/evidence/FOUL-CONSEQUENCE-MACHINERY/foul-consequence-machinery.json",
+        "docs/evidence/CARD-MACHINERY/card-machinery.json"
+      ],
+      "source_record": "docs/evidence/RESTART-DESIGNATION-FACTS-CONFORMANCE/restart-designation-facts-state.json",
+      "source_record_sha256": "271b1526592cc13e3792bee42f2544379e7dea16de9571b43113b32b57e7fc56"
+    },
+    "foul_detection_and_human_serve": {
+      "foul_detection": {
+        "source_record": "docs/evidence/FOUL-DETECTION-MACHINERY/foul-detection-machinery.json",
+        "source_record_sha256": "69104ea10e14aa2607eefbd9e3206e17d025f4cea5206032867e4772bc89a272"
+      },
+      "human_ball_server_literal": {
+        "source_record": "docs/evidence/HUMAN-BALL-SERVER-LITERAL/human-ball-server-literal.json",
+        "source_record_sha256": "85fc082d30e9120c5c12f9d9e6950dbb332fee8960affdf8852f8feb5c4734ef"
+      }
+    }
+  },
+  "specd": {
+    "fouls_cards_spec": {
+      "path": "specs/FOULS_CARDS_SPEC.md",
+      "model": "fouls-v1",
+      "exists": true,
+      "advantage_design_contract": {
+        "sections": [
+          "§6.1",
+          "§6.2",
+          "§6.3",
+          "§6.4",
+          "§6.5"
+        ],
+        "present": true,
+        "note": "§6 advantage semantics promoted from a named stub to a normative design contract by ADVANTAGE-WINDOW-SPEC."
+      },
+      "advantage_window_ticks": 24,
+      "foul_caution_pending_ticks": 12,
+      "both_are_foundation_fixed_dt_tick_budgets": true,
+      "advantage_retention_ref": "BLOCKED_MISSING_REFERENCE",
+      "advantage_played": "NAMED-NOT-REGISTERED",
+      "source_record": "docs/evidence/ADVANTAGE-WINDOW-SPEC/manifest.json",
+      "source_record_sha256": "2febf1302470dc7f7f8d6daf9a3e6d61e67baf277748e35f9f4e55f204b391a9",
+      "source_record_pin_kind": "file_bytes",
+      "audit_artifact": "docs/evidence/ADVANTAGE-WINDOW-SPEC/audit.json",
+      "audit_artifact_sha256": "1608f247fa974049375c89c197725927adbcbed2563291be1fbc79bd0f5b9f5a",
+      "source_record_note": "ADVANTAGE-WINDOW-SPEC is BOOKKEEPING/spec-only and produced no producer record with a record_sha256; it is pinned by its manifest bytes plus the audit artifact sha256 the manifest itself records (no guess)."
+    }
+  },
+  "deferred": [
+    "ADVANTAGE-PLAYED machinery: the advantage-window design is spec'd, not implemented; the engine calls every recognized foul (ADVANTAGE-WINDOW-SPEC; FOULS_CARDS_SPEC §6).",
+    "The card contact-severity path (direct red): foul_card_direct_red_severity_threshold 0.85 stays BLOCKED_MISSING_REFERENCE; cards issue by equal-fouls accumulation only (CARD-MACHINERY).",
+    "Second-yellow -> red: not implemented; the accumulation path issues a caution at 2 and an expulsion at 5 (CARD-MACHINERY).",
+    "All blocked references stay BLOCKED_MISSING_REFERENCE, never invented: advantage_retention_ref + advantage_window_ref_ms (FOULS_CARDS_SPEC §11), foul_card_threshold_ref, foul_severity_distribution_ref, foul_ball_carrier_identity_ref, free_kick_trajectory_ref, disciplinary_scale_ref, card_display_visual_ref, plus the GK-*-REF and the rules-suite MATCH-CORNER-KICK-CROSS / MATCH-GOAL-KICK-DISTRIBUTION.",
+    "Regulation rules (offside, penalty kicks) — regulation-only, no existence claim.",
+    "Full-match ecology.",
+    "PES fidelity: no measured PES envelope; all unmeasured values stay VERSIONED_PROVISIONAL."
+  ],
+  "limitations": [
+    "The referee loop is GATED and opt-in: it is not claimed to be always-on, and PES referee frequency/fidelity is not claimed (REFEREE-SHIPPED-WIRING).",
+    "Driven-fixture evidence: the referee, foul/free-kick and card browser arcs are driven duels (scripted standing tackles, short windows), disclosed, not organic 90-minute matches.",
+    "CARD-ISSUED is NOT_EVALUATED on every accepted stream: the driven shape is commit-only and the organic shape is below the caution threshold; the oracle's guards are proven by canary tests, not an accepted PASS stream (CARD-ISSUED-SUITE-REGISTRATION).",
+    "Browser<->headless correspondence is event-structural only, never per-tick floats (the known pinned-runtime gap) (REFEREE-SHIPPED-WIRING).",
+    "The fouls suite is partial: 4 of 5 §10 criteria registered; FREE-KICK-AWARD's PASS rests on one organic stream with two deliberate power-guard FAILs excluded and reported (FOULS-AGGREGATE-HONESTY-RERUN).",
+    "The gk-regression canary returns honest NOT_EVALUATED for a pin a stream never triggers (never PASS by silence) and is wired only to the six GK-*-REG criteria (GK-REGRESSION-POLICY-REGISTRATION).",
+    "No suite-level PASS, no PROMOTION, no FOUNDATION_LAB_PASS, no milestone PASS; no criterion is upgraded beyond what the executed evaluator returns."
+  ],
+  "cited_records": {
+    "docs/evidence/FOUL-DETECTION-MACHINERY/foul-detection-machinery.json": {
+      "objective_id": "FOUL-DETECTION-MACHINERY",
+      "record_sha256": "69104ea10e14aa2607eefbd9e3206e17d025f4cea5206032867e4772bc89a272",
+      "pin_kind": "record"
+    },
+    "docs/evidence/FOULS-SUITE-REGISTRATION/fouls-suite-registration.json": {
+      "objective_id": "FOULS-SUITE-REGISTRATION",
+      "record_sha256": "5e538e5d183ee0c3c79e4981bb447a06c42d3b7be3a3ceb66f320dfb24611794",
+      "pin_kind": "record"
+    },
+    "docs/evidence/HUMAN-BALL-SERVER-LITERAL/human-ball-server-literal.json": {
+      "objective_id": "HUMAN-BALL-SERVER-LITERAL",
+      "record_sha256": "85fc082d30e9120c5c12f9d9e6950dbb332fee8960affdf8852f8feb5c4734ef",
+      "pin_kind": "record"
+    },
+    "docs/evidence/GK-DRIVEN-CLOSURE/gk-driven-closure.json": {
+      "objective_id": "GK-DRIVEN-CLOSURE",
+      "record_sha256": "21a596277aac626f3612e225ced4145310e1a81631bd28552f9188d223b33d7a",
+      "pin_kind": "record"
+    },
+    "docs/evidence/FOUL-CONSEQUENCE-MACHINERY/foul-consequence-machinery.json": {
+      "objective_id": "FOUL-CONSEQUENCE-MACHINERY",
+      "record_sha256": "39da80ad4106546939afeefa34cca2763a113bdfc559eec013a9ee578834da95",
+      "pin_kind": "record"
+    },
+    "docs/evidence/FREE-KICK-SUITE-REGISTRATION/freekick-suite-registration.json": {
+      "objective_id": "FREE-KICK-SUITE-REGISTRATION",
+      "record_sha256": "86a34acb5f7336ac339c91fced93246c52f1f6beadb5407ae916cae7e6b425f2",
+      "pin_kind": "record"
+    },
+    "docs/evidence/GK-REGRESSION-POLICY-REGISTRATION/gk-regression-policy-registration.json": {
+      "objective_id": "GK-REGRESSION-POLICY-REGISTRATION",
+      "record_sha256": "fc7d1b97b3b1a78613b571610e3bdbc53aa076b5ae42f828555a4110e037e60e",
+      "pin_kind": "record"
+    },
+    "docs/evidence/FOUL-FREEKICK-BROWSER-EVIDENCE/foul-freekick-browser-evidence-state.json": {
+      "objective_id": "FOUL-FREEKICK-BROWSER-EVIDENCE",
+      "record_sha256": "e65c3618369a1474eb2c094714b41fb85986e68d3a6e6f19011fd7ed4cb6188c",
+      "pin_kind": "record"
+    },
+    "docs/evidence/FOULS-AGGREGATE-HONESTY-RERUN/fouls-aggregate-honesty-rerun.json": {
+      "objective_id": "FOULS-AGGREGATE-HONESTY-RERUN",
+      "record_sha256": "c8b3b63edd57f6acd15e91f4daa0bdb8d35e239155ee51b6975cc76f59acaa21",
+      "pin_kind": "record"
+    },
+    "docs/evidence/CARD-MACHINERY/card-machinery.json": {
+      "objective_id": "CARD-MACHINERY",
+      "record_sha256": "01d731ada16b2451b1a939bf9d20af66da8bdc07445fbcd150cd41062a2cba66",
+      "pin_kind": "record"
+    },
+    "docs/evidence/CARD-ISSUED-SUITE-REGISTRATION/card-issued-suite-registration.json": {
+      "objective_id": "CARD-ISSUED-SUITE-REGISTRATION",
+      "record_sha256": "3dac8a48cae826d846e58c16ec487cc40187b645b9b17bc385ae2f64dc16bd3c",
+      "pin_kind": "record"
+    },
+    "docs/evidence/CARD-BROWSER-EVIDENCE/card-browser-evidence-state.json": {
+      "objective_id": "CARD-BROWSER-EVIDENCE",
+      "record_sha256": "bc9daf1fff3167eed5e7d14a6c7a739c3210e4fa449268b5bef76de9384069d0",
+      "pin_kind": "record"
+    },
+    "docs/evidence/REFEREE-SHIPPED-WIRING/referee-shipped-wiring-state.json": {
+      "objective_id": "REFEREE-SHIPPED-WIRING",
+      "record_sha256": "b2f5392784b10431fdf1bd689ee29e4a94f6a6c3bb4a3e746e97461320f0a40a",
+      "pin_kind": "record"
+    },
+    "docs/evidence/RESTART-DESIGNATION-FACTS-CONFORMANCE/restart-designation-facts-state.json": {
+      "objective_id": "RESTART-DESIGNATION-FACTS-CONFORMANCE",
+      "record_sha256": "271b1526592cc13e3792bee42f2544379e7dea16de9571b43113b32b57e7fc56",
+      "pin_kind": "record"
+    },
+    "docs/evidence/REFEREE-SHIPPED-WIRING/manifest.json": {
+      "objective_id": "REFEREE-SHIPPED-WIRING",
+      "record_sha256": "1219570a04182abadf8ae172a67861e258ac28d18c18b6094ceedfe04a75f4d5",
+      "pin_kind": "file_bytes"
+    },
+    "docs/evidence/ADVANTAGE-WINDOW-SPEC/manifest.json": {
+      "objective_id": "ADVANTAGE-WINDOW-SPEC",
+      "record_sha256": "2febf1302470dc7f7f8d6daf9a3e6d61e67baf277748e35f9f4e55f204b391a9",
+      "pin_kind": "file_bytes"
+    },
+    "docs/evidence/ADVANTAGE-WINDOW-SPEC/audit.json": {
+      "objective_id": "ADVANTAGE-WINDOW-SPEC",
+      "record_sha256": "1608f247fa974049375c89c197725927adbcbed2563291be1fbc79bd0f5b9f5a",
+      "pin_kind": "file_bytes"
+    }
+  },
+  "source_hashes": {
+    "gauntlet/RELEASE-0.9.8-PRODUCT.md": "0eff626ac9777d9719323a65da098b95af05b1d6193a2218dd240afc5bc3f504",
+    "gauntlet/RELEASE-0.9.7.md": "3a2f91b4a3aa9446eeb3943682c4b3afe496f5f4cfaa1e8ef8a51b4a6eda0da9",
+    "gauntlet/RELEASE-0.9.8.md": "91e9641393925b1a518074e3a64a6bd590cde8a8c33b26ed4a211ec049baa000",
+    "gauntlet/VERSION.json": "e3140851c5e632ad22406ac05763d88e2c6d81dc498f7bea038247f77c594e3a"
+  },
+  "claims_not_made": [
+    "No suite-level PASS claim for the fouls suite (4 of 5 criteria registered; ADVANTAGE-PLAYED named-not-registered; CARD-ISSUED NOT_EVALUATED on every accepted stream) or for the goalkeepers suite (1 BLOCKED + 1 NEEDS_PERCEPTUAL_REVIEW + 1 NOT_EVALUATED remain).",
+    "No PROMOTION claim.",
+    "No FOUNDATION_LAB_PASS claim.",
+    "No milestone PASS claim.",
+    "No PES 2017 fidelity / measured PES envelope claim; all unmeasured values stay VERSIONED_PROVISIONAL.",
+    "No invented reference envelope or tolerance; blocked references stay BLOCKED_MISSING_REFERENCE, including advantage_retention_ref.",
+    "No advantage implemented or claimed: ADVANTAGE-PLAYED stays NAMED-NOT-REGISTERED and no verdict is reported for it.",
+    "No criterion is upgraded beyond what the executed evaluator returns; every PASS cited is from the accepted executed records.",
+    "Zero gameplay/source change: git diff src/ src/contracts/ src/adapters/ eval/ specs/ is EMPTY; only RELEASE-0.9.8-PRODUCT.md + evidence + a binding test + this producer are added.",
+    "No VERSION.json / prompt-gate.ts change: the live system version stays 0.9.9 and the 0.9.8 system release notes (gauntlet/RELEASE-0.9.8.md) are not modified; the name collision is resolved by the -PRODUCT suffix and disclosed.",
+    "No accepted record mutation: the cited accepted records (v34-v37 + RESTART-DESIGNATION-FACTS-CONFORMANCE) stay byte-untouched (verified by their pinned record_sha256 / pinned manifest bytes)."
+  ],
+  "record_sha256": "633970c0f9622998aef97daa6debc1e6b877829473db3ff138b5964841c5717c"
+}
