@@ -18,3 +18,5 @@ blob-report/
 .DS_Store
 .worktrees/
 tests/browser/__screenshots__/
+
+.delivery-local/

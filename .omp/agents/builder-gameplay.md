@@ -1,7 +1,7 @@
 ---
 name: builder-gameplay
 description: Gauntlet gameplay builder.
-tools: read, grep, glob, edit, bash
+tools: read, grep, glob, edit, bash, gauntlet_runtime
 model: "@gauntlet-builder-gameplay"
 prewalk: false
 ---

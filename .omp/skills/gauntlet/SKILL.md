@@ -10,6 +10,8 @@ Read these files first:
 - `gauntlet/product-flow-contract.md`
 - `gauntlet/parallel-issue-contract.md`
 - `gauntlet/harness-contract.md`
+- `gauntlet/runtime-efficiency-contract.md`
+- `gauntlet/memory-context-contract.md`
 - `gauntlet/models.json`
 - `gauntlet/state/CURRENT.md`
 - `gauntlet/state/HORIZON.md`
@@ -44,3 +46,5 @@ pnpm run gauntlet:parallel:complete -- --objective OBJECTIVE_ID
 ```
 
 Canonical state transitions and final publication remain serialized.
+
+Before objective planning/delegation, bind `/gauntlet-objective OBJECTIVE_ID`. Include `[gauntlet-objective:OBJECTIVE_ID]` in every builder, critic, integration, aux and committer assignment. Keep other objective markers out of shared batch context. Telemetry is active in baseline mode; all optimizations start disabled. After the existing remotely durable acceptance step, run `mise run gauntlet-telemetry -- accepted OBJECTIVE_ID FULL_ACCEPTANCE_COMMIT`. Do not enable optimizations until a complete baseline is measured and reviewed. Enabled `gauntlet_runtime` actions prepare bounded context, safe checkpoints, fresh task seeds and verification batches. Fresh parallel tasks still use the READY issue gate. No additional TPM governor, backoff or wait controller may compete with OMP.

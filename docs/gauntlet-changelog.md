@@ -4,6 +4,10 @@ Human-readable history of meaningful changes to the Gauntlet's **rules, prompts,
 
 This changelog does **not** record normal gameplay objectives or routine live-state updates produced by the running Gauntlet. Git remains the source of truth for exact file contents and diffs.
 
+## 2026-10-03 — Gauntlet 0.10.0: measured runtime efficiency
+
+Runtime-connected OMP telemetry ships first, with baseline mode and explicit opt-in after a measured baseline. Selectively adapt bounded project memory, context packets/mapper, checkpoints/fresh builder rotation and verification batching from historical 66be461; use 1a45539 audits as historical evidence only. Omit the old governor/backoff/wait controller. Keep 0.9.9 routing, product-first planning, READY issue admission and every acceptance/evidence/remote-durability gate. Runtime state is not rewritten.
+
 ## 2026-08-16 — Replan continuation and tag publication patch
 
 **Gauntlet system version (SemVer):** `0.8.1`  

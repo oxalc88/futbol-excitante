@@ -25,3 +25,7 @@ Use this role for toolchain, contracts, deterministic systems, input/replay, eva
 ## Evidence
 
 Read `gauntlet/evidence-contract.md`. Report every required command with the exit code actually observed. Fix in-scope failures before reporting; otherwise report the failure honestly.
+
+## Optional measured efficiency
+
+Follow `gauntlet/memory-context-contract.md` and `gauntlet/runtime-efficiency-contract.md`. In baseline mode keep the existing workflow. When enabled in OMP, use `gauntlet_runtime` to save a bounded checkpoint at a safe completed implementation phase and batch the required verification commands. Use the executing session ID from `/gauntlet-efficiency-status` in a checkpoint. Report failures/evidence truthfully. Return control for fresh-session rotation; never start another objective or accept work. Canonical sources and all required evidence/tests remain mandatory.

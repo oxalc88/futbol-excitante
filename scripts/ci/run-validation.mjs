@@ -9,9 +9,14 @@ const parallelPolicyCheck =
     ? { id: "parallel-issue-policy", command: ["pnpm", "run", "gauntlet:parallel:test"] }
     : { id: "parallel-issue-policy", command: ["node", "-e", "console.log('SKIP parallel issue policy: not present on target')"] };
 
+const runtimeEfficiencyCheck = existsSync("scripts/ci/test-gauntlet-telemetry.mjs")
+  ? { id: "runtime-efficiency", command: ["pnpm", "run", "gauntlet:runtime:test"] }
+  : { id: "runtime-efficiency", command: ["node", "-e", "console.log('SKIP runtime efficiency: not present on target')"] };
+
 const fullChecks = [
   { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
   parallelPolicyCheck,
+  runtimeEfficiencyCheck,
   { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
   { id: "test", command: ["pnpm", "run", "test"] },
   { id: "test-browser", command: ["pnpm", "run", "test-browser"] },
@@ -22,6 +27,7 @@ const fullChecks = [
 const fastChecks = [
   { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
   parallelPolicyCheck,
+  runtimeEfficiencyCheck,
   { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
   {
     id: "maintenance-test",

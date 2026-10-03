@@ -14,7 +14,9 @@ All Gauntlet agents, skills, routing, deterministic evals, and contracts live in
 
 `gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-Current candidate: **0.9.9** over 0.9.8.
+Current candidate: **0.10.0** over 0.9.9.
+
+0.10.0 adds runtime-connected OMP telemetry first, then opt-in bounded memory/context, builder checkpoints/rotation and verification batching. All optimizations are disabled until a measured baseline is reviewed. See `gauntlet/runtime-efficiency-contract.md`; current routing and acceptance guarantees remain unchanged.
 
 0.9.9 keeps product-first planning and adds issue-gated parallel execution. GitHub issues are optional for sequential work and mandatory for parallel implementation work. Parallel workers start only from synchronized `READY` issues. OMP also applies conservative NaN concurrency limits and blocks invalid parallel builder batches.
 

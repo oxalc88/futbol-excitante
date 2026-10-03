@@ -1,7 +1,7 @@
 ---
 name: builder-structured
 description: Gauntlet structured builder.
-tools: read, grep, glob, edit, bash
+tools: read, grep, glob, edit, bash, gauntlet_runtime
 model: "@gauntlet-builder-structured"
 prewalk: false
 ---
