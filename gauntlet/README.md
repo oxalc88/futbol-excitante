@@ -97,7 +97,7 @@ Two deterministic checks protect this split: wrappers must reference an existing
 | `aux` | subagent | `gemma4` | cheap summaries and bounded semantic audit |
 | `git-committer` | subagent | `gemma4` | atomic conventional commits and requested publication |
 
-Exact IDs and fallback ordering live in `gauntlet/models.json`. Routing generation for 0.9.8 is `gauntlet-models-v8`.
+Exact IDs and fallback ordering live in `gauntlet/models.json`. Routing generation for 0.9.8 is `gauntlet-models-v8`. The same file also declares harness routes for Grok, OMP, and OpenCode; `gauntlet/harness-contract.md` defines how adapters consume them.
 
 ## Model routing
 
@@ -146,6 +146,18 @@ Choose one builder by responsibility, not provider:
 - `builder-gameplay` for locomotion, ball integration, controls, passing/shooting/contact, gameplay-coupled team behavior, and presentation-facing gameplay integration.
 
 If an objective spans both, choose the dominant responsibility or decompose it. Do not add another builder role merely to switch models.
+
+## Harness adapters
+
+Gauntlet core is harness-neutral. Canonical roles, evidence rules, product policy, and acceptance rules live under `gauntlet/`. Runtime directories such as `.grok/`, `.omp/`, and `.opencode/` are adapters.
+
+The current orchestrator routes are:
+
+- Grok: `grok-4.6`;
+- OMP: `glm5.3-flash` with high reasoning;
+- OpenCode: `grok-4.6`.
+
+OMP has no Grok dependency. Its project adapter uses NaN models only. See `.omp/README.md`.
 
 ## Product-first planning
 
