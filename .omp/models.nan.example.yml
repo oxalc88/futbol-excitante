@@ -1,0 +1,40 @@
+providers:
+  nan:
+    baseUrl: https://api.nan.builders/v1
+    apiKey: NAN_API_KEY
+    api: openai-completions
+    models:
+      - id: glm5.3-flash
+        name: GLM 5.3 Flash
+        reasoning: true
+        input: [text, image]
+        contextWindow: 1000000
+        thinking:
+          mode: effort
+          efforts: [low, medium, high, max]
+          defaultLevel: high
+      - id: deepseek-v4-flash
+        name: DeepSeek V4 Flash
+        reasoning: true
+        input: [text, image]
+        contextWindow: 1000000
+      - id: qwen3.8-flash
+        name: Qwen 3.8 Flash
+        reasoning: true
+        input: [text, image]
+        contextWindow: 1000000
+      - id: mimo-v2.6-flash
+        name: Xiaomi MiMo V2.6 Flash
+        reasoning: true
+        input: [text, image]
+        contextWindow: 1000000
+      - id: gemma4
+        name: Gemma 4
+        reasoning: true
+        input: [text, image]
+        contextWindow: 262144
+      - id: qwen3.6
+        name: Qwen 3.6
+        reasoning: true
+        input: [text, image]
+        contextWindow: 262144
