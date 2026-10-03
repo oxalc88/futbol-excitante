@@ -36,6 +36,8 @@ const RULES: GateRule[] = [
   { name: "semantic audit is bounded and cannot accept", file: "gauntlet/semantic-audit-contract.md", mustContain: ["VALID|INVALID|INSUFFICIENT_CONTEXT", "can never produce objective `ACCEPT`"] },
   { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.9.8\"", "\"previous_system_version\": \"0.9.7\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene", "model-capability-routing", "timing-aggregate-consistency", "routing-wrapper-consistency", "equivalent-orchestrator-continuation", "product-first-planning", "issue-context-index", "parallel-objective-execution", "product-flow-metrics"] },
   { name: "reviewer fallback remains explicit", file: "gauntlet/models.json", mustContain: ["gauntlet-models-v8", "critic-qwen", "critic-mimo", "integration-reviewer-qwen", "integration-reviewer-mimo", "mimo-v2.6-flash"] },
+  { name: "harness routing is explicit", file: "gauntlet/models.json", mustContain: ["harness_routes", "\"grok\"", "\"omp\"", "\"opencode\"", "harness-contract.md"] },
+  { name: "omp adapter is product-local and role-routed", file: ".omp/config.yml", mustContain: ["modelRoleStorage: project", "gauntlet-orchestrator", "nan/glm5.3-flash", "gauntlet-builder-structured", "gauntlet-builder-gameplay", "gauntlet-critic", "gauntlet-integration"] },
   { name: "review pipeline uses capability contract", file: "gauntlet/PROMPT.md", mustContain: ["gauntlet/model-capability-contract.md", "configured `critic` route and fallbacks from `gauntlet/models.json`", "configured independent `integration-reviewer` route and fallbacks from `gauntlet/models.json`"] },
 ];
 
