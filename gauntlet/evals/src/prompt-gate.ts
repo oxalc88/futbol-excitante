@@ -35,7 +35,7 @@ const RULES: GateRule[] = [
   { name: "evidence manifest contract exists", file: "gauntlet/evidence-manifest-contract.md", mustContain: ["candidate_commit", "sha256", "sequence.json", "video-reference.json", "milestones", "never silently overwritten"] },
   { name: "semantic audit is bounded and cannot accept", file: "gauntlet/semantic-audit-contract.md", mustContain: ["VALID|INVALID|INSUFFICIENT_CONTEXT", "can never produce objective `ACCEPT`"] },
   { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.9.8\"", "\"previous_system_version\": \"0.9.7\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene", "model-capability-routing", "timing-aggregate-consistency", "routing-wrapper-consistency", "equivalent-orchestrator-continuation", "product-first-planning", "issue-context-index", "parallel-objective-execution", "product-flow-metrics"] },
-  { name: "reviewer fallback remains explicit", file: "gauntlet/models.json", mustContain: ["critic-qwen", "critic-mimo", "integration-reviewer-qwen", "integration-reviewer-mimo"] },
+  { name: "reviewer fallback remains explicit", file: "gauntlet/models.json", mustContain: ["gauntlet-models-v8", "critic-qwen", "critic-mimo", "integration-reviewer-qwen", "integration-reviewer-mimo", "mimo-v2.6-flash"] },
   { name: "review pipeline uses capability contract", file: "gauntlet/PROMPT.md", mustContain: ["gauntlet/model-capability-contract.md", "configured `critic` route and fallbacks from `gauntlet/models.json`", "configured independent `integration-reviewer` route and fallbacks from `gauntlet/models.json`"] },
 ];
 
