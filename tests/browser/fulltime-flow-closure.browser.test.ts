@@ -435,7 +435,7 @@ describe("FULLTIME-FLOW-CLOSURE: the composition root wires the end-of-match flo
     expect(mainTsRaw).toContain("createFulltimeFlow(document");
     expect(mainTsRaw).toContain("lastMatchConfig =");
     expect(mainTsRaw).toContain("onRematch:");
-    expect(mainTsRaw).toContain("startMatch(c.scenario, c.urlMode, c.teamALabel, c.teamBLabel, c.controlsHint, c.difficulty)");
+    expect(mainTsRaw).toContain("startMatch(c.scenario, c.urlMode, c.teamALabel, c.teamBLabel, c.controlsHint, c.difficulty, c.refereeOptIn)");
     expect(mainTsRaw).toContain("onBackToMenu:");
     expect(mainTsRaw).toContain("stopMatch();");
     expect(mainTsRaw).toContain("showSetupMenu();");

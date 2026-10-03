@@ -122,6 +122,33 @@ html, body {
   color: #ffffff;
 }
 
+/* REFEREE-SHIPPED-WIRING: the shipped "Referee" toggle is an honest inline
+   checkbox + label (a real selectable control in the menu).  Override the boxed
+   input styling above so the checkbox renders as a normal inline control with a
+   readable, non-uppercased label. */
+.setup-field label.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.5px;
+  text-transform: none;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+.setup-field .toggle-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
 /* ==========================================================================
    Controls legend (setup menu + in-match overlay)
    ========================================================================== */

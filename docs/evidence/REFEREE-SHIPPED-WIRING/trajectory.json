@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "objective_id": "REFEREE-SHIPPED-WIRING",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-referee-shipped-wiring.ts",
+  "driver": "eval/runners/defensive-duel-driver.ts runDefensiveDuel({ freeKickConfig:{ awardFreeKicks:true }, cardConfig:{ issueCards:true } }) — the accepted driven-duel shape reproducing the browser run's event structure.",
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "play_ticks": 320,
+  "frame_anchors": [
+    {
+      "label": "foul-contact",
+      "path": "foul-contact.png",
+      "tick": 65,
+      "semantic": "before",
+      "sha256": "5decc5905abed0d4ec6077410c7f4dd0813e16d2e2c333748af3348daa483882"
+    },
+    {
+      "label": "freekick-award",
+      "path": "freekick-award.png",
+      "tick": 67,
+      "semantic": "event",
+      "sha256": "612d18605fb67bd2c6819e581627f083738b01af35064ff85752e8b4e539b21e"
+    },
+    {
+      "label": "freekick-served",
+      "path": "freekick-served.png",
+      "tick": 128,
+      "semantic": "result",
+      "sha256": "8937bb6abda31837104470052b2f751606b6def99d6a144cae27d2406a607f67"
+    },
+    {
+      "label": "foul-2-contact",
+      "path": "foul-2-contact.png",
+      "tick": 289,
+      "semantic": "transition",
+      "sha256": "1ac6992b5740e1ed116e3c588556a46ed2879b948d4ace63d07c55c46e8286be"
+    },
+    {
+      "label": "caution",
+      "path": "caution.png",
+      "tick": 290,
+      "semantic": "result",
+      "sha256": "4bc12fd48b31610b0cf375da8b6126b8226de28b64e0222fcae6e79f7be70f81"
+    }
+  ],
+  "correspondence": {
+    "browser_foul_ticks": [
+      66,
+      290
+    ],
+    "browser_free_kick_tick": 126,
+    "browser_caution_tick": 290,
+    "browser_caution_accumulated_fouls": 2,
+    "browser_caution_player": "player-1",
+    "headless_foul_ticks": [
+      66,
+      290
+    ],
+    "headless_free_kick_tick": 126,
+    "headless_caution_tick": 290,
+    "headless_caution_accumulated_fouls": 2,
+    "headless_caution_player": "player-1",
+    "foul_ticks_equal": true,
+    "free_kick_tick_offset": 0,
+    "caution_tick_offset": 0,
+    "free_kick_countdown": 60,
+    "correspondence_traced": true
+  },
+  "free_kick_countdown": 60,
+  "disclosures": [
+    "The trajectory is the accepted headless defensive-duel stream (fouls at 66/290, free kick at tick 126, caution at tick 290). The browser run locates the same event structure from its own event log; per-tick floats are not compared across runtimes (the known pinned-runtime gap).",
+    "The free-kick countdown (60), serve speed (14 m/s), loft (0.18), and ball-z (0.11), and the `fouls-v1` accumulation thresholds (caution at 2 / expulsion at 5) are VERSIONED_PROVISIONAL match-rules-v1/fouls-v1 design choices, NOT measured PES 2017 constants."
+  ]
+}

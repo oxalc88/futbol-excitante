@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "objective_id": "REFEREE-SHIPPED-WIRING",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "semantic_order": "man-not-ball foul contact -> free-kick award -> served free kick -> 2nd foul contact -> caution (yellow) issued",
+  "durable_capture": true,
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "rendering": {
+    "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium), same createSimulation config surface the shipped composition root uses",
+    "hud": "showMatchPhaseHud:true + showCardHud:true (curated FREE KICK label + yellow booking notice, presentation-only enrichment)"
+  },
+  "arc": {
+    "foul_ticks": [
+      66,
+      290
+    ],
+    "foul_count": 2,
+    "card_count": 1,
+    "first_free_kick": {
+      "tick": 126,
+      "teamId": "team-b",
+      "free_kick_position": {
+        "x": -1.8825283681923257,
+        "y": 0.03639052588315668
+      },
+      "kick_direction": {
+        "x": 0,
+        "y": -1
+      }
+    },
+    "caution": {
+      "tick": 290,
+      "cardType": "caution",
+      "accumulatedFouls": 2,
+      "playerId": "player-1"
+    },
+    "booking_state": {
+      "player-1": {
+        "fouls": 2,
+        "cautions": 1,
+        "expulsions": 0
+      }
+    }
+  },
+  "frames": [
+    {
+      "label": "foul-contact",
+      "path": "foul-contact.png",
+      "tick": 65,
+      "semantic": "before",
+      "description": "Man-not-ball tackle contact (the first foul): the defending body commits a standing tackle on the carrier — both in contact, the ball still in play (PLAYING) before the free kick is awarded",
+      "sha256": "5decc5905abed0d4ec6077410c7f4dd0813e16d2e2c333748af3348daa483882"
+    },
+    {
+      "label": "freekick-award",
+      "path": "freekick-award.png",
+      "tick": 67,
+      "semantic": "event",
+      "description": "Free kick awarded for the first foul: the phase turns FREE KICK, the ball is re-placed at the contact position (team-b awarded)",
+      "sha256": "612d18605fb67bd2c6819e581627f083738b01af35064ff85752e8b4e539b21e"
+    },
+    {
+      "label": "freekick-served",
+      "path": "freekick-served.png",
+      "tick": 128,
+      "semantic": "result",
+      "description": "Served free kick: the ball is back in play off the contact spot along the committed kick direction, the phase is PLAYING again",
+      "sha256": "8937bb6abda31837104470052b2f751606b6def99d6a144cae27d2406a607f67"
+    },
+    {
+      "label": "foul-2-contact",
+      "path": "foul-2-contact.png",
+      "tick": 289,
+      "semantic": "transition",
+      "description": "The 2nd man-not-ball tackle contact (the offending player's 2nd accumulated foul) — still PLAYING before the booking",
+      "sha256": "1ac6992b5740e1ed116e3c588556a46ed2879b948d4ace63d07c55c46e8286be"
+    },
+    {
+      "label": "caution",
+      "path": "caution.png",
+      "tick": 290,
+      "semantic": "result",
+      "description": "Caution (yellow) issued on the 2nd accumulated foul: the card consequence issues a caution to player-1 (accumulated 2); the card HUD draws the yellow booking and the 2nd free kick is awarded (phase FREE KICK)",
+      "sha256": "4bc12fd48b31610b0cf375da8b6126b8226de28b64e0222fcae6e79f7be70f81"
+    }
+  ]
+}

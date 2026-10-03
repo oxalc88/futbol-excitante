@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "objective_id": "REFEREE-SHIPPED-WIRING",
+  "produced_by": "scripts/capture-referee-shipped-wiring.ts",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "spec_sections": [
+    "FOULS_CARDS_SPEC §5.1",
+    "FOULS_CARDS_SPEC §7",
+    "FOULS_CARDS_SPEC §8",
+    "FOULS_CARDS_SPEC §9.1",
+    "FOULS_CARDS_SPEC §10"
+  ],
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "play_ticks": 320,
+  "rendering": {
+    "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium), same createSimulation config surface the shipped composition root uses",
+    "hud": "showMatchPhaseHud:true + showCardHud:true (curated FREE KICK label + yellow booking notice, presentation-only enrichment)"
+  },
+  "semantics": {
+    "order": "man-not-ball foul contact -> free-kick award -> served free kick -> 2nd foul contact -> caution (yellow) issued",
+    "note": "event-centered on the referee consequence: the man-not-ball foul contact, the free-kick award (phase FREE KICK), the served free kick back in play, the 2nd foul contact, and the caution (yellow) booking."
+  },
+  "frames": [
+    {
+      "label": "foul-contact",
+      "path": "foul-contact.png",
+      "tick": 65,
+      "semantic": "before",
+      "description": "Man-not-ball tackle contact (the first foul): the defending body commits a standing tackle on the carrier — both in contact, the ball still in play (PLAYING) before the free kick is awarded",
+      "sha256": "5decc5905abed0d4ec6077410c7f4dd0813e16d2e2c333748af3348daa483882"
+    },
+    {
+      "label": "freekick-award",
+      "path": "freekick-award.png",
+      "tick": 67,
+      "semantic": "event",
+      "description": "Free kick awarded for the first foul: the phase turns FREE KICK, the ball is re-placed at the contact position (team-b awarded)",
+      "sha256": "612d18605fb67bd2c6819e581627f083738b01af35064ff85752e8b4e539b21e"
+    },
+    {
+      "label": "freekick-served",
+      "path": "freekick-served.png",
+      "tick": 128,
+      "semantic": "result",
+      "description": "Served free kick: the ball is back in play off the contact spot along the committed kick direction, the phase is PLAYING again",
+      "sha256": "8937bb6abda31837104470052b2f751606b6def99d6a144cae27d2406a607f67"
+    },
+    {
+      "label": "foul-2-contact",
+      "path": "foul-2-contact.png",
+      "tick": 289,
+      "semantic": "transition",
+      "description": "The 2nd man-not-ball tackle contact (the offending player's 2nd accumulated foul) — still PLAYING before the booking",
+      "sha256": "1ac6992b5740e1ed116e3c588556a46ed2879b948d4ace63d07c55c46e8286be"
+    },
+    {
+      "label": "caution",
+      "path": "caution.png",
+      "tick": 290,
+      "semantic": "result",
+      "description": "Caution (yellow) issued on the 2nd accumulated foul: the card consequence issues a caution to player-1 (accumulated 2); the card HUD draws the yellow booking and the 2nd free kick is awarded (phase FREE KICK)",
+      "sha256": "4bc12fd48b31610b0cf375da8b6126b8226de28b64e0222fcae6e79f7be70f81"
+    }
+  ],
+  "arc": {
+    "foul_ticks": [
+      66,
+      290
+    ],
+    "foul_count": 2,
+    "card_count": 1,
+    "first_free_kick": {
+      "tick": 126,
+      "teamId": "team-b",
+      "free_kick_position": {
+        "x": -1.8825283681923257,
+        "y": 0.03639052588315668
+      },
+      "kick_direction": {
+        "x": 0,
+        "y": -1
+      }
+    },
+    "caution": {
+      "tick": 290,
+      "cardType": "caution",
+      "accumulatedFouls": 2,
+      "playerId": "player-1"
+    },
+    "booking_state": {
+      "player-1": {
+        "fouls": 2,
+        "cautions": 1,
+        "expulsions": 0
+      }
+    }
+  },
+  "correspondence": {
+    "browser_foul_ticks": [
+      66,
+      290
+    ],
+    "browser_free_kick_tick": 126,
+    "browser_caution_tick": 290,
+    "browser_caution_accumulated_fouls": 2,
+    "browser_caution_player": "player-1",
+    "headless_foul_ticks": [
+      66,
+      290
+    ],
+    "headless_free_kick_tick": 126,
+    "headless_caution_tick": 290,
+    "headless_caution_accumulated_fouls": 2,
+    "headless_caution_player": "player-1",
+    "foul_ticks_equal": true,
+    "free_kick_tick_offset": 0,
+    "caution_tick_offset": 0,
+    "free_kick_countdown": 60,
+    "correspondence_traced": true
+  },
+  "drives": {
+    "fixture": "5v5-human-vs-cpu.v1.json + withProximateHumanDefence (the accepted driven-duel shape)",
+    "policy": "repeated scripted standing-tackle (commitDistance 3.0, earliestTick 44, every 16 ticks) on the HUMAN slot; CPU slots through the same adapter + team-decision profile the browser composition root uses",
+    "gates": "awardFreeKicks:true + issueCards:true (the SAME createSimulation config surface the shipped composition root exposes via the Referee toggle)",
+    "capture_test": "tests/browser/referee-shipped-wiring.browser.test.ts",
+    "rendering_surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium), showMatchPhaseHud:true + showCardHud:true"
+  },
+  "disclosures": [
+    "The fouls, the free kick, and the caution are REAL core events: the core commits a man-not-ball tackle contact (spec §5.1) and, with both accepted gates live, awards a free kick to the fouled team at the contact position and issues the caution on the 2nd accumulated foul. The driven-duel script reproduces the headless defensive-duel driver's standing-tackle policy; nothing is forced or synthesized.",
+    "The single run drives BOTH the foul→free-kick consequence and the accumulating booking, so a real player who opts into the Referee toggle sees a free kick AND a card in the same match.",
+    "The driven fixture is a DRIVEN duel (short observation window, scripted standing tackles), not an organic 90-minute match; the fouling sequence is disclosed, not masked.",
+    "The card events and free-kick-executed events are read from the core's committed persistent state ((the accepted serialization limitation), so the browser test enriches the snapshot (enrichPresentationWithCards) for the card HUD.",
+    "PNG re-capture non-determinism: the WebGL readPixels + canvas.toDataURL render path (GPU/rasterizer floats) is not promised byte-identical across re-captures; the per-frame SHA-256 values recorded here are the bytes captured at evidence time. The record JSON itself is byte-reproducible (record_sha256) and carries no wall-clock field, and an ordinary (non-evidence) run writes under test-results/gauntlet-capture/** and leaves docs/ byte-identical.",
+    "The free-kick countdown (60), serve speed (14 m/s), loft (0.18), and ball-z (0.11), and the `fouls-v1` accumulation thresholds (caution at 2 / expulsion at 5) are VERSIONED_PROVISIONAL match-rules-v1/fouls-v1 design choices, NOT measured PES 2017 constants."
+  ],
+  "claims_not_made": [
+    "The referee loop is gated and opt-in through the shipped menu; it is NOT claimed to be always-on, and PES 2017 referee frequency/fidelity is NOT claimed.",
+    "No PROMOTION claim. No FOUNDATION_LAB_PASS claim.",
+    "No PES 2017 fidelity or measured PES envelope claim: ",
+    "No gameplay / simulation-core / contracts change: git diff src/simulation/ and src/contracts/ are EMPTY. The referee gates flow through the SAME accepted createSimulation config surface; the only browser changes are the app-layer Referee toggle and the opt-in renderer HUD affordances (byte-neutral when off).",
+    "No claim that the foul was forced: the foul is a REAL core man-not-ball contact (the shared foul predicate) produced by the driven-duel standing-tackle policy; the award/placement/serve and the booking are the core's own accepted consequence machinery.",
+    "No claim that the browser composition root and the headless runner are per-tick byte-identical: the verified correspondence is the event structure (foul ticks, free-kick tick, caution tick, offender/accumulation), never per-tick floats (the known pinned-runtime gap).",
+    "No claim that an expulsion reproduces within this window: only the caution (2nd foul) is evidenced here; the full caution→expulsion arc is the separate accepted CARD-BROWSER-EVIDENCE record."
+  ],
+  "record_sha256": "b2f5392784b10431fdf1bd689ee29e4a94f6a6c3bb4a3e746e97461320f0a40a"
+}

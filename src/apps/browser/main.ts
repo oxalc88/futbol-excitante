@@ -19,6 +19,7 @@ import { createSimulation } from "../../simulation/loop/simulation.js";
 import {
   createPresentationSession,
   enrichPresentationWithKeeperRoles,
+  enrichPresentationWithCards,
   DEFAULT_RENDERER_CONFIG,
 } from "../../adapters/renderer-three/renderer.js";
 import {
@@ -45,6 +46,7 @@ import {
   setControlsHintText,
 } from "./controls-legend-ui.js";
 import { createFulltimeFlow, type FulltimeFlow } from "./fulltime-flow.js";
+import { resolveRefereeWiring } from "./referee-config.js";
 
 // ---------------------------------------------------------------------------
 // Match mode configuration (for setup menu)
@@ -141,6 +143,8 @@ interface MatchStartConfig {
   teamBLabel: string;
   controlsHint: string;
   difficulty: DifficultyLevel;
+  /** REFEREE-SHIPPED-WIRING: whether the shooter opted into the referee loop. */
+  refereeOptIn: boolean;
 }
 
 let lastMatchConfig: MatchStartConfig | null = null;
@@ -156,6 +160,7 @@ const teamBNameInput = document.getElementById("team-b-name") as HTMLInputElemen
 const startButton = document.getElementById("start-button");
 const backToMenuButton = document.getElementById("back-to-menu");
 const difficultySelect = document.getElementById("difficulty-select") as HTMLSelectElement | null;
+const refereeToggle = document.getElementById("referee-toggle") as HTMLInputElement | null;
 
 // ---------------------------------------------------------------------------
 // Match stats accumulator
@@ -481,15 +486,21 @@ function startMatch(
   teamBLabel: string,
   controlsHint: string,
   difficulty: DifficultyLevel = "medium",
+  refereeOptIn: boolean = false,
 ): void {
   stopMatch();
   hideSetupMenu();
+
+  // REFEREE-SHIPPED-WIRING: resolve the accepted referee gates + opt-in card HUD
+  // once, from the menu toggle.  Off resolves to `undefined`/false so the sim
+  // and render paths are byte-identical to pre-referee on every non-opted mode.
+  const referee = resolveRefereeWiring(refereeOptIn);
 
   // FULLTIME-FLOW-CLOSURE: remember this match's start params so the end-of-match
   // REMATCH affordance can re-enter the composition-root path with the same
   // scenario/mode/labels, and clear any stale fulltime affordance from a
   // previous match.  Presentation-layer only; no simulation state poke.
-  lastMatchConfig = { scenario, urlMode, teamALabel, teamBLabel, controlsHint, difficulty };
+  lastMatchConfig = { scenario, urlMode, teamALabel, teamBLabel, controlsHint, difficulty, refereeOptIn };
   fulltimeFlow.hide();
 
   // Derive mode flags from the resolved urlMode string.
@@ -525,8 +536,21 @@ function startMatch(
   // 1. Create world from the scenario.
   const world = createWorld({ scenario });
 
-  // 2. Create simulation (synchronous, DOM-free core).
-  const sim: Simulation = createSimulation(world);
+  // 2. Create simulation (synchronous, DOM-free core).  REFEREE-SHIPPED-WIRING:
+  // when the player opted into the referee loop, the accepted foul/free-kick and
+  // card gates enter through the SAME createSimulation config surface; when off
+  // (default) the gates stay undefined and the core is byte-identical to pre-change.
+  const sim: Simulation = createSimulation(
+    world,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    referee.freeKickConfig,
+    referee.cardConfig,
+  );
 
   // -------------------------------------------------------------------
   // Player switching — handled natively by sim.step() via SWITCH_PLAYER_BIT
@@ -621,6 +645,10 @@ function startMatch(
     // FULLTIME-FLOW-CLOSURE: also draw the end-of-match affordance on the HUD
     // at the fulltime terminal state.  Draw-only; reads the immutable snapshot.
     showFulltimeFlowHud: true,
+    // REFEREE-SHIPPED-WIRING: the opt-in card HUD (bookings) is drawn only when
+    // the shooter opted into the referee loop; other modes leaf it at the default
+    // off so the render path stays byte-identical.
+    showCardHud: referee.cardHud,
   });
 
   // KEEPER-VISUAL-MARKER: with the keeper role live (the accepted 5v5 CPU-vs-CPU
@@ -631,10 +659,19 @@ function startMatch(
   // renders byte-identically to the pre-marker path.
   const keeperPids = IS_KEEPER_ROLE_LIVE ? keeperPlayerIdsFromLayout(scenario) : {};
 
-  /** Enrich a base snapshot with the keeper designation (presentation-only). */
+  // REFEREE-SHIPPED-WIRING: the committed card events are accumulated from the
+  // per-step event stream and copied into the presentation snapshot so the
+  // opt-in card HUD can draw them (a card event is commit-only to the core's
+  // persistent state, so sim.presentation() leaves `events` empty).  With the
+  // referee off (default) no card event is emitted and the array stays empty, so
+  // the enrichment below is a byte-neutral no-op.
+  const committedCards: Array<{ id: string; tick: number; kind: string; label: string }> = [];
+
+  /** Enrich a base snapshot with the keeper designation + card notices (presentation-only). */
   const displaySnapshot = (): PresentationSnapshot => {
     const base = sim.presentation();
-    return IS_KEEPER_ROLE_LIVE ? enrichPresentationWithKeeperRoles(base, keeperPids) : base;
+    const withKeeper = IS_KEEPER_ROLE_LIVE ? enrichPresentationWithKeeperRoles(base, keeperPids) : base;
+    return refereeOptIn ? enrichPresentationWithCards(withKeeper, committedCards) : withKeeper;
   };
 
   // 6. Render initial state.
@@ -731,6 +768,17 @@ function startMatch(
       for (const evt of stepResult.events) {
         // Stats accumulation (pure derivation from event stream)
         processStatsEvent(matchStats, evt);
+
+        // REFEREE-SHIPPED-WIRING: accumulate committed card events so the opt-in
+        // card HUD can draw them.  App-layer derivation only; never a state write.
+        if (refereeOptIn && evt.kind === "card-issued") {
+          committedCards.push({
+            id: evt.id,
+            tick: evt.tick,
+            kind: evt.kind,
+            label: evt.label ?? "",
+          });
+        }
 
         if (evt.kind === "goal") {
           const goalIndex = (evt.payload.goalIndex as number) ?? -1;
@@ -846,7 +894,7 @@ const fulltimeFlow: FulltimeFlow = createFulltimeFlow(document, {
   onRematch: () => {
     if (lastMatchConfig) {
       const c = lastMatchConfig;
-      startMatch(c.scenario, c.urlMode, c.teamALabel, c.teamBLabel, c.controlsHint, c.difficulty);
+      startMatch(c.scenario, c.urlMode, c.teamALabel, c.teamBLabel, c.controlsHint, c.difficulty, c.refereeOptIn);
     }
   },
   onBackToMenu: () => {
@@ -884,7 +932,10 @@ if (startButton) {
     const teamA = teamANameInput?.value?.trim() || "HOME";
     const teamB = teamBNameInput?.value?.trim() || "AWAY";
     const selectedDifficulty = (difficultySelect?.value ?? "medium") as DifficultyLevel;
-    startMatch(entry.scenario, entry.urlMode, teamA, teamB, entry.hint, selectedDifficulty);
+    // REFEREE-SHIPPED-WIRING: a real, menu-visible selectable control — the
+    // "Referee" toggle — is read from the shipped setup menu at start time.
+    const refereeOptIn = refereeToggle?.checked ?? false;
+    startMatch(entry.scenario, entry.urlMode, teamA, teamB, entry.hint, selectedDifficulty, refereeOptIn);
   });
 }
 
@@ -933,7 +984,11 @@ function bootstrap(): void {
     // URL params present → auto-start the match (existing behavior).
     if (setupMenu) setupMenu.classList.add("hidden");
     const { scenario, urlMode, hint, difficulty } = getScenarioFromUrl();
-    startMatch(scenario, urlMode, "HOME", "AWAY", hint, difficulty);
+    // REFEREE-SHIPPED-WIRING: a `referee=1` URL param opts into the referee loop
+    // for the auto-start path (used by headless/replay and the evidence drive);
+    // absent (default) leaves the gates off exactly as before.
+    const refereeOptIn = new URLSearchParams(window.location.search).get("referee") === "1";
+    startMatch(scenario, urlMode, "HOME", "AWAY", hint, difficulty, refereeOptIn);
   } else {
     // No URL params → show the setup menu.
     showSetupMenu();

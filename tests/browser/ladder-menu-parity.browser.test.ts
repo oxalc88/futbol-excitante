@@ -2,13 +2,16 @@
  * @module tests/browser/ladder-menu-parity.browser.test
  *
  * Parity guard: asserts menu-to-scenario-selector parity for the full
- * small-sided ladder (1v1/2v2/3v3/5v5 × human-vs-CPU / CPU-vs-CPU).
+ * small-sided ladder (1v1/2v2/3v3/5v5 × human-vs-CPU / CPU-vs-CPU), and that the
+ * shipped "Referee" toggle is a real, menu-visible selectable control.
  *
  * 1. Every ladder mode in the HTML <select id="mode-select"> has a
  *    scenario-selector mapping via selectBrowserScenario().
  * 2. Every scenario-selector ladder mode has a menu entry in the HTML.
  * 3. Negative control: removing a menu entry causes the parity check
  *    to fail with the named missing mode.
+ * 4. REFEREE-SHIPPED-WIRING: the `#referee-toggle` checkbox exists in the
+ *    shipped menu (a real selectable control, not hidden config).
  *
  * Evidence class: HEADLESS (binding guard test).
  * Case version: browser-case-ladder-menu-parity-v1.
@@ -224,7 +227,13 @@ describe("Ladder menu parity guard", () => {
     ).toBe(true);
   });
 
-  it("discriminating failure — simulating removed entry in full parity check", () => {
+  it("REFEREE-SHIPPED-WIRING — the shipped menu exposes a real, selectable Referee toggle", () => {
+    // A real, menu-visible selectable control (honest UI), not hidden config.
+    expect(indexHtmlRaw).toMatch(/id="referee-toggle"/);
+    expect(indexHtmlRaw).toMatch(/<input\s+type="checkbox"\s+id="referee-toggle"/);
+  });
+
+  it("discriminating failure — removing a menu entry breaks parity", () => {
     // Simulate what happens when human-vs-ai-3v3 is removed from the HTML.
     const removedModeId = "human-vs-ai-3v3";
     const removedLabel = "3v3 Human vs CPU";
