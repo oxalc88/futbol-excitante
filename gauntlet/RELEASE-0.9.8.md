@@ -26,3 +26,9 @@ The orchestrator records product-flow observations at product-horizon boundaries
 0.9.8 does not manually edit execution-owned `gauntlet/state/**` in this maintenance release. On the first orchestrator run after upgrade, the planning-policy change is materially higher-value evidence. An active horizon selected under the 0.9.7 policy must be invalidated and replanned under the 0.9.8 product-first policy. Preserve accepted history.
 
 For the current repository state, this means Horizon v37 should be reassessed before execution rather than treated as an automatic path to release consolidation.
+
+## Model routing refresh
+
+- Routing generation advances to `gauntlet-models-v8`.
+- The Xiaomi MiMo fallback changes from `mimo-v2.5` to `mimo-v2.6-flash`.
+- `gauntlet/models.json`, Grok agent wrappers, and `opencode.json` use the same model ID.
