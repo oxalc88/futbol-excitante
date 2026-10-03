@@ -9,7 +9,7 @@ horizon_id: "advantage-machinery-in-ship"
 created_from_commit: 7d5add9
 created_at: 2026-10-03
 reason: "Horizon v37 (COMPLETE 3/3, remote-durable at 026106a, publication verified 7d5add9) shipped the referee loop into the app and promoted the advantage window to the §6.1–§6.5 design contract. The decisive gap: the shipped referee still calls every recognized foul immediately — advantage, the last fouls disposition, is machinery-free while its design contract is accepted and actionable. The deterministic realization is bounded: window open/close/cancel/expiry per §6.2–§6.3, deferred free-kick/card consequence per §6.4, the retention predicate honestly BLOCKED (advantage_retention_ref) with no invented envelope, ADVANTAGE-PLAYED registrable per §6.5 once observable advantage-cancelled/expired decisions exist."
-current_index: 1
+current_index: 2
 objectives:
   - id: ADVANTAGE-MACHINERY
     status: accepted
@@ -17,8 +17,8 @@ objectives:
     builder: builder-structured
     prerequisite: ""
   - id: ADVANTAGE-SUITE-REGISTRATION
-    status: pending
-    reason: "Register the advantage criterion as an executable protected oracle in suite-fouls-v1 per §6.5 (criterion record, protected oracle, invariant-definition, observation-definition, binding, scenario — the FREE-KICK/CARD-ISSUED additive pattern): an advantage close without a recognized foul FAILs (power guards); honest NOT_EVALUATED/BLOCKED verdicts where the retained path has no reference; the FOULS_CARDS_SPEC §6.5/§10/§13 status text folded to the new registration state. No pre-existing row changed."
+    status: accepted
+    reason: "accepted 2026-10-03 — candidate 023112e, critic glm5.3-flash RETRY (evidence reproducibility) then ACCEPT, integration glm5.3-flash ACCEPT"
     builder: builder-structured
     prerequisite: ADVANTAGE-MACHINERY
   - id: ADVANTAGE-BROWSER-EVIDENCE

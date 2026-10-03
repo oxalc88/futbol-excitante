@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-10-03T20:20:00Z
+measured_at: 2026-10-03T23:35:00Z
 tracking_contract_version: 1
-last_tracked_objective: ADVANTAGE-MACHINERY
-usage_aggregates_through: ADVANTAGE-MACHINERY
-clock_aggregates_through: ADVANTAGE-MACHINERY
-model_evaluation_through: ADVANTAGE-MACHINERY
+last_tracked_objective: ADVANTAGE-SUITE-REGISTRATION
+usage_aggregates_through: ADVANTAGE-SUITE-REGISTRATION
+clock_aggregates_through: ADVANTAGE-SUITE-REGISTRATION
+model_evaluation_through: ADVANTAGE-SUITE-REGISTRATION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -305,6 +305,7 @@ invoices.
 | ADVANTAGE-WINDOW-SPEC | accepted | ~25m | ~24m | 6m | 10m | <1m | n/a | n/a |
 | RELEASE-0.9.8-CONSOLIDATION | accepted | ~45m | ~14m | 7m | 18m | <1m | n/a | n/a |
 | ADVANTAGE-MACHINERY | accepted | ~2h 10m | 1h 41m | 12m | 16.5m | <1m | n/a | n/a |
+| ADVANTAGE-SUITE-REGISTRATION | accepted | ~3h 05m | ~1h 02m | 21m | 58m | <1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -664,6 +665,7 @@ on an H task is the interesting result.
 | ADVANTAGE-WINDOW-SPEC | deepseek-v4-flash | L | Low — spec-only §6 rewrite (BOOKKEEPING, zero src/eval change) | 0 | A | first-pass ACCEPT; the binding suite re-pin is additive-only and the named-not-registered invariant held with a live registry dump |
 | RELEASE-0.9.8-CONSOLIDATION | deepseek-v4-flash | L | Low — BOOKKEEPING release record + producer + binding test (zero src/eval/spec change; the RELEASE-0.9.8.md name collision resolved to RELEASE-0.9.8-PRODUCT and disclosed) | 0 | A | first-pass ACCEPT; record 17 pinned citations; discriminating mutation case in the binding suite |
 | ADVANTAGE-MACHINERY | deepseek-v4-flash | M | Medium — gated default-OFF advantage-window machinery per FOULS_CARDS_SPEC §6.2–§6.4 (new advantage-policy.ts with pure resolveAdvantageClose; 6b-3d window block in simulation.ts with deferred close-tick consequence; additive gated event kinds; runner passthroughs + serializeRestartFacts kinds; 11 unit + 7 integration tests; minimal 4-line spec status fold; judged-retained path deliberately NOT implemented) | 0 | A | first-pass ACCEPT; gate-off pin fb5e9b02… byte-exact; driven+organic two-run attestations |
+| ADVANTAGE-SUITE-REGISTRATION | deepseek-v4-flash | M | Medium — additive registration of ADVANTAGE-PLAYED per FOULS_CARDS_SPEC §6.5 in suite-fouls-v1 (criterion + oracle + invariant + observation + binding + scenario; shared obs/scn with prior foul registrations; ALL_TEST_IDS 60→61; oracle grounded in shared foul-predicate + advantage-policy; power guards over committed §5.1 contacts; spec §6.5/§10/§13 status fold) | 1 | B | critic RETRY on evidence reproducibility (durable trajectory missing the 6th disclosure); fixed by durable-evidence recapture, then ACCEPT |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -1017,6 +1019,8 @@ on an H task is the interesting result.
 | RELEASE-0.9.8-CONSOLIDATION | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | binding + fouls-spec suites re-run green; CI=1 gauntlet:eval exit 0 (39 scenarios + 41 prompt checks); all 17 pins + record sha independently recomputed; evaluator integrity PASS; disclosed non-blocking note: the pre-existing GK-REGRESSION continuous-stream binding test sits ~104s vs its 100s vitest cap on this 1-vCPU host (candidate-independent, file unchanged since 5dd2c1e) |
 | ADVANTAGE-MACHINERY | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: gate-off pin fb5e9b02… re-derived byte-exact + two-run hashes re-derived via own tsx script; 6b-3c/6b-4 gate-off equivalence verified against git show HEAD; spec fold audited line-by-line (exactly 4 status-prose lines); unhandled vitest worker-RPC error attributed to the documented repo precedent (isolated run 18/18 clean); no scope creep, ADVANTAGE-PLAYED stays NAMED-NOT-REGISTERED |
 | ADVANTAGE-MACHINERY | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | neighbor batteries 207/207 + 60/60 + 63/63; all createSimulation consumers enumerated default-identical (10th param optional); Set→Record membership-equivalent + hash-neutral; docs/ byte-identity on ordinary runs; fresh ephemeral capture reproduced pin + two-run byte-equality |
+| ADVANTAGE-SUITE-REGISTRATION | critic (glm5.3-flash) | glm5.3-flash | RETRY → ACCEPT | first pass: 12/12 substantive criteria PASS (additive verified row-by-row; retained path proven unable to PASS via stream mutation; four power guards FAIL correctly; independent stream re-execution reproduced fb5e9b02… + 76a98275…; spec fold status-text-only) but EVIDENCE-REPRODUCIBILITY FAIL — durable trajectory had 5 of the script's 6 disclosures; RETRY fix verified by independent stash+recapture (0-line diff), then ACCEPT |
+| ADVANTAGE-SUITE-REGISTRATION | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | 133/133 registry/binding; typecheck 0; gauntlet:eval 39+41; eval:state 13/13; independent ephemeral re-capture byte-equal to durable; no accepted pin moved; disclosed pre-existing failure: release-0-9-8-product-binding.ts pins the ADVANTAGE-WINDOW-SPEC-era NAMED-NOT-REGISTERED text and fails identically on clean HEAD (follow-up bookkeeping) |
 
 ### Builder scoreboard
 
