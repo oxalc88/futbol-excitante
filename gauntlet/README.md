@@ -90,14 +90,14 @@ Two deterministic checks protect this split: wrappers must reference an existing
 | `builder-gameplay` | subagent | `qwen3.8-flash` | gameplay, ball/control/team behavior, presentation-facing integration |
 | `critic` | subagent | `glm5.3-flash` | primary independent qualitative critic |
 | `critic-qwen` | fallback critic | `qwen3.6` | independent critic fallback |
-| `critic-mimo` | fallback critic | `mimo-v2.5` | independent critic fallback |
+| `critic-mimo` | fallback critic | `mimo-v2.6-flash` | independent critic fallback |
 | `integration-reviewer` | subagent | `glm5.3-flash` | primary integration/neighbouring-regression review |
 | `integration-reviewer-qwen` | fallback integration | `qwen3.6` | independent integration fallback |
-| `integration-reviewer-mimo` | fallback integration | `mimo-v2.5` | independent integration fallback |
+| `integration-reviewer-mimo` | fallback integration | `mimo-v2.6-flash` | independent integration fallback |
 | `aux` | subagent | `gemma4` | cheap summaries and bounded semantic audit |
 | `git-committer` | subagent | `gemma4` | atomic conventional commits and requested publication |
 
-Exact IDs and fallback ordering live in `gauntlet/models.json`.
+Exact IDs and fallback ordering live in `gauntlet/models.json`. Routing generation for 0.9.8 is `gauntlet-models-v8`.
 
 ## Model routing
 
@@ -107,7 +107,7 @@ Current registered model IDs used by the Gauntlet are:
 - `qwen3.8-flash`
 - `glm5.3-flash`
 - `qwen3.6`
-- `mimo-v2.5`
+- `mimo-v2.6-flash`
 - `gemma4`
 - `grok-4.6` for the parent orchestrator
 
