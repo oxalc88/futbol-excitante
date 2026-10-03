@@ -14,7 +14,7 @@ A critic ACCEPT is never final. An objective is accepted only after integration 
 
 Use a rolling execution horizon persisted in `gauntlet/state/HORIZON.md`.
 
-At startup, after a handoff, or when the horizon is exhausted/invalidated, perform one strategic reassessment from the actual repository, evidence, research, authoritative specs, `CURRENT.md`, and `objectives.md`. Select a short horizon of roughly 4–8 candidate objectives, ordered by current value and dependencies, and persist concise reasons. This horizon is temporary planning state, not a fixed backlog.
+At startup, after a handoff, or when the horizon is exhausted/invalidated, perform one strategic reassessment from the actual repository, evidence, research, authoritative specs, `CURRENT.md`, `objectives.md`, and any open GitHub issues that describe current product work. Select a short horizon of 2–4 objectives. Start from one player-visible product outcome, then include only the technical work that directly enables or protects that outcome. This horizon is temporary planning state, not a fixed backlog.
 
 For objectives inside a valid horizon, do NOT globally reread/reprioritize the whole project after every acceptance. Use `CURRENT.md`, `HORIZON.md`, the just-finished objective evidence/verdicts, and only the directly relevant specs/files to advance to the next horizon objective.
 
@@ -28,7 +28,11 @@ Invalidate and rebuild the horizon early when any of these occurs:
 
 Do not invalidate merely because an objective needed ordinary retries or because another possible improvement exists.
 
-Where technically reasonable, every horizon must lead toward at least one observable playable/browser-facing capability or milestone. A horizon containing only evaluator/laboratory/infrastructure work must record why that infrastructure is required before observable gameplay progress can safely continue. Do not invent gameplay requirements beyond the specs.
+Every normal product horizon must name one observable playable/browser-facing outcome. Prefer work in this order: player-visible blocker → gameplay feel/readability → broken match flow → missing core mechanic → supporting eval/spec work. Evaluator, laboratory, infrastructure, and spec-only objectives are valid only when they directly unblock or protect the named product outcome. A feature is not product-complete while it exists only in fixtures, test bridges, capture paths, or gated code that normal shipped play does not use. Do not invent gameplay requirements beyond the specs.
+
+Read `gauntlet/product-flow-contract.md` when planning. Use GitHub issues as a durable work queue and compact context index when issues exist. GitHub issues do not replace `CURRENT.md`, `HORIZON.md`, acceptance manifests, or history.
+
+At the first strategic reassessment after a Gauntlet system upgrade that materially changes planning policy, invalidate any active horizon whose objective selection was made under the old policy and replan under the new policy. Preserve the old horizon as historical state; do not rewrite accepted history.
 
 ## Horizon invariants
 
@@ -59,8 +63,8 @@ Model availability and model capability are separate facts. Follow `gauntlet/mod
 Loop until you are stopped or a human-needed blocker is reached:
 
 1. Inspect repository state, `CURRENT.md`, and `HORIZON.md`. Repair a stale accepted `active_candidate`, then validate horizon invariants before selection.
-2. If the horizon is missing/exhausted/materially invalidated, perform strategic reassessment and persist a validated 4–8 objective horizon. Otherwise advance without global replanning. After persisting a valid replanned horizon, if its indexed next objective is executable and no allowed stop reason applies, delegate it immediately without asking the human for confirmation.
-3. Determine the strictest evidence class from `gauntlet/evidence-classes.md`, choose `builder-structured` or `builder-gameplay` by the responsibility rules above, and delegate one coherent implementation. Require executed tests and class-specific artifacts from `gauntlet/evidence-contract.md`. A temporal browser-visible claim requires `DYNAMIC_VISUAL`; event-driven claims require event-centered semantic evidence.
+2. If the horizon is missing/exhausted/materially invalidated, perform strategic reassessment and persist a validated 2–4 objective product-first horizon. Otherwise advance without global replanning. After persisting a valid replanned horizon, if its indexed next objective is executable and no allowed stop reason applies, delegate it immediately without asking the human for confirmation.
+3. Determine the strictest evidence class from `gauntlet/evidence-classes.md`, choose `builder-structured` or `builder-gameplay` by the responsibility rules above, and delegate one coherent implementation. Require executed tests and class-specific artifacts from `gauntlet/evidence-contract.md`. A temporal browser-visible claim requires `DYNAMIC_VISUAL`; event-driven claims require event-centered semantic evidence. When two or more horizon objectives are independent, have non-overlapping file ownership, and have no acceptance dependency, they may run in parallel on separate branches/worktrees. Each parallel objective keeps its own tests, evidence, critic, integration review, and acceptance record. Never parallelize objectives that modify the same canonical state or require the result of another objective.
 4. Run the deterministic pre-review gate: `pnpm run gauntlet:audit -- --objective <id> --class <class> --tests-pass true` plus `--integration-test-pass true` for multi-tick classes and `--requires-slot-wiring true --slot-wiring-pass true` when ownership/routing is an acceptance criterion. The audit persists `docs/evidence/<id>/audit.json` and covers test facts, artifact existence, semantic-sequence requirements, screenshot SHA reuse, trajectory requirements, CURRENT/HORIZON consistency, TIMING consistency, eval-result freshness, and optional slot/player wiring invariants.
    - `FAIL` with `owner: builder`: return concrete evidence/implementation fixes to the builder.
    - `FAIL` with `owner: orchestrator`: repair bookkeeping/tracking/persistence locally and rerun the audit; do not send valid gameplay back to the builder.
@@ -75,6 +79,7 @@ Loop until you are stopped or a human-needed blocker is reached:
 11. Immediately invoke `git-committer` in **acceptance publication mode** for the final acceptance commit. Push the accepted chain once, fetch the configured upstream, and verify the exact final acceptance commit is contained in the remote branch. A local final commit is not sufficient remote durability. If push or verification fails, repair publication before continuing. Do not delegate or replan past an accepted objective until remote durability is verified.
 12. Continue immediately only after step 11 succeeds. If another horizon objective exists, delegate it. If the horizon is exhausted, first ensure the exhausted horizon's last acceptance is remotely durable, then perform strategic reassessment and start the next horizon. Horizon exhaustion triggers strategic reassessment; it is never a stop condition by itself.
 13. At a strategic boundary where a normative milestone has enough implemented material to evaluate, apply the milestone playtest flow below. This evaluation reports milestone truth; it does not retroactively change objective acceptance.
+14. At the end of each product horizon, record the product-flow observations defined in `gauntlet/product-flow-contract.md`: player-visible changes, time-to-playable when measurable, process-only objective count, playtest issues opened/closed, and gameplay regressions. These are planning signals, not acceptance gates.
 
 ## Milestone-aware playtesting and observability
 
