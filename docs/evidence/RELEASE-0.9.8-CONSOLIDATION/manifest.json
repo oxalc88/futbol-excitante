@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.9",
+  "objective_id": "RELEASE-0.9.8-CONSOLIDATION",
+  "accepted_at": "2026-10-03T11:03:29.581Z",
+  "candidate_commit": "bd95764",
+  "evidence_class": "BOOKKEEPING",
+  "evidence": {
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/RELEASE-0.9.8-CONSOLIDATION/audit.json",
+      "sha256": "5e557e9fb7cf0d6c3f34e222d4cbc033c7ac47155b50481843fff70fc44aac72",
+      "git_blob": "318a975786d18e55e29ad6395741ca6f164169fe",
+      "candidate_commit": "bd95764",
+      "bytes": 2698,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "RELEASE-0.9.8-PRODUCT.md consolidates the v34-v37 accepted gains (playable referee loop, executable-attested fouls/GK state, advantage spec, deferred set, honest limitations), every claim citing an accepted record",
+      "release-0-9-8-product.json byte-reproducible, record_sha256 633970c0…, 17 pinned citations, no wall-clock field, throws on mutation",
+      "name-collision resolution disclosed: PRODUCT record (the 0.9.8 SYSTEM notes already occupied gauntlet/RELEASE-0.9.8.md); VERSION.json stays 0.9.9 (system), stored as historical snapshot",
+      "binding test 12 cases incl. discriminating mutation; the historical 0.9.7 binding test unchanged and green"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "artifact": "docs/evidence/RELEASE-0.9.8-CONSOLIDATION/audit.json",
+      "note": "BOOKKEEPING class, 20 checks; candidate artifacts filed under RELEASE-0.9.8-PRODUCT per disclosed name-collision resolution"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT",
+      "pass": 1,
+      "note": "record_sha256 recomputed MATCH (633970c0…); all 17 cited pins verified live (14 record + 3 file-byte); headline facts grounded in the pinned accepted records; no claim upgrade; name-collision (RELEASE-0.9.8-PRODUCT vs the 0.9.8 SYSTEM notes) and VERSION.json handling judged honest; binding suites executed 22/22 exit 0"
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT",
+      "pass": 1,
+      "note": "binding + fouls-spec suites re-run green; gauntlet:eval exit 0 (39 scenarios + 41 prompt checks); all 17 pins + record sha independently recomputed; evaluator integrity PASS (CARD-ISSUED honest NOT_EVALUATED preserved; no invented envelopes); disclosed non-blocking neighbor note: the pre-existing GK-REGRESSION continuous-stream binding test sits ~104s vs its 100s vitest cap on this 1-vCPU host (candidate-independent, file unchanged since 5dd2c1e)"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-10-03/2026-10-03T11-03-29-581Z-RELEASE-0.9.8-CONSOLIDATION-acceptance.json"
+}

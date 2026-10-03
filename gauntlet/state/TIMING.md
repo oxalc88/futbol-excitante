@@ -5,12 +5,12 @@ Do not treat these numbers as a provider invoice.
 
 ```yaml
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
-measured_at: 2026-10-03T10:15:00Z
+measured_at: 2026-10-03T11:10:00Z
 tracking_contract_version: 1
-last_tracked_objective: ADVANTAGE-WINDOW-SPEC
-usage_aggregates_through: ADVANTAGE-WINDOW-SPEC
-clock_aggregates_through: ADVANTAGE-WINDOW-SPEC
-model_evaluation_through: ADVANTAGE-WINDOW-SPEC
+last_tracked_objective: RELEASE-0.9.8-CONSOLIDATION
+usage_aggregates_through: RELEASE-0.9.8-CONSOLIDATION
+clock_aggregates_through: RELEASE-0.9.8-CONSOLIDATION
+model_evaluation_through: RELEASE-0.9.8-CONSOLIDATION
 source: ~/.grok/sessions/.../subagents/*/meta.json + child updates.jsonl
 idle_excluded: 2026-08-14T07:46Z .. 2026-08-14T13:03Z
 backfill_note: "2026-08-19 pickup: rows for CPU-DEFENSIVE-ORGANIZATION, MATCH-CORNER-KICK, BROWSER-PLAYER-ANIMATION, BROWSER-UI-POLISH backfilled from durable acceptance records/manifests and commit timestamps; per-step durations are estimates, not subagent meta.json."
@@ -49,7 +49,7 @@ style meter is the live context window, not session cost.
 | Orchestrator thinking between steps | ~5h est. (within-session only) |
 | Intersession idle (multi-day gaps, not itemized) | remainder of span |
 
-Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-10-03T10:15:00Z`.
+Session start: `2026-08-14 01:19 UTC`. Measurement: `2026-10-03T11:10:00Z`.
 Recomputed 2026-09-07 at the RELEASE-0.9.7-CONSOLIDATION acceptance
 (Horizon v33 4/4): 205 accepted per-step rows summing to ~186h 40m (the new
 objective adds ~1h 07m: builder ~20m / critic ~16m / integration 30m /
@@ -303,6 +303,7 @@ invoices.
 | CARD-BROWSER-EVIDENCE | accepted | ~3h 25m | ~47m | 20m | 2h 07m | <1m | n/a | n/a |
 | REFEREE-SHIPPED-WIRING | accepted | ~2h 40m | ~24m\* | 33m | 8m | <1m | n/a | n/a |
 | ADVANTAGE-WINDOW-SPEC | accepted | ~25m | ~24m | 6m | 10m | <1m | n/a | n/a |
+| RELEASE-0.9.8-CONSOLIDATION | accepted | ~45m | ~14m | 7m | 18m | <1m | n/a | n/a |
 
 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\* deepseek-v4-flash builder time spans two subagent sessions (the orchestrator expanded the objective's scope mid-flight to also fix the 10 masked eval/runners type-drift errors, so the total covers the union fix + the full eval/runners repair + the ~1100-test regression battery). Clean first pass: critic ACCEPT first pass (independent HEAD-worktree reproduction of all 12 baseline errors + byte-identical runner outputs), integration ACCEPT first pass, on glm5.3-flash. Typecheck exit 0 across core/node/browser; zero runtime behavior change. Reviewer/commit times from subagent meta.json.
 
@@ -660,6 +661,7 @@ on an H task is the interesting result.
 | CARD-BROWSER-EVIDENCE | deepseek-v4-flash (reroute) | M | Medium - the booking visible in the real browser (DYNAMIC_VISUAL, zero gameplay change): 5 event-centered byte-distinct real-Chromium frames (foul@66 → caution@116 → continued@173 → 4th@276 → expulsion@371) with the gated card HUD reading snapshot.events via the capture-path enrichment (no contracts change; the architectural judgment explicit — upstream of the renderer, no shared mutation, main.ts untouched); an EXACT 0/0 browser↔headless correspondence; the byte-neutrality proven by re-capturing the accepted FOUL-FREEKICK frames through the modified renderer reproducing the exact pinned bytes; the test-bridge cardConfig passthrough (the freeKickConfig precedent) | 0 | A | first-pass ACCEPT; the critic did full PNG forensics (viewed all 5, re-hashed, the temporal coherence TIME = 5400 − tick, the pinned bytes reproduced by an independent re-capture) and made the architectural judgment explicit; integration ran the FULL browser battery 54 files / 274 tests + the FULL node battery (nothing skipped) + the createTestBridge enumeration (173 sites) |
 | REFEREE-SHIPPED-WIRING | qwen3.8-flash (prior-session candidate adopted) | M | Medium — shipped composition-root wiring through the accepted createSimulation config surface (DYNAMIC_VISUAL, zero core change) | 0 | A | first-pass ACCEPT; the builder session pre-dated this continuation — the orchestrator re-verified the candidate (typecheck 0, targeted browser tests, audit PASS) before review |
 | ADVANTAGE-WINDOW-SPEC | deepseek-v4-flash | L | Low — spec-only §6 rewrite (BOOKKEEPING, zero src/eval change) | 0 | A | first-pass ACCEPT; the binding suite re-pin is additive-only and the named-not-registered invariant held with a live registry dump |
+| RELEASE-0.9.8-CONSOLIDATION | deepseek-v4-flash | L | Low — BOOKKEEPING release record + producer + binding test (zero src/eval/spec change; the RELEASE-0.9.8.md name collision resolved to RELEASE-0.9.8-PRODUCT and disclosed) | 0 | A | first-pass ACCEPT; record 17 pinned citations; discriminating mutation case in the binding suite |
 ### Reviewer route and catches
 
 | Step | Reviewer | Route | Result | Catches |
@@ -1009,6 +1011,8 @@ on an H task is the interesting result.
 | REFEREE-SHIPPED-WIRING | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | dependency direction PASS (core diff empty, re-verified); neighbor tests re-run 17/17; docs aggregate SHA-256 pre/post byte-identical (evidence re-runs write only under ignored test-results/**); replay/determinism verified (state-hash chain assertion + record_sha256 recomputed in Node); presentation snapshot-driven PASS (draw-only gated affordances); evaluator integrity PASS (no oracle weakened; the parity guard got STRICTER preconditions); critic verdict verified from transcript |
 | ADVANTAGE-WINDOW-SPEC | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: spec-only containment (git diff src/ src/contracts/ eval/ empty); exactly two numerics in §6, both pre-existing fouls-v1 VERSIONED_PROVISIONAL tick budgets re-characterized at foundation-fixed-dt-v1; advantage_retention_ref BLOCKED_MISSING_REFERENCE with an explicit prohibition on invented envelopes; ADVANTAGE-PLAYED named-not-registered invariant verified against live registry state; all four binding suites critic-executed 96/96 exit 0; §5.1 predicate paraphrase exact; no false current-behavior claim |
 | ADVANTAGE-WINDOW-SPEC | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | shared fouls binding suites re-run 68/68 exit 0 (spec 47 + detection 12 + aggregate-honesty 9); diff audit additive-only — no pre-existing binding expectation weakened; live registry dump: 97 criteria, 0 advantage-family entries, the fouls suite exactly the four registered oracles; §10 header count unchanged; no src/contracts change so all core surfaces unmodified |
+| RELEASE-0.9.8-CONSOLIDATION | critic (glm5.3-flash) | glm5.3-flash | ACCEPT | first-pass ACCEPT: record_sha256 recomputed MATCH; all 17 cited pins verified live; headline facts read back from the pinned accepted records (fouls 4-of-5 with CARD-ISSUED honest NOT_EVALUATED; gk canary NE→PASS; goalkeepers 10/0/1/1/1; the REFEREE frame/correspondence facts; the §6 spec facts); no forbidden-claim language; name-collision timeline verified (system notes committed 2026-10-02, horizon created 2026-09-08); binding suites executed 22/22 exit 0 |
+| RELEASE-0.9.8-CONSOLIDATION | integration-reviewer (glm5.3-flash) | glm5.3-flash | ACCEPT | binding + fouls-spec suites re-run green; CI=1 gauntlet:eval exit 0 (39 scenarios + 41 prompt checks); all 17 pins + record sha independently recomputed; evaluator integrity PASS; disclosed non-blocking note: the pre-existing GK-REGRESSION continuous-stream binding test sits ~104s vs its 100s vitest cap on this 1-vCPU host (candidate-independent, file unchanged since 5dd2c1e) |
 
 ### Builder scoreboard
 
