@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.9.9",
+  "objective_id": "REFEREE-SHIPPED-WIRING",
+  "accepted_at": "2026-10-03T09:37:47.946Z",
+  "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "evidence": {
+    "screenshots": [
+      {
+        "path": "docs/screenshots/REFEREE-SHIPPED-WIRING/caution.png",
+        "sha256": "4bc12fd48b31610b0cf375da8b6126b8226de28b64e0222fcae6e79f7be70f81",
+        "git_blob": "49a7867b7ced3f98f7a2ad78b4938821df3f4805",
+        "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+        "bytes": 35922,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/REFEREE-SHIPPED-WIRING/foul-2-contact.png",
+        "sha256": "1ac6992b5740e1ed116e3c588556a46ed2879b948d4ace63d07c55c46e8286be",
+        "git_blob": "114a658d81dd9cb12576e4ec8f7ab90d7e27324f",
+        "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+        "bytes": 30227,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/REFEREE-SHIPPED-WIRING/foul-contact.png",
+        "sha256": "5decc5905abed0d4ec6077410c7f4dd0813e16d2e2c333748af3348daa483882",
+        "git_blob": "7875e1c77d42f45361f7c7d62c61ee1d46058d5b",
+        "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+        "bytes": 31037,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/REFEREE-SHIPPED-WIRING/freekick-award.png",
+        "sha256": "612d18605fb67bd2c6819e581627f083738b01af35064ff85752e8b4e539b21e",
+        "git_blob": "0dde098acf5a1356ca48cb6bcb6b59cfdcc45da0",
+        "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+        "bytes": 31627,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/REFEREE-SHIPPED-WIRING/freekick-served.png",
+        "sha256": "8937bb6abda31837104470052b2f751606b6def99d6a144cae27d2406a607f67",
+        "git_blob": "db30ba8d70276da7809a966cd5e320967f074728",
+        "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+        "bytes": 31781,
+        "committed_with_candidate": true
+      },
+      {
+        "path": "docs/screenshots/REFEREE-SHIPPED-WIRING/menu-referee-toggle.png",
+        "sha256": "47365544e972dbd1b14c3c7e2052c41cb9a8f92e084d759b3a2c2436384abe36",
+        "git_blob": "b0689f087e9f9c9f5a4bb48ddf736b17c00d833b",
+        "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+        "bytes": 58044,
+        "committed_with_candidate": true
+      }
+    ],
+    "semantic_sequence": {
+      "metadata": {
+        "schema_version": 1,
+        "objective_id": "REFEREE-SHIPPED-WIRING",
+        "evidence_class": "DYNAMIC_VISUAL",
+        "semantic_order": "man-not-ball foul contact -> free-kick award -> served free kick -> 2nd foul contact -> caution (yellow) issued",
+        "durable_capture": true,
+        "scenario": "5v5-human-vs-cpu-v1",
+        "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+        "rendering": {
+          "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium), same createSimulation config surface the shipped composition root uses",
+          "hud": "showMatchPhaseHud:true + showCardHud:true (curated FREE KICK label + yellow booking notice, presentation-only enrichment)"
+        },
+        "arc": {
+          "foul_ticks": [
+            66,
+            290
+          ],
+          "foul_count": 2,
+          "card_count": 1,
+          "first_free_kick": {
+            "tick": 126,
+            "teamId": "team-b",
+            "free_kick_position": {
+              "x": -1.8825283681923257,
+              "y": 0.03639052588315668
+            },
+            "kick_direction": {
+              "x": 0,
+              "y": -1
+            }
+          },
+          "caution": {
+            "tick": 290,
+            "cardType": "caution",
+            "accumulatedFouls": 2,
+            "playerId": "player-1"
+          },
+          "booking_state": {
+            "player-1": {
+              "fouls": 2,
+              "cautions": 1,
+              "expulsions": 0
+            }
+          }
+        },
+        "frames": [
+          {
+            "label": "foul-contact",
+            "path": "foul-contact.png",
+            "tick": 65,
+            "semantic": "before",
+            "description": "Man-not-ball tackle contact (the first foul): the defending body commits a standing tackle on the carrier — both in contact, the ball still in play (PLAYING) before the free kick is awarded",
+            "sha256": "5decc5905abed0d4ec6077410c7f4dd0813e16d2e2c333748af3348daa483882"
+          },
+          {
+            "label": "freekick-award",
+            "path": "freekick-award.png",
+            "tick": 67,
+            "semantic": "event",
+            "description": "Free kick awarded for the first foul: the phase turns FREE KICK, the ball is re-placed at the contact position (team-b awarded)",
+            "sha256": "612d18605fb67bd2c6819e581627f083738b01af35064ff85752e8b4e539b21e"
+          },
+          {
+            "label": "freekick-served",
+            "path": "freekick-served.png",
+            "tick": 128,
+            "semantic": "result",
+            "description": "Served free kick: the ball is back in play off the contact spot along the committed kick direction, the phase is PLAYING again",
+            "sha256": "8937bb6abda31837104470052b2f751606b6def99d6a144cae27d2406a607f67"
+          },
+          {
+            "label": "foul-2-contact",
+            "path": "foul-2-contact.png",
+            "tick": 289,
+            "semantic": "transition",
+            "description": "The 2nd man-not-ball tackle contact (the offending player's 2nd accumulated foul) — still PLAYING before the booking",
+            "sha256": "1ac6992b5740e1ed116e3c588556a46ed2879b948d4ace63d07c55c46e8286be"
+          },
+          {
+            "label": "caution",
+            "path": "caution.png",
+            "tick": 290,
+            "semantic": "result",
+            "description": "Caution (yellow) issued on the 2nd accumulated foul: the card consequence issues a caution to player-1 (accumulated 2); the card HUD draws the yellow booking and the 2nd free kick is awarded (phase FREE KICK)",
+            "sha256": "4bc12fd48b31610b0cf375da8b6126b8226de28b64e0222fcae6e79f7be70f81"
+          }
+        ]
+      },
+      "artifact": {
+        "path": "docs/screenshots/REFEREE-SHIPPED-WIRING/sequence.json",
+        "sha256": "0a71f32c498343dbac3d883dcdd8fae5f1839e48a2c234f68e596a27088a6847",
+        "git_blob": "438133a0affa87fe1312c99237434a4212a2b02a",
+        "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+        "bytes": 3247,
+        "committed_with_candidate": true
+      }
+    },
+    "trajectory": {
+      "path": "docs/evidence/REFEREE-SHIPPED-WIRING/trajectory.json",
+      "sha256": "6e593a0443ed609da00c66eb1ceaf87efcd36520c41ab3ef88cae131cf5e0c3f",
+      "git_blob": "4c12e086667a821b889540ea98a9aba2d17d3cd7",
+      "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+      "bytes": 2832,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/REFEREE-SHIPPED-WIRING/audit.json",
+      "sha256": "d5a7b997df35e137b2b5e55769c7f22f74d82a5d2677fe9bb0e25d823a90144b",
+      "git_blob": "157b0d51ceafe0bb89861642abfba81a62348e25",
+      "candidate_commit": "7e9adde81c4fcb002763f60c8423205dffc602d8",
+      "bytes": 2636,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": [
+      "5 event-centered real-Chromium frames (foul-contact@65, freekick-award@67, freekick-served@128, foul-2-contact@289, caution@290)",
+      "browser↔headless correspondence exact: foul_ticks [66,290], free_kick_tick 126 offset 0, caution_tick 290 offset 0",
+      "menu-visible Referee toggle + referee=1 URL param; gates through the SAME accepted createSimulation config surface",
+      "gate-off byte-identity guard (explicit-undefined call === createSimulation(world) hash chain)"
+    ]
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS",
+      "artifact": "docs/evidence/REFEREE-SHIPPED-WIRING/audit.json",
+      "checks": 20,
+      "note": "DYNAMIC_VISUAL class; all checks PASS or NOT_APPLICABLE; rerun after reviews"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "agent": "critic",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT",
+      "pass": 1,
+      "note": "PNG SHA forensics vs sequence.json/state/trajectory exact; record_sha256 recomputed; independent non-durable re-runs (unit apps 4/4, browser 3/3 with arc reproduction, ladder-menu-parity 10/10, fulltime-flow-closure 7/7); zero core/contracts diff verified"
+    },
+    "integration": {
+      "agent": "integration-reviewer",
+      "model": "glm5.3-flash",
+      "verdict": "ACCEPT",
+      "pass": 1,
+      "note": "dependency direction PASS; neighbor tests re-run (17 browser tests); docs byte-identity pre/post verified; presentation snapshot-driven PASS; evaluator integrity PASS; critic verified"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-10-03/2026-10-03T09-37-47-946Z-REFEREE-SHIPPED-WIRING-acceptance.json"
+}

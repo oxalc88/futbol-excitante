@@ -7,7 +7,7 @@ orchestrator_in_use: orchestrator
 overflow_orchestrator: orchestrator-deepseek
 handoff_at_percent: 89
 handoff_metric: super_grok_weekly_usage
-next_objective_id: REFEREE-SHIPPED-WIRING
+next_objective_id: ADVANTAGE-WINDOW-SPEC
 
 
 
@@ -207,13 +207,23 @@ accepted:
   - CARD-MACHINERY
   - CARD-ISSUED-SUITE-REGISTRATION
   - CARD-BROWSER-EVIDENCE
+  - REFEREE-SHIPPED-WIRING
 
 blocked: []
 
-selection_note: "Horizon v37 (referee-shipping-and-advantage-spec) ACTIVE 0/3 - created 2026-09-08 after Horizon v36 COMPLETE 4/4 (remote-durable at 3553e64). v36 completed the referee machinery (FOULS-AGGREGATE-HONESTY-RERUN record c8b3b63e…; CARD-MACHINERY record 01d731ad…; CARD-ISSUED-SUITE-REGISTRATION record 3dac8a48…; CARD-BROWSER-EVIDENCE record bc9daf1fff…). The decisive gap: every referee gate is default-off and exercised only through driven fixtures/test-bridge — the shipped app never enables them, so a real player never sees a foul, a free kick, or a card in normal play. v37 closes it: (1) REFEREE-SHIPPED-WIRING (builder-gameplay, DYNAMIC_VISUAL) — enable the referee gates in the shipped composition root for the appropriate modes (menu-visible toggle or mode default per the ladder/menu pattern), with real-browser evidence of fouls/free-kicks/cards in normal play, parity guards byte-neutral for untouched modes; (2) ADVANTAGE-WINDOW-SPEC (builder-structured, HEADLESS) — the advantage-window semantics drafted in FOULS_CARDS_SPEC (spec-first for the last criterion; named-but-unregistered until machinery; unmeasurable conditions BLOCKED, never invented); (3) RELEASE-0.9.8-CONSOLIDATION (builder-structured, prereq (1)) — the v34-v37 gains into the release record + the version bump (the needle advance routed to the orchestrator if the gate requires it). Deferred: ADVANTAGE-PLAYED machinery, the severity path, second-yellow→red, regulation implementation, GK beyond small-sided, full-match ecology, perceptual-rubric/networked/PES-fidelity; CORNER-KICK-CROSS + GOAL-KICK-DISTRIBUTION + GK-*-REF stay BLOCKED_MISSING_REFERENCE; GK-*-VIS/GK-*-CAUSAL stay as-is."
-```
+selection_note: "Horizon v37 (referee-shipping-and-advantage-spec) ACTIVE 1/3 — created 2026-09-08 after Horizon v36 COMPLETE 4/4 (remote-durable at 3553e64). REFEREE-SHIPPED-WIRING accepted 2026-10-03 (candidate 7e9adde): the shipped composition root now exposes a menu-visible Referee toggle; the accepted awardFreeKicks/issueCards gates flow through the SAME createSimulation config surface with EMPTY core/contracts diff; 5 event-centered real-Chromium frames (fouls@66/290, FK@126, caution@290) with exact browser↔headless correspondence and a gate-off byte-identity guard. Remaining: (2) ADVANTAGE-WINDOW-SPEC (builder-structured, spec-only) — §6 advantage-window semantics, no machinery; (3) RELEASE-0.9.8-CONSOLIDATION (builder-structured) — the v34-v37 release record, VERSION 0.9.7 → 0.9.8."
+
 ## Last accepted objective
-CARD-BROWSER-EVIDENCE - Horizon v36 4/4 — horizon COMPLETE (DYNAMIC_VISUAL). The booking visible in the real browser: 5 event-centered byte-distinct real-Chromium frames (foul-1-contact@66 → caution@116 "YELLOW CARD player-1 (2)" → continued-foul@173 → foul-4-contact@276 → expulsion@371 "RED CARD player-1 (5)"), sequence.json bindings verified against the PNG bytes, temporal coherence exact (TIME = 5400 − tick), and an EXACT 0/0 browser↔headless correspondence (foul ticks [66,116,173,276,371]; booking {fouls:5, cautions:1, expulsions:1}). Zero gameplay change (src/simulation/ + src/contracts/ empty); the architectural judgment explicit — the capture-path enrichment is legitimate (upstream of the renderer, no shared mutation, the draw branch double-gated, main.ts untouched); the byte-neutrality proven by re-capturing the accepted FOUL-FREEKICK frames through the modified renderer reproducing the exact pinned bytes. Integration: the FULL browser battery 54 files / 274 tests + the FULL node battery — all green, no pin moved. record_sha256 bc9daf1fff… byte-reproducible (critic + integration byte-exact).
+REFEREE-SHIPPED-WIRING - Horizon v37 1/3 (DYNAMIC_VISUAL). The referee loop playable in the shipped app: a menu-visible "Referee — fouls, free kicks & cards" toggle (a real checkbox in the shipped #setup-menu; a `referee=1` URL param covers the auto-start path; the fulltime rematch threads refereeOptIn) resolves through the new src/apps/browser/referee-config.ts to the SAME accepted createSimulation config surface ({awardFreeKicks:true} / {issueCards:true}) — git diff src/simulation/ src/contracts/ EMPTY. Real-browser evidence: 5 event-centered byte-distinct real-Chromium frames (foul-contact@65 → freekick-award@67 FREE KICK → freekick-served@128 PLAYING → foul-2-contact@289 → caution@290 with the card HUD "YELLOW CARD player-1 (2)"), sequence.json SHA bindings verified against the PNG bytes, an EXACT browser↔headless correspondence (foul ticks [66,290]; FK@126 offset 0; caution@290 offset 0), and the gate-off path byte-identical by construction (explicit-undefined call === createSimulation(world) state-hash chain; gates-off run: 0 free kicks / 0 cards).
+
+- builder: builder-gameplay / qwen3.8-flash (candidate pre-existed in the working tree from the prior builder session; adopted and re-verified by the orchestrator before review)
+- critic: critic / glm5.3-flash — ACCEPT (first pass; full PNG forensics + independent non-durable re-runs reproducing the identical arc)
+- integration: integration-reviewer / glm5.3-flash — ACCEPT (first pass; docs byte-identity pre/post; neighbor tests 17/17; presentation snapshot-driven PASS)
+- Evidence: durable acceptance manifest + record; deterministic audit PASS, DYNAMIC_VISUAL
+- Candidate: 7e9adde
+
+Previously accepted:
+CARD-BROWSER-EVIDENCE - Horizon v36 4/4 — horizon COMPLETE (DYNAMIC_VISUAL). The booking visible in the real browser: 5 event-centered byte-distinct real-Chromium frames (foul-1-contact@66 → caution@116 "YELLOW CARD player-1 (2)" → continued-foul@173 → foul-4-contact@276 → expulsion@371 "RED CARD player-1 (5)"), sequence.json bindings verified against the PNG bytes, temporal coherence exact (TIME = 5400 − tick), and an EXACT 0/0 browser↔headless correspondence (foul ticks [66,116,173,276,371]; booking {fouls:5, cautions:1, expulsions:1}). Zero gameplay change (src/simulation/ + src/contracts/ empty); the architectural judgment explicit — the capture-path enrichment is legitimate (upstream of the renderer, no shared mutation, the draw branch double-gated, mai…
 
 - builder: builder-gameplay / deepseek-v4-flash (reroute)
 - critic: critic / glm5.3-flash — ACCEPT (first pass; full PNG forensics + the architectural judgment)
