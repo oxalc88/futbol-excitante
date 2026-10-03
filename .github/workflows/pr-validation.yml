@@ -12,7 +12,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Select validation mode
+        id: mode
+        run: node scripts/ci/select-validation-mode.mjs "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+
   validate:
+    needs: detect
     strategy:
       fail-fast: false
       matrix:
@@ -49,6 +65,7 @@ jobs:
           PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS: "true"
 
       - name: Install Chromium
+        if: needs.detect.outputs.mode == 'full'
         working-directory: target
         run: pnpm exec playwright install --with-deps chromium
 
@@ -58,6 +75,7 @@ jobs:
         working-directory: target
         run: node ../source/scripts/ci/run-validation.mjs
         env:
+          CI_VALIDATION_MODE: ${{ needs.detect.outputs.mode }}
           CI_TARGET_SHA: ${{ matrix.target == 'base' && github.event.pull_request.base.sha || github.event.pull_request.head.sha }}
           CI_REPORT_PATH: ../artifacts/ci/${{ matrix.target }}.json
 
@@ -69,7 +87,7 @@ jobs:
           if-no-files-found: error
 
   classify:
-    needs: validate
+    needs: [detect, validate]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
