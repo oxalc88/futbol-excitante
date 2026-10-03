@@ -15,11 +15,13 @@
       "acceptance_criteria": [
         "The expected behavior is available in normal play."
       ],
-      "test_plan_summary": "Run the focused unit and integration tests for objective A.",
       "evidence_required": [
         "Required Gauntlet evidence for the selected evidence class."
       ],
-      "gauntlet_role": "builder-gameplay"
+      "gauntlet_role": "builder-gameplay",
+      "test_plan": [
+        "Run the focused unit and integration tests for objective A."
+      ]
     },
     {
       "objective_id": "OBJECTIVE-B",
@@ -33,11 +35,13 @@
       "acceptance_criteria": [
         "The supporting behavior is complete and tested."
       ],
-      "test_plan_summary": "Run the focused tests for objective B.",
       "evidence_required": [
         "Required Gauntlet evidence for the selected evidence class."
       ],
-      "gauntlet_role": "builder-structured"
+      "gauntlet_role": "builder-structured",
+      "test_plan": [
+        "Run the focused tests for objective B."
+      ]
     }
   ]
 }

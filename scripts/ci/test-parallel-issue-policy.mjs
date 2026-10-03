@@ -14,7 +14,7 @@ function objective(id, ownership, dependencies = []) {
     dependencies,
     expected_file_ownership: ownership,
     acceptance_criteria: ["accepted"],
-    test_plan_summary: "test",
+    test_plan: ["test"],
     evidence_required: ["evidence"],
     gauntlet_role: id.endsWith("A") ? "builder-gameplay" : "builder-structured",
   };

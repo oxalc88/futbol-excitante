@@ -37,7 +37,7 @@ Each objective must define:
 - `dependencies`
 - `expected_file_ownership`
 - `acceptance_criteria`
-- `test_plan_summary`
+- `test_plan`
 - `evidence_required`
 - `gauntlet_role`
 
