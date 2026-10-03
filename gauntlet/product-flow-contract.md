@@ -1,6 +1,6 @@
 # Product flow contract
 
-Gauntlet 0.9.8 uses product progress to select work. The existing acceptance pipeline still decides whether an implementation is accepted.
+Gauntlet 0.9.9 uses product progress to select work. The existing acceptance pipeline still decides whether an implementation is accepted.
 
 ## Horizon rule
 
@@ -25,31 +25,39 @@ Use this order unless evidence gives a stronger reason:
 
 ## GitHub issues
 
-GitHub issues are an optional durable work queue and context index. They do not replace canonical Gauntlet state or acceptance evidence.
+GitHub issues are optional for sequential execution.
 
-A useful issue contains:
+GitHub issues are mandatory for parallel implementation execution. Read `gauntlet/parallel-issue-contract.md`.
+
+Issues are a durable work queue and context index. They do not replace canonical Gauntlet state or acceptance evidence.
+
+A parallel issue must contain:
 
 - Goal
 - Player-visible outcome
 - Why now
 - Dependencies
-- Likely files
+- Expected file ownership
 - Acceptance criteria
 - How to play/test
 - Evidence required
-- Blockers
-
-An agent can read the open issue, create a branch/worktree, implement, test, open a PR, and continue to the next unblocked issue after merge.
+- Gauntlet role
+- Execution state: `READY` or `BLOCKED`
 
 ## Parallel work
 
 Two objectives may run in parallel only when:
 
+- both objectives have synchronized GitHub issues;
+- each issue has explicit dependency metadata;
+- each issue is `READY`;
 - neither objective depends on the acceptance of the other;
 - their expected file ownership does not overlap;
 - they do not both modify canonical Gauntlet state;
-- each objective has a separate branch/worktree;
+- each objective has an isolated workspace/worktree;
 - each objective has its own tests, evidence, critic review, integration review, and acceptance record.
+
+If GitHub write capability or issue synchronization is unavailable, run the objectives sequentially.
 
 If these conditions stop being true, serialize the work.
 

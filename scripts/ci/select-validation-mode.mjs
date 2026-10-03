@@ -23,17 +23,59 @@ const exact = new Set([
   "gauntlet/principles.md",
   "gauntlet/product-flow-contract.md",
   "gauntlet/harness-contract.md",
+  "gauntlet/parallel-issue-contract.md",
+  "gauntlet/parallel-plan.example.json",
+  "scripts/ci/test-parallel-issue-policy.mjs",
+  "scripts/ci/test-omp-parallel-gate.mjs",
   "gauntlet/evals/src/prompt-gate.ts",
   "tests/unit/eval/release-0-9-7-consolidation-binding.test.ts",
 ]);
 
+
+const FAST_PACKAGE_SCRIPTS = new Set([
+  "gauntlet:parallel:sync",
+  "gauntlet:parallel:state",
+  "gauntlet:parallel:complete",
+  "gauntlet:parallel:status",
+  "gauntlet:parallel:test",
+]);
+
+function stable(value) {
+  if (Array.isArray(value)) return value.map(stable);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value).sort().map((key) => [key, stable(value[key])]),
+    );
+  }
+  return value;
+}
+
+function packageJsonIsFastSafe() {
+  try {
+    const readAt = (ref) =>
+      JSON.parse(execFileSync("git", ["show", `${ref}:package.json`], { encoding: "utf8" }));
+    const stripAllowedScripts = (pkg) => ({
+      ...pkg,
+      scripts: Object.fromEntries(
+        Object.entries(pkg.scripts ?? {}).filter(([name]) => !FAST_PACKAGE_SCRIPTS.has(name)),
+      ),
+    });
+    return JSON.stringify(stable(stripAllowedScripts(readAt(base)))) ===
+      JSON.stringify(stable(stripAllowedScripts(readAt(head))));
+  } catch {
+    return false;
+  }
+}
+
 const prefixes = [
+  "scripts/gauntlet/",
   ".grok/",
   ".omp/",
   ".opencode/",
 ];
 
 function isFastPath(path) {
+  if (path === "package.json") return packageJsonIsFastSafe();
   if (exact.has(path)) return true;
   if (prefixes.some((prefix) => path.startsWith(prefix))) return true;
   if (/^gauntlet\/RELEASE-[^/]+\.md$/.test(path)) return true;

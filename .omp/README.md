@@ -31,12 +31,48 @@ OMP does not require Grok. The OMP adapter uses:
 orchestrator -> nan/glm5.3-flash:high
 ```
 
-The builder and reviewer roles come from `gauntlet/models.json`.
+The builder and reviewer roles come from `gauntlet/models.json`. OMP uses MiMo 2.6 Flash as the primary critic and GLM 5.3 Flash as the critic fallback. This keeps critic models independent from both current builder routes.
 
 ## Parallel work
 
-Ask the main OMP session to use the named Gauntlet agents in parallel only for objectives that the Gauntlet horizon marks independent.
+OMP uses the Gauntlet issue gate before parallel implementation.
 
-OMP Agent Hub can supervise the workers. Editing workers must use isolated worktrees when their tasks can run concurrently.
+The project config sets:
+
+- `task.batch: true`;
+- `task.maxConcurrency: 5`;
+- `providers.maxInFlightRequests.nan: 6`;
+- `task.maxRecursionDepth: 1`;
+- `task.isolation.mode: auto`;
+- `async.enabled: false`.
+
+The NaN base plan allows seven simultaneous requests across all models. The project keeps one request of headroom.
+
+Before parallel builders:
+
+1. verify `gh auth status`;
+2. create `artifacts/gauntlet/parallel-plan.json` from `gauntlet/parallel-plan.example.json`;
+3. run `pnpm run gauntlet:parallel:sync -- --plan artifacts/gauntlet/parallel-plan.json`;
+4. inspect the `READY` and `BLOCKED` objectives;
+5. start only `READY` builders in one isolated OMP `task` batch;
+6. include `[gauntlet-objective:OBJECTIVE_ID]` in each builder task.
+
+The project hook blocks a non-compliant parallel builder batch.
+
+For one sequential builder, GitHub issue creation is optional.
+
+After canonical acceptance is persisted and remotely durable, run:
+
+```bash
+pnpm run gauntlet:parallel:complete -- --objective OBJECTIVE_ID
+```
+
+This closes the accepted issue and recomputes dependent issue readiness.
+
+Use the project skill to start or continue the workflow:
+
+```text
+/skill:gauntlet Continue the Gauntlet work.
+```
 
 The canonical acceptance transition remains serialized.

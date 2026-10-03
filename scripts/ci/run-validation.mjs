@@ -3,8 +3,15 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
+const parallelPolicyCheck =
+  existsSync("scripts/ci/test-parallel-issue-policy.mjs") &&
+  existsSync("scripts/ci/test-omp-parallel-gate.mjs")
+    ? { id: "parallel-issue-policy", command: ["pnpm", "run", "gauntlet:parallel:test"] }
+    : { id: "parallel-issue-policy", command: ["node", "-e", "console.log('SKIP parallel issue policy: not present on target')"] };
+
 const fullChecks = [
   { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
+  parallelPolicyCheck,
   { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
   { id: "test", command: ["pnpm", "run", "test"] },
   { id: "test-browser", command: ["pnpm", "run", "test-browser"] },
@@ -14,6 +21,7 @@ const fullChecks = [
 
 const fastChecks = [
   { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
+  parallelPolicyCheck,
   { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
   {
     id: "maintenance-test",
