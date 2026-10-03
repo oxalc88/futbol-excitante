@@ -76,3 +76,7 @@ Use the project skill to start or continue the workflow:
 ```
 
 The canonical acceptance transition remains serialized.
+
+## Runtime telemetry and efficiency (0.10.0)
+
+Native `.omp/extensions/` modules observe real parent and child events. Start from the repository root, bind each objective with `/gauntlet-objective ID`, and put its marker in every child assignment. `/gauntlet-efficiency-status` shows the current profile/session binding. Telemetry runs in baseline mode; optimization tools are registered only after a complete measured baseline and explicit local opt-in. See `gauntlet/runtime-efficiency-contract.md` for measurement, compatibility and enablement. OMP keeps its current scheduling/concurrency/retry controls.

@@ -54,7 +54,10 @@
     "gauntlet:parallel:state": "node scripts/gauntlet/parallel-issues.mjs state",
     "gauntlet:parallel:complete": "node scripts/gauntlet/parallel-issues.mjs complete",
     "gauntlet:parallel:status": "node scripts/gauntlet/parallel-issues.mjs status",
-    "gauntlet:parallel:test": "node scripts/ci/test-parallel-issue-policy.mjs && node scripts/ci/test-omp-parallel-gate.mjs"
+    "gauntlet:parallel:test": "node scripts/ci/test-parallel-issue-policy.mjs && node scripts/ci/test-omp-parallel-gate.mjs",
+    "gauntlet:telemetry": "node scripts/gauntlet/telemetry.mjs",
+    "gauntlet:runtime:test": "node scripts/ci/test-gauntlet-telemetry.mjs && vitest run tests/unit/gauntlet-0.10.0-runtime.test.ts --project node",
+    "gauntlet:memory:validate": "tsx scripts/gauntlet/runtime.ts memory-validate"
   },
   "dependencies": {
     "three": "^0.170.0"

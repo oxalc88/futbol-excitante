@@ -6,10 +6,12 @@ import { bindTelemetry } from '../../.omp/extensions/gauntlet-telemetry.js';
 import { appendTelemetry, readTelemetry, summarizeTelemetry } from '../../gauntlet/runtime/telemetry.mjs';
 
 const root = mkdtempSync(path.join(tmpdir(),'gauntlet-telemetry-'));
+const listeners = new Map();
+const events = {on(name,fn) { const handlers=listeners.get(name) ?? []; handlers.push(fn); listeners.set(name,handlers); }, emit(name,event) { for (const handler of listeners.get(name) ?? []) handler(event); }};
 function runtime(sessionId, role, model) {
   const handlers = new Map();
   const commands = new Map();
-  const pi = { on: (name,fn) => handlers.set(name,fn), registerCommand: (name,command) => commands.set(name,command) };
+  const pi = { events, on: (name,fn) => handlers.set(name,fn), registerCommand: (name,command) => commands.set(name,command) };
   bindTelemetry(pi,{root});
   const ctx = { sessionManager:{getSessionId:()=>sessionId}, agent:{kind:role === 'orchestrator' ? 'main':'sub',name:role}, model:{provider:'nan',id:model} };
   return { emit: (name,event={}) => handlers.get(name)?.(event,ctx), commands, ctx };
@@ -56,6 +58,13 @@ try {
   parent.emit('before_agent_start',{prompt:'[gauntlet-objective:A] [gauntlet-objective:B]'});
   parent.emit('before_provider_request',{payload:{}});
   assert.equal(readTelemetry(root).at(-1).objectiveId,null);
+  await parent.commands.get('gauntlet-objective').handler('C',parent.ctx);
+  childB.emit('before_provider_request',{payload:{}});
+  assert.equal(readTelemetry(root).filter(e => e.sessionId === 'child-b').at(-1).objectiveId,'B'); // Parent command cannot relabel a sibling.
+  parent.emit('before_provider_request',{payload:{}});
+  assert.equal(readTelemetry(root).at(-1).objectiveId,'C');
+  const orphanCall = summarizeTelemetry([{id:'1',at:0,...identity,type:'provider_request',data:{}}]);
+  assert.equal(orphanCall.profiles[0].coverageComplete,false);
   // Even a real ACCEPT verdict is not an acceptance event; denominator requires remote verification.
   const empty = summarizeTelemetry(events.filter(e => e.type !== 'acceptance_remote_verified'));
   assert.equal(empty.profiles[0].processedInputTokensPerAcceptedObjective,null);

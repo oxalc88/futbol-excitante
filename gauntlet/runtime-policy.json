@@ -1,0 +1,26 @@
+{
+  "schema_version": 2,
+  "default_profile": "baseline",
+  "native_omp_owns": ["scheduling", "concurrency", "retries", "backoff", "waits"],
+  "builder_budget": {
+    "context_soft_limit_tokens": 180000,
+    "cumulative_input_soft_limit_tokens": 12000000,
+    "generation_soft_limit": 80
+  },
+  "memory": {
+    "search_preview_limit": 5,
+    "initial_topic_limit": 3,
+    "summary_max_characters": 600,
+    "body_max_characters": 4000,
+    "maximum_topics": 200
+  },
+  "objective_context": {
+    "maximum_tokens": 1500,
+    "mapper_search_limit": 4,
+    "mapper_file_limit": 12,
+    "small_task_file_limit": 3,
+    "mapper_read_maximum_bytes": 64000
+  },
+  "builder_checkpoint": { "maximum_tokens": 1000 },
+  "verification": { "failure_excerpt_lines": 20, "maximum_commands": 12, "timeout_ms": 1200000 }
+}

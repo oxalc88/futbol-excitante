@@ -1,10 +1,10 @@
 {
-  "version": "0.9.9",
+  "version": "0.10.0",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.9.8",
+  "previous_system_version": "0.9.9",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
-  "baseline_commit": "f661b38b068f884f5ed5a079d76babe3cc70b8eb",
+  "baseline_commit": "7d5add9f8eea9c4a6465a86ae1330655f0dd550d",
   "includes": [
     "prompts",
     "agents",
@@ -42,6 +42,14 @@
     "product-flow-metrics",
     "parallel-issue-sync",
     "issue-gated-parallelism",
-    "omp-concurrency-guard"
+    "omp-concurrency-guard",
+    "runtime-event-telemetry",
+    "baseline-first-efficiency",
+    "bounded-project-memory",
+    "context-packets",
+    "context-mapper",
+    "builder-checkpoints",
+    "builder-rotation",
+    "verification-batching"
   ]
 }

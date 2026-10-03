@@ -26,6 +26,7 @@ const token = value => Number.isSafeInteger(value) && value >= 0;
 export function normalizeUsage(usage) {
   if (!usage || !['input', 'output', 'cacheRead', 'cacheWrite'].every(key => token(usage[key]))) return null;
   const processedInputTokens = usage.input + usage.cacheRead + usage.cacheWrite;
+  if (processedInputTokens === 0 && usage.output === 0) return null; // OMP initializes absent usage with zeros.
   return { processedInputTokens, outputTokens: usage.output,
     peakContext: token(usage.contextTokens) ? usage.contextTokens : processedInputTokens,
     contextPrecision: token(usage.contextTokens) ? 'provider' : 'input-buckets',
@@ -82,11 +83,13 @@ export function summarizeTelemetry(events) {
         timeToAcceptanceMs: start === undefined ? null : event.at-start };
     });
     const processedInputTokens = rows.reduce((n,g) => n+g.processedInputTokens,0);
-    const complete = !rows.some(g => g.coverageGaps || g.missingUsageGenerations ||
+    const providerCalls = rows.reduce((n,g) => n+g.calls,0);
+    const generations = rows.reduce((n,g) => n+g.generations,0);
+    const complete = providerCalls === generations && !rows.some(g => g.coverageGaps || g.missingUsageGenerations ||
       (g.objectiveId === null && (g.calls || g.generations)));
     return { profile, processedInputTokens, acceptedObjectives: objectives,
       processedInputTokensPerAcceptedObjective: objectives.length && complete ? processedInputTokens/objectives.length : null,
-      coverageComplete: complete };
+      coverageComplete: complete, providerCalls, generations };
   });
-  return { schema: SCHEMA, precision: 'processed-input-not-billed', groups: [...groups.values()], profiles };
+  return { schema: SCHEMA, precision: 'processed-input-not-billed', retryPrecision: 'omp-auto-retry-events', rateLimitPrecision: 'surfaced-http-429', transportAttempts: null, groups: [...groups.values()], profiles };
 }

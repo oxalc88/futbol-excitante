@@ -80,3 +80,7 @@ Canonical state transitions are serialized.
 CI must verify that committed harness adapters resolve to the model intent in `gauntlet/models.json`.
 
 Historical records keep the exact model and harness that produced them. Do not rewrite old provenance after a routing change.
+
+## Runtime efficiency adapter (0.10.0)
+
+OMP observes native provider/session events through `.omp/extensions/gauntlet-telemetry.js`. Opt-in execution lives in `.omp/extensions/gauntlet-efficiency.ts`; canonical data/validation live in `gauntlet/runtime/`. Baseline measurement precedes optimization. Other harnesses must provide actual event/usage integration before claiming comparable telemetry; they do not inherit OMP telemetry just by loading role prose. Native scheduling, concurrency and retries remain harness-owned. See `runtime-efficiency-contract.md`.

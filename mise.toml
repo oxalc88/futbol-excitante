@@ -40,3 +40,15 @@ run = "pnpm run test-browser"
 [tasks.test-all]
 description = "Frozen-install check, typecheck, architecture/node/browser tests, headless smoke, Vite production build"
 run = "pnpm run test-all"
+
+[tasks.gauntlet-telemetry]
+description = "Report measured runtime usage or record remote-verified acceptance"
+run = "node scripts/gauntlet/telemetry.mjs"
+
+[tasks.gauntlet-memory-validate]
+description = "Validate bounded non-authoritative memory"
+run = "pnpm run gauntlet:memory:validate"
+
+[tasks.gauntlet-runtime-test]
+description = "Verify runtime telemetry and efficiency integration"
+run = "pnpm run gauntlet:runtime:test"

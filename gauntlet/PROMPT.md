@@ -47,6 +47,12 @@ Treat the horizon objective list as an ordered map keyed by objective ID. Before
 
 On acceptance, find the existing entry by objective ID and update that entry in place; never append another copy. Before writing, validate the entire candidate horizon and its correspondence with the candidate `CURRENT.md`. If validation fails, repair candidate bookkeeping from existing horizon/accepted state, validate again, and only then write. A bookkeeping repair is not a reason for global strategic reassessment and must not rewrite historical state.
 
+## Measured efficiency
+
+Read `gauntlet/runtime-efficiency-contract.md` and `gauntlet/memory-context-contract.md`. Runtime telemetry precedes optimization; baseline mode keeps all optimization capabilities disabled. In OMP bind each objective with `/gauntlet-objective` before planning/delegation and include `[gauntlet-objective:OBJECTIVE_ID]` in every child role assignment. After the existing remote-durability step, record `gauntlet-telemetry accepted OBJECTIVE_ID FULL_ACCEPTANCE_COMMIT`; only verified acceptance counts toward processed input tokens per accepted objective.
+
+When explicitly enabled after a measured baseline, use bounded non-authoritative context/memory and digest-bound checkpoints. Batch all required verification commands into one summary. At a safe completed phase boundary, an over-budget builder may continue as a fresh native task seeded with the same objective/role and validated checkpoint, without its old conversation. Every fresh parallel task still requires synchronized READY issue admission and isolation. These tools cannot replace critic, integration review, evidence, state audit or remote containment. OMP owns scheduling, concurrency, retry/backoff and settlement; do not add a second governor or wait controller.
+
 ## Builder routing
 
 Choose the implementation role by responsibility, not by provider/model:

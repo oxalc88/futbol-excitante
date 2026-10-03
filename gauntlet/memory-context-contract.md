@@ -1,0 +1,9 @@
+# Bounded project knowledge and objective context
+
+`memory/` persists knowledge, not orchestration. Current authoritative specs, source, evidence and Gauntlet contracts always win. Every topic has a stable key, type, status, bounded summary/body, canonical references, evidence links and the digest of current canonical inputs. Active topics need evidence; changed inputs require review. Retrieval excludes stale or invalid topics, including duplicate active identities. Search returns at most five previews and objective preparation loads at most three topics. The repository permits at most 200 topics.
+
+The deterministic read-only context mapper prepares one packet per objective. A small obvious change bypasses research. Bounds are four searches, twelve source references, 64 KB of mapper reads and a 1,500 estimated-token packet. Every packet declares `nonAuthoritative: true`; stale source digests require remapping. A packet contains the product objective, canonical files, validated memory summaries, tests, dependencies, risks/conflicts and necessary skills. It does not replace product-first planning or issue synchronization.
+
+Builder checkpoints are at most 1,000 estimated tokens and summarize implemented behavior, changed files, actual tests, outstanding failures, evidence and next action. Changes/relevant files/evidence are digest-bound. A fresh builder receives the same role/objective and these bounded artifacts, with `previousTranscriptIncluded: false`. Rotation starts only after an old child settles at a safe persisted boundary; it cannot bypass reviews, acceptance or remote durability. Every parallel fresh task must still satisfy the READY issue gate.
+
+Raw conversations, prompts, reasoning, credentials, complete tool output, acceptance claims and provider logs do not belong in knowledge or handoffs. See `runtime-efficiency-contract.md` for telemetry precision, opt-in controls and OMP execution.
