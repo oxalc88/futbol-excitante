@@ -1,0 +1,705 @@
+{
+  "schema_version": 1,
+  "objective_id": "ADVANTAGE-MACHINERY",
+  "evidence_class": "MULTI_TICK",
+  "capture_mode": "durable-evidence",
+  "produced_by": "scripts/capture-advantage-machinery.ts",
+  "driver": "eval/runners/headless-match.ts (playAdvantage gate, core-owned lifecycle, serializeRestartFacts) + eval/runners/defensive-duel-driver.ts (scripted standing tackle, advantageConfig) + the shared foul predicate + src/simulation/advantage-policy.ts.",
+  "activation": {
+    "field": "runHeadlessMatch({ playAdvantage, awardFreeKicks, issueCards }) + runDefensiveDuel({ advantageConfig, freeKickConfig, cardConfig })",
+    "meaning": "the in-core ADVANTAGE-MACHINERY window in src/simulation/loop/simulation.ts: a committed man-not-ball tackle contact (the SAME §5.1 predicate the runner-level detection uses) opens the bounded §6.2 window on the contact tick instead of calling the foul immediately. The window closes at the earliest of cancellation (§6.3: the ball's lastTouchRef no longer resolves to the fouled team, or the match phase leaves playing) or expiry at advantage_window_ticks=24 (§6.2c); on close the pending foul is called at the CLOSE tick through the accepted restart/card machinery (deferred, not retroactive). Off (the default) the stream is byte-identical to pre-change. The judged-retained path (§6.2a) is NOT implemented: advantage_retention_ref stays BLOCKED_MISSING_REFERENCE and no advantage is ever played.",
+    "set_by": [
+      "src/simulation/loop/simulation.ts (6b-3d advantage window + AdvantageConfig.playAdvantage gate)",
+      "src/simulation/advantage-policy.ts (pure §6.2–§6.3 close decision + the two fouls-v1 budgets)",
+      "src/simulation/foul-predicate.ts (single-source-of-truth §5.1 predicate)",
+      "eval/runners/headless-match.ts runHeadlessMatch({ playAdvantage })",
+      "eval/runners/defensive-duel-driver.ts runDefensiveDuel({ advantageConfig })",
+      "NOT the browser composition root (browser wiring is a later objective)"
+    ]
+  },
+  "guard_state": {
+    "driven_two_run_attestation": true,
+    "organic_two_run_attestation": true,
+    "driven_gate_off_two_run_attestation": true,
+    "gate_off_byte_identity_to_pre_change": true,
+    "baseline_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+    "driven_last_touch_loss_cancellation": true,
+    "organic_expiry_at_window_budget": true,
+    "organic_stoppage_cancellation": true,
+    "driven_stoppage_cancellation": true,
+    "driven_stoppage_close_tick_card": true,
+    "close_tick_free_kick_deferral": true,
+    "card_accumulation_on_deferred_calls": true,
+    "judged_retained_path_implemented": false
+  },
+  "trajectory": {
+    "organic": {
+      "sample": [
+        {
+          "tick": 1,
+          "phase": "kickoff",
+          "ball_lastTouchRef": "player-ball-contact-1-1",
+          "ball_x": -30.5353,
+          "ball_y": 2.4963
+        },
+        {
+          "tick": 2,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.6276,
+          "ball_y": 2.4769
+        },
+        {
+          "tick": 3,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.6951,
+          "ball_y": 2.4625
+        },
+        {
+          "tick": 4,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.7471,
+          "ball_y": 2.4519
+        },
+        {
+          "tick": 5,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.7898,
+          "ball_y": 2.4433
+        },
+        {
+          "tick": 6,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.8275,
+          "ball_y": 2.4367
+        },
+        {
+          "tick": 7,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.8631,
+          "ball_y": 2.4313
+        },
+        {
+          "tick": 8,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.8986,
+          "ball_y": 2.4275
+        },
+        {
+          "tick": 9,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.9345,
+          "ball_y": 2.4225
+        },
+        {
+          "tick": 10,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -30.972,
+          "ball_y": 2.4168
+        },
+        {
+          "tick": 11,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.0118,
+          "ball_y": 2.4102
+        },
+        {
+          "tick": 12,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.0544,
+          "ball_y": 2.4042
+        },
+        {
+          "tick": 13,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.0999,
+          "ball_y": 2.3979
+        },
+        {
+          "tick": 14,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.1485,
+          "ball_y": 2.3928
+        },
+        {
+          "tick": 15,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.2004,
+          "ball_y": 2.3884
+        },
+        {
+          "tick": 16,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.2547,
+          "ball_y": 2.3815
+        },
+        {
+          "tick": 17,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.3116,
+          "ball_y": 2.3722
+        },
+        {
+          "tick": 18,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.3713,
+          "ball_y": 2.3627
+        },
+        {
+          "tick": 19,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.4339,
+          "ball_y": 2.353
+        },
+        {
+          "tick": 20,
+          "phase": "playing",
+          "ball_lastTouchRef": "pass-2-2",
+          "ball_x": -31.4995,
+          "ball_y": 2.3451
+        }
+      ],
+      "advantage_windows": [
+        {
+          "openTick": 233,
+          "closeTick": 257,
+          "reason": "expired",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 233,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        }
+      ],
+      "free_kick_events": [
+        {
+          "tick": 317,
+          "teamId": "team-b",
+          "position": {
+            "x": -43.04129282311101,
+            "y": 2.7667015550856524
+          }
+        }
+      ]
+    },
+    "driven": {
+      "last_touch_loss_windows": [
+        {
+          "openTick": 66,
+          "closeTick": 67,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 66,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        },
+        {
+          "openTick": 116,
+          "closeTick": 135,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 116,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        },
+        {
+          "openTick": 173,
+          "closeTick": 174,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 173,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        }
+      ],
+      "stoppage_windows": [
+        {
+          "openTick": 66,
+          "closeTick": 67,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 66,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        },
+        {
+          "openTick": 116,
+          "closeTick": 121,
+          "reason": "cancelled-stoppage",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 116,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        }
+      ],
+      "stoppage_cards": [
+        {
+          "tick": 121,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "foulTick": 116
+        }
+      ],
+      "close_tick_free_kicks": [
+        {
+          "tick": 127,
+          "teamId": "team-b",
+          "position": {
+            "x": -1.8825283681923257,
+            "y": 0.03639052588315668
+          }
+        },
+        {
+          "tick": 368,
+          "teamId": "team-b",
+          "position": {
+            "x": -7.388339201741683,
+            "y": 3.033738141937836
+          }
+        }
+      ],
+      "close_tick_cards": [
+        {
+          "tick": 308,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "foulTick": 289
+        }
+      ]
+    },
+    "stoppage": {
+      "advantage_windows": [
+        {
+          "openTick": 233,
+          "closeTick": 257,
+          "reason": "expired",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 233,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        },
+        {
+          "openTick": 1430,
+          "closeTick": 1436,
+          "reason": "cancelled-stoppage",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 1430,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        }
+      ],
+      "cards": [
+        {
+          "tick": 1436,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "foulTick": 1430
+        }
+      ]
+    }
+  },
+  "disclosures": [
+    "ADVANTAGE-MACHINERY is a DELIBERATE core change in src/simulation/loop/simulation.ts: a default-off playAdvantage gate opens the bounded §6.2 advantage window at a committed man-not-ball contact and defers the §8 free-kick / §7 card consequence to the close tick. With the gate OFF (the default) the window branch never runs and the core is byte-identical to pre-change; this is attested by the gate-off legacy pin reproducing the pre-change baseline hash-of-hashes byte-for-byte, and by the driven gate-off stream being byte-identical with the parameter absent vs explicitly false.",
+    "The judged-retained path (§6.2a) is NOT implemented. advantage_retention_ref is BLOCKED_MISSING_REFERENCE (spec §11); no territory / distance / possession retention envelope is invented, no retained-advantage decision is emitted, and no advantage is ever played — every window closes by cancellation (§6.3) or expiry (§6.2c) and the foul is called at the close tick.",
+    "The window close decision reads only the accepted committed facts: the window open tick, the current tick, the match phase, and the team the ball's accepted lastTouchRef resolves to. It adds no collider, no event family outside the advantage decision events, no action and no possession model.",
+    "The pending caution is applied at the close tick itself (0 of the foul_caution_pending_ticks=12 budget withheld), which the §6.4 bound permits; the budget is carried on the close event for auditability.",
+    "The organic 3v3-press advantage stream runs under cpuAntiHuddle:false (the accepted organic shape from FOUL-CONSEQUENCE-MACHINERY); the anti-huddle contract is out of scope for this objective.",
+    "Same-tick arbitration (spec §2.2) is a deliberate deterministic priority: a stoppage that claims the phase inside the window wins over the pending advantage (the pending advantage does not survive into the restart window), so the cancelled window's free-kick consequence cannot open a restart; the deferred §7 caution is still called at the close tick. Two in-core stoppage coincidences are captured: the driven shape whose first half ends inside the window opened at tick 116 (cancelled at 121, caution at 121), and the organic 3v3-press shape where a goal at tick 1436 claims the phase inside the window opened at 1430 (cancelled at 1436).",
+    "ADVANTAGE-PLAYED remains NAMED-NOT-REGISTERED (spec §10): no criterion, oracle, invariant-definition, observation-definition, binding or verdict accompanies it. Registration is a later objective.",
+    "No PES fidelity claim: the window length (24 ticks) and pending-caution budget (12 ticks) are fouls-v1 VERSIONED_PROVISIONAL engine-tick budgets at foundation-fixed-dt-v1, not measured wall-clock latencies (advantage_window_ref_ms stays BLOCKED_MISSING_REFERENCE)."
+  ],
+  "runs": [
+    {
+      "id": "advantage-driven-gate-off",
+      "role": "gate-off driven control: no advantage event, pre-change path",
+      "ticks": 200,
+      "observation_count": 200,
+      "event_kind_counts": {
+        "player-player-contact": 770,
+        "player-ball-contact": 6,
+        "pass": 2,
+        "tackle-phase": 24,
+        "input-rejection": 3,
+        "foul": 3,
+        "second-touch": 8
+      },
+      "state_hash_of_hashes": "87fdd04de37556c7e43310b29049ef37c70d3a382181e9d8f3581318609e073b",
+      "determinism_run2_hash_of_hashes": "87fdd04de37556c7e43310b29049ef37c70d3a382181e9d8f3581318609e073b",
+      "foul_count": 3,
+      "advantage_windows": [],
+      "cards": [
+        {
+          "tick": 116,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "foulTick": 116
+        }
+      ],
+      "free_kicks": []
+    },
+    {
+      "id": "advantage-driven-cancelled",
+      "role": "driven foul → window → §6.3 last-touch-loss cancellation → deferred card",
+      "ticks": 200,
+      "observation_count": 200,
+      "event_kind_counts": {
+        "player-player-contact": 770,
+        "player-ball-contact": 6,
+        "pass": 2,
+        "tackle-phase": 24,
+        "input-rejection": 3,
+        "foul": 3,
+        "second-touch": 8
+      },
+      "state_hash_of_hashes": "e230d2404135f4a738dc14d6f58ff1c0c77b121aac4d6ed0331e503a9d09a17e",
+      "determinism_run2_hash_of_hashes": "e230d2404135f4a738dc14d6f58ff1c0c77b121aac4d6ed0331e503a9d09a17e",
+      "foul_count": 3,
+      "advantage_windows": [
+        {
+          "openTick": 66,
+          "closeTick": 67,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 66,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        },
+        {
+          "openTick": 116,
+          "closeTick": 135,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 116,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        },
+        {
+          "openTick": 173,
+          "closeTick": 174,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 173,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        }
+      ],
+      "cards": [
+        {
+          "tick": 135,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "foulTick": 116
+        }
+      ],
+      "free_kicks": []
+    },
+    {
+      "id": "advantage-driven-close-tick-free-kick",
+      "role": "driven deferred call: free kick opens at the close tick, card at the close tick",
+      "ticks": 380,
+      "observation_count": 380,
+      "event_kind_counts": {
+        "player-player-contact": 375,
+        "player-ball-contact": 8,
+        "pass": 3,
+        "tackle-phase": 20,
+        "input-rejection": 2,
+        "foul": 2,
+        "second-touch": 11,
+        "pitch-contact": 1
+      },
+      "state_hash_of_hashes": "77a9aa470661c32ce71daec6c4cfdf0cc27aff5c80dfb3545173c1a69786483a",
+      "determinism_run2_hash_of_hashes": null,
+      "foul_count": 2,
+      "advantage_windows": [
+        {
+          "openTick": 66,
+          "closeTick": 67,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 66,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        },
+        {
+          "openTick": 289,
+          "closeTick": 308,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 289,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        }
+      ],
+      "cards": [
+        {
+          "tick": 308,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "foulTick": 289
+        }
+      ],
+      "free_kicks": [
+        {
+          "tick": 127,
+          "teamId": "team-b",
+          "position": {
+            "x": -1.8825283681923257,
+            "y": 0.03639052588315668
+          }
+        },
+        {
+          "tick": 368,
+          "teamId": "team-b",
+          "position": {
+            "x": -7.388339201741683,
+            "y": 3.033738141937836
+          }
+        }
+      ]
+    },
+    {
+      "id": "advantage-driven-stoppage",
+      "role": "driven half ending inside the window: §6.3 new-stoppage cancellation with the caution at the close tick",
+      "ticks": 200,
+      "observation_count": 200,
+      "event_kind_counts": {
+        "player-player-contact": 775,
+        "player-ball-contact": 5,
+        "pass": 2,
+        "tackle-phase": 20,
+        "input-rejection": 1,
+        "foul": 3,
+        "second-touch": 3
+      },
+      "state_hash_of_hashes": "c2630deb47b1c9544415e24df60c0159ba54bb6bf782aa83e44c19c6c155eb13",
+      "determinism_run2_hash_of_hashes": null,
+      "foul_count": 3,
+      "advantage_windows": [
+        {
+          "openTick": 66,
+          "closeTick": 67,
+          "reason": "cancelled-last-touch-loss",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 66,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        },
+        {
+          "openTick": 116,
+          "closeTick": 121,
+          "reason": "cancelled-stoppage",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 116,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        }
+      ],
+      "cards": [
+        {
+          "tick": 121,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "foulTick": 116
+        }
+      ],
+      "free_kicks": []
+    },
+    {
+      "id": "advantage-organic-expired",
+      "role": "organic foul → window → §6.2c expiry at exactly 24 ticks → free kick at the close",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 12,
+        "core-match-phase": 600,
+        "restart-designation": 600,
+        "pass": 1,
+        "tackle-phase": 16,
+        "shot": 10,
+        "second-touch": 2,
+        "player-player-contact": 471,
+        "advantage-opened": 1,
+        "foul": 1,
+        "advantage-expired": 1,
+        "free-kick-executed": 1,
+        "pitch-contact": 2,
+        "ball-out-of-play": 1
+      },
+      "state_hash_of_hashes": "76a982759e2e14d1c4f2a2eccb82b4d53b1b283dd734c0e9e1f59c9111998930",
+      "determinism_run2_hash_of_hashes": "76a982759e2e14d1c4f2a2eccb82b4d53b1b283dd734c0e9e1f59c9111998930",
+      "foul_count": 1,
+      "advantage_windows": [
+        {
+          "openTick": 233,
+          "closeTick": 257,
+          "reason": "expired",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 233,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        }
+      ],
+      "cards": [],
+      "free_kicks": [
+        {
+          "tick": 317,
+          "teamId": "team-b",
+          "position": {
+            "x": -43.04129282311101,
+            "y": 2.7667015550856524
+          }
+        }
+      ]
+    },
+    {
+      "id": "advantage-organic-stoppage",
+      "role": "organic window cancelled by a goal (§6.3 new stoppage)",
+      "ticks": 1440,
+      "observation_count": 1440,
+      "event_kind_counts": {
+        "player-ball-contact": 22,
+        "core-match-phase": 1440,
+        "restart-designation": 1440,
+        "pass": 3,
+        "tackle-phase": 31,
+        "shot": 25,
+        "second-touch": 20,
+        "player-player-contact": 1232,
+        "advantage-opened": 2,
+        "foul": 2,
+        "advantage-expired": 1,
+        "free-kick-executed": 1,
+        "pitch-contact": 4,
+        "ball-out-of-play": 1,
+        "goal": 2,
+        "advantage-cancelled": 1,
+        "card-issued": 1
+      },
+      "state_hash_of_hashes": "bd296c7ab3851df56394b43dbfbb52c5a453e0733c0cdc7591e74b139281c831",
+      "determinism_run2_hash_of_hashes": null,
+      "foul_count": 2,
+      "advantage_windows": [
+        {
+          "openTick": 233,
+          "closeTick": 257,
+          "reason": "expired",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 233,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        },
+        {
+          "openTick": 1430,
+          "closeTick": 1436,
+          "reason": "cancelled-stoppage",
+          "windowTicks": 24,
+          "fouledTeam": "team-b",
+          "offenderId": "player-1",
+          "foulTick": 1430,
+          "pendingFoulCount": 1,
+          "cautionPendingBudgetTicks": 12
+        }
+      ],
+      "cards": [
+        {
+          "tick": 1436,
+          "cardType": "caution",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "foulTick": 1430
+        }
+      ],
+      "free_kicks": [
+        {
+          "tick": 317,
+          "teamId": "team-b",
+          "position": {
+            "x": -43.04129282311101,
+            "y": 2.7667015550856524
+          }
+        }
+      ]
+    },
+    {
+      "id": "advantage-gate-off-pin",
+      "role": "gate-off legacy control reproducing the pre-change pin byte-for-byte",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "determinism_run2_hash_of_hashes": null,
+      "foul_count": 0,
+      "advantage_windows": [],
+      "cards": [],
+      "free_kicks": []
+    }
+  ]
+}

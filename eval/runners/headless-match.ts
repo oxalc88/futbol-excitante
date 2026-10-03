@@ -45,7 +45,7 @@ import type { SimulationObserver } from "../../src/simulation/telemetry/observer
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { SimulationEvent } from "../../src/contracts/scenario.js";
 import type { ScenarioDefinition } from "../../src/contracts/scenario.js";
-import type { GoalResetConfig, FreeKickConfig, CardConfig } from "../../src/simulation/loop/simulation.js";
+import type { GoalResetConfig, FreeKickConfig, CardConfig, AdvantageConfig } from "../../src/simulation/loop/simulation.js";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -296,6 +296,19 @@ export interface HeadlessMatchConfig {
    * here (a later objective registers it).
    */
   issueCards?: boolean;
+  /**
+   * Open the bounded FOULS_CARDS_SPEC §6.2–§6.4 advantage window on a committed
+   * man-not-ball tackle contact instead of calling the foul immediately
+   * (ADVANTAGE-MACHINERY). This is the default-OFF gate for the in-core
+   * advantage window: it is passed through to the simulation
+   * (`advantageConfig.playAdvantage`). With the gate off (default) no window
+   * opens and the core is byte-identical to pre-change on every accepted
+   * stream. The judged-retained path (§6.2a) is NOT implemented:
+   * `advantage_retention_ref` stays BLOCKED_MISSING_REFERENCE, so no advantage
+   * is ever played; the window closes by cancellation or expiry and the foul is
+   * called at the close tick. ADVANTAGE-PLAYED registration is a later objective.
+   */
+  playAdvantage?: boolean;
   /**
    * Open a free-kick restart window at tick 0 from committed state
    * (FOUL-CONSEQUENCE-MACHINERY, driven anti-huddle adjudication). This is the
@@ -769,6 +782,7 @@ export function runHeadlessMatch(
     rehomeKeeper,
     awardFreeKicks = false,
     issueCards = false,
+    playAdvantage = false,
     freeKickWindow,
   } = config;
   const halfDurationTicks = halfDurationTicksRaw;
@@ -828,7 +842,15 @@ export function runHeadlessMatch(
     ? { issueCards: true }
     : undefined;
 
-  const sim = createSimulation(world, collectObserver, undefined, undefined, undefined, undefined, goalResetConfig, freeKickConfig, cardConfig);
+  // ADVANTAGE-MACHINERY: pass the default-OFF advantage-window gate through to
+  // the simulation core (the FOUL-CONSEQUENCE / CARD-MACHINERY pattern). With it
+  // off (default) no advantage window opens and the core is byte-identical to
+  // pre-change. The judged-retained path (§6.2a) is NOT implemented.
+  const advantageConfig: AdvantageConfig | undefined = playAdvantage
+    ? { playAdvantage: true }
+    : undefined;
+
+  const sim = createSimulation(world, collectObserver, undefined, undefined, undefined, undefined, goalResetConfig, freeKickConfig, cardConfig, advantageConfig);
 
   // HUMAN-RESTART-RULES-CONFORMANCE: open the human's restart window at tick 0
   // from the committed state (the same fixture-driven technique the accepted
@@ -1345,16 +1367,19 @@ export function runHeadlessMatch(
     //    event keeps its committed id/tick/sequence so the award oracles pair
     //    it with the right boundary event.
     const committedEvents = finalState.events;
-    const restartExecKinds = new Set([
-      "throw-in-executed",
-      "goal-kick-executed",
-      "corner-kick-executed",
-      "free-kick-executed",
-      "restart-serve-wait",
-      "card-issued",
-    ]);
+    const restartExecKinds: Record<string, true> = {
+      "throw-in-executed": true,
+      "goal-kick-executed": true,
+      "corner-kick-executed": true,
+      "free-kick-executed": true,
+      "restart-serve-wait": true,
+      "card-issued": true,
+      "advantage-opened": true,
+      "advantage-cancelled": true,
+      "advantage-expired": true,
+    };
     for (const ev of committedEvents) {
-      if (!restartExecKinds.has(ev.kind)) continue;
+      if (restartExecKinds[ev.kind] !== true) continue;
       const o = obsByTick.get(ev.tick);
       if (o === undefined) continue;
       o.events.push({

@@ -73,6 +73,11 @@ import type { TackleState } from "../contacts/tackle-system.js";
 import { isFoulCandidateEvent } from "../foul-predicate.js";
 import { resolveCardForAccumulatedFouls } from "../card-policy.js";
 import {
+  ADVANTAGE_WINDOW_TICKS,
+  FOUL_CAUTION_PENDING_TICKS,
+  resolveAdvantageClose,
+} from "../advantage-policy.js";
+import {
   FOUNDATION_LOCOMOTION_V1,
   FOUNDATION_BALL_V1,
   FOUNDATION_CLOSE_CONTROL_V1,
@@ -154,6 +159,32 @@ export interface FreeKickConfig {
 export interface CardConfig {
   /** Gate: issue cards on committed foul contacts (off by default). */
   issueCards?: boolean;
+}
+
+/**
+ * Advantage-window configuration (ADVANTAGE-MACHINERY, FOULS_CARDS_SPEC
+ * §6.2–§6.4).
+ *
+ * Controls the default-OFF gate that, instead of calling a committed man-not-ball
+ * tackle contact (spec §5.1) immediately, opens the bounded §6.2 advantage
+ * window on the contact tick and defers the §8 free-kick / §7 card consequence
+ * to the close tick (§6.4) — the earliest of cancellation (§6.3: the ball's
+ * `lastTouchRef` no longer resolves to the fouled team, or the match phase
+ * leaves `playing`) or expiry at `advantage_window_ticks` (§6.2c, §9.1).
+ *
+ * The judged-retained path (§6.2a) is NOT implemented: `advantage_retention_ref`
+ * is `BLOCKED_MISSING_REFERENCE` (§11), so no retention envelope is invented and
+ * no advantage is ever played — the window always closes with the foul called.
+ * Off by default: with the gate off (or no foul) the core is byte-identical to
+ * pre-change on every accepted stream.
+ *
+ * Versioned provisional configuration — the window length and pending-caution
+ * budget are `fouls-v1` engine-tick design choices, NOT measured PES 2017
+ * constants and not wall-clock latencies.
+ */
+export interface AdvantageConfig {
+  /** Gate: play the §6.2–§6.4 advantage window on committed foul contacts (off by default). */
+  playAdvantage?: boolean;
 }
 
 /**
@@ -295,6 +326,10 @@ export interface Simulation {
  * @param cardConfig - Optional card-consequence configuration.
  *   Controls the default-OFF gate that issues a caution / expulsion to the
  *   offending player on a committed foul contact (CARD-MACHINERY).
+ * @param advantageConfig - Optional advantage-window configuration.
+ *   Controls the default-OFF gate that opens the bounded §6.2–§6.4 advantage
+ *   window on a committed foul contact and defers the free-kick / card
+ *   consequence to the close tick (ADVANTAGE-MACHINERY).
  * @returns A simulation instance.
  */
 export function createSimulation(
@@ -307,6 +342,7 @@ export function createSimulation(
   goalResetConfig?: GoalResetConfig,
   freeKickConfig?: FreeKickConfig,
   cardConfig?: CardConfig,
+  advantageConfig?: AdvantageConfig,
 ): Simulation {
   const obs = observer ?? NO_OP_OBSERVER;
 
@@ -356,6 +392,41 @@ export function createSimulation(
   // foul is committed; with the gate off (or no qualifying foul) no booking
   // field is added and no card event is emitted — byte-identical to pre-change.
   const issueCards = cardConfig?.issueCards === true;
+
+  // ADVANTAGE-MACHINERY: the default-OFF gate that opens the bounded §6.2–§6.4
+  // advantage window on a committed man-not-ball tackle contact and defers the
+  // free-kick / card consequence to the close tick. Lives in the simulation
+  // closure (like `humanServeWaitTicks`) so it never enters the WorldState; with
+  // the gate off the window branch never runs and the core is byte-identical to
+  // pre-change on every accepted stream. The judged-retained path (§6.2a) is NOT
+  // implemented: `advantage_retention_ref` is BLOCKED_MISSING_REFERENCE (§11), so
+  // no retention envelope is invented and no advantage is ever played.
+  const playAdvantage = advantageConfig?.playAdvantage === true;
+
+  /**
+   * One recognized §5.1 foul contact deferred by an open advantage window:
+   * the committed foul event (for the §7 card consequence) plus the fouled
+   * team and the contact position captured at the foul tick (for the §8
+   * free-kick restart — §6.4 applies the consequence from the close tick, not
+   * retroactively at the foul tick, so the contact spot must be preserved).
+   */
+  interface DeferredFoulContact {
+    event: SimulationEvent;
+    awardingTeam: string;
+    contactPosition: { x: number; y: number };
+  }
+
+  /**
+   * The single open advantage window (or null). Closure state: it never enters
+   * the WorldState or the canonical hash; only the advantage decision events it
+   * emits into `state.events` do. The window is opened by the first recognized
+   * foul contact on a tick and closed by cancellation (§6.3) or expiry (§6.2c).
+   */
+  let advantageWindow: {
+    openTick: number;
+    fouledTeam: string;
+    pending: DeferredFoulContact[];
+  } | null = null;
 
   // Per-player dribble-touch cooldown — maps playerId → last tick a dribble-touch occurred.
   // Lives in the simulation closure; does not affect world state or hashing.
@@ -1478,25 +1549,17 @@ export function createSimulation(
    * player's team) and the CONTACT POSITION (the fouled player's planar
    * position at the contact tick — the players have not moved since the tackle
    * stage, so this is exactly the contact spot). Only considered when the core
-   * is in `playing` (the caller gates it).
+   * is in `playing` (the caller gates it). A thin read of the shared
+   * `collectFoulContacts` so the immediate and the deferred (ADVANTAGE-MACHINERY)
+   * consequence cannot disagree about what a foul contact is.
    */
   function findFoulContact(
     stepEvents: readonly SimulationEvent[],
   ): { awardingTeam: string; contactPosition: { x: number; y: number } } | null {
-    for (const ev of stepEvents) {
-      if (!isFoulCandidateEvent(ev)) continue;
-      const p = ev.payload as Record<string, unknown>;
-      const fouledPlayerId = p.playerIdB as string | undefined;
-      const awardingTeam = p.teamIdB as string | undefined;
-      if (!fouledPlayerId || !awardingTeam) continue;
-      const fouled = state.players.find((pl) => pl.playerId === fouledPlayerId);
-      if (!fouled) continue;
-      return {
-        awardingTeam,
-        contactPosition: { x: fouled.groundPosition.x, y: fouled.groundPosition.y },
-      };
-    }
-    return null;
+    const [first] = collectFoulContacts(stepEvents);
+    return first
+      ? { awardingTeam: first.awardingTeam, contactPosition: first.contactPosition }
+      : null;
   }
 
   /**
@@ -1548,6 +1611,77 @@ export function createSimulation(
       },
     };
     state.events = [...state.events, cardEvent];
+  }
+
+  // ------------------------------------------------------------------
+  // Advantage-window helpers (ADVANTAGE-MACHINERY, FOULS_CARDS_SPEC §6.2–§6.4)
+  // ------------------------------------------------------------------
+
+  /**
+   * Collect every committed man-not-ball foul contact in a tick's events, in
+   * event order. This is the same §5.1 predicate `findFoulContact` reads
+   * (src/simulation/foul-predicate.ts), extended to return all of them so a
+   * foul committed while a window is already open is still a recognized foul
+   * whose consequence is called at the window close (§6.4). The contact
+   * position is the fouled player's planar position at the contact tick (the
+   * players have not moved since the tackle stage).
+   */
+  function collectFoulContacts(
+    stepEvents: readonly SimulationEvent[],
+  ): DeferredFoulContact[] {
+    const contacts: DeferredFoulContact[] = [];
+    for (const ev of stepEvents) {
+      if (!isFoulCandidateEvent(ev)) continue;
+      const p = ev.payload as Record<string, unknown>;
+      const fouledPlayerId = p.playerIdB as string | undefined;
+      const awardingTeam = p.teamIdB as string | undefined;
+      if (!fouledPlayerId || !awardingTeam) continue;
+      const fouled = state.players.find((pl) => pl.playerId === fouledPlayerId);
+      if (!fouled) continue;
+      contacts.push({
+        event: ev,
+        awardingTeam,
+        contactPosition: { x: fouled.groundPosition.x, y: fouled.groundPosition.y },
+      });
+    }
+    return contacts;
+  }
+
+  /**
+   * Append one advantage decision event to the core's persistent state (the
+   * same serialization the free-kick / card consequences use, so a post-run
+   * consumer can read the window open/close decisions off `state.events`).
+   */
+  function emitAdvantageDecision(
+    kind: "advantage-opened" | "advantage-cancelled" | "advantage-expired",
+    label: string,
+    payload: Record<string, unknown>,
+  ): void {
+    eventCounter++;
+    const ev: SimulationEvent = {
+      id: `${kind}-${state.tick}-${eventCounter}`,
+      tick: state.tick,
+      sequence: eventCounter,
+      kind,
+      label,
+      payload,
+    };
+    state.events = [...state.events, ev];
+  }
+
+  /**
+   * The shared §5.1 foul-contact facts for one deferred contact (the offender
+   * is the tackler `playerIdA`, the fouled player `playerIdB`).
+   */
+  function deferredContactFacts(contact: DeferredFoulContact): Record<string, unknown> {
+    const p = contact.event.payload as Record<string, unknown>;
+    return {
+      foulSourceEventId: contact.event.id,
+      foulTick: contact.event.tick,
+      fouledTeam: contact.awardingTeam,
+      offenderId: (p.playerIdA as string | undefined) ?? null,
+      fouledPlayerId: (p.playerIdB as string | undefined) ?? null,
+    };
   }
 
   // ------------------------------------------------------------------
@@ -2515,6 +2649,96 @@ export function createSimulation(
         }
       }
 
+      // 6b-3d. Advantage window (ADVANTAGE-MACHINERY, FOULS_CARDS_SPEC
+      // §6.2–§6.4). Gated on `playAdvantage` (off by default): when it is on, a
+      // committed man-not-ball tackle contact (spec §5.1) OPENS the bounded
+      // §6.2 advantage window on the contact tick instead of calling the foul
+      // immediately. The window closes at the earliest of cancellation (§6.3:
+      // the ball's `lastTouchRef` no longer resolves to the fouled team, or the
+      // match phase leaves `playing`) or expiry at `advantage_window_ticks`
+      // (§6.2c); on close the pending foul is called at the CLOSE tick through
+      // the SAME accepted restart/card machinery the immediate 6b-3c/6b-4
+      // blocks use — deferred, not retroactive at the foul tick (§6.4). The
+      // judged-retained path (§6.2a) is NOT implemented: `advantage_retention_ref`
+      // is BLOCKED_MISSING_REFERENCE (§11), so no retention envelope is invented
+      // and the window always ends with the foul called. When the gate is off
+      // this whole block is skipped and the core is byte-identical to
+      // pre-change.
+      if (playAdvantage) {
+        // A foul is recognized only while the core is in `playing` — the same
+        // deterministic same-tick priority the immediate consequence uses (a
+        // restart that already claimed the phase this tick wins; spec §2.2).
+        const foulContacts =
+          state.matchPhase === "playing" ? collectFoulContacts(allStepEvents) : [];
+
+        if (advantageWindow === null) {
+          if (foulContacts.length > 0) {
+            // §6.2: the window opens on the tick the recognized foul candidate's
+            // contact event is committed.
+            advantageWindow = {
+              openTick: state.tick,
+              fouledTeam: foulContacts[0].awardingTeam,
+              pending: foulContacts,
+            };
+            emitAdvantageDecision("advantage-opened", `Advantage window opened at tick ${state.tick}`, {
+              openTick: state.tick,
+              windowTicks: ADVANTAGE_WINDOW_TICKS,
+              pendingFoulCount: foulContacts.length,
+              ...deferredContactFacts(foulContacts[0]),
+            });
+          }
+        } else {
+          // A foul committed while the window is open is still a recognized
+          // foul: it joins the pending set so its consequence is called at the
+          // close (§6.4). It never opens a second window.
+          for (const contact of foulContacts) advantageWindow.pending.push(contact);
+
+          const closeReason = resolveAdvantageClose({
+            openTick: advantageWindow.openTick,
+            currentTick: state.tick,
+            phase: state.matchPhase,
+            lastTouchTeam: resolveLastTouchTeam(state.ball.lastTouchRef),
+            fouledTeam: advantageWindow.fouledTeam,
+          });
+
+          if (closeReason !== null) {
+            const closed = advantageWindow;
+            advantageWindow = null;
+            const first = closed.pending[0];
+            emitAdvantageDecision(
+              closeReason === "expired" ? "advantage-expired" : "advantage-cancelled",
+              `Advantage window ${closeReason} at tick ${state.tick}`,
+              {
+                openTick: closed.openTick,
+                closeTick: state.tick,
+                windowTicks: ADVANTAGE_WINDOW_TICKS,
+                reason: closeReason,
+                pendingFoulCount: closed.pending.length,
+                // §6.4: the pending caution is withheld for AT MOST
+                // `foul_caution_pending_ticks` after the window closes. With no
+                // retention judgment the deterministic resolution applies the
+                // consequence at the close tick itself (0 of the budget
+                // withheld); the budget is the hard upper bound.
+                cautionPendingBudgetTicks: FOUL_CAUTION_PENDING_TICKS,
+                cautionPendingTicksUsed: 0,
+                ...(first ? deferredContactFacts(first) : {}),
+              },
+            );
+            // §6.4: the foul is called at the close tick and the pending
+            // consequence applies from that tick (never retroactively at the
+            // foul tick). Card first, then the free kick, mirroring the
+            // immediate 6b-3c/6b-4 order; each consequence keeps its own
+            // default-OFF gate.
+            for (const contact of closed.pending) {
+              if (issueCards) issueCardForFoul(contact.event);
+              if (awardFreeKicks) {
+                onFreeKickEvent(contact.awardingTeam, contact.contactPosition);
+              }
+            }
+          }
+        }
+      }
+
       // 6b-3c. Card consequence (CARD-MACHINERY): issue a caution / expulsion to
       // the offending player per FOULS_CARDS_SPEC §7 / §9.1 when a committed
       // man-not-ball tackle contact reaches the accumulated-foul thresholds.
@@ -2530,7 +2754,7 @@ export function createSimulation(
       // arbitration (spec §2.2) is a deliberate deterministic priority: cards
       // are also evaluated only while matchPhase is still "playing", so a
       // ball-out-of-play / goal restart that claimed the phase wins.
-      if (issueCards && state.matchPhase === "playing") {
+      if (!playAdvantage && issueCards && state.matchPhase === "playing") {
         for (const ev of allStepEvents) {
           if (!isFoulCandidateEvent(ev)) continue;
           issueCardForFoul(ev);
@@ -2552,7 +2776,11 @@ export function createSimulation(
       // Same-tick arbitration (spec §2.2): this runs only when matchPhase is still
       // "playing"; if a ball-out-of-play restart already claimed the phase this
       // tick, the out-of-play restart wins (a deliberate deterministic priority).
-      if (awardFreeKicks && state.matchPhase === "playing") {
+      //
+      // ADVANTAGE-MACHINERY: `!playAdvantage` — with the advantage gate on, the
+      // immediate call is replaced by the 6b-3d window above, which calls the
+      // foul at the CLOSE tick through this same helper.
+      if (!playAdvantage && awardFreeKicks && state.matchPhase === "playing") {
         const foul = findFoulContact(allStepEvents);
         if (foul) {
           onFreeKickEvent(foul.awardingTeam, foul.contactPosition);

@@ -39,7 +39,7 @@ import {
 import type { InputFrame } from "../../src/contracts/input.js";
 import type { SimulationEvent, ScenarioDefinition } from "../../src/contracts/scenario.js";
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
-import type { Simulation, FreeKickConfig, CardConfig } from "../../src/simulation/loop/simulation.js";
+import type { Simulation, FreeKickConfig, CardConfig, AdvantageConfig } from "../../src/simulation/loop/simulation.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -95,6 +95,12 @@ export interface DefensiveDuelConfig {
    * pre-change.
    */
   cardConfig?: CardConfig;
+  /**
+   * ADVANTAGE-MACHINERY: the default-OFF gate for the in-core advantage window,
+   * passed through to the simulation. With it off (default) no window opens and
+   * the core is byte-identical to pre-change.
+   */
+  advantageConfig?: AdvantageConfig;
 }
 
 /** A press the human policy actually issued, with its tick and bit mask. */
@@ -145,6 +151,12 @@ export interface DefensiveDuelResult {
    */
   cardEvents: SimulationEvent[];
   /**
+   * ADVANTAGE-MACHINERY: the committed advantage decision events
+   * (`advantage-opened` / `advantage-cancelled` / `advantage-expired`) from the
+   * core's persistent state, in commit order. Empty for a gate-off run.
+   */
+  advantageEvents: SimulationEvent[];
+  /**
    * CARD-MACHINERY: the final committed per-player booking state (the core's
    * `state.bookings`), keyed by player id. Absent (undefined) for a gate-off
    * run or when no qualifying foul was committed.
@@ -179,6 +191,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
   const cpuAntiHuddle = config.cpuAntiHuddle ?? true;
   const freeKickConfig = config.freeKickConfig;
   const cardConfig = config.cardConfig;
+  const advantageConfig = config.advantageConfig;
 
   const world = createWorld({ scenario });
   const observations: TelemetryObservation[] = [];
@@ -186,7 +199,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
     onObservation(obs) {
       observations.push(obs);
     },
-  }, undefined, undefined, undefined, undefined, undefined, freeKickConfig, cardConfig);
+  }, undefined, undefined, undefined, undefined, undefined, freeKickConfig, cardConfig, advantageConfig);
 
   // --- HUMAN slot resolution (the match declares exactly one) ------------
   let humanControlSlot = "";
@@ -390,6 +403,15 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
   const cardEvents = finalState.events.filter(
     (ev) => ev.kind === "card-issued",
   );
+  // ADVANTAGE-MACHINERY: capture the committed advantage decision events from
+  // the core's persistent state so the driven window open/close decisions are
+  // observable (the per-step event array never carries them).
+  const advantageEvents = finalState.events.filter(
+    (ev) =>
+      ev.kind === "advantage-opened" ||
+      ev.kind === "advantage-cancelled" ||
+      ev.kind === "advantage-expired",
+  );
 
   return {
     tick: sim.tick,
@@ -402,6 +424,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
     humanPlayerId,
     freeKickEvents,
     cardEvents,
+    advantageEvents,
     bookingState: finalState.bookings,
   };
 }
