@@ -38,7 +38,7 @@ Every horizon must have unique objective IDs, coherent prerequisites, and a zero
 
 After an accepted objective, continue the next applicable horizon objective without a global reprioritization pass unless the horizon is invalidated by a blocker, architectural constraint, dependency change, inapplicable planned objective, unsafe newly discovered defect, materially higher-value evidence, or a human-needed spec/legal blocker.
 
-Each normal product horizon must name an observable playable/browser-facing outcome. A feature is not product-complete while it exists only in fixtures, test bridges, capture paths, or gated code that normal shipped play does not use. Independent objectives may run in parallel only on separate branches/worktrees with non-overlapping file ownership and no acceptance dependency.
+Each normal product horizon must name an observable playable/browser-facing outcome. A feature is not product-complete while it exists only in fixtures, test bridges, capture paths, or gated code that normal shipped play does not use. GitHub issues are optional for sequential work. Parallel implementation requires synchronized GitHub issues, explicit dependencies, `READY` state, isolated workspaces/worktrees, non-overlapping file ownership, and no acceptance dependency. If issue synchronization is unavailable, run sequentially.
 
 Do not skip the architecture boundaries to jump to 11v11, tactics, polished art, networking, Rapier, workers, WASM, or WebGPU.
 

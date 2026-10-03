@@ -23,11 +23,16 @@ const exact = new Set([
   "gauntlet/principles.md",
   "gauntlet/product-flow-contract.md",
   "gauntlet/harness-contract.md",
+  "gauntlet/parallel-issue-contract.md",
+  "gauntlet/parallel-plan.example.json",
+  "scripts/ci/test-parallel-issue-policy.mjs",
+  "scripts/ci/test-omp-parallel-gate.mjs",
   "gauntlet/evals/src/prompt-gate.ts",
   "tests/unit/eval/release-0-9-7-consolidation-binding.test.ts",
 ]);
 
 const prefixes = [
+  "scripts/gauntlet/",
   ".grok/",
   ".omp/",
   ".opencode/",

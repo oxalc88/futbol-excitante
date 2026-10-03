@@ -14,9 +14,9 @@ All Gauntlet agents, skills, routing, deterministic evals, and contracts live in
 
 `gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-Current candidate: **0.9.8** over 0.9.7.
+Current candidate: **0.9.9** over 0.9.8.
 
-0.9.8 changes strategic planning from technical-first to product-first. A normal horizon has 2–4 objectives, starts from one player-visible outcome, and includes technical/spec work only when it directly enables or protects that outcome. It also defines GitHub issues as an optional durable work queue/context index, allows safe parallel objectives on separate branches/worktrees, and adds product-flow observations without weakening the existing critic, evidence, acceptance, or remote-durability pipeline.
+0.9.9 keeps product-first planning and adds issue-gated parallel execution. GitHub issues are optional for sequential work and mandatory for parallel implementation work. Parallel workers start only from synchronized `READY` issues. OMP also applies conservative NaN concurrency limits and blocks invalid parallel builder batches.
 
 `gauntlet/state/CURRENT.md` uses `gauntlet_version: gauntlet-loop-v1` as the persisted loop/state protocol identifier; it is not the Gauntlet system SemVer. The canonical release version remains `gauntlet/VERSION.json`.
 
@@ -97,7 +97,7 @@ Two deterministic checks protect this split: wrappers must reference an existing
 | `aux` | subagent | `gemma4` | cheap summaries and bounded semantic audit |
 | `git-committer` | subagent | `gemma4` | atomic conventional commits and requested publication |
 
-Exact IDs and fallback ordering live in `gauntlet/models.json`. Routing generation for 0.9.8 is `gauntlet-models-v8`. The same file also declares harness routes for Grok, OMP, and OpenCode; `gauntlet/harness-contract.md` defines how adapters consume them.
+Exact IDs and fallback ordering live in `gauntlet/models.json`. Routing generation for 0.9.9 is `gauntlet-models-v9`. The same file also declares harness routes for Grok, OMP, and OpenCode; `gauntlet/harness-contract.md` defines how adapters consume them.
 
 ## Model routing
 
@@ -165,11 +165,13 @@ Read `gauntlet/product-flow-contract.md`.
 
 A normal horizon starts from one player-visible result. The orchestrator then selects 2–4 objectives that deliver or protect that result. A feature is not product-complete if it exists only in fixtures, test bridges, capture paths, or gated code that normal shipped play does not use.
 
-GitHub issues can hold compact task context, dependencies, acceptance criteria, and links to evidence. They are a work queue and context index. Canonical execution and acceptance state remain in `gauntlet/state/**` and accepted evidence.
+GitHub issues can hold compact task context, dependencies, acceptance criteria, and links to evidence. They are optional for sequential execution and mandatory for parallel implementation execution. Canonical execution and acceptance state remain in `gauntlet/state/**` and accepted evidence.
 
-Independent objectives may run in parallel only when they have no acceptance dependency and do not overlap in file ownership. Each objective uses a separate branch/worktree and keeps its own review and acceptance chain.
+Before parallel fan-out, create a plan from `gauntlet/parallel-plan.example.json` and run `pnpm run gauntlet:parallel:sync -- --plan artifacts/gauntlet/parallel-plan.json`. Only synchronized `READY` objectives may start. If GitHub write access is unavailable, execute sequentially. Each parallel objective uses an isolated workspace/worktree and keeps its own review and acceptance chain.
 
-0.9.8 does not manually rewrite execution-owned `gauntlet/state/**`. On the first orchestrator run after this upgrade, the changed planning policy is material evidence to invalidate an active horizon selected under the old policy and create a new product-first horizon while preserving history.
+OMP limits implementation fan-out to five workers and NaN provider requests to six in flight. The NaN base plan allows seven simultaneous requests per API key, so this leaves one request of headroom.
+
+0.9.9 does not rewrite execution-owned `gauntlet/state/**`. An existing valid product-first horizon remains valid. Issue synchronization is required only when the orchestrator selects parallel implementation.
 
 ## Acceptance pipeline
 
@@ -207,7 +209,7 @@ Deterministic and bounded semantic audits may invalidate or request more evidenc
 
 ## Timing bookkeeping
 
-`gauntlet/state/TIMING.md` is acceptance persistence. 0.9.8 requires all four tracking markers to reach the latest accepted objective:
+`gauntlet/state/TIMING.md` is acceptance persistence. 0.9.9 requires all four tracking markers to reach the latest accepted objective:
 
 ```yaml
 last_tracked_objective: <objective-id>

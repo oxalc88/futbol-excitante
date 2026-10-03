@@ -9,6 +9,7 @@ The following are harness-neutral:
 - `gauntlet/PROMPT.md`;
 - `gauntlet/principles.md`;
 - `gauntlet/product-flow-contract.md`;
+- `gauntlet/parallel-issue-contract.md`;
 - `gauntlet/roles/**`;
 - `gauntlet/models.json`;
 - evidence, acceptance, and state contracts.
@@ -56,12 +57,21 @@ If a route is unavailable, select the next compatible fallback from the same har
 
 The core decides whether objectives are independent. The harness decides how to spawn them.
 
+Before a harness starts more than one implementation objective at the same time, it must satisfy `gauntlet/parallel-issue-contract.md`.
+
 Parallel objectives require:
 
+- synchronized GitHub issues;
+- explicit issue dependencies;
+- `READY` state for every worker that starts;
 - no acceptance dependency between them;
 - non-overlapping expected file ownership;
-- isolated branches/worktrees when they edit files;
+- isolated workspaces/worktrees when they edit files;
 - separate tests, evidence, review, and acceptance records.
+
+If the harness cannot create or update GitHub issues, it must use sequential execution.
+
+OMP additionally enforces this rule with a project `tool_call` hook. The hook blocks parallel builder batches that do not have synchronized `READY` issues.
 
 Canonical state transitions are serialized.
 

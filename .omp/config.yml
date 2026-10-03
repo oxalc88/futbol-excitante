@@ -2,13 +2,21 @@
 # Provider credentials stay outside the repository.
 modelRoleStorage: project
 
+async:
+  enabled: false
+
+providers:
+  maxInFlightRequests:
+    nan: 6
+
 modelRoles:
   default: nan/glm5.3-flash:high
   plan: nan/glm5.3-flash:high
   gauntlet-orchestrator: nan/glm5.3-flash:high
   gauntlet-builder-structured: nan/deepseek-v4-flash
   gauntlet-builder-gameplay: nan/qwen3.8-flash
-  gauntlet-critic: nan/deepseek-v4-flash
+  gauntlet-critic: nan/mimo-v2.6-flash
+  gauntlet-critic-glm: nan/glm5.3-flash
   gauntlet-critic-mimo: nan/mimo-v2.6-flash
   gauntlet-integration: nan/glm5.3-flash
   gauntlet-integration-mimo: nan/mimo-v2.6-flash
@@ -16,10 +24,18 @@ modelRoles:
   gauntlet-commit: nan/gemma4
 
 task:
+  batch: true
+  maxConcurrency: 5
+  maxRecursionDepth: 1
+  isolation:
+    mode: auto
+    apply: true
+    merge: patch
   agentModelOverrides:
     builder-structured: "@gauntlet-builder-structured"
     builder-gameplay: "@gauntlet-builder-gameplay"
     critic: "@gauntlet-critic"
+    critic-glm: "@gauntlet-critic-glm"
     critic-mimo: "@gauntlet-critic-mimo"
     integration-reviewer: "@gauntlet-integration"
     integration-reviewer-mimo: "@gauntlet-integration-mimo"

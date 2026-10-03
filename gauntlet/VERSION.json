@@ -1,8 +1,8 @@
 {
-  "version": "0.9.8",
+  "version": "0.9.9",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.9.7",
+  "previous_system_version": "0.9.8",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
   "baseline_commit": "f661b38b068f884f5ed5a079d76babe3cc70b8eb",
   "includes": [
@@ -39,6 +39,9 @@
     "product-first-planning",
     "issue-context-index",
     "parallel-objective-execution",
-    "product-flow-metrics"
+    "product-flow-metrics",
+    "parallel-issue-sync",
+    "issue-gated-parallelism",
+    "omp-concurrency-guard"
   ]
 }
