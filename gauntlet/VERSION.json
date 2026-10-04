@@ -1,8 +1,8 @@
 {
-  "version": "0.11.0",
+  "version": "0.11.1",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.10.0",
+  "previous_system_version": "0.11.0",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
   "baseline_commit": "7d5add9f8eea9c4a6465a86ae1330655f0dd550d",
   "includes": [

@@ -7,6 +7,7 @@ Read these files first:
 
 - `AGENTS.md`
 - `gauntlet/PROMPT.md`
+- `gauntlet/VERSION.json`
 - `gauntlet/product-flow-contract.md`
 - `gauntlet/parallel-issue-contract.md`
 - `gauntlet/harness-contract.md`
@@ -15,6 +16,12 @@ Read these files first:
 - `gauntlet/models.json`
 - `gauntlet/state/CURRENT.md`
 - `gauntlet/state/HORIZON.md`
+
+Before any other status prose or delegation, print one compact startup line using the version read from `gauntlet/VERSION.json` and the active session role and model:
+
+`Gauntlet <version> · <agent-or-role> · <model>`
+
+Use the active session model, not a guessed configured default. If the role or model cannot be determined from the session, report `unknown` for that field. Repeat this announcement when the skill starts or resumes work; do not require a custom user prompt.
 
 Follow the canonical Gauntlet pipeline.
 

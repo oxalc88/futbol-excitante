@@ -75,6 +75,8 @@ Use the project skill to start or continue the workflow:
 /skill:gauntlet Continue the Gauntlet work.
 ```
 
+At each skill start or resume, OMP first announces `Gauntlet <version> · <agent-or-role> · <model>`. The version comes from `gauntlet/VERSION.json`; role/model come from the active session, with `unknown` for unavailable fields. No custom startup prompt is needed.
+
 The canonical acceptance transition remains serialized.
 
 ## Runtime telemetry and efficiency (0.10.0)
