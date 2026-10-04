@@ -6,6 +6,8 @@ import { tmpdir } from 'node:os';
 import { snapshot, scopedPlan, inputKey, hash, type Snapshot } from '../../gauntlet/runtime/scoped-quality.js';
 import { classifyFailure, testReport, validateScopedProofs } from '../../gauntlet/runtime/check-proof.js';
 import { certificationHealth, verifyObjectiveAdmission, requireMilestoneCertificate, verificationMeasurements } from '../../gauntlet/runtime/certification.js';
+import { rememberFailure } from '../../gauntlet/runtime/quality-execution.js';
+import { qualityPlan } from '../../gauntlet/runtime/product-quality.js';
 import { verifyCandidateQuality } from '../../gauntlet/runtime/candidate-quality.js';
 const memory=(files:Record<string,string>):Snapshot=>({files:Object.keys(files).sort(),read:p=>p in files?Buffer.from(files[p]!):null});
 const files={ 'tests/architecture/core.test.ts':'', 'tests/unit/gauntlet-fixture.test.ts':'', 'tests/unit/ball/physics.test.ts':"import '../../../src/simulation/ball/physics.js';", 'tests/unit/loop/rules.test.ts':"import '../../../src/simulation/card-policy.js';", 'tests/browser/game.browser.test.ts':'', 'src/simulation/ball/physics.ts':'', 'src/simulation/card-policy.ts':'' };
@@ -138,6 +140,16 @@ describe('0.12 real command, durable progress and proof validation',()=>{
       f.write('src/main.ts','unaccepted behavior');f.git('add','.');f.git('commit','-m','unaccepted source');expect(()=>verifyObjectiveAdmission(f.root,f.git('rev-parse','HEAD'),{full_required:false},'PLAYER-A')).toThrow('intervening unaccepted');
       const record=f.git('ls-files','gauntlet/certification').split('\n')[0]!;const value=f.json(record);value.horizon='v100';f.write(record,JSON.stringify(value));f.git('add','.');f.git('commit','-m','tampered certificate history');expect(()=>certificationHealth(f.root)).toThrow('append-only');
       expect(()=>requireMilestoneCertificate(f.root,target)).toThrow();
+    }finally{rmSync(f.dir,{recursive:true,force:true});}
+  },15000);
+  it('carries exhausted old full-gate recovery into certification without rewriting old records',()=>{
+    const f=fixture();try{
+      const check=qualityPlan(['gauntlet/runtime/quality-execution.ts']).checks.find(c=>c.id==='regression-tests')!;
+      const old=rememberFailure(null,check,{id:check.id,status:'FAIL',exit_code:1,log:'old.log',duration_ms:1,failure_signature:'a'.repeat(64),failed_test_files:[]});old.budget!.started_at_ms-=91*60*1000;old.budget!.repair_attempts=2;
+      const path='.delivery-local/quality/OLD-PRODUCT/recovery.json',bytes=JSON.stringify(old);f.write(path,bytes);
+      const out='docs/evidence/CERT-migration/quality.json',result=f.cli('--stage','certification','--execute','--out',out);
+      expect(result.status).toBe(1);expect(f.json(out).status).toBe('RECOVERY_BLOCKED');expect(f.json(out).recovery_budget.repair_attempts).toBe(2);expect(f.json(out).metrics.executed_checks).toBe(0);expect(readFileSync(join(f.root,path),'utf8')).toBe(bytes);
+      const migrated=f.json('.delivery-local/quality/repository/certification/recovery.json');expect(migrated.budget.started_at_ms).toBe(old.budget!.started_at_ms);expect(migrated.legacy_sources[0].sha256).toBe(hash(bytes));
     }finally{rmSync(f.dir,{recursive:true,force:true});}
   },15000);
   it('freezes baseline provenance without fabricating missing historical measurements',()=>{

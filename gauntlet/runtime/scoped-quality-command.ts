@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, mkdirSync, writeFileSync, renameSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, mkdirSync, writeFileSync, renameSync, rmSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { snapshot, scopedPlan, hash, digest, verificationArtifact, bookkeeping, inputKey } from './scoped-quality.js';
 import { executionProfile, testReport, coveragePass, classifyFailure, writeCheckProof, validateCheckProof, type ProvenResult, type FailureClass } from './check-proof.js';
@@ -58,13 +58,22 @@ export async function executeScopedQuality(args:string[]):Promise<void> {
     // Old broad recovery is preserved byte-for-byte as diagnostics. It never
     // grants new-scope PASS and is not deleted/reset. A new required full plan
     // still honors the old budget; bounded objectives do not inherit unrelated certification incidents.
-    const oldPath=`.delivery-local/quality/${objective}/recovery.json`;
-    if(!recovery&&plan.full_required&&existsSync(oldPath)){
-      const old=JSON.parse(readFileSync(oldPath,'utf8')) as QualityRecovery;
-      const allowed=qualityPlan(['gauntlet/runtime/quality-execution.ts']).checks.find(c=>c.id===old.failure?.check?.id);
-      if(!allowed||JSON.stringify(allowed.command)!==JSON.stringify(old.failure.check.command))throw new Error('invalid quality recovery record');
-      initializeRecoveryBudget(old);recoveryTimeRemaining(old);
-      recovery={...old,failure:{...old.failure,check:plan.checks.find(c=>c.id===old.failure.check.id)??old.failure.check}};save(recoveryPath,recovery);
+    const oldPaths=certification?readdirSync('.delivery-local/quality',{withFileTypes:true}).filter(entry=>entry.isDirectory()&&entry.name!=='repository').map(entry=>`.delivery-local/quality/${entry.name}/recovery.json`):[`.delivery-local/quality/${objective}/recovery.json`];
+    if(!recovery&&plan.full_required){
+      const legacy=oldPaths.filter(existsSync).map(path=>{
+        const old=JSON.parse(readFileSync(path,'utf8')) as QualityRecovery;
+        const allowed=qualityPlan(['gauntlet/runtime/quality-execution.ts']).checks.find(c=>c.id===old.failure?.check?.id);
+        if(old.schema_version!==1||!allowed||JSON.stringify(allowed.command)!==JSON.stringify(old.failure.check.command)||!/^[a-f0-9]{64}$/.test(old.failure.signature))throw new Error('invalid legacy quality recovery record');
+        initializeRecoveryBudget(old);return {path,old};
+      }).sort((a,b)=>a.old.budget!.started_at_ms-b.old.budget!.started_at_ms);
+      if(legacy.length){
+        const earliest=legacy[0]!.old;
+        const check=plan.checks.find(c=>c.id===earliest.failure.check.id)??plan.checks.find(c=>c.id==='regression-tests')!;
+        recovery={...earliest,failure:{...earliest.failure,check},budget:{...earliest.budget!,repair_attempts:Math.max(...legacy.map(r=>r.old.budget!.repair_attempts))}};
+        // The most restrictive deadline/attempt history survives the boundary
+        // move. Original records stay untouched; no old repair grants PASS.
+        delete recovery.repair;save(recoveryPath,{...recovery,legacy_sources:legacy.map(r=>({path:r.path,sha256:hash(readFileSync(r.path))}))});recoveryTimeRemaining(recovery);
+      }
     }
     const context=digest({base,plan,hashes,profile});
     const repair=args.includes('--repair');let checks=plan.checks,whole=false,diagnosis='';
