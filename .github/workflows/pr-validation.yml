@@ -48,15 +48,9 @@ jobs:
           ref: ${{ matrix.target == 'base' && github.event.pull_request.base.sha || github.event.pull_request.head.sha }}
           path: target
 
-      - uses: pnpm/action-setup@v4
+      - uses: jdx/mise-action@v2
         with:
-          version: 11.10.0
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: target/pnpm-lock.yaml
+          working_directory: target
 
       - name: Install dependencies
         working-directory: target

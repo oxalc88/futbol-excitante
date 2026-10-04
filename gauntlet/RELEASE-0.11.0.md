@@ -22,7 +22,7 @@ This establishes the experiment. There is no real post-change Horizon throughput
 
 ## Verification
 
-Implementation preflight: [full frozen-main/head comparison](https://github.com/oxalc88/futbol-excitante/actions/runs/37172692965). The unchanged regression classifier found no PR regressions. Final command/adapter refinements also pass local product tests and typecheck; final version/contract checks pass: 47 scenarios, 45 prompt gates and 14 state-audit checks, plus 53 product/runtime/contract tests.
+Implementation preflight: [full frozen-main/head comparison](https://github.com/oxalc88/futbol-excitante/actions/runs/37173620385). The unchanged regression classifier found no PR regressions. Final command/adapter refinements also pass local product tests and typecheck; final version/contract checks pass: 47 scenarios, 45 prompt gates and 14 state-audit checks, plus 53 product/runtime/contract tests.
 
 | Coverage | Result |
 |---|---|
@@ -40,3 +40,7 @@ The raw full suite is **not entirely green**. Both revisions retain node capture
 Full node coverage includes fast, locomotion, ball, touch/actions, duels, goalkeepers, rules/fouls, current team-suite status, milestone reduction, evidence/provenance, acceptance durability, candidate scope and parallel/runtime checks. Passing regression tests do not promote gameplay suite or milestone verdicts: existing NOT_EVALUATED, missing-reference and deferred team statuses retain their meanings.
 
 Publication uses the existing immutable tag workflow after merge to main. This PR does not rewrite older release documents or accepted state.
+
+## Maintenance CI scope
+
+Gauntlet-only PRs use Node contract/runtime/trajectory, state, routing, parallel, candidate-scope and architecture checks plus typecheck/build. Chromium installation and application browser/capture suites remain in full CI for application/eval changes or unknown impact. Explicit package/TypeScript guards permit only the Gauntlet script/include additions; dependencies, compiler options, removal of application checking and mixed scopes still trigger full. Nineteen git-fixture cases protect this selection. The release-wide full comparison above remains evidence; its workflow is manual so maintenance pushes do not launch a second full run. CI uses the repository-pinned mise toolchain. Canonical candidate quality requirements and the regression classifier are unchanged.

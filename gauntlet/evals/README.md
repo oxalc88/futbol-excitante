@@ -43,7 +43,7 @@ By default model eval uses `orchestrator-deepseek` with `deepseek-v4-flash`. The
 
 1. **Contract evals** — deterministic checks of evidence, browser screenshot requirements, horizon invariants, reviewer routing, continuation, and tracking completeness.
 2. **Prompt gate** — static checks that critical evidence/continuation/tracking rules remain present on the active orchestration surfaces.
-3. **Live state audit** — verifies the last accepted objective is actually represented in `TIMING.md` according to `gauntlet/timing-contract.md`. This is an acceptance-time gate rather than a normal CI dependency because persisted Gauntlet state is mutable.
+3. **Live state audit** — verifies the last accepted objective is actually represented in `TIMING.md` according to `gauntlet/timing-contract.md`. CI checks the committed snapshot; the acceptance pipeline rechecks after bookkeeping because persisted Gauntlet state is mutable.
 4. **Runtime/model evals** — optional headless runs of the real orchestrator/model against synthetic scenarios. The runner tells the model not to call tools or touch live project state.
 5. **Incident artifacts** — failed deterministic, prompt-gate or model evals write compact JSON under `gauntlet/evals/artifacts/incidents/` (gitignored).
 
@@ -82,3 +82,5 @@ Runtime traces/incidents should prefer stable fields such as `run_id`, `horizon_
 ## 0.11 product experiment
 
 `pnpm run gauntlet:product:test` verifies product outcome decisions, conservative impact rules, candidate receipt binding, unavailable measurements, the frozen baseline seal, and the canonical append-only command with remote acceptance snapshot checks. Eight additional deterministic scenarios protect unchanged/fixture-only/regressed product results and mandatory-review triggers. Future Horizon completion also requires the latest recorded normal-play result to be ACCEPT; accepted internal objectives alone are insufficient. See `gauntlet/trajectory-contract.md` and `gauntlet/product-quality-contract.md`.
+
+Gauntlet-only maintenance CI runs these Node checks and Gauntlet/architecture/candidate-scope tests without Chromium. Application/eval edits, unsafe shared configuration or unknown paths retain full validation. `node scripts/ci/test-validation-mode.mjs` checks the conservative scope selector. A release-wide browser/gameplay comparison remains available through the manual full-comparison workflow.

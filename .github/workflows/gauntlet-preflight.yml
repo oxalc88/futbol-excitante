@@ -1,8 +1,7 @@
-name: Gauntlet branch preflight
+name: Gauntlet full comparison (manual)
 
 on:
-  push:
-    branches: ['codex/gauntlet-*']
+  # A full release comparison is opt-in, not repeated on each maintenance push.
   workflow_dispatch:
 
 permissions:
