@@ -1,8 +1,23 @@
 import { RUNTIME_POLICY } from "./policy.js";
+import { qualityPlan } from './product-quality.js';
+import { qualityTimeout } from './quality-execution.js';
 
 export interface VerificationCommand {
   id: string;
   command: string[];
+}
+
+export function verificationTimeout(command: VerificationCommand): number {
+  const argv = command.command;
+  if (argv.slice(0, 4).join(' ') !== 'pnpm run gauntlet:quality --' || !argv.includes('--execute') || !argv.includes('--out')) {
+    return RUNTIME_POLICY.verification.timeout_ms;
+  }
+  // This is an outer process budget, not a quality waiver. The shared runner
+  // still enforces individual checks and its persisted recovery deadline.
+  const maximumPlan = qualityPlan(['gauntlet/runtime/quality-execution.ts']);
+  const timeout = argv.includes('--repair') ? Math.max(...maximumPlan.checks.map(c => qualityTimeout(c)))
+    : maximumPlan.checks.reduce((sum, check) => sum + qualityTimeout(check), 0);
+  return timeout + 30000; // Preflight, receipt writes and process cleanup.
 }
 
 export interface VerificationExecution {
