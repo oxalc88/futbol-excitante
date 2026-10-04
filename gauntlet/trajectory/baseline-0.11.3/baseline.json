@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "version": "0.11.3",
+  "base_commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+  "status": "RECONSTRUCTED_EXACT",
+  "sources": [
+    {
+      "path": "gauntlet/VERSION.json",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "d61b27effde95fef22e0b15bfb0fd16550b9ac2213ce74f1ad6eb64c1e0b4bd4",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "gauntlet/runtime/product-quality.ts",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "bebb86782037f1d626f5ffc0669db7bca890184154342689f6e9ec9b1cc7971f",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "gauntlet/runtime/quality-execution.ts",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "a805fe60156ea5ee84c78a6e2d2fe018d667e44162734a00e04767d366d81401",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "gauntlet/runtime/candidate-quality.ts",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "0b3860a03f13348624d2a836b87667b820c913035ee7552f7f77988dad46c07b",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "scripts/gauntlet/product-quality.ts",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "a2749fadecf437d97da39a3271dcd1c5ecbad42d1fe59f5614f5adb6b1291418",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "gauntlet/runtime-policy.json",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "8571c419a9bdc0a9c2de0be7691d9de848768fac38e9baa830c5cf7286ad2c9c",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "gauntlet/PROMPT.md",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "c4fcec14975131bcbfd2b66a8192a40d2f6a6d335bd347665fc35bb90b685a46",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "gauntlet/product-quality-contract.md",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "5e60d0026e98dafef4edbfdc5219d7c7293dcb964d0164a8c06682e26549c8e5",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "gauntlet/state/HORIZON.md",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "2f0a0b337077493a0f3308740460d0f6b2184b60ae1013484dde945eef66f202",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "gauntlet/state/HISTORY.md",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "cec92056e74e0fdf331f3363480a6328c4d1d62af2d64b54e87c703f795cc6f7",
+      "status": "RECONSTRUCTED_EXACT"
+    },
+    {
+      "path": "gauntlet/state/TIMING.md",
+      "commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
+      "sha256": "ef06c234925dfd5d959ca53c94733b84fe8bb2e9c27fbf1b008cc5504feed9f0",
+      "status": "RECONSTRUCTED_EXACT"
+    }
+  ],
+  "configuration": {
+    "node": "24.18.0",
+    "pnpm": "11.10.0",
+    "whole_node_timeout_ms": 2400000,
+    "other_timeout_ms": 1200000,
+    "repair_attempts": 2,
+    "recovery_wall_ms": 5400000,
+    "objective_requires_whole_node_and_browser": true,
+    "pass_reuse": false
+  },
+  "metrics": {
+    "wall_time_per_accepted_objective": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    },
+    "processed_input_tokens_per_accepted_objective": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    },
+    "verification_minutes_per_accepted_objective": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    },
+    "full_suite_executions_per_milestone": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    },
+    "duplicated_unchanged_checks": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    },
+    "harness_blocked_time": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    },
+    "product_failure_detection_latency": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    },
+    "escaped_regressions": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    },
+    "human_interventions": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    },
+    "milestone_certification_time": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "No complete source-bound server run/session telemetry available in this checkout."
+    }
+  },
+  "reported_worker_observations": [
+    {
+      "value": [
+        26,
+        32
+      ],
+      "unit": "minutes",
+      "status": "RECONSTRUCTED_ESTIMATE",
+      "note": "User-supplied worker screenshots report full Node wall time on a contended host; raw run logs/source/toolchain provenance unavailable."
+    }
+  ],
+  "historical_0_10_baseline": "gauntlet/trajectory/baseline-0.10.0/baseline.json",
+  "claims": [
+    "Configured budgets are not measured run durations.",
+    "No post-0.12 execution exists at freeze time.",
+    "No historical PASS or zero-cost measurement is invented."
+  ]
+}
