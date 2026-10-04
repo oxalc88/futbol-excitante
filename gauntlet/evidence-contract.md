@@ -22,7 +22,7 @@ Required evidence is an acceptance gate, not advisory guidance.
 - Tests and deterministic checks establish facts. They never replace the independent critic's qualitative comparison against the applicable reference bar.
 - Missing mandatory evidence prevents `ACCEPT` at every review and orchestration stage.
 
-Before the critic, run `pnpm run gauntlet:audit -- --objective <id> --class <class> ...`. The audit persists its latest structured result at `docs/evidence/<objective-id>/audit.json`. `FAIL` must be repaired by the owner reported by the audit. `REVIEW_REQUIRED` invokes the bounded cheap semantic audit. Only `PASS` proceeds to the critic.
+Before the critic, run `pnpm run gauntlet:audit -- --objective <id> --class <class> ...`. The audit persists its latest structured result at `docs/evidence/<objective-id>/audit.json`. `FAIL` must be repaired by the owner reported by the audit. `REVIEW_REQUIRED` invokes the bounded cheap semantic audit. Only `PASS` proceeds to impact-required review under `gauntlet/product-quality-contract.md`.
 
 ## Capture and evidence hygiene (0.9.2+)
 
@@ -124,7 +124,7 @@ Rules:
 Rules:
 
 - `independence_ok` must be true and the critic model must differ from the builder model.
-- The critic is mandatory even after deterministic/semantic audit success.
+- The critic is mandatory for protected properties, ambiguous impact or elevated regression risk even after deterministic/semantic audit success. Explicit trivial leaf waivers require the recomputed impact plan and NOT_REQUIRED; no evidence class itself grants a waiver.
 - Verify mandatory artifacts and inspect the candidate against the applicable reference bar; do not merely repeat script output.
 - `mandatory_evidence_ok` must be true for `ACCEPT`.
 - `BLOCKED_MISSING_REFERENCE` is not a builder failure and must not be converted into invented reference numbers.

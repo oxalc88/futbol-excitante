@@ -1,0 +1,400 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gauntlet-horizon-trajectory-v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "horizon",
+    "gauntlet_version",
+    "decision",
+    "outcome",
+    "metrics",
+    "objectives",
+    "harness",
+    "measurement_profile",
+    "acceptances"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "horizon": {
+      "type": "string",
+      "pattern": "^v[1-9][0-9]*$"
+    },
+    "gauntlet_version": {
+      "const": "0.11.0"
+    },
+    "decision": {
+      "enum": [
+        "ACCEPT",
+        "ITERATE"
+      ]
+    },
+    "outcome": {
+      "$ref": "#/$defs/outcome"
+    },
+    "objectives": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "direct_player_result",
+          "enables_or_protects"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "direct_player_result": {
+            "type": "boolean"
+          },
+          "enables_or_protects": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "harness": {
+      "type": "string"
+    },
+    "measurement_profile": {
+      "type": "string"
+    },
+    "acceptances": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/provenance"
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "time_to_playable",
+        "player_visible_changes",
+        "player_visible_changes_per_active_hour",
+        "process_only_objectives",
+        "playtest_issues_opened",
+        "playtest_issues_closed",
+        "gameplay_regressions",
+        "processed_input_tokens",
+        "tokens_per_player_visible_change",
+        "active_agent_time_per_player_visible_change",
+        "retries",
+        "critic_rejects",
+        "integration_rejects",
+        "existing_eval_suite_failures",
+        "critic_catches",
+        "integration_catches",
+        "post_acceptance_defects",
+        "milestone_playtest_result"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "time_to_playable": {
+          "$ref": "#/$defs/measurement"
+        },
+        "player_visible_changes": {
+          "$ref": "#/$defs/measurement"
+        },
+        "player_visible_changes_per_active_hour": {
+          "$ref": "#/$defs/measurement"
+        },
+        "process_only_objectives": {
+          "$ref": "#/$defs/measurement"
+        },
+        "playtest_issues_opened": {
+          "$ref": "#/$defs/measurement"
+        },
+        "playtest_issues_closed": {
+          "$ref": "#/$defs/measurement"
+        },
+        "gameplay_regressions": {
+          "$ref": "#/$defs/measurement"
+        },
+        "processed_input_tokens": {
+          "$ref": "#/$defs/measurement"
+        },
+        "tokens_per_player_visible_change": {
+          "$ref": "#/$defs/measurement"
+        },
+        "active_agent_time_per_player_visible_change": {
+          "$ref": "#/$defs/measurement"
+        },
+        "retries": {
+          "$ref": "#/$defs/measurement"
+        },
+        "critic_rejects": {
+          "$ref": "#/$defs/measurement"
+        },
+        "integration_rejects": {
+          "$ref": "#/$defs/measurement"
+        },
+        "existing_eval_suite_failures": {
+          "$ref": "#/$defs/measurement"
+        },
+        "critic_catches": {
+          "$ref": "#/$defs/measurement"
+        },
+        "integration_catches": {
+          "$ref": "#/$defs/measurement"
+        },
+        "post_acceptance_defects": {
+          "$ref": "#/$defs/measurement"
+        },
+        "milestone_playtest_result": {
+          "$ref": "#/$defs/measurement"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "required": [
+        "path",
+        "commit",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "required": [
+        "value",
+        "status",
+        "sources",
+        "note"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "MEASURED",
+            "RECONSTRUCTED_EXACT",
+            "RECONSTRUCTED_ESTIMATE",
+            "UNAVAILABLE"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/provenance"
+          }
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "UNAVAILABLE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "value": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "sources": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "outcome": {
+      "type": "object",
+      "required": [
+        "problem",
+        "smallest_playable_slice",
+        "changed_for_player",
+        "playtest",
+        "quality"
+      ],
+      "properties": {
+        "problem": {
+          "type": "string",
+          "minLength": 1
+        },
+        "smallest_playable_slice": {
+          "type": "string",
+          "minLength": 1
+        },
+        "changed_for_player": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "playtest": {
+          "type": "object",
+          "required": [
+            "mode",
+            "method",
+            "before",
+            "after",
+            "materially_better",
+            "improved",
+            "still_wrong",
+            "issues_opened",
+            "issues_closed",
+            "regressions"
+          ],
+          "properties": {
+            "mode": {
+              "const": "normal_shipped_play"
+            },
+            "method": {
+              "type": "string",
+              "minLength": 1
+            },
+            "before": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/provenance"
+              }
+            },
+            "after": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/provenance"
+              }
+            },
+            "materially_better": {
+              "type": "boolean"
+            },
+            "still_wrong": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "issues_opened": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "issues_closed": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "regressions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "improved": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          }
+        },
+        "quality": {
+          "type": "object",
+          "required": [
+            "baseline_pass",
+            "affected_domains_pass",
+            "no_known_accepted_regression",
+            "sources"
+          ],
+          "properties": {
+            "baseline_pass": {
+              "type": "boolean"
+            },
+            "affected_domains_pass": {
+              "type": "boolean"
+            },
+            "no_known_accepted_regression": {
+              "type": "boolean"
+            },
+            "sources": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/provenance"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "ACCEPT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "acceptances": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

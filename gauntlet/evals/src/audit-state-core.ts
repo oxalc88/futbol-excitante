@@ -1,3 +1,4 @@
+import { auditHorizonProduct } from "../../runtime/horizon-product-audit.js";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
@@ -131,6 +132,11 @@ export async function runStateChecks(repoRoot: string): Promise<{ objective: str
         checks.push({ name: "v0.8 latest objective manifest is acceptance-complete", pass: false, detail: `${objective} manifest is malformed`, owner: "orchestrator" });
       }
     }
+  }
+
+  if (systemVersion && /^0\.(?:11|1[2-9]|[2-9]\d)\./.test(systemVersion)) {
+    const product = await auditHorizonProduct(repoRoot, Number(yamlValue(horizon, "horizon_version")), yamlValue(horizon, "status") ?? "");
+    checks.push({ name: "Horizon product outcome and trajectory", ...product, owner: "orchestrator" });
   }
 
   return { objective, checks };

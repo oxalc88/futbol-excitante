@@ -61,3 +61,7 @@ The current OMP concurrency configuration, role routing, issue admission, isolat
 Product-first horizons, READY GitHub issue admission for parallel implementation, file ownership, isolated workspaces, independent critic, integration review, executable evidence gates, candidate provenance, separate acceptance/bookkeeping commit, state audit and remote containment are unchanged. Packets, memory, checkpoints and telemetry can neither accept nor advance canonical state.
 
 The selected modules are individually ported and hardened from `66be461a562f11d567972f5d4597be8942587d46`, not cherry-picked. No historical VERSION/RELEASE, state/horizon, routing or Grok wrappers are imported. `1a4553968adc2d00cc32094e4d3f046aa2a0743e` and its `gauntlet-token-audit.md`/`qwen-token-audit.md` are historical design evidence: growing repeated input and inherited builder context motivate checkpoints and batched verification. Historical rate limits and model assumptions are not current facts.
+
+## 0.11 product measurement
+
+The frozen historical trajectory is separate from the complete runtime baseline required to enable opt-in optimizations. The product impact contract changes review applicability, not telemetry hooks, native scheduling, memory/context/checkpoint boundaries or verification batching. Required reviews and every applicable evidence/durability gate remain protected. Future Horizons use `gauntlet:trajectory`; no historical token estimate satisfies the OMP optimization prerequisite.

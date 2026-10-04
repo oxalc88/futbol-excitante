@@ -32,7 +32,7 @@ The Gauntlet loop lives in `gauntlet/`. Launch and model routing are documented 
 
 The repo may start empty. `BOOTSTRAP-01` is the initial objective only while there is no toolchain or `src/`.
 
-Strategic prioritization uses the temporary rolling horizon in `gauntlet/state/HORIZON.md`. At startup, handoff, horizon exhaustion, or material invalidation, inspect actual project state, evidence, research, specs, `gauntlet/objectives.md`, and relevant open GitHub issues. Select 2–4 objectives around one player-visible outcome. Technical or spec-only work is valid only when it directly enables or protects that outcome. The horizon is not a fixed backlog.
+Strategic prioritization uses the temporary rolling horizon in `gauntlet/state/HORIZON.md`. At startup, handoff, horizon exhaustion, or material invalidation, inspect actual project state, evidence, research, specs, `gauntlet/objectives.md`, and relevant open GitHub issues. Select 1–4 internal objectives only as needed around one player-visible outcome. Technical or spec-only work is valid only when it directly enables or protects that outcome. The horizon is not a fixed backlog.
 
 Every horizon must have unique objective IDs, coherent prerequisites, and a zero-based `current_index` pointing to the next applicable non-accepted objective. Already accepted objectives must not reappear as pending. Acceptance updates the existing entry in place; validate candidate horizon/current state before persisting. Repair ordinary bookkeeping errors without another agent, historical rewrites, or global replanning.
 
@@ -56,8 +56,10 @@ Do not skip the architecture boundaries to jump to 11v11, tactics, polished art,
 - `builder-gameplay` implements gameplay/ball/control/team-behavior/presentation-facing gameplay objectives. Current route: `qwen3.8-flash`.
 - `critic` and its model fallbacks share `gauntlet/roles/critic.md`. Current primary route: `glm5.3-flash`. Never review with the same model that implemented the candidate.
 - `integration-reviewer` and its fallbacks share `gauntlet/roles/integration-reviewer.md`. Current primary route: `glm5.3-flash`.
-- The orchestrator records acceptance only after critic ACCEPT, integration ACCEPT, durable provenance/persistence, and the state audit required by the current Gauntlet contract.
+- The orchestrator records acceptance only after the deterministic impact plan and required independent critic/integration ACCEPT reviews, durable provenance/persistence, and the state audit required by the current Gauntlet contract.
 - `aux` does cheap summaries/bounded semantic audit only.
 - `git-committer` (`gemma4`) makes atomic commits. Orchestrators/builders do not commit.
 
 Timing and token statistics must preserve the exact model ID and role so equivalent Gauntlet work can be compared across orchestrator models.
+
+Horizon success requires a materially better normal shipped-play outcome, not just accepted objectives. Follow `gauntlet/product-quality-contract.md` and `gauntlet/trajectory-contract.md`; start trajectory measurement at selection, record first play, and append the product comparison before advancing.

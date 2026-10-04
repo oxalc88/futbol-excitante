@@ -102,3 +102,7 @@ A temporary horizon completion is evidence of implementation progress, not a mil
 ## Historical evidence
 
 Gauntlet 0.9 does not backfill or rewrite accepted 0.8.x objective evidence. Older evidence remains historical. New milestone bundles may reference it while explicitly reporting what it does and does not demonstrate.
+
+## Horizon product outcome (0.11.0)
+
+Every Horizon compares its selected problem in normal shipped play and records changed player behavior, method, improvement, remaining issues and regressions through `gauntlet:trajectory`. Use these existing plans/bundles when applicable. A materially better slice establishes Horizon success only; it does not substitute for normative milestone requirements or the independent milestone critic. Fixtures can protect properties but cannot alone establish a normal-play product outcome.

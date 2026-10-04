@@ -12,6 +12,7 @@ const exact = new Set([
   "AGENTS.md",
   "opencode.json",
   ".github/workflows/pr-validation.yml",
+  ".github/workflows/gauntlet-preflight.yml",
   "scripts/ci/run-validation.mjs",
   "scripts/ci/classify-pr-validation.mjs",
   "scripts/ci/select-validation-mode.mjs",
@@ -27,6 +28,8 @@ const exact = new Set([
   "gauntlet/parallel-plan.example.json",
   "scripts/ci/test-parallel-issue-policy.mjs",
   "scripts/ci/test-omp-parallel-gate.mjs",
+  "scripts/ci/test-gauntlet-telemetry.mjs",
+  "scripts/ci/test-validation-mode.mjs",
   "gauntlet/evals/src/prompt-gate.ts",
   "tests/unit/eval/release-0-9-7-consolidation-binding.test.ts",
 ]);
@@ -38,6 +41,9 @@ const FAST_PACKAGE_SCRIPTS = new Set([
   "gauntlet:parallel:complete",
   "gauntlet:parallel:status",
   "gauntlet:parallel:test",
+  "gauntlet:quality",
+  "gauntlet:trajectory",
+  "gauntlet:product:test",
 ]);
 
 function stable(value) {
@@ -67,7 +73,23 @@ function packageJsonIsFastSafe() {
   }
 }
 
+// Gauntlet CLI additions may extend node checking, but must not remove or
+// alter application checking, compiler settings or exclusions.
+function nodeConfigIsFastSafe() {
+  try {
+    const readAt = (ref) => JSON.parse(execFileSync("git", ["show", `${ref}:tsconfig.node.json`], { encoding: "utf8" }));
+    const before = readAt(base), after = readAt(head);
+    const withoutInclude = ({ include, ...rest }) => rest;
+    if (JSON.stringify(stable(withoutInclude(before))) !== JSON.stringify(stable(withoutInclude(after)))) return false;
+    if (!Array.isArray(before.include) || !Array.isArray(after.include)) return false;
+    if (before.include.some(path => !after.include.includes(path))) return false;
+    return after.include.filter(path => !before.include.includes(path)).every(path =>
+      typeof path === "string" && !path.includes("..") && /^(?:gauntlet\/|scripts\/gauntlet\/|\.omp\/)/.test(path));
+  } catch { return false; }
+}
+
 const prefixes = [
+  "gauntlet/",
   "scripts/gauntlet/",
   ".grok/",
   ".omp/",
@@ -76,9 +98,10 @@ const prefixes = [
 
 function isFastPath(path) {
   if (path === "package.json") return packageJsonIsFastSafe();
+  if (path === "tsconfig.node.json") return nodeConfigIsFastSafe();
   if (exact.has(path)) return true;
   if (prefixes.some((prefix) => path.startsWith(prefix))) return true;
-  if (/^gauntlet\/RELEASE-[^/]+\.md$/.test(path)) return true;
+  if (/^tests\/unit\/gauntlet-[^/]+\.test\.ts$/.test(path)) return true;
   return false;
 }
 

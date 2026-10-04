@@ -13,10 +13,21 @@ const runtimeEfficiencyCheck = existsSync("scripts/ci/test-gauntlet-telemetry.mj
   ? { id: "runtime-efficiency", command: ["pnpm", "run", "gauntlet:runtime:test"] }
   : { id: "runtime-efficiency", command: ["node", "-e", "console.log('SKIP runtime efficiency: not present on target')"] };
 
+const productQualityCheck = existsSync("tests/unit/gauntlet-0.11.0-product.test.ts")
+  ? { id: "product-quality", command: ["pnpm", "run", "gauntlet:product:test"] }
+  : null;
+
+const validationPolicyCheck = existsSync("scripts/ci/test-validation-mode.mjs")
+  ? { id: "validation-policy", command: ["node", "scripts/ci/test-validation-mode.mjs"] }
+  : null;
+
 const fullChecks = [
-  { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
+  { id: "state-audit", command: ["node", "--import", "tsx", "gauntlet/evals/src/run-state-audit.ts"] },
+  { id: "gauntlet-eval", command: ["node", "--import", "tsx", "gauntlet/evals/src/run.ts"] },
   parallelPolicyCheck,
   runtimeEfficiencyCheck,
+  ...(productQualityCheck ? [productQualityCheck] : []),
+  ...(validationPolicyCheck ? [validationPolicyCheck] : []),
   { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
   { id: "test", command: ["pnpm", "run", "test"] },
   { id: "test-browser", command: ["pnpm", "run", "test-browser"] },
@@ -25,9 +36,14 @@ const fullChecks = [
 ];
 
 const fastChecks = [
-  { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
+  { id: "state-audit", command: ["node", "--import", "tsx", "gauntlet/evals/src/run-state-audit.ts"] },
+  { id: "gauntlet-eval", command: ["node", "--import", "tsx", "gauntlet/evals/src/run.ts"] },
   parallelPolicyCheck,
-  runtimeEfficiencyCheck,
+  ...(existsSync("scripts/ci/test-gauntlet-telemetry.mjs") ? [{ id: "runtime-efficiency", command: ["node", "scripts/ci/test-gauntlet-telemetry.mjs"] }] : [runtimeEfficiencyCheck]),
+  ...(validationPolicyCheck ? [validationPolicyCheck] : []),
+  // The isolation test writes a temporary forbidden-global probe in src/;
+  // run these files sequentially so the boundary scanner cannot see that probe.
+  { id: "gauntlet-contract-tests", command: ["pnpm", "exec", "vitest", "run", "tests/unit/gauntlet-", "tests/candidate-scope.node.test.ts", "tests/architecture/core", "tests/architecture/contracts-no-forbidden-imports.test.ts", "--project", "node", "--passWithNoTests=false", "--no-file-parallelism"] },
   { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
   {
     id: "maintenance-test",

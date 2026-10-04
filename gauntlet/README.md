@@ -1,11 +1,11 @@
 # Gauntlet Loop
 
-Grok Build orchestration for this football simulation. It is project-specific, not a generic agent framework.
+Harness-neutral orchestration for this football simulation through Grok, OMP and OpenCode. It is project-specific, not a generic agent framework.
 
 The loop is:
 
 ```text
-orchestrator → builder → required evidence → critic → fix/retry → integration → evidence gate → candidate commit → acceptance/bookkeeping → remote verification → next horizon objective
+player problem → smallest playable slice → build → baseline + affected assurance → normal play → materially better? accept : iterate
 ```
 
 All Gauntlet agents, skills, routing, deterministic evals, and contracts live in this repository. NaN endpoint registration/auth remains user-level runtime configuration; the repo only declares which registered model IDs each role uses.
@@ -14,7 +14,9 @@ All Gauntlet agents, skills, routing, deterministic evals, and contracts live in
 
 `gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-Current candidate: **0.10.0** over 0.9.9.
+Current candidate: **0.11.0** over 0.10.0.
+
+0.11.0 makes a materially better normal-play result the Horizon success criterion. It adds a frozen historical trajectory baseline, deterministic impact-based assurance/review requirements, and append-only selection/first-play/outcome measurements. See `RELEASE-0.11.0.md`, `product-quality-contract.md` and `trajectory-contract.md`. No measured speedup is claimed.
 
 0.10.0 adds runtime-connected OMP telemetry first, then opt-in bounded memory/context, builder checkpoints/rotation and verification batching. All optimizations are disabled until a measured baseline is reviewed. See `gauntlet/runtime-efficiency-contract.md`; current routing and acceptance guarantees remain unchanged.
 
@@ -76,6 +78,7 @@ Shared behavior lives once:
 - integration reviewer: `gauntlet/roles/integration-reviewer.md`
 - structured builder: `gauntlet/roles/builder-structured.md`
 - gameplay builder: `gauntlet/roles/builder-gameplay.md`
+- git committer: `gauntlet/roles/git-committer.md`
 
 `.grok/agents/*.md` files are thin runtime wrappers containing frontmatter/model binding plus only runtime-specific behavior. Shared rules belong in the canonical role contracts.
 
@@ -99,7 +102,7 @@ Two deterministic checks protect this split: wrappers must reference an existing
 | `aux` | subagent | `gemma4` | cheap summaries and bounded semantic audit |
 | `git-committer` | subagent | `gemma4` | atomic conventional commits and requested publication |
 
-Exact IDs and fallback ordering live in `gauntlet/models.json`. Routing generation for 0.9.9 is `gauntlet-models-v9`. The same file also declares harness routes for Grok, OMP, and OpenCode; `gauntlet/harness-contract.md` defines how adapters consume them.
+Exact IDs and fallback ordering live in `gauntlet/models.json`. The preserved routing generation is `gauntlet-models-v9`. The same file also declares harness routes for Grok, OMP, and OpenCode; `gauntlet/harness-contract.md` defines how adapters consume them.
 
 ## Model routing
 
@@ -165,7 +168,7 @@ OMP has no Grok dependency. Its project adapter uses NaN models only. See `.omp/
 
 Read `gauntlet/product-flow-contract.md`.
 
-A normal horizon starts from one player-visible result. The orchestrator then selects 2–4 objectives that deliver or protect that result. A feature is not product-complete if it exists only in fixtures, test bridges, capture paths, or gated code that normal shipped play does not use.
+A normal horizon starts from one player-visible result. The orchestrator selects 1–4 internal objectives only as necessary to deliver or protect the smallest playable slice. It reaches normal play early, records the comparison, and iterates when the result is not materially better. Accepted objectives alone do not complete a Horizon. A feature is not product-complete if it exists only in fixtures, test bridges, capture paths, or gated code that normal shipped play does not use.
 
 GitHub issues can hold compact task context, dependencies, acceptance criteria, and links to evidence. They are optional for sequential execution and mandatory for parallel implementation execution. Canonical execution and acceptance state remain in `gauntlet/state/**` and accepted evidence.
 
@@ -182,13 +185,13 @@ OBJECTIVE
   ↓
 BUILDER ROLE
   ↓
-tests + class-specific artifacts
+always-on baseline + affected-domain assurance + class-specific artifacts
   ↓
 gauntlet:audit
   ↓
-mandatory independent CRITIC
+impact-required independent CRITIC / deterministic NOT_REQUIRED
   ↓
-INTEGRATION REVIEWER
+impact-required INTEGRATION REVIEWER / deterministic NOT_REQUIRED
   ↓
 FINAL EVIDENCE GATE
   ↓
@@ -204,10 +207,14 @@ final acceptance commit
   ↓
 push + origin/main durability verification
   ↓
-ACCEPT → next horizon objective / replan
+objective ACCEPT → enabling objective or normal play
+  ↓
+product comparison + append-only trajectory
+  ↓
+Horizon ACCEPT / ITERATE
 ```
 
-Deterministic and bounded semantic audits may invalidate or request more evidence but cannot substitute for the qualitative critic.
+Deterministic and bounded semantic audits may invalidate or request more evidence but cannot substitute for an impact-required qualitative critic. The baseline always applies; only explicit trivial leaf changes with no protected or elevated risk may waive both reviews.
 
 ## Timing bookkeeping
 

@@ -1,0 +1,17 @@
+# Product quality execution (0.11.0)
+
+Before delegation inspect the explicit map, or preview expected paths with `mise exec -- pnpm run gauntlet:quality -- --base <accepted-head> --expected-paths <paths.json>` (a JSON array). Preview is advisory only and cannot execute or grant a waiver. After edits, inspect actual impact with `--base <candidate-parent>`. Before the candidate snapshot, run the same command with `--execute --out docs/evidence/<objective>/quality.json`. It runs the existing commands and records every exit code; cancellation, crash, absent tests and missing checks cannot pass. Keep full logs in ignored artifacts. Verification batching may run this single command.
+
+Always-on baseline: typecheck, build, node regression tests (including architecture boundaries), Gauntlet contract checks, state audit and browser regression tests. No known accepted regression may survive. Simulation smoke and affected suite assurance apply to protected changes. A presentation leaf needs browser/playtest evidence but no unrelated new physics evidence.
+
+`gauntlet/runtime/product-quality.ts` maps repository paths to protected properties and the existing `eval/contracts/suites.ts` registry. This is an explicit dependency map, not an AI classifier or task taxonomy. Ball changes affect contact, duels, keepers and rule consequences; locomotion affects actions and team behavior; rules/fouls affect both rules and fouls; input/replay/state/core changes run broad assurance. Team tests verify the current declared/deferred status without adding a registered suite or fabricating PASS. Unknown paths and changed evaluator/test/architecture contracts select full assurance.
+
+Both critic and integration review are mandatory when protected gameplay, deterministic/core simulation, rules, replay, persistence, architecture boundaries or elevated regression evidence can change. Ambiguous impact runs both. Existing accepted evidence edits are elevated risk. `--elevated-risk` and `--architecture-changed` can only add assurance.
+
+Fresh per-objective screenshot/audit artifacts accompany the actual code scope without adding unrelated impact. Evidence-only objectives still require both reviews; edits to existing accepted evidence always elevate risk.
+
+Only the closed, explicit presentation/document leaf allowlist can waive these reviews. Record each waived review as `verdict: NOT_REQUIRED`, with the deterministic plan in the acceptance record. If a reviewer is invoked, ACCEPT and a model independent of the builder remain required. Milestone qualitative review remains mandatory under the existing milestone contract.
+
+Acceptance recomputes scope from the candidate's actual parent and changed paths, validates the receipt's exact plan, source hashes and every required exit code, then validates reviews. It does not trust an LLM-supplied impact label. `quality.json` is hashed into the immutable candidate manifest. Selection/playable events and trajectory outcomes are canonical bookkeeping: the working-tree planner excludes them and canonical state, while candidate verification refuses snapshots containing acceptance bookkeeping. Publish them with the appropriate state/bookkeeping commit, never as candidate implementation evidence.
+
+Candidate snapshots, evidence classes, semantic audits, state audits, serialized publication, remote durability and issue-gated parallel execution keep their existing meanings. Past acceptance records are read as historical records, never migrated in place.
