@@ -1,10 +1,10 @@
 {
-  "version": "0.11.3",
+  "version": "0.12.0",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.11.2",
+  "previous_system_version": "0.11.3",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
-  "baseline_commit": "7d5add9f8eea9c4a6465a86ae1330655f0dd550d",
+  "baseline_commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
   "includes": [
     "prompts",
     "agents",
@@ -57,7 +57,12 @@
     "normal-play-comparison",
     "provenance-aware-horizon-trajectory",
     "bounded-quality-recovery",
-    "quality-recovery-budget"
+    "quality-recovery-budget",
+    "objective-certification-boundary",
+    "content-addressed-check-proofs",
+    "failure-attribution",
+    "bounded-certification-debt",
+    "verification-cost-trajectory"
   ],
   "trajectory_baseline_commit": "d3dccf77c565102de531bc5aa981bea9aca009c3"
 }
