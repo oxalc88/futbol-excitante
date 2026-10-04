@@ -47,6 +47,8 @@ jobs:
         with:
           ref: ${{ matrix.target == 'base' && github.event.pull_request.base.sha || github.event.pull_request.head.sha }}
           path: target
+          # Provenance tests read the frozen baseline commit, not just HEAD.
+          fetch-depth: 0
 
       - uses: jdx/mise-action@v2
         with:
