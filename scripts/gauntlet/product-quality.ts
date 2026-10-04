@@ -3,6 +3,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync, existsSync, rmSync, renameSync, realpathSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { qualityPlan } from '../../gauntlet/runtime/product-quality.js';
+import { RUNTIME_POLICY } from '../../gauntlet/runtime/policy.js';
 import { qualityPreflight, repairCheck, requireRepairProof, rememberFailure, runQualityChecks, spawnQualityCheck, initializeRecoveryBudget, recoveryTimeRemaining, reserveRepairAttempt, qualityTimeout, RecoveryBlockedError, type QualityRecovery, type QualityResult } from '../../gauntlet/runtime/quality-execution.js';
 
 const args = process.argv.slice(2);
@@ -101,6 +102,9 @@ if (args.includes('--execute')) {
     // Keep the original full command after a narrowed repair fails.
     recovery.failure.check = original;
     saveRecovery(); report.status = 'FAIL'; process.exitCode = 1;
+    if (recovery.budget!.repair_attempts >= RUNTIME_POLICY.verification.recovery.maximum_repair_attempts) {
+      deadlineError ??= new RecoveryBlockedError('RECOVERY_BLOCKED: repair attempts exhausted without passing verification; preserve logs and report the blocked objective');
+    }
   } else if (deadlineError) { delete recovery!.repair; saveRecovery(); report.status = 'RECOVERY_BLOCKED'; }
   else if (requestedRepair) {
     recovery!.repair = { context_hash: context, signature: recovery!.failure.signature, diagnosis, whole_check: wholeCheck };

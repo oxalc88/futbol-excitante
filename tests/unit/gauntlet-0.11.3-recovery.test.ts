@@ -90,6 +90,8 @@ describe('0.11.3 shared quality recovery budgets', () => {
       }
       expect(state().budget!.repair_attempts).toBe(2); expect(state().budget!.started_at_ms).toBe(started);
       expect(state().identical_failures).toBe(1);
+      expect(JSON.parse(readFileSync(join(root, 'docs/evidence/TEST/quality.json'), 'utf8')).status).toBe('RECOVERY_BLOCKED');
+      expect(JSON.parse(readFileSync(join(root, '.delivery-local/quality/TEST/blocked.json'), 'utf8')).recovery.budget.repair_attempts).toBe(2);
       const calls = () => readFileSync(join(root, '.delivery-local/calls'), 'utf8');
       const before = calls(); const blocked = cli(...args, '--repair', '.delivery-local/diagnosis.json');
       expect(blocked.status).toBe(1); expect(blocked.stderr).toContain('RECOVERY_BLOCKED'); expect(calls()).toBe(before);
