@@ -8,7 +8,9 @@
  *   - OFF (the default) resolves the gates to `undefined` and the card HUD to
  *     `false` — the sim and render paths are byte-identical to pre-referee.
  *   - ON resolves the SAME accepted createSimulation config surface
- *     (`awardFreeKicks:true`, `issueCards:true`) and opts the card HUD in.
+ *     (`awardFreeKicks:true`, `issueCards:true`, `playAdvantage:true` — the
+ *     ADVANTAGE-BROWSER-EVIDENCE window gate on the same wiring) and opts the
+ *     card HUD in.
  *
  * No Math.random, Date, DOM, or Node I/O in the simulation core.
  */
@@ -21,6 +23,7 @@ describe("REFEREE-SHIPPED-WIRING app-layer wiring", () => {
     const wiring = resolveRefereeWiring(false);
     expect(wiring.freeKickConfig).toBeUndefined();
     expect(wiring.cardConfig).toBeUndefined();
+    expect(wiring.advantageConfig).toBeUndefined();
     expect(wiring.cardHud).toBe(false);
   });
 
@@ -29,11 +32,13 @@ describe("REFEREE-SHIPPED-WIRING app-layer wiring", () => {
     // The gates flow through the SAME accepted createSimulation config surface.
     expect(wiring.freeKickConfig).toEqual({ awardFreeKicks: true });
     expect(wiring.cardConfig).toEqual({ issueCards: true });
+    expect(wiring.advantageConfig).toEqual({ playAdvantage: true });
     expect(wiring.cardHud).toBe(true);
   });
 
   it("the gates are default-off semantics (no config object carries a false gate)", () => {
-    // Always either undefined (off) or { awardFreeKicks:true } / { issueCards:true }.
+    // Always either undefined (off) or { awardFreeKicks:true } / { issueCards:true }
+    // / { playAdvantage:true }.
     for (const optIn of [false, true]) {
       const wiring = resolveRefereeWiring(optIn);
       if (wiring.freeKickConfig !== undefined) {
@@ -41,6 +46,9 @@ describe("REFEREE-SHIPPED-WIRING app-layer wiring", () => {
       }
       if (wiring.cardConfig !== undefined) {
         expect(wiring.cardConfig.issueCards).toBe(true);
+      }
+      if (wiring.advantageConfig !== undefined) {
+        expect(wiring.advantageConfig.playAdvantage).toBe(true);
       }
     }
   });

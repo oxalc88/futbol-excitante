@@ -4,10 +4,11 @@
  * The shipped composition root now calls `createSimulation` with the resolved
  * referee gate configs (which resolve to `undefined` when the Referee toggle is
  * OFF).  This guard proves that the explicit-undefined call the app emits
- * (`createSimulation(world, undefined, ..., undefined, undefined)`) is
- * byte-identical on the committed state to the pre-change call
- * (`createSimulation(world)`).  So a non-referee mode is byte-neutral on the
- * simulation path.
+ * (`createSimulation(world, undefined, ..., undefined, undefined, undefined)` —
+ * the ADVANTAGE-BROWSER-EVIDENCE wiring adds the third trailing undefined
+ * advantage gate) is byte-identical on the committed state to the pre-change
+ * call (`createSimulation(world)`).  So a non-referee mode is byte-neutral on
+ * the simulation path.
  *
  * No Math.random, Date, DOM, or Node I/O in the simulation core.
  */
@@ -24,6 +25,7 @@ describe("REFEREE-SHIPPED-WIRING gate-off byte-identity", () => {
     // The app-layer off-path: the helper's `undefined` gates threaded through.
     const wired = createSimulation(
       createWorld({ scenario: FOUNDATION_SCENARIO_5V5 }),
+      undefined,
       undefined,
       undefined,
       undefined,

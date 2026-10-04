@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "objective_id": "ADVANTAGE-BROWSER-EVIDENCE",
+  "produced_by": "scripts/capture-advantage-browser-evidence.ts",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "spec_sections": [
+    "FOULS_CARDS_SPEC §5.1",
+    "FOULS_CARDS_SPEC §6.2",
+    "FOULS_CARDS_SPEC §6.3",
+    "FOULS_CARDS_SPEC §6.4",
+    "FOULS_CARDS_SPEC §7",
+    "FOULS_CARDS_SPEC §8",
+    "FOULS_CARDS_SPEC §9.1"
+  ],
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "play_ticks": 380,
+  "rendering": {
+    "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium), same createSimulation config surface the shipped composition root uses (resolveRefereeWiring: freeKickConfig + cardConfig + advantageConfig on one call)",
+    "hud": "showMatchPhaseHud:true + showCardHud:true (curated PLAYING/FREE KICK label + yellow booking notice, presentation-only enrichment)"
+  },
+  "wiring": {
+    "source": "src/apps/browser/referee-config.ts resolveRefereeWiring(true) — the existing single menu-visible Referee toggle, no new toggle",
+    "gates": {
+      "awardFreeKicks": true,
+      "issueCards": true,
+      "playAdvantage": true
+    }
+  },
+  "semantics": {
+    "order": "tackle contact -> foul tick opens the §6.2 advantage window (no immediate call) -> play continues inside the window -> window closes (cancelled-last-touch-loss) and the pending foul is called: FREE KICK + deferred caution at the close tick -> deferred set-piece placement",
+    "note": "event-centered on the advantage window: the tackle contact, the foul tick that OPENS the §6.2 window without calling the foul, live play inside the window, the close tick (cancellation) that calls the deferred foul (FREE KICK + caution), and the deferred set-piece placement."
+  },
+  "frames": [
+    {
+      "label": "foul-contact",
+      "path": "foul-contact.png",
+      "tick": 288,
+      "semantic": "before",
+      "description": "The man-not-ball tackle contact commits on the next tick: the standing tackle is on the carrier, the ball is live, phase PLAYING — the referee has not called anything yet",
+      "sha256": "580322accc28dcda996d0856553c4231bae6a7fa8979f98a22463b47098af711"
+    },
+    {
+      "label": "advantage-open",
+      "path": "advantage-open.png",
+      "tick": 289,
+      "semantic": "event",
+      "description": "The foul-contact tick: the §6.2 advantage window OPENS here — the free kick is NOT awarded, phase stays PLAYING with the ball live (team-b fouled, offender player-1); with the gate off this tick would already show the FREE KICK phase",
+      "sha256": "bcb9223513ab2e419fe03a776695c982f6530feb862e0e913598c60e2dfc79e7"
+    },
+    {
+      "label": "advantage-window",
+      "path": "advantage-window.png",
+      "tick": 297,
+      "semantic": "transition",
+      "description": "Play continues while the window is open: tick 297 sits 8 ticks inside the 24-tick budget, the phase is PLAYING, the ball is live and moving, and there is NO free-kick award or FREE KICK HUD yet",
+      "sha256": "f9f0eeda03414384a43c8e2b6cedd85b1fc8cc24fdab5c7bb07a1422ff8cdb70"
+    },
+    {
+      "label": "advantage-close",
+      "path": "advantage-close.png",
+      "tick": 308,
+      "semantic": "transition",
+      "description": "The window CLOSES by cancelled-last-touch-loss at tick 308 and the pending foul is called at the close tick: the phase turns FREE KICK and the deferred caution (player-1, 2nd accumulated foul) is committed on this tick",
+      "sha256": "c263c1930b36226097b341e5bdeae1dbd7fe6a6771be33700f842ae56f04efe9"
+    },
+    {
+      "label": "freekick-placement",
+      "path": "freekick-placement.png",
+      "tick": 312,
+      "semantic": "result",
+      "description": "The deferred consequence in the shipped app: the ball is placed at the contact position (team-b awarded) and the curated FREE KICK HUD draws — the same restart machinery as the gate-off award, applied 19 ticks late because the window ran",
+      "sha256": "532be7b887071131d3ab84174e485158c09eb2450c12d2092762f49bda893c96"
+    }
+  ],
+  "arc": {
+    "foul_ticks": [
+      66,
+      289
+    ],
+    "foul_count": 2,
+    "window": {
+      "open_tick": 289,
+      "close_tick": 308,
+      "open_to_close_ticks": 19,
+      "window_ticks_budget": 24,
+      "close_reason": "cancelled-last-touch-loss",
+      "fouled_team": "team-b",
+      "offender_id": "player-1",
+      "pending_foul_count": 1
+    },
+    "all_windows": [
+      {
+        "openTick": 66,
+        "closeTick": 67,
+        "reason": "cancelled-last-touch-loss",
+        "windowTicks": 24,
+        "fouledTeam": "team-b",
+        "offenderId": "player-1",
+        "pendingFoulCount": 1
+      },
+      {
+        "openTick": 289,
+        "closeTick": 308,
+        "reason": "cancelled-last-touch-loss",
+        "windowTicks": 24,
+        "fouledTeam": "team-b",
+        "offenderId": "player-1",
+        "pendingFoulCount": 1
+      }
+    ],
+    "window_free_kick": {
+      "tick": 368,
+      "teamId": "team-b",
+      "free_kick_position": {
+        "x": -7.388279741878565,
+        "y": 3.03392806019655
+      },
+      "kick_direction": {
+        "x": 0,
+        "y": -1
+      },
+      "call_tick": 308,
+      "countdown": 60
+    },
+    "close_tick_card": {
+      "tick": 308,
+      "cardType": "caution",
+      "playerId": "player-1",
+      "accumulatedFouls": 2
+    },
+    "card_count": 1,
+    "booking_state": {
+      "player-1": {
+        "fouls": 2,
+        "cautions": 1,
+        "expulsions": 0
+      }
+    }
+  },
+  "correspondence": {
+    "browser_foul_ticks": [
+      66,
+      289
+    ],
+    "browser_windows": [
+      {
+        "openTick": 66,
+        "closeTick": 67,
+        "reason": "cancelled-last-touch-loss",
+        "windowTicks": 24,
+        "fouledTeam": "team-b",
+        "offenderId": "player-1",
+        "pendingFoulCount": 1
+      },
+      {
+        "openTick": 289,
+        "closeTick": 308,
+        "reason": "cancelled-last-touch-loss",
+        "windowTicks": 24,
+        "fouledTeam": "team-b",
+        "offenderId": "player-1",
+        "pendingFoulCount": 1
+      }
+    ],
+    "browser_framed_window": {
+      "openTick": 289,
+      "closeTick": 308,
+      "reason": "cancelled-last-touch-loss",
+      "windowTicks": 24,
+      "fouledTeam": "team-b",
+      "offenderId": "player-1",
+      "pendingFoulCount": 1
+    },
+    "browser_deferred_free_kick_tick": 368,
+    "browser_deferred_card": {
+      "tick": 308,
+      "cardType": "caution",
+      "playerId": "player-1",
+      "accumulatedFouls": 2
+    },
+    "headless_foul_ticks": [
+      66,
+      289
+    ],
+    "headless_windows": [
+      {
+        "openTick": 66,
+        "closeTick": 67,
+        "reason": "cancelled-last-touch-loss",
+        "windowTicks": 24,
+        "fouledTeam": "team-b",
+        "offenderId": "player-1",
+        "pendingFoulCount": 1
+      },
+      {
+        "openTick": 289,
+        "closeTick": 308,
+        "reason": "cancelled-last-touch-loss",
+        "windowTicks": 24,
+        "fouledTeam": "team-b",
+        "offenderId": "player-1",
+        "pendingFoulCount": 1
+      }
+    ],
+    "headless_framed_window": {
+      "openTick": 289,
+      "closeTick": 308,
+      "reason": "cancelled-last-touch-loss",
+      "windowTicks": 24,
+      "fouledTeam": "team-b",
+      "offenderId": "player-1",
+      "pendingFoulCount": 1
+    },
+    "headless_deferred_free_kick_tick": 368,
+    "headless_deferred_card": {
+      "tick": 308,
+      "cardType": "caution",
+      "playerId": "player-1",
+      "accumulatedFouls": 2
+    },
+    "foul_ticks_equal": true,
+    "windows_equal": true,
+    "deferred_free_kick_tick_offset": 0,
+    "deferred_card_tick_offset": 0,
+    "close_reason_equal": true,
+    "free_kick_countdown": 60,
+    "correspondence_traced": true
+  },
+  "control_no_advantage_wiring": {
+    "wiring": "the accepted HEAD referee wiring: awardFreeKicks:true + issueCards:true, the advantage gate absent",
+    "advantage_events_committed": 0,
+    "foul_ticks": [
+      66,
+      290
+    ],
+    "free_kick_executed_ticks": [
+      126,
+      350
+    ],
+    "card_ticks": [
+      290
+    ],
+    "browser_foul_ticks": [
+      66,
+      290
+    ],
+    "browser_immediate_call": [
+      {
+        "foul_tick": 66,
+        "free_kick_phase_from": 67
+      },
+      {
+        "foul_tick": 290,
+        "free_kick_phase_from": 291
+      }
+    ],
+    "headless_serves_follow_fouls": true,
+    "fouls_equal": true,
+    "note": "with the advantage gate absent the SAME fouls are called immediately (foul tick -> free-kick phase on the next tick) — the control that isolates playAdvantage as the deferral the frames evidence"
+  },
+  "gate_off": {
+    "wiring": "resolveRefereeWiring(false): freeKickConfig/cardConfig/advantageConfig all undefined (the shipped default)",
+    "advantage_events_committed": 0,
+    "windows_committed": 0,
+    "free_kick_events_committed": 0,
+    "card_events_committed": 0,
+    "booking_state_present": false,
+    "browser_advantage_events_committed": 0,
+    "browser_free_kick_phases_seen": 0,
+    "browser_byte_identity_to_pre_change_call": true,
+    "browser_referee_off_chain_sha256": "dc72c6c5ddb4c6b357540ec2733414259f2a72d43a9d3495815898ff066f23fc",
+    "browser_pre_change_call_chain_sha256": "dc72c6c5ddb4c6b357540ec2733414259f2a72d43a9d3495815898ff066f23fc",
+    "compared_ticks": 380,
+    "headless_off_hash_of_hashes": "ebe4acff35f7352f7df4437c773afd9e8b7209d8ba28d2d9f388f0556e36931b",
+    "note": "the referee-off shipped path resolves all three gates undefined: no advantage decision, no free-kick phase, no card, no booking field; the 10-argument undefined-gate createSimulation call is byte-identical to the pre-change 9-argument call (tests/unit/apps/referee-config-gate-off.test.ts + the browser Pass-4 chain comparison recorded here)"
+  },
+  "drives": {
+    "fixture": "5v5-human-vs-cpu.v1.json + withProximateHumanDefence (the accepted driven-duel shape)",
+    "policy": "repeated scripted standing-tackle (commitDistance 3.0, earliestTick 44, every 16 ticks) on the HUMAN slot; CPU slots through the same adapter + team-decision profile the browser composition root uses",
+    "gates": "awardFreeKicks:true + issueCards:true + playAdvantage:true — the SAME createSimulation config surface the shipped composition root exposes via the single Referee toggle (resolveRefereeWiring(true))",
+    "capture_test": "tests/browser/advantage-browser-evidence.browser.test.ts",
+    "rendering_surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium), showMatchPhaseHud:true + showCardHud:true"
+  },
+  "disclosures": [
+    "The fouls, the window decisions, the deferred free kick and the deferred caution are REAL committed core events: the accepted in-core §6.2–§6.4 advantage branch opens the window on the committed foul-contact tick, the §6.3 condition (the ball's lastTouchRef no longer resolving to the fouled team — cancelled-last-touch-loss) closes it at tick 308, and the pending foul is called AT the close tick through the SAME accepted restart/card machinery — 19 ticks of live play were framable inside the 24-tick budget.",
+    "The captured window closed by cancellation (cancelled-last-touch-loss), NOT by expiry and NOT by a judged retention: the §6.2a judged-retained path is not implemented and nothing here evidences one.",
+    "The advantage decision events are commit-only to the core's persistent state (the same accepted serialization limitation the free-kick/card consequences have), so the browser test reads the window facts from the final snapshot, never from the per-step event array; the card HUD reads the committed card events through the accepted presentation-only enrichment.",
+    "The driven fixture is a DRIVEN duel (short 380-tick observation window, a repeated scripted standing-tackle sequence), not an organic 90-minute match; the fouling sequence is disclosed, not masked.",
+    "PNG re-capture non-determinism: the WebGL readPixels + canvas.toDataURL render path (GPU/rasterizer floats) is not promised byte-identical across re-captures; the per-frame SHA-256 values recorded here are the bytes captured at evidence time and were re-verified against the PNG files on disk by this producer. The record JSON itself is byte-reproducible (record_sha256) and carries no wall-clock field, and an ordinary (non-evidence) run writes under test-results/gauntlet-capture/** and leaves docs/ byte-identical.",
+    "The advantage window budget (24 engine ticks), the pending-caution budget (12 ticks), the free-kick countdown (60), serve speed (14 m/s), loft (0.18) and ball-z (0.11), and the `fouls-v1` accumulation thresholds (caution at 2 / expulsion at 5) are VERSIONED_PROVISIONAL fouls-v1/match-rules-v1 design choices at foundation-fixed-dt-v1, NOT measured PES 2017 constants (`advantage_window_ref_ms` stays BLOCKED_MISSING_REFERENCE)."
+  ],
+  "claims_not_made": [
+    "No retained-advantage claim: the judged-retained path (FOULS_CARDS_SPEC §6.2a) is NOT implemented (advantage_retention_ref is BLOCKED_MISSING_REFERENCE); the captured window closes by cancelled-last-touch-loss (§6.3/§6.2c) and the pending foul is CALLED at the close tick — no advantage was played.",
+    "No PES 2017 fidelity or measured PES envelope claim: The advantage window budget (24 engine ticks), the pending-caution budget (12 ticks), the free-kick countdown (60), serve speed (14 m/s), loft (0.18) and ball-z (0.11), and the `fouls-v1` accumulation thresholds (caution at 2 / expulsion at 5) are VERSIONED_PROVISIONAL fouls-v1/match-rules-v1 design choices at foundation-fixed-dt-v1, NOT measured PES 2017 constants (`advantage_window_ref_ms` stays BLOCKED_MISSING_REFERENCE).",
+    "No gameplay / simulation-core / contracts change: git diff src/simulation/ and src/contracts/ are EMPTY. The advantage gate enters through the SAME accepted createSimulation config surface via the existing single menu-visible Referee toggle (resolveRefereeWiring); no new toggle was added.",
+    "No claim that the window was forced: the foul, the window open/close decisions, the deferred free kick and the deferred caution are all REAL committed core events (the accepted ADVANTAGE-MACHINERY branch + shared foul predicate + advantage policy); the driven-duel script only reproduces the accepted defensive-duel driver's standing-tackle policy.",
+    "No claim that the browser composition root and the headless runner are per-tick byte-identical: the verified correspondence is the event structure (foul ticks, window open/close ticks + reason, deferred serve/caution ticks, offender/accumulation), never per-tick floats (the known pinned-runtime gap). The gate-off byte-identity is proven WITHIN each runtime (node unit test + browser Pass 4 chain comparison).",
+    "No suite-level PASS claim: ADVANTAGE-PLAYED executes over these streams as the registered fifth fouls-suite oracle (accepted in ADVANTAGE-SUITE-REGISTRATION); this objective evidences the browser-visible wiring, not the suite.",
+    "No PROMOTION claim. No FOUNDATION_LAB_PASS claim."
+  ],
+  "record_sha256": "5abb6b885a4cca8616b2596064c2e611ce6ec0ae99f7d914076422b3b29ae9d1"
+}

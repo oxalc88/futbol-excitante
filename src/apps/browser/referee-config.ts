@@ -7,11 +7,13 @@
  * CARD-MACHINERY) ships with the consequence gates OFF by default.  The shipped
  * composition root exposes a menu-visible "Referee" toggle; when a player opts
  * in, this helper resolves the SAME accepted `createSimulation` config surface
- * (the `freeKickConfig` / `cardConfig` parameters) and the opt-in renderer
- * affordance (`showCardHud`) so the browser can see a foul, a free kick, and a
- * booking in normal play.
+ * (the `freeKickConfig` / `cardConfig` / `advantageConfig` parameters) and the
+ * opt-in renderer affordance (`showCardHud`) so the browser can see a foul, the
+ * bounded §6.2 advantage window, a free kick, and a booking in normal play
+ * (ADVANTAGE-BROWSER-EVIDENCE threads the accepted playAdvantage gate through
+ * the same single toggle).
  *
- * When the toggle is OFF (the default) this resolves to `undefined` for both
+ * When the toggle is OFF (the default) this resolves to `undefined` for all
  * gate configs and `showCardHud: false`, so a non-referee mode is byte-identical
  * on both the simulation path and the render path.  No `src/simulation/**` or
  * `src/contracts/**` change: the gates enter through the same config surface.
@@ -20,7 +22,7 @@
  * the wiring without the browser.
  */
 
-import type { CardConfig, FreeKickConfig } from "../../simulation/loop/simulation.js";
+import type { AdvantageConfig, CardConfig, FreeKickConfig } from "../../simulation/loop/simulation.js";
 
 /** The app-layer referee wiring resolved from the menu opt-in. */
 export interface RefereeWiring {
@@ -28,6 +30,13 @@ export interface RefereeWiring {
   freeKickConfig: FreeKickConfig | undefined;
   /** The accepted card gate, or `undefined` when the referee is off. */
   cardConfig: CardConfig | undefined;
+  /**
+   * The accepted advantage-window gate (ADVANTAGE-MACHINERY), or `undefined`
+   * when the referee is off.  With the referee on, a committed man-not-ball
+   * foul opens the bounded §6.2 window instead of calling the foul
+   * immediately; the consequence applies at the close tick.
+   */
+  advantageConfig: AdvantageConfig | undefined;
   /**
    * Whether the opt-in card HUD affordance should be drawn.  True exactly when
    * the referee is on; otherwise leafs the renderer at its default (off).
@@ -46,11 +55,17 @@ export interface RefereeWiring {
  */
 export function resolveRefereeWiring(refereeOptIn: boolean): RefereeWiring {
   if (!refereeOptIn) {
-    return { freeKickConfig: undefined, cardConfig: undefined, cardHud: false };
+    return {
+      freeKickConfig: undefined,
+      cardConfig: undefined,
+      advantageConfig: undefined,
+      cardHud: false,
+    };
   }
   return {
     freeKickConfig: { awardFreeKicks: true },
     cardConfig: { issueCards: true },
+    advantageConfig: { playAdvantage: true },
     cardHud: true,
   };
 }

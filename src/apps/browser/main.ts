@@ -537,9 +537,12 @@ function startMatch(
   const world = createWorld({ scenario });
 
   // 2. Create simulation (synchronous, DOM-free core).  REFEREE-SHIPPED-WIRING:
-  // when the player opted into the referee loop, the accepted foul/free-kick and
-  // card gates enter through the SAME createSimulation config surface; when off
-  // (default) the gates stay undefined and the core is byte-identical to pre-change.
+  // when the player opted into the referee loop, the accepted foul/free-kick,
+  // card and advantage-window gates enter through the SAME createSimulation
+  // config surface; when off (default) the gates stay undefined and the core is
+  // byte-identical to pre-change.  ADVANTAGE-BROWSER-EVIDENCE: the same single
+  // Referee toggle now also rides the accepted playAdvantage gate, so the §6.2
+  // advantage window is visible in the shipped app.
   const sim: Simulation = createSimulation(
     world,
     undefined,
@@ -550,6 +553,7 @@ function startMatch(
     undefined,
     referee.freeKickConfig,
     referee.cardConfig,
+    referee.advantageConfig,
   );
 
   // -------------------------------------------------------------------

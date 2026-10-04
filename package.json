@@ -41,6 +41,8 @@
     "capture-foul-freekick-browser-record": "WIP_SECTION=__EVIDENCE__:FOUL-FREEKICK-BROWSER-EVIDENCE tsx scripts/capture-foul-freekick-browser-evidence.ts",
     "capture-card-browser-evidence": "WIP_SECTION=__EVIDENCE__:CARD-BROWSER-EVIDENCE vitest run tests/browser/card-browser-evidence.browser.test.ts --project browser",
     "capture-card-browser-record": "WIP_SECTION=__EVIDENCE__:CARD-BROWSER-EVIDENCE tsx scripts/capture-card-browser-evidence.ts",
+    "capture-advantage-browser-evidence": "WIP_SECTION=__EVIDENCE__:ADVANTAGE-BROWSER-EVIDENCE vitest run tests/browser/advantage-browser-evidence.browser.test.ts --project browser",
+    "capture-advantage-browser-record": "WIP_SECTION=__EVIDENCE__:ADVANTAGE-BROWSER-EVIDENCE tsx scripts/capture-advantage-browser-evidence.ts",
     "capture-keeper-visual-marker": "WIP_SECTION=__EVIDENCE__:KEEPER-VISUAL-MARKER vitest run tests/browser/keeper-visual-marker.browser.test.ts --project browser",
     "capture-ai-video": "node scripts/capture-ai-match-video.mjs",
     "capture-controls-legend": "node scripts/capture-controls-legend-screenshots.mjs",
