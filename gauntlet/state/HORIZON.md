@@ -9,7 +9,8 @@ horizon_id: "advantage-machinery-in-ship"
 created_from_commit: 7d5add9
 created_at: 2026-10-03
 reason: "Horizon v37 (COMPLETE 3/3, remote-durable at 026106a, publication verified 7d5add9) shipped the referee loop into the app and promoted the advantage window to the §6.1–§6.5 design contract. The decisive gap: the shipped referee still calls every recognized foul immediately — advantage, the last fouls disposition, is machinery-free while its design contract is accepted and actionable. The deterministic realization is bounded: window open/close/cancel/expiry per §6.2–§6.3, deferred free-kick/card consequence per §6.4, the retention predicate honestly BLOCKED (advantage_retention_ref) with no invented envelope, ADVANTAGE-PLAYED registrable per §6.5 once observable advantage-cancelled/expired decisions exist."
-current_index: 2
+status: COMPLETE
+current_index: 3
 objectives:
   - id: ADVANTAGE-MACHINERY
     status: accepted
@@ -22,8 +23,8 @@ objectives:
     builder: builder-structured
     prerequisite: ADVANTAGE-MACHINERY
   - id: ADVANTAGE-BROWSER-EVIDENCE
-    status: pending
-    reason: "The advantage window visible in the shipped app through the existing menu-visible Referee toggle: event-centered byte-distinct real-Chromium frames (foul contact → play continues while the window is open → the close tick calls the foul with the FREE KICK HUD), sequence.json bindings, exact browser↔headless correspondence, gate-off byte-identity. Zero gameplay change beyond the accepted machinery gate; the shipped wiring consumes the SAME createSimulation config surface. Evidence class DYNAMIC_VISUAL."
+    status: accepted
+    reason: "accepted 2026-10-04 — candidate a6013c3, critic glm5.3-flash ACCEPT (first pass), integration glm5.3-flash ACCEPT (first pass)"
     builder: builder-gameplay
     prerequisite: ADVANTAGE-MACHINERY
 observable_progress_target: "Advantage playable in the shipped app (play continuing after a foul within the bounded window, the close-tick call visible with browser evidence); the advantage oracle registered with honest verdicts. NO invented retention envelope, no direct-red severity path, no second-yellow→red, no regulation implementation, no full-match ecology, no PES fidelity; blocked references stay blocked."
