@@ -76,10 +76,11 @@ export function validateReviews(plan: QualityPlan, builderModel: string, critic:
   }
 }
 
-export function validateQualityReceipt(plan: QualityPlan, receipt: { checks: Array<{ id: string; exit_code: number | null }> }): void {
+export function validateQualityReceipt(plan: QualityPlan, receipt: { checks: Array<{ id: string; exit_code: number | null; status?: string }>; execution_mode?: string; status?: string }): void {
+  if ((receipt.execution_mode && receipt.execution_mode !== 'full') || (receipt.status && receipt.status !== 'PASS')) throw new Error('Only a complete full quality PASS can be accepted');
   if (!Array.isArray(receipt.checks)) throw new Error('quality receipt required');
   for (const expected of plan.checks) {
     const rows = receipt.checks.filter(c => c.id === expected.id);
-    if (rows.length !== 1 || rows[0]?.exit_code !== 0) throw new Error(`required quality check missing or failed: ${expected.id}`);
+    if (rows.length !== 1 || rows[0]?.exit_code !== 0 || (rows[0].status && rows[0].status !== 'PASS')) throw new Error(`required quality check missing or failed: ${expected.id}`);
   }
 }

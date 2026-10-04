@@ -64,7 +64,7 @@
     "gauntlet:memory:validate": "tsx scripts/gauntlet/runtime.ts memory-validate",
     "gauntlet:quality": "node --import tsx scripts/gauntlet/product-quality.ts",
     "gauntlet:trajectory": "node --import tsx scripts/gauntlet/trajectory.ts",
-    "gauntlet:product:test": "vitest run tests/unit/gauntlet-0.11.0-product.test.ts --project node"
+    "gauntlet:product:test": "vitest run tests/unit/gauntlet-0.11 --project node"
   },
   "dependencies": {
     "three": "^0.170.0"

@@ -8,6 +8,8 @@ Current Gauntlet system version is read from `gauntlet/VERSION.json`.
 
 The pipeline is: builder → tests/artifacts → deterministic audit → optional bounded cheap semantic audit → impact-required critic → impact-required integration-reviewer → final evidence gate → candidate snapshot commit → persist acceptance + objective manifest → bookkeeping → state audit → final acceptance commit → acceptance publication + remote verification → accept → continue.
 
+On a failed quality check, follow `gauntlet/product-quality-contract.md`: read the failure log, diagnose/repair the cause, run `gauntlet:quality --repair` for focused verification, then run one fresh full gate after `REPAIR_PASS`. Do not repeatedly rerun the full battery, bypass the recovery record, or use critic/integration ACCEPT to override a failed check. This rule is always on in OMP, Grok and OpenCode and independent of opt-in runtime efficiency tools.
+
 A critic ACCEPT is never final. An objective is accepted only after the deterministic quality plan and required independent reviews pass, durable candidate/evidence provenance, acceptance persistence, bookkeeping, and post-bookkeeping state audit all succeed. Never say an objective is **fully accepted**, **committed**, or complete merely because a critic/reviewer returned ACCEPT.
 
 ## Strategic planning vs execution
