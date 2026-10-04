@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-CARD-SEVERITY",
+  "produced_by": "scripts/capture-foul-card-severity.ts",
+  "evidence_class": "MULTI_TICK",
+  "spec_sections": [
+    "FOULS_CARDS_SPEC §5.1",
+    "FOULS_CARDS_SPEC §7",
+    "FOULS_CARDS_SPEC §9.1",
+    "FOULS_CARDS_SPEC §10",
+    "FOULS_CARDS_SPEC §11"
+  ],
+  "direct_red_severity_threshold": 0.85,
+  "registry": {
+    "content_hash": "fnv1a64-v1:f18fa65a78804310",
+    "test_binding_count": 62,
+    "fouls_suite_direct_test_ids": [
+      "FOULS-DETECT-001",
+      "FOULS-CLEAN-TACKLE-001",
+      "FOULS-FREE-KICK-AWARD-001",
+      "FOULS-CARD-ISSUED-001",
+      "FOULS-CARD-DIRECT-RED-001",
+      "FOULS-ADVANTAGE-PLAYED-001"
+    ],
+    "card_direct_red_invariant": "foul-card-direct-red-evidence"
+  },
+  "runs": [
+    {
+      "id": "driven-slide-direct-red-1",
+      "role": "proximate 5v5 human-vs-CPU (defensive-duel-driver) with ONE scripted slide tackle (commitDistance 4.0, earliestTick 48) and the card gate on (issueCards): the committed slide man-not-ball contact is deep inside the versioned slide reach (2.8 m), so its committed severity crosses the §9.1 threshold and the core commits a direct-red expulsion. serializeCommittedEvents injects the committed card-issued fact into the matching-tick observation, so the registered fouls suite adjudicates CARD-DIRECT-RED over the observation stream.",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 140,
+      "observation_count": 140,
+      "event_kind_counts": {
+        "player-player-contact": 301,
+        "player-ball-contact": 1,
+        "pass": 1,
+        "tackle-phase": 4,
+        "card-issued": 1,
+        "foul": 1
+      },
+      "state_hash_of_hashes": "3cb89d3d52efedf3ee017e860adcdd1b6d11fa27f381f02611b35f5ba352b28d",
+      "accepted_state_hash_of_hashes": null,
+      "state_hash_chain_identical_to_accepted": false,
+      "foul_count": 1,
+      "card_count": 1,
+      "direct_red_card_count": 1,
+      "card_events": [
+        {
+          "tick": 52,
+          "id": "card-issued-52-197-player-1",
+          "cardType": "expulsion",
+          "cardReason": "direct-severity",
+          "playerId": "player-1",
+          "accumulatedFouls": 1,
+          "directRedSeverity": 0.924926327957164,
+          "foulSourceEventId": "tackle-player-contact-52-196"
+        }
+      ],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "CARD-DIRECT-RED": "PASS",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "driven-slide-direct-red-2",
+      "role": "the identical scripted slide run repeated: two-run determinism of the direct-red driven stream.",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 140,
+      "observation_count": 140,
+      "event_kind_counts": {
+        "player-player-contact": 301,
+        "player-ball-contact": 1,
+        "pass": 1,
+        "tackle-phase": 4,
+        "card-issued": 1,
+        "foul": 1
+      },
+      "state_hash_of_hashes": "3cb89d3d52efedf3ee017e860adcdd1b6d11fa27f381f02611b35f5ba352b28d",
+      "accepted_state_hash_of_hashes": null,
+      "state_hash_chain_identical_to_accepted": false,
+      "foul_count": 1,
+      "card_count": 1,
+      "direct_red_card_count": 1,
+      "card_events": [
+        {
+          "tick": 52,
+          "id": "card-issued-52-197-player-1",
+          "cardType": "expulsion",
+          "cardReason": "direct-severity",
+          "playerId": "player-1",
+          "accumulatedFouls": 1,
+          "directRedSeverity": 0.924926327957164,
+          "foulSourceEventId": "tackle-player-contact-52-196"
+        }
+      ],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "CARD-DIRECT-RED": "PASS",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "driven-standing-control",
+      "role": "the standing-tackle control (repeated scripted standing tackles, commitDistance 3.0 every 16 ticks from t=44): every committed standing contact is below the direct-red threshold, so the only card is the §7 accumulation caution at the 2nd foul and CARD-DIRECT-RED is honestly NOT_EVALUATED.",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 120,
+      "observation_count": 120,
+      "event_kind_counts": {
+        "player-player-contact": 435,
+        "player-ball-contact": 3,
+        "pass": 2,
+        "tackle-phase": 11,
+        "input-rejection": 1,
+        "foul": 2,
+        "second-touch": 2,
+        "card-issued": 1
+      },
+      "state_hash_of_hashes": "aa55856685971a6914b36f1dfbf0f4d4799a002255d739499ba8a7539f83ef2f",
+      "accepted_state_hash_of_hashes": null,
+      "state_hash_chain_identical_to_accepted": false,
+      "foul_count": 2,
+      "card_count": 1,
+      "direct_red_card_count": 0,
+      "card_events": [
+        {
+          "tick": 116,
+          "id": "card-issued-116-441-player-1",
+          "cardType": "caution",
+          "cardReason": "",
+          "playerId": "player-1",
+          "accumulatedFouls": 2,
+          "directRedSeverity": null,
+          "foulSourceEventId": "tackle-player-contact-116-440"
+        }
+      ],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "PASS",
+        "CARD-DIRECT-RED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "driven-gate-off-1",
+      "role": "the scripted slide shape with the card gate OFF (issueCards undefined): no booking field, no card event — the default-off path is byte-identical to pre-change.",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 140,
+      "observation_count": 140,
+      "event_kind_counts": {
+        "player-player-contact": 301,
+        "player-ball-contact": 1,
+        "pass": 1,
+        "tackle-phase": 4
+      },
+      "state_hash_of_hashes": "c38c5fd7e7e2d563824abb99eac902fb1f923c918c678ae895c0e74f02164644",
+      "accepted_state_hash_of_hashes": null,
+      "state_hash_chain_identical_to_accepted": false,
+      "foul_count": 0,
+      "card_count": 0,
+      "direct_red_card_count": 0,
+      "card_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "CARD-DIRECT-RED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "driven-gate-off-2",
+      "role": "the identical gate-off slide run repeated: two-run byte-identity of the gate-off path.",
+      "scenario": "eval/scenarios/5v5-human-vs-cpu.v1.json (withProximateHumanDefence)",
+      "ticks": 140,
+      "observation_count": 140,
+      "event_kind_counts": {
+        "player-player-contact": 301,
+        "player-ball-contact": 1,
+        "pass": 1,
+        "tackle-phase": 4
+      },
+      "state_hash_of_hashes": "c38c5fd7e7e2d563824abb99eac902fb1f923c918c678ae895c0e74f02164644",
+      "accepted_state_hash_of_hashes": null,
+      "state_hash_chain_identical_to_accepted": false,
+      "foul_count": 0,
+      "card_count": 0,
+      "direct_red_card_count": 0,
+      "card_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "CARD-DIRECT-RED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "organic-card-gate-on",
+      "role": "the accepted organic 3v3 CPU-vs-CPU stream (3v3-press, 600 ticks, core-owned, cpuDefensiveTackle + detectFouls + issueCards + serializeRestartFacts): its single man-not-ball contact is a GRAZING slide foul (committed contact near the reach edge), below the direct-red threshold, so no direct red is committed and the accepted CARD-ISSUED state-hash pin is reproduced unchanged.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 20,
+        "core-match-phase": 600,
+        "restart-designation": 600,
+        "pass": 3,
+        "tackle-phase": 12,
+        "shot": 22,
+        "second-touch": 22,
+        "player-player-contact": 72,
+        "foul": 1,
+        "goal": 1
+      },
+      "state_hash_of_hashes": "88a08d2786a29c4dead92e4201d63fa5719f43f464938f1595c1f5cac83c243f",
+      "accepted_state_hash_of_hashes": "88a08d2786a29c4dead92e4201d63fa5719f43f464938f1595c1f5cac83c243f",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 1,
+      "card_count": 0,
+      "direct_red_card_count": 0,
+      "card_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "PASS",
+        "FOUL-DETECT": "PASS",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "CARD-DIRECT-RED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "gate-off-legacy",
+      "role": "the accepted legacy gate-off control (3v3-press, detectFouls:false, awardFreeKicks:false, issueCards:false), run twice: byte-identical to the accepted pre-change pin fb5e9b02….",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "accepted_state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 0,
+      "card_count": 0,
+      "direct_red_card_count": 0,
+      "card_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "CARD-DIRECT-RED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      }
+    },
+    {
+      "id": "gate-off-legacy-2",
+      "role": "the identical legacy gate-off run repeated for the two-run attestation.",
+      "scenario": "eval/scenarios/3v3-press-scenario.v1.json",
+      "ticks": 600,
+      "observation_count": 600,
+      "event_kind_counts": {
+        "player-ball-contact": 19,
+        "pass": 2,
+        "tackle-phase": 16,
+        "shot": 16,
+        "second-touch": 14,
+        "player-player-contact": 73,
+        "goal": 1,
+        "input-rejection": 1,
+        "ball-out-of-play": 1
+      },
+      "state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "accepted_state_hash_of_hashes": "fb5e9b02efc539e3f2935c320fb58e9750ea4ee10a1b5fec93836794f90eda5a",
+      "state_hash_chain_identical_to_accepted": true,
+      "foul_count": 0,
+      "card_count": 0,
+      "direct_red_card_count": 0,
+      "card_events": [],
+      "fouls_suite_verdicts": {
+        "FOUL-CLEAN-TACKLE": "NOT_EVALUATED",
+        "FOUL-DETECT": "NOT_EVALUATED",
+        "FREE-KICK-AWARD": "NOT_EVALUATED",
+        "CARD-ISSUED": "NOT_EVALUATED",
+        "CARD-DIRECT-RED": "NOT_EVALUATED",
+        "ADVANTAGE-PLAYED": "NOT_EVALUATED"
+      }
+    }
+  ],
+  "claims_not_made": [
+    "No PES 2017 fidelity or invented reference envelope: the severity normalization is a fouls-v1 VERSIONED_PROVISIONAL design choice, and foul_severity_distribution_ref / disciplinary_scale_ref stay BLOCKED_MISSING_REFERENCE.",
+    "No second-yellow-to-red rule: the direct red reads only the committed contact severity, never the accumulated count.",
+    "No regulation/removal mechanics: the direct red does not remove the offender from play.",
+    "No FOUNDATION_LAB_PASS, milestone or regression PASS claim.",
+    "No accepted pin altered: the legacy gate-off pin and the organic card-gate-on pin are reproduced byte-identically."
+  ],
+  "record_sha256": "8649c767df04695c5f3acfcc1cb75524fc412e15b38a66182b17bb1ebc8a6d8c"
+}

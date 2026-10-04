@@ -321,6 +321,10 @@ describe("RELEASE-0.9.8-PRODUCT release record", () => {
     expect(spec.foul_caution_pending_ticks).toBe(12);
     expect(spec.both_are_foundation_fixed_dt_tick_budgets).toBe(true);
     expect(spec.advantage_retention_ref).toBe("BLOCKED_MISSING_REFERENCE");
+    // 023112e (ADVANTAGE-SUITE-REGISTRATION, accepted) registered the ADVANTAGE-PLAYED
+    // oracle; the frozen RELEASE-0.9.8-PRODUCT record keeps its historical pin, but the
+    // live spec no longer carries the pre-registration marker (FOULS_CARDS_SPEC §10:
+    // "six registered, none named-not-registered").
     expect(spec.advantage_played).toBe("NAMED-NOT-REGISTERED");
     expect(spec.source_record).toBe("docs/evidence/ADVANTAGE-WINDOW-SPEC/manifest.json");
     expect(spec.source_record_pin_kind).toBe("file_bytes");
@@ -332,7 +336,7 @@ describe("RELEASE-0.9.8-PRODUCT release record", () => {
     for (const section of ["### 6.1 ", "### 6.2 ", "### 6.3 ", "### 6.4 ", "### 6.5 "]) {
       expect(foulsSpec).toContain(section);
     }
-    expect(foulsSpec).toContain("NAMED-NOT-REGISTERED");
+    expect(foulsSpec).toContain("registered by ADVANTAGE-SUITE-REGISTRATION");
   });
 
   it("deferred names ADVANTAGE-PLAYED machinery, the severity path, second-yellow->red, blocked references, regulation, ecology, PES fidelity", () => {
