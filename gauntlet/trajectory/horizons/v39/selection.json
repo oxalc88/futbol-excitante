@@ -1,0 +1,23 @@
+{
+  "problem": "The shipped referee shows cards only through a per-player accumulation ladder (caution at 2 fouls, expulsion at 5) — a single hard challenge is disciplined exactly like a routine one, so bookings in normal play do not read as football decisions.",
+  "smallest_playable_slice": "With the Referee toggle on, a card-quality foul in a normal shipped human-vs-CPU match can produce a direct red card immediately at the foul tick, visible as the existing card HUD entry, with the direct-red path governed by the already-pinned fouls-v1 severity threshold and off by default at the same config surface as the existing referee gates.",
+  "sources": [
+    {
+      "path": "specs/FOULS_CARDS_SPEC.md",
+      "commit": "71bd84db42d7e937a6770fda0b13ca1ae457425d",
+      "sha256": "b04886d3fe65a10a94cb656c76f1d515c7ba36fefb5f1d2d279ff3e11d68d413"
+    },
+    {
+      "path": "src/simulation/card-policy.ts",
+      "commit": "71bd84db42d7e937a6770fda0b13ca1ae457425d",
+      "sha256": "03277b42d5ae36050a9ec0ee2bc962bb9601720328193571d7e6866bb8a66784"
+    },
+    {
+      "path": "src/simulation/advantage-policy.ts",
+      "commit": "71bd84db42d7e937a6770fda0b13ca1ae457425d",
+      "sha256": "6419f1ab0b2f7c9906e55cd7bee67054f5fe4e6ae18d29f20fa790fc14b0dfa0"
+    }
+  ],
+  "selected_at": "2026-10-04T04:11:46.000Z",
+  "gauntlet_version": "0.11.1"
+}

@@ -3,32 +3,26 @@
 ## Active horizon
 
 ```yaml
-horizon_version: 38
+horizon_version: 39
 status: ACTIVE
-horizon_id: "advantage-machinery-in-ship"
-created_from_commit: 7d5add9
-created_at: 2026-10-03
-reason: "Horizon v37 (COMPLETE 3/3, remote-durable at 026106a, publication verified 7d5add9) shipped the referee loop into the app and promoted the advantage window to the §6.1–§6.5 design contract. The decisive gap: the shipped referee still calls every recognized foul immediately — advantage, the last fouls disposition, is machinery-free while its design contract is accepted and actionable. The deterministic realization is bounded: window open/close/cancel/expiry per §6.2–§6.3, deferred free-kick/card consequence per §6.4, the retention predicate honestly BLOCKED (advantage_retention_ref) with no invented envelope, ADVANTAGE-PLAYED registrable per §6.5 once observable advantage-cancelled/expired decisions exist."
-status: COMPLETE
-current_index: 3
+horizon_id: "direct-red-severity-in-ship"
+created_from_commit: 71bd84d
+created_at: 2026-10-04
+reason: "Horizon v38 (COMPLETE 3/3, remote-durable: d759e87 verified contained in origin/main 71bd84d) shipped the bounded advantage window. Strategic reassessment under Gauntlet 0.11 product-first policy: the shipped referee disciplines a single hard challenge exactly like a routine one — cards resolve only through the per-player accumulation ladder (caution at 2, expulsion at 5 per FOULS_CARDS_SPEC §7/§9.1). The severity discriminator is pinned (foul_card_direct_red_severity_threshold=0.85, fouls-v1 VERSIONED_PROVISIONAL) and card-policy.ts already cites it, but §7 only NAMES the optional contact-severity path — never implemented, so the smallest decisive playable slice is the direct-red-by-severity path behind the same default-OFF referee gate surface. No invented severity envelope: the normalized severity must derive from the accepted tackle-contact machinery and the fouls-v1 §11 BLOCKED refs (foul_severity_distribution_ref, disciplinary_scale_ref) stay blocked — the threshold is judged against the committed contact facts, with any normalization choice versioned-provisional and disclosed, and unsupported severities honestly NOT_EVALUATED."
+current_index: 0
 objectives:
-  - id: ADVANTAGE-MACHINERY
-    status: accepted
-    reason: "accepted 2026-10-03 — candidate 9072d09, critic glm5.3-flash ACCEPT (first pass), integration glm5.3-flash ACCEPT (first pass)"
+  - id: FOUL-CARD-SEVERITY
+    status: pending
+    reason: "the direct-red path is the spec-named, threshold-pinned, unimplemented card disposition; enables the playable slice"
     builder: builder-structured
     prerequisite: ""
-  - id: ADVANTAGE-SUITE-REGISTRATION
-    status: accepted
-    reason: "accepted 2026-10-03 — candidate 023112e, critic glm5.3-flash RETRY (evidence reproducibility) then ACCEPT, integration glm5.3-flash ACCEPT"
-    builder: builder-structured
-    prerequisite: ADVANTAGE-MACHINERY
-  - id: ADVANTAGE-BROWSER-EVIDENCE
-    status: accepted
-    reason: "accepted 2026-10-04 — candidate a6013c3, critic glm5.3-flash ACCEPT (first pass), integration glm5.3-flash ACCEPT (first pass)"
+  - id: FOUL-CARD-BROWSER-EVIDENCE
+    status: pending
+    reason: "the direct red visible in the shipped app with event-centered real-Chromium evidence (the CARD-BROWSER-EVIDENCE / ADVANTAGE-BROWSER-EVIDENCE pattern)"
     builder: builder-gameplay
-    prerequisite: ADVANTAGE-MACHINERY
-observable_progress_target: "Advantage playable in the shipped app (play continuing after a foul within the bounded window, the close-tick call visible with browser evidence); the advantage oracle registered with honest verdicts. NO invented retention envelope, no direct-red severity path, no second-yellow→red, no regulation implementation, no full-match ecology, no PES fidelity; blocked references stay blocked."
-last_invalidation_reason: "Horizon v37 COMPLETE 3/3 remote-durable at 026106a (verified 7d5add9); strategic reassessment at exhaustion selected advantage machinery: the §6 design contract is accepted, the deferred set names ADVANTAGE-PLAYED machinery as the actionable next fouls item, and the shipped referee currently calls every foul immediately — the playable payoff is the bounded window with deferred consequences. No invalidation of the remaining deferred set: direct-red severity, second-yellow→red, regulation, GK beyond small-sided, full-match ecology, PES fidelity remain deferred."
+    prerequisite: FOUL-CARD-SEVERITY
+observable_progress_target: "A card-quality foul in normal shipped play (Referee toggle on) can produce a direct red at the foul tick, visible via the existing card HUD; the severity path is registered/executable with honest verdicts; no second-yellow→red, no invented severity envelope, no regulation, no PES fidelity; blocked refs stay blocked."
+last_invalidation_reason: "Horizon v38 COMPLETE 3/3 remote-durable (d759e87 contained in origin/main); strategic reassessment at exhaustion under the 0.11 product-first policy selected the direct-red severity path: it is the next actionable item in the accepted fouls deferred set (second-yellow→red needs the same severity/accumulation surface; offside/penalty stay regulation-deferred with no spec; the free-kick set-piece variant is already accepted machinery)."
 replan_if:
   - objective_blocked
   - architectural_invalidation
@@ -38,6 +32,9 @@ replan_if:
   - materially_higher_value_evidence
   - human_needed_spec_or_legal_blocker
 ```
+
+
+Horizon v38 (advantage-machinery-in-ship) — COMPLETE 3/3 (accepted 2026-10-03/04; remote-durable: the full chain through d759e87 verified contained in origin/main 71bd84d): ADVANTAGE-MACHINERY (candidate 9072d09, MULTI_TICK — the §6.2–§6.4 window behind the default-OFF playAdvantage gate, resolveAdvantageClose stoppage>last-touch-loss>expiry, no retained outcome representable). ADVANTAGE-SUITE-REGISTRATION (candidate 023112e, MULTI_TICK — ADVANTAGE-PLAYED the fifth suite-fouls protected oracle, additive row-by-row, retained path honestly blocked). ADVANTAGE-BROWSER-EVIDENCE (candidate a6013c3, DYNAMIC_VISUAL — the Referee toggle resolves advantageConfig; referee-off byte-identity; 5 event-centered real-Chromium frames foul@288 → advantage-open@289 → close@308 FREE KICK + YELLOW CARD).
 
 ## Completed horizons
 Horizon v37 (referee-shipping-and-advantage-spec) — COMPLETE 3/3 (accepted 2026-10-03; remote-durable: the full chain through 026106a verified contained in origin/main after the human repaired push credentials): REFEREE-SHIPPED-WIRING accepted (the referee loop playable in the shipped app — the menu-visible Referee toggle + referee=1; the accepted awardFreeKicks/issueCards gates through the SAME createSimulation config surface with EMPTY core diff; 5 event-centered real-Chromium frames (fouls@66/290, FK@126, caution@290 "YELLOW CARD player-1 (2)"); exact browser↔headless correspondence; gate-off byte-identity; candidate 7e9adde, DYNAMIC_VISUAL). ADVANTAGE-WINDOW-SPEC accepted (FOULS_CARDS_SPEC §6 promoted to the §6.1–§6.5 advantage-window design contract — window 24 ticks/cancellation/deferral/registration preconditions; advantage_retention_ref BLOCKED_MISSING_REFERENCE; ADVANTAGE-PLAYED named-not-registered; fouls-spec-binding 42→47; candidate 0acbd65, BOOKKEEPING). RELEASE-0.9.8-CONSOLIDATION accepted (the v34-v37 gains consolidated into gauntlet/RELEASE-0.9.8-PRODUCT.md + the byte-reproducible record with 17 pinned citations — the RELEASE-0.9.8.md name collision with the 0.9.8 SYSTEM notes resolved to the -PRODUCT suffix and disclosed; VERSION.json stays 0.9.9; candidate bd95764, BOOKKEEPING).
