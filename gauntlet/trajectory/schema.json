@@ -67,7 +67,6 @@
     },
     "acceptances": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "$ref": "#/$defs/provenance"
       }
@@ -339,6 +338,14 @@
                 "minLength": 1
               },
               "uniqueItems": true
+            },
+            "improved": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
             }
           }
         },
@@ -371,5 +378,23 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "ACCEPT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "acceptances": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
 }

@@ -2,7 +2,7 @@
 
 This is prioritization guidance, not a fixed implementation backlog.
 
-At each strategic reassessment, the orchestrator must inspect the actual repository, evidence, research, specs, and relevant open GitHub issues. It must first identify one player-visible product outcome, then choose the smallest 2–4 objective horizon that delivers or protects that outcome. Milestone names may inform that choice. They must not force a predetermined order when product evidence says another gap is more important.
+At each strategic reassessment, the orchestrator must inspect the actual repository, evidence, research, specs, and relevant open GitHub issues. It must first identify one player-visible product outcome, then choose the smallest 1–4 objective horizon, decomposed only as needed, that delivers or protects that outcome. Milestone names may inform that choice. They must not force a predetermined order when product evidence says another gap is more important.
 
 Prioritize work in this order: player-visible blocker → gameplay feel/readability → broken match flow → missing core mechanic → supporting eval/spec work. A technical or spec-only objective is valid only when it directly enables or protects the selected product outcome.
 

@@ -77,4 +77,8 @@ Runtime traces/incidents should prefer stable fields such as `run_id`, `horizon_
 
 `pnpm run gauntlet:audit -- --objective <id> --class <class> ...` is the pre-critic filesystem/state gate. It emits `PASS`, `FAIL`, or `REVIEW_REQUIRED` with an owner per check. `REVIEW_REQUIRED` is the only path to bounded cheap semantic review.
 
-`GAUNTLET_ACCEPTANCE_JSON='<json>' pnpm run gauntlet:acceptance:persist` writes a candidate acceptance record only after deterministic PASS, semantic VALID when invoked, critic ACCEPT, integration ACCEPT, and builder/critic model independence. `pnpm run gauntlet:eval:state` then checks post-bookkeeping state before final acceptance.
+`GAUNTLET_ACCEPTANCE_JSON='<json>' pnpm run gauntlet:acceptance:persist` writes a candidate acceptance record only after deterministic PASS, semantic VALID when invoked, a valid candidate-bound quality receipt, and the impact-required independent critic/integration ACCEPT reviews (or deterministic NOT_REQUIRED leaf waivers). `pnpm run gauntlet:eval:state` then checks post-bookkeeping state before final acceptance.
+
+## 0.11 product experiment
+
+`pnpm run gauntlet:product:test` verifies product outcome decisions, conservative impact rules, candidate receipt binding, unavailable measurements, the frozen baseline seal, and the canonical append-only command with remote acceptance snapshot checks. Eight additional deterministic scenarios protect unchanged/fixture-only/regressed product results and mandatory-review triggers. Future Horizon completion also requires the latest recorded normal-play result to be ACCEPT; accepted internal objectives alone are insufficient. See `gauntlet/trajectory-contract.md` and `gauntlet/product-quality-contract.md`.

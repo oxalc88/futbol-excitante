@@ -88,6 +88,10 @@ describe('canonical Horizon recording command',()=>{
       const selected={problem:'Controls are hard to read',smallest_playable_slice:'Make the controls legible',sources:[source('docs/before.json')]};
       write('selection-input.json',selected);cli('start','v39','selection-input.json');
       expect(()=>cli('start','v39','selection-input.json')).toThrow();commit('selection');
+      const failed=outcome();failed.playtest.before=[source('docs/before.json')];failed.playtest.after=[source('docs/after.json')];failed.quality.sources=[source('docs/after.json')];failed.playtest.materially_better=false;failed.changed_for_player=[];failed.playtest.improved=[];
+      write('failed-input.json',{outcome:failed,acceptances:[],objectives:[{id:'CSS',direct_player_result:true,enables_or_protects:'Legible shipped controls'}]});commit('failed first observation');
+      expect(cli('record','v39','failed-input.json')).toContain('ITERATE');
+      const failedRecord=JSON.parse(readFileSync(join(dir,'gauntlet/trajectory/horizons/v39/attempt-1.json'),'utf8'));expect(failedRecord.metrics.time_to_playable).toMatchObject({value:null,status:'UNAVAILABLE'});expect(await auditHorizonProduct(dir,39,'COMPLETE')).toMatchObject({pass:false});
       write('play-input.json',{mode:'normal_shipped_play',method:'fixture normal-play observation',sources:[source('docs/after.json')]});cli('playable','v39','play-input.json');commit('first play');
       const base=git('rev-parse','HEAD');const plan=qualityPlan(['src/apps/browser/styles.css']);
       write('src/apps/browser/styles.css','after');write('docs/evidence/CSS/quality.json',{base_commit:base,plan,source_hashes:{'src/apps/browser/styles.css':createHash('sha256').update('after').digest('hex')},checks:plan.checks.map(c=>({id:c.id,exit_code:0}))});
@@ -101,11 +105,13 @@ describe('canonical Horizon recording command',()=>{
       const o=outcome();o.playtest.before=[source('docs/before.json')];o.playtest.after=[source('docs/after.json')];o.quality.sources=[source('docs/evidence/CSS/quality.json')];
       write('outcome-input.json',{outcome:o,acceptances:[source(ap,acceptance)],objectives:[{id:'CSS',direct_player_result:true,enables_or_protects:'Legible shipped controls'}]});commit('observed outcome');
       expect(cli('record','v39','outcome-input.json')).toContain('ACCEPT');
-      const first=readFileSync(join(dir,'gauntlet/trajectory/horizons/v39/attempt-1.json'),'utf8');
+      const first=readFileSync(join(dir,'gauntlet/trajectory/horizons/v39/attempt-2.json'),'utf8');
       const r=JSON.parse(first);expect(r.metrics.processed_input_tokens).toMatchObject({value:null,status:'UNAVAILABLE'});expect(r.metrics.player_visible_changes.value).toBe(1);expect(r.metrics.time_to_playable.value).toBeGreaterThanOrEqual(0);
       expect(await auditHorizonProduct(dir,39,'COMPLETE')).toMatchObject({pass:true});
+      write('outcome-input.json',{outcome:o,acceptances:[source(ap,acceptance)],objectives:[{id:'UNRELATED',direct_player_result:true,enables_or_protects:'Unrelated work'}]});commit('invalid objective attribution');
+      expect(()=>cli('record','v39','outcome-input.json')).toThrow();
       o.playtest.materially_better=false;write('outcome-input.json',{outcome:o,acceptances:[source(ap,acceptance)],objectives:[{id:'CSS',direct_player_result:true,enables_or_protects:'Legible shipped controls'}]});commit('follow-up observation');
-      expect(cli('record','v39','outcome-input.json')).toContain('ITERATE');expect(readFileSync(join(dir,'gauntlet/trajectory/horizons/v39/attempt-1.json'),'utf8')).toBe(first);
+      expect(cli('record','v39','outcome-input.json')).toContain('ITERATE');expect(readFileSync(join(dir,'gauntlet/trajectory/horizons/v39/attempt-2.json'),'utf8')).toBe(first);
       expect(await auditHorizonProduct(dir,39,'COMPLETE')).toMatchObject({pass:false});expect(await auditHorizonProduct(dir,38,'COMPLETE')).toMatchObject({pass:true});
       expect(await auditHorizonProduct(dir,40,'ACTIVE')).toMatchObject({pass:false});
     } finally {rmSync(dir,{recursive:true,force:true});rmSync(dir+'-origin.git',{recursive:true,force:true});}

@@ -66,7 +66,7 @@ If these conditions stop being true, serialize the work.
 Record these at the end of a product horizon when the data exists:
 
 - `player_visible_changes`: count of meaningful changes available in normal shipped play;
-- `time_to_playable`: elapsed time from objective selection to first usable normal-play version;
+- `time_to_playable`: elapsed time from Horizon product selection to first usable normal-play version;
 - `process_only_objectives`: objectives with no direct player-visible result;
 - `playtest_issues_opened`: top gameplay problems recorded from the horizon playtest;
 - `playtest_issues_closed`: playtest problems materially improved by the next horizon;

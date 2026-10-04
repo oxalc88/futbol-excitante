@@ -39,18 +39,23 @@ if (action === 'report') {
     writeFileSync(`${dir}/first-playable.json`, JSON.stringify({ ...input, first_playable_at: now }, null, 2)+'\n', { flag: 'wx' });
   } else if (action === 'record') {
     const selection = JSON.parse(readFileSync(`${dir}/selection.json`, 'utf8'));
-    const playable = JSON.parse(readFileSync(`${dir}/first-playable.json`, 'utf8'));
+    const playable = existsSync(`${dir}/first-playable.json`) ? JSON.parse(readFileSync(`${dir}/first-playable.json`, 'utf8')) : null;
     const outcome = input.outcome as ProductOutcome;
     if (outcome.problem !== selection.problem || outcome.smallest_playable_slice !== selection.smallest_playable_slice) throw new Error('outcome must match selected product slice');
     [...outcome.playtest.before, ...outcome.playtest.after, ...outcome.quality.sources].forEach(verify);
+    const decision = outcomeDecision(outcome);
+    if (decision === 'ACCEPT' && !playable) throw new Error('successful Horizon requires first normal-play event');
     // No asserted "tests passed" can substitute for actual accepted candidate provenance.
-    if (!Array.isArray(input.acceptances) || !input.acceptances.length) throw new Error('remote-durable acceptance references required');
+    if (!Array.isArray(input.acceptances) || (decision === 'ACCEPT' && !input.acceptances.length)) throw new Error('remote-durable acceptance references required for ACCEPT');
+    const acceptedObjectives = new Set<string>();
     for (const ref of input.acceptances as Provenance[]) {
       verify(ref);
       execFileSync('git', ['fetch', 'origin', 'main'], { stdio: 'pipe' });
       execFileSync('git', ['merge-base', '--is-ancestor', ref.commit, 'origin/main']);
       const acceptance = JSON.parse(execFileSync('git', ['show', `${ref.commit}:${ref.path}`], { encoding: 'utf8' }));
       if (acceptance.record_type !== 'candidate_acceptance' || acceptance.deterministic_audit?.status !== 'PASS') throw new Error('invalid acceptance source');
+      if (acceptedObjectives.has(acceptance.objective_id)) throw new Error('duplicate accepted objective');
+      acceptedObjectives.add(acceptance.objective_id);
       verifyCandidateQuality(process.cwd(), acceptance.candidate_commit, acceptance.objective_id, acceptance.builder.model, acceptance.critic, acceptance.integration);
       execFileSync(process.execPath, [fileURLToPath(new URL('../ci/verify-acceptance-durability.mjs', import.meta.url)), '--objective', acceptance.objective_id, '--commit', ref.commit, '--ref', ref.commit, '--mode', 'remote'], { stdio: 'pipe' });
       const manifest = JSON.parse(execFileSync('git', ['show', `${ref.commit}:docs/evidence/${acceptance.objective_id}/manifest.json`], {encoding:'utf8'}));
@@ -59,9 +64,9 @@ if (action === 'report') {
       const receipt = JSON.parse(execFileSync('git', ['show', `${acceptance.candidate_commit}:${receiptPath}`], { encoding: 'utf8' }));
       if (!receipt.checks.length || receipt.checks.some((c: any) => c.exit_code !== 0)) throw new Error('quality checks not passed');
     }
-    const decision = outcomeDecision(outcome);
     if (!Array.isArray(input.objectives) || !input.objectives.length || input.objectives.some((o: any) => !o.id || typeof o.direct_player_result !== 'boolean' || !o.enables_or_protects?.trim())) throw new Error('objectives require ids, direct_player_result and product link');
     if (new Set(input.objectives.map((o:any)=>o.id)).size !== input.objectives.length) throw new Error('duplicate objective');
+    if ([...acceptedObjectives].some(id => !input.objectives.some((o:any)=>o.id === id))) throw new Error('accepted objective missing from Horizon cost scope');
     const recordRef = { path: `${dir}/attempt-${readdirSync(dir).filter(n=>/^attempt-\d+\.json$/.test(n)).length+1}.json`, commit: '', sha256: '' };
     // Self-contained observations refer to the immutable input committed before recording.
     const inputRef: Provenance = { path: inputPath, commit: execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim(), sha256: sha(readFileSync(inputPath)) };
@@ -75,12 +80,13 @@ if (action === 'report') {
     metrics.playtest_issues_opened = observed(new Set(outcome.playtest.issues_opened).size, 'Issues opened by this playtest.');
     metrics.playtest_issues_closed = observed(new Set(outcome.playtest.issues_closed).size, 'Previously open issues materially improved and retested.');
     metrics.gameplay_regressions = observed(new Set(outcome.playtest.regressions).size, 'Observed regressions in this run, not a claim of universal absence.');
-    const seconds = (Date.parse(playable.first_playable_at) - Date.parse(selection.selected_at)) / 1000;
-    const events = ['selection.json','first-playable.json'].map(p => {
+    const events = (playable ? ['selection.json','first-playable.json'] : ['selection.json']).map(p => {
       const commit = execFileSync('git', ['rev-parse','HEAD'], {encoding:'utf8'}).trim();
       const ref = {path:`${dir}/${p}`,commit,sha256:sha(readFileSync(`${dir}/${p}`))}; verify(ref); return ref;
     });
-    metrics.time_to_playable = { value: seconds, status: 'MEASURED', sources: events, note: 'Seconds between canonical selection and first observed normal-play event; includes idle.' };
+    metrics.time_to_playable = playable
+      ? { value: (Date.parse(playable.first_playable_at) - Date.parse(selection.selected_at)) / 1000, status: 'MEASURED', sources: events, note: 'Seconds between canonical selection and first observed normal-play event; includes idle.' }
+      : { value: null, status: 'UNAVAILABLE', sources: events, note: 'A useful normal-play version has not yet been reached; failed observations remain ITERATE.' };
     const active: Measurement = input.active_agent_hours ?? { value: null, status: 'UNAVAILABLE', sources: [], note: 'No reconciled interval union.' };
     if (!['MEASURED','RECONSTRUCTED_EXACT','RECONSTRUCTED_ESTIMATE','UNAVAILABLE'].includes(active.status) || (active.status === 'UNAVAILABLE' ? active.value !== null : typeof active.value !== 'number' || !Number.isFinite(active.value) || active.value < 0 || !active.sources?.length)) throw new Error('invalid active-agent hours');
     if (active.status !== 'UNAVAILABLE') active.sources.forEach(verify);
