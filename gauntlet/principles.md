@@ -4,11 +4,13 @@ This file is the canonical source for the acceptance philosophy. Runtime prompts
 
 1. **Deterministic audits may invalidate evidence or state, but they must never replace the Gauntlet critic's qualitative comparison against the reference bar.**
 2. **Scripts establish facts. Cheap auditors resolve bounded ambiguity. Critics judge quality against the bar.**
-3. A deterministic `PASS` is permission to proceed to criticism, never permission to accept an objective.
+3. A deterministic `PASS` does not accept an objective. Apply the explicit impact policy in `gauntlet/product-quality-contract.md` before review/persistence; scripts never grant qualitative protected-gameplay acceptance.
 4. A cheap semantic-auditor verdict is advisory input to the critic. It can clear or reject a bounded ambiguity, but it cannot accept an objective.
-5. Every accepted implementation must have an independent critic verdict and an independent integration-review verdict before the final acceptance transition.
+5. Every protected or ambiguous implementation must have an independent critic verdict and an independent integration-review verdict before the final acceptance transition. Only deterministic allowlisted trivial presentation/document leaves may record NOT_REQUIRED. Quality baseline, evidence and durability still apply.
 6. Bookkeeping/audit defects are repaired by the orchestrator and re-audited; they do not send already-valid gameplay back to a builder unless implementation evidence itself is defective.
 7. **Provider, transport, quota, authentication, and harness failures are non-progress events.** Before consuming any child/agent response as a builder result, critic verdict, integration verdict, or orchestration decision, enforce `gauntlet/provider-failure-contract.md`. A CLI-reported `completed` turn is not sufficient when the assistant content is a provider/harness failure signature.
 8. Retryable inference failures resume the same logical inference under the bounded exponential-backoff policy in `gauntlet/provider-failure-contract.md`; they never advance objective state, create acceptance evidence, or duplicate history/bookkeeping transitions.
 9. **Acceptance durability includes canonical state, not only commit ancestry.** Enforce `gauntlet/acceptance-durability-contract.md`: every canonical bookkeeping change produced by an acceptance must be included in the final acceptance commit, and the resulting acceptance/state must be verified from `origin/main` before continuation.
 10. Canonical state newer than `origin/main` is repair input, never cleanup residue. Preserve it and classify omitted acceptance bookkeeping as `MISSING_ACCEPTANCE_BOOKKEEPING`; never restore/discard it merely to obtain a clean worktree.
+
+11. Horizon success requires a materially better normal-play outcome persisted under `gauntlet/trajectory-contract.md`. Internal objective acceptance alone is insufficient.

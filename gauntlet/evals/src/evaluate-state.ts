@@ -1,3 +1,4 @@
+import { qualityPlan, validateReviews } from "../../runtime/product-quality.js";
 import { isAllowedStopReason } from "../contracts/stop-reasons.js";
 import type {
   EvaluationResult,
@@ -203,6 +204,14 @@ function evaluateRegressionMonitorTrigger(s: RegressionMonitorTriggerGateScenari
 
 export function evaluateScenario(s: GauntletScenario): EvaluationResult {
   switch (s.kind) {
+    case "product_outcome_gate": return { scenario_id: s.id, decision: s.input.normal_shipped_play && s.input.materially_better && s.input.quality_pass && s.input.gameplay_regressions === 0 ? "product_accept" : "product_iterate" };
+    case "impact_review_gate": {
+      try {
+        const plan = qualityPlan(s.input.changed_paths, s.input.elevated_risk);
+        validateReviews(plan, s.input.builder_model, { verdict: s.input.critic_verdict, model: s.input.critic_model }, { verdict: s.input.integration_verdict, model: s.input.integration_model });
+        return { scenario_id: s.id, decision: "impact_reviews_valid" };
+      } catch { return { scenario_id: s.id, decision: "impact_reviews_required" }; }
+    }
     case "evidence_gate": return evaluateEvidence(s);
     case "horizon_validation": return evaluateHorizon(s);
     case "routing_fallback": return evaluateRouting(s);

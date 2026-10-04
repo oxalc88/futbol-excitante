@@ -86,6 +86,8 @@ export async function buildEvidenceManifest(
 
   const screenshots = await screenshotRecords(repoRoot, objective, candidateCommit);
   const trajectory = await exists(trajectoryPath) ? await artifact(repoRoot, trajectoryPath, candidateCommit) : null;
+  const qualityPath = path.join(evidenceDir, "quality.json");
+  const qualityArtifact = await exists(qualityPath) ? await artifact(repoRoot, qualityPath, candidateCommit) : null;
   const auditArtifact = await exists(auditPath) ? await artifact(repoRoot, auditPath, candidateCommit) : null;
   const sequenceArtifact = await exists(sequencePath) ? await artifact(repoRoot, sequencePath, candidateCommit) : null;
   const sequence = await readJsonIfPresent(sequencePath);
@@ -108,6 +110,7 @@ export async function buildEvidenceManifest(
     candidate_commit: candidateCommit,
     evidence_class: input.evidence_class ?? null,
     evidence: {
+      quality: qualityArtifact,
       screenshots,
       semantic_sequence: sequence ? { metadata: sequence, artifact: sequenceArtifact } : null,
       trajectory,

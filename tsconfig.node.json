@@ -15,7 +15,9 @@
     "eval/**/*.ts",
     "gauntlet/runtime/**/*.ts",
     "scripts/gauntlet/runtime.ts",
-    ".omp/extensions/gauntlet-efficiency.ts"
+    ".omp/extensions/gauntlet-efficiency.ts",
+    "scripts/gauntlet/product-quality.ts",
+    "scripts/gauntlet/trajectory.ts"
   ],
   "exclude": [
     "node_modules",

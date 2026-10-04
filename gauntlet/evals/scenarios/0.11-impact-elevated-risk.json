@@ -1,0 +1,16 @@
+{
+  "id": "0.11-impact-elevated-risk",
+  "kind": "impact_review_gate",
+  "input": {
+    "changed_paths": [
+      "src/apps/browser/styles.css"
+    ],
+    "elevated_risk": true,
+    "critic_verdict": "NOT_REQUIRED",
+    "integration_verdict": "NOT_REQUIRED",
+    "builder_model": "builder"
+  },
+  "expect": {
+    "decision": "impact_reviews_required"
+  }
+}

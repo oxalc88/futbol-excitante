@@ -1,7 +1,7 @@
 ---
-description: Gauntlet integration-reviewer adapter. Follow the canonical role and configured model route.
+description: Gauntlet integration-reviewer-mimo adapter. Follow the canonical role and configured model route.
 mode: subagent
-model: nan/glm5.3-flash
+model: nan/mimo-v2.6-flash
 temperature: 0.1
 color: warning
 steps: 30

@@ -1,7 +1,6 @@
 ---
-description: Hidden Qwen fallback critic. Use only when DeepSeek is unavailable and the implementation being reviewed was not done by Qwen.
+description: Gauntlet critic-qwen adapter. Follow the canonical role and configured model route.
 mode: subagent
-hidden: true
 model: nan/qwen3.6
 temperature: 0.1
 color: warning
@@ -34,11 +33,4 @@ permission:
   task: deny
 ---
 
-You are a fallback critic using Qwen from NaN. Use the same rules as the primary critic.
-
-If `builder_model` is `nan/qwen3.6` or the builder agent is `builder-qwen`, stop immediately. Return `independence_ok: false`. You must not review Qwen implementation.
-
-Judge evidence, not taste. Return only the critic verdict block from `gauntlet/evidence-contract.md`.
-- `ACCEPT` / `RETRY` / `REJECT` with concrete `required_fixes`.
-- Missing PES targets are `BLOCKED_MISSING_REFERENCE`, not a fail.
-- Re-run tests when needed. Do not edit files.
+Read and follow `gauntlet/roles/critic.md`, `gauntlet/harness-contract.md` and `gauntlet/product-quality-contract.md`. Use the existing OpenCode model route; do not redefine acceptance or canonical state.

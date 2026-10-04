@@ -1,7 +1,7 @@
 ---
-description: Gauntlet orchestrator adapter. Follow the canonical role and configured model route.
+description: Gauntlet orchestrator-deepseek adapter. Follow the canonical role and configured model route.
 mode: primary
-model: xai/grok-4.6
+model: nan/deepseek-v4-flash
 temperature: 0.2
 color: accent
 steps: 80

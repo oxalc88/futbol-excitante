@@ -1,0 +1,14 @@
+{
+  "id": "0.11-product-fixture-only",
+  "kind": "product_outcome_gate",
+  "input": {
+    "normal_shipped_play": false,
+    "materially_better": true,
+    "quality_pass": true,
+    "gameplay_regressions": 0,
+    "all_objectives_accepted": true
+  },
+  "expect": {
+    "decision": "product_iterate"
+  }
+}

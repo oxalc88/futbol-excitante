@@ -1,0 +1,16 @@
+{
+  "id": "0.11-impact-ball-protected",
+  "kind": "impact_review_gate",
+  "input": {
+    "changed_paths": [
+      "src/simulation/ball/ball-system.ts"
+    ],
+    "elevated_risk": false,
+    "critic_verdict": "NOT_REQUIRED",
+    "integration_verdict": "NOT_REQUIRED",
+    "builder_model": "builder"
+  },
+  "expect": {
+    "decision": "impact_reviews_required"
+  }
+}

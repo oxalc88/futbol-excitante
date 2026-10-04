@@ -4,6 +4,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { buildEvidenceManifest, writeEvidenceManifest } from "./evidence-manifest.js";
+import { verifyCandidateQuality } from "../../runtime/candidate-quality.js";
 import { assertScreenshotSanity } from "./screenshot-sanity.js";
 
 const execFileAsync = promisify(execFile);
@@ -16,9 +17,7 @@ const required = ["objective_id", "candidate_commit", "builder", "critic", "inte
 for (const key of required) if (!input[key]) throw new Error(`missing acceptance field: ${key}`);
 if (input.deterministic_audit.status !== "PASS") throw new Error("deterministic audit must PASS before persistence");
 if (input.semantic_audit && input.semantic_audit.verdict !== "VALID") throw new Error("semantic audit must be VALID when invoked");
-if (input.critic.verdict !== "ACCEPT") throw new Error("critic ACCEPT is mandatory; deterministic/cheap audits cannot substitute");
-if (input.integration.verdict !== "ACCEPT") throw new Error("integration ACCEPT is mandatory");
-if (input.builder.model === input.critic.model) throw new Error("builder/critic model independence violated");
+if (!input.builder.model) throw new Error("builder model required");
 
 const candidateCommit = String(input.candidate_commit);
 if (!/^[0-9a-f]{7,40}$/i.test(candidateCommit)) throw new Error("candidate_commit must be a git commit SHA, not a verbal working-tree marker");
@@ -29,6 +28,7 @@ try {
 }
 
 const version = JSON.parse(await readFile(path.join(repoRoot, "gauntlet/VERSION.json"), "utf8")) as { version: string };
+const quality = verifyCandidateQuality(repoRoot, candidateCommit, String(input.objective_id), input.builder.model, input.critic, input.integration);
 const now = new Date();
 const acceptedAt = now.toISOString();
 const day = acceptedAt.slice(0, 10);
@@ -39,13 +39,14 @@ await mkdir(dir, { recursive: true });
 const file = path.join(dir, `${stamp}-${safeObjective}-acceptance.json`);
 const relativeRecord = path.relative(repoRoot, file);
 const record = {
-  schema_version: 2,
+  ...input,
+  schema_version: 3,
   record_type: "candidate_acceptance",
   gauntlet_version: version.version,
   persisted_at: acceptedAt,
   state_audit_required: true,
   objective_manifest_required: true,
-  ...input,
+  quality_plan: quality.plan,
   candidate_commit: candidateCommit,
 };
 

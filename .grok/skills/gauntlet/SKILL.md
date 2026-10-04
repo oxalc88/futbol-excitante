@@ -17,7 +17,7 @@ Before any other status prose, print one compact startup line using the version 
 
 Before ordinary objective selection, fetch `origin/gauntlet-regressions` and inspect OPEN regression records as required by `gauntlet/regression-inbox-contract.md`. CI is the detector/classifier; reproduce the named deterministic check before prioritizing a repair. Never edit or resolve the inbox yourself.
 
-For each candidate follow the full pipeline in `gauntlet/PROMPT.md`: builder → tests/artifacts → `pnpm run gauntlet:audit` → optional bounded semantic audit only on `REVIEW_REQUIRED` → mandatory critic → integration reviewer → final evidence gate → candidate snapshot commit → `GAUNTLET_ACCEPTANCE_JSON=... pnpm run gauntlet:acceptance:persist` → bookkeeping → `pnpm run gauntlet:eval:state` → final acceptance commit → acceptance publication + remote containment verification → continue.
+For each candidate follow the full pipeline in `gauntlet/PROMPT.md`: builder → tests/artifacts → `pnpm run gauntlet:audit` → optional bounded semantic audit only on `REVIEW_REQUIRED` → impact-required critic → impact-required integration reviewer → final evidence gate → candidate snapshot commit → `GAUNTLET_ACCEPTANCE_JSON=... pnpm run gauntlet:acceptance:persist` → bookkeeping → `pnpm run gauntlet:eval:state` → final acceptance commit → acceptance publication + remote containment verification → continue.
 
 Critic ACCEPT alone is never final, and deterministic/cheap-auditor success never bypasses the critic. Never claim an objective is fully accepted/committed until durable acceptance record, objective manifest, accepted state, candidate commit, final acceptance commit, and required remote publication all exist.
 
@@ -32,3 +32,5 @@ A successful acceptance commit, tracking repair, or horizon exhaustion is not a 
 Before returning control to the human, resolve an explicit `allowed_stop_reason` to one of: `human_needed_spec`, `human_needed_legal`, `builders_exhausted`, `explicitly_deferred`, or `quota_handoff`. Tests passing, pipeline phase completion, audit completion, candidate commit, acceptance completion, horizon exhaustion, and replan completion are never allowed stop reasons. If no allowed stop reason exists and a required next action remains, execute that action instead of stopping.
 
 If the user supplies extra focus, apply it only to objective selection; never skip audit, critic, integration review, provenance persistence, state audit, remote publication, regression-inbox pickup, or an applicable milestone gate.
+
+Apply `gauntlet/product-quality-contract.md` for deterministic review/assurance applicability. Follow `gauntlet/trajectory-contract.md` at Horizon selection, first normal play and completion. ACCEPT requires a materially better normal shipped-play result; otherwise iterate. These canonical rules apply to this harness without changing its model routes or scheduling.

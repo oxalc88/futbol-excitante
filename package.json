@@ -59,7 +59,10 @@
     "gauntlet:parallel:test": "node scripts/ci/test-parallel-issue-policy.mjs && node scripts/ci/test-omp-parallel-gate.mjs",
     "gauntlet:telemetry": "node scripts/gauntlet/telemetry.mjs",
     "gauntlet:runtime:test": "node scripts/ci/test-gauntlet-telemetry.mjs && vitest run tests/unit/gauntlet-0.10.0-runtime.test.ts --project node",
-    "gauntlet:memory:validate": "tsx scripts/gauntlet/runtime.ts memory-validate"
+    "gauntlet:memory:validate": "tsx scripts/gauntlet/runtime.ts memory-validate",
+    "gauntlet:quality": "node --import tsx scripts/gauntlet/product-quality.ts",
+    "gauntlet:trajectory": "node --import tsx scripts/gauntlet/trajectory.ts",
+    "gauntlet:product:test": "vitest run tests/unit/gauntlet-0.11.0-product.test.ts --project node"
   },
   "dependencies": {
     "three": "^0.170.0"

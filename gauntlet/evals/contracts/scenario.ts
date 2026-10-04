@@ -7,6 +7,8 @@ export type ValidationStatus = "PASS" | "FAIL";
 export type RegressionInboxStatus = "OPEN" | "RESOLVED" | "MISSING";
 
 export type ScenarioKind =
+  | "product_outcome_gate"
+  | "impact_review_gate"
   | "evidence_gate"
   | "horizon_validation"
   | "routing_fallback"
@@ -62,5 +64,8 @@ export interface PrRegressionClassificationGateScenario { id: string; kind: "pr_
 export interface RegressionInboxGateScenario { id: string; kind: "regression_inbox_gate"; input: { check_status: ValidationStatus; current_status: RegressionInboxStatus; current_signature: string | null; observed_signature: string | null }; expect: ScenarioExpectation }
 export interface RegressionMonitorTriggerGateScenario { id: string; kind: "regression_monitor_trigger_gate"; input: { pushed_branch: string }; expect: ScenarioExpectation }
 
-export type GauntletScenario = EvidenceGateScenario | HorizonValidationScenario | RoutingFallbackScenario | ContinuationScenario | TrackingGateScenario | CompositionGateScenario | AcceptedStateGateScenario | EvalFreshnessGateScenario | EvidenceUniquenessGateScenario | TimingConsistencyGateScenario | AcceptancePipelineGateScenario | AcceptanceClaimGateScenario | PostAcceptanceContinuationGateScenario | RemoteDurabilityGateScenario | AcceptanceStateDurabilityGateScenario | CleanupClassificationGateScenario | MilestonePlaytestGateScenario | ManifestGateScenario | DynamicSequenceGateScenario | PrRegressionClassificationGateScenario | RegressionInboxGateScenario | RegressionMonitorTriggerGateScenario;
+export interface ProductOutcomeGateScenario { id: string; kind: "product_outcome_gate"; input: { normal_shipped_play: boolean; materially_better: boolean; quality_pass: boolean; gameplay_regressions: number; all_objectives_accepted: boolean }; expect: ScenarioExpectation }
+export interface ImpactReviewGateScenario { id: string; kind: "impact_review_gate"; input: { changed_paths: string[]; elevated_risk?: boolean; critic_verdict: string; integration_verdict: string; builder_model: string; critic_model?: string; integration_model?: string }; expect: ScenarioExpectation }
+
+export type GauntletScenario = ProductOutcomeGateScenario | ImpactReviewGateScenario | EvidenceGateScenario | HorizonValidationScenario | RoutingFallbackScenario | ContinuationScenario | TrackingGateScenario | CompositionGateScenario | AcceptedStateGateScenario | EvalFreshnessGateScenario | EvidenceUniquenessGateScenario | TimingConsistencyGateScenario | AcceptancePipelineGateScenario | AcceptanceClaimGateScenario | PostAcceptanceContinuationGateScenario | RemoteDurabilityGateScenario | AcceptanceStateDurabilityGateScenario | CleanupClassificationGateScenario | MilestonePlaytestGateScenario | ManifestGateScenario | DynamicSequenceGateScenario | PrRegressionClassificationGateScenario | RegressionInboxGateScenario | RegressionMonitorTriggerGateScenario;
 export interface EvaluationResult extends ScenarioExpectation { scenario_id: string }

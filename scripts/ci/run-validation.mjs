@@ -13,10 +13,16 @@ const runtimeEfficiencyCheck = existsSync("scripts/ci/test-gauntlet-telemetry.mj
   ? { id: "runtime-efficiency", command: ["pnpm", "run", "gauntlet:runtime:test"] }
   : { id: "runtime-efficiency", command: ["node", "-e", "console.log('SKIP runtime efficiency: not present on target')"] };
 
+const productQualityCheck = existsSync("tests/unit/gauntlet-0.11.0-product.test.ts")
+  ? { id: "product-quality", command: ["pnpm", "run", "gauntlet:product:test"] }
+  : null;
+
 const fullChecks = [
+  { id: "state-audit", command: ["node", "--import", "tsx", "gauntlet/evals/src/run-state-audit.ts"] },
   { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
   parallelPolicyCheck,
   runtimeEfficiencyCheck,
+  ...(productQualityCheck ? [productQualityCheck] : []),
   { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
   { id: "test", command: ["pnpm", "run", "test"] },
   { id: "test-browser", command: ["pnpm", "run", "test-browser"] },
@@ -25,9 +31,11 @@ const fullChecks = [
 ];
 
 const fastChecks = [
+  { id: "state-audit", command: ["node", "--import", "tsx", "gauntlet/evals/src/run-state-audit.ts"] },
   { id: "gauntlet-eval", command: ["pnpm", "run", "gauntlet:eval"] },
   parallelPolicyCheck,
   runtimeEfficiencyCheck,
+  ...(productQualityCheck ? [productQualityCheck] : []),
   { id: "typecheck", command: ["pnpm", "run", "typecheck"] },
   {
     id: "maintenance-test",
