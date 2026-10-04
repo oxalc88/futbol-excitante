@@ -10,7 +10,7 @@ import { mapObjectiveContext, type ContextMappingRequest } from './context-mappe
 import { validateContextPacket, type ObjectiveContextPacket } from './context-packet.js';
 import { createBuilderCheckpoint, validateBuilderCheckpoint, seedFreshBuilder, type BuilderCheckpoint } from './builder-checkpoint.js';
 import { decideBuilderRotation } from './builder-rotation.js';
-import { runVerificationBatch, type VerificationCommand, type VerificationExecution } from './verification-batch.js';
+import { runVerificationBatch, verificationTimeout, type VerificationCommand, type VerificationExecution } from './verification-batch.js';
 import { approximateTokens, isSafeObjectiveId, resolveRepositoryFile } from './digest.js';
 import { RUNTIME_POLICY } from './policy.js';
 
@@ -124,7 +124,7 @@ export class GauntletRuntime {
         const log = createWriteStream(logPath);
         return new Promise<VerificationExecution>((resolve,reject) => {
           let tail = '';
-          const child = spawn(command.command[0]!,command.command.slice(1),{cwd:this.repoRoot,shell:false,signal,timeout:RUNTIME_POLICY.verification.timeout_ms,env:{...process.env,CI:'1'}});
+          const child = spawn(command.command[0]!,command.command.slice(1),{cwd:this.repoRoot,shell:false,signal,timeout:verificationTimeout(command),env:{...process.env,CI:'1'}});
           const capture = (chunk: Buffer) => { tail = (tail+chunk.toString()).slice(-12000); };
           child.stdout.pipe(log,{end:false}); child.stderr.pipe(log,{end:false});
           child.stdout.on('data',capture); child.stderr.on('data',capture);

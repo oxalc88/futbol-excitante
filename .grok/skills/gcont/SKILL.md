@@ -36,3 +36,5 @@ If the user supplies extra focus, apply it only to objective selection; never sk
 Apply `gauntlet/product-quality-contract.md` for deterministic review/assurance applicability. Follow `gauntlet/trajectory-contract.md` at Horizon selection, first normal play and completion. Horizon ACCEPT requires a materially better normal shipped-play result; otherwise iterate. These canonical rules apply to this harness without changing its model routes or scheduling.
 
 For failed checks, follow the focused repair flow in `gauntlet/product-quality-contract.md`. `REPAIR_PASS` is diagnostic only; rerun the full gate once after repair. Do not repeat the full battery or bypass the local failure record.
+
+Apply the shared recovery budget and stop rule in `gauntlet/product-quality-contract.md` automatically. At `RECOVERY_BLOCKED`, stop equivalent experiments, preserve the candidate/logs, and report the blocked objective and next decision. Do not reset the recovery record or bypass the canonical runner. Establish the cause with smaller reproductions before repair verification.

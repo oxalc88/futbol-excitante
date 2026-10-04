@@ -81,7 +81,10 @@ describe('0.11.2 canonical quality command across sessions',()=>{
       expect(cli(...args,'--repair','.delivery-local/repair.json').status).toBe(0);expect(calls().at(-1)).toContain('tests/difficulty-capture.node.test.ts');
       expect(JSON.parse(readFileSync(join(root,out),'utf8')).status).toBe('REPAIR_PASS');
       write('src/apps/browser/styles.css','changed after repair');expect(cli(...args).stderr).toContain('REPAIR_REQUIRED');
-      write('.delivery-local/mode','fail');expect(cli(...args,'--repair','.delivery-local/repair.json').status).toBe(1);
+      // Restore the verified source, then consume its proof in a full retry.
+      // 0.11.3 limits recovery to two repairs, including successful attempts.
+      write('src/apps/browser/styles.css','after');
+      write('.delivery-local/mode','fail');expect(cli(...args).status).toBe(1);
       expect(JSON.parse(readFileSync(join(root,'.delivery-local/quality/CSS/recovery.json'),'utf8')).identical_failures).toBe(2);
       write('.delivery-local/mode','pass');
       expect(cli(...args,'--repair','.delivery-local/repair.json').status).toBe(0);

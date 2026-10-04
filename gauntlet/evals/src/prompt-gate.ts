@@ -43,7 +43,7 @@ const RULES: GateRule[] = [
   { name: "class-based evidence contract cannot regress", file: "gauntlet/evidence-contract.md", mustContain: ["`HEADLESS`", "`BROWSER_VISIBLE`", "`MULTI_TICK`", "`DYNAMIC_VISUAL`", "3–5 semantic frames", "temporal and browser-visible", "centered on that event", "`PRESENTATION`", "`BOOKKEEPING`", "manifest.json", "The critic is mandatory"] },
   { name: "evidence manifest contract exists", file: "gauntlet/evidence-manifest-contract.md", mustContain: ["candidate_commit", "sha256", "sequence.json", "video-reference.json", "milestones", "never silently overwritten"] },
   { name: "semantic audit is bounded and cannot accept", file: "gauntlet/semantic-audit-contract.md", mustContain: ["VALID|INVALID|INSUFFICIENT_CONTEXT", "can never produce objective `ACCEPT`"] },
-  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.11.2\"", "\"previous_system_version\": \"0.11.1\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene", "model-capability-routing", "timing-aggregate-consistency", "routing-wrapper-consistency", "equivalent-orchestrator-continuation", "product-first-planning", "parallel-issue-sync", "issue-gated-parallelism", "omp-concurrency-guard"] },
+  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.11.3\"", "\"previous_system_version\": \"0.11.2\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene", "model-capability-routing", "timing-aggregate-consistency", "routing-wrapper-consistency", "equivalent-orchestrator-continuation", "product-first-planning", "parallel-issue-sync", "issue-gated-parallelism", "omp-concurrency-guard"] },
   { name: "reviewer fallback remains explicit", file: "gauntlet/models.json", mustContain: ["gauntlet-models-v9", "critic-qwen", "critic-mimo", "integration-reviewer-qwen", "integration-reviewer-mimo", "mimo-v2.6-flash"] },
   { name: "OpenCode delegates canonical roles and committer", file: ".opencode/agents/orchestrator.md", mustContain: ["\"builder-structured\": allow", "\"builder-gameplay\": allow", "\"git-committer\": allow", "gauntlet/PROMPT.md"] },
   { name: "harness routing is explicit", file: "gauntlet/models.json", mustContain: ["harness_routes", "\"grok\"", "\"omp\"", "\"opencode\"", "harness-contract.md"] },
@@ -53,6 +53,12 @@ const RULES: GateRule[] = [
   { name: "parallel issue scripts are available", file: "package.json", mustContain: ["gauntlet:parallel:sync", "gauntlet:parallel:state", "gauntlet:parallel:complete", "gauntlet:parallel:test"] },
   { name: "review pipeline uses capability contract", file: "gauntlet/PROMPT.md", mustContain: ["gauntlet/model-capability-contract.md", "configured `critic` route and fallbacks from `gauntlet/models.json`", "configured independent `integration-reviewer` route and fallbacks from `gauntlet/models.json`"] },
 ];
+
+RULES.push(
+  { name: "shared recovery stop rule is canonical", file: "gauntlet/product-quality-contract.md", mustContain: ["two canonical repair attempts", "90 minutes", "RECOVERY_BLOCKED", "UNAVAILABLE", "unhandled worker errors", "shared instruction applies automatically"] },
+  { name: "canonical prompt stops exhausted recovery", file: "gauntlet/PROMPT.md", mustContain: ["RECOVERY_BLOCKED", "Do not reset the record", "smaller reproductions"] },
+  ...[".omp/skills/gauntlet/SKILL.md", ".grok/skills/gauntlet/SKILL.md", ".grok/skills/gauntlet-continue/SKILL.md", ".grok/skills/gcont/SKILL.md", ".opencode/commands/gauntlet.md"].map(file => ({ name: `${file} consumes shared recovery stop rule`, file, mustContain: ["shared recovery budget and stop rule", "RECOVERY_BLOCKED", "Do not reset the recovery record"] })),
+);
 
 const WRAPPER_CONTRACTS: Record<string, string> = {
   "orchestrator.md": "gauntlet/PROMPT.md",

@@ -27,6 +27,8 @@ Follow the canonical Gauntlet pipeline.
 
 For failed checks, use the focused repair flow in `gauntlet/product-quality-contract.md`. `REPAIR_PASS` is diagnostic only; rerun the full gate once after repair. Do not repeat the full battery or bypass the local failure record.
 
+Apply the shared recovery budget and stop rule in `gauntlet/product-quality-contract.md` automatically. At `RECOVERY_BLOCKED`, stop equivalent experiments, preserve the candidate/logs, and report the blocked objective and next decision. Do not reset the recovery record or bypass the canonical runner. Establish the cause with smaller reproductions before repair verification.
+
 For one sequential implementation objective, GitHub issue creation is optional.
 
 For two or more parallel implementation objectives:

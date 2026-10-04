@@ -10,6 +10,7 @@ export interface QualityResult {
   exit_code: number | null;
   log: string | null;
   duration_ms: number | null;
+  timeout_ms?: number;
   failure_signature?: string;
   failed_test_files?: string[];
   failure_excerpt?: string[];
@@ -23,7 +24,40 @@ export interface QualityRecovery {
   schema_version: 1;
   failure: QualityFailure;
   identical_failures: number;
+  budget?: { started_at_ms: number; repair_attempts: number; history_before_budget: 'MEASURED' | 'UNAVAILABLE' };
   repair?: { context_hash: string; signature: string; diagnosis: string; whole_check: boolean };
+}
+
+export class RecoveryBlockedError extends Error {}
+export function initializeRecoveryBudget(recovery: QualityRecovery, now = Date.now()): void {
+  // Older records have no attempt/time history. Start a prospective budget;
+  // never claim their earlier experiments were measured as zero.
+  recovery.budget ??= { started_at_ms: now, repair_attempts: 0, history_before_budget: 'UNAVAILABLE' };
+}
+export function recoveryTimeRemaining(recovery: QualityRecovery, now = Date.now()): number {
+  const budget = recovery.budget;
+  if (!budget || !Number.isSafeInteger(budget.started_at_ms) || budget.started_at_ms <= 0 ||
+      !Number.isSafeInteger(budget.repair_attempts) || budget.repair_attempts < 0 ||
+      !['MEASURED', 'UNAVAILABLE'].includes(budget.history_before_budget)) throw new Error('invalid recovery budget');
+  if (now < budget.started_at_ms) throw new RecoveryBlockedError('RECOVERY_BLOCKED: clock moved backwards; preserve the record and review the execution environment');
+  const remaining = RUNTIME_POLICY.verification.recovery.maximum_elapsed_ms - (now - budget.started_at_ms);
+  if (remaining <= 0) throw new RecoveryBlockedError('RECOVERY_BLOCKED: recovery deadline reached; preserve logs and report the blocked objective');
+  return remaining;
+}
+export function reserveRepairAttempt(recovery: QualityRecovery, now = Date.now()): void {
+  recoveryTimeRemaining(recovery, now);
+  if (recovery.budget!.repair_attempts >= RUNTIME_POLICY.verification.recovery.maximum_repair_attempts) {
+    throw new RecoveryBlockedError('RECOVERY_BLOCKED: repair attempt limit reached; preserve logs and report the blocked objective');
+  }
+  // Persist this reservation before launching a repair, so interruption counts.
+  recovery.budget!.repair_attempts++;
+  delete recovery.repair;
+}
+export function qualityTimeout(check: QualityCheck, recovery: QualityRecovery | null = null, now = Date.now()): number {
+  // Only the canonical whole Node battery earns the measured larger budget.
+  const configured = check.id === 'regression-tests' && check.command.join(' ') === 'pnpm run test'
+    ? RUNTIME_POLICY.verification.check_timeout_ms['regression-tests'] : RUNTIME_POLICY.verification.timeout_ms;
+  return recovery ? Math.min(configured, recoveryTimeRemaining(recovery, now)) : configured;
 }
 
 const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
@@ -60,7 +94,8 @@ export async function runQualityChecks(checks: QualityCheck[], run: (check: Qual
 export function rememberFailure(previous: QualityRecovery | null, check: QualityCheck, result: QualityResult): QualityRecovery {
   if (result.status !== 'FAIL' || !result.failure_signature) throw new Error('failure signature required');
   return { schema_version: 1, failure: { check, signature: result.failure_signature, failed_test_files: result.failed_test_files ?? [] },
-    identical_failures: previous?.failure.signature === result.failure_signature ? previous.identical_failures + 1 : 1 };
+    identical_failures: previous?.failure.signature === result.failure_signature ? previous.identical_failures + 1 : 1,
+    budget: previous?.budget ?? { started_at_ms: Date.now(), repair_attempts: 0, history_before_budget: previous ? 'UNAVAILABLE' : 'MEASURED' } };
 }
 export function repairCheck(recovery: QualityRecovery): { check: QualityCheck; whole_check: boolean } {
   const original = recovery.failure.check;
@@ -77,6 +112,9 @@ export function requireRepairProof(recovery: QualityRecovery | null, context: st
   if (recovery.schema_version !== 1 || !Number.isInteger(recovery.identical_failures) || recovery.identical_failures < 1) throw new Error('invalid quality recovery record');
   const proof = recovery.repair;
   if (!proof || proof.context_hash !== context || proof.signature !== recovery.failure.signature || !proof.diagnosis?.trim() || (recovery.identical_failures >= 2 && !proof.whole_check)) {
+    if ((recovery.budget?.repair_attempts ?? 0) >= RUNTIME_POLICY.verification.recovery.maximum_repair_attempts) {
+      throw new RecoveryBlockedError('RECOVERY_BLOCKED: repair attempts exhausted without current verified proof; preserve logs and report the blocked objective');
+    }
     throw new Error('REPAIR_REQUIRED: diagnose and run --repair before another full gate; repair proof must match the current sources/toolchain');
   }
 }
@@ -98,7 +136,7 @@ export function qualityPreflight(root: string) {
   return { node, pnpm, vite };
 }
 
-export function spawnQualityCheck(root: string, check: QualityCheck, logPath: string, timeout = RUNTIME_POLICY.verification.timeout_ms): Promise<QualityResult> {
+export function spawnQualityCheck(root: string, check: QualityCheck, logPath: string, timeout = qualityTimeout(check)): Promise<QualityResult> {
   return new Promise(resolve => {
     const started = Date.now();
     const log = createWriteStream(logPath);
@@ -123,7 +161,7 @@ export function spawnQualityCheck(root: string, check: QualityCheck, logPath: st
       const note = error || (timedOut ? 'Error: quality check timeout' : cancelled ? 'Error: quality check cancelled' : signal ? `Error: terminated by ${signal}` : '');
       const exit = note ? null : code;
       const finish = () => resolve({ id: check.id, status: exit === 0 ? 'PASS' as const : 'FAIL' as const, exit_code: exit,
-        log: logPath, duration_ms: Date.now() - started, ...(exit !== 0 ? failureDetails(check, exit, `${tail}\n${note}`) : {}) });
+        log: logPath, duration_ms: Date.now() - started, timeout_ms: timeout, ...(exit !== 0 ? failureDetails(check, exit, `${tail}\n${note}`) : {}) });
       if (log.destroyed) finish(); else { log.once('close', finish); log.end(note ? `\n${note}\n` : '', finish); }
     });
   });

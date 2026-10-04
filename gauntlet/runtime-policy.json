@@ -22,5 +22,11 @@
     "mapper_read_maximum_bytes": 64000
   },
   "builder_checkpoint": { "maximum_tokens": 1000 },
-  "verification": { "failure_excerpt_lines": 20, "maximum_commands": 12, "timeout_ms": 1200000 }
+  "verification": {
+    "failure_excerpt_lines": 20,
+    "maximum_commands": 12,
+    "timeout_ms": 1200000,
+    "check_timeout_ms": { "regression-tests": 2400000 },
+    "recovery": { "maximum_repair_attempts": 2, "maximum_elapsed_ms": 5400000 }
+  }
 }
