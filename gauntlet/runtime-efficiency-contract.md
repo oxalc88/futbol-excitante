@@ -65,3 +65,7 @@ The selected modules are individually ported and hardened from `66be461a562f11d5
 ## 0.11 product measurement
 
 The frozen historical trajectory is separate from the complete runtime baseline required to enable opt-in optimizations. The product impact contract changes review applicability, not telemetry hooks, native scheduling, memory/context/checkpoint boundaries or verification batching. Required reviews and every applicable evidence/durability gate remain protected. Future Horizons use `gauntlet:trajectory`; no historical token estimate satisfies the OMP optimization prerequisite.
+
+## 0.11.2 quality failure recovery
+
+Canonical `gauntlet:quality` execution is always fail-fast and requires verified repair before another full gate; see `product-quality-contract.md`. This command does not depend on enabling runtime optimizations. The optional generic `verify_batch` still delivers every submitted result in one bounded summary; submit the canonical quality command as one item rather than recreating its checks or bypassing its recovery record. This recovery concerns failing test processes, not OMP/provider retries, concurrency or backoff.

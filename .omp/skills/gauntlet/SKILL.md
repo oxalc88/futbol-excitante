@@ -25,6 +25,8 @@ Use the active session model, not a guessed configured default. If the role or m
 
 Follow the canonical Gauntlet pipeline.
 
+For failed checks, use the focused repair flow in `gauntlet/product-quality-contract.md`. `REPAIR_PASS` is diagnostic only; rerun the full gate once after repair. Do not repeat the full battery or bypass the local failure record.
+
 For one sequential implementation objective, GitHub issue creation is optional.
 
 For two or more parallel implementation objectives:

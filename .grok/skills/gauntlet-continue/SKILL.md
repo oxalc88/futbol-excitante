@@ -34,3 +34,5 @@ Before returning control to the human, resolve an explicit `allowed_stop_reason`
 If the user supplies extra focus, apply it only to objective selection; never skip audit, required critic and integration reviews, provenance persistence, state audit, remote publication, regression-inbox pickup, or an applicable milestone gate.
 
 Apply `gauntlet/product-quality-contract.md` for deterministic review/assurance applicability. Follow `gauntlet/trajectory-contract.md` at Horizon selection, first normal play and completion. Horizon ACCEPT requires a materially better normal shipped-play result; otherwise iterate. These canonical rules apply to this harness without changing its model routes or scheduling.
+
+For failed checks, follow the focused repair flow in `gauntlet/product-quality-contract.md`. `REPAIR_PASS` is diagnostic only; rerun the full gate once after repair. Do not repeat the full battery or bypass the local failure record.
