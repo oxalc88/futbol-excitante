@@ -14,7 +14,9 @@ All Gauntlet agents, skills, routing, deterministic evals, and contracts live in
 
 `gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-Current candidate: **0.11.0** over 0.10.0.
+Current candidate: **0.11.1** over 0.11.0.
+
+0.11.1 adds the installed-version/active-role/model startup announcement to the OMP skill, matching Grok. New trajectory records read the canonical version instead of hardcoding 0.11.0. See `RELEASE-0.11.1.md`.
 
 0.11.0 makes a materially better normal-play result the Horizon success criterion. It adds a frozen historical trajectory baseline, deterministic impact-based assurance/review requirements, and append-only selection/first-play/outcome measurements. See `RELEASE-0.11.0.md`, `product-quality-contract.md` and `trajectory-contract.md`. No measured speedup is claimed.
 

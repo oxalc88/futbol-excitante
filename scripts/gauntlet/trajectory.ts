@@ -29,10 +29,12 @@ if (action === 'report') {
   if (!inputPath) throw new Error('input JSON required');
   const input = JSON.parse(readFileSync(inputPath, 'utf8'));
   const now = new Date().toISOString();
+  const gauntletVersion = JSON.parse(readFileSync('gauntlet/VERSION.json', 'utf8')).version;
+  if (typeof gauntletVersion !== 'string' || !/^\d+\.\d+\.\d+$/.test(gauntletVersion)) throw new Error('invalid Gauntlet system version');
   if (action === 'start') {
     if (!input.problem?.trim() || !input.smallest_playable_slice?.trim() || !input.sources?.length) throw new Error('start requires problem, smallest_playable_slice, sources');
     input.sources.forEach(verify);
-    writeFileSync(`${dir}/selection.json`, JSON.stringify({ ...input, selected_at: now, gauntlet_version: '0.11.0' }, null, 2)+'\n', { flag: 'wx' });
+    writeFileSync(`${dir}/selection.json`, JSON.stringify({ ...input, selected_at: now, gauntlet_version: gauntletVersion }, null, 2)+'\n', { flag: 'wx' });
   } else if (action === 'playable') {
     if (!existsSync(`${dir}/selection.json`) || input.mode !== 'normal_shipped_play' || !input.method?.trim() || !input.sources?.length) throw new Error('select first; playable requires actual normal shipped play with evidence');
     input.sources.forEach(verify);
@@ -94,7 +96,7 @@ if (action === 'report') {
     deriveMetrics(metrics, active);
     validateMetrics(metrics);
     for (const m of Object.values(metrics)) m.sources.forEach(verify);
-    writeFileSync(recordRef.path, JSON.stringify({ schema_version: 1, horizon, gauntlet_version: '0.11.0', recorded_at: now, decision, outcome, metrics, objectives: input.objectives, measurement_profile: input.measurement_profile ?? 'unavailable', harness: input.harness ?? 'unavailable', acceptances: input.acceptances, active_agent_hours: active }, null, 2)+'\n', { flag: 'wx' });
+    writeFileSync(recordRef.path, JSON.stringify({ schema_version: 1, horizon, gauntlet_version: gauntletVersion, recorded_at: now, decision, outcome, metrics, objectives: input.objectives, measurement_profile: input.measurement_profile ?? 'unavailable', harness: input.harness ?? 'unavailable', acceptances: input.acceptances, active_agent_hours: active }, null, 2)+'\n', { flag: 'wx' });
     console.log(`${decision}: ${recordRef.path}`);
   } else throw new Error('unknown trajectory command');
 }
