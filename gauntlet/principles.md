@@ -14,3 +14,5 @@ This file is the canonical source for the acceptance philosophy. Runtime prompts
 10. Canonical state newer than `origin/main` is repair input, never cleanup residue. Preserve it and classify omitted acceptance bookkeeping as `MISSING_ACCEPTANCE_BOOKKEEPING`; never restore/discard it merely to obtain a clean worktree.
 
 11. Horizon success requires a materially better normal-play outcome persisted under `gauntlet/trajectory-contract.md`. Internal objective acceptance alone is insufficient.
+
+Objective progress is protected by baseline/affected checks and required independent reviews. Whole-repository certification protects integration boundaries and milestones/releases. A supported harness failure does not revoke proven durable objectives; known product or unknown certification failures cannot be carried through scoped acceptance. Certificate debt is explicit and bounded. See `product-quality-contract.md`; never increase a recovery budget to escape an exhausted incident.

@@ -45,3 +45,7 @@ Cleanup is not allowed to make local canonical state older merely to obtain a cl
 - `REMOTE_STATE_STALE`: the acceptance commit is remotely reachable but the canonical state/artifacts at `origin/main` do not semantically represent that acceptance.
 
 These are orchestration/publication failures, not gameplay acceptance failures. The already-reviewed gameplay candidate is not sent back to the builder unless its own evidence or implementation is defective.
+
+## 0.12.0 verification boundary
+
+Objective acceptance (schema 4) proves required objective coverage and sets `repository_certified: false`. All steps above remain mandatory. Certificate records and immutable proof artifacts are separate serialized bookkeeping publication; verify their exact publication commit in the remote branch before continuation. Never substitute focused PASS for a milestone certificate or revoke accepted objectives because certification is blocked.

@@ -1,3 +1,5 @@
+import { requireMilestoneCertificate } from "../../runtime/certification.js";
+import { execFileSync } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,8 +21,17 @@ for (let i = 2; i < process.argv.length; i += 1) {
 const milestone = args.get("milestone");
 const inputPath = args.get("input");
 if (!milestone || !inputPath) {
-  console.error("usage: pnpm run gauntlet:milestone:evaluate -- --milestone <id> --input <json>");
+  console.error("usage: pnpm run gauntlet:milestone:evaluate -- --milestone <id> --target <certified-sha> --input <json>");
   process.exit(2);
+}
+
+const version = JSON.parse(await readFile(path.join(repoRoot, "gauntlet/VERSION.json"), "utf8")).version;
+let certificationTarget: string | null = null;
+if (Number(version.split(".")[1]) >= 12) {
+  const target = args.get("target");
+  if (!target) throw new Error("--target required: bind the milestone to a certified repository revision");
+  certificationTarget = execFileSync("git",["rev-parse",`${target}^{commit}`],{cwd:repoRoot,encoding:"utf8"}).trim();
+  requireMilestoneCertificate(repoRoot, certificationTarget);
 }
 
 const safeMilestone = milestone.replace(/[^A-Za-z0-9_-]/g, "_");
@@ -34,6 +45,7 @@ const input = JSON.parse(await readFile(path.resolve(repoRoot, inputPath), "utf8
   evidence?: Record<string, unknown>;
 };
 
+if (certificationTarget && input.evidence?.target_commit !== certificationTarget) throw new Error("Playtest evidence must name the exact certified target_commit");
 const scenario: MilestonePlaytestGateScenario = {
   id: `MILESTONE-${milestone}`,
   kind: "milestone_playtest_gate",
@@ -56,6 +68,7 @@ await mkdir(outDir, { recursive: true });
 const outPath = path.join(outDir, `${runId}.json`);
 const output = {
   schema_version: 1,
+  certification_target: certificationTarget,
   record_type: "milestone_playtest_result",
   milestone_id: milestone,
   playtest_plan_version: plan.playtest_plan_version ?? null,

@@ -68,7 +68,7 @@ function nextPending(s: ContinuationScenario): string | undefined {
 }
 
 function evaluateContinuation(s: ContinuationScenario): EvaluationResult {
-  if (s.input.stop_reason && isAllowedStopReason(s.input.stop_reason)) return { scenario_id: s.id, decision: "stop" };
+  if (s.input.stop_reason && isAllowedStopReason(s.input.stop_reason, s.input)) return { scenario_id: s.id, decision: "stop" };
   const next = nextPending(s);
   const stale = s.input.active_candidate !== null && s.input.accepted.includes(s.input.active_candidate);
   if (stale && next) return { scenario_id: s.id, decision: "repair_and_continue", failure_class: "stale_active_candidate", clear_active_candidate: true, next_objective: next };
@@ -123,7 +123,7 @@ function evaluateAcceptanceClaim(s: AcceptanceClaimGateScenario): EvaluationResu
 }
 
 function evaluatePostAcceptanceContinuation(s: PostAcceptanceContinuationGateScenario): EvaluationResult {
-  if (s.input.stop_reason && isAllowedStopReason(s.input.stop_reason)) return { scenario_id: s.id, decision: "stop" };
+  if (s.input.stop_reason && isAllowedStopReason(s.input.stop_reason, s.input)) return { scenario_id: s.id, decision: "stop" };
   if (!s.input.acceptance_finalized) return { scenario_id: s.id, decision: "finish_acceptance" };
   if (s.input.replan_completed && s.input.next_objective) return { scenario_id: s.id, decision: "delegate_and_continue", next_objective: s.input.next_objective };
   if (s.input.horizon_exhausted) return { scenario_id: s.id, decision: "replan_and_continue" };

@@ -88,3 +88,7 @@ Important milestones such as playable 2v2, 5v5, and 11v11 may generate a summary
 `docs/evidence/milestones/<milestone-id>/`
 
 The bundle contains `manifest.json` and references/copies only already-existing accepted evidence: primary screenshot, semantic sequence, trajectory, metrics, and video reference where available. Creating a milestone bundle must never mutate the source objective evidence.
+
+## 0.12.0 verification boundary
+
+New objective `quality.json` uses schema 2 and references immutable per-check proof JSON, compressed full logs and original Vitest reports under `verification/`. The existing manifest hashes quality.json; its nested SHA-256 references bind these candidate artifacts transitively. Only complete coverage can be reused after input/profile revalidation. Certificate receipts/records live in separate publication commits and name the frozen target; never overwrite any accepted artifact.

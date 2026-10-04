@@ -5,7 +5,7 @@ export interface PromptGateResult { name: string; pass: boolean; detail?: string
 interface GateRule { name: string; file: string; mustContain: string[] }
 
 const RULES: GateRule[] = [
-  { name: "quality failures stop and require focused repair", file: "gauntlet/product-quality-contract.md", mustContain: ["stops after the first failed check", "NOT_RUN", "After two identical failures", "REPAIR_PASS", "No earlier PASS is reused", "Only the new full PASS permits candidate persistence"] },
+  { name: "quality failures stop and require focused repair", file: "gauntlet/product-quality-contract.md", mustContain: ["stops after the first failed check", "NOT_RUN", "After two identical failures", "REPAIR_PASS", "Equivalent complete PASS checks may be reused", "Only the complete required-plan PASS permits candidate persistence"] },
   { name: "quality recovery is canonical across harnesses", file: "gauntlet/PROMPT.md", mustContain: ["gauntlet:quality --repair", "Do not repeatedly rerun the full battery", "always on in OMP, Grok and OpenCode"] },
   { name: "OMP consumes quality recovery", file: ".omp/skills/gauntlet/SKILL.md", mustContain: ["focused repair flow", "REPAIR_PASS", "Do not repeat the full battery"] },
   { name: "OpenCode consumes quality recovery", file: ".opencode/commands/gauntlet.md", mustContain: ["focused repair flow", "REPAIR_PASS", "Do not repeat the full battery"] },
@@ -43,7 +43,7 @@ const RULES: GateRule[] = [
   { name: "class-based evidence contract cannot regress", file: "gauntlet/evidence-contract.md", mustContain: ["`HEADLESS`", "`BROWSER_VISIBLE`", "`MULTI_TICK`", "`DYNAMIC_VISUAL`", "3–5 semantic frames", "temporal and browser-visible", "centered on that event", "`PRESENTATION`", "`BOOKKEEPING`", "manifest.json", "The critic is mandatory"] },
   { name: "evidence manifest contract exists", file: "gauntlet/evidence-manifest-contract.md", mustContain: ["candidate_commit", "sha256", "sequence.json", "video-reference.json", "milestones", "never silently overwritten"] },
   { name: "semantic audit is bounded and cannot accept", file: "gauntlet/semantic-audit-contract.md", mustContain: ["VALID|INVALID|INSUFFICIENT_CONTEXT", "can never produce objective `ACCEPT`"] },
-  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.11.3\"", "\"previous_system_version\": \"0.11.2\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene", "model-capability-routing", "timing-aggregate-consistency", "routing-wrapper-consistency", "equivalent-orchestrator-continuation", "product-first-planning", "parallel-issue-sync", "issue-gated-parallelism", "omp-concurrency-guard"] },
+  { name: "semver system version is declared", file: "gauntlet/VERSION.json", mustContain: ["\"version\": \"0.12.0\"", "\"previous_system_version\": \"0.11.3\"", "\"semver\": true", "provider-failure-resilience", "orchestration-continuity", "evidence-immutability", "worktree-hygiene", "model-capability-routing", "timing-aggregate-consistency", "routing-wrapper-consistency", "equivalent-orchestrator-continuation", "product-first-planning", "parallel-issue-sync", "issue-gated-parallelism", "omp-concurrency-guard"] },
   { name: "reviewer fallback remains explicit", file: "gauntlet/models.json", mustContain: ["gauntlet-models-v9", "critic-qwen", "critic-mimo", "integration-reviewer-qwen", "integration-reviewer-mimo", "mimo-v2.6-flash"] },
   { name: "OpenCode delegates canonical roles and committer", file: ".opencode/agents/orchestrator.md", mustContain: ["\"builder-structured\": allow", "\"builder-gameplay\": allow", "\"git-committer\": allow", "gauntlet/PROMPT.md"] },
   { name: "harness routing is explicit", file: "gauntlet/models.json", mustContain: ["harness_routes", "\"grok\"", "\"omp\"", "\"opencode\"", "harness-contract.md"] },
@@ -55,6 +55,7 @@ const RULES: GateRule[] = [
 ];
 
 RULES.push(
+  { name: "scoped progress cannot replace certification", file: "gauntlet/product-quality-contract.md", mustContain: ["four objectives", "PRODUCT_FAILURE", "HARNESS_ENVIRONMENT", "UNKNOWN", "exact played target", "state audit always executes fresh", "intervening unaccepted source changes", "--stage certification"] },
   { name: "shared recovery stop rule is canonical", file: "gauntlet/product-quality-contract.md", mustContain: ["two canonical repair attempts", "90 minutes", "RECOVERY_BLOCKED", "UNAVAILABLE", "unhandled worker errors", "shared instruction applies automatically"] },
   { name: "canonical prompt stops exhausted recovery", file: "gauntlet/PROMPT.md", mustContain: ["RECOVERY_BLOCKED", "Do not reset the record", "smaller reproductions"] },
   ...[".omp/skills/gauntlet/SKILL.md", ".grok/skills/gauntlet/SKILL.md", ".grok/skills/gauntlet-continue/SKILL.md", ".grok/skills/gcont/SKILL.md", ".opencode/commands/gauntlet.md"].map(file => ({ name: `${file} consumes shared recovery stop rule`, file, mustContain: ["shared recovery budget and stop rule", "RECOVERY_BLOCKED", "Do not reset the recovery record"] })),

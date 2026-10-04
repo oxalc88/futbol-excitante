@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
+import { certificationHealth, verificationMeasurements } from '../../gauntlet/runtime/certification.js';
 import { verifyCandidateQuality } from '../../gauntlet/runtime/candidate-quality.js';
 import { METRICS, deriveMetrics, outcomeDecision, validateMetrics, type Measurement, type MetricName, type ProductOutcome, type Provenance } from '../../gauntlet/runtime/product-trajectory.js';
 
@@ -21,7 +22,7 @@ if (action === 'report') {
     const records = readdirSync(`${root}/${id}`).filter(n => /^attempt-\d+\.json$/.test(n)).sort((a,b) => Number(a.match(/\d+/)![0]) - Number(b.match(/\d+/)![0]));
     if (records.length) rows.push(JSON.parse(readFileSync(`${root}/${id}/${records.at(-1)}`, 'utf8')));
   }
-  console.log(JSON.stringify({ baseline_id: baseline.baseline_id, rows, note: 'Compare equal coverage/harness/profile only. Historical proxies are estimates; no speed claim without observed future execution.' }, null, 2));
+  console.log(JSON.stringify({ baseline_id: baseline.baseline_id, ...(existsSync('gauntlet/trajectory/baseline-0.11.3/baseline.json')?{acceptance_flow_baseline:JSON.parse(readFileSync('gauntlet/trajectory/baseline-0.11.3/baseline.json','utf8'))}:{}), rows, note: 'Compare equal coverage/harness/profile only. Historical proxies are estimates; no speed claim without observed future execution.' }, null, 2));
 } else {
   if (!horizon || !/^v[1-9]\d*$/.test(horizon)) throw new Error('usage: trajectory start|playable|record vNN input.json; trajectory report');
   const dir = `${root}/${horizon}`;
@@ -96,7 +97,7 @@ if (action === 'report') {
     deriveMetrics(metrics, active);
     validateMetrics(metrics);
     for (const m of Object.values(metrics)) m.sources.forEach(verify);
-    writeFileSync(recordRef.path, JSON.stringify({ schema_version: 1, horizon, gauntlet_version: gauntletVersion, recorded_at: now, decision, outcome, metrics, objectives: input.objectives, measurement_profile: input.measurement_profile ?? 'unavailable', harness: input.harness ?? 'unavailable', acceptances: input.acceptances, active_agent_hours: active }, null, 2)+'\n', { flag: 'wx' });
+    writeFileSync(recordRef.path, JSON.stringify({ schema_version: 1, horizon, gauntlet_version: gauntletVersion, recorded_at: now, decision, ...(Number(gauntletVersion.split('.')[1]) >= 12 ? { certification: certificationHealth(process.cwd()), verification: verificationMeasurements(process.cwd(), input.objectives.map((o: any) => o.id), execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim(), horizon) } : {}), outcome, metrics, objectives: input.objectives, measurement_profile: input.measurement_profile ?? 'unavailable', harness: input.harness ?? 'unavailable', acceptances: input.acceptances, active_agent_hours: active }, null, 2)+'\n', { flag: 'wx' });
     console.log(`${decision}: ${recordRef.path}`);
   } else throw new Error('unknown trajectory command');
 }

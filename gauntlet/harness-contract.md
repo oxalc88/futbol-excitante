@@ -88,3 +88,7 @@ OMP observes native provider/session events through `.omp/extensions/gauntlet-te
 ## Product loop (0.11.0)
 
 All three adapters use the same `gauntlet:quality` and `gauntlet:trajectory` commands. Review applicability comes from actual candidate impact, not harness APIs. OMP event extensions, model routes, native concurrency/retry controls, and Grok/OpenCode adapter availability are preserved. A missing non-OMP usage adapter stays UNAVAILABLE rather than inheriting OMP token semantics.
+
+## 0.12.0 verification boundary
+
+All OMP, Grok and OpenCode launch/continue adapters automatically consume the same scoped objective command, certification command, durable proofs, bounded continuation and recovery rules in `product-quality-contract.md`. No core code depends on OMP APIs. Routing, concurrency/retries, telemetry and role independence remain unchanged. A running older session must reload the updated canonical instructions/version before resuming; no bespoke worker prompt can override the deterministic gates.

@@ -1,5 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { snapshot, scopedPlan, verificationArtifact } from './scoped-quality.js';
+import { validateScopedProofs } from './check-proof.js';
+import { verifyObjectiveAdmission } from './certification.js';
 import { qualityPlan, validateQualityReceipt, validateReviews } from './product-quality.js';
 
 export function verifyCandidateQuality(repoRoot: string, candidate: string, objective: string, builderModel: string, critic: Record<string, unknown>, integration: Record<string, unknown>) {
@@ -9,10 +12,15 @@ export function verifyCandidateQuality(repoRoot: string, candidate: string, obje
   const receipt = JSON.parse(git('show', `${candidate}:${receiptPath}`));
   const base = git('rev-parse', `${candidate}^`).trim();
   if (receipt.base_commit !== base) throw new Error('quality receipt must cover the candidate parent');
-  const paths = git('diff', '--name-only', base, candidate).trim().split('\n').filter(p => p && p !== receiptPath).sort();
-  if (paths.some(p => /^gauntlet\/(?:state\/|trajectory\/horizons\/|evals\/results\/)/.test(p) || p.endsWith('/manifest.json'))) throw new Error('candidate contains acceptance bookkeeping');
+  const allPaths = git('diff', '--name-only', base, candidate).trim().split('\n').filter(Boolean);
+  for (const p of allPaths.filter(verificationArtifact)) { try { git('cat-file','-e',`${base}:${p}`); } catch { continue; } throw new Error('accepted verification evidence is immutable'); }
+  const paths = allPaths.filter(p => p !== receiptPath && !verificationArtifact(p)).sort();
+  if (paths.some(p => /^gauntlet\/(?:state\/|certification\/|trajectory\/horizons\/|evals\/results\/)/.test(p) || p.endsWith('/manifest.json'))) throw new Error('candidate contains acceptance bookkeeping');
   const elevated = paths.some(p => /^(?:docs\/evidence|docs\/screenshots)\//.test(p) && (() => { try { git('cat-file', '-e', `${base}:${p}`); return true; } catch { return false; } })());
-  const plan = qualityPlan(paths, elevated || receipt.elevated_risk === true, receipt.architecture_changed === true);
+  const before = snapshot(repoRoot, base), after = snapshot(repoRoot, candidate);
+  const modern = [before,after].some(source => { try { return Number(JSON.parse(source.read('gauntlet/VERSION.json')!.toString()).version.split('.')[1]) >= 12; } catch { return false; } });
+  if (modern && receipt.schema_version !== 2) throw new Error('new candidate cannot downgrade quality schema');
+  const plan = receipt.schema_version === 2 ? scopedPlan(paths,before,after,elevated || receipt.elevated_risk === true,receipt.architecture_changed === true) : qualityPlan(paths, elevated || receipt.elevated_risk === true, receipt.architecture_changed === true);
   if (JSON.stringify(plan) !== JSON.stringify(receipt.plan)) throw new Error('quality plan differs from candidate impact');
   for (const p of paths) {
     let bytes: Buffer;
@@ -21,5 +29,10 @@ export function verifyCandidateQuality(repoRoot: string, candidate: string, obje
   }
   validateQualityReceipt(plan, receipt);
   validateReviews(plan, builderModel, critic, integration);
+  if (receipt.schema_version === 2) {
+    if (receipt.proof_scope !== 'objective' || plan.schema_version !== 2) throw new Error('objective proof required');
+    validateScopedProofs(plan as ReturnType<typeof scopedPlan>,receipt,after,receiptPath);
+    verifyObjectiveAdmission(repoRoot,base,plan as ReturnType<typeof scopedPlan>,objective);
+  }
   return { plan, receiptPath };
 }
