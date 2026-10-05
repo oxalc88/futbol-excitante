@@ -89,7 +89,7 @@ export function scopedPlan(paths:string[], before:Snapshot, after:Snapshot, elev
   if(integrated)legacy.reviews_required=true;
   legacy.changed_paths=[...new Set(paths)].sort();
   const substantive=paths.filter(p=>!artifact.test(p)&&!verificationArtifact(p)&&!(productFirst&&unitArtifact(p)));
-  const integrity=productFirst&&substantive.some(p=>/^gauntlet\/(?:runtime\/|evals\/(?:src|contracts)\/)|^scripts\/gauntlet\/(?:product-quality|control)\.ts$/.test(p));
+  const integrity=productFirst&&substantive.some(p=>/^gauntlet\/(?:engineering-routes\.json$|runtime\/|evals\/(?:src|contracts)\/)|^scripts\/gauntlet\/(?:product-quality|control)\.ts$/.test(p));
   const gauntletOnly=!integrity&&substantive.length>0&&substantive.every(p=>maintenance.test(p))&&!elevated&&!architecture;
   const trivial=substantive.length>0&&substantive.every(p=>leaf.test(p))&&!elevated&&!architecture;
   const known=legacy.protected_properties.every(p=>!['ambiguous','determinism','architecture','assurance','replay','persistence','elevated_regression_risk'].includes(p));

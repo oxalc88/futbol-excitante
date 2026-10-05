@@ -119,6 +119,8 @@ Remote durability is a continuation invariant, not a gameplay acceptance criteri
 
 Use `gauntlet:control -- continue` and the canonical `product-first-contract.md` before returning control. Publish a canonical structured stop only for an exact remaining external decision after required autonomous actions and applicable engineering escalation. Builder exhaustion, a failed unit, certificate failure, an expired incident and routine choices are not stops. Native quota handoff transfers the same persisted work to a usable route.
 
+Execute the returned action automatically. ENGINEERING_ESCALATION invokes the available canonical route through the native isolated-task handoff in `product-first-contract.md`; a generated packet is not a dispatched engineer. In OMP use `gauntlet_engineering_repair` in the native task workspace. If the core refuses `stop`, do not report a stop or request routine policy permission: perform its permitted action and preserve debt/history. A zero-check budget refusal is an attempt, not a new observed product failure or a bootstrap/PASS.
+
 Otherwise continue the loop.
 
 Authoritative specs: `specs/TECHNICAL_SPEC.md`, `specs/GAMEPLAY_EVALUATION_SPEC.md`, `specs/VISUAL_SPEC.md`.

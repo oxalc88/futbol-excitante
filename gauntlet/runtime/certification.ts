@@ -1,16 +1,17 @@
 import { execFileSync } from 'node:child_process';
 import { snapshot, scopedPlan, hash, type Snapshot } from './scoped-quality.js';
 import { validateScopedProofs, validateFailureCause, type FailureClass } from './check-proof.js';
+import { incidentEvents } from './incidents.js';
 export interface Certificate { schema_version:1; target_commit:string; recorded_at:string; status:string; failure_class:FailureClass|null; receipt:{path:string;sha256:string}; horizon:string|null }
 const ancestor=(root:string,a:string,b:string)=>{try{execFileSync('git',['-C',root,'merge-base','--is-ancestor',a,b],{stdio:'pipe'});return true;}catch{return false;}};
-export function certificationHealth(root:string,ref='HEAD'): { latest:Certificate|null; last_certified:string|null; accepted_since:number; horizon:string|null } {
+export function certificationHealth(root:string,ref='HEAD'): { latest:Certificate|null; latest_attempt:Certificate|null; last_certified:string|null; accepted_since:number; horizon:string|null } {
   const source=snapshot(root,ref==='WORKTREE'?undefined:ref);
   const ancestryRef=ref==='WORKTREE'?'HEAD':ref;
   const history=execFileSync('git',['-C',root,'log','--format=','--name-status',ancestryRef,'--','gauntlet/certification/'],{encoding:'utf8'});
   const dirty=ref==='WORKTREE'?execFileSync('git',['-C',root,'diff','--name-status','HEAD','--','gauntlet/certification/'],{encoding:'utf8'}):'';
   if([...history.split('\n'),...dirty.split('\n')].some(row=>row.trim()&&!row.startsWith('A\t')))throw new Error('certification history is append-only');
   const records=source.files.filter(p=>/^gauntlet\/certification\/[A-Za-z0-9._-]+\.json$/.test(p)).map(p=>JSON.parse(source.read(p)!.toString()) as Certificate).sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at));
-  let latest:Certificate|null=null,last_certified:string|null=null;
+  let latest:Certificate|null=null,latest_attempt:Certificate|null=null,last_certified:string|null=null;
   for(const record of records){
     if(record.schema_version!==1||!['PASS','FAIL','BLOCKED','RECOVERY_BLOCKED'].includes(record.status)||!/^[a-f0-9]{40}$/.test(record.target_commit)||!Number.isFinite(Date.parse(record.recorded_at))||!ancestor(root,record.target_commit,ancestryRef)||!/^docs\/evidence\/CERT-[A-Za-z0-9._-]+\/verification\/[A-Za-z0-9._-]+-receipt\.json$/.test(record.receipt?.path))throw new Error('invalid certification record');
     const bytes=source.read(record.receipt.path);if(!bytes||hash(bytes)!==record.receipt.sha256)throw new Error('certification receipt provenance mismatch');
@@ -29,7 +30,14 @@ export function certificationHealth(root:string,ref='HEAD'): { latest:Certificat
       const failed=receipt.checks.find((r:any)=>r.status==='FAIL');const check=plan.checks.find(c=>c.id===failed?.id);
       if(!check||validateFailureCause(check,failed,overlay,plan.expected_tests[check.id]??[])!=='HARNESS_ENVIRONMENT')throw new Error('unsupported certification failure classification');
     }
-    latest=record;
+    latest_attempt=record;
+    // A proved refusal to execute is debt, not a new product observation. It
+    // cannot replace an evidenced PASS/FAIL or supply missing bootstrap proof.
+    if(record.status==='RECOVERY_BLOCKED'&&receipt.metrics?.executed_checks===0&&receipt.checks?.every((r:any)=>r.status==='NOT_RUN')){
+      const target=snapshot(root,record.target_commit),plan=scopedPlan([],target,target,false,false,true);
+      const incident=incidentEvents(root,source).find(e=>e.incident_id===receipt.incident_id&&e.boundary==='repository/full');
+      if(!incident||receipt.failure_class!==null||receipt.metrics.reused_checks!==0||receipt.executed_commands?.length!==0||JSON.stringify(plan)!==JSON.stringify(receipt.plan)||JSON.stringify(receipt.checks.map((r:any)=>r.id))!==JSON.stringify(plan.checks.map(c=>c.id)))throw new Error('invalid non-executed certification attempt');
+    }else latest=record;
   }
   const objectives=new Set<string>();
   for(const p of source.files.filter(p=>p.startsWith('gauntlet/evals/results/')&&p.endsWith('-acceptance.json'))){
@@ -38,7 +46,7 @@ export function certificationHealth(root:string,ref='HEAD'): { latest:Certificat
     if(last_certified&&ancestor(root,record.candidate_commit,last_certified))continue;
     objectives.add(record.objective_id);
   }
-  return {latest,last_certified,accepted_since:objectives.size,horizon:latest?.horizon??null};
+  return {latest,latest_attempt,last_certified,accepted_since:objectives.size,horizon:latest?.horizon??null};
 }
 export function verifyObjectiveAdmission(root:string,base:string,plan:{full_required:boolean},objective:string):void {
   const health=certificationHealth(root,base);
