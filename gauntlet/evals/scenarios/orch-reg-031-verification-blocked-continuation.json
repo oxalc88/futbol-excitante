@@ -8,7 +8,21 @@
     "stop_reason": "verification_blocked",
     "verification_blocked": true,
     "safe_objective_available": false,
-    "environment_decision_required": true
+    "environment_decision_required": true,
+    "exact_decision_required": "Provide a usable execution environment after exhausted repair and engineering escalation",
+    "incident_id": "canonical-incident",
+    "autonomous_actions_attempted": [
+      "diagnosis",
+      "machinery repair",
+      "audited execution",
+      "engineering escalation"
+    ],
+    "evidence": [
+      {
+        "path": "gauntlet/incidents/fixture.json",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ]
   },
   "expect": {
     "decision": "stop"

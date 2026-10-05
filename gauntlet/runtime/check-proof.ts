@@ -37,7 +37,7 @@ export function classifyFailure(output:string,report:{product:boolean;complete:b
 }
 export function coveragePass(check:QualityCheck,result:QualityResult,expected:string[],report:{files:string[];complete:boolean},output:string):boolean {
   if(result.status!=='PASS'||result.exit_code!==0||/Unhandled Errors?|\[vitest-worker\].*(?:Error|Timeout)|worker exited unexpectedly/i.test(output))return false;
-  if(!expected.length)return !check.command.includes('vitest')&&!['regression-tests','browser-tests'].includes(check.id);
+  if(!expected.length)return !check.command.includes('vitest')&&!check.command.includes('test')&&!check.command.includes('test-browser')&&!['regression-tests','browser-tests'].includes(check.id);
   return report.complete&&JSON.stringify(report.files)===JSON.stringify([...expected].sort());
 }
 export function writeCheckProof(root:string,objective:string,run:string,check:QualityCheck,result:QualityResult,source:Snapshot,profile:Profile,receipt:string,expected:string[],observed:string[],reportBytes:Buffer|null=null):ProofReference {

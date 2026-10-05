@@ -10,9 +10,7 @@ The pipeline is: builder → tests/artifacts → deterministic audit → optiona
 
 Objective verification and repository certification follow `gauntlet/product-quality-contract.md`. Run baseline plus deterministic affected checks for each candidate; full certification protects milestones/releases and the four-objective integration boundary. Product outcome is never inferred from a certificate alone. At startup inspect committed `gauntlet/certification/*.json`; an initial scoped acceptance needs a bootstrap certification attempt. Publish certificate evidence as separate bookkeeping with remote containment, not candidate source.
 
-On a failed quality check, diagnose from immutable logs/reports, use `gauntlet:quality --repair`, then complete the normal scoped command after `REPAIR_PASS`; it reuses only validated identical PASS evidence and runs missing coverage. Do not repeatedly rerun the full battery. This rule is always on in OMP, Grok and OpenCode.
-
-Consume the shared recovery budget and stop rule automatically: whole Node 40 minutes, other checks 20 minutes, two repair attempts within 90 elapsed minutes per incident. At `RECOVERY_BLOCKED`, preserve verified candidate/logs and report the blocker/decision. Do not reset the record, rename the incident, raise limits or run equivalent experiments outside the canonical command. Establish cause with smaller reproductions. A supported unrelated harness certification failure can permit already-selected work in that same Horizon, through its own required checks/reviews, up to four uncertified objectives. Product/unknown failures block scoped acceptance. A fifth objective, milestone/release, unknown scope or protected core/shared architecture requires complete verification. Do not select another Horizon to evade debt.
+Read `gauntlet/product-first-contract.md` for the shared continuation, incidents, material repair, execution DAG, escalation and stop policy. This is always on in OMP, Grok and OpenCode. Use gauntlet:quality --repair only for the one authorized reproducer; Do not repeatedly rerun the full battery. RECOVERY_BLOCKED preserves progress and debt: inspect safe work and deterministic next actions automatically. Do not reset the record; use smaller reproductions within the canonical incident limit.
 
 A critic ACCEPT is never final. An objective is accepted only after the deterministic quality plan and required independent reviews pass, durable candidate/evidence provenance, acceptance persistence, bookkeeping, and post-bookkeeping state audit all succeed. Never say an objective is **fully accepted**, **committed**, or complete merely because a critic/reviewer returned ACCEPT.
 
@@ -36,7 +34,7 @@ Do not invalidate merely because an objective needed ordinary retries or because
 
 Every normal product horizon must name one observable playable/browser-facing outcome. Prefer work in this order: player-visible blocker → gameplay feel/readability → broken match flow → missing core mechanic → supporting eval/spec work. Evaluator, laboratory, infrastructure, and spec-only objectives are valid only when they directly unblock or protect the named product outcome. A feature is not product-complete while it exists only in fixtures, test bridges, capture paths, or gated code that normal shipped play does not use. Do not invent gameplay requirements beyond the specs.
 
-Read `gauntlet/product-flow-contract.md`, `gauntlet/product-quality-contract.md`, `gauntlet/trajectory-contract.md` and `gauntlet/parallel-issue-contract.md` when planning. GitHub issues are optional for sequential execution. Before any parallel implementation delegation, synchronize one GitHub issue per candidate objective, record dependencies and expected file ownership, and classify each issue as `READY` or `BLOCKED`. Only synchronized `READY` issues may start parallel implementation workers. If GitHub write capability or issue synchronization is unavailable, run the objectives sequentially. GitHub issues do not replace `CURRENT.md`, `HORIZON.md`, acceptance manifests, or history.
+Read `gauntlet/product-flow-contract.md`, `gauntlet/product-quality-contract.md`, `gauntlet/trajectory-contract.md`, `gauntlet/parallel-issue-contract.md` and `gauntlet/product-first-contract.md` when planning. GitHub issues are optional for sequential execution. A substantial product issue can own a canonical execution DAG with several temporary units and one integrated acceptance. Use `gauntlet:control -- execution`; do not create a product objective/issue for each unit. Existing `gauntlet:parallel:sync` remains for genuinely independent objectives. If issue synchronization cannot complete, serialize the work. Units with unresolved dependencies/interfaces wait; ownership conflicts serialize; workers use isolated harness-native workspaces.
 
 At the first strategic reassessment after a Gauntlet system upgrade that materially changes planning policy, invalidate any active horizon whose objective selection was made under the old policy and replan under the new policy. Preserve the old horizon as historical state; do not rewrite accepted history.
 
@@ -119,12 +117,7 @@ Completion of an objective, critic/integration ACCEPT, a candidate snapshot comm
 
 Remote durability is a continuation invariant, not a gameplay acceptance criterion: the candidate/acceptance pipeline decides whether the objective is accepted; publication decides whether the accepted state is safe to advance past. Never claim remote durability from a local commit alone.
 
-Stop only when one of these is true:
-- a required human spec, perceptual-capability route, or legal decision is missing;
-- required verification is blocked and no safely admissible same-Horizon work remains (`verification_blocked`);
-- NaN builders repeatedly failed and the objective is explicitly marked blocked with evidence;
-- the next work is explicitly deferred by the authoritative specs;
-- this is the Grok CLI/SuperGrok adapter with a Grok 4.6 parent, SuperGrok weekly usage is ≥89%, and a valid overflow handoff has been written.
+Use `gauntlet:control -- continue` and the canonical `product-first-contract.md` before returning control. Publish a canonical structured stop only for an exact remaining external decision after required autonomous actions and applicable engineering escalation. Builder exhaustion, a failed unit, certificate failure, an expired incident and routine choices are not stops. Native quota handoff transfers the same persisted work to a usable route.
 
 Otherwise continue the loop.
 
@@ -148,4 +141,4 @@ then `/gauntlet-continue`. Other harnesses use their native quota and continuati
 
 If current Flash itself fails with a model-specific availability, allowance, or capacity failure, follow `gauntlet/provider-failure-contract.md`; there is no deprecated snapshot fallback. Do not use model fallback for authentication, network, context, test, or ordinary task failures.
 
-`verification_blocked` is allowed only when required verification/certification cannot proceed under the bounded incident policy, no same-Horizon objective is safely admissible, and a reviewed environment/execution-policy decision is required. Report preserved progress, exact failing scope, evidence and needed decision; never return control merely because one certificate failed while safe product work remains.
+A verification-blocked claim follows the canonical product-first continuation and structured-stop policy. Do not return control while safe product work or an authorized deterministic action remains.

@@ -57,7 +57,7 @@ export function verifyObjectiveAdmission(root:string,base:string,plan:{full_requ
     changed.forEach(p=>covered.add(p));
   }
   const intervening=execFileSync('git',['-C',root,'diff','--name-only',health.latest.target_commit,base],{encoding:'utf8'}).trim().split('\n').filter(Boolean);
-  if(intervening.some(p=>!covered.has(p)&&!/^gauntlet\/(?:state|certification|evals\/results|trajectory\/horizons)\//.test(p)&&!/^docs\/evidence\/(?:CERT-[^/]+\/|[^/]+\/(?:manifest\.json|verification\/))/.test(p)))throw new Error('CERTIFICATION_REQUIRED: intervening unaccepted source changes');
+  if(intervening.some(p=>!covered.has(p)&&!/^gauntlet\/(?:state|certification|incidents|execution|evals\/results|trajectory\/horizons)\//.test(p)&&!/^docs\/evidence\/(?:CERT-[^/]+\/|[^/]+\/(?:manifest\.json|verification\/))/.test(p)))throw new Error('CERTIFICATION_REQUIRED: intervening unaccepted source changes');
   if(health.latest.status!=='PASS'){
     if(health.latest.failure_class!=='HARNESS_ENVIRONMENT')throw new Error('CERTIFICATION_BLOCKED: product, unknown or invalid certification failure');
     const horizon=snapshot(root,base).read('gauntlet/state/HORIZON.md')?.toString()??'';

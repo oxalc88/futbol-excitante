@@ -1,3 +1,5 @@
+import { auditStopRecords } from '../../runtime/continuation.js';
+import { incidentEvents } from '../../runtime/incidents.js';
 import { certificationHealth } from "../../runtime/certification.js";
 import { auditHorizonProduct } from "../../runtime/horizon-product-audit.js";
 import { readdir, readFile, stat } from "node:fs/promises";
@@ -85,6 +87,7 @@ export async function runStateChecks(repoRoot: string): Promise<{ objective: str
   const systemVersion = (JSON.parse(versionFile) as { version: string }).version;
   const objective = latestAcceptedObjective(current);
   const checks: StateCheck[] = [];
+  if(Number(systemVersion.split('.')[1])>=13){try{const events=incidentEvents(repoRoot);auditStopRecords(repoRoot);checks.push({name:'canonical incident lifecycle',pass:true,detail:`${events.length} append-only events; certification debt preserved`,owner:'orchestrator'});}catch(error){checks.push({name:'canonical incident lifecycle',pass:false,detail:String(error),owner:'orchestrator'});}}
   if (!objective) return { objective, checks: [{ name: "latest accepted objective is parseable", pass: false, detail: "CURRENT.md has no Last accepted objective", owner: "orchestrator" }] };
 
   checks.push({ name: "CURRENT accepted list contains latest accepted", pass: acceptedSection(current).includes(objective), detail: acceptedSection(current).includes(objective) ? undefined : `${objective} missing from CURRENT.accepted`, owner: "orchestrator" });

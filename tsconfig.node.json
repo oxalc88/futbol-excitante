@@ -17,7 +17,8 @@
     "scripts/gauntlet/runtime.ts",
     ".omp/extensions/gauntlet-efficiency.ts",
     "scripts/gauntlet/product-quality.ts",
-    "scripts/gauntlet/trajectory.ts"
+    "scripts/gauntlet/trajectory.ts",
+    "scripts/gauntlet/control.ts"
   ],
   "exclude": [
     "node_modules",

@@ -7,7 +7,7 @@ export const DOMAIN_TESTS: Record<string, string[]> = {
   locomotion: ['tests/unit/locomotion', 'tests/unit/eval/foundation-evaluator'],
   touch_and_actions: ['tests/unit/contacts', 'tests/unit/eval/capability-design-runner'],
   duels: ['tests/unit/eval/duels'],
-  goalkeepers: ['tests/unit/eval/goalkeeper'],
+  goalkeepers: ['tests/unit/eval/goalkeeper', 'tests/unit/eval/gk'],
   rules: ['tests/unit/eval/rules'],
   fouls: ['tests/unit/eval/fouls', 'tests/unit/loop/advantage'],
   team: ['tests/unit/eval/team', 'tests/unit/gauntlet-0.9-team-declaration.test.ts'],
@@ -37,7 +37,7 @@ const rules: Array<[RegExp, string[]]> = [
 // browser test bridges and arbitrary renderer changes cannot qualify by a label.
 const trivial = /^(?:src\/apps\/browser\/styles\.css|src\/apps\/browser\/controls-legend-ui\.ts|docs\/(?:player-controls|how-to-play)\.md)$/;
 
-export function qualityPlan(paths: string[], elevatedRisk = false, architectureChanged = false): QualityPlan {
+export function qualityPlan(paths: string[], elevatedRisk = false, architectureChanged = false, mappedGameplayInput = false): QualityPlan {
   if (!paths.length || paths.some(p => p.includes('..') || p.startsWith('/') || p.includes('\\'))) throw new Error('invalid or empty change scope');
   const evidenceArtifact = /^docs\/(?:evidence|screenshots)\/[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+\.(?:json|png|jpg|jpeg|webp|md)$/;
   const changed_paths = [...new Set(paths)].sort();
@@ -45,7 +45,8 @@ export function qualityPlan(paths: string[], elevatedRisk = false, architectureC
   const reasons: string[] = [];
   for (const file of changed_paths) {
     if (trivial.test(file) || evidenceArtifact.test(file)) continue;
-    const match = rules.find(([pattern]) => pattern.test(file));
+    const gameplayInput = mappedGameplayInput && file === 'src/simulation/input/input-system.ts';
+    const match = gameplayInput ? [/^$/, ['touch_and_actions', 'duels', 'goalkeepers', 'rules', 'fouls', 'team']] as [RegExp, string[]] : rules.find(([pattern]) => pattern.test(file));
     for (const domain of match?.[1] ?? ['ambiguous']) properties.add(domain);
     reasons.push(`${file}: ${match ? match[1].join(', ') : 'ambiguous impact; full assurance'}`);
   }

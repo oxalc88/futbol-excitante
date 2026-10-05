@@ -1,6 +1,7 @@
 import path from 'node:path';
+import { hash } from '../../gauntlet/runtime/scoped-quality.js';
 import { fileURLToPath } from 'node:url';
-import { readFile, rename } from 'node:fs/promises';
+import { readFile, rename, readdir } from 'node:fs/promises';
 import { GauntletRuntime, type RuntimeAction } from '../../gauntlet/runtime/service.js';
 import { readRuntimeConfiguration } from '../../gauntlet/runtime/configuration.mjs';
 import { appendTelemetry, type TelemetryIdentity } from '../../gauntlet/runtime/telemetry.mjs';
@@ -13,6 +14,21 @@ export default function gauntletEfficiency(pi: any) {
 }
 export function bindEfficiency(pi: any, {root}: {root:string}) {
   const configuration = readRuntimeConfiguration(root);
+  let displayedStop: string | null = null;
+  const displayStop = async (_event: unknown, ctx: any) => {
+    const directory = path.join(root,'gauntlet/incidents');
+    const names = await readdir(directory).catch(() => [] as string[]);
+    const records = (await Promise.all(names.filter(n => /^stop-[a-f0-9]{64}\.json$/.test(n)).map(async name => {try{const record=JSON.parse(await readFile(path.join(directory,name),'utf8'));return name===`stop-${hash(JSON.stringify(record))}.json`?{name,record}:null;}catch{return null;}}))).filter((row):row is {name:string;record:any}=>row!==null);
+    const latest = records.sort((a,b)=>a.record.recorded_at.localeCompare(b.record.recorded_at)).at(-1);
+    if(latest && latest.name !== displayedStop){
+      displayedStop=latest.name;
+      const s=latest.record;
+      ctx.ui.notify(`Gauntlet stopped: ${s.stop_reason}. Boundary: ${s.blocked_boundary ?? 'product decision'}. Preserved: ${(s.preserved_progress ?? []).join(', ')}. Certification debt: ${s.certification_debt}. Required: ${s.exact_decision_required}`,'warning');
+    }
+  };
+  pi.on('session_start',displayStop);
+  pi.on('tool_result',displayStop); // Thin in-session display, no stop policy or polling.
+
   let objectiveId: string | null = null;
   const identity = (ctx: any): TelemetryIdentity => ({sessionId:ctx.sessionManager.getSessionId(),role:ctx.agent.kind === 'main' ? 'orchestrator':ctx.agent.name,
     model:`${ctx.model?.provider ?? 'unknown'}/${ctx.model?.id ?? 'unknown'}`,objectiveId,profile:configuration.profile});
