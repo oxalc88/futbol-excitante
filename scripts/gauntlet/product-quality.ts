@@ -1,3 +1,4 @@
+import { executeUnitQuality } from '../../gauntlet/runtime/unit-quality.js';
 import { createHash } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync, existsSync, rmSync, renameSync, realpathSync } from 'node:fs';
@@ -9,7 +10,8 @@ import { qualityPreflight, repairCheck, requireRepairProof, rememberFailure, run
 import { executeScopedQuality } from '../../gauntlet/runtime/scoped-quality-command.js';
 const args = process.argv.slice(2);
 const installedVersion = existsSync('gauntlet/VERSION.json') ? JSON.parse(readFileSync('gauntlet/VERSION.json','utf8')).version : '0.11.3';
-if (args.includes('--stage') || Number(installedVersion.split('.')[1]) >= 12) {
+if(args.includes('--unit')){await executeUnitQuality(args);}
+else if (args.includes('--stage') || Number(installedVersion.split('.')[1]) >= 12) {
   await executeScopedQuality(args);
 } else {
 const option = (key: string) => args[args.indexOf(key) + 1];
