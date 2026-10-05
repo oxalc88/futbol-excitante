@@ -19,8 +19,8 @@ export function continuationDecision(f: ContinuationFacts) {
   const safe = f.safe_work_considered.find(w=>w.executable);
   if(f.routine_action)return {action:f.routine_action,stop:false};
   if(safe)return {action:'EXECUTE_PRODUCT',objective_id:safe.id,stop:false};
-  if(f.repair_available)return {action:'BOUNDED_REPAIR',stop:false};
   if(f.engineering_escalation_available&&!f.engineering_escalation_attempted)return {action:'ENGINEERING_ESCALATION',stop:false};
+  if(f.repair_available)return {action:'BOUNDED_REPAIR',stop:false};
   if(!f.external_decision?.exact_decision_required.trim())return {action:f.blocked_boundary?'DIAGNOSE_OR_REPLAN':'REPLAN',stop:false};
   if(!['specification','legal','perceptual_route','credentials_resources','environment_execution_policy','explicit_external_decision'].includes(f.external_decision.kind))throw new Error('unknown external decision');
   if(f.external_decision.kind==='environment_execution_policy' && (!f.blocked_boundary || !f.incident_id || !f.autonomous_actions_attempted.length || !f.evidence.length))throw new Error('environment stop requires audited bounded repair/escalation');
@@ -68,7 +68,7 @@ export function stopRecord(root:string,f:ContinuationFacts):string {
     facts.blocked_boundary=latest.boundary;facts.failure_class=latest.failure_class;facts.evidence=latest.evidence;
     facts.autonomous_actions_attempted=history.filter(e=>!['OPEN','FAILURE','EXHAUST'].includes(e.kind)).map(e=>`${e.kind}:${e.sequence}`);
     facts.repair_available=['ACTIVE','EXHAUSTED'].includes(latest.state)&&!history.some(e=>e.kind==='DIAGNOSE');
-    facts.engineering_escalation_attempted=history.some(e=>e.kind==='ESCALATE');
+    facts.engineering_escalation_attempted=history.some(e=>e.kind==='DISPATCH');
   }
   const decision=continuationDecision(facts);if(!decision.stop)throw new Error('no external decision: continue automatically');
   if(f.external_decision?.kind==='environment_execution_policy'){

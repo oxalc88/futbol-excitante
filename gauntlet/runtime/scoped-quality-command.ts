@@ -53,7 +53,7 @@ export async function executeScopedQuality(args:string[]):Promise<void> {
   saveReport();
   try {
     if(productFirst&&!certification&&!args.includes('--repair'))validateIntegratedExecution(root,objective!,'WORKTREE');
-    if(!certification)verifyObjectiveAdmission(root,base,plan,objective!);
+    if(!certification&&!args.includes('--repair'))verifyObjectiveAdmission(root,base,plan,objective!);
     const tools=qualityPreflight(root),profile=executionProfile(root,tools);
     if(productFirst){let boundary=incidentBoundary(certification,plan.full_required,objective!);if(args.includes('--incident')){const event=incidentEvents(root).filter(e=>e.incident_id===option('--incident')).at(-1);if(!event||event.state==='CLOSED'||event.boundary==='repository/full'&&!plan.full_required||event.boundary.startsWith('objective/')&&(certification||event.boundary!==`objective/${objective}`))throw new Error('incident does not authorize this verification boundary');if(!args.includes('--repair')&&plan.full_required&&event.boundary!=='repository/full'&&activeIncident(root,'repository/full'))throw new Error('RECOVERY_BLOCKED: computed full-required scope cannot bypass repository/full incident');boundary=event.boundary;}canonical=new IncidentRecovery(root,boundary);}
     if(!productFirst&&existsSync(recoveryPath)){

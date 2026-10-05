@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, mkdirSync, writeFileSync, rmSync, readdirSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { join } from 'node:path';
-import { activeIncident, appendIncident, openIncident, exhaustIncident, importLegacyIncidents, incidentBoundary, evidence, requirePublishedIncident, validateRepairCommit, requireRelevantRepair, incidentEvents, type IncidentEvent, type MaterialRepair } from './incidents.js';
+import { activeIncident, appendIncident, openIncident, exhaustIncident, importLegacyIncidents, incidentBoundary, evidence, requirePublishedIncident, validateRepairCommit, validateRepairExecution, requireRelevantRepair, incidentEvents, type IncidentEvent, type MaterialRepair } from './incidents.js';
 import { snapshot, hash, digest } from './scoped-quality.js';
 import { rememberFailure, repairCheck, RecoveryBlockedError, type QualityRecovery } from './quality-execution.js';
 import { validateCheckProof, type Profile, type ProvenResult } from './check-proof.js';
@@ -52,11 +52,15 @@ export class IncidentRecovery {
     requirePublishedIncident(this.root,e);
     const input=JSON.parse(readFileSync(path,'utf8'));
     if(!input.diagnosis?.trim()||!input.component?.trim()||!/^[a-f0-9]{40}$/.test(input.repair_commit))throw new Error('diagnosis, repaired component and durable repair commit required');
-    validateRepairCommit(this.root,input.repair_commit);requireRelevantRepair(this.root,e,input.component,input.repair_commit);
     const bytes=Buffer.from(JSON.stringify({diagnosis:input.diagnosis,component:input.component,repair_commit:input.repair_commit})+'\n');
     const ref={path:`gauntlet/incidents/diagnosis-${e.incident_id}.json`,sha256:hash(bytes)};
     writeFileSync(`${this.root}/${ref.path}`,bytes,{flag:'wx'});
     this.incident=appendIncident(this.root,{...e,kind:'DIAGNOSE',state:e.state,evidence:[...e.evidence,ref]});
+    try{validateRepairCommit(this.root,input.repair_commit);requireRelevantRepair(this.root,e,input.component,input.repair_commit);validateRepairExecution(this.root,input.repair_commit,execFileSync('git',['-C',this.root,'rev-parse','HEAD'],{encoding:'utf8'}).trim());}catch(error){
+      const rejected=Buffer.from(JSON.stringify({incident_id:e.incident_id,status:'REJECTED',reason:String(error),repair_commit:input.repair_commit})+'\n');
+      const rejection={path:`gauntlet/incidents/rejected-${e.incident_id}.json`,sha256:hash(rejected)};writeFileSync(`${this.root}/${rejection.path}`,rejected,{flag:'wx'});
+      this.incident=appendIncident(this.root,{...this.incident,kind:'REPAIR_FAILED',state:'BLOCKED',evidence:[...this.incident.evidence,rejection]});throw error;
+    }
     this.repairInput=input;return repairCheck(e.recovery).check;
   }
   confirmRepair(check:QualityCheck,row:ProvenResult,profile:Profile,receiptPath:string):void {
@@ -66,11 +70,12 @@ export class IncidentRecovery {
     // are in the proof when no focused paths are present.
     validateCheckProof(check,row,source,profile,receiptPath,proof.expected_tests);
     if(expected.length&&JSON.stringify(expected)!==JSON.stringify(proof.expected_tests))throw new Error('focused reproducer coverage differs');
-    const repaired_identity=digest({profile,repair_commit:this.repairInput!.repair_commit});
-    const data={receipt_path:receiptPath,execution_mode:'repair',status:'REPAIR_PASS',incident_id:e.incident_id,original_failure:e.recovery.failure.signature,command:check.command,repaired_identity,exit_code:row.exit_code,proof:row.proof};
+    const execution_commit=execFileSync('git',['-C',this.root,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
+    const repaired_identity=digest({profile,repair_commit:this.repairInput!.repair_commit,execution_commit});
+    const data={receipt_path:receiptPath,execution_mode:'repair',status:'REPAIR_PASS',incident_id:e.incident_id,original_failure:e.recovery.failure.signature,command:check.command,repaired_identity,execution_commit,exit_code:row.exit_code,proof:row.proof};
     const bytes=Buffer.from(JSON.stringify(data,null,2)+'\n'),ref={path:`gauntlet/incidents/reproducer-${e.incident_id}.json`,sha256:hash(bytes)};
     writeFileSync(`${this.root}/${ref.path}`,bytes,{flag:'wx'});
-    const repair:MaterialRepair={original_failure:e.recovery.failure.signature,component:this.repairInput!.component,repair_commit:this.repairInput!.repair_commit,previous_identity:digest(e.recovery.failure),repaired_identity,reproducer:check.command,result:ref,diagnosis:e.evidence.at(-1)!};
+    const repair:MaterialRepair={original_failure:e.recovery.failure.signature,component:this.repairInput!.component,repair_commit:this.repairInput!.repair_commit,execution_commit,previous_identity:digest(e.recovery.failure),repaired_identity,reproducer:check.command,result:ref,diagnosis:e.evidence.at(-1)!};
     this.incident=appendIncident(this.root,{...e,kind:'REPAIR',state:'REPAIR_CONFIRMED',repair,evidence:[...e.evidence,ref]});
   }
   failed(check:QualityCheck,row:ProvenResult):void {

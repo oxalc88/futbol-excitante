@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "routes": [
+    { "id": "codex-cli", "command": ["codex", "exec", "--sandbox", "workspace-write", "-"], "review_command": ["codex", "exec", "--sandbox", "read-only", "-"] }
+  ]
+}
