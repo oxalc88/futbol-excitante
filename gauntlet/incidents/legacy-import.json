@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-05T04:52:11.744Z",
+  "imports": [
+    {
+      "path": "gauntlet/incidents/legacy-f960b92b26aa53f48ebce68fe6c70896270d1e5f75d051fc9b5fd2a31f4756fc.json",
+      "sha256": "f960b92b26aa53f48ebce68fe6c70896270d1e5f75d051fc9b5fd2a31f4756fc"
+    },
+    {
+      "path": "gauntlet/incidents/legacy-db56b1787d4c01f27164f0e8c370160ac5711c99e149e5b768c3a35c0aec178c.json",
+      "sha256": "db56b1787d4c01f27164f0e8c370160ac5711c99e149e5b768c3a35c0aec178c"
+    }
+  ]
+}

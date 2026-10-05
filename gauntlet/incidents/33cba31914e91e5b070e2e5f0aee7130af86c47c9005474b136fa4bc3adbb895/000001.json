@@ -1,0 +1,48 @@
+{
+  "incident_id": "33cba31914e91e5b070e2e5f0aee7130af86c47c9005474b136fa4bc3adbb895",
+  "boundary": "repository/full",
+  "recovery": {
+    "schema_version": 1,
+    "failure": {
+      "check": {
+        "id": "regression-tests",
+        "command": [
+          "pnpm",
+          "run",
+          "test"
+        ]
+      },
+      "signature": "a0d93a3fc07e7ab27ac9d97a38ddb4242d0e9311b6326c71890cbe92c964ad18",
+      "failed_test_files": []
+    },
+    "identical_failures": 1,
+    "budget": {
+      "started_at_ms": 1791136789699,
+      "repair_attempts": 2,
+      "history_before_budget": "UNAVAILABLE"
+    },
+    "legacy_sources": [
+      {
+        "path": ".delivery-local/quality/FOUL-CARD-SEVERITY/recovery.json",
+        "sha256": "db56b1787d4c01f27164f0e8c370160ac5711c99e149e5b768c3a35c0aec178c"
+      }
+    ]
+  },
+  "state": "ACTIVE",
+  "kind": "FAILURE",
+  "failure_class": "UNKNOWN",
+  "evidence": [
+    {
+      "path": "gauntlet/incidents/legacy-f960b92b26aa53f48ebce68fe6c70896270d1e5f75d051fc9b5fd2a31f4756fc.json",
+      "sha256": "f960b92b26aa53f48ebce68fe6c70896270d1e5f75d051fc9b5fd2a31f4756fc"
+    },
+    {
+      "path": "gauntlet/incidents/legacy-db56b1787d4c01f27164f0e8c370160ac5711c99e149e5b768c3a35c0aec178c.json",
+      "sha256": "db56b1787d4c01f27164f0e8c370160ac5711c99e149e5b768c3a35c0aec178c"
+    }
+  ],
+  "schema_version": 1,
+  "sequence": 1,
+  "previous": "1ef01de82c60fef997900ef0a5e564dcf47cae7e71bcd8dba41aac49242f8348",
+  "recorded_at": "2026-10-05T04:52:11.275Z"
+}

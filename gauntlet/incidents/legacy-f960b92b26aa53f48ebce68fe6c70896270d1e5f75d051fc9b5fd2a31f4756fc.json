@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "failure": {
+    "check": {
+      "id": "regression-tests",
+      "command": [
+        "pnpm",
+        "run",
+        "test"
+      ]
+    },
+    "signature": "a0d93a3fc07e7ab27ac9d97a38ddb4242d0e9311b6326c71890cbe92c964ad18",
+    "failed_test_files": []
+  },
+  "identical_failures": 1,
+  "budget": {
+    "started_at_ms": 1791136789699,
+    "repair_attempts": 2,
+    "history_before_budget": "UNAVAILABLE"
+  },
+  "legacy_sources": [
+    {
+      "path": ".delivery-local/quality/FOUL-CARD-SEVERITY/recovery.json",
+      "sha256": "db56b1787d4c01f27164f0e8c370160ac5711c99e149e5b768c3a35c0aec178c"
+    }
+  ]
+}
