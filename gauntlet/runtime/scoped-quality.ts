@@ -1,3 +1,4 @@
+import { mappedLoopGameplay, mappedInputGameplay, mappedGameplayModule } from './simulation-impact.js';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync, realpathSync } from 'node:fs';
@@ -34,9 +35,10 @@ export function snapshot(root: string, commit?: string): Snapshot {
 export const nodeTest = (p: string) => /^tests\/.*\.test\.ts$/.test(p) && !p.startsWith('tests/browser/') && !p.endsWith('.browser.test.ts');
 export const browserTest = (p: string) => /^tests\/browser\/.*\.test\.ts$/.test(p);
 export const verificationArtifact = (p: string) => /^docs\/evidence\/[A-Za-z0-9._-]+\/verification\/[A-Za-z0-9._-]+\.(?:json|log\.gz|report\.json\.gz)$/.test(p);
-export const bookkeeping = (p: string) => /^gauntlet\/(?:state\/|certification\/|trajectory\/horizons\/|evals\/results\/)/.test(p);
+export const bookkeeping = (p: string) => /^gauntlet\/(?:state\/|certification\/|incidents\/|execution\/|trajectory\/horizons\/|evals\/results\/)/.test(p);
 const baseline = ['tests/architecture/', 'tests/candidate-scope.node.test.ts', 'tests/unit/gauntlet-'];
 const maintenance = /^(?:gauntlet\/|scripts\/gauntlet\/|\.grok\/|\.omp\/|\.opencode\/|tests\/unit\/gauntlet-[^/]+\.test\.ts$)/;
+export const unitArtifact=(p:string)=>/^docs\/evidence\/[A-Za-z0-9._-]+\/units\/[A-Za-z0-9._-]+\/(?:handoff\.(?:md|json)|local-quality\.json)$/.test(p);
 const artifact = /^docs\/(?:evidence|screenshots)\/[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+\.(?:json|png|jpg|jpeg|webp|md)$/;
 const leaf = /^(?:src\/apps\/browser\/(?:styles\.css|controls-legend-ui\.ts)|docs\/(?:player-controls|how-to-play)\.md)$/;
 
@@ -73,15 +75,25 @@ export interface ScopedPlan extends Omit<QualityPlan,'schema_version'> {
   full_required: boolean;
   expected_tests: Record<string,string[]>;
 }
-export function scopedPlan(paths:string[], before:Snapshot, after:Snapshot, elevated=false, architecture=false, certification=false):ScopedPlan {
-  const impactPaths=paths.filter(p=>!nodeTest(p)||p.startsWith('tests/architecture/')||p.startsWith('tests/unit/gauntlet-'));
-  const legacy=qualityPlan(impactPaths.length?impactPaths:paths.length?paths:['gauntlet/runtime/product-quality.ts'],elevated,architecture);
+export function scopedPlan(paths:string[], before:Snapshot, after:Snapshot, elevated=false, architecture=false, certification=false,integrated=false):ScopedPlan {
+  const productFirst = [before, after].some(s => { try { return Number(JSON.parse(s.read('gauntlet/VERSION.json')!.toString()).version.split('.')[1]) >= 13; } catch { return false; } });
+  const impactPaths=paths.filter(p=>(!nodeTest(p)||p.startsWith('tests/architecture/')||p.startsWith('tests/unit/gauntlet-'))&&!(productFirst&&unitArtifact(p)));
+  const inputMapped=productFirst&&paths.includes('src/simulation/input/input-system.ts')&&mappedInputGameplay(before,after);
+  const loopMapped=productFirst&&paths.includes('src/simulation/loop/simulation.ts')&&mappedLoopGameplay(before,after);
+  const mappedPaths=loopMapped?impactPaths.map(p=>p==='src/simulation/loop/simulation.ts'?'src/simulation/input/input-system.ts':p):impactPaths;
+  const moduleRisk=productFirst&&paths.some(p=>/^src\/simulation\/(?:(?:ball|locomotion|contacts|player-contact)\/|(?:foul-predicate|card-policy|advantage-policy)\.ts$)/.test(p)&&!mappedGameplayModule(p,before,after));
+  const legacy=qualityPlan(mappedPaths.length?mappedPaths:paths.length?paths:['gauntlet/runtime/product-quality.ts'],elevated,architecture,loopMapped||inputMapped);
+  if(moduleRisk)legacy.reasons.push('mapped simulation module public/import/global surface or protected/dynamic behavior changed; full verification required');
+  if(loopMapped)legacy.reasons.push('simulation loop: only allowlisted gameplay helper bodies changed; stepping/clock/public declarations unchanged');
+  if(inputMapped)legacy.reasons.push('input system: gameplay selection helper bodies only; scheduler, duplicate policy and public contracts unchanged');
+  if(integrated)legacy.reviews_required=true;
   legacy.changed_paths=[...new Set(paths)].sort();
-  const substantive=paths.filter(p=>!artifact.test(p)&&!verificationArtifact(p));
-  const gauntletOnly=substantive.length>0&&substantive.every(p=>maintenance.test(p))&&!elevated&&!architecture;
+  const substantive=paths.filter(p=>!artifact.test(p)&&!verificationArtifact(p)&&!(productFirst&&unitArtifact(p)));
+  const integrity=productFirst&&substantive.some(p=>/^gauntlet\/(?:runtime\/|evals\/(?:src|contracts)\/)|^scripts\/gauntlet\/(?:product-quality|control)\.ts$/.test(p));
+  const gauntletOnly=!integrity&&substantive.length>0&&substantive.every(p=>maintenance.test(p))&&!elevated&&!architecture;
   const trivial=substantive.length>0&&substantive.every(p=>leaf.test(p))&&!elevated&&!architecture;
   const known=legacy.protected_properties.every(p=>!['ambiguous','determinism','architecture','assurance','replay','persistence','elevated_regression_risk'].includes(p));
-  let full=certification || (!gauntletOnly && !trivial && !known), selected:string[]=[];
+  let full=certification || moduleRisk || (!gauntletOnly && !trivial && !known), selected:string[]=[];
   if(!full) {
     if(gauntletOnly||trivial)selected=after.files.filter(nodeTest).filter(p=>baseline.some(prefix=>p.startsWith(prefix)));
     else { const a=affectedTests(before,new Set(paths)),b=affectedTests(after,new Set(paths)); full=a.ambiguous||b.ambiguous; selected=[...new Set([...a.files,...b.files])].filter(p=>after.files.includes(p)).sort(); }
@@ -141,6 +153,7 @@ export function inputKey(check:QualityCheck,source:Snapshot,profile:unknown,rece
   }
   // Unknown file/data/dynamic dependencies retain a whole-tree key. Never infer
   // equivalence from changed-file lists or an LLM-provided impact label.
-  const inputs=source.files.filter(p=>(!selected||selected.has(p))&&p!==receiptPath&&!verificationArtifact(p)&&!p.startsWith('gauntlet/certification/')&&!/^docs\/evidence\/CERT-[A-Za-z0-9._-]+\/quality\.json$/.test(p)).map(p=>[p,hash(source.read(p)!)]);
+  const productFirst=Number(JSON.parse(source.read('gauntlet/VERSION.json')?.toString()??'{}').version?.split('.')[1])>=13;
+  const inputs=source.files.filter(p=>(!selected||selected.has(p))&&p!==receiptPath&&!(productFirst&&p.startsWith('gauntlet/execution/'))&&!verificationArtifact(p)&&!p.startsWith('gauntlet/certification/')&&!p.startsWith('gauntlet/incidents/')&&!/^docs\/evidence\/CERT-[A-Za-z0-9._-]+\/quality\.json$/.test(p)).map(p=>[p,hash(source.read(p)!)]);
   return digest({protocol:QUALITY_PROTOCOL,command:check.command,expected,profile,inputs});
 }
