@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "objective_id": "PLAYER-CONTROLS-REFERENCE",
+  "unit_id": "A",
+  "acceptance": false,
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": [
+        "pnpm",
+        "run",
+        "typecheck"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "log": {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/units/A/typecheck.log",
+        "sha256": "591332928e9395bf85794a68e528629246de43058813603625f2e4e3fe7b81e0"
+      }
+    }
+  ],
+  "executed_at": "2026-10-05T15:23:35Z"
+}
