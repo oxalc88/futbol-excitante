@@ -1,9 +1,10 @@
 import { execFileSync } from 'node:child_process';
 import { snapshot, scopedPlan, hash } from './scoped-quality.js';
 import { verifyObjectiveAdmission, certificationHealth } from './certification.js';
-import { activeIncident, incidentBoundary, incidentEvents, evidence, requirePublishedIncident, type EvidenceRef, type IncidentEvent } from './incidents.js';
+import { auditAppendOnly, currentEvidenceAvailable, activeIncident, incidentBoundary, incidentEvents, evidence, requirePublishedIncident, type EvidenceRef, type IncidentEvent } from './incidents.js';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { executionState } from './integrated-execution.js';
+import { repairExecutionProvenance } from './execution-provenance.js';
 import type { FailureClass } from './check-proof.js';
 
 export type ExternalDecision = 'specification' | 'legal' | 'perceptual_route' | 'credentials_resources' | 'environment_execution_policy' | 'explicit_external_decision';
@@ -59,10 +60,23 @@ export function preservedProgress(root:string,ref='HEAD'):string[] {
   const source=snapshot(root,ref);
   return [`source_commit:${execFileSync('git',['-C',root,'rev-parse',ref],{encoding:'utf8'}).trim()}`,...source.files.filter(p=>/^gauntlet\/evals\/results\/.*-acceptance\.json$/.test(p)||/^gauntlet\/execution\/[^/]+\/[^/]+\.json$/.test(p))];
 }
+export function routineContinuation(root:string):string|null {
+  auditAppendOnly(root,'gauntlet/execution/provenance/');
+  try{repairExecutionProvenance(root);}catch(error){
+    if(String(error).includes('EXECUTION_PROVENANCE_MISSING'))return 'REGENERATE_EXECUTION_EVIDENCE';
+    throw error;
+  }
+  const dirty=execFileSync('git',['-C',root,'status','--porcelain','--','gauntlet/execution/provenance/'],{encoding:'utf8'}).trim();
+  if(dirty)return 'PUBLISH_BOOKKEEPING';
+  const incident=activeIncident(root,'repository/full');
+  if(incident&&currentEvidenceAvailable(root,incident))return 'CERTIFY_CURRENT';
+  return null;
+}
 export function stopRecord(root:string,f:ContinuationFacts):string {
+  const routine=routineContinuation(root);
   const considered=sameHorizonWork(root),history=f.incident_id?incidentEvents(root).filter(e=>e.incident_id===f.incident_id):[];
   const latest=history.at(-1);
-  const facts={...f,safe_work_considered:considered,preserved_progress:preservedProgress(root),certification_debt:certificationHealth(root).accepted_since};
+  const facts={...f,routine_action:routine??f.routine_action,safe_work_considered:considered,preserved_progress:preservedProgress(root),certification_debt:certificationHealth(root).accepted_since};
   if(f.incident_id){
     if(!latest)throw new Error('stop incident missing');
     facts.blocked_boundary=latest.boundary;facts.failure_class=latest.failure_class;facts.evidence=latest.evidence;

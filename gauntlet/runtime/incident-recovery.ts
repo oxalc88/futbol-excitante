@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, mkdirSync, writeFileSync, rmSync, readdirSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { join } from 'node:path';
-import { activeIncident, appendIncident, openIncident, exhaustIncident, importLegacyIncidents, incidentBoundary, evidence, requirePublishedIncident, validateRepairCommit, validateRepairExecution, requireRelevantRepair, incidentEvents, type IncidentEvent, type MaterialRepair } from './incidents.js';
+import { currentEvidenceAvailable, activeIncident, appendIncident, openIncident, exhaustIncident, importLegacyIncidents, incidentBoundary, evidence, requirePublishedIncident, validateRepairCommit, validateRepairExecution, requireRelevantRepair, incidentEvents, type IncidentEvent, type MaterialRepair } from './incidents.js';
 import { snapshot, hash, digest } from './scoped-quality.js';
 import { rememberFailure, repairCheck, RecoveryBlockedError, type QualityRecovery } from './quality-execution.js';
 import { validateCheckProof, type Profile, type ProvenResult } from './check-proof.js';
@@ -18,6 +18,7 @@ export function legacyRecoveryPaths(root:string):string[] {
 export class IncidentRecovery {
   incident:IncidentEvent|null;
   resumed=false;
+  observing=false;
   repairInput: {diagnosis:string;component:string;repair_commit:string}|null=null;
   constructor(readonly root:string,readonly boundary:string){
     mkdirSync(`${root}/gauntlet/incidents`,{recursive:true});
@@ -35,8 +36,13 @@ export class IncidentRecovery {
       this.incident=appendIncident(this.root,{...e,kind:'REPAIR_FAILED',state:'BLOCKED',evidence:[...e.evidence,ref]});
     }
   }
-  beforeRun():void {
+  beforeRun(certification=false):void {
     const e=this.incident;if(!e)return;
+    if(certification&&currentEvidenceAvailable(this.root,e)){
+      requirePublishedIncident(this.root,e);
+      this.incident=appendIncident(this.root,{...e,kind:'OBSERVE',state:e.state,current_policy:'legacy-current-v1',current_target:execFileSync('git',['-C',this.root,'rev-parse','HEAD'],{encoding:'utf8'}).trim()});
+      this.observing=true;return;
+    }
     if(e.state!=='RESUME_ONCE')throw new RecoveryBlockedError(`RECOVERY_BLOCKED: incident ${e.incident_id} ${e.state}; diagnose/repair or continue independently verifiable product work`);
     requirePublishedIncident(this.root,e);
     const noncePath=`${this.root}/.delivery-local/locks/resume-${e.incident_id}.json`;
@@ -79,12 +85,17 @@ export class IncidentRecovery {
     this.incident=appendIncident(this.root,{...e,kind:'REPAIR',state:'REPAIR_CONFIRMED',repair,evidence:[...e.evidence,ref]});
   }
   failed(check:QualityCheck,row:ProvenResult):void {
+    if(this.observing)return; // Complete receipt records current failure; no repair budget is granted.
     const prior=this.incident,recovery=rememberFailure(prior?.recovery??null,check,row),refs=[row.proof!];
     if(!prior)this.incident=openIncident(this.root,this.boundary,recovery,row.failure_class??'UNKNOWN',refs);
     else if(this.resumed){this.incident=appendIncident(this.root,{...prior,kind:'BLOCK',state:'BLOCKED',recovery,evidence:[...prior.evidence,...refs],failure_class:row.failure_class??'UNKNOWN'});}
     // Diagnostic failure consumes the only repair and remains blocked. The
     // original failure and deadline survive, even with a new failure signature.
     else this.incident=appendIncident(this.root,{...prior,kind:'REPAIR_FAILED' as IncidentEvent['kind'],state:'BLOCKED',recovery,evidence:[...prior.evidence,...refs],failure_class:row.failure_class??'UNKNOWN'});
+  }
+  completed(ref:{path:string;sha256:string}):void {
+    if(this.observing&&this.incident){this.incident=appendIncident(this.root,{...this.incident,kind:'OBSERVED',state:this.incident.state,evidence:[...this.incident.evidence,ref]});return;}
+    const receipt=JSON.parse(evidence(snapshot(this.root),ref).toString());if(receipt.status==='PASS')this.passed(ref);
   }
   passed(ref:{path:string;sha256:string}):void {
     const receipt=JSON.parse(evidence(snapshot(this.root),ref).toString());
