@@ -8,63 +8,37 @@
  * 4. Write to docs/screenshots/BROWSER-DIFFICULTY-SETTING/frame-000.png
  */
 
+import { createServer, type ViteDevServer } from "vite";
+import type { Browser } from "playwright";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
-import { spawn } from "node:child_process";
 
-let browser: Awaited<ReturnType<typeof chromium.launch>> | null = null;
-let vite: ReturnType<typeof spawn> | null = null;
-let port: number | null = null;
-let viteStarted = false;
+let browser: Browser | null = null;
+let viteServer: ViteDevServer | null = null;
+let baseUrl = "http://127.0.0.1:5179";
 
-function startVite(): Promise<void> {
-  if (viteStarted && vite) return Promise.resolve();
-  if (viteStarted) return Promise.resolve();
-
-  return new Promise((resolve, reject) => {
-    vite = spawn(
-      "npx",
-      ["vite", "--port", "0", "--host"],
-      {
-        cwd: join(__dirname, "..", ".."),
-        stdio: "pipe",
-        env: { ...process.env, CI: "1" },
-      }
-    );
-
-    let ready = false;
-    const handler = (data: Buffer) => {
-      const str = data.toString();
-      const match = str.match(/:\s+http:\/\/.*?:?(\d+)\//);
-      if (match) {
-        port = parseInt(match[1], 10);
-        ready = true;
-        viteStarted = true;
-        vite.stderr?.removeListener("data", handler);
-        resolve();
-      }
-    };
-    vite.stdout?.on("data", handler);
-    vite.stderr?.on("data", handler);
-    vite.on("error", (e) => { viteStarted = false; reject(e); });
-
-    setTimeout(() => {
-      if (!ready) {
-        vite?.kill("SIGTERM");
-        viteStarted = false;
-        reject(new Error("vite timeout"));
-      }
-    }, 60000);
+async function startVite(): Promise<void> {
+  if (viteServer) return;
+  // Programmatic pinned-local Vite (the capture-fulltime-flow-closure-menu.mts
+  // pattern): no npx resolution, and listen() resolves only when actually ready.
+  viteServer = await createServer({
+    root: join(__dirname, ".."),
+    server: { port: 5179, host: "127.0.0.1", strictPort: true },
+    logLevel: "error",
   });
+  await viteServer.listen();
+  baseUrl =
+    viteServer.resolvedUrls?.local[0]?.replace(/\/$/, "") ??
+    "http://127.0.0.1:5179";
 }
 
 function stopVite() {
-  viteStarted = false;
-  vite?.kill("SIGTERM");
-  vite = null;
+  void viteServer?.close();
+  viteServer = null;
 }
+
 
 /** Inline 2D canvas renderer — draws pitch, players, ball, HUD. */
 const RENDER_2D = `
@@ -194,7 +168,7 @@ describe("DIFFICULTY-EVIDENCE: node-side durable capture", () => {
   beforeAll(async () => {
     await startVite();
     browser = await chromium.launch({ args: ["--enable-features=WebGL2", "--use-gl=swiftshader"] });
-  }, 60000);
+  }, 180000);
 
   afterAll(async () => {
     stopVite();
@@ -213,7 +187,7 @@ describe("DIFFICULTY-EVIDENCE: node-side durable capture", () => {
     }
 
     const page = await browser!.newPage();
-    await page.goto(`http://localhost:${port}/`);
+    await page.goto(`${baseUrl}/`);
     await page.waitForTimeout(1000);
 
     // Inject the 2D renderer and generate the screenshot.

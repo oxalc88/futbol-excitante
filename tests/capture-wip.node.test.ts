@@ -14,69 +14,42 @@
  * requires GAUNTLET_EVIDENCE_CAPTURE=1 and refuses to overwrite accepted evidence.
  */
 
+import type { Browser } from "playwright";
+import { createServer, type ViteDevServer } from "vite";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
-import { spawn } from "node:child_process";
 
-let browser: Awaited<ReturnType<typeof chromium.launch>> | null = null;
-let vite: ReturnType<typeof spawn> | null = null;
-let port: number | null = null;
-let viteStarted = false;
+let browser: Browser | null = null;
+let viteServer: ViteDevServer | null = null;
+let baseUrl = "http://localhost:5178";
 
-function startVite(): Promise<void> {
-  if (viteStarted && vite) return Promise.resolve();
-  if (viteStarted) return Promise.resolve();
-
-  return new Promise((resolve, reject) => {
-    vite = spawn(
-      "npx",
-      ["vite", "--port", "0", "--host"],
-      {
-        cwd: join(__dirname, "..", ".."),
-        stdio: "pipe",
-        env: { ...process.env, CI: "1" },
-      }
-    );
-
-    let ready = false;
-    const handler = (data: Buffer) => {
-      const str = data.toString();
-      const match = str.match(/:\s+http:\/\/.*?:?(\d+)\//);
-      if (match) {
-        port = parseInt(match[1], 10);
-        ready = true;
-        viteStarted = true;
-        vite.stderr?.removeListener("data", handler);
-        resolve();
-      }
-    };
-    vite.stdout?.on("data", handler);
-    vite.stderr?.on("data", handler);
-    vite.on("error", (e) => { viteStarted = false; reject(e); });
-
-    setTimeout(() => {
-      if (!ready) {
-        vite?.kill("SIGTERM");
-        viteStarted = false;
-        reject(new Error("vite timeout"));
-      }
-    }, 60000);
+async function startVite(): Promise<void> {
+  if (viteServer) return;
+  // Programmatic pinned-local Vite (the capture-fulltime-flow-closure-menu.mts
+  // pattern): no npx resolution, and listen() resolves only when actually ready.
+  viteServer = await createServer({
+    root: join(__dirname, ".."),
+    server: { port: 5178, host: "127.0.0.1", strictPort: true },
+    logLevel: "error",
   });
+  await viteServer.listen();
+  baseUrl =
+    viteServer.resolvedUrls?.local[0]?.replace(/\/$/, "") ??
+    "http://127.0.0.1:5178";
 }
 
 function stopVite() {
-  viteStarted = false;
-  vite?.kill("SIGTERM");
-  vite = null;
+  void viteServer?.close();
+  viteServer = null;
 }
 
 describe("WIP capture: node mode", () => {
   beforeAll(async () => {
     await startVite();
     browser = await chromium.launch({ args: ["--enable-features=WebGL2", "--use-gl=swiftshader"] });
-  }, 60000);
+  }, 180000);
 
   afterAll(async () => {
     stopVite();
@@ -96,7 +69,7 @@ describe("WIP capture: node mode", () => {
       throw new Error(`Accepted evidence is immutable: ${section} already has a manifest`);
     }
 
-    console.log(`[node] port=${port} section=${section} durable=${durableEvidence}`);
+    console.log(`[node] baseUrl=${baseUrl} section=${section} durable=${durableEvidence}`);
 
     if (!existsSync(outDir)) {
       mkdirSync(outDir, { recursive: true });
@@ -104,7 +77,7 @@ describe("WIP capture: node mode", () => {
 
     const page = await browser!.newPage();
 
-    await page.goto(`http://localhost:${port}/`);
+    await page.goto(`${baseUrl}/`);
     await page.waitForTimeout(3000);
 
     try {
