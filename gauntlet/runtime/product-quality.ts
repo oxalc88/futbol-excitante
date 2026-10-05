@@ -14,7 +14,7 @@ export const DOMAIN_TESTS: Record<string, string[]> = {
 };
 export interface QualityCheck { id: string; command: string[] }
 export interface QualityPlan {
-  schema_version: 1;
+  schema_version: 1 | 2;
   changed_paths: string[];
   protected_properties: string[];
   suite_ids: string[];

@@ -1,3 +1,4 @@
+import { certificationHealth } from "../../runtime/certification.js";
 import { auditHorizonProduct } from "../../runtime/horizon-product-audit.js";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
@@ -137,6 +138,13 @@ export async function runStateChecks(repoRoot: string): Promise<{ objective: str
   if (systemVersion && /^0\.(?:11|1[2-9]|[2-9]\d)\./.test(systemVersion)) {
     const product = await auditHorizonProduct(repoRoot, Number(yamlValue(horizon, "horizon_version")), yamlValue(horizon, "status") ?? "");
     checks.push({ name: "Horizon product outcome and trajectory", ...product, owner: "orchestrator" });
+  }
+
+  if (systemVersion && Number(systemVersion.split('.')[1]) >= 12) {
+    try {
+      const health = certificationHealth(repoRoot, 'WORKTREE');
+      checks.push({ name: "Certification evidence and bounded integration interval", pass: health.accepted_since <= 4, detail: health.latest ? `${health.latest.status}: last certified ${health.last_certified ?? 'UNAVAILABLE'}, ${health.accepted_since} uncertified objectives` : 'Migration: no new certificate recorded; scoped acceptance requires bootstrap', owner: 'orchestrator' });
+    } catch (error) { checks.push({ name: "Certification evidence and bounded integration interval", pass: false, detail: String(error), owner: 'orchestrator' }); }
   }
 
   return { objective, checks };

@@ -40,7 +40,8 @@ const file = path.join(dir, `${stamp}-${safeObjective}-acceptance.json`);
 const relativeRecord = path.relative(repoRoot, file);
 const record = {
   ...input,
-  schema_version: 3,
+  schema_version: quality.plan.schema_version === 2 ? 4 : 3,
+  ...(quality.plan.schema_version === 2 ? { proof_scope: "objective", repository_certified: false } : {}),
   record_type: "candidate_acceptance",
   gauntlet_version: version.version,
   persisted_at: acceptedAt,

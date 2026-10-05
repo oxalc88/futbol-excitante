@@ -1,0 +1,16 @@
+{
+  "id": "ORCH-REG-031",
+  "kind": "post_acceptance_continuation_gate",
+  "input": {
+    "acceptance_finalized": true,
+    "horizon_exhausted": false,
+    "next_objective": "PLAYER-B",
+    "stop_reason": "verification_blocked",
+    "verification_blocked": true,
+    "safe_objective_available": false,
+    "environment_decision_required": true
+  },
+  "expect": {
+    "decision": "stop"
+  }
+}

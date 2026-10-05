@@ -6,7 +6,12 @@ import { qualityPlan } from '../../gauntlet/runtime/product-quality.js';
 import { RUNTIME_POLICY } from '../../gauntlet/runtime/policy.js';
 import { qualityPreflight, repairCheck, requireRepairProof, rememberFailure, runQualityChecks, spawnQualityCheck, initializeRecoveryBudget, recoveryTimeRemaining, reserveRepairAttempt, qualityTimeout, RecoveryBlockedError, type QualityRecovery, type QualityResult } from '../../gauntlet/runtime/quality-execution.js';
 
+import { executeScopedQuality } from '../../gauntlet/runtime/scoped-quality-command.js';
 const args = process.argv.slice(2);
+const installedVersion = existsSync('gauntlet/VERSION.json') ? JSON.parse(readFileSync('gauntlet/VERSION.json','utf8')).version : '0.11.3';
+if (args.includes('--stage') || Number(installedVersion.split('.')[1]) >= 12) {
+  await executeScopedQuality(args);
+} else {
 const option = (key: string) => args[args.indexOf(key) + 1];
 if (!args.includes('--base')) throw new Error('usage: product-quality --base COMMIT [--head COMMIT] [--execute [--repair diagnosis.json] --out docs/evidence/OBJECTIVE/quality.json] [--elevated-risk] [--architecture-changed]');
 if (args.includes('--repair') && !args.includes('--execute')) throw new Error('--repair requires --execute');
@@ -129,3 +134,5 @@ if (args.includes('--execute')) {
   }
 }
 process.stdout.write(JSON.stringify(report, null, 2) + '\n');
+
+}

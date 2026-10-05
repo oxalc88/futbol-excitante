@@ -153,3 +153,7 @@ Rules:
 ```
 
 Integration must independently verify mandatory evidence and confirm that the critic actually ran and accepted. A deterministic or cheap-auditor result can never substitute for the critic.
+
+## 0.12.0 verification boundary
+
+Objective quality proofs and full repository certificates are different evidence scopes under `product-quality-contract.md`. A supported harness failure is durable FAIL evidence, never product PASS. Preserve all existing screenshot, semantic, temporal, critic and provenance gates for the affected player result.

@@ -1,11 +1,21 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const selector = fileURLToPath(new URL("./select-validation-mode.mjs", import.meta.url));
+const workflow = readFileSync(new URL("../../.github/workflows/pr-validation.yml", import.meta.url), "utf8");
+function assertBaselineHistory(text) {
+  const target = text.match(/- name: Checkout validation target[\s\S]*?(?=\n      - |$)/)?.[0] ?? "";
+  assert.match(target, /fetch-depth:\s*0\b/, "Validation target needs frozen baseline history");
+}
+assertBaselineHistory(workflow);
+const targetCheckout = workflow.match(/- name: Checkout validation target[\s\S]*?(?=\n      - |$)/)[0];
+assert.throws(() => assertBaselineHistory(workflow.replace(targetCheckout, targetCheckout.replace(/fetch-depth:\s*0/, "fetch-depth: 1"))));
+assert.throws(() => assertBaselineHistory(workflow.replace(targetCheckout, targetCheckout.replace(/fetch-depth:\s*0/, ""))));
+console.log("PASS baseline-history checkout and shallow/missing-depth guards");
 const pkg = { scripts: { test: "vitest run --project node" }, devDependencies: { vitest: "existing" } };
 const config = { compilerOptions: { types: ["node"] }, include: ["src/**/*.ts", "gauntlet/runtime/**/*.ts"], exclude: ["tests/**/*"] };
 const json = value => JSON.stringify(value);
