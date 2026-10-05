@@ -27,7 +27,7 @@ Use this order unless evidence gives a stronger reason:
 
 GitHub issues are optional for sequential execution.
 
-GitHub issues are mandatory for parallel implementation execution. Read `gauntlet/parallel-issue-contract.md`.
+A substantial product issue owns one acceptance and can contain parallel execution units under `product-first-contract.md`. Separate issues are required only for genuinely independent parallel objectives. Read `gauntlet/parallel-issue-contract.md`.
 
 Issues are a durable work queue and context index. They do not replace canonical Gauntlet state or acceptance evidence.
 

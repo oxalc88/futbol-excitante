@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "objective_id": "PLAYER-VISIBLE-OUTCOME",
+  "issue_number": 1,
+  "base_commit": "0000000000000000000000000000000000000000",
+  "units": [
+    { "id": "A", "purpose": "Implement a bounded gameplay change", "dependencies": [], "expected_file_ownership": ["src/simulation/contacts/contact-system.ts"], "builder_role": "builder-gameplay", "interfaces_known": true, "local_checks": [{"id": "contacts", "command": ["pnpm", "exec", "vitest", "run", "tests/unit/contacts", "--project", "node", "--passWithNoTests=false"]}], "handoff_contract": "Commit, source ownership, immutable exact local-check proof and integration notes" },
+    { "id": "B", "purpose": "Implement the known presentation interface", "dependencies": [], "expected_file_ownership": ["src/apps/browser/controls-legend-ui.ts"], "builder_role": "builder-structured", "interfaces_known": true, "local_checks": [{"id": "types", "command": ["pnpm", "run", "typecheck"]}], "handoff_contract": "Commit, source ownership, immutable typecheck proof and integration notes" }
+  ]
+}

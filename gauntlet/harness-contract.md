@@ -55,7 +55,7 @@ If a route is unavailable, select the next compatible fallback from the same har
 
 ## Parallel execution
 
-The core decides whether objectives are independent. The harness decides how to spawn them.
+The core decides dependencies, readiness, ownership conflicts and integration order. The harness owns worker start, isolated workspaces, native settlement, concurrency and retries. Execution units under one product issue follow `product-first-contract.md` with one integrated acceptance; they do not need separate issues. The following compatibility rules apply only to genuinely independent product objectives.
 
 Before a harness starts more than one implementation objective at the same time, it must satisfy `gauntlet/parallel-issue-contract.md`.
 
@@ -92,3 +92,7 @@ All three adapters use the same `gauntlet:quality` and `gauntlet:trajectory` com
 ## 0.12.0 verification boundary
 
 All OMP, Grok and OpenCode launch/continue adapters automatically consume the same scoped objective command, certification command, durable proofs, bounded continuation and recovery rules in `product-quality-contract.md`. No core code depends on OMP APIs. Routing, concurrency/retries, telemetry and role independence remain unchanged. A running older session must reload the updated canonical instructions/version before resuming; no bespoke worker prompt can override the deterministic gates.
+
+## 0.13.0 core authority
+
+Continuation, verification scope, incidents, debt, execution DAG, stop eligibility, escalation schema and recovery authorization are canonical in `product-first-contract.md` and `gauntlet/runtime/`. Adapters must reference these rules. OMP thin UI display uses its existing ctx.ui.notify on canonical stop records; Grok/OpenCode currently expose session text only. Out-of-session notification is unavailable.

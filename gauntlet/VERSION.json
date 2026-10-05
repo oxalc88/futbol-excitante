@@ -1,8 +1,8 @@
 {
-  "version": "0.12.0",
+  "version": "0.13.0",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.11.3",
+  "previous_system_version": "0.12.0",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
   "baseline_commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
   "includes": [
@@ -62,7 +62,12 @@
     "content-addressed-check-proofs",
     "failure-attribution",
     "bounded-certification-debt",
-    "verification-cost-trajectory"
+    "verification-cost-trajectory",
+    "product-first-autonomous-execution",
+    "canonical-incident-lifecycle",
+    "audited-resume-once",
+    "execution-unit-dag",
+    "structured-external-decision-stop"
   ],
   "trajectory_baseline_commit": "d3dccf77c565102de531bc5aa981bea9aca009c3"
 }

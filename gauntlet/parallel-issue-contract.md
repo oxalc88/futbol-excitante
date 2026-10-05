@@ -1,6 +1,6 @@
 # Parallel issue contract
 
-Gauntlet 0.9.9 uses GitHub Issues as the coordination gate for parallel implementation.
+Gauntlet 0.13.0 uses one GitHub issue per substantial product outcome. Execution units under that issue follow `product-first-contract.md` and the canonical DAG; one issue receives one integrated acceptance. The independent-objective compatibility path below remains available when outcomes are truly independent.
 
 Issues do not replace `gauntlet/state/**`, acceptance manifests, or evidence.
 
