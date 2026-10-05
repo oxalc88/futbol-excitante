@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "objective_id": "PLAYER-CONTROLS-REFERENCE",
+  "issue_number": 28,
+  "base_commit": "f796a548d61f7c45112d292112fdaea488b32e69",
+  "units": [
+    {
+      "id": "A",
+      "purpose": "Write the player-facing controls reference and how-to-play guide",
+      "dependencies": [],
+      "expected_file_ownership": [
+        "docs/player-controls.md",
+        "docs/how-to-play.md"
+      ],
+      "builder_role": "builder-gameplay",
+      "interfaces_known": true,
+      "local_checks": [
+        {
+          "id": "typecheck",
+          "command": [
+            "pnpm",
+            "run",
+            "typecheck"
+          ]
+        }
+      ],
+      "handoff_contract": "Committed docs with sources traced to controls-legend.ts, index.html, referee-config.ts, fulltime-flow.ts"
+    }
+  ]
+}
