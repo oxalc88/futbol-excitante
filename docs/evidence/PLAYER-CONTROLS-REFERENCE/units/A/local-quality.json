@@ -14,11 +14,12 @@
       ],
       "status": "PASS",
       "exit_code": 0,
-      "log": {
-        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/units/A/typecheck.log",
-        "sha256": "591332928e9395bf85794a68e528629246de43058813603625f2e4e3fe7b81e0"
+      "proof": {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/unitA-typecheck.json",
+        "sha256": "bf26f84a9d330c1272ab4e0645b9129c5fa49359cd60d6c6302d80f4bf24fada",
+        "reused": false
       }
     }
   ],
-  "executed_at": "2026-10-05T15:23:35Z"
+  "executed_at": "2026-10-05T15:44:56.238Z"
 }
