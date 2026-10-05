@@ -763,6 +763,45 @@ function designationTeamObservation(
 export function runHeadlessMatch(
   config: HeadlessMatchConfig,
 ): HeadlessMatchResult {
+  // Sync drain of the generator: identical statement order and state
+  // transitions as before the generator refactor (no yields are awaited),
+  // so every accepted pin and two-run byte-identity is preserved.
+  const gen = runHeadlessMatchGen(config);
+  let step = gen.next();
+  while (!step.done) step = gen.next();
+  return step.value;
+}
+
+/**
+ * Cooperative variant for vitest worker contexts: the birpc onTaskUpdate
+ * channel (vitest 3.2.7, worker.js) answers on the worker's own event loop,
+ * so a test whose body stays synchronously blocked for >60 s starves the
+ * queued RPC response past the hardcoded birpc DEFAULT_TIMEOUT (60 s,
+ * chunks/index.B521nVV-.js) and the run fails with
+ * "[vitest-worker]: Timeout calling onTaskUpdate" even though every test
+ * passed. Awaiting this variant yields to the macrotask queue every
+ * YIELD_EVERY_TICKS ticks, keeping the worker responsive without touching
+ * the simulation's call sequence (inputs, steps, hashes are identical).
+ */
+export async function runHeadlessMatchAsync(
+  config: HeadlessMatchConfig,
+): Promise<HeadlessMatchResult> {
+  const gen = runHeadlessMatchGen(config);
+  let step = gen.next();
+  while (!step.done) {
+    // ES2022 lib: no Promise.withResolvers; the executor form is fine here —
+    // resolve is called synchronously by setImmediate.
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    step = gen.next();
+  }
+  return step.value;
+}
+
+const YIELD_EVERY_TICKS = 250;
+
+export function* runHeadlessMatchGen(
+  config: HeadlessMatchConfig,
+): Generator<void, HeadlessMatchResult, void> {
   const {
     scenario,
     maxTicks = scenario.durationTicks,
@@ -1024,6 +1063,7 @@ export function runHeadlessMatch(
   const releaseRecordsStart = gkBehavior ? getKeeperReleaseRecords().length : 0;
 
   for (let i = 0; i < maxTicks; i++) {
+    if (i > 0 && i % YIELD_EVERY_TICKS === 0) yield;
     // Phase derivation for this tick.
     const isLastTickAndFulltime =
       maxTicks > 1 && maxTicks >= 2 * halfDurationTicks && i === maxTicks - 1;

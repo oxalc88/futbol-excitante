@@ -43,7 +43,7 @@ import { createHash } from "node:crypto";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { runHeadlessMatch } from "../../../eval/runners/headless-match.js";
+import { runHeadlessMatchAsync } from "../../../eval/runners/headless-match.js";
 import { evaluateSuite } from "../../../eval/runners/foundation-evaluator.js";
 import type { ScenarioDefinition } from "../../../src/contracts/scenario.js";
 
@@ -135,9 +135,13 @@ function loadRecord(): GkRecord {
   );
 }
 
-function runReproduce(scenarioPath: string, maxTicks: number) {
+async function runReproduce(scenarioPath: string, maxTicks: number) {
   const scenario = loadScenario(scenarioPath);
-  const match = runHeadlessMatch({
+  // Cooperative variant: the 1800-tick run is one synchronous block long
+  // enough to starve the vitest worker's birpc onTaskUpdate response past
+  // its hardcoded 60 s timeout (identical simulation sequence, see
+  // headless-match.ts).
+  const match = await runHeadlessMatchAsync({
     scenario,
     maxTicks,
     cpuAntiHuddle: true,
@@ -308,8 +312,8 @@ describe("GK-SUITE-CORE-OWNED-STATE goalkeepers-suite record", () => {
 
   it(
     "record is not hand-written: reproducing the two keeper runs under core-owned yields the pinned verdicts",
-    () => {
-      const cont = runReproduce("eval/scenarios/5v5-continuous-play.v1.json", 1800);
+    async () => {
+      const cont = await runReproduce("eval/scenarios/5v5-continuous-play.v1.json", 1800);
       expect(cont.gk["GK-POSITIONING-HOLD"]).toBe("PASS");
       expect(cont.gk["GK-NO-FIELD-CHASE"]).toBe("PASS");
       expect(cont.gk["GK-ROLE-DESIGNATION"]).toBe("PASS");
@@ -321,7 +325,7 @@ describe("GK-SUITE-CORE-OWNED-STATE goalkeepers-suite record", () => {
       expect(cont.common["COMMON-BOUNDS"]).toBe("PASS");
       expect(cont.releases).toBe(8);
 
-      const fix = runReproduce("eval/scenarios/5v5-keeper-shot-fixture.v1.json", 600);
+      const fix = await runReproduce("eval/scenarios/5v5-keeper-shot-fixture.v1.json", 600);
       expect(fix.gk["GK-POSITIONING-HOLD"]).toBe("PASS");
       expect(fix.gk["GK-NO-FIELD-CHASE"]).toBe("PASS");
       expect(fix.gk["GK-ROLE-DESIGNATION"]).toBe("PASS");

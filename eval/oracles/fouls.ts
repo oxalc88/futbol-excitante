@@ -11,6 +11,7 @@
  *   - FREE-KICK-AWARD      -> checkFoulFreeKickAward
  *   - CARD-ISSUED          -> checkFoulCardIssued
  *   - ADVANTAGE-PLAYED     -> checkFoulAdvantagePlayed
+ *   - CARD-DIRECT-RED      -> checkFoulCardDirectRed
  *
  * Each oracle is a pure `TelemetryObservation[] → InvariantResult[]` function
  * and reads only committed, observable fields: the `foul` events emitted by the
@@ -29,7 +30,9 @@
  * (src/simulation/foul-predicate.ts), the card-policy threshold
  * (src/simulation/card-policy.ts) and the advantage-window policy
  * (src/simulation/advantage-policy.ts) exactly as the in-core consequence does;
- * none duplicates the spec §5.1 / §9.1 / §6.2–§6.3 definition.
+ * CARD-DIRECT-RED imports the same card-policy severity derivation
+ * (resolveDirectRedForFoul / foulContactSeverity).  None of them duplicates the
+ * spec §5.1 / §9.1 / §6.2–§6.3 definition.
  *
  * ADVANTAGE-PLAYED's retained path (§6.2a judged retained) is NOT implemented
  * and `advantage_retention_ref` is BLOCKED_MISSING_REFERENCE (§11): the oracle
@@ -52,7 +55,12 @@
 import type { TelemetryObservation } from "../../src/contracts/telemetry.js";
 import type { InvariantResult } from "../../src/contracts/telemetry.js";
 import { isFoulCandidatePayload } from "../../src/simulation/foul-predicate.js";
-import { resolveCardForAccumulatedFouls } from "../../src/simulation/card-policy.js";
+import {
+  resolveCardForAccumulatedFouls,
+  resolveDirectRedForFoul,
+  foulContactSeverity,
+  FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD,
+} from "../../src/simulation/card-policy.js";
 import {
   ADVANTAGE_WINDOW_TICKS,
   resolveAdvantageClose,
@@ -456,19 +464,29 @@ export function checkFoulFreeKickAward(
 }
 
 /** A `card-issued` observation event as committed by the accepted card machinery
- * (CARD-MACHINERY, FOULS_CARDS_SPEC §7 / §9.1): the fact the CARD-ISSUED oracle
- * reads.  The card is issued to the offending player (the tackler, playerIdA) at
- * the accumulation threshold the card-policy declares. */
+ * (CARD-MACHINERY / CARD-DIRECT-RED, FOULS_CARDS_SPEC §7 / §9.1): the fact the
+ * CARD-ISSUED and CARD-DIRECT-RED oracles read.  The card is issued to the
+ * offending player (the tackler, playerIdA) at the accumulation threshold the
+ * card-policy declares, or as a direct expulsion (`cardReason`
+ * "direct-severity") when the committed contact severity crosses the §9.1
+ * `foul_card_direct_red_severity_threshold`. */
 interface CardIssuedEvent {
   tick: number;
   id: string;
   cardType: string;
+  cardReason: string;
+  directRedSeverity: number;
   playerId: string;
   fouledPlayerId: string;
   accumulatedFouls: number;
   foulSourceEventId: string;
   foulTick: number;
 }
+
+/** The committed `cardReason` the §7 contact-severity direct-red path stamps on
+ * its card-issued events.  A pre-existing accumulation card carries no
+ * `cardReason`, so every filter keyed on this marker is additive. */
+const DIRECT_RED_CARD_REASON = "direct-severity";
 
 /** Gather every `card-issued` event in the window. */
 function cardIssuedEvents(
@@ -483,6 +501,8 @@ function cardIssuedEvents(
         tick: ev.tick,
         id: ev.id,
         cardType: typeof p.cardType === "string" ? p.cardType : "",
+        cardReason: typeof p.cardReason === "string" ? p.cardReason : "",
+        directRedSeverity: typeof p.directRedSeverity === "number" ? p.directRedSeverity : NaN,
         playerId: typeof p.playerId === "string" ? p.playerId : "",
         fouledPlayerId: typeof p.fouledPlayerId === "string" ? p.fouledPlayerId : "",
         accumulatedFouls: typeof p.accumulatedFouls === "number" ? p.accumulatedFouls : NaN,
@@ -528,7 +548,13 @@ export function checkFoulCardIssued(
   observations: TelemetryObservation[],
 ): InvariantResult[] {
   const cards = cardIssuedEvents(observations);
-  if (cards.length === 0) {
+  // CARD-DIRECT-RED events (cardReason "direct-severity") are the §7
+  // contact-severity path's direct expulsions, adjudicated by the CARD-DIRECT-RED
+  // criterion — not by the §7/§9.1 accumulation semantics.  Filtering them out
+  // here is additive: no pre-existing accumulation card carries the marker, so
+  // every pre-existing stream's verdict is unchanged.
+  const accumulationCards = cards.filter((c) => c.cardReason !== DIRECT_RED_CARD_REASON);
+  if (accumulationCards.length === 0) {
     return [];
   }
 
@@ -562,7 +588,7 @@ export function checkFoulCardIssued(
 
   const failures: string[] = [];
   const usedFoulSources = new Set<string>();
-  for (const card of cards) {
+  for (const card of accumulationCards) {
     const foul = genuineBySource.get(card.foulSourceEventId);
     // Power guard: a card with no qualifying man-not-ball foul.
     if (!foul) {
@@ -609,7 +635,7 @@ export function checkFoulCardIssued(
         status: "fail",
         description:
           `${failures.length} FOULS_CARDS_SPEC §10 CARD-ISSUED violation(s): ${failures.join("; ")}`,
-        details: { cardEventCount: cards.length, fouledEventCount: genuineFouls.length, failures },
+        details: { cardEventCount: accumulationCards.length, fouledEventCount: genuineFouls.length, failures },
       },
     ];
   }
@@ -619,9 +645,134 @@ export function checkFoulCardIssued(
       id: "foul-card-issued-ok",
       status: "pass",
       description:
-        `${cards.length} card-issued event(s) each match the FOULS_CARDS_SPEC §7 / §9.1 accumulation semantics: ` +
+        `${accumulationCards.length} card-issued event(s) each match the FOULS_CARDS_SPEC §7 / §9.1 accumulation semantics: ` +
         `the correct card type at the correct accumulated count for the correct offending player`,
-      details: { cardEventCount: cards.length, fouledEventCount: genuineFouls.length },
+      details: { cardEventCount: accumulationCards.length, fouledEventCount: genuineFouls.length },
+    },
+  ];
+}
+
+/**
+ * CARD-DIRECT-RED — the FOULS_CARDS_SPEC §7 contact-severity direct-red
+ * consequence.  A recognized man-not-ball foul whose committed contact severity
+ * crosses the `fouls-v1` §9.1 `foul_card_direct_red_severity_threshold` is a
+ * direct expulsion (cardReason "direct-severity").  The oracle imports the
+ * SINGLE-SOURCE-OF-TRUTH derivation (`src/simulation/card-policy.ts`
+ * resolveDirectRedForFoul / foulContactSeverity) exactly as the in-core
+ * consequence does, so it never duplicates the normalization or the threshold.
+ *
+ * Guards, mapped to the §7 path:
+ *   - a direct red whose foulSourceEventId does not resolve to a genuine §5.1
+ *     man-not-ball contact FAILs — a direct red is only the consequence of a
+ *     recognized foul;
+ *   - a direct red to a player other than the offending player (the tackler)
+ *     FAILs;
+ *   - a direct red of the wrong type FAILs (a direct red is an expulsion);
+ *   - a direct red recorded on a contact whose recomputed severity does not cross
+ *     the threshold FAILs — a below-threshold contact is NOT a direct red; and a
+ *     recorded severity that disagrees with the shared derivation FAILs;
+ *   - a second direct red for the same foul FAILs (duplicate).
+ *
+ * A stream that carries no observable direct-red card-issued event (below
+ * threshold, gate off, a commit-only card the observation stream does not carry,
+ * or an accumulation card) returns [] → honest NOT_EVALUATED; the oracle never
+ * invents a PASS or a false FAIL.
+ */
+export function checkFoulCardDirectRed(
+  observations: TelemetryObservation[],
+): InvariantResult[] {
+  const directRedCards = cardIssuedEvents(observations).filter(
+    (c) => c.cardReason === DIRECT_RED_CARD_REASON,
+  );
+  if (directRedCards.length === 0) {
+    return [];
+  }
+
+  // Genuine §5.1 man-not-ball foul contacts keyed by their committed event id,
+  // resolved exactly as the detector / accumulation oracle resolve them.
+  const contactsById = new Map(contactEvents(observations).map((c) => [c.id, c]));
+  const genuineBySource = new Map<string, Record<string, unknown>>();
+  for (const foul of foulSourceIds(observations)) {
+    const source = contactsById.get(foul.sourceEventId);
+    if (!source || !isFoulCandidate(source.payload)) continue;
+    genuineBySource.set(foul.sourceEventId, source.payload);
+  }
+
+  const failures: string[] = [];
+  const usedFoulSources = new Set<string>();
+  for (const card of directRedCards) {
+    const source = genuineBySource.get(card.foulSourceEventId);
+    // Power guard: a direct red with no qualifying man-not-ball foul.
+    if (!source) {
+      failures.push(
+        `${card.id} (tick ${card.tick}): direct red with no qualifying man-not-ball foul (source ${card.foulSourceEventId})`,
+      );
+      continue;
+    }
+    // A second direct red for the same foul is an invalid duplicate.
+    if (usedFoulSources.has(card.foulSourceEventId)) {
+      failures.push(`${card.id}: duplicate direct red for foul ${card.foulSourceEventId}`);
+      continue;
+    }
+    usedFoulSources.add(card.foulSourceEventId);
+    // Guard: the card must go to the offending player (the tackler, playerIdA).
+    const offender =
+      typeof source.playerIdA === "string" ? (source.playerIdA as string) : "";
+    if (card.playerId !== offender) {
+      failures.push(
+        `${card.id}: direct red to ${card.playerId} but the offending player is ${offender}`,
+      );
+      continue;
+    }
+    // Guard: a direct red is an expulsion.
+    if (card.cardType !== "expulsion") {
+      failures.push(
+        `${card.id}: direct red card type ${card.cardType} is not an expulsion`,
+      );
+      continue;
+    }
+    // Guard: the committed contact severity must cross the §9.1 threshold.
+    const severity = foulContactSeverity(source);
+    if (resolveDirectRedForFoul(source) !== "expulsion") {
+      failures.push(
+        `${card.id}: direct red for a below-threshold contact (committed severity ${severity} < ${FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD})`,
+      );
+      continue;
+    }
+    // Guard: a recorded severity must agree with the shared derivation.
+    if (Number.isFinite(card.directRedSeverity) && Math.abs(card.directRedSeverity - severity) > 1e-9) {
+      failures.push(
+        `${card.id}: recorded directRedSeverity ${card.directRedSeverity} disagrees with the shared derivation ${severity}`,
+      );
+      continue;
+    }
+  }
+
+  if (failures.length > 0) {
+    return [
+      {
+        id: "foul-card-direct-red-invalid",
+        status: "fail",
+        description:
+          `${failures.length} FOULS_CARDS_SPEC §7 CARD-DIRECT-RED violation(s): ${failures.join("; ")}`,
+        details: {
+          cardEventCount: directRedCards.length,
+          foulEventCount: genuineBySource.size,
+          failures,
+        },
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "foul-card-direct-red-ok",
+      status: "pass",
+      description:
+        `${directRedCards.length} direct-red expulsion(s) each grounded in a recognized man-not-ball foul ` +
+        `whose committed contact severity reaches the FOULS_CARDS_SPEC §9.1 foul_card_direct_red_severity_threshold ` +
+        `(${FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD}), awarded to the offending player`,
+      details: { cardEventCount: directRedCards.length, foulEventCount: genuineBySource.size },
     },
   ];
 }

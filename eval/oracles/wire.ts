@@ -22,7 +22,7 @@ import { checkDeferredMutants } from "./deferred-mutants.js";
 import { checkPrngOrderOracle } from "./prng-order.js";
 import { checkPlayerContactEvidence } from "./player-contact.js";
 import { checkTacklePhaseEvidence } from "./tackle-phase.js";
-import { checkFoulDetect, checkFoulCleanTackle, checkFoulFreeKickAward, checkFoulCardIssued, checkFoulAdvantagePlayed } from "./fouls.js";
+import { checkFoulDetect, checkFoulCleanTackle, checkFoulFreeKickAward, checkFoulCardIssued, checkFoulCardDirectRed, checkFoulAdvantagePlayed } from "./fouls.js";
 import { checkScoreTracker } from "./match.js";
 import { checkMatchClock } from "./match.js";
 import {
@@ -373,6 +373,11 @@ const entries: OracleEntry[] = [
     oracle_id: "foul-card-issued-oracle-v1",
     oracle_version: "oracle-foul-card-issued-v1",
     fn: checkFoulCardIssued,
+  },
+  {
+    oracle_id: "foul-card-direct-red-oracle-v1",
+    oracle_version: "oracle-foul-card-direct-red-v1",
+    fn: checkFoulCardDirectRed,
   },
   {
     oracle_id: "foul-advantage-played-oracle-v1",

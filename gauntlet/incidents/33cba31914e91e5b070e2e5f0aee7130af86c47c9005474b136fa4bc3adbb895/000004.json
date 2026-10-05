@@ -1,0 +1,61 @@
+{
+  "incident_id": "33cba31914e91e5b070e2e5f0aee7130af86c47c9005474b136fa4bc3adbb895",
+  "boundary": "repository/full",
+  "recovery": {
+    "schema_version": 1,
+    "failure": {
+      "check": {
+        "id": "regression-tests",
+        "command": [
+          "pnpm",
+          "run",
+          "test"
+        ]
+      },
+      "signature": "a0d93a3fc07e7ab27ac9d97a38ddb4242d0e9311b6326c71890cbe92c964ad18",
+      "failed_test_files": []
+    },
+    "identical_failures": 1,
+    "budget": {
+      "started_at_ms": 1791136789699,
+      "repair_attempts": 2,
+      "history_before_budget": "UNAVAILABLE"
+    },
+    "legacy_sources": [
+      {
+        "path": ".delivery-local/quality/FOUL-CARD-SEVERITY/recovery.json",
+        "sha256": "db56b1787d4c01f27164f0e8c370160ac5711c99e149e5b768c3a35c0aec178c"
+      }
+    ]
+  },
+  "state": "EXHAUSTED",
+  "kind": "DISPATCH",
+  "failure_class": "UNKNOWN",
+  "evidence": [
+    {
+      "path": "gauntlet/incidents/legacy-f960b92b26aa53f48ebce68fe6c70896270d1e5f75d051fc9b5fd2a31f4756fc.json",
+      "sha256": "f960b92b26aa53f48ebce68fe6c70896270d1e5f75d051fc9b5fd2a31f4756fc"
+    },
+    {
+      "path": "gauntlet/incidents/legacy-db56b1787d4c01f27164f0e8c370160ac5711c99e149e5b768c3a35c0aec178c.json",
+      "sha256": "db56b1787d4c01f27164f0e8c370160ac5711c99e149e5b768c3a35c0aec178c"
+    }
+  ],
+  "schema_version": 1,
+  "sequence": 4,
+  "previous": "a4e3287e1da2ddcda62ac105c71d0114d3eea8d8e226a6abc1eed6299aa21dc7",
+  "recorded_at": "2026-10-05T14:58:16.302Z",
+  "engineering": {
+    "route": "codex-cli",
+    "mode": "REPAIR",
+    "command": [
+      "codex",
+      "exec",
+      "--sandbox",
+      "workspace-write",
+      "-"
+    ],
+    "workspace_commit": "f6e804ef0d551afdc9b403cbdff9493539da5337",
+    "authorization_commit": "8ed6919310ad8f6661048d73b3b783c7bbf1a32e"
+  }
+}

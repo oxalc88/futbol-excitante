@@ -10,6 +10,12 @@ export default defineConfig({
     "process.env.WIP_FRAME_STRIDE": JSON.stringify(process.env.WIP_FRAME_STRIDE || "30"),
   },
   test: {
+    // Root-level (not project-level): vitest only honors maxWorkers here.
+    // CI=1 defaults maxWorkers to 1, which serializes the node gate past
+    // the 20-min verification cap on this 2-vCPU host. Two forked workers
+    // restore file parallelism (~1.5x) without touching any test/oracle.
+    maxWorkers: 2,
+    minWorkers: 1,
     projects: [
       {
         extends: true,
@@ -19,6 +25,7 @@ export default defineConfig({
           environment: "node",
           include: ["tests/**/*.test.ts"],
           exclude: ["tests/browser/**/*.test.ts", "**/*.browser.test.ts"],
+          setupFiles: ["tests/setup/worker-flush.node.ts"],
         },
       },
       {

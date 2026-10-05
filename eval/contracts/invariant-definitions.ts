@@ -666,6 +666,26 @@ export const INV_FOUL_CARD_ISSUED: InvariantDefinition = {
 };
 
 /**
+ * Foul card-direct-red evidence: a committed `card-issued` event carrying the
+ * §7 contact-severity marker matches the direct-red semantics — a recognized
+ * man-not-ball foul whose committed contact severity reaches the `fouls-v1`
+ * §9.1 threshold, awarded as an expulsion to the offending player, with its
+ * recorded severity agreeing with the shared derivation.  Bound to the
+ * protected foul-card-direct-red oracle.
+ */
+export const INV_FOUL_CARD_DIRECT_RED: InvariantDefinition = {
+  invariant_id: "foul-card-direct-red-evidence",
+  invariant_version: "invariant-foul-card-direct-red-v1",
+  input_observation_ids: ["obs-fouls-v1"],
+  oracle_id: "foul-card-direct-red-oracle-v1",
+  oracle_version: "oracle-foul-card-direct-red-v1",
+  owner: "PROTECTED_EVALUATOR",
+  invalid_data_behavior: "INVALID_RUN",
+  output_schema_id: "invariant-result-v1",
+  output_schema_version: "schema-invariant-result-v1",
+};
+
+/**
  * Foul advantage-played evidence: the committed §6.2–§6.4 advantage-window
  * decisions — every window open/call grounded in a recognized §5.1 man-not-ball
  * foul, every close a recognized §6.2–§6.3 reason that agrees with the shared
@@ -728,6 +748,7 @@ export const INVARIANT_DEFINITIONS: Record<string, InvariantDefinition> = {
   [INV_FOUL_CLEAN_TACKLE.invariant_id]: INV_FOUL_CLEAN_TACKLE,
   [INV_FOUL_FREE_KICK_AWARD.invariant_id]: INV_FOUL_FREE_KICK_AWARD,
   [INV_FOUL_CARD_ISSUED.invariant_id]: INV_FOUL_CARD_ISSUED,
+  [INV_FOUL_CARD_DIRECT_RED.invariant_id]: INV_FOUL_CARD_DIRECT_RED,
   [INV_FOUL_ADVANTAGE_PLAYED.invariant_id]: INV_FOUL_ADVANTAGE_PLAYED,
 };
 

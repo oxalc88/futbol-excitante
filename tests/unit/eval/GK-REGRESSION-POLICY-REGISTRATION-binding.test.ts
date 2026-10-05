@@ -43,7 +43,7 @@ import { evaluateSuite } from "../../../eval/runners/foundation-evaluator.js";
 import { checkGkRegression } from "../../../eval/oracles/gk-regression.js";
 import { checkGkSaveClaim } from "../../../eval/oracles/gk-role.js";
 import { GK_SMALL_SIDED_V1 } from "../../../src/adapters/input-browser/goalkeeper-role.js";
-import { runHeadlessMatch } from "../../../eval/runners/headless-match.js";
+import { runHeadlessMatchAsync } from "../../../eval/runners/headless-match.js";
 import type { TelemetryObservation } from "../../../src/contracts/telemetry.js";
 import type { ScenarioDefinition } from "../../../src/contracts/scenario.js";
 
@@ -417,9 +417,13 @@ function loadScenario(relativePath: string): ScenarioDefinition {
   return readJson<ScenarioDefinition>(relativePath);
 }
 
-function runReproduce(scenarioPath: string, maxTicks: number) {
+async function runReproduce(scenarioPath: string, maxTicks: number) {
   const scenario = loadScenario(scenarioPath);
-  const match = runHeadlessMatch({
+  // The 1800-tick continuous reproduction is one synchronous block long
+  // enough to starve the vitest worker's birpc onTaskUpdate response past
+  // its hardcoded 60 s timeout; the cooperative variant yields between
+  // tick chunks (identical simulation sequence, see headless-match.ts).
+  const match = await runHeadlessMatchAsync({
     scenario,
     maxTicks,
     cpuAntiHuddle: true,
@@ -618,18 +622,18 @@ describe("GK-REGRESSION-POLICY-REGISTRATION durable record", () => {
     expect(joined).toContain("no accepted record mutation");
   });
 
-  it("record is not hand-written: the continuous stream reproduces the pinned reg verdicts", () => {
-    const cont = runReproduce("eval/scenarios/5v5-continuous-play.v1.json", 1800);
+  it("record is not hand-written: the continuous stream reproduces the pinned reg verdicts", async () => {
+    const cont = await runReproduce("eval/scenarios/5v5-continuous-play.v1.json", 1800);
     expect(Object.values(cont.reg).every((v) => v === "PASS")).toBe(true);
   }, 100_000);
 
-  it("record is not hand-written: the shot fixture reproduces the pinned reg verdicts", () => {
-    const fix = runReproduce("eval/scenarios/5v5-keeper-shot-fixture.v1.json", 600);
+  it("record is not hand-written: the shot fixture reproduces the pinned reg verdicts", async () => {
+    const fix = await runReproduce("eval/scenarios/5v5-keeper-shot-fixture.v1.json", 600);
     expect(Object.values(fix.reg).every((v) => v === "PASS")).toBe(true);
   }, 100_000);
 
-  it("record is not hand-written: the release fixture reproduces the pinned reg verdicts", () => {
-    const rel = runReproduce("eval/scenarios/5v5-keeper-release-fixture.v1.json", 300);
+  it("record is not hand-written: the release fixture reproduces the pinned reg verdicts", async () => {
+    const rel = await runReproduce("eval/scenarios/5v5-keeper-release-fixture.v1.json", 300);
     expect(Object.values(rel.reg).every((v) => v === "PASS")).toBe(true);
   }, 100_000);
 });

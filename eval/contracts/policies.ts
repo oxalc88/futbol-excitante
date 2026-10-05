@@ -539,6 +539,7 @@ export const EXPANSION_FOULS_V1: ExpansionManifest = {
     "FOULS-CLEAN-TACKLE-001",
     "FOULS-FREE-KICK-AWARD-001",
     "FOULS-CARD-ISSUED-001",
+    "FOULS-CARD-DIRECT-RED-001",
     "FOULS-ADVANTAGE-PLAYED-001",
   ],
   expanded_test_ids: [
@@ -546,6 +547,7 @@ export const EXPANSION_FOULS_V1: ExpansionManifest = {
     "FOULS-DETECT-001",
     "FOULS-FREE-KICK-AWARD-001",
     "FOULS-CARD-ISSUED-001",
+    "FOULS-CARD-DIRECT-RED-001",
     "FOULS-ADVANTAGE-PLAYED-001",
   ],
   common_criterion_ids: [],

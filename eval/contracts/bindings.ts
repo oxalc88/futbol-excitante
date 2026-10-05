@@ -1057,6 +1057,25 @@ export const BINDING_FOULS_ADVANTAGE_PLAYED_001: TestImplementationBinding = mak
   },
 );
 
+/**
+ * FOULS-CARD-DIRECT-RED-001 — a committed direct-red `card-issued` event
+ * (cardReason "direct-severity") matches the §7 contact-severity semantics: the
+ * backing contact is a recognized man-not-ball foul whose committed severity
+ * reaches the §9.1 threshold, awarded as an expulsion to the offending player.
+ * CARD-DIRECT-RED is bound to the protected foul-card-direct-red oracle.
+ */
+export const BINDING_FOULS_CARD_DIRECT_RED_001: TestImplementationBinding = makeTestBindingWith(
+  "FOULS-CARD-DIRECT-RED-001",
+  ["scn-fouls-lifecycle-v1"],
+  [],
+  ["foul-card-direct-red-evidence"],
+  ["obs-per-tick-v1", "obs-fouls-v1"],
+  [],
+  {
+    "CARD-DIRECT-RED": ["foul-card-direct-red-evidence"],
+  },
+);
+
 // ---------------------------------------------------------------------------
 // Registry — all bindings keyed by test_id
 // ---------------------------------------------------------------------------
@@ -1132,6 +1151,7 @@ export const TEST_BINDINGS: Record<string, TestImplementationBinding> = {
   [BINDING_FOULS_CLEAN_TACKLE_001.test_id]: BINDING_FOULS_CLEAN_TACKLE_001,
   [BINDING_FOULS_FREE_KICK_AWARD_001.test_id]: BINDING_FOULS_FREE_KICK_AWARD_001,
   [BINDING_FOULS_CARD_ISSUED_001.test_id]: BINDING_FOULS_CARD_ISSUED_001,
+  [BINDING_FOULS_CARD_DIRECT_RED_001.test_id]: BINDING_FOULS_CARD_DIRECT_RED_001,
   [BINDING_FOULS_ADVANTAGE_PLAYED_001.test_id]: BINDING_FOULS_ADVANTAGE_PLAYED_001,
 };
 

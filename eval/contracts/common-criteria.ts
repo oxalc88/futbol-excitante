@@ -1116,6 +1116,31 @@ export const CARD_ISSUED: EvaluationCriterion = {
 };
 
 /**
+ * CARD-DIRECT-RED — the §7 contact-severity direct-red consequence of a
+ * recognized foul.  A recognized man-not-ball foul whose committed contact
+ * severity crosses the `fouls-v1` §9.1 `foul_card_direct_red_severity_threshold`
+ * (0.85, VERSIONED_PROVISIONAL) is a direct expulsion to the offending player,
+ * independent of the accumulation ladder.  The severity normalization live in
+ * `src/simulation/card-policy.ts` is a `fouls-v1` VERSIONED_PROVISIONAL design
+ * (NOT a PES magnitude); §11's `foul_severity_distribution_ref` and
+ * `disciplinary_scale_ref` stay BLOCKED_MISSING_REFERENCE.
+ * Class: HARD_INVARIANT.  Oracle: foul-card-direct-red-oracle-v1.
+ */
+export const CARD_DIRECT_RED: EvaluationCriterion = {
+  criterion_id: "CARD-DIRECT-RED",
+  class: "HARD_INVARIANT",
+  rule:
+    "A recognized man-not-ball foul whose committed contact severity reaches " +
+    "the fouls-v1 direct-red severity threshold yields a direct expulsion to " +
+    "the offending player (the tackler).  A direct red with no qualifying " +
+    "man-not-ball foul, to the wrong player, of the wrong card type, on a " +
+    "below-threshold contact, duplicated for the same foul, or whose recorded " +
+    "severity disagrees with the shared derivation violates the criterion.  It " +
+    "is not a second-yellow rule: the severity path never reads the accumulated " +
+    "count.",
+};
+
+/**
  * ADVANTAGE-PLAYED — the FOULS_CARDS_SPEC §10 advantage criterion over the
  * committed §6.2–§6.4 advantage-window decisions.  A recognized man-not-ball
  * foul contact opens the bounded window (advantage_window_ticks); the window
@@ -1254,6 +1279,7 @@ export const COMMON_CRITERIA: Record<string, EvaluationCriterion> = {
   [FOUL_CLEAN_TACKLE.criterion_id]: FOUL_CLEAN_TACKLE,
   [FREE_KICK_AWARD.criterion_id]: FREE_KICK_AWARD,
   [CARD_ISSUED.criterion_id]: CARD_ISSUED,
+  [CARD_DIRECT_RED.criterion_id]: CARD_DIRECT_RED,
   [ADVANTAGE_PLAYED.criterion_id]: ADVANTAGE_PLAYED,
 };
 

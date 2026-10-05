@@ -30,7 +30,10 @@ import {
   FOULS_YELLOW_ACCUMULATION_COUNT,
   FOULS_RED_ACCUMULATION_COUNT,
   resolveCardForAccumulatedFouls,
+  FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD,
 } from "../../../src/simulation/card-policy.js";
+import { evaluateSuite } from "../../../eval/runners/foundation-evaluator.js";
+import type { DefensiveDuelResult } from "../../../eval/runners/defensive-duel-driver.js";
 import type { ScenarioDefinition } from "../../../src/contracts/scenario.js";
 
 function loadScenario(path: string = "eval/scenarios/5v5-human-serve-throwin.v1.json"): ScenarioDefinition {
@@ -127,5 +130,111 @@ describe("CARD-MACHINERY in-core consequence (driven)", () => {
     const r = runDefensiveDuel({ scenario, maxTicks: 120, attempts });
     expect(r.cardEvents).toHaveLength(0);
     expect(r.bookingState).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CARD-DIRECT-RED (FOULS_CARDS_SPEC §7 contact-severity) — driven core
+// ---------------------------------------------------------------------------
+
+/** The driven deep-slide shape: one scripted slide on the CPU carrier. */
+const SLIDE_ATTEMPTS: Array<{ kind: "slide"; commitDistance: number; earliestTick: number }> = [
+  { kind: "slide", commitDistance: 4.0, earliestTick: 48 },
+];
+
+/** The driven standing shape: repeated scripted standing tackles. */
+function standingAttempts(): Array<{ kind: "standing"; commitDistance: number; earliestTick: number }> {
+  const attempts: Array<{ kind: "standing"; commitDistance: number; earliestTick: number }> = [];
+  for (let t = 44; t <= 100; t += 16) {
+    attempts.push({ kind: "standing", commitDistance: 3.0, earliestTick: t });
+  }
+  return attempts;
+}
+
+function runSlide(opts: { cards: boolean; serializeCommittedEvents?: boolean }): DefensiveDuelResult {
+  return runDefensiveDuel({
+    scenario: withProximateHumanDefence(loadScenario("eval/scenarios/5v5-human-vs-cpu.v1.json")),
+    maxTicks: 140,
+    attempts: SLIDE_ATTEMPTS,
+    cardConfig: opts.cards ? { issueCards: true } : undefined,
+    serializeCommittedEvents: opts.serializeCommittedEvents,
+  });
+}
+
+function runStanding(opts: { cards: boolean; serializeCommittedEvents?: boolean }): DefensiveDuelResult {
+  return runDefensiveDuel({
+    scenario: withProximateHumanDefence(loadScenario("eval/scenarios/5v5-human-vs-cpu.v1.json")),
+    maxTicks: 120,
+    attempts: standingAttempts(),
+    cardConfig: opts.cards ? { issueCards: true } : undefined,
+    serializeCommittedEvents: opts.serializeCommittedEvents,
+  });
+}
+
+/** The direct-red (`cardReason` direct-severity) events among the card events. */
+function directRedCards(events: readonly { kind: string; payload?: Record<string, unknown> }[]) {
+  return events.filter(
+    (e) => e.kind === "card-issued" && (e.payload ?? {}).cardReason === "direct-severity",
+  );
+}
+
+describe("CARD-DIRECT-RED in-core consequence (driven)", () => {
+  it("a scripted slide man-not-ball foul crosses the §9.1 threshold and is issued as a direct red", () => {
+    const r = runSlide({ cards: true });
+    expect(r.cardEvents).toHaveLength(1);
+    const card = r.cardEvents[0];
+    const p = (card.payload ?? {}) as Record<string, unknown>;
+    expect(p.cardType).toBe("expulsion");
+    expect(p.cardReason).toBe("direct-severity");
+    expect(p.playerId).toBe(r.humanPlayerId);
+    expect(p.fouledPlayerId).toBeTruthy();
+    expect(p.foulSourceEventId).toBeTruthy();
+    expect(p.accumulatedFouls).toBe(1);
+    const severity = p.directRedSeverity as number;
+    expect(severity).toBeGreaterThanOrEqual(FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD);
+    expect(p.directRedSeverity).toBeCloseTo(severity, 12);
+    // The booking state records the expulsion (not a caution).
+    expect(r.bookingState).toBeDefined();
+    expect(r.bookingState![r.humanPlayerId].expulsions).toBe(1);
+    expect(r.bookingState![r.humanPlayerId].cautions).toBe(0);
+  });
+
+  it("a driven standing foul does NOT cross the threshold: no direct red is issued", () => {
+    const r = runStanding({ cards: true });
+    expect(r.cardEvents).toHaveLength(1); // the 2nd standing foul's accumulation caution
+    expect(directRedCards(r.cardEvents)).toHaveLength(0);
+    const p = (r.cardEvents[0].payload ?? {}) as Record<string, unknown>;
+    expect(p.cardType).toBe("caution");
+    expect(p.cardReason).toBeUndefined();
+    expect(r.bookingState![r.humanPlayerId].expulsions).toBe(0);
+  });
+
+  it("the gate off is byte-identical across two runs and emits no card / booking", () => {
+    const a = runSlide({ cards: false });
+    const b = runSlide({ cards: false });
+    expect(a.cardEvents).toHaveLength(0);
+    expect(b.cardEvents).toHaveLength(0);
+    expect(a.bookingState).toBeUndefined();
+    expect(JSON.stringify(a.stateHashes)).toBe(JSON.stringify(b.stateHashes));
+  }, 20_000);
+
+  it("the driven direct-red stream is adjudicated PASS by the registered CARD-DIRECT-RED oracle", () => {
+    const r = runSlide({ cards: true, serializeCommittedEvents: true });
+    detectFoulEvents(r.observations);
+    const suite = evaluateSuite("fouls", r.observations);
+    const criterion = suite.tests
+      .find((t) => t.test_id === "FOULS-CARD-DIRECT-RED-001")!
+      .criteria.find((c) => c.criterion_id === "CARD-DIRECT-RED");
+    expect(criterion!.outcome).toBe("PASS");
+  });
+
+  it("the driven standing stream carries no direct red: CARD-DIRECT-RED is NOT_EVALUATED", () => {
+    const r = runStanding({ cards: true, serializeCommittedEvents: true });
+    detectFoulEvents(r.observations);
+    const suite = evaluateSuite("fouls", r.observations);
+    const criterion = suite.tests
+      .find((t) => t.test_id === "FOULS-CARD-DIRECT-RED-001")!
+      .criteria.find((c) => c.criterion_id === "CARD-DIRECT-RED");
+    expect(criterion!.outcome).toBe("NOT_EVALUATED");
   });
 });

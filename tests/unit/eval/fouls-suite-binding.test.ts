@@ -34,6 +34,11 @@ import "../../../eval/oracles/wire.js";
 import { getOracle } from "../../../eval/oracles/oracle-registry.js";
 import { detectFoulEvents, FOUL_CONTACT_TYPES } from "../../../eval/runners/foul-detection.js";
 import { checkFoulAdvantagePlayed } from "../../../eval/oracles/fouls.js";
+import {
+  foulContactSeverity,
+  resolveDirectRedForFoul,
+  FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD,
+} from "../../../src/simulation/card-policy.js";
 import { TEST_BINDINGS } from "../../../eval/contracts/bindings.js";
 import { INVARIANT_DEFINITIONS } from "../../../eval/contracts/invariant-definitions.js";
 import { COMMON_CRITERIA } from "../../../eval/contracts/common-criteria.js";
@@ -53,6 +58,7 @@ const FOULS_ORACLE_CRITERIA: Record<string, string> = {
   "FOUL-CLEAN-TACKLE": "foul-clean-tackle-oracle-v1",
   "FREE-KICK-AWARD": "foul-free-kick-award-oracle-v1",
   "CARD-ISSUED": "foul-card-issued-oracle-v1",
+  "CARD-DIRECT-RED": "foul-card-direct-red-oracle-v1",
   "ADVANTAGE-PLAYED": "foul-advantage-played-oracle-v1",
 };
 
@@ -69,6 +75,7 @@ const FOULS_TEST_IDS = [
   "FOULS-CLEAN-TACKLE-001",
   "FOULS-FREE-KICK-AWARD-001",
   "FOULS-CARD-ISSUED-001",
+  "FOULS-CARD-DIRECT-RED-001",
   "FOULS-ADVANTAGE-PLAYED-001",
 ];
 
@@ -212,6 +219,50 @@ function cardIssuedStream(): TelemetryObservation[] {
     foulTick: 20,
   }, 20);
   return [...obs, mk(20, [card])];
+}
+
+/**
+ * A committed SLIDING man-not-ball tackle contact deep inside the versioned
+ * slide reach (2.8 m): the committed contact severity crosses the §9.1
+ * direct-red threshold.  Only accepted tackle-contact fields are used.
+ */
+const DEEP_SLIDE = {
+  ...MAN_NOT_BALL,
+  contactType: "slide-tackle",
+  reach: 2.8,
+  planarDistance: 0.42,
+  activeWindowStartTick: 10,
+  activeWindowEndTick: 18,
+};
+
+/**
+ * A direct-red stream: a genuine deep sliding man-not-ball foul whose committed
+ * severity crosses the §9.1 threshold, carrying the committed direct-red
+ * `card-issued` event (cardReason "direct-severity") the §7 path emits.
+ */
+function directRedStream(contact: Record<string, unknown> = DEEP_SLIDE): TelemetryObservation[] {
+  const obs = [mk(10, [contactEvent("ppc-10-1", contact)])];
+  detectFoulEvents(obs);
+  const card = cardIssuedEvent("card-10-1", {
+    cardType: "expulsion",
+    cardReason: "direct-severity",
+    directRedSeverity: foulContactSeverity(contact),
+    playerId: "def-1",
+    teamId: "team-a",
+    fouledPlayerId: "carrier-1",
+    accumulatedFouls: 1,
+    foulSourceEventId: "ppc-10-1",
+    foulTick: 10,
+  }, 10);
+  return [...obs, mk(10, [card])];
+}
+
+/** The CARD-DIRECT-RED criterion outcome of a fouls-suite evaluation. */
+function directRedOutcome(observations: TelemetryObservation[]): string {
+  const suite = evaluateSuite("fouls", observations);
+  return suite.tests
+    .find((t) => t.test_id === "FOULS-CARD-DIRECT-RED-001")!
+    .criteria.find((c) => c.criterion_id === "CARD-DIRECT-RED")!.outcome;
 }
 
 /** A per-tick observation with an explicit ball lastTouchRef. */
@@ -375,7 +426,7 @@ describe("fouls suite registration", () => {
     expect(SUITES["fouls"]).toBe(FOULS_SUITE);
   });
 
-  it("fouls suite has exactly the four §10 registered test ids", () => {
+  it("fouls suite has exactly the six §10 registered test ids", () => {
     expect(FOULS_SUITE.direct_test_ids).toEqual(FOULS_TEST_IDS);
   });
 
@@ -474,6 +525,36 @@ describe("evaluateSuite('fouls', ...) produces real verdicts", () => {
       .find((t) => t.test_id === "FOULS-ADVANTAGE-PLAYED-001")!
       .criteria.find((c) => c.criterion_id === "ADVANTAGE-PLAYED");
     expect(advantage!.outcome).toBe("NOT_EVALUATED");
+  });
+
+  it("a deep sliding foul crossing the §9.1 threshold yields CARD-DIRECT-RED PASS", () => {
+    // The committed severity is the shared derivation; the threshold is the
+    // exported fouls-v1 §9.1 value.  The crossing is genuine, not invented.
+    expect(foulContactSeverity(DEEP_SLIDE)).toBeGreaterThanOrEqual(
+      FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD,
+    );
+    expect(resolveDirectRedForFoul(DEEP_SLIDE)).toBe("expulsion");
+    expect(directRedOutcome(directRedStream())).toBe("PASS");
+  });
+
+  it("a below-threshold genuine foul (standing / grazing slide) with no direct-red card is NOT_EVALUATED", () => {
+    // The driven standing contact is below the direct-red threshold; with no
+    // observable direct-red card the oracle returns honest NOT_EVALUATED, never
+    // an invented PASS.  The grazing slide (near the reach edge) is likewise
+    // below threshold — the same honest absence.
+    expect(resolveDirectRedForFoul(MAN_NOT_BALL)).toBeNull();
+    expect(directRedOutcome(foulStream())).toBe("NOT_EVALUATED");
+    const grazing = { ...MAN_NOT_BALL, contactType: "slide-tackle", reach: 2.8, planarDistance: 2.6 };
+    expect(resolveDirectRedForFoul(grazing)).toBeNull();
+    const grazingStream = [mk(10, [contactEvent("ppc-10-1", grazing)])];
+    detectFoulEvents(grazingStream);
+    expect(directRedOutcome(grazingStream)).toBe("NOT_EVALUATED");
+  });
+
+  it("an accumulation card (no direct-red marker) is NOT_EVALUATED for CARD-DIRECT-RED", () => {
+    // The accumulation path's caution carries no cardReason, so CARD-DIRECT-RED
+    // has nothing to adjudicate — the two card dispositions stay separate.
+    expect(directRedOutcome(cardIssuedStream())).toBe("NOT_EVALUATED");
   });
 });
 
@@ -796,6 +877,109 @@ describe("mutant / canary guards", () => {
     expect(direct[0].description).toContain("BLOCKED_MISSING_REFERENCE");
     expect(direct[0].details?.blockedReference).toBe(RETAINED_PATH_REFERENCE);
   });
+
+  it("CARD-DIRECT-RED FAILs on a direct red with NO qualifying man-not-ball foul (power guard)", () => {
+    // A direct-red card whose foulSourceEventId resolves to no genuine §5.1
+    // contact: a direct red is only the consequence of a recognized foul.
+    const obs = mk(10, [cardIssuedEvent("card-10-1", {
+      cardType: "expulsion",
+      cardReason: "direct-severity",
+      directRedSeverity: 0.95,
+      playerId: "def-1",
+      teamId: "team-a",
+      fouledPlayerId: "carrier-1",
+      accumulatedFouls: 1,
+      foulSourceEventId: "ppc-nonexistent",
+      foulTick: 10,
+    }, 10)]);
+    expect(directRedOutcome([obs])).toBe("FAIL");
+  });
+
+  it("CARD-DIRECT-RED FAILs on a direct red to the WRONG player", () => {
+    // A genuine deep slide foul for def-1, but the direct red names carrier-1.
+    const stream = directRedStream();
+    const card = cardIssuedEvent("card-10-2", {
+      cardType: "expulsion",
+      cardReason: "direct-severity",
+      directRedSeverity: foulContactSeverity(DEEP_SLIDE),
+      playerId: "carrier-1",
+      teamId: "team-b",
+      fouledPlayerId: "carrier-1",
+      accumulatedFouls: 1,
+      foulSourceEventId: "ppc-10-1",
+      foulTick: 10,
+    }, 10);
+    expect(directRedOutcome([...stream, mk(10, [card])])).toBe("FAIL");
+  });
+
+  it("CARD-DIRECT-RED FAILs on a direct red for a BELOW-threshold contact", () => {
+    // A genuine standing man-not-ball foul (below the threshold) claimed as a
+    // direct red: a below-threshold contact is not a direct red.
+    const obs = [mk(10, [contactEvent("ppc-10-1", MAN_NOT_BALL)])];
+    detectFoulEvents(obs);
+    const card = cardIssuedEvent("card-10-1", {
+      cardType: "expulsion",
+      cardReason: "direct-severity",
+      directRedSeverity: foulContactSeverity(MAN_NOT_BALL),
+      playerId: "def-1",
+      teamId: "team-a",
+      fouledPlayerId: "carrier-1",
+      accumulatedFouls: 1,
+      foulSourceEventId: "ppc-10-1",
+      foulTick: 10,
+    }, 10);
+    expect(directRedOutcome([...obs, mk(10, [card])])).toBe("FAIL");
+  });
+
+  it("CARD-DIRECT-RED FAILs on a wrong card type for the direct-red path", () => {
+    // A direct-red marker on a caution is contradictory: the §7 severity path
+    // is an expulsion.
+    const stream = directRedStream();
+    const card = cardIssuedEvent("card-10-2", {
+      cardType: "caution",
+      cardReason: "direct-severity",
+      directRedSeverity: foulContactSeverity(DEEP_SLIDE),
+      playerId: "def-1",
+      teamId: "team-a",
+      fouledPlayerId: "carrier-1",
+      accumulatedFouls: 1,
+      foulSourceEventId: "ppc-10-1",
+      foulTick: 10,
+    }, 10);
+    expect(directRedOutcome([...stream, mk(10, [card])])).toBe("FAIL");
+  });
+
+  it("CARD-DIRECT-RED FAILs on a DUPLICATE direct red for the same foul", () => {
+    const stream = directRedStream();
+    const duplicate = cardIssuedEvent("card-10-2", {
+      cardType: "expulsion",
+      cardReason: "direct-severity",
+      directRedSeverity: foulContactSeverity(DEEP_SLIDE),
+      playerId: "def-1",
+      teamId: "team-a",
+      fouledPlayerId: "carrier-1",
+      accumulatedFouls: 1,
+      foulSourceEventId: "ppc-10-1",
+      foulTick: 10,
+    }, 10);
+    expect(directRedOutcome([...stream, mk(10, [duplicate])])).toBe("FAIL");
+  });
+
+  it("CARD-DIRECT-RED FAILs when the recorded severity disagrees with the shared derivation", () => {
+    const stream = directRedStream();
+    const card = cardIssuedEvent("card-10-2", {
+      cardType: "expulsion",
+      cardReason: "direct-severity",
+      directRedSeverity: 0.1,
+      playerId: "def-1",
+      teamId: "team-a",
+      fouledPlayerId: "carrier-1",
+      accumulatedFouls: 1,
+      foulSourceEventId: "ppc-10-1",
+      foulTick: 10,
+    }, 10);
+    expect(directRedOutcome([...stream, mk(10, [card])])).toBe("FAIL");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -813,6 +997,7 @@ describe("registry integrity", () => {
     expect(registry.invariant_definitions["foul-clean-tackle-evidence"]).toBeDefined();
     expect(registry.invariant_definitions["foul-free-kick-award-evidence"]).toBeDefined();
     expect(registry.invariant_definitions["foul-card-issued-evidence"]).toBeDefined();
+    expect(registry.invariant_definitions["foul-card-direct-red-evidence"]).toBeDefined();
     expect(registry.invariant_definitions["foul-advantage-played-evidence"]).toBeDefined();
     expect(registry.observation_definitions["obs-fouls-v1"]).toBeDefined();
   });

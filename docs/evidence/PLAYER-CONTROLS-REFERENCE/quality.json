@@ -1,0 +1,239 @@
+{
+  "schema_version": 2,
+  "incident_id": null,
+  "continuation": null,
+  "horizon": "40",
+  "output_path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/quality.json",
+  "proof_scope": "objective",
+  "base_commit": "e76e5308cebf7283f4a7f093d5dfdd413dfd503c",
+  "target_commit": null,
+  "elevated_risk": false,
+  "architecture_changed": false,
+  "plan": {
+    "schema_version": 2,
+    "changed_paths": [
+      "docs/how-to-play.md",
+      "docs/player-controls.md"
+    ],
+    "protected_properties": [],
+    "suite_ids": [],
+    "reviews_required": false,
+    "reasons": [
+      "mapped affected coverage plus contract/architecture baseline"
+    ],
+    "checks": [
+      {
+        "id": "typecheck",
+        "command": [
+          "pnpm",
+          "run",
+          "typecheck"
+        ]
+      },
+      {
+        "id": "build",
+        "command": [
+          "pnpm",
+          "run",
+          "build"
+        ]
+      },
+      {
+        "id": "regression-tests",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/architecture/build-vite-resolve.test.ts",
+          "tests/architecture/contracts-no-forbidden-imports.test.ts",
+          "tests/architecture/core-boundary.test.ts",
+          "tests/architecture/core-ts-isolation.test.ts",
+          "tests/architecture/toolchain-smoke-test.test.ts",
+          "tests/architecture/toolchain-version-check.test.ts",
+          "tests/candidate-scope.node.test.ts",
+          "tests/unit/gauntlet-0.10.0-runtime.test.ts",
+          "tests/unit/gauntlet-0.11.0-product.test.ts",
+          "tests/unit/gauntlet-0.11.2-quality.test.ts",
+          "tests/unit/gauntlet-0.11.3-recovery.test.ts",
+          "tests/unit/gauntlet-0.12.0-certification.test.ts",
+          "tests/unit/gauntlet-0.13.0-adapters.test.ts",
+          "tests/unit/gauntlet-0.13.0-product-first.test.ts",
+          "tests/unit/gauntlet-0.13.0-scope.test.ts",
+          "tests/unit/gauntlet-0.9-contracts.test.ts",
+          "tests/unit/gauntlet-0.9-team-declaration.test.ts",
+          "--project",
+          "node",
+          "--passWithNoTests=false",
+          "--no-file-parallelism"
+        ]
+      },
+      {
+        "id": "gauntlet-eval",
+        "command": [
+          "pnpm",
+          "run",
+          "gauntlet:eval"
+        ]
+      },
+      {
+        "id": "state-audit",
+        "command": [
+          "pnpm",
+          "run",
+          "gauntlet:eval:state"
+        ]
+      },
+      {
+        "id": "browser-tests",
+        "command": [
+          "pnpm",
+          "run",
+          "test-browser"
+        ]
+      }
+    ],
+    "proof_scope": "objective",
+    "full_required": false,
+    "expected_tests": {
+      "regression-tests": [
+        "tests/architecture/build-vite-resolve.test.ts",
+        "tests/architecture/contracts-no-forbidden-imports.test.ts",
+        "tests/architecture/core-boundary.test.ts",
+        "tests/architecture/core-ts-isolation.test.ts",
+        "tests/architecture/toolchain-smoke-test.test.ts",
+        "tests/architecture/toolchain-version-check.test.ts",
+        "tests/candidate-scope.node.test.ts",
+        "tests/unit/gauntlet-0.10.0-runtime.test.ts",
+        "tests/unit/gauntlet-0.11.0-product.test.ts",
+        "tests/unit/gauntlet-0.11.2-quality.test.ts",
+        "tests/unit/gauntlet-0.11.3-recovery.test.ts",
+        "tests/unit/gauntlet-0.12.0-certification.test.ts",
+        "tests/unit/gauntlet-0.13.0-adapters.test.ts",
+        "tests/unit/gauntlet-0.13.0-product-first.test.ts",
+        "tests/unit/gauntlet-0.13.0-scope.test.ts",
+        "tests/unit/gauntlet-0.9-contracts.test.ts",
+        "tests/unit/gauntlet-0.9-team-declaration.test.ts"
+      ],
+      "browser-tests": [
+        "tests/browser/1v1-control-screenshots.browser.test.ts",
+        "tests/browser/1v1-control.browser.test.ts",
+        "tests/browser/2v2-ai-match.browser.test.ts",
+        "tests/browser/2v2-keyboard-screenshot.browser.test.ts",
+        "tests/browser/3v3-match-screenshots.browser.test.ts",
+        "tests/browser/3v3-match.browser.test.ts",
+        "tests/browser/5v5-ai-match.browser.test.ts",
+        "tests/browser/5v5-human-vs-cpu.browser.test.ts",
+        "tests/browser/advantage-browser-evidence.browser.test.ts",
+        "tests/browser/ai-match-screenshot.browser.test.ts",
+        "tests/browser/anti-huddle-dynamic-evidence.browser.test.ts",
+        "tests/browser/archetype-browser-capture.browser.test.ts",
+        "tests/browser/archetype-full-pair-recapture.browser.test.ts",
+        "tests/browser/archetype-identical-recapture.browser.test.ts",
+        "tests/browser/archetype-remaining-visuals.browser.test.ts",
+        "tests/browser/archetype-render-capture.browser.test.ts",
+        "tests/browser/archetype-render-difference.browser.test.ts",
+        "tests/browser/browser-core-evidence.test.ts",
+        "tests/browser/browser-full-match-flow-evidence.browser.test.ts",
+        "tests/browser/capture-2v2-keyboard.browser.test.ts",
+        "tests/browser/capture-human-vs-cpu-3v3.browser.test.ts",
+        "tests/browser/capture-player-indicator.browser.test.ts",
+        "tests/browser/capture-player-switch.browser.test.ts",
+        "tests/browser/capture-switch-indicator-evidence.browser.test.ts",
+        "tests/browser/capture-wip.browser.test.ts",
+        "tests/browser/card-browser-evidence.browser.test.ts",
+        "tests/browser/controls-legend-ui.browser.test.ts",
+        "tests/browser/core-smoke.browser.test.ts",
+        "tests/browser/corner-driven-dynamic-evidence.browser.test.ts",
+        "tests/browser/cpu-tackle-screenshot-capture.browser.test.ts",
+        "tests/browser/difficulty-setting.browser.test.ts",
+        "tests/browser/duel-control-screenshot-capture.browser.test.ts",
+        "tests/browser/foul-freekick-browser-evidence.browser.test.ts",
+        "tests/browser/fulltime-flow-closure.browser.test.ts",
+        "tests/browser/gk-browser-dynamic-evidence.browser.test.ts",
+        "tests/browser/hud-ortho-resize.browser.test.ts",
+        "tests/browser/human-action-readability-observability.browser.test.ts",
+        "tests/browser/human-action-screenshot-capture.browser.test.ts",
+        "tests/browser/human-arc-interaction.browser.test.ts",
+        "tests/browser/human-keeper-control.browser.test.ts",
+        "tests/browser/human-restart-control.browser.test.ts",
+        "tests/browser/human-vs-cpu-3v3-screenshot.browser.test.ts",
+        "tests/browser/human-vs-cpu-5v3.browser.test.ts",
+        "tests/browser/human-vs-cpu-screenshot.browser.test.ts",
+        "tests/browser/keeper-visual-marker.browser.test.ts",
+        "tests/browser/ladder-menu-parity.browser.test.ts",
+        "tests/browser/ladder-menu-screenshots.browser.test.ts",
+        "tests/browser/player-indicator.browser.test.ts",
+        "tests/browser/player-switch.browser.test.ts",
+        "tests/browser/referee-shipped-wiring.browser.test.ts",
+        "tests/browser/small-sided-001.browser.test.ts",
+        "tests/browser/small-sided-action-event-observability.browser.test.ts",
+        "tests/browser/small-sided-coherence-rerun.browser.test.ts",
+        "tests/browser/small-sided-integrated-playtest.browser.test.ts",
+        "tests/browser/small-sided-readability.browser.test.ts"
+      ]
+    }
+  },
+  "source_hashes": {
+    "docs/how-to-play.md": "1358ea654529cca637cdeb7e21e57691b381ee40b99e2d691cf432d8f8850093",
+    "docs/player-controls.md": "86e7605be83bdd875f62d69145d90a501e6ee3b3b4591aab2568a910b354d706"
+  },
+  "execution_mode": "full",
+  "status": "BLOCKED",
+  "failure_class": null,
+  "checks": [
+    {
+      "id": "typecheck",
+      "status": "NOT_RUN",
+      "exit_code": null,
+      "log": null,
+      "duration_ms": null
+    },
+    {
+      "id": "build",
+      "status": "NOT_RUN",
+      "exit_code": null,
+      "log": null,
+      "duration_ms": null
+    },
+    {
+      "id": "regression-tests",
+      "status": "NOT_RUN",
+      "exit_code": null,
+      "log": null,
+      "duration_ms": null
+    },
+    {
+      "id": "gauntlet-eval",
+      "status": "NOT_RUN",
+      "exit_code": null,
+      "log": null,
+      "duration_ms": null
+    },
+    {
+      "id": "state-audit",
+      "status": "NOT_RUN",
+      "exit_code": null,
+      "log": null,
+      "duration_ms": null
+    },
+    {
+      "id": "browser-tests",
+      "status": "NOT_RUN",
+      "exit_code": null,
+      "log": null,
+      "duration_ms": null
+    }
+  ],
+  "recovery_budget": null,
+  "blocked_reason": "Error: CERTIFICATION_BLOCKED: product, unknown or invalid certification failure",
+  "metrics": {
+    "executed_checks": 0,
+    "reused_checks": 0,
+    "verification_ms": 0,
+    "full_suite_executions": 0,
+    "wall_ms": 2877
+  },
+  "started_at": "2026-10-05T05:21:59.892Z",
+  "executed_commands": []
+}
