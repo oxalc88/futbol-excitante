@@ -90,7 +90,7 @@ export async function executeScopedQuality(args:string[]):Promise<void> {
       diagnosis=JSON.parse(readFileSync(option('--repair')!,'utf8')).diagnosis;
       if(typeof diagnosis!=='string'||!diagnosis.trim())throw new Error('written diagnosis required');
       const focused=repairCheck(recovery);reserveRepairAttempt(recovery);save(recoveryPath,recovery);checks=[focused.check];whole=focused.whole_check;}
-    }else if(canonical)canonical.beforeRun();else requireRepairProof(recovery,context);
+    }else if(canonical)canonical.beforeRun(certification);else requireRepairProof(recovery,context);
     const run=`${Date.now()}-${process.pid}`;const logDir=`artifacts/gauntlet/quality/${objective}/${run}`;mkdirSync(logDir,{recursive:true});
     report.status='RUNNING';saveReport();let failed=false;
     for(const check of checks){
@@ -139,7 +139,7 @@ export async function executeScopedQuality(args:string[]):Promise<void> {
   // serialized bookkeeping commit. No canonical state is accepted by this CLI.
   report.metrics.wall_ms=Date.now()-Date.parse(report.started_at);saveReport();
   const archive=`docs/evidence/${objective}/verification/${Date.now()}-${process.pid}-receipt.json`;mkdirSync(dirname(archive),{recursive:true});writeFileSync(archive,JSON.stringify(report,null,2)+'\n',{flag:'wx'});
-  if(canonical&&report.status==='PASS')canonical.passed({path:archive,sha256:hash(readFileSync(archive))});
+  if(canonical&&(report.status==='PASS'||canonical.observing))canonical.completed({path:archive,sha256:hash(readFileSync(archive))});
   if(certification&&!args.includes('--repair')){
     const horizon=after.read('gauntlet/state/HORIZON.md')?.toString().match(/^horizon_version:\s*(\d+)/m)?.[1];
     const record={schema_version:1,target_commit:target,recorded_at:new Date().toISOString(),status:report.status,failure_class:report.failure_class,receipt:{path:archive,sha256:hash(readFileSync(archive))},horizon:horizon?`v${horizon}`:null};

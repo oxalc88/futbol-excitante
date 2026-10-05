@@ -3,7 +3,7 @@ import { hash, snapshot } from '../../gauntlet/runtime/scoped-quality.js';
 import { readFileSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { appendIncident, incidentEvents, activeIncident, engineeringRoutes, engineeringWorkspaceBase, reserveEngineeringDispatch } from '../../gauntlet/runtime/incidents.js';
 import { reserveResume, closeObjectiveIncident, IncidentRecovery } from '../../gauntlet/runtime/incident-recovery.js';
-import { sameHorizonWork, continuationDecision, stopRecord, escalationPacket, preservedProgress, type ContinuationFacts } from '../../gauntlet/runtime/continuation.js';
+import { routineContinuation, sameHorizonWork, continuationDecision, stopRecord, escalationPacket, preservedProgress, type ContinuationFacts } from '../../gauntlet/runtime/continuation.js';
 import { certificationHealth } from '../../gauntlet/runtime/certification.js';
 import { executionState } from '../../gauntlet/runtime/integrated-execution.js';
 const root=process.cwd(),[command,...args]=process.argv.slice(2),option=(k:string)=>args[args.indexOf(k)+1];
@@ -39,6 +39,7 @@ else if(command==='escalate'){
   f.engineering_escalation_available=Boolean(route);
   f.safe_work_considered=sameHorizonWork(root); // Local packets cannot assert admission.
   if(f.incident_id){const e=incidentEvents(root).filter(e=>e.incident_id===f.incident_id).at(-1);if(!e)throw new Error('incident not found');f.blocked_boundary=e.boundary;f.failure_class=e.failure_class;f.evidence=e.evidence;f.engineering_escalation_attempted=incidentEvents(root).some(r=>r.incident_id===e.incident_id&&r.kind==='DISPATCH');f.repair_available=['ACTIVE','EXHAUSTED'].includes(e.state)&&!incidentEvents(root).some(r=>r.incident_id===e.incident_id&&r.kind==='DIAGNOSE');}
+  f.routine_action=routineContinuation(root);
   const decision=continuationDecision(f);
   const engineering_workspace_base=route&&incident?(spent?execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim():engineeringWorkspaceBase(root,incident.incident_id)):null;
   console.log(JSON.stringify(command==='stop'?{...decision,record:stopRecord(root,f)}:{...decision,facts:f,engineering_route:route??null,engineering_workspace_base},null,2));

@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { snapshot, scopedPlan, hash, type Snapshot } from './scoped-quality.js';
 import { validateScopedProofs, validateFailureCause, type FailureClass } from './check-proof.js';
-import { incidentEvents } from './incidents.js';
+import { incidentEvents, validateCurrentCertificate } from './incidents.js';
 export interface Certificate { schema_version:1; target_commit:string; recorded_at:string; status:string; failure_class:FailureClass|null; receipt:{path:string;sha256:string}; horizon:string|null }
 const ancestor=(root:string,a:string,b:string)=>{try{execFileSync('git',['-C',root,'merge-base','--is-ancestor',a,b],{stdio:'pipe'});return true;}catch{return false;}};
 export function certificationHealth(root:string,ref='HEAD'): { latest:Certificate|null; latest_attempt:Certificate|null; last_certified:string|null; accepted_since:number; horizon:string|null } {
@@ -16,7 +16,9 @@ export function certificationHealth(root:string,ref='HEAD'): { latest:Certificat
     if(record.schema_version!==1||!['PASS','FAIL','BLOCKED','RECOVERY_BLOCKED'].includes(record.status)||!/^[a-f0-9]{40}$/.test(record.target_commit)||!Number.isFinite(Date.parse(record.recorded_at))||!ancestor(root,record.target_commit,ancestryRef)||!/^docs\/evidence\/CERT-[A-Za-z0-9._-]+\/verification\/[A-Za-z0-9._-]+-receipt\.json$/.test(record.receipt?.path))throw new Error('invalid certification record');
     const bytes=source.read(record.receipt.path);if(!bytes||hash(bytes)!==record.receipt.sha256)throw new Error('certification receipt provenance mismatch');
     const receipt=JSON.parse(bytes.toString());if(receipt.target_commit!==record.target_commit||receipt.proof_scope!=='certification'||receipt.status!==record.status||receipt.failure_class!==record.failure_class)throw new Error('certification record differs from execution');
-    if(record.status==='PASS'){
+    if(record.status==='PASS'&&receipt.incident_id&&incidentEvents(root,source).some(e=>e.kind==='OBSERVED'&&e.incident_id===receipt.incident_id&&e.evidence.at(-1)?.sha256===record.receipt.sha256)){
+      validateCurrentCertificate(root,receipt,source);last_certified=record.target_commit;
+    }else if(record.status==='PASS'){
       const target=snapshot(root,record.target_commit);
       const plan=scopedPlan([],target,target,false,false,true);
       if(JSON.stringify(plan)!==JSON.stringify(receipt.plan))throw new Error('certification plan mismatch');

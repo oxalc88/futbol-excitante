@@ -52,3 +52,15 @@ run = "pnpm run gauntlet:memory:validate"
 [tasks.gauntlet-runtime-test]
 description = "Verify runtime telemetry and efficiency integration"
 run = "pnpm run gauntlet:runtime:test"
+
+[tasks.gauntlet-deadlock-replay]
+description = "Reproduce the exact a0f6161 ledger/stop with current policy (not product certification)"
+run = "node --import tsx scripts/ci/reproduce-published-deadlock.ts"
+
+[tasks.gauntlet-product-test]
+description = "Run deterministic Gauntlet product policy regressions"
+run = "pnpm run gauntlet:product:test"
+
+[tasks.gauntlet-quality]
+description = "Run the canonical Gauntlet verification command"
+run = "pnpm run gauntlet:quality"

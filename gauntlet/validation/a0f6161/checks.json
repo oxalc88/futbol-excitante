@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "typecheck": "PASS",
+  "deterministic_evaluator": {
+    "status": "PASS",
+    "scenarios": 49,
+    "prompt_checks": 60
+  },
+  "new_policy_tests": {
+    "status": "PASS",
+    "tests": 3,
+    "command": "mise run test -- tests/unit/gauntlet-0.13.2-published-deadlock.test.ts --no-file-parallelism"
+  },
+  "existing_policy_suite_attempt": {
+    "status": "FAIL",
+    "passed": 83,
+    "failed": 1,
+    "reason": "Existing material-recovery test exceeded its unchanged 20-second test limit (20.943 seconds)."
+  },
+  "affected_recovery_check_after_avoiding_unnecessary_snapshot": {
+    "status": "PASS",
+    "passed": 1,
+    "skipped": 8,
+    "duration_seconds": 15.58
+  },
+  "whole_repository_certification": "PENDING_REAL_EXECUTION",
+  "independent_review": {
+    "model": "glm5.3-flash",
+    "role": "critic",
+    "first_result": "RETRY",
+    "disposition": "Missing-object classification and historical policy binding corrected; re-review is pending. Not objective acceptance."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "command": "mise run gauntlet-deadlock-replay",
+  "classification": "policy reproduction using exact published Git history and deterministic command transport; not product certification",
+  "cases": [
+    {
+      "published": "a0f61618161600f9a887b7287d417686a86e60ef",
+      "transport": "deterministic policy fixture, not product certification",
+      "case": "pass",
+      "checks": [
+        {
+          "id": "typecheck",
+          "status": "PASS"
+        },
+        {
+          "id": "build",
+          "status": "PASS"
+        },
+        {
+          "id": "regression-tests",
+          "status": "PASS"
+        },
+        {
+          "id": "gauntlet-eval",
+          "status": "PASS"
+        },
+        {
+          "id": "state-audit",
+          "status": "PASS"
+        },
+        {
+          "id": "browser-tests",
+          "status": "PASS"
+        },
+        {
+          "id": "sim-smoke",
+          "status": "PASS"
+        },
+        {
+          "id": "parallel-policy",
+          "status": "PASS"
+        },
+        {
+          "id": "runtime-telemetry",
+          "status": "PASS"
+        }
+      ],
+      "executed": 9,
+      "legacy_state": "BLOCKED",
+      "legacy_failure_class": "UNKNOWN",
+      "budget": {
+        "started_at_ms": 1791136789699,
+        "repair_attempts": 2,
+        "history_before_budget": "UNAVAILABLE"
+      },
+      "provenance": "whole-tree verified",
+      "stop": "preserved; new stop refused while current evidence available",
+      "result": "REPRODUCED"
+    },
+    {
+      "published": "a0f61618161600f9a887b7287d417686a86e60ef",
+      "transport": "deterministic policy fixture, not product certification",
+      "case": "unknown",
+      "checks": [
+        {
+          "id": "typecheck",
+          "status": "PASS"
+        },
+        {
+          "id": "build",
+          "status": "PASS"
+        },
+        {
+          "id": "regression-tests",
+          "status": "FAIL"
+        },
+        {
+          "id": "gauntlet-eval",
+          "status": "NOT_RUN"
+        },
+        {
+          "id": "state-audit",
+          "status": "NOT_RUN"
+        },
+        {
+          "id": "browser-tests",
+          "status": "NOT_RUN"
+        },
+        {
+          "id": "sim-smoke",
+          "status": "NOT_RUN"
+        },
+        {
+          "id": "parallel-policy",
+          "status": "NOT_RUN"
+        },
+        {
+          "id": "runtime-telemetry",
+          "status": "NOT_RUN"
+        }
+      ],
+      "executed": 3,
+      "legacy_state": "BLOCKED",
+      "legacy_failure_class": "UNKNOWN",
+      "budget": {
+        "started_at_ms": 1791136789699,
+        "repair_attempts": 2,
+        "history_before_budget": "UNAVAILABLE"
+      },
+      "provenance": "whole-tree verified",
+      "stop": "preserved; new stop refused while current evidence available",
+      "result": "REPRODUCED"
+    },
+    {
+      "case": "fresh-clone-without-orphans",
+      "published": "a0f61618161600f9a887b7287d417686a86e60ef",
+      "original": "f796a548d61f7c45112d292112fdaea488b32e69",
+      "result": "REPRODUCED"
+    }
+  ]
+}
