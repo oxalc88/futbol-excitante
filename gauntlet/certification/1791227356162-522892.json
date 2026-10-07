@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "target_commit": "ca4c0504111230e8fd7056785f7d8e8feaa029fe",
+  "recorded_at": "2026-10-05T19:09:16.162Z",
+  "status": "FAIL",
+  "failure_class": "HARNESS_ENVIRONMENT",
+  "receipt": {
+    "path": "docs/evidence/CERT-A0F6161-CURRENT/verification/1791227353031-522892-receipt.json",
+    "sha256": "6e71199c2c4655518e0a2af088a14672ae13f6cd503c62c94d57eb19d9d1e958"
+  },
+  "horizon": "v40"
+}
