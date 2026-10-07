@@ -56,7 +56,7 @@ const RULES: GateRule[] = [
 
 RULES.push(
   { name: "bureaucracy regressions protect product flow", file: "gauntlet/bureaucracy-contract.md", mustContain: ["Current green state cannot be stopped by history", "Machinery is not product progress", "No bookkeeping retry", "No aggregate bureaucracy score", "adds no human approval"] },
-  { name: "0.14 current verification authority is canonical", file: "gauntlet/product-first-contract.md", mustContain: ["Incident history is evidence, not permanent execution authority", "PRODUCT_FAILURE requires a product-input change", "CERTIFY_CURRENT", "bureaucracy-contract.md"] },
+  { name: "0.14 current verification authority is canonical", file: "gauntlet/product-first-contract.md", mustContain: ["Incident history is evidence, not permanent execution authority", "Prior PRODUCT_FAILURE, HARNESS_ENVIRONMENT or UNKNOWN classification remains historical evidence", "CERTIFY_CURRENT", "bureaucracy-contract.md"] },
   { name: "one canonical product-first policy", file: "gauntlet/product-first-contract.md", mustContain: ["runtime/continuation.ts", "exact remaining external decision", "one integrated candidate and one acceptance", "RESUME_ONCE", "transport only", "Out-of-session"] },
   { name: "execution DAG is harness-neutral", file: "gauntlet/runtime/execution-dag.mjs", mustContain: ["ownershipOverlaps", "execution DAG cycle", "Harness owns worker start"] },
   { name: "scoped progress cannot replace certification", file: "gauntlet/product-quality-contract.md", mustContain: ["four objectives", "PRODUCT_FAILURE", "HARNESS_ENVIRONMENT", "UNKNOWN", "exact played target", "state audit always executes fresh", "intervening unaccepted source changes", "--stage certification"] },
