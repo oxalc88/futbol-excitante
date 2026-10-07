@@ -64,3 +64,7 @@ run = "pnpm run gauntlet:product:test"
 [tasks.gauntlet-quality]
 description = "Run the canonical Gauntlet verification command"
 run = "pnpm run gauntlet:quality"
+
+[tasks.test-git-personal-identity]
+description = "Verify oxalc88 commit identity protection against real Git commits"
+run = "node scripts/ci/test-personal-git-hooks.mjs"
