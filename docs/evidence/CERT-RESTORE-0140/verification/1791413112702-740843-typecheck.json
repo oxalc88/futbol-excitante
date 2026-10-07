@@ -1,0 +1,39 @@
+{
+  "protocol": "gauntlet-quality-0.12.0",
+  "check": {
+    "id": "typecheck",
+    "command": [
+      "pnpm",
+      "run",
+      "typecheck"
+    ]
+  },
+  "key": "6d004605923170157528dc99a4a27decab33785e8f9d3e44e9fbf8b4f10aa07e",
+  "profile": {
+    "node": "24.18.0",
+    "pnpm": "11.10.0",
+    "vite": "6.4.3",
+    "platform": "linux",
+    "arch": "x64",
+    "environment_sha256": "7cc2d2fa9632635a9f38d4b0f40565c14dd16b70d3c4d2088eeaafa0d9107658",
+    "installed_sha256": "16956395abafc20f94833ea57bfbf991288c448754702854c232430fcbca3a92"
+  },
+  "expected_tests": [],
+  "observed_tests": [],
+  "result": {
+    "id": "typecheck",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "artifacts/gauntlet/quality/CERT-RESTORE-0140/1791413112702-740843/typecheck.log",
+    "duration_ms": 19704,
+    "timeout_ms": 1200000
+  },
+  "started_from": "058b0a5d95fbf01f2528ae1331c79a7ffbc4a900",
+  "completed_at": "2026-10-07T22:45:33.989Z",
+  "log": {
+    "path": "docs/evidence/CERT-RESTORE-0140/verification/1791413112702-740843-typecheck.log.gz",
+    "sha256": "1fef8e838f2ee43dfa8e66eb752c1d5c4be890d3585a6c5001b6e4683d00b19f"
+  },
+  "test_report": null,
+  "producing_root": "/home/ubuntu/projects/oxDeveloop/pes-simulator"
+}
