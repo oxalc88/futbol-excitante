@@ -23,7 +23,7 @@ References:
 2. **Safe deterministic work forbids human stop.** If a routine action or safe product objective is executable, continuation cannot require a human merely to repair bookkeeping.
 3. **Machinery is not product progress.** Gauntlet/test/ledger-only changes never increment player-visible progress or complete a Horizon.
 4. **No bookkeeping retry.** A new CERT label, ledger write, state note or evidence publication alone cannot create a fresh verification execution.
-5. **Material changes may be reverified.** A product fix after PRODUCT_FAILURE, or a product/verification-machinery change after UNKNOWN/HARNESS_ENVIRONMENT, may run current verification even when an older incident exhausted recovery.
+5. **Material changes may be reverified.** Any changed product or verification input creates a new current state that may be verified once even when an older incident exhausted recovery. The prior failure classification does not grant or deny observation of new current truth; an unchanged state cannot rerun.
 6. **No aggregate bureaucracy score.** Each failure remains visible; burden reductions cannot offset weakened quality or a new stop condition.
 
 ## Prospective burden counters

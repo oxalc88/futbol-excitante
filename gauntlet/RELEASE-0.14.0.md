@@ -6,8 +6,8 @@
 
 A canonical incident is now scoped to the verification input state that failed, not to a repository boundary forever. The incident ledger remains append-only. No FAIL is rewritten and no recovery budget is reset.
 
-- PRODUCT_FAILURE can be reverified only after product inputs change.
-- HARNESS_ENVIRONMENT or UNKNOWN can be reverified after product or verification-machinery inputs change.
+- Any changed product or verification input creates a new current state that may be verified once.
+- The previous PRODUCT_FAILURE / HARNESS_ENVIRONMENT / UNKNOWN classification remains evidence; it does not deny observation of changed current truth.
 - Bookkeeping-only changes, CERT renames, state notes and evidence publication cannot manufacture another execution.
 - A complete valid current-target PASS is authoritative for current admission. Historical incidents remain available for audit but cannot veto that PASS.
 - Existing one-diagnosis/one-repair/resume controls still prevent repeating the same failed verification state indefinitely.

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
 import { admitsCurrentVerification, evaluateBureaucracy, verificationMaterial, ZERO_BURDEN } from '../../../gauntlet/runtime/bureaucracy.js';
+import { fixture } from '../../helpers/gauntlet-quality.js';
 
 describe('Gauntlet 0.14 bureaucracy regression invariants', () => {
   it('does not let bookkeeping manufacture another verification execution', () => {
@@ -9,10 +12,39 @@ describe('Gauntlet 0.14 bureaucracy regression invariants', () => {
 
   it('permits a materially changed current state without resetting history', () => {
     expect(admitsCurrentVerification('PRODUCT_FAILURE',['src/simulation/loop.ts'])).toBe(true);
-    expect(admitsCurrentVerification('PRODUCT_FAILURE',['tests/unit/example.test.ts'])).toBe(false);
+    expect(admitsCurrentVerification('PRODUCT_FAILURE',['tests/unit/example.test.ts'])).toBe(true);
     expect(admitsCurrentVerification('HARNESS_ENVIRONMENT',['gauntlet/runtime/scoped-quality-command.ts'])).toBe(true);
     expect(admitsCurrentVerification('UNKNOWN',['eval/oracles/example.ts'])).toBe(true);
   });
+
+  it('allows one verification per materially changed state without resetting incident history', async () => {
+    const { IncidentRecovery }=await import('../../../gauntlet/runtime/incident-recovery.js');
+    const { incidentEvents }=await import('../../../gauntlet/runtime/incidents.js');
+    const f=fixture(true);try{
+      f.write('.delivery-local/quality/OLD/recovery.json',readFileSync(join(process.cwd(),'gauntlet/incidents/legacy-f960b92b26aa53f48ebce68fe6c70896270d1e5f75d051fc9b5fd2a31f4756fc.json'),'utf8'));
+      new IncidentRecovery(f.root,'repository/full');
+      f.git('add','gauntlet/incidents');f.git('commit','-m','publish imported history');
+
+      f.write('docs/player-controls.md','material player-facing input');
+      f.git('add','docs/player-controls.md');f.git('commit','-m','material product input');
+      const first=new IncidentRecovery(f.root,'repository/full');
+      first.beforeRun(true);
+      f.git('add','gauntlet/incidents');f.git('commit','-m','publish first observation');
+
+      f.write('gauntlet/runtime/continuation.ts','material verification input');
+      f.git('add','gauntlet/runtime/continuation.ts');f.git('commit','-m','material verification change');
+      const second=new IncidentRecovery(f.root,'repository/full');
+      expect(()=>second.beforeRun(true)).not.toThrow();
+      expect(incidentEvents(f.root).filter(e=>e.kind==='OBSERVE')).toHaveLength(2);
+      expect(incidentEvents(f.root).at(-1)?.current_policy).toBe('current-verification-v2');
+
+      f.git('add','gauntlet/incidents');f.git('commit','-m','publish second observation');
+      f.write('gauntlet/state/CURRENT.md','bookkeeping only');
+      f.git('add','gauntlet/state/CURRENT.md');f.git('commit','-m','bookkeeping only');
+      const third=new IncidentRecovery(f.root,'repository/full');
+      expect(()=>third.beforeRun(true)).toThrow('RECOVERY_BLOCKED');
+    }finally{rmSync(f.dir,{recursive:true,force:true});}
+  },15000);
 
   it('fails any policy that stops a current green product because of history', () => {
     const result=evaluateBureaucracy({

@@ -4,7 +4,7 @@ VISION governs product outcomes. A product issue can own several temporary execu
 
 ## 0.14 current-state authority and bureaucracy regression
 
-Incident history is evidence, not permanent execution authority. A repository/full incident remains append-only and keeps its diagnosis/repair history, but it owns the verification input state that failed, not the repository boundary forever. A materially changed current product or verification input may be certified again. PRODUCT_FAILURE requires a product-input change; HARNESS_ENVIRONMENT/UNKNOWN may be re-observed after a product or verification-machinery change. Bookkeeping, CERT renames, state notes and evidence publication alone never re-admit execution.
+Incident history is evidence, not permanent execution authority. A repository/full incident remains append-only and keeps its diagnosis/repair history, but it owns the verification input state that failed, not the repository boundary forever. A materially changed current product or verification input may be certified again exactly once for that changed state. Prior PRODUCT_FAILURE, HARNESS_ENVIRONMENT or UNKNOWN classification remains historical evidence but does not deny observation of a new current state. Bookkeeping, CERT renames, state notes and evidence publication alone never re-admit execution.
 
 A complete valid current-target PASS supersedes older incident state for current admission without rewriting or deleting that history. `gauntlet:control -- continue` must return `CERTIFY_CURRENT` when such a materially changed current verification is available. This restores the 0.11 product-outcome hierarchy while retaining exact failure provenance and the no-identical-retry protection.
 

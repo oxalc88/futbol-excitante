@@ -23,10 +23,11 @@ export function verificationMaterial(paths: string[]): VerificationMaterial {
  * An incident owns one verification input state, not a repository boundary
  * forever. Bookkeeping alone cannot manufacture another execution.
  */
-export function admitsCurrentVerification(failureClass: BureaucracyFailureClass, paths: string[]): boolean {
+export function admitsCurrentVerification(_failureClass: BureaucracyFailureClass, paths: string[]): boolean {
   const material = verificationMaterial(paths);
-  if (material.administrative_only) return false;
-  if (failureClass === 'PRODUCT_FAILURE') return material.product;
+  // Permission to observe current truth is content-addressed, not a reward for
+  // a prior classification. Any changed product or verification input creates
+  // a new state that may be verified once. Administrative-only changes do not.
   return material.product || material.verification;
 }
 

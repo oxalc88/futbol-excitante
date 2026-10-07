@@ -61,12 +61,13 @@ export function incidentEvents(root: string, source = snapshot(root)): IncidentE
     if (e.kind === 'DIAGNOSE' && result.some(r=>r.incident_id===e.incident_id && r.kind==='DIAGNOSE')) throw new Error('one causal diagnosis per incident');
     if(['OBSERVE','OBSERVED'].includes(e.kind)&&prior&&(JSON.stringify(e.recovery)!==JSON.stringify(prior.event.recovery)||e.failure_class!==prior.event.failure_class||JSON.stringify(e.evidence.slice(0,prior.event.evidence.length))!==JSON.stringify(prior.event.evidence)))throw new Error('current evidence cannot rewrite historical uncertainty');
     if(e.kind==='OBSERVE'){
+      if(!prior)throw new Error('current evidence requires an existing incident');
       const eligible=e.current_policy==='legacy-current-v1'
-        ? currentEvidenceAvailable(root,prior?.event as IncidentEvent,source,result,e.current_target)
+        ? currentEvidenceAvailable(root,prior.event,source,result,e.current_target)
         : e.current_policy==='current-verification-v2'
-          ? currentVerificationAvailable(root,prior?.event as IncidentEvent,source,result,e.current_target)
+          ? currentVerificationAvailable(root,prior.event,source,result,e.current_target)
           : false;
-      if(!prior||!eligible||!/^[a-f0-9]{40}$/.test(e.current_target??''))throw new Error('current evidence is not an incident retry');
+      if(!eligible||!/^[a-f0-9]{40}$/.test(e.current_target??''))throw new Error('current evidence is not an incident retry');
       execFileSync('git',['-C',root,'merge-base','--is-ancestor',e.current_target!,'HEAD'],{stdio:'pipe'});
     }
     if(e.kind==='OBSERVED'){
