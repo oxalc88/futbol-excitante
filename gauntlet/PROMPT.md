@@ -144,3 +144,5 @@ then `/gauntlet-continue`. Other harnesses use their native quota and continuati
 If current Flash itself fails with a model-specific availability, allowance, or capacity failure, follow `gauntlet/provider-failure-contract.md`; there is no deprecated snapshot fallback. Do not use model fallback for authentication, network, context, test, or ordinary task failures.
 
 A verification-blocked claim follows the canonical product-first continuation and structured-stop policy. Do not return control while safe product work or an authorized deterministic action remains.
+
+For `PUBLISH_BOOKKEEPING`, publish the automatic exact-tree execution provenance recovery without rewriting historical proofs. For `REGENERATE_EXECUTION_EVIDENCE`, regenerate unresolved unit evidence on valid current ancestry. For `CERTIFY_CURRENT`, execute the normal frozen-HEAD full certification once under `product-first-contract.md`; retain the imported UNKNOWN and consumed repair history. A current failure remains a blocker. These are routine autonomous actions, never requests to reset an incident or widen the machinery allowlist.

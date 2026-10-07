@@ -22,9 +22,11 @@ export interface MaterialRepair {
 }
 export interface IncidentEvent {
   schema_version: 1; incident_id: string; sequence: number; previous: string | null;
-  recorded_at: string; kind: 'OPEN' | 'FAILURE' | 'EXHAUST' | 'DIAGNOSE' | 'REPAIR' | 'RESERVE' | 'CLOSE' | 'BLOCK' | 'REPAIR_FAILED' | 'ESCALATE' | 'DISPATCH';
+  recorded_at: string; kind: 'OPEN' | 'FAILURE' | 'EXHAUST' | 'DIAGNOSE' | 'REPAIR' | 'RESERVE' | 'CLOSE' | 'BLOCK' | 'REPAIR_FAILED' | 'ESCALATE' | 'DISPATCH' | 'OBSERVE' | 'OBSERVED';
   boundary: string; state: IncidentState; failure_class: FailureClass;
   recovery: QualityRecovery; evidence: EvidenceRef[]; repair?: MaterialRepair; execution_id?: string;
+  current_target?: string;
+  current_policy?: 'legacy-current-v1';
   engineering?: { route: string; mode:'REPAIR'|'REVIEW_ONLY'; authorization_commit: string; workspace_commit: string; command: string[] };
 }
 export const incidentBoundary = (certification: boolean, full: boolean, objective: string) => certification || full ? 'repository/full' : `objective/${objective}`;
@@ -47,8 +49,8 @@ export function incidentEvents(root: string, source = snapshot(root)): IncidentE
   for (const path of paths) {
     const bytes = source.read(path)!, e = JSON.parse(bytes.toString()) as IncidentEvent, prior = last.get(e.incident_id);
     if (e.schema_version !== 1 || path !== `gauntlet/incidents/${e.incident_id}/${String(e.sequence).padStart(6,'0')}.json` || e.sequence !== (prior?.event.sequence ?? -1) + 1 || e.previous !== (prior?.sha ?? null) || !Number.isFinite(Date.parse(e.recorded_at)) || !['PRODUCT_FAILURE','HARNESS_ENVIRONMENT','UNKNOWN'].includes(e.failure_class)) throw new Error('invalid incident chain');
-    const allowed: Record<IncidentEvent['kind'], IncidentState[]> = { OPEN: [], FAILURE: ['ACTIVE'], EXHAUST: ['ACTIVE'], DIAGNOSE: ['ACTIVE','EXHAUSTED'], REPAIR: ['ACTIVE','EXHAUSTED'], RESERVE: ['REPAIR_CONFIRMED'], CLOSE: ['RESUME_ONCE','BLOCKED'], BLOCK: ['RESUME_ONCE','REPAIR_CONFIRMED','BLOCKED'], REPAIR_FAILED: ['ACTIVE','EXHAUSTED'], ESCALATE:['ACTIVE','EXHAUSTED','BLOCKED'], DISPATCH:['ACTIVE','EXHAUSTED','BLOCKED'] };
-    const states: Record<IncidentEvent['kind'], IncidentState> = { OPEN:'ACTIVE', FAILURE:'ACTIVE', EXHAUST:'EXHAUSTED', DIAGNOSE:prior?.event.state ?? 'ACTIVE', REPAIR:'REPAIR_CONFIRMED', RESERVE:'RESUME_ONCE', CLOSE:'CLOSED', BLOCK:'BLOCKED', REPAIR_FAILED:'BLOCKED', ESCALATE:prior?.event.state??'ACTIVE', DISPATCH:prior?.event.state??'ACTIVE' };
+    const allowed: Record<IncidentEvent['kind'], IncidentState[]> = { OBSERVE:['EXHAUSTED','BLOCKED'], OBSERVED:['EXHAUSTED','BLOCKED'], OPEN: [], FAILURE: ['ACTIVE'], EXHAUST: ['ACTIVE'], DIAGNOSE: ['ACTIVE','EXHAUSTED'], REPAIR: ['ACTIVE','EXHAUSTED'], RESERVE: ['REPAIR_CONFIRMED'], CLOSE: ['RESUME_ONCE','BLOCKED'], BLOCK: ['RESUME_ONCE','REPAIR_CONFIRMED','BLOCKED'], REPAIR_FAILED: ['ACTIVE','EXHAUSTED'], ESCALATE:['ACTIVE','EXHAUSTED','BLOCKED'], DISPATCH:['ACTIVE','EXHAUSTED','BLOCKED'] };
+    const states: Record<IncidentEvent['kind'], IncidentState> = { OBSERVE:prior?.event.state??'BLOCKED', OBSERVED:prior?.event.state??'BLOCKED', OPEN:'ACTIVE', FAILURE:'ACTIVE', EXHAUST:'EXHAUSTED', DIAGNOSE:prior?.event.state ?? 'ACTIVE', REPAIR:'REPAIR_CONFIRMED', RESERVE:'RESUME_ONCE', CLOSE:'CLOSED', BLOCK:'BLOCKED', REPAIR_FAILED:'BLOCKED', ESCALATE:prior?.event.state??'ACTIVE', DISPATCH:prior?.event.state??'ACTIVE' };
     if (!allowed[e.kind] || (e.kind === 'OPEN' ? Boolean(prior) : !prior || !allowed[e.kind].includes(prior.event.state)) || e.state !== states[e.kind]) throw new Error('invalid incident transition');
     initializeRecoveryBudget(e.recovery);
     const budget=e.recovery.budget!;if(!Number.isSafeInteger(budget.started_at_ms)||budget.started_at_ms<=0||!Number.isSafeInteger(budget.repair_attempts)||budget.repair_attempts<0||!['MEASURED','UNAVAILABLE'].includes(budget.history_before_budget))throw new Error('invalid recovery budget');
@@ -56,6 +58,19 @@ export function incidentEvents(root: string, source = snapshot(root)): IncidentE
     e.evidence.forEach(r => evidence(source,r));
     if (prior && (e.boundary !== prior.event.boundary || e.recovery.budget!.started_at_ms !== prior.event.recovery.budget!.started_at_ms || e.recovery.budget!.repair_attempts < prior.event.recovery.budget!.repair_attempts)) throw new Error('incident history cannot reset');
     if (e.kind === 'DIAGNOSE' && result.some(r=>r.incident_id===e.incident_id && r.kind==='DIAGNOSE')) throw new Error('one causal diagnosis per incident');
+    if(['OBSERVE','OBSERVED'].includes(e.kind)&&prior&&(JSON.stringify(e.recovery)!==JSON.stringify(prior.event.recovery)||e.failure_class!==prior.event.failure_class||JSON.stringify(e.evidence.slice(0,prior.event.evidence.length))!==JSON.stringify(prior.event.evidence)))throw new Error('current evidence cannot rewrite historical uncertainty');
+    if(e.kind==='OBSERVE'){
+      if(!prior||!currentEvidenceAvailable(root,prior.event,source,result,e.current_target)||!/^[a-f0-9]{40}$/.test(e.current_target??'')||e.current_policy!=='legacy-current-v1')throw new Error('current evidence is not an incident retry');
+      execFileSync('git',['-C',root,'merge-base','--is-ancestor',e.current_target!,'HEAD'],{stdio:'pipe'});
+    }
+    if(e.kind==='OBSERVED'){
+      if(prior?.event.kind!=='OBSERVE'||e.current_target!==prior.event.current_target||e.current_policy!==prior.event.current_policy)throw new Error('current evidence reservation required');
+      const receipt=JSON.parse(evidence(source,e.evidence.at(-1)!).toString());
+      if(receipt.incident_id!==e.incident_id||receipt.target_commit!==e.current_target||receipt.proof_scope!=='certification'||receipt.execution_mode!=='full'||!['PASS','FAIL','BLOCKED'].includes(receipt.status))throw new Error('current certification evidence required');
+      if(receipt.status==='PASS'){
+        validateCurrentCertificate(root,receipt,source);
+      }
+    }
     if(e.kind==='CLOSE'){
       const receipt=JSON.parse(evidence(source,e.evidence.at(-1)!).toString());
       if(!result.some(r=>r.incident_id===e.incident_id&&r.kind==='RESERVE')||receipt.incident_id!==e.incident_id||receipt.status!=='PASS'||receipt.execution_mode!=='full'||receipt.schema_version!==2||!receipt.target_commit&&!receipt.completed_commit)throw new Error('incident closure requires complete verification PASS');
@@ -83,9 +98,48 @@ export function incidentEvents(root: string, source = snapshot(root)): IncidentE
   }
   return result;
 }
+/** Frozen v1 certification contract. Historical observations must not be
+ * reinterpreted by a future scopedPlan implementation. New policy versions need
+ * their own validation branch; this inventory/command contract stays fixed. */
+export function validateCurrentCertificate(root:string,receipt:any,source:Snapshot):void {
+  const target=snapshot(root,receipt.target_commit),plan=receipt.plan;
+  const checks=[
+    {id:'typecheck',command:['pnpm','run','typecheck']},
+    {id:'build',command:['pnpm','run','build']},
+    {id:'regression-tests',command:['pnpm','run','test']},
+    {id:'gauntlet-eval',command:['pnpm','run','gauntlet:eval']},
+    {id:'state-audit',command:['pnpm','run','gauntlet:eval:state']},
+    {id:'browser-tests',command:['pnpm','run','test-browser']},
+    {id:'sim-smoke',command:['pnpm','run','sim-smoke']},
+    {id:'parallel-policy',command:['pnpm','run','gauntlet:parallel:test']},
+    {id:'runtime-telemetry',command:['node','scripts/ci/test-gauntlet-telemetry.mjs']},
+  ];
+  const expected={'regression-tests':target.files.filter(nodeTest),'browser-tests':target.files.filter(browserTest)};
+  if(receipt.schema_version!==2||receipt.status!=='PASS'||receipt.failure_class!==null||receipt.execution_mode!=='full'||receipt.proof_scope!=='certification'||plan?.schema_version!==2||plan.proof_scope!=='certification'||!plan.full_required||JSON.stringify(plan.changed_paths)!=='[]'||JSON.stringify(plan.checks)!==JSON.stringify(checks)||JSON.stringify(plan.expected_tests)!==JSON.stringify(expected)||!/^docs\/evidence\/CERT-[A-Za-z0-9._-]+\/quality\.json$/.test(receipt.output_path))throw new Error('current evidence coverage differs');
+  validateScopedProofs(plan,receipt,{files:target.files,read:p=>target.read(p)??source.read(p)},receipt.output_path);
+}
+/** Historical UNKNOWN stays UNKNOWN. Only a complete new certificate removes
+ * the legacy import from current execution admission; it does not close/repair it. */
+function currentEvidencePassed(e:IncidentEvent,source:Snapshot):boolean {
+  return e.kind==='OBSERVED'&&JSON.parse(evidence(source,e.evidence.at(-1)!).toString()).status==='PASS';
+}
+export function currentEvidenceAvailable(root:string,e:IncidentEvent,source?:Snapshot,history?:IncidentEvent[],target='HEAD'):boolean {
+  if(['OBSERVE','OBSERVED'].includes(e.kind)||e.boundary!=='repository/full'||!['BLOCKED','EXHAUSTED'].includes(e.state)||e.failure_class!=='UNKNOWN'||!e.evidence.some(r=>r.path.startsWith('gauntlet/incidents/legacy-')))return false;
+  source??=snapshot(root,'HEAD');history??=incidentEvents(root,source);
+  const rows=history.filter(r=>r.incident_id===e.incident_id);
+  if(rows.some(r=>r.kind==='OBSERVE'||r.kind==='RESERVE'||r.kind==='REPAIR'))return false;
+  const original=rows[0],provenance=source;
+  if(!original||!original.evidence.every(r=>r.path.startsWith('gauntlet/incidents/legacy-'))||rows.some(r=>r.evidence.some(ref=>JSON.parse(evidence(provenance,ref).toString()).protocol=== 'gauntlet-quality-0.12.0')))return false;
+  const anchor=engineeringWorkspaceBase(root,e.incident_id),head=execFileSync('git',['-C',root,'rev-parse',target],{encoding:'utf8'}).trim();
+  execFileSync('git',['-C',root,'merge-base','--is-ancestor',anchor,head],{stdio:'pipe'});
+  const paths=execFileSync('git',['-C',root,'diff','--name-only',anchor,head],{encoding:'utf8'}).trim().split('\n');
+  // New product/evaluator inputs are required. A new CERT label, bookkeeping,
+  // model/session change or policy edit cannot earn another observation.
+  return paths.some(p=>/^(?:src\/|eval\/|docs\/(?:player-controls|how-to-play)\.md$)/.test(p));
+}
 export function activeIncident(root: string, boundary: string): IncidentEvent | null {
-  const latest = new Map<string,IncidentEvent>(); incidentEvents(root).forEach(e=>latest.set(e.incident_id,e));
-  const active = [...latest.values()].filter(e=>e.boundary===boundary && e.state!=='CLOSED');
+  const source=snapshot(root),latest = new Map<string,IncidentEvent>(); incidentEvents(root,source).forEach(e=>latest.set(e.incident_id,e));
+  const active = [...latest.values()].filter(e=>e.boundary===boundary && e.state!=='CLOSED' && !currentEvidencePassed(e,source));
   if (active.length>1) throw new Error('multiple unresolved incidents at one verification boundary');
   return active[0] ?? null;
 }

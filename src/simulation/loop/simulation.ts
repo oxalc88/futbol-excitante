@@ -71,7 +71,12 @@ import type { DribbleState } from "../contacts/second-touch-system.js";
 import { stepTackle, replayTackleEvent } from "../contacts/tackle-system.js";
 import type { TackleState } from "../contacts/tackle-system.js";
 import { isFoulCandidateEvent } from "../foul-predicate.js";
-import { resolveCardForAccumulatedFouls } from "../card-policy.js";
+import {
+  resolveCardForAccumulatedFouls,
+  resolveDirectRedForFoul,
+  foulContactSeverity,
+  FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD,
+} from "../card-policy.js";
 import {
   ADVANTAGE_WINDOW_TICKS,
   FOUL_CAUTION_PENDING_TICKS,
@@ -1564,11 +1569,19 @@ export function createSimulation(
 
   /**
    * Issue a card consequence for one committed man-not-ball foul contact
-   * (CARD-MACHINERY, FOULS_CARDS_SPEC §7 / §9.1). The offender is the tackler
-   * (`playerIdA` / `teamIdA`); the fouled player is the contacted opponent
-   * (`playerIdB` / `teamIdB`). Every recognized foul increments that player's
-   * accumulated foul count; a caution is issued when it reaches the yellow
-   * accumulation count, an expulsion when it reaches the red accumulation count.
+   * (CARD-MACHINERY / CARD-DIRECT-RED, FOULS_CARDS_SPEC §7 / §9.1). The
+   * offender is the tackler (`playerIdA` / `teamIdA`); the fouled player is the
+   * contacted opponent (`playerIdB` / `teamIdB`). Every recognized foul
+   * increments that player's accumulated foul count.
+   *
+   * Disposition, in precedence order:
+   *   1. CARD-DIRECT-RED — the committed contact severity crosses the exported
+   *      `fouls-v1` §9.1 `FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD`: a direct
+   *      expulsion, independent of (and taking precedence over) the
+   *      accumulation ladder for that foul. Not a second-yellow rule.
+   *   2. CARD-MACHINERY accumulation — a caution when the count reaches the
+   *      yellow accumulation count, an expulsion when it reaches the red
+   *      accumulation count.
    *
    * Booking state is materialized lazily in `state.bookings` only once a
    * qualifying foul is committed, so the off-path (gate off or no foul) never
@@ -1584,6 +1597,42 @@ export function createSimulation(
     const bookings = state.bookings ?? (state.bookings = {});
     const booking = bookings[offenderId] ?? (bookings[offenderId] = { fouls: 0, cautions: 0, expulsions: 0 });
     booking.fouls += 1;
+
+    // CARD-DIRECT-RED (FOULS_CARDS_SPEC §7 contact-severity): a recognized foul
+    // whose committed contact severity crosses the exported fouls-v1 §9.1
+    // threshold is a DIRECT expulsion, independent of the accumulation ladder.
+    // It takes precedence over an accumulation card for the same foul (an
+    // expulsion is the more severe disposition). This is NOT a second-yellow
+    // rule: the severity path reads only the committed contact, never the
+    // accumulated count.
+    if (resolveDirectRedForFoul(p) === "expulsion") {
+      booking.expulsions += 1;
+      const severity = foulContactSeverity(p);
+      eventCounter++;
+      const directRedEvent: SimulationEvent = {
+        id: `card-issued-${state.tick}-${eventCounter}-${offenderId}`,
+        tick: state.tick,
+        sequence: eventCounter,
+        kind: "card-issued",
+        label:
+          `Expulsion: ${offenderId} direct red (contact severity ` +
+          `${severity.toFixed(3)} >= ${FOUL_CARD_DIRECT_RED_SEVERITY_THRESHOLD}) ` +
+          `(foul vs ${fouledPlayerId})`,
+        payload: {
+          cardType: "expulsion",
+          cardReason: "direct-severity",
+          directRedSeverity: severity,
+          playerId: offenderId,
+          teamId,
+          fouledPlayerId,
+          accumulatedFouls: booking.fouls,
+          foulSourceEventId: ev.id,
+          foulTick: ev.tick,
+        },
+      };
+      state.events = [...state.events, directRedEvent];
+      return;
+    }
 
     const cardType = resolveCardForAccumulatedFouls(booking.fouls);
     if (cardType === null) return;

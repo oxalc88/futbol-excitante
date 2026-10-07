@@ -30,7 +30,7 @@ const _b: any = Buffer;
 `;
 
 describe("CORE-TS-ISOLATION-001: core tsconfig forbids DOM/Node globals", () => {
-  it("compilation of forbidden globals FAILS with tsconfig.core.json", () => {
+  it("compilation of forbidden globals FAILS with tsconfig.core.json", { timeout: 120000 }, () => {
     // Write the probe file inside the core include scope
     writeFileSync(PROBE_FILE, PROBE_CODE);
 

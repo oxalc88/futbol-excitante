@@ -101,6 +101,15 @@ export interface DefensiveDuelConfig {
    * the core is byte-identical to pre-change.
    */
   advantageConfig?: AdvantageConfig;
+  /**
+   * CARD-DIRECT-RED: when true, inject the core's committed `card-issued`
+   * events (read from the persistent `state.events`) into the matching-tick
+   * observations, so the card/direct-red consequence is observable at the
+   * observation level — the same post-loop, hash-neutral technique the headless
+   * runner's `serializeRestartFacts` gate uses. Off by default: the returned
+   * observation stream is byte-identical to the pre-change shape.
+   */
+  serializeCommittedEvents?: boolean;
 }
 
 /** A press the human policy actually issued, with its tick and bit mask. */
@@ -192,6 +201,7 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
   const freeKickConfig = config.freeKickConfig;
   const cardConfig = config.cardConfig;
   const advantageConfig = config.advantageConfig;
+  const serializeCommittedEvents = config.serializeCommittedEvents ?? false;
 
   const world = createWorld({ scenario });
   const observations: TelemetryObservation[] = [];
@@ -413,11 +423,22 @@ export function runDefensiveDuel(config: DefensiveDuelConfig): DefensiveDuelResu
       ev.kind === "advantage-expired",
   );
 
+  // CARD-DIRECT-RED: post-loop, additive injection of the committed
+  // `card-issued` facts into the matching-tick observations.  Inputs, steps and
+  // state hashes are all already committed, so this provably cannot affect
+  // them.  Off by default → the observation stream is byte-identical.
+  const committedObservations = serializeCommittedEvents
+    ? observations.map((o) => {
+        const injected = cardEvents.filter((ev) => ev.tick === o.tick);
+        return injected.length === 0 ? o : { ...o, events: [...o.events, ...injected] };
+      })
+    : observations;
+
   return {
     tick: sim.tick,
     stateHashes,
     events,
-    observations,
+    observations: committedObservations,
     humanInputs,
     humanPresses,
     humanControlSlot,

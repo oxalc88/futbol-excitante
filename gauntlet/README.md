@@ -14,7 +14,9 @@ All Gauntlet agents, skills, routing, deterministic evals, and contracts live in
 
 `gauntlet/VERSION.json` is the canonical SemVer declaration for the complete harness. A version becomes a published release after merge to `main` and publication of the immutable `gauntlet-vX.Y.Z` tag.
 
-Current candidate: **0.12.0** over 0.11.3.
+Current candidate: **0.13.2** over 0.13.1.
+
+0.13.2 recovers rebased execution provenance using verified whole-tree identity and permits one full current certification of changed product inputs behind an unattested legacy import. Historical UNKNOWN and consumed recovery remain unchanged. See `RELEASE-0.13.2.md`.
 
 0.12.0 separates durable objective acceptance from whole-repository milestone/release certification. Each objective runs baseline plus deterministic affected checks; high-risk/unknown changes still require complete checks. Content-addressed check proofs avoid repeating unchanged valid checks after repair. Supported unrelated harness certification failures preserve bounded same-Horizon progress; known product/unknown failures block it, and certification is mandatory before a fifth uncertified objective. All three adapters load the same policy. Timeouts/recovery limits and application behavior are unchanged. See `RELEASE-0.12.0.md` and `product-quality-contract.md`. No measured speedup is claimed.
 

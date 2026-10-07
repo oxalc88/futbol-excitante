@@ -350,6 +350,10 @@ const CRITERION_TO_ORACLE: Record<
     oracle_id: "foul-card-issued-oracle-v1",
     oracle_version: "oracle-foul-card-issued-v1",
   },
+  "CARD-DIRECT-RED": {
+    oracle_id: "foul-card-direct-red-oracle-v1",
+    oracle_version: "oracle-foul-card-direct-red-v1",
+  },
   "ADVANTAGE-PLAYED": {
     oracle_id: "foul-advantage-played-oracle-v1",
     oracle_version: "oracle-foul-advantage-played-v1",

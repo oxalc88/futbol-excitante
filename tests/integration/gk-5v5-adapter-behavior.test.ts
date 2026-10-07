@@ -100,6 +100,12 @@ interface Run {
   counters: Record<string, number>;
 }
 
+// Awaiting this expression between long synchronous match runs yields to the
+// macrotask queue so the vitest worker keeps processing its birpc onTaskUpdate
+// channel (60 s hardcoded timeout); a >60 s unbroken sync block fails the run
+// as an unhandled error even when every test passes.
+const flushMacrotasks = () => new Promise<void>((resolve) => setImmediate(resolve));
+
 function runMatch(path: string, ticks: number, gkBehavior: boolean): Run {
   resetMechanismCounters();
   resetKeeperMechanismCounters();
@@ -148,13 +154,19 @@ let stashed: Run;
 let fixtureLive: Run;
 let fixtureStashed: Run;
 
-beforeAll(() => {
+beforeAll(async () => {
   // The continuous window is kept short here: 1800-tick coherence is the
   // durable artifact's job (docs/evidence/GK-5V5-ADAPTER-BEHAVIOR), and the
   // stash-identity guard below is the only 1800-tick run this suite needs.
+  // Each await yields to the macrotask queue so the vitest worker keeps
+  // processing its birpc onTaskUpdate channel (60 s hardcoded timeout —
+  // these runs must not present a >60 s unbroken synchronous block).
   live = runMatch(CONTINUOUS_MATCH, 900, true);
+  await flushMacrotasks();
   fixtureLive = runMatch(SHOT_FIXTURE, 600, true);
+  await flushMacrotasks();
   fixtureStashed = runMatch(SHOT_FIXTURE, 600, false);
+  await flushMacrotasks();
   stashed = runMatch(CONTINUOUS_MATCH, 1800, false);
 }, HOOK_TIMEOUT);
 

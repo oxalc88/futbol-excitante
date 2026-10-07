@@ -1,3 +1,4 @@
+import { executionAncestor, executionCommit } from './execution-provenance.js';
 import { existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { validateExecutionPlan, executableUnits, type ExecutionPlan } from './execution-dag.mjs';
@@ -7,9 +8,10 @@ import { auditAppendOnly, evidence, type EvidenceRef } from './incidents.js';
 export interface UnitResult { unit_id:string; base_commit:string; output_commit:string; handoff:EvidenceRef; checks:ProvenResult[]; receipt_path:string }
 export function executionState(root:string,objective:string,source=snapshot(root,'HEAD')) {
   const path=`gauntlet/execution/${objective}.json`,bytes=source.read(path);if(!bytes)return null;
-  const plan=JSON.parse(bytes.toString()) as ExecutionPlan;if(plan.objective_id!==objective)throw new Error('execution parent mismatch');
+  const originalPlan=JSON.parse(bytes.toString()) as ExecutionPlan;
+  const plan={...originalPlan,base_commit:executionAncestor(root,originalPlan.base_commit!,false,source)};if(plan.objective_id!==objective)throw new Error('execution parent mismatch');
   const order=validateExecutionPlan(plan);if(!/^[a-f0-9]{40}$/.test(plan.base_commit??''))throw new Error('canonical execution plan requires source base commit');execFileSync('git',['-C',root,'merge-base','--is-ancestor',plan.base_commit!,'HEAD']);auditAppendOnly(root,'gauntlet/execution/');
-  const results=source.files.filter(p=>p.startsWith(`gauntlet/execution/${objective}/`)&&p.endsWith('.json')).map(p=>{const row=JSON.parse(source.read(p)!.toString()) as UnitResult;if(!order.includes(row.unit_id)||p!==`gauntlet/execution/${objective}/${row.unit_id}.json`)throw new Error('unknown or misnamed unit settlement');return row;});
+  const results=source.files.filter(p=>p.startsWith(`gauntlet/execution/${objective}/`)&&p.endsWith('.json')).map(p=>{const original=JSON.parse(source.read(p)!.toString()) as UnitResult;const row={...original,base_commit:executionCommit(root,original.base_commit,source),output_commit:executionCommit(root,original.output_commit,source)};if(!order.includes(row.unit_id)||p!==`gauntlet/execution/${objective}/${row.unit_id}.json`)throw new Error('unknown or misnamed unit settlement');return row;});
   const done:string[]=[];
   for(const id of order){
     const rows=results.filter(r=>r.unit_id===id);if(rows.length>1)throw new Error('duplicate unit settlement');if(!rows.length)continue;
