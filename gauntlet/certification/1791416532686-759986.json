@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "target_commit": "30908bafbf6ca3b1a9095d3e11d3df30e7406bee",
+  "recorded_at": "2026-10-07T23:42:12.686Z",
+  "status": "FAIL",
+  "failure_class": "PRODUCT_FAILURE",
+  "receipt": {
+    "path": "docs/evidence/CERT-0140-GREEN/verification/1791416528852-759986-receipt.json",
+    "sha256": "993680823f4513e2548e1fa21ffa953ea200edd70a80c3dbf4c3187d0874d527"
+  },
+  "horizon": "v40"
+}
