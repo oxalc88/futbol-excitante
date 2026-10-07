@@ -67,8 +67,10 @@
     "gauntlet:memory:validate": "node --import tsx scripts/gauntlet/runtime.ts memory-validate",
     "gauntlet:quality": "node --import tsx scripts/gauntlet/product-quality.ts",
     "gauntlet:trajectory": "node --import tsx scripts/gauntlet/trajectory.ts",
-    "gauntlet:product:test": "vitest run tests/unit/gauntlet-0.11 tests/unit/gauntlet-0.12 tests/unit/gauntlet-0.13 --project node --no-file-parallelism",
-    "gauntlet:control": "node --import tsx scripts/gauntlet/control.ts"
+    "gauntlet:product:test": "vitest run tests/unit/gauntlet-0.11 tests/unit/gauntlet-0.12 tests/unit/gauntlet-0.13 tests/unit/gauntlet-0.14.0-bureaucracy.test.ts --project node --no-file-parallelism",
+    "gauntlet:control": "node --import tsx scripts/gauntlet/control.ts",
+    "gauntlet:bureaucracy": "node --import tsx scripts/gauntlet/bureaucracy.ts",
+    "gauntlet:bureaucracy:test": "vitest run tests/unit/gauntlet-0.14.0-bureaucracy.test.ts --project node --no-file-parallelism"
   },
   "dependencies": {
     "three": "^0.170.0"

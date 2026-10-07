@@ -59,3 +59,10 @@ Simulation mappings use actual before/after trees. Existing ball/contacts/locomo
 Every invocation appends immutable receipt/log/report proofs and executed/reused measurements, including failed and diagnostic runs. Certification publication, bounded debt, independent reviews, exact-target promotion and normal-play trajectory guarantees above remain mandatory.
 
 0.13.2 distinguishes unattested historical imports from source-bound current failures. The single changed-input full certification observation in `product-first-contract.md` preserves UNKNOWN and the entire consumed recovery history; it is not REPAIR_PASS or RESUME_ONCE. Existing check limits, coverage proofs and certification/debt barriers still apply. Only a complete independently validated current certificate can authorize subsequent scoped claims. Execution ancestry bookkeeping uses cryptographically verified exact-tree records, never edited historical receipts.
+
+
+## 0.14 changed-state certification
+
+A canonical blocked incident does not permanently own the repository/full boundary. When product or verification input content changes after the last attempted target, the new content-addressed state may execute one fresh full certification. This is observation of new current truth, not another recovery attempt: the old incident, failure class, diagnosis, repair history and budget remain append-only.
+
+An unchanged state cannot rerun by changing a CERT label, bookkeeping, evidence publication or state files. A changed state receives no PASS credit from history: every required current check must still be executed or validly reused under the existing proof rules, and any current failure remains FAIL. Only a complete validated current-target PASS becomes authoritative for current admission.

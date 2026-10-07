@@ -1,0 +1,28 @@
+{
+  "problem": "The shipped app has no player-facing reference for its control surface — the in-app legend covers slot-1 keys only, while keeper takeover, restart destination steering, difficulty scaling and the referee toggle remain undocumented, so a new player cannot discover them without reading source.",
+  "smallest_playable_slice": "A player can open docs/player-controls.md and docs/how-to-play.md in the repository and discover every shipped control — movement, sprint, first touch, pass/shot/lofted/through, tackles, switching (including the keeper in 5v5 human-vs-CPU), restart steering during award windows, difficulty scaling, and the referee toggle gating fouls/free kicks/cards — with each claim traceable to the shipped sources.",
+  "sources": [
+    {
+      "path": "specs/FOULS_CARDS_SPEC.md",
+      "commit": "3e888e0eb769af5e86ba2b6c58b54a471f372d5e",
+      "sha256": "4c73eb6f89b545dd034d9dff16ba92dced6b80f14a3c38fdf0f0b728fd18b4b7"
+    },
+    {
+      "path": "src/contracts/controls-legend.ts",
+      "commit": "3e888e0eb769af5e86ba2b6c58b54a471f372d5e",
+      "sha256": "6e38c41e33fa1135e89323fc7e515c318f563f756928ab7e66eb2ad90ac7be63"
+    },
+    {
+      "path": "docs/player-controls.md",
+      "commit": "3e888e0eb769af5e86ba2b6c58b54a471f372d5e",
+      "sha256": "86e7605be83bdd875f62d69145d90a501e6ee3b3b4591aab2568a910b354d706"
+    },
+    {
+      "path": "docs/how-to-play.md",
+      "commit": "3e888e0eb769af5e86ba2b6c58b54a471f372d5e",
+      "sha256": "1358ea654529cca637cdeb7e21e57691b381ee40b99e2d691cf432d8f8850093"
+    }
+  ],
+  "selected_at": "2026-10-07T10:43:01.803Z",
+  "gauntlet_version": "0.13.2"
+}
