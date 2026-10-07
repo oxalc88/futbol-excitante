@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, mkdirSync, writeFileSync, rmSync, readdirSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { join } from 'node:path';
-import { currentEvidenceAvailable, activeIncident, appendIncident, openIncident, exhaustIncident, importLegacyIncidents, incidentBoundary, evidence, requirePublishedIncident, validateRepairCommit, validateRepairExecution, requireRelevantRepair, incidentEvents, type IncidentEvent, type MaterialRepair } from './incidents.js';
+import { currentEvidenceAvailable, currentVerificationAvailable, activeIncident, appendIncident, openIncident, exhaustIncident, importLegacyIncidents, incidentBoundary, evidence, requirePublishedIncident, validateRepairCommit, validateRepairExecution, requireRelevantRepair, incidentEvents, type IncidentEvent, type MaterialRepair } from './incidents.js';
 import { snapshot, hash, digest } from './scoped-quality.js';
 import { rememberFailure, repairCheck, RecoveryBlockedError, type QualityRecovery } from './quality-execution.js';
 import { validateCheckProof, type Profile, type ProvenResult } from './check-proof.js';
@@ -41,6 +41,11 @@ export class IncidentRecovery {
     if(certification&&currentEvidenceAvailable(this.root,e)){
       requirePublishedIncident(this.root,e);
       this.incident=appendIncident(this.root,{...e,kind:'OBSERVE',state:e.state,current_policy:'legacy-current-v1',current_target:execFileSync('git',['-C',this.root,'rev-parse','HEAD'],{encoding:'utf8'}).trim()});
+      this.observing=true;return;
+    }
+    if(certification&&currentVerificationAvailable(this.root,e)){
+      requirePublishedIncident(this.root,e);
+      this.incident=appendIncident(this.root,{...e,kind:'OBSERVE',state:e.state,current_policy:'current-verification-v2',current_target:execFileSync('git',['-C',this.root,'rev-parse','HEAD'],{encoding:'utf8'}).trim()});
       this.observing=true;return;
     }
     if(e.state!=='RESUME_ONCE')throw new RecoveryBlockedError(`RECOVERY_BLOCKED: incident ${e.incident_id} ${e.state}; diagnose/repair or continue independently verifiable product work`);

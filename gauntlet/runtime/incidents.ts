@@ -6,6 +6,7 @@ import { dirname, posix } from 'node:path';
 import { snapshot, scopedPlan, hash, digest, nodeTest, browserTest, type Snapshot } from './scoped-quality.js';
 import { initializeRecoveryBudget, recoveryTimeRemaining, repairCheck, type QualityRecovery } from './quality-execution.js';
 import type { FailureClass } from './check-proof.js';
+import { admitsCurrentVerification } from './bureaucracy.js';
 
 export type IncidentState = 'ACTIVE' | 'EXHAUSTED' | 'REPAIR_CONFIRMED' | 'RESUME_ONCE' | 'CLOSED' | 'BLOCKED';
 export interface EvidenceRef { path: string; sha256: string }
@@ -26,7 +27,7 @@ export interface IncidentEvent {
   boundary: string; state: IncidentState; failure_class: FailureClass;
   recovery: QualityRecovery; evidence: EvidenceRef[]; repair?: MaterialRepair; execution_id?: string;
   current_target?: string;
-  current_policy?: 'legacy-current-v1';
+  current_policy?: 'legacy-current-v1' | 'current-verification-v2';
   engineering?: { route: string; mode:'REPAIR'|'REVIEW_ONLY'; authorization_commit: string; workspace_commit: string; command: string[] };
 }
 export const incidentBoundary = (certification: boolean, full: boolean, objective: string) => certification || full ? 'repository/full' : `objective/${objective}`;
@@ -60,7 +61,12 @@ export function incidentEvents(root: string, source = snapshot(root)): IncidentE
     if (e.kind === 'DIAGNOSE' && result.some(r=>r.incident_id===e.incident_id && r.kind==='DIAGNOSE')) throw new Error('one causal diagnosis per incident');
     if(['OBSERVE','OBSERVED'].includes(e.kind)&&prior&&(JSON.stringify(e.recovery)!==JSON.stringify(prior.event.recovery)||e.failure_class!==prior.event.failure_class||JSON.stringify(e.evidence.slice(0,prior.event.evidence.length))!==JSON.stringify(prior.event.evidence)))throw new Error('current evidence cannot rewrite historical uncertainty');
     if(e.kind==='OBSERVE'){
-      if(!prior||!currentEvidenceAvailable(root,prior.event,source,result,e.current_target)||!/^[a-f0-9]{40}$/.test(e.current_target??'')||e.current_policy!=='legacy-current-v1')throw new Error('current evidence is not an incident retry');
+      const eligible=e.current_policy==='legacy-current-v1'
+        ? currentEvidenceAvailable(root,prior?.event as IncidentEvent,source,result,e.current_target)
+        : e.current_policy==='current-verification-v2'
+          ? currentVerificationAvailable(root,prior?.event as IncidentEvent,source,result,e.current_target)
+          : false;
+      if(!prior||!eligible||!/^[a-f0-9]{40}$/.test(e.current_target??''))throw new Error('current evidence is not an incident retry');
       execFileSync('git',['-C',root,'merge-base','--is-ancestor',e.current_target!,'HEAD'],{stdio:'pipe'});
     }
     if(e.kind==='OBSERVED'){
@@ -136,6 +142,36 @@ export function currentEvidenceAvailable(root:string,e:IncidentEvent,source?:Sna
   // New product/evaluator inputs are required. A new CERT label, bookkeeping,
   // model/session change or policy edit cannot earn another observation.
   return paths.some(p=>/^(?:src\/|eval\/|docs\/(?:player-controls|how-to-play)\.md$)/.test(p));
+}
+
+/**
+ * 0.14 current-state authority. A blocked historical incident may observe a
+ * materially changed current verification state. The incident remains
+ * append-only; bookkeeping-only changes do not earn another execution.
+ */
+export function currentVerificationAvailable(root:string,e:IncidentEvent,source?:Snapshot,history?:IncidentEvent[],target='HEAD'):boolean {
+  if(!e||e.boundary!=='repository/full'||!['BLOCKED','EXHAUSTED'].includes(e.state))return false;
+  source??=snapshot(root,'HEAD');history??=incidentEvents(root,source);
+  if(currentEvidencePassed(e,source))return false;
+  const rows=history.filter(r=>r.incident_id===e.incident_id);
+  let anchor=rows.slice().reverse().find(r=>r.kind==='OBSERVE'&&/^[a-f0-9]{40}$/.test(r.current_target??''))?.current_target??null;
+  if(!anchor){
+    outer: for(const row of rows.slice().reverse()){
+      for(const ref of row.evidence.slice().reverse()){
+        try{
+          const record=JSON.parse(evidence(source,ref).toString());
+          const candidate=record.target_commit??record.completed_commit;
+          if(/^[a-f0-9]{40}$/.test(candidate??'')){anchor=candidate;break outer;}
+        }catch{/* Evidence can be a non-receipt incident payload. */}
+      }
+    }
+  }
+  anchor??=engineeringWorkspaceBase(root,e.incident_id);
+  const head=execFileSync('git',['-C',root,'rev-parse',target],{encoding:'utf8'}).trim();
+  if(anchor===head)return false;
+  execFileSync('git',['-C',root,'merge-base','--is-ancestor',anchor,head],{stdio:'pipe'});
+  const paths=execFileSync('git',['-C',root,'diff','--name-only',anchor,head],{encoding:'utf8'}).trim().split('\n').filter(Boolean);
+  return admitsCurrentVerification(e.failure_class,paths);
 }
 export function activeIncident(root: string, boundary: string): IncidentEvent | null {
   const source=snapshot(root),latest = new Map<string,IncidentEvent>(); incidentEvents(root,source).forEach(e=>latest.set(e.incident_id,e));

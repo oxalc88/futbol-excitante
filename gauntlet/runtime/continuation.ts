@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { snapshot, scopedPlan, hash } from './scoped-quality.js';
 import { verifyObjectiveAdmission, certificationHealth } from './certification.js';
-import { auditAppendOnly, currentEvidenceAvailable, activeIncident, incidentBoundary, incidentEvents, evidence, requirePublishedIncident, type EvidenceRef, type IncidentEvent } from './incidents.js';
+import { auditAppendOnly, currentEvidenceAvailable, currentVerificationAvailable, activeIncident, incidentBoundary, incidentEvents, evidence, requirePublishedIncident, type EvidenceRef, type IncidentEvent } from './incidents.js';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { executionState } from './integrated-execution.js';
 import { repairExecutionProvenance } from './execution-provenance.js';
@@ -69,7 +69,7 @@ export function routineContinuation(root:string):string|null {
   const dirty=execFileSync('git',['-C',root,'status','--porcelain','--','gauntlet/execution/provenance/'],{encoding:'utf8'}).trim();
   if(dirty)return 'PUBLISH_BOOKKEEPING';
   const incident=activeIncident(root,'repository/full');
-  if(incident&&currentEvidenceAvailable(root,incident))return 'CERTIFY_CURRENT';
+  if(incident&&(currentEvidenceAvailable(root,incident)||currentVerificationAvailable(root,incident)))return 'CERTIFY_CURRENT';
   return null;
 }
 export function stopRecord(root:string,f:ContinuationFacts):string {
