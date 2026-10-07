@@ -1,0 +1,38 @@
+{
+  "protocol": "gauntlet-quality-0.12.0",
+  "check": {
+    "id": "typecheck",
+    "command": [
+      "pnpm",
+      "run",
+      "typecheck"
+    ]
+  },
+  "key": "da2414de6f404b78925e5a10e5643fec63e396715b1d291a87f16bd82fd1b7ba",
+  "profile": {
+    "node": "24.18.0",
+    "pnpm": "11.10.0",
+    "vite": "6.4.3",
+    "platform": "linux",
+    "arch": "x64",
+    "environment_sha256": "b4b758b9c4a55c8d67dd9c95d769ce09ceda90854ebb00674135e866282e6f2e",
+    "installed_sha256": "16956395abafc20f94833ea57bfbf991288c448754702854c232430fcbca3a92"
+  },
+  "expected_tests": [],
+  "observed_tests": [],
+  "result": {
+    "id": "typecheck",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": ".delivery-local/unit-typecheck.log",
+    "duration_ms": 21000
+  },
+  "started_from": "ba1ec6398bee1b0b401bab47d9d166143468a086",
+  "completed_at": "2026-10-07T04:00:38.056Z",
+  "log": {
+    "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/unitA-muxkxwfn-typecheck.log.gz",
+    "sha256": "1fef8e838f2ee43dfa8e66eb752c1d5c4be890d3585a6c5001b6e4683d00b19f"
+  },
+  "test_report": null,
+  "producing_root": "/home/ubuntu/projects/oxDeveloop/pes-simulator"
+}
