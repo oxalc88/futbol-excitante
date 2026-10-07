@@ -2,7 +2,7 @@
   "schema_version": 1,
   "objective_id": "PLAYER-CONTROLS-REFERENCE",
   "issue_number": 28,
-  "base_commit": "59a1ae905e97346e919bf3e3fb23ca2fb94721ce",
+  "base_commit": "c6605312c96dd2a0b363cc4443fb3c4c6c2aa2cd",
   "units": [
     {
       "id": "A",
