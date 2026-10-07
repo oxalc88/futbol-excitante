@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-CARD-BROWSER-EVIDENCE",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "semantic_order": "slide lunge closing -> direct red (contact severity crosses fouls-v1 §9.1 threshold 0.85) at the foul tick",
+  "durable_capture": true,
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "rendering": {
+    "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium)",
+    "hud": "showMatchPhaseHud:true + showCardHud:true (curated card booking notice, presentation-only enrichment)"
+  },
+  "arc": {
+    "foul_ticks": [
+      52
+    ],
+    "fouling_player_id": "player-1",
+    "direct_red": {
+      "tick": 52,
+      "cardType": "expulsion",
+      "cardReason": "direct-severity",
+      "directRedSeverity": 0.924926327957164,
+      "accumulatedFouls": 1,
+      "fouledPlayerId": "player-10"
+    },
+    "booking_state": {
+      "player-1": {
+        "fouls": 1,
+        "cautions": 0,
+        "expulsions": 1
+      }
+    },
+    "controls": {
+      "standing_tackle": {
+        "foul_ticks": [
+          66,
+          290
+        ],
+        "card_count": 1,
+        "card_type": "caution",
+        "direct_red": false
+      },
+      "gate_off": {
+        "card_count": 0,
+        "bookings_present": false
+      }
+    }
+  },
+  "frames": [
+    {
+      "label": "slide-contact",
+      "path": "slide-contact.png",
+      "tick": 51,
+      "semantic": "before",
+      "description": "The sliding lunge closing on the carrier: the offending body (player-1) has committed the slide deep inside the versioned slide reach (commitDistance 4.0) — the ball still in play (PLAYING), no card yet",
+      "sha256": "e1f75035fde3de77627ffddcd87b573c564978d5d94cc39d7c76d664e8dfeebe"
+    },
+    {
+      "label": "direct-red",
+      "path": "direct-red.png",
+      "tick": 52,
+      "semantic": "event",
+      "description": "DIRECT red at the foul tick: the committed slide man-not-ball contact (fouled player-10) has a normalized contact severity 0.925 crossing the fouls-v1 §9.1 threshold 0.85, so the core issues a direct expulsion to player-1 independent of the accumulation ladder; the card HUD draws the RED CARD notice",
+      "sha256": "17ab66b60fb3d3d62724970ca0fab2854e138a6fbd8eb9dd13e82ca6190c93f3"
+    }
+  ]
+}
