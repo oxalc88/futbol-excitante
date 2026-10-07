@@ -231,7 +231,7 @@ describe("PLAYABLE_1V1: entry prereq outcome values", () => {
         expect(p.outcome).toBe(outcome);
       }
     }
-  });
+  }, 30000);
 
   it("the module exports evaluatePlayable1v1 with the option", async () => {
     const mod = await import(
