@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "original_commit": "2421d111fc397caa9c96f02fd88a0ecde27082e7",
+  "ancestor_commit": "955d0900454180fcdc5b17d8de1d7a79e68f28e3",
+  "tree": "e9d9dc3e4eeb3a547a2d74df7340d3ed276db8a9",
+  "original_commit_object": "tree e9d9dc3e4eeb3a547a2d74df7340d3ed276db8a9\nparent f796a548d61f7c45112d292112fdaea488b32e69\nauthor Rolando Oxalc <qj.oxalc@gmail.com> 1791214290 -0500\ncommitter Rolando Oxalc <qj.oxalc@gmail.com> 1791214290 -0500\n\nchore(gauntlet): publish PLAYER-CONTROLS-REFERENCE execution plan (unit A: docs/player-controls.md + docs/how-to-play.md)\n"
+}

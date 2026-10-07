@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "original_commit": "07d940ecf8caa501ffb05b023ba714867656a91d",
+  "ancestor_commit": "704235321677b0061ada97d85473c808f1518ba8",
+  "tree": "37350a32fc62a412f48c8f4953be8551e206fbd5",
+  "original_commit_object": "tree 37350a32fc62a412f48c8f4953be8551e206fbd5\nparent 2421d111fc397caa9c96f02fd88a0ecde27082e7\nauthor Rolando Oxalc <qj.oxalc@gmail.com> 1791214290 -0500\ncommitter Rolando Oxalc <qj.oxalc@gmail.com> 1791215217 -0500\n\ndocs(player): unit A output — player-controls reference and how-to-play guide\n"
+}

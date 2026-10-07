@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "original_commit": "f796a548d61f7c45112d292112fdaea488b32e69",
+  "ancestor_commit": "0caa4cb1578273902c5851bec70231afa848d5f9",
+  "tree": "d17675669de5f4af47934eae3d99d02495999e4c",
+  "original_commit_object": "tree d17675669de5f4af47934eae3d99d02495999e4c\nparent ad4c7e03471e14f4215372007fb874c44e8ea573\nauthor Rolando Oxalc <qj.oxalc@gmail.com> 1791214290 -0500\ncommitter Rolando Oxalc <qj.oxalc@gmail.com> 1791214290 -0500\n\nchore(gauntlet): lift docs out of the candidate tree for unit-based execution (PLAYER-CONTROLS-REFERENCE)\n"
+}
