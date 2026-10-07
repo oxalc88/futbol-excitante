@@ -52,7 +52,7 @@
   "schema_version": 1,
   "sequence": 7,
   "previous": "94e0b72e84ad87a59c5d02749869dbf2af2599cd7e94164d41f35fe7e329cbe5",
-  "recorded_at": "2026-10-05T18:52:39.788Z",
+  "recorded_at": "2026-10-07T11:47:52.573Z",
   "engineering": {
     "route": "codex-cli",
     "mode": "REPAIR",
@@ -67,5 +67,5 @@
     "authorization_commit": "8ed6919310ad8f6661048d73b3b783c7bbf1a32e"
   },
   "current_policy": "legacy-current-v1",
-  "current_target": "ca4c0504111230e8fd7056785f7d8e8feaa029fe"
+  "current_target": "32f5957908aebf1494e6e7934a78bf2a6c4456c7"
 }

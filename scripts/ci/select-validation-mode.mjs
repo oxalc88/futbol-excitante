@@ -44,6 +44,8 @@ const FAST_PACKAGE_SCRIPTS = new Set([
   "gauntlet:quality",
   "gauntlet:trajectory",
   "gauntlet:product:test",
+  "gauntlet:bureaucracy",
+  "gauntlet:bureaucracy:test",
 ]);
 
 function stable(value) {

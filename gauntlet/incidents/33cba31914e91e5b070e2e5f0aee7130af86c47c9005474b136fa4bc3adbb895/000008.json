@@ -49,14 +49,14 @@
       "sha256": "223d1e1e4005dcb504dfe92f2b62c00430a00067b7c6cd28f92480032fd0fd54"
     },
     {
-      "path": "docs/evidence/CERT-A0F6161-CURRENT/verification/1791227353031-522892-receipt.json",
-      "sha256": "6e71199c2c4655518e0a2af088a14672ae13f6cd503c62c94d57eb19d9d1e958"
+      "path": "docs/evidence/CERT-CURRENT2/verification/1791374655570-633954-receipt.json",
+      "sha256": "df6d8394cb24c02f74792d75d84fbb933d88817b73732f03dc6a814fbc82b2cd"
     }
   ],
   "schema_version": 1,
   "sequence": 8,
-  "previous": "b043db8cecd29bdcf23c9bef5aa7e1c8f0466e5ed38eff8a7c0ec4a683464ace",
-  "recorded_at": "2026-10-05T19:09:14.721Z",
+  "previous": "0e8400416af7120e583e1620b4e60003103a32bdfa5f4226a060163d5642ddc0",
+  "recorded_at": "2026-10-07T12:04:17.243Z",
   "engineering": {
     "route": "codex-cli",
     "mode": "REPAIR",
@@ -71,5 +71,5 @@
     "authorization_commit": "8ed6919310ad8f6661048d73b3b783c7bbf1a32e"
   },
   "current_policy": "legacy-current-v1",
-  "current_target": "ca4c0504111230e8fd7056785f7d8e8feaa029fe"
+  "current_target": "32f5957908aebf1494e6e7934a78bf2a6c4456c7"
 }

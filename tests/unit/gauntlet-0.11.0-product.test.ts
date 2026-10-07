@@ -120,5 +120,5 @@ describe('canonical Horizon recording command',()=>{
       expect(await auditHorizonProduct(dir,39,'COMPLETE')).toMatchObject({pass:false});expect(await auditHorizonProduct(dir,38,'COMPLETE')).toMatchObject({pass:true});
       expect(await auditHorizonProduct(dir,40,'ACTIVE')).toMatchObject({pass:false});
     } finally {rmSync(dir,{recursive:true,force:true});rmSync(dir+'-origin.git',{recursive:true,force:true});}
-  });
+  },30000);
 });

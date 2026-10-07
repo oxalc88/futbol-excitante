@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "target_commit": "4590f410045f3f4124f406513b072e4e6ae1a468",
+  "recorded_at": "2026-10-07T12:15:36.647Z",
+  "status": "RECOVERY_BLOCKED",
+  "failure_class": null,
+  "receipt": {
+    "path": "docs/evidence/CERT-CURRENT3/verification/1791375336646-651494-receipt.json",
+    "sha256": "12bc798f9959c080fd4cd9b6ada155a8d7019a4fd5ee81edc53c1f60f4dba740"
+  },
+  "horizon": "v40"
+}
