@@ -18,8 +18,8 @@ describe('Gauntlet 0.14 bureaucracy regression invariants', () => {
   });
 
   it('allows one verification per materially changed state without resetting incident history', async () => {
-    const { IncidentRecovery }=await import('../../../gauntlet/runtime/incident-recovery.js');
-    const { incidentEvents }=await import('../../../gauntlet/runtime/incidents.js');
+    const { IncidentRecovery }=await import('../../gauntlet/runtime/incident-recovery.js');
+    const { incidentEvents }=await import('../../gauntlet/runtime/incidents.js');
     const f=fixture(true);try{
       f.write('.delivery-local/quality/OLD/recovery.json',readFileSync(join(process.cwd(),'gauntlet/incidents/legacy-f960b92b26aa53f48ebce68fe6c70896270d1e5f75d051fc9b5fd2a31f4756fc.json'),'utf8'));
       new IncidentRecovery(f.root,'repository/full');
