@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  vitest@3.2.7: aaadf06ea4e01b9816f03721f4e6c32cd858b67857fced43b1844af93155da3c
+
 importers:
 
   .:
@@ -35,7 +38,7 @@ importers:
         version: 6.4.3(@types/node@22.20.1)(tsx@4.23.12)
       vitest:
         specifier: ^3.1.1
-        version: 3.2.7(@types/node@22.20.1)(@vitest/browser@3.2.7)(tsx@4.23.12)
+        version: 3.2.7(patch_hash=aaadf06ea4e01b9816f03721f4e6c32cd858b67857fced43b1844af93155da3c)(@types/node@22.20.1)(@vitest/browser@3.2.7)(tsx@4.23.12)
 
 packages:
 
@@ -1214,7 +1217,7 @@ snapshots:
       magic-string: 0.30.21
       sirv: 3.0.2
       tinyrainbow: 2.0.0
-      vitest: 3.2.7(@types/node@22.20.1)(@vitest/browser@3.2.7)(tsx@4.23.12)
+      vitest: 3.2.7(patch_hash=aaadf06ea4e01b9816f03721f4e6c32cd858b67857fced43b1844af93155da3c)(@types/node@22.20.1)(@vitest/browser@3.2.7)(tsx@4.23.12)
       ws: 8.21.3
     optionalDependencies:
       playwright: 1.62.1
@@ -1541,7 +1544,7 @@ snapshots:
       fsevents: 2.3.3
       tsx: 4.23.12
 
-  vitest@3.2.7(@types/node@22.20.1)(@vitest/browser@3.2.7)(tsx@4.23.12):
+  vitest@3.2.7(patch_hash=aaadf06ea4e01b9816f03721f4e6c32cd858b67857fced43b1844af93155da3c)(@types/node@22.20.1)(@vitest/browser@3.2.7)(tsx@4.23.12):
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.7
