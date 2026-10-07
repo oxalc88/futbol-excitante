@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "objective_id": "PLAYER-CONTROLS-REFERENCE",
+  "unit_id": "A",
+  "acceptance": false,
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": [
+        "pnpm",
+        "run",
+        "typecheck"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "proof": {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/unitA-muxm5m8o-typecheck.json",
+        "sha256": "dcd5fa55bc64749a2175e7b325d816835c7e456eb1a5250d0071ce5aeb1f2f11",
+        "reused": false
+      }
+    }
+  ],
+  "executed_at": "2026-10-07T04:34:37.718Z"
+}
