@@ -1,8 +1,8 @@
 {
-  "version": "0.13.2",
+  "version": "0.14.0",
   "schema_version": 1,
   "semver": true,
-  "previous_system_version": "0.13.1",
+  "previous_system_version": "0.13.2",
   "legacy_prompt_generation": "v6-browser-evidence-model-tracking",
   "baseline_commit": "f3c83d6ebadc1b8103dffffee5c2b0c184269d83",
   "includes": [
@@ -67,7 +67,9 @@
     "canonical-incident-lifecycle",
     "audited-resume-once",
     "execution-unit-dag",
-    "structured-external-decision-stop"
+    "structured-external-decision-stop",
+    "bureaucracy-regression-evals",
+    "current-verification-authority"
   ],
   "trajectory_baseline_commit": "d3dccf77c565102de531bc5aa981bea9aca009c3"
 }

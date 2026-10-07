@@ -6,6 +6,8 @@ Follow the acceptance philosophy in `gauntlet/principles.md`. Preserve the adver
 
 Current Gauntlet system version is read from `gauntlet/VERSION.json`.
 
+For Gauntlet/harness machinery changes, run `pnpm run gauntlet:bureaucracy:test` and follow `gauntlet/bureaucracy-contract.md`. A historical incident may not stop a complete valid current PASS; machinery-only work never counts as player-visible product progress. This is a deterministic regression gate and adds no human approval or per-change manifest.
+
 The pipeline is: builder → tests/artifacts → deterministic audit → optional bounded cheap semantic audit → impact-required critic → impact-required integration-reviewer → final evidence gate → candidate snapshot commit → persist acceptance + objective manifest → bookkeeping → state audit → final acceptance commit → acceptance publication + remote verification → accept → continue.
 
 Objective verification and repository certification follow `gauntlet/product-quality-contract.md`. Run baseline plus deterministic affected checks for each candidate; full certification protects milestones/releases and the four-objective integration boundary. Product outcome is never inferred from a certificate alone. At startup inspect committed `gauntlet/certification/*.json`; an initial scoped acceptance needs a bootstrap certification attempt. Publish certificate evidence as separate bookkeeping with remote containment, not candidate source.

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "baseline_id": "gauntlet-bureaucracy-0.11.0",
+  "source": {
+    "commit": "2165230db92c83f2bf9b08cde462e73ff3c2e06c",
+    "path": "gauntlet/PROMPT.md",
+    "status": "RECONSTRUCTED_EXACT"
+  },
+  "semantic_invariants": {
+    "product_outcome_is_horizon_authority": true,
+    "accepted_objectives_alone_do_not_complete_horizon": true,
+    "iterate_when_normal_play_is_not_materially_better": true,
+    "tests_passing_is_not_a_stop_reason": true
+  },
+  "numeric_burden": {
+    "status": "UNAVAILABLE",
+    "reason": "0.11.0 did not record complete command/write/handoff/time/token traces with the 0.14 definitions."
+  }
+}
