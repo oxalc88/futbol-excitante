@@ -15,11 +15,11 @@
       "status": "PASS",
       "exit_code": 0,
       "proof": {
-        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/unitA-muxm5m8o-typecheck.json",
-        "sha256": "dcd5fa55bc64749a2175e7b325d816835c7e456eb1a5250d0071ce5aeb1f2f11",
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/unitA-muxmbf9s-typecheck.json",
+        "sha256": "8e46d2561066705debdde5cd61e0238b0c56326efb56c0d9b346fa1e61c97ad1",
         "reused": false
       }
     }
   ],
-  "executed_at": "2026-10-07T04:34:37.718Z"
+  "executed_at": "2026-10-07T04:39:08.622Z"
 }
