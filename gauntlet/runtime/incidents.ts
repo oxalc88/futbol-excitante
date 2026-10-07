@@ -155,7 +155,12 @@ export function currentVerificationAvailable(root:string,e:IncidentEvent,source?
   source??=snapshot(root,'HEAD');history??=incidentEvents(root,source);
   if(currentEvidencePassed(e,source))return false;
   const rows=history.filter(r=>r.incident_id===e.incident_id);
-  let anchor=rows.slice().reverse().find(r=>r.kind==='OBSERVE'&&/^[a-f0-9]{40}$/.test(r.current_target??''))?.current_target??null;
+  const observedAnchor=rows.slice().reverse().find(r=>r.kind==='OBSERVE'&&/^[a-f0-9]{40}$/.test(r.current_target??''))?.current_target??null;
+  const legacyOnly=!observedAnchor&&rows.every(row=>row.evidence.every(ref=>ref.path.startsWith('gauntlet/incidents/legacy-')||ref.path.startsWith('gauntlet/incidents/diagnosis-')||ref.path.startsWith('gauntlet/incidents/rejected-')||ref.path.startsWith('gauntlet/incidents/interrupted-')));
+  // Initial unattested legacy imports retain the narrow 0.13.2 bootstrap path.
+  // v2 applies only after current evidence exists, or to a source-bound incident.
+  if(legacyOnly)return false;
+  let anchor=observedAnchor;
   if(!anchor){
     outer: for(const row of rows.slice().reverse()){
       for(const ref of row.evidence.slice().reverse()){

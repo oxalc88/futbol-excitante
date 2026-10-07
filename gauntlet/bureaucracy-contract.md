@@ -43,4 +43,4 @@ Time and tokens may be added when complete telemetry exists. Missing measurement
 
 The 0.11.0 baseline is semantic because complete historical action/time/token telemetry does not exist. It preserves the product-outcome authority that 0.11 introduced. Numeric burden comparison begins prospectively with 0.14 traces.
 
-No new manual manifest or approval is required to satisfy this contract. The eval is derived from code/scenario traces so measuring bureaucracy does not create more bureaucracy.
+This adds no human approval, manual manifest, or per-change paperwork to satisfy the contract. The eval is derived from code/scenario traces so measuring bureaucracy does not create more bureaucracy.

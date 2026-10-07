@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
-import { admitsCurrentVerification, evaluateBureaucracy, verificationMaterial, ZERO_BURDEN } from '../../../gauntlet/runtime/bureaucracy.js';
-import { fixture } from '../../helpers/gauntlet-quality.js';
+import { admitsCurrentVerification, evaluateBureaucracy, verificationMaterial, ZERO_BURDEN } from '../../gauntlet/runtime/bureaucracy.js';
+import { fixture } from '../helpers/gauntlet-quality.js';
 
 describe('Gauntlet 0.14 bureaucracy regression invariants', () => {
   it('does not let bookkeeping manufacture another verification execution', () => {

@@ -113,7 +113,10 @@ describe('0.13 actual command and canonical recovery',()=>{
       f.write('scripts/ci/transport.mjs','process.exit(0);');f.git('add','.');f.git('commit','-m','bounded machinery repair');f.write('.delivery-local/repair.json',JSON.stringify({diagnosis:'transport cause',component:'scripts/ci/transport.mjs',repair_commit:f.git('rev-parse','HEAD')}));
       const recovery=new IncidentRecovery(f.root,'repository/full');recovery.beginRepair(join(f.root,'.delivery-local/repair.json'));const restarted=new IncidentRecovery(f.root,'repository/full');expect(restarted.incident!.state).toBe('BLOCKED');expect(()=>restarted.beginRepair(join(f.root,'.delivery-local/repair.json'))).toThrow('one diagnosis');
       f.git('add','.');f.git('commit','-m','publish interrupted bounded diagnosis');
-      const stopped=stopRecord(f.root,facts({incident_id:restarted.incident!.incident_id,external_decision:{kind:'environment_execution_policy',exact_decision_required:'Provide an environment in which the protected worker check can execute'}}));expect(f.json(stopped).autonomous_actions_attempted).toContain('REPAIR_FAILED:2');expect(auditStopRecords(f.root)).toBe(1);
+      // 0.14 supersedes the old terminal environment stop when verification inputs changed:
+      // current truth must be re-certified before asking a human to alter policy.
+      expect(()=>stopRecord(f.root,facts({incident_id:restarted.incident!.incident_id,external_decision:{kind:'environment_execution_policy',exact_decision_required:'Provide an environment in which the protected worker check can execute'}}))).toThrow('continue automatically');
+      expect(auditStopRecords(f.root)).toBe(0);
     }finally{rmSync(f.dir,{recursive:true,force:true});}
   },20000);
 
