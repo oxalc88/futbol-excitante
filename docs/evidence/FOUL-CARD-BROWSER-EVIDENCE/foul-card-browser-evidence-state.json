@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-CARD-BROWSER-EVIDENCE",
+  "produced_by": "scripts/capture-foul-card-browser-evidence.ts",
+  "evidence_class": "DYNAMIC_VISUAL",
+  "spec_sections": [
+    "FOULS_CARDS_SPEC §5.1",
+    "FOULS_CARDS_SPEC §7",
+    "FOULS_CARDS_SPEC §9.1",
+    "FOULS_CARDS_SPEC §10",
+    "FOULS_CARDS_SPEC §11"
+  ],
+  "direct_red_severity_threshold": 0.85,
+  "scenario": "5v5-human-vs-cpu-v1",
+  "scenario_path": "eval/scenarios/5v5-human-vs-cpu.v1.json",
+  "play_ticks": 200,
+  "rendering": {
+    "surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium)",
+    "hud": "showMatchPhaseHud:true + showCardHud:true (curated card booking notice, presentation-only enrichment)"
+  },
+  "semantics": {
+    "order": "slide lunge closing -> direct red (contact severity crosses fouls-v1 §9.1 threshold 0.85) at the foul tick",
+    "note": "event-centered on the direct-red consequence: the slide lunge closing on the carrier, then the committed slide man-not-ball contact whose severity crosses the fouls-v1 §9.1 threshold — the core issues the DIRECT expulsion on the foul tick and the card HUD draws the RED CARD notice through the presentation-only enrichment."
+  },
+  "frames": [
+    {
+      "label": "slide-contact",
+      "path": "slide-contact.png",
+      "tick": 51,
+      "semantic": "before",
+      "description": "The sliding lunge closing on the carrier: the offending body (player-1) has committed the slide deep inside the versioned slide reach (commitDistance 4.0) — the ball still in play (PLAYING), no card yet",
+      "sha256": "e1f75035fde3de77627ffddcd87b573c564978d5d94cc39d7c76d664e8dfeebe"
+    },
+    {
+      "label": "direct-red",
+      "path": "direct-red.png",
+      "tick": 52,
+      "semantic": "event",
+      "description": "DIRECT red at the foul tick: the committed slide man-not-ball contact (fouled player-10) has a normalized contact severity 0.925 crossing the fouls-v1 §9.1 threshold 0.85, so the core issues a direct expulsion to player-1 independent of the accumulation ladder; the card HUD draws the RED CARD notice",
+      "sha256": "17ab66b60fb3d3d62724970ca0fab2854e138a6fbd8eb9dd13e82ca6190c93f3"
+    }
+  ],
+  "arc": {
+    "foul_ticks": [
+      52
+    ],
+    "fouling_player_id": "player-1",
+    "direct_red": {
+      "tick": 52,
+      "cardType": "expulsion",
+      "cardReason": "direct-severity",
+      "directRedSeverity": 0.924926327957164,
+      "accumulatedFouls": 1,
+      "fouledPlayerId": "player-10"
+    },
+    "booking_state": {
+      "player-1": {
+        "fouls": 1,
+        "cautions": 0,
+        "expulsions": 1
+      }
+    },
+    "controls": {
+      "standing_tackle": {
+        "foul_ticks": [
+          66,
+          290
+        ],
+        "card_count": 1,
+        "card_type": "caution",
+        "direct_red": false
+      },
+      "gate_off": {
+        "card_count": 0,
+        "bookings_present": false
+      }
+    }
+  },
+  "correspondence": {
+    "browser_foul_tick": 52,
+    "browser_direct_red_tick": 52,
+    "browser_fouling_player": "player-1",
+    "browser_fouled_player": "player-10",
+    "browser_direct_red_severity": 0.924926327957164,
+    "browser_booking_state": {
+      "player-1": {
+        "fouls": 1,
+        "cautions": 0,
+        "expulsions": 1
+      }
+    },
+    "headless_foul_tick": 52,
+    "headless_direct_red_tick": 52,
+    "headless_fouling_player": "player-1",
+    "headless_fouled_player": "player-10",
+    "headless_direct_red_severity": 0.924926327957164,
+    "headless_booking_state": {
+      "player-1": {
+        "fouls": 1,
+        "cautions": 0,
+        "expulsions": 1
+      }
+    },
+    "foul_tick_offset": 0,
+    "direct_red_tick_offset": 0,
+    "offsets_traced": true
+  },
+  "drives": {
+    "fixture": "5v5-human-vs-cpu.v1.json + withProximateHumanDefence (the accepted driven-duel shape)",
+    "policy": "ONE scripted slide tackle (commitDistance 4.0, earliestTick 48 — the FOUL-CARD-SEVERITY SLIDE_ATTEMPTS shape) on the HUMAN slot; CPU slots through the same adapter + team-decision profile the browser composition root uses; gates issueCards + awardFreeKicks ON",
+    "capture_test": "tests/browser/foul-card-severity-browser-evidence.browser.test.ts",
+    "rendering_surface": "src/apps/browser/test-bridge.ts + real Three renderer (Chromium), showMatchPhaseHud:true + showCardHud:true"
+  },
+  "disclosures": [
+    "The fouls and cards are REAL core events: the core commits the slide man-not-ball tackle contact (spec §5.1) and, with the accepted issueCards gate, the in-core card consequence issues a DIRECT expulsion because the committed contact severity crosses the §9.1 threshold. The driven-duel script reproduces the headless defensive-duel driver's scripted slide policy; nothing is forced or synthesized.",
+    "The card-issued event is commit-only to the core's persistent state (the accepted serialization limitation), so the browser test reads it from the snapshot's committed events rather than the per-step event array. The card HUD reads the same committed events through the presentation-only enrichment (enrichPresentationWithCards).",
+    "The renderer card HUD is the accepted OPTIONAL, draw-only presentation affordance (showCardHud, default false). The direct-red label is commit-only, so the browser-visible RED CARD notice is asserted at the pixel plane: the direct-red frame carries the red notice pixels, the pre-card frame carries none.",
+    "In-test controls: the standing-tackle control (repeated standing tackles below the threshold) commits the §7 accumulation caution only — no direct red; the gate-off shape (the identical slide with issueCards off) commits no card and keeps bookings absent.",
+    "The driven fixture is a DRIVEN duel (short observation window, a scripted slide sequence), not an organic 90-minute match; the fouling sequence is disclosed, not masked.",
+    "The §9.1 direct-red severity threshold (0.85) and the committed-contact severity normalization (challenge span × contact penetration, src/simulation/card-policy.ts) are fouls-v1 VERSIONED_PROVISIONAL design choices, NOT measured PES 2017 constants."
+  ],
+  "claims_not_made": [
+    "No suite-level PASS claim: this is DYNAMIC_VISUAL browser-visible evidence; the CARD-DIRECT-RED criterion adjudication lives in the FOUL-CARD-SEVERITY headless record.",
+    "No second-yellow rule: the direct red reads only the committed contact severity, never the accumulated count.",
+    "No regulation/removal mechanics: the direct red does not remove the offender from play.",
+    "No PES 2017 fidelity or invented reference envelope: §11's foul_severity_distribution_ref / disciplinary_scale_ref stay BLOCKED_MISSING_REFERENCE.",
+    "No claim that the browser composition root and the headless runner are per-tick byte-identical: the verified correspondence is the event structure (foul tick, direct-red tick, offender, fouled player, committed severity), never per-tick floats (the known pinned-runtime gap).",
+    "No accepted pin altered."
+  ],
+  "record_sha256": "e612aef463e5c8e43449be5cff8b5cc849affcc3e98276d48695d0c0ca6fddf3"
+}
