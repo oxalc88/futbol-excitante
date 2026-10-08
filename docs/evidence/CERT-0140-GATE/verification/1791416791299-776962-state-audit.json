@@ -1,0 +1,39 @@
+{
+  "protocol": "gauntlet-quality-0.12.0",
+  "check": {
+    "id": "state-audit",
+    "command": [
+      "pnpm",
+      "run",
+      "gauntlet:eval:state"
+    ]
+  },
+  "key": "8bd508117562d8b884cf0a078b1d4a4aa1534cb3e5301f8fb529e490103a1b91",
+  "profile": {
+    "node": "24.18.0",
+    "pnpm": "11.10.0",
+    "vite": "6.4.3",
+    "platform": "linux",
+    "arch": "x64",
+    "environment_sha256": "7cc2d2fa9632635a9f38d4b0f40565c14dd16b70d3c4d2088eeaafa0d9107658",
+    "installed_sha256": "16956395abafc20f94833ea57bfbf991288c448754702854c232430fcbca3a92"
+  },
+  "expected_tests": [],
+  "observed_tests": [],
+  "result": {
+    "id": "state-audit",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "artifacts/gauntlet/quality/CERT-0140-GATE/1791416791299-776962/state-audit.log",
+    "duration_ms": 27268,
+    "timeout_ms": 1200000
+  },
+  "started_from": "3012f18f8f9bbe837a184634dec6084061e577aa",
+  "completed_at": "2026-10-08T00:02:57.687Z",
+  "log": {
+    "path": "docs/evidence/CERT-0140-GATE/verification/1791416791299-776962-state-audit.log.gz",
+    "sha256": "5bf739edd847ba1010db3747979466bba7a75c6eecc87985504eaf4128accba4"
+  },
+  "test_report": null,
+  "producing_root": "/home/ubuntu/projects/oxDeveloop/pes-simulator"
+}
