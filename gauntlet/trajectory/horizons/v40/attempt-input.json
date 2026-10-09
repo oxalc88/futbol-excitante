@@ -30,7 +30,7 @@
   },
   "quality": {
    "baseline_pass": true,
-   "affected_domains_pass": false,
+   "affected_domains_pass": true,
    "sources": [
     {
      "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/units/A/local-quality.json",
