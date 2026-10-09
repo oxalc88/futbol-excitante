@@ -1,0 +1,66 @@
+{
+ "outcome": {
+  "problem": "The shipped app has no player-facing reference for its control surface \u2014 the in-app legend covers slot-1 keys only, while keeper takeover, restart destination steering, difficulty scaling and the referee toggle remain undocumented, so a new player cannot discover them without reading source.",
+  "smallest_playable_slice": "A player can open docs/player-controls.md and docs/how-to-play.md in the repository and discover every shipped control \u2014 movement, sprint, first touch, pass/shot/lofted/through, tackles, switching (including the keeper in 5v5 human-vs-CPU), restart steering during award windows, difficulty scaling, and the referee toggle gating fouls/free kicks/cards \u2014 with each claim traceable to the shipped sources.",
+  "playtest": {
+   "mode": "normal_shipped_play",
+   "method": "Real Chromium session of the shipped app exercising the documented control surface end to end (setup menu, in-match keys, keeper takeover, restart steering, fulltime flow)",
+   "before": [
+    {
+     "path": "gauntlet/trajectory/horizons/v40/selection.json",
+     "commit": "c6034794f23fe671bea338a941f663ca2686d2a3",
+     "sha256": "6b77c2b6e3ab1edc86d60787dcc8edd07ee00e0b460c706fac0dc426cc8b3124"
+    }
+   ],
+   "after": [
+    {
+     "path": "gauntlet/trajectory/horizons/v40/first-playable.json",
+     "commit": "67b03e79d2974823277f80c9824e36ad2ab4c961",
+     "sha256": "76c6d4b808a183dffcd906a120d53c5d8ddbacc2673196107b5463377f642313"
+    }
+   ],
+   "materially_better": true,
+   "improved": [
+    "A new player can discover every shipped control \u2014 including keeper takeover, restart destination steering and the difficulty/referee toggles \u2014 from the player-facing reference without reading source."
+   ],
+   "still_wrong": [],
+   "issues_opened": [],
+   "issues_closed": [],
+   "regressions": []
+  },
+  "quality": {
+   "baseline_pass": true,
+   "affected_domains_pass": false,
+   "sources": [
+    {
+     "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/units/A/local-quality.json",
+     "commit": "704235321677b0061ada97d85473c808f1518ba8",
+     "sha256": "c515288acc6426911ca1662a7afefd2ca620a805a0553bbdc4dd421d6efee297"
+    }
+   ],
+   "no_known_accepted_regression": true
+  },
+  "changed_for_player": [
+   "docs/player-controls.md: complete shipped keyboard control table, setup-menu options (mode, difficulty, referee toggle), keeper takeover, restart destination steering, switching, automatic behaviors \u2014 every claim traceable to shipped sources",
+   "docs/how-to-play.md: getting-started guide and match-flow overview pointing at player-controls.md"
+  ]
+ },
+ "objectives": [
+  {
+   "id": "PLAYER-CONTROLS-REFERENCE",
+   "direct_player_result": true,
+   "enables_or_protects": "The player-facing controls reference IS the playable slice: it is how the player discovers the shipped control surface."
+  },
+  {
+   "id": "FOUL-CARD-SEVERITY",
+   "direct_player_result": true,
+   "enables_or_protects": "A card-quality foul in normal shipped play produces an immediate direct red at the foul tick (Referee toggle on) \u2014 a player-visible referee behavior."
+  },
+  {
+   "id": "FOUL-CARD-BROWSER-EVIDENCE",
+   "direct_player_result": false,
+   "enables_or_protects": "Event-centered real-Chromium evidence that the direct red is visible in the shipped app; protects the severity path's player visibility."
+  }
+ ],
+ "acceptances": []
+}
