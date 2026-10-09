@@ -65,17 +65,17 @@
  "acceptances": [
   {
    "path": "gauntlet/evals/results/2026-10-09/2026-10-09T07-37-58-173Z-PLAYER-CONTROLS-REFERENCE-acceptance.json",
-   "commit": "95ab6ee4725820a55245e0a7cf4c919af9d2a8bf",
+   "commit": "7aee772",
    "sha256": "6fac7a3a6324ecefc808ceae0c6df04c00e5ecd711dd4b70969bc60a64f5dd5f"
   },
   {
    "path": "gauntlet/evals/results/2026-10-09/2026-10-09T08-44-58-718Z-FOUL-CARD-SEVERITY-acceptance.json",
-   "commit": "95ab6ee4725820a55245e0a7cf4c919af9d2a8bf",
+   "commit": "9017101",
    "sha256": "705a1ce3537871f74802baeae5fc7ab9a8d382c568c44a404fecd6ba590d71fe"
   },
   {
    "path": "gauntlet/evals/results/2026-10-09/2026-10-09T09-23-39-933Z-FOUL-CARD-BROWSER-EVIDENCE-acceptance.json",
-   "commit": "95ab6ee4725820a55245e0a7cf4c919af9d2a8bf",
+   "commit": "4e7b1bf",
    "sha256": "349460a79f3a81248c2ea85b673675c22fe3312bf61bbb81dc5440057410bfcb"
   }
  ]
