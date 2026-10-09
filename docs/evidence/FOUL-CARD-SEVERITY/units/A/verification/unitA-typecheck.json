@@ -1,0 +1,28 @@
+{
+  "protocol": "gauntlet-quality-0.12.0",
+  "check": {
+    "id": "typecheck",
+    "command": [
+      "pnpm",
+      "run",
+      "typecheck"
+    ]
+  },
+  "key": "04073e70e672cb91a86a303a9eda25a27f9ad79c7dc74c0b355054450c12da48",
+  "result": {
+    "id": "typecheck",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "artifacts/unitA-typecheck.log",
+    "duration_ms": 19000,
+    "timeout_ms": 1200000
+  },
+  "started_from": "52119f557aa2dbbfc747b979a1a1082d7c4c324f",
+  "completed_at": "2026-10-09T07:50:00.000Z",
+  "log": {
+    "path": "docs/evidence/FOUL-CARD-SEVERITY/units/A/verification/unitA-typecheck.log.gz",
+    "sha256": "2986bee70c9c923f536ec6cea5c6d6689d113ec03e8131eac45e6882fcffe286"
+  },
+  "test_report": null,
+  "producing_root": "/home/ubuntu/projects/oxDeveloop/pes-simulator"
+}

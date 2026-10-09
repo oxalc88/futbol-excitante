@@ -1,0 +1,24 @@
+{
+  "schema_version": 2,
+  "objective_id": "FOUL-CARD-SEVERITY",
+  "unit_id": "A",
+  "acceptance": false,
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": [
+        "pnpm",
+        "run",
+        "typecheck"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "proof": {
+        "path": "docs/evidence/FOUL-CARD-SEVERITY/units/A/verification/unitA-typecheck.json",
+        "sha256": "955b454006784ee99fe1eccf4875bd6853ad299b677ad53146535de15646f357",
+        "reused": false
+      }
+    }
+  ]
+}

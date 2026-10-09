@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "objective_id": "FOUL-CARD-SEVERITY",
+  "issue_number": 28,
+  "base_commit": "8ed6919310ad8f6661048d73b3b783c7bbf1a32e",
+  "units": [
+    {
+      "id": "A",
+      "purpose": "Implement the FOULS_CARDS_SPEC \u00a77 contact-severity direct-red path: pure severity discriminator in card-policy.ts, core wiring at the two existing card sites behind the issueCards gate, additive CARD-DIRECT-RED suite registration, spec status note, driven crossing fixture, two-run gate-off byte-identity",
+      "dependencies": [],
+      "expected_file_ownership": [
+        "src/simulation/card-policy.ts",
+        "src/simulation/loop/simulation.ts",
+        "eval/contracts/**",
+        "eval/oracles/fouls.ts",
+        "eval/oracles/wire.ts",
+        "eval/runners/defensive-duel-driver.ts",
+        "eval/runners/foul-detection.ts",
+        "eval/runners/headless-match.ts",
+        "specs/FOULS_CARDS_SPEC.md",
+        "scripts/capture-foul-card-severity.ts",
+        "tests/unit/loop/card-machinery-sim.test.ts",
+        "tests/unit/eval/eval-registry.test.ts",
+        "tests/unit/eval/fouls-spec-binding.test.ts",
+        "tests/unit/eval/fouls-suite-binding.test.ts",
+        "tests/architecture/core-ts-isolation.test.ts",
+        "eval/runners/foundation-evaluator.ts",
+        "package.json",
+        "tests/capture-wip.node.test.ts",
+        "tests/difficulty-capture.node.test.ts",
+        "tests/integration/gk-5v5-adapter-behavior.test.ts",
+        "tests/unit/eval/GK-REGRESSION-POLICY-REGISTRATION-binding.test.ts",
+        "tests/unit/eval/GK-SUITE-CORE-OWNED-STATE-binding.test.ts",
+        "tests/setup/worker-flush.node.ts",
+        "vitest.config.ts"
+      ],
+      "builder_role": "builder-structured",
+      "interfaces_known": true,
+      "local_checks": [
+        {
+          "id": "typecheck",
+          "command": [
+            "pnpm",
+            "run",
+            "typecheck"
+          ]
+        }
+      ],
+      "handoff_contract": "Committed machinery + registration with sources traced to FOULS_CARDS_SPEC \u00a77/\u00a79.1; severity derived from committed tackle facts only"
+    }
+  ]
+}
