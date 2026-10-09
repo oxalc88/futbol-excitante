@@ -65,7 +65,7 @@
  "acceptances": [
   {
    "path": "gauntlet/evals/results/2026-10-09/2026-10-09T07-37-58-173Z-PLAYER-CONTROLS-REFERENCE-acceptance.json",
-   "commit": "c4e2d82cf674810715fbf6904d314393f8e89d32",
+   "commit": "566dca35d5caa666d3d629e88ad6ece6f3558a66",
    "sha256": "6fac7a3a6324ecefc808ceae0c6df04c00e5ecd711dd4b70969bc60a64f5dd5f"
   },
   {
