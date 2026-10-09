@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "target_commit": "a54b116cb828d79dbb8f4fd2db82641cd7ccca10",
+  "recorded_at": "2026-10-09T04:46:56.650Z",
+  "status": "BLOCKED",
+  "failure_class": null,
+  "receipt": {
+    "path": "docs/evidence/CERT-CARRIER-GATE/verification/1791521216649-104889-receipt.json",
+    "sha256": "79214d5fee5c3346464dcb78e22d4536ee6ca7289af5c0faf61e9b83e325ebff"
+  },
+  "horizon": "v40"
+}

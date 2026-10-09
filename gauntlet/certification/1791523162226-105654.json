@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "target_commit": "a54b116cb828d79dbb8f4fd2db82641cd7ccca10",
+  "recorded_at": "2026-10-09T05:19:22.226Z",
+  "status": "PASS",
+  "failure_class": null,
+  "receipt": {
+    "path": "docs/evidence/CERT-CARRIER-GATE/verification/1791523147014-105654-receipt.json",
+    "sha256": "8f57b4452b15f1701ed1df9c4c7bbbe6683c0729124d043ff1600a48b0882d32"
+  },
+  "horizon": "v40"
+}
