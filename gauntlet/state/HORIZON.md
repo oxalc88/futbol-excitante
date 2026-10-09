@@ -12,7 +12,7 @@ reason: "Horizon v39 (direct-red-severity-in-ship) is blocked at objective verif
 current_index: 0
 objectives:
   - id: PLAYER-CONTROLS-REFERENCE
-    status: pending
+    status: accepted
     reason: "the shipped control surface (movement, sprint, first touch, pass/shot/lofted/through, tackles, switch, keeper control, restart destination steering, difficulty + referee menu toggles) has no player-facing reference; docs/player-controls.md + docs/how-to-play.md are the closed presentation-leaf allowlist"
     builder: builder-gameplay
     prerequisite: ""
