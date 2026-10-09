@@ -1,0 +1,39 @@
+{
+  "protocol": "gauntlet-quality-0.12.0",
+  "check": {
+    "id": "state-audit",
+    "command": [
+      "pnpm",
+      "run",
+      "gauntlet:eval:state"
+    ]
+  },
+  "key": "3cad7a343bc762f6a222bac1d8b9f3b1d8dd78ba8139405819d4cab3b47a6fa5",
+  "profile": {
+    "node": "24.18.0",
+    "pnpm": "11.10.0",
+    "vite": "6.4.3",
+    "platform": "linux",
+    "arch": "x64",
+    "environment_sha256": "cad6d3bb7b423357094cfddaa9b91b07aa84a27c6ce9cc59780f4744bfa561d2",
+    "installed_sha256": "16956395abafc20f94833ea57bfbf991288c448754702854c232430fcbca3a92"
+  },
+  "expected_tests": [],
+  "observed_tests": [],
+  "result": {
+    "id": "state-audit",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "artifacts/gauntlet/quality/PLAYER-CONTROLS-REFERENCE/1791528085537-150970/state-audit.log",
+    "duration_ms": 89524,
+    "timeout_ms": 1200000
+  },
+  "started_from": "047a5bc0232c6269be2ab22f0475536cea5d4e84",
+  "completed_at": "2026-10-09T06:43:01.165Z",
+  "log": {
+    "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791528085537-150970-state-audit.log.gz",
+    "sha256": "2a1801f526abca06e2ed8ddf839e646058f5337571a61517d8e652221c03a858"
+  },
+  "test_report": null,
+  "producing_root": "/home/ubuntu/projects/oxDeveloop/pes-simulator"
+}
