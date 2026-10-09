@@ -223,6 +223,20 @@ export interface HeadlessMatchConfig {
    */
   detectFouls?: boolean;
   /**
+   * Serialize the carrier facts (FOUL-CARRIER-FACT, FOULS_CARDS_SPEC §5.3
+   * named criterion input) into the matching-tick observation's committed
+   * `player-player-contact` duel payloads. When true, the runner — post-loop,
+   * additively, and reading only already-committed events — annotates each
+   * duel payload with `carrierBallDistance` (the contacted player's planar
+   * distance to the ball at the contact tick) and `isCarrierContest` (that
+   * distance inside the pinned `foundation-cpu-tackle-v1.carrierContestDistance`
+   * radius). This is a READ of committed state (zero gameplay change; inputs,
+   * steps and state hashes are all committed before the injection), and when
+   * false (the default) the observation stream is byte-identical to every
+   * accepted non-gated run.
+   */
+  serializeCarrierFacts?: boolean;
+  /**
    * Drive a human-taken restart through the SAME core machinery and observation
    * extension (HUMAN-RESTART-RULES-CONFORMANCE). When present, the runner
    * opens the given restart window at tick 0 from committed state (the same
@@ -817,6 +831,7 @@ export function* runHeadlessMatchGen(
     lifecyclePhaseSync = DEFAULT_LIFECYCLE_PHASE_SYNC,
     serializeRestartFacts = false,
     detectFouls = false,
+    serializeCarrierFacts = false,
     humanRestartControl,
     rehomeKeeper,
     awardFreeKicks = false,
@@ -1649,6 +1664,38 @@ export function* runHeadlessMatchGen(
   // `contactType` ∈ {`standing-tackle`, `slide-tackle`},
   // `tacklePhase === "active"`, and `duelWon === false`. Cards, advantage and
   // free-kicks stay spec-only (not implemented).
+
+  // FOUL-CARRIER-FACT: serialize the carrier facts into the committed duel
+  // payloads. Gated on `serializeCarrierFacts` (off => every accepted run
+  // stays byte-identical), runs post-loop (inputs, steps and state hashes are
+  // all already committed, so it provably cannot affect them) and is additive
+  // (payload annotations on already-committed observation events; the gk-role
+  // / restart-designation precedent; the core, its event union and its
+  // contracts are untouched). The facts are a READ of committed state: the
+  // contacted player's planar distance to the ball at the contact tick, and
+  // whether that distance sits inside the pinned
+  // `foundation-cpu-tackle-v1.carrierContestDistance` radius — the committed
+  // fact a FOUL-DETECT carrier-assertion extension adjudicates against.
+  if (serializeCarrierFacts && observations.length > 0) {
+    const contestRadius = 2.5; // foundation-cpu-tackle-v1.carrierContestDistance (VERSIONED_PROVISIONAL)
+    for (const o of observations) {
+      for (const ev of o.events) {
+        if (ev.kind !== "player-player-contact") continue;
+        const payload = { ...(ev.payload ?? {}) } as Record<string, unknown>;
+        const contactedId = payload.playerIdB as string | undefined;
+        if (contactedId === undefined) continue;
+        const contacted = o.players.find((p) => p.playerId === contactedId);
+        if (contacted === undefined) continue;
+        const dx = contacted.groundPosition.x - o.ball.position.x;
+        const dy = contacted.groundPosition.y - o.ball.position.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        payload.carrierBallDistance = dist;
+        payload.isCarrierContest = dist <= contestRadius;
+        ev.payload = payload;
+      }
+    }
+  }
+
   if (detectFouls && observations.length > 0) {
     detectFoulEvents(observations);
   }

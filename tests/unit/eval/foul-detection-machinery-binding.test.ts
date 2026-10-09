@@ -35,6 +35,7 @@ import {
   FOUL_CONTACT_TYPES,
 } from "../../../eval/runners/foul-detection.js";
 import { runHeadlessMatch } from "../../../eval/runners/headless-match.js";
+import type { HeadlessMatchResult } from "../../../eval/runners/headless-match.js";
 import { makeTelemetryObservation } from "../contracts.fixture.js";
 import type { TelemetryObservation } from "../../../src/contracts/telemetry.js";
 import type { ScenarioDefinition } from "../../../src/contracts/scenario.js";
@@ -161,7 +162,7 @@ function loadScenario(path: string): ScenarioDefinition {
   ) as ScenarioDefinition;
 }
 
-function runOrganic(detectFouls: boolean) {
+function runOrganic(detectFouls: boolean, serializeCarrierFacts = false): HeadlessMatchResult {
   return runHeadlessMatch({
     scenario: loadScenario(ORGANIC_SCENARIO),
     maxTicks: ORGANIC_TICKS,
@@ -169,12 +170,13 @@ function runOrganic(detectFouls: boolean) {
     lifecyclePhaseSync: "legacy",
     cpuDefensiveTackle: true,
     detectFouls,
+    serializeCarrierFacts,
   });
 }
 
 describe("runner gate detectFouls", () => {
-  let on: ReturnType<typeof runOrganic>;
-  let off: ReturnType<typeof runOrganic>;
+  let on: HeadlessMatchResult;
+  let off: HeadlessMatchResult;
 
   beforeAll(() => {
     on = runOrganic(true);
@@ -223,5 +225,53 @@ describe("runner gate detectFouls", () => {
         expect(["card", "advantage", "free-kick"]).not.toContain(ev.kind);
       }
     }
+  });
+});
+
+describe("runner gate serializeCarrierFacts (FOUL-CARRIER-FACT)", () => {
+  let on: HeadlessMatchResult;
+  let off: HeadlessMatchResult;
+
+  beforeAll(() => {
+    on = runOrganic(true, true);
+    off = runOrganic(true, false);
+  }, 240_000);
+
+  it("serializeCarrierFacts:true annotates the committed duel payloads with the carrier facts", () => {
+    const duels = on.observations
+      .flatMap((o) => o.events)
+      .filter((e) => e.kind === "player-player-contact" && ["standing-tackle", "slide-tackle"].includes((e.payload as Record<string, unknown>).contactType as string));
+    expect(duels.length).toBeGreaterThan(0);
+    for (const e of duels) {
+      const p = e.payload as Record<string, unknown>;
+      expect(typeof p.carrierBallDistance).toBe("number");
+      expect(p.carrierBallDistance as number).toBeGreaterThanOrEqual(0);
+      expect(typeof p.isCarrierContest).toBe("boolean");
+      expect(p.isCarrierContest).toBe((p.carrierBallDistance as number) <= 2.5);
+    }
+  });
+
+  it("serializeCarrierFacts:false leaves the duel payloads byte-identical (no carrier fields)", () => {
+    const duels = off.observations
+      .flatMap((o) => o.events)
+      .filter((e) => e.kind === "player-player-contact" && ["standing-tackle", "slide-tackle"].includes((e.payload as Record<string, unknown>).contactType as string));
+    for (const e of duels) {
+      expect((e.payload as Record<string, unknown>).carrierBallDistance).toBeUndefined();
+      expect((e.payload as Record<string, unknown>).isCarrierContest).toBeUndefined();
+    }
+  });
+
+  it("the injected foul events carry the carrier facts on the gated run", () => {
+    const fouls = on.observations.flatMap((o) => o.events).filter((e) => e.kind === "foul");
+    expect(fouls.length).toBeGreaterThanOrEqual(1);
+    for (const f of fouls) {
+      const p = f.payload as Record<string, unknown>;
+      expect(typeof p.carrierBallDistance).toBe("number");
+      expect(typeof p.isCarrierContest).toBe("boolean");
+    }
+  });
+
+  it("the gate never affects the state-hash chain (post-loop, additive)", () => {
+    expect(sha256(JSON.stringify(on.stateHashes))).toBe(sha256(JSON.stringify(off.stateHashes)));
   });
 });

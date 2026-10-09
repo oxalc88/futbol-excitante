@@ -56,6 +56,9 @@ export interface FoulEventPayload {
   reach: number;
   planarDistance: number;
   committedDirection: { x: number; y: number };
+  /** FOUL-CARRIER-FACT: present only when the gated serialization ran. */
+  carrierBallDistance?: number;
+  isCarrierContest?: boolean;
 }
 
 /**
@@ -103,6 +106,18 @@ export function detectFoulEvents(observations: TelemetryObservation[]): number {
           reach: p.reach,
           planarDistance: p.planarDistance,
           committedDirection: p.committedDirection,
+          // FOUL-CARRIER-FACT: when the gated serialization has annotated the
+          // source duel payload, the foul event carries the same committed
+          // carrier facts so a FOUL-DETECT carrier assertion adjudicates the
+          // foul event alone (no cross-event join). Absent fields mean the
+          // run did not request the serialization — the extension stays
+          // honestly NOT_EVALUATED rather than guessing.
+          ...(p.carrierBallDistance !== undefined
+            ? {
+                carrierBallDistance: p.carrierBallDistance,
+                isCarrierContest: p.isCarrierContest,
+              }
+            : {}),
         },
       });
       maxSeq++;
