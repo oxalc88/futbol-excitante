@@ -1,0 +1,39 @@
+{
+  "protocol": "gauntlet-quality-0.12.0",
+  "check": {
+    "id": "sim-smoke",
+    "command": [
+      "pnpm",
+      "run",
+      "sim-smoke"
+    ]
+  },
+  "key": "2051dd3a135a929ef6edf9219ece8b00a2935dd14c8454a2c160ee57c6820c26",
+  "profile": {
+    "node": "24.18.0",
+    "pnpm": "11.10.0",
+    "vite": "6.4.3",
+    "platform": "linux",
+    "arch": "x64",
+    "environment_sha256": "cad6d3bb7b423357094cfddaa9b91b07aa84a27c6ce9cc59780f4744bfa561d2",
+    "installed_sha256": "16956395abafc20f94833ea57bfbf991288c448754702854c232430fcbca3a92"
+  },
+  "expected_tests": [],
+  "observed_tests": [],
+  "result": {
+    "id": "sim-smoke",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "artifacts/gauntlet/quality/PLAYER-CONTROLS-REFERENCE/1791525706415-131577/sim-smoke.log",
+    "duration_ms": 3262,
+    "timeout_ms": 1200000
+  },
+  "started_from": "a0fefa8fb149625d5ce942b974245c6f06b600b9",
+  "completed_at": "2026-10-09T06:31:57.331Z",
+  "log": {
+    "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791525706415-131577-sim-smoke.log.gz",
+    "sha256": "ed37d4487bd75a8f0d04959a5ed4e5fa2b933d28d969f4dafc76873120ba5aa2"
+  },
+  "test_report": null,
+  "producing_root": "/home/ubuntu/projects/oxDeveloop/pes-simulator"
+}
