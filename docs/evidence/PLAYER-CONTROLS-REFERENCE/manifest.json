@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.14.0",
+  "objective_id": "PLAYER-CONTROLS-REFERENCE",
+  "accepted_at": "2026-10-09T07:37:58.173Z",
+  "candidate_commit": "b0fdcc8",
+  "evidence_class": "BOOKKEEPING",
+  "evidence": {
+    "quality": {
+      "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/quality.json",
+      "sha256": "7de983105e1beea9a5e8c2831879f5e705eefa378348a0c3a043e1175584f02a",
+      "git_blob": "05573ccea9cb6727c3ca9ecbf822e2336ca8dabd",
+      "candidate_commit": "b0fdcc8",
+      "bytes": 23844,
+      "committed_with_candidate": true
+    },
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": null,
+    "deterministic_audit_artifact": null,
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "mimo-v2.6-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "mimo-v2.6-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-10-09/2026-10-09T07-37-58-173Z-PLAYER-CONTROLS-REFERENCE-acceptance.json"
+}
