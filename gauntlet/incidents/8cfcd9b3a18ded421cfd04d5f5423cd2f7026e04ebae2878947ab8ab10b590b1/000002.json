@@ -1,0 +1,45 @@
+{
+  "incident_id": "8cfcd9b3a18ded421cfd04d5f5423cd2f7026e04ebae2878947ab8ab10b590b1",
+  "boundary": "repository/full",
+  "recovery": {
+    "schema_version": 1,
+    "failure": {
+      "check": {
+        "id": "regression-tests",
+        "command": [
+          "pnpm",
+          "run",
+          "test"
+        ]
+      },
+      "signature": "48d44fd5e500bc72f832a9c54358313f4736efdb95e9a6a9cee9e590bbbf52f4",
+      "failed_test_files": [
+        "tests/integration/match-scoring.test.ts",
+        "tests/unit/gauntlet-0.13.1-continuation.test.ts",
+        "tests/unit/loop/card-machinery-sim.test.ts"
+      ]
+    },
+    "identical_failures": 1,
+    "budget": {
+      "started_at_ms": 1791419848111,
+      "repair_attempts": 0,
+      "history_before_budget": "MEASURED"
+    }
+  },
+  "state": "EXHAUSTED",
+  "kind": "OBSERVE",
+  "failure_class": "PRODUCT_FAILURE",
+  "evidence": [
+    {
+      "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791418818658-796899-regression-tests.json",
+      "sha256": "914c34e3dbdd3e2e8ae2a60138fe738a9dac482e2feec45ebc8f2dd6129a8314",
+      "reused": false
+    }
+  ],
+  "schema_version": 1,
+  "sequence": 2,
+  "previous": "cce7e9b4fa0f339be80dc9860d2ebc6eefda859d79a5259a3977a5428143ff32",
+  "recorded_at": "2026-10-09T04:51:21.683Z",
+  "current_policy": "current-verification-v2",
+  "current_target": "a54b116cb828d79dbb8f4fd2db82641cd7ccca10"
+}
