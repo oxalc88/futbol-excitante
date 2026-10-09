@@ -4,12 +4,12 @@
 
 ```yaml
 horizon_version: 40
-status: ACTIVE
+status: COMPLETE
 horizon_id: "player-controls-readability"
 created_from_commit: 1c557c7
 created_at: 2026-10-05
 reason: "Horizon v39 (direct-red-severity-in-ship) is blocked at objective verification: the implementation is complete and focused-verified (9/9 files, 204/204 tests, zero unhandled worker errors) but the exhausted repository/full recovery incident (2/2 attempts, deadline expired 2026-10-04 14:29, canonical ledger gauntlet/incidents/33cba31914e91e5b070e2e5f0aee7130af86c47c9005474b136fa4bc3adbb895) refuses every full-required scope, and FOUL-CARD-SEVERITY changes protected core (src/simulation/card-policy.ts, loop/simulation.ts) so it is always full-required. No compliant bounded machinery repair exists: the material fixes live in tests/, eval/runners/ and vitest.config.ts, all outside the incident machinery path allowlist, and the contract forbids modifying existing tests as incident repair. Per product-first-contract: replan automatically, preserve certification debt (the blocked incident stays visibly open), select safe independent product work. Replan_if objective_blocked fired. The selected objective is the smallest player-visible readability slice that is bounded by the presentation leaf allowlist: the shipped app has no player-facing controls reference — docs/player-controls.md and docs/how-to-play.md do not exist — while VISION names control discoverability and the accepted HUMAN-KEEPER-CONTROL / HUMAN-RESTART-CONTROL / referee-menu surfaces added controls the legend table does not mention."
-current_index: 0
+current_index: 3
 objectives:
   - id: PLAYER-CONTROLS-REFERENCE
     status: accepted
@@ -17,12 +17,12 @@ objectives:
     builder: builder-gameplay
     prerequisite: ""
   - id: FOUL-CARD-SEVERITY
-    status: pending
+    status: accepted
     reason: "implementation complete in the working tree and focused-verified; canonical verification blocked by the exhausted repository/full incident — resumes the moment the incident closes"
     builder: builder-structured
     prerequisite: PLAYER-CONTROLS-REFERENCE
   - id: FOUL-CARD-BROWSER-EVIDENCE
-    status: pending
+    status: accepted
     reason: "the direct red visible in the shipped app with event-centered real-Chromium evidence (the CARD-BROWSER-EVIDENCE / ADVANTAGE-BROWSER-EVIDENCE pattern)"
     builder: builder-gameplay
     prerequisite: FOUL-CARD-SEVERITY

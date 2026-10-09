@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "gauntlet_version": "0.14.0",
+  "objective_id": "FOUL-CARD-SEVERITY",
+  "accepted_at": "2026-10-09T08:44:58.718Z",
+  "candidate_commit": "428b1d2",
+  "evidence_class": "MULTI_TICK",
+  "evidence": {
+    "quality": {
+      "path": "docs/evidence/FOUL-CARD-SEVERITY/quality.json",
+      "sha256": "9da44281c0ce13cb663ab91804e6903c5759d1f995941153cb83f04a62a0c40a",
+      "git_blob": "187c234a34b0793d678b3564d71486b1a31fd7c0",
+      "candidate_commit": "428b1d2",
+      "bytes": 23739,
+      "committed_with_candidate": true
+    },
+    "screenshots": [],
+    "semantic_sequence": null,
+    "trajectory": {
+      "path": "docs/evidence/FOUL-CARD-SEVERITY/trajectory.json",
+      "sha256": "0da25e91dd6d4255dfa604141ddcaab09b2579f764a35bf1f81890e839f0de04",
+      "git_blob": "81e9c9ff7edd095e48be67faeb708104b23d8cd1",
+      "candidate_commit": "428b1d2",
+      "bytes": 14470,
+      "committed_with_candidate": true
+    },
+    "deterministic_audit_artifact": {
+      "path": "docs/evidence/FOUL-CARD-SEVERITY/audit.json",
+      "sha256": "61275793f633591230a68e8f29156b26214a3983226188f2821ee373f8d81103",
+      "git_blob": "e4975c2a88df4436cb5a219fa73776bf0f069fbc",
+      "candidate_commit": "428b1d2",
+      "bytes": 2836,
+      "committed_with_candidate": true
+    },
+    "video": null,
+    "metrics": []
+  },
+  "reviews": {
+    "deterministic_audit": {
+      "status": "PASS"
+    },
+    "semantic_audit": null,
+    "critic": {
+      "critic": "critic",
+      "model": "mimo-v2.6-flash",
+      "verdict": "ACCEPT"
+    },
+    "integration": {
+      "reviewer": "integration-reviewer",
+      "model": "mimo-v2.6-flash",
+      "verdict": "ACCEPT"
+    }
+  },
+  "acceptance_record": "gauntlet/evals/results/2026-10-09/2026-10-09T08-44-58-718Z-FOUL-CARD-SEVERITY-acceptance.json"
+}

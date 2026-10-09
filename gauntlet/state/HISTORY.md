@@ -4048,3 +4048,24 @@ All 3 objectives of horizon v17 accepted. Milestone did not pass — honest eval
 - objective_id: PLAYER-CONTROLS-REFERENCE
 - result: accepted
 - notes: Horizon v40 — accepted with candidate-bound scoped receipt (see manifest).
+<<<<<<< Updated upstream
+=======
+
+## Iteration — FOUL-CARD-SEVERITY
+
+- objective_id: FOUL-CARD-SEVERITY
+- result: accepted
+- notes: Horizon v40 — accepted with candidate-bound scoped receipt (see manifest).
+
+## Iteration — FOUL-CARD-BROWSER-EVIDENCE
+
+- objective_id: FOUL-CARD-BROWSER-EVIDENCE
+- result: accepted
+- notes: Horizon v40 — accepted with candidate-bound scoped receipt (see manifest).
+>>>>>>> Stashed changes
+
+## Iteration — FOUL-CARD-SEVERITY
+
+- objective_id: FOUL-CARD-SEVERITY
+- result: accepted
+- notes: Horizon v40 — accepted with candidate-bound scoped receipt (see manifest).

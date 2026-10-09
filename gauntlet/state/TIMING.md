@@ -7,7 +7,11 @@ Do not treat these numbers as a provider invoice.
 session_id: 019ffdda-1b40-7b90-91ae-cc7f3ad623b0
 measured_at: 2026-10-04T03:55:00Z
 tracking_contract_version: 1
-last_tracked_objective: PLAYER-CONTROLS-REFERENCE
+<<<<<<< Updated upstream
+last_tracked_objective: FOUL-CARD-SEVERITY
+=======
+last_tracked_objective: FOUL-CARD-SEVERITY
+>>>>>>> Stashed changes
 usage_aggregates_through: ADVANTAGE-BROWSER-EVIDENCE
 clock_aggregates_through: ADVANTAGE-BROWSER-EVIDENCE
 model_evaluation_through: ADVANTAGE-BROWSER-EVIDENCE

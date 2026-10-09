@@ -222,6 +222,12 @@ next_objective_id: PLAYER-CONTROLS-REFERENCE
 active_candidate: {}
 
   - PLAYER-CONTROLS-REFERENCE
+<<<<<<< Updated upstream
+=======
+  - FOUL-CARD-SEVERITY
+  - FOUL-CARD-BROWSER-EVIDENCE
+>>>>>>> Stashed changes
+  - FOUL-CARD-SEVERITY
 blocked_verification_debt:
   objective_id: PLAYER-CONTROLS-REFERENCE, FOUL-CARD-SEVERITY, FOUL-CARD-BROWSER-EVIDENCE
   state: "Horizon v40 playable slice DELIVERED (docs/player-controls.md + docs/how-to-play.md committed 7042353; unit-A typecheck PASS; first normal-play recorded gauntlet/trajectory/horizons/v40/first-playable.json; attempt-1 ITERATE honest). FOUL-CARD-SEVERITY + FOUL-CARD-BROWSER-EVIDENCE implementation content is fully contained in the certified chain (src/eval identical to ad4c7e0/216fa58). All three objective receipts are BLOCKED, not FAILED: the empty-scope fallback maps an evidence-only acceptance commit to full-required, and the repository/full incident gate refuses it."
