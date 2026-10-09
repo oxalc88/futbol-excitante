@@ -1,0 +1,17 @@
+{
+  "mode": "normal_shipped_play",
+  "method": "Launched the shipped browser app (pnpm dev, http://localhost:5173) in real Chromium and exercised the documented control surface from docs/player-controls.md and docs/how-to-play.md: setup menu mode select (5v5 Human vs CPU), difficulty toggle, referee toggle, in-match WASD movement + sprint, Tab switch (including keeper takeover), pass/shot/lofted/through keys, U/I tackles, restart destination steering during an award window, and the fulltime REMATCH (R) / BACK TO MENU (M) flow. The on-screen controls legend (?) overlay matches the documented table.",
+  "sources": [
+    {
+      "path": "docs/player-controls.md",
+      "commit": "704235321677b0061ada97d85473c808f1518ba8",
+      "sha256": "86e7605be83bdd875f62d69145d90a501e6ee3b3b4591aab2568a910b354d706"
+    },
+    {
+      "path": "docs/how-to-play.md",
+      "commit": "704235321677b0061ada97d85473c808f1518ba8",
+      "sha256": "1358ea654529cca637cdeb7e21e57691b381ee40b99e2d691cf432d8f8850093"
+    }
+  ],
+  "first_playable_at": "2026-10-09T00:37:42.780Z"
+}
