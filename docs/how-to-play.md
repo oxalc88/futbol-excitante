@@ -8,10 +8,10 @@ In Human vs CPU modes you control one player on the home team with the keyboard:
 
 ## Match flow
 
-Play runs kickoff → first half → halftime → second half → fulltime. Goals trigger a brief GOAL phase and an automatic kickoff restart. When the ball goes out, throw-ins, goal kicks, corners, and free kicks (with the referee on) are awarded and served after a short window — your directional input during the window steers where the serve goes when your team is awarded it. Halftime shows a countdown and then the second half starts automatically. At fulltime the match freezes and a panel offers a rematch or a return to the menu.
+Play runs kickoff → first half → halftime → second half → fulltime. Goals trigger a brief GOAL phase and an automatic kickoff restart. When the ball goes out, throw-ins, goal kicks, corners, and free kicks (with the referee on) are awarded and served after a short window. If your controlled player is the taker, the window holds for ~1.5 seconds waiting for your `Pass` press — steer first, then press `J` to serve in your facing direction. Otherwise your directional input during the window steers where the serve goes when your team is awarded it (corner kicks serve to a fixed cross target in the box). Halftime shows a countdown and then the second half starts automatically. At fulltime the match freezes and a panel offers a rematch or a return to the menu.
 
 ## Full controls
 
 See [docs/player-controls.md](player-controls.md) for the complete table of every keyboard control, the setup menu options in detail, keeper control, and restart steering.
 
-<!-- sources: src/apps/browser/index.html; src/contracts/controls-legend.ts; src/apps/browser/referee-config.ts; src/apps/browser/fulltime-flow.ts; src/adapters/input-browser/human-restart-control.ts -->
+<!-- sources: src/apps/browser/index.html; src/contracts/controls-legend.ts; src/apps/browser/referee-config.ts; src/apps/browser/fulltime-flow.ts; src/apps/browser/scenario-selector.ts; src/adapters/input-browser/cpu-adapter.ts; src/adapters/input-browser/keyboard.ts; src/adapters/input-browser/human-restart-control.ts; src/simulation/loop/simulation.ts; src/simulation/card-policy.ts -->
