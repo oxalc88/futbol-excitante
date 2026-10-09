@@ -1,0 +1,1093 @@
+{
+  "schema_version": 1,
+  "horizon": "v40",
+  "gauntlet_version": "0.14.0",
+  "recorded_at": "2026-10-09T11:01:51.650Z",
+  "decision": "ITERATE",
+  "certification": {
+    "latest": {
+      "schema_version": 1,
+      "target_commit": "a54b116cb828d79dbb8f4fd2db82641cd7ccca10",
+      "recorded_at": "2026-10-09T05:19:22.226Z",
+      "status": "PASS",
+      "failure_class": null,
+      "receipt": {
+        "path": "docs/evidence/CERT-CARRIER-GATE/verification/1791523147014-105654-receipt.json",
+        "sha256": "8f57b4452b15f1701ed1df9c4c7bbbe6683c0729124d043ff1600a48b0882d32"
+      },
+      "horizon": "v40"
+    },
+    "latest_attempt": {
+      "schema_version": 1,
+      "target_commit": "a54b116cb828d79dbb8f4fd2db82641cd7ccca10",
+      "recorded_at": "2026-10-09T05:19:22.226Z",
+      "status": "PASS",
+      "failure_class": null,
+      "receipt": {
+        "path": "docs/evidence/CERT-CARRIER-GATE/verification/1791523147014-105654-receipt.json",
+        "sha256": "8f57b4452b15f1701ed1df9c4c7bbbe6683c0729124d043ff1600a48b0882d32"
+      },
+      "horizon": "v40"
+    },
+    "last_certified": "a54b116cb828d79dbb8f4fd2db82641cd7ccca10",
+    "accepted_since": 3,
+    "horizon": "v40"
+  },
+  "verification": {
+    "coverage": "committed run receipts only; session totals require complete telemetry",
+    "full_suite_executions": 8,
+    "duplicated_unchanged_checks": 5,
+    "status": "MEASURED",
+    "verification_ms": 10087818,
+    "executed_checks": 42,
+    "reused_checks": 19,
+    "sources": [
+      {
+        "path": "docs/evidence/CERT-0140-GATE/verification/1791418365488-776962-receipt.json",
+        "sha256": "50b90e266f3f5196de6f90af8a64ee405386903e9aaea713d97bb8814c5629d1",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "PASS",
+        "metrics": {
+          "executed_checks": 8,
+          "reused_checks": 1,
+          "verification_ms": 1534337,
+          "full_suite_executions": 1,
+          "wall_ms": 1584228
+        },
+        "executed_commands": [
+          {
+            "id": "build",
+            "command": [
+              "pnpm",
+              "run",
+              "build"
+            ],
+            "input_key": "a37a38697c2683abc8adacdd6cfee63a261a52da836411b0ae171be0be7ba7b6",
+            "duration_ms": 6628,
+            "exit_code": 0
+          },
+          {
+            "id": "regression-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test"
+            ],
+            "input_key": "75794b40752ec18a73895bcce6e123889123d98cbf2c3a3effacc221c8abd78f",
+            "duration_ms": 937450,
+            "exit_code": 0
+          },
+          {
+            "id": "gauntlet-eval",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:eval"
+            ],
+            "input_key": "e1909fc2510eb9a7c6152062d28ab8afbe5c3c54fee0eb3ab5d7ad777320fd6c",
+            "duration_ms": 1876,
+            "exit_code": 0
+          },
+          {
+            "id": "state-audit",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:eval:state"
+            ],
+            "input_key": "8bd508117562d8b884cf0a078b1d4a4aa1534cb3e5301f8fb529e490103a1b91",
+            "duration_ms": 27268,
+            "exit_code": 0
+          },
+          {
+            "id": "browser-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test-browser"
+            ],
+            "input_key": "f7dfe3883373011340968cfb726f32776cee00e66454d44a55e58ea6c929a4c1",
+            "duration_ms": 556854,
+            "exit_code": 0
+          },
+          {
+            "id": "sim-smoke",
+            "command": [
+              "pnpm",
+              "run",
+              "sim-smoke"
+            ],
+            "input_key": "647c3a8968729c60b0f21922d1b7ef04764eaecd15649051927f413ef35d3f94",
+            "duration_ms": 2615,
+            "exit_code": 0
+          },
+          {
+            "id": "parallel-policy",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:parallel:test"
+            ],
+            "input_key": "296bfc97ee0308907d7f69e156f8ae7bfccb1ed315343b15a401079fec702ce2",
+            "duration_ms": 1496,
+            "exit_code": 0
+          },
+          {
+            "id": "runtime-telemetry",
+            "command": [
+              "node",
+              "scripts/ci/test-gauntlet-telemetry.mjs"
+            ],
+            "input_key": "e8aed8b1563ff4d54ed533bbe04db0be46d98358ac72fa9e287280358919206d",
+            "duration_ms": 150,
+            "exit_code": 0
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/CERT-0140-GREEN/verification/1791416528852-759986-receipt.json",
+        "sha256": "993680823f4513e2548e1fa21ffa953ea200edd70a80c3dbf4c3187d0874d527",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "FAIL",
+        "metrics": {
+          "executed_checks": 3,
+          "reused_checks": 0,
+          "verification_ms": 957698,
+          "full_suite_executions": 1,
+          "wall_ms": 991581
+        },
+        "executed_commands": [
+          {
+            "id": "typecheck",
+            "command": [
+              "pnpm",
+              "run",
+              "typecheck"
+            ],
+            "input_key": "b3b990af2f29cf8cc3d102abd7723827c4d90d62c426cae4c9eb51cd3567db35",
+            "duration_ms": 19352,
+            "exit_code": 0
+          },
+          {
+            "id": "build",
+            "command": [
+              "pnpm",
+              "run",
+              "build"
+            ],
+            "input_key": "bc3ee783dec66bdb50a33b225453bb32e736cf782275afdda5bf70d5ee166afc",
+            "duration_ms": 7088,
+            "exit_code": 0
+          },
+          {
+            "id": "regression-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test"
+            ],
+            "input_key": "0bf874cf2c3d9c674e23fbc505f77b3e0737de560c6008731f15757778a210e6",
+            "duration_ms": 931258,
+            "exit_code": 1
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/CERT-A0F6161-CURRENT/verification/1791227353031-522892-receipt.json",
+        "sha256": "6e71199c2c4655518e0a2af088a14672ae13f6cd503c62c94d57eb19d9d1e958",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "FAIL",
+        "metrics": {
+          "executed_checks": 3,
+          "reused_checks": 0,
+          "verification_ms": 976106,
+          "full_suite_executions": 1,
+          "wall_ms": 1000060
+        },
+        "executed_commands": [
+          {
+            "id": "typecheck",
+            "command": [
+              "pnpm",
+              "run",
+              "typecheck"
+            ],
+            "input_key": "017b310d15105aa752d215f4c0c3f07a0f89c9a2edd84c6deb37d41432d2190b",
+            "duration_ms": 19518,
+            "exit_code": 0
+          },
+          {
+            "id": "build",
+            "command": [
+              "pnpm",
+              "run",
+              "build"
+            ],
+            "input_key": "edc7cfc3fd28cefb0d7b46dbfefd44fa9479cff3b2e408bcc3458bd80940354f",
+            "duration_ms": 6937,
+            "exit_code": 0
+          },
+          {
+            "id": "regression-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test"
+            ],
+            "input_key": "5d704d013571a076c6dc71f9aa7f5de74a33e4be923f1a6ca1f59c4df535b357",
+            "duration_ms": 949651,
+            "exit_code": 1
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/CERT-CARRIER-GATE/verification/1791520861278-103819-receipt.json",
+        "sha256": "1f26305b0c683ceab55cf1da523ece6d518aa003ec55850539f65a0e4bfcc8f2",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 72077
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/CERT-CARRIER-GATE/verification/1791521216649-104889-receipt.json",
+        "sha256": "79214d5fee5c3346464dcb78e22d4536ee6ca7289af5c0faf61e9b83e325ebff",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 69887
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/CERT-CARRIER-GATE/verification/1791523147014-105654-receipt.json",
+        "sha256": "8f57b4452b15f1701ed1df9c4c7bbbe6683c0729124d043ff1600a48b0882d32",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "PASS",
+        "metrics": {
+          "executed_checks": 9,
+          "reused_checks": 0,
+          "verification_ms": 1592550,
+          "full_suite_executions": 1,
+          "wall_ms": 1695028
+        },
+        "executed_commands": [
+          {
+            "id": "typecheck",
+            "command": [
+              "pnpm",
+              "run",
+              "typecheck"
+            ],
+            "input_key": "1348586f7816e687590a5c9ac4b13b6a9ad6ea227ea4520fc3683b932ec719cd",
+            "duration_ms": 19008,
+            "exit_code": 0
+          },
+          {
+            "id": "build",
+            "command": [
+              "pnpm",
+              "run",
+              "build"
+            ],
+            "input_key": "0a597ca09ab5f8afe3b73c69494c0d945557a3c0f6719ff239d2456263022822",
+            "duration_ms": 7085,
+            "exit_code": 0
+          },
+          {
+            "id": "regression-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test"
+            ],
+            "input_key": "bfb249a76b2e1675fe07e9a6bf442414be55a1fc86f92ce4522f271fffa5718b",
+            "duration_ms": 938309,
+            "exit_code": 0
+          },
+          {
+            "id": "gauntlet-eval",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:eval"
+            ],
+            "input_key": "548556a4e0a9b83e441b3c69633b1a08c919f68e882aa4f7baa584cd863f1ac4",
+            "duration_ms": 2283,
+            "exit_code": 0
+          },
+          {
+            "id": "state-audit",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:eval:state"
+            ],
+            "input_key": "0416f18915fed14613fbdfa79a52ababdea7e5b70ff599e60cc48644f86273b4",
+            "duration_ms": 52774,
+            "exit_code": 0
+          },
+          {
+            "id": "browser-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test-browser"
+            ],
+            "input_key": "6ea03535b0306b8937a13e38b9e5c5eb939aab37d0e1f415a744e97927366727",
+            "duration_ms": 568788,
+            "exit_code": 0
+          },
+          {
+            "id": "sim-smoke",
+            "command": [
+              "pnpm",
+              "run",
+              "sim-smoke"
+            ],
+            "input_key": "56d7f64aebf202e80e31ee35197ea3a49e58764067763ab1cd13cd5556727603",
+            "duration_ms": 2423,
+            "exit_code": 0
+          },
+          {
+            "id": "parallel-policy",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:parallel:test"
+            ],
+            "input_key": "cd83a57b04236478ec935986b32b87a17ccd1d4da7f18af06b2c153beae472d1",
+            "duration_ms": 1752,
+            "exit_code": 0
+          },
+          {
+            "id": "runtime-telemetry",
+            "command": [
+              "node",
+              "scripts/ci/test-gauntlet-telemetry.mjs"
+            ],
+            "input_key": "89a66a3df2d61361962171cad6f98e41d3e51e3d664aab60b604564e3c3178e5",
+            "duration_ms": 128,
+            "exit_code": 0
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/CERT-CURRENT2/verification/1791374655570-633954-receipt.json",
+        "sha256": "df6d8394cb24c02f74792d75d84fbb933d88817b73732f03dc6a814fbc82b2cd",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "FAIL",
+        "metrics": {
+          "executed_checks": 3,
+          "reused_checks": 0,
+          "verification_ms": 967396,
+          "full_suite_executions": 1,
+          "wall_ms": 989658
+        },
+        "executed_commands": [
+          {
+            "id": "typecheck",
+            "command": [
+              "pnpm",
+              "run",
+              "typecheck"
+            ],
+            "input_key": "684d0f2948f6a5b14ec4882fc837dfb16b41eb38a054495ce20250ab643acd4c",
+            "duration_ms": 20666,
+            "exit_code": 0
+          },
+          {
+            "id": "build",
+            "command": [
+              "pnpm",
+              "run",
+              "build"
+            ],
+            "input_key": "4b95f4ad17f4b0d6cb9fa4eb020c00a79146adf94518dae30309662dbc56eac0",
+            "duration_ms": 6798,
+            "exit_code": 0
+          },
+          {
+            "id": "regression-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test"
+            ],
+            "input_key": "00845d8e9ed217ef0a7c381ad782153b02a7eb0e776a17cafa45110ecbb40a26",
+            "duration_ms": 939932,
+            "exit_code": 1
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/CERT-CURRENT3/verification/1791375284271-651266-receipt.json",
+        "sha256": "8b3bb041af01280fcb4a0f4812aac359b2c60615e93fef7f04e0356825ff2f70",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "RECOVERY_BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 10873
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/CERT-CURRENT3/verification/1791375336646-651494-receipt.json",
+        "sha256": "12bc798f9959c080fd4cd9b6ada155a8d7019a4fd5ee81edc53c1f60f4dba740",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "RECOVERY_BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 10698
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/CERT-RESTORE-0140/verification/1791414112500-740843-receipt.json",
+        "sha256": "bd4588bb28dc46b930f3877e6c978876adf1fc0a58f4d51a66f5568ba4ed3726",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "FAIL",
+        "metrics": {
+          "executed_checks": 3,
+          "reused_checks": 0,
+          "verification_ms": 978859,
+          "full_suite_executions": 1,
+          "wall_ms": 1010040
+        },
+        "executed_commands": [
+          {
+            "id": "typecheck",
+            "command": [
+              "pnpm",
+              "run",
+              "typecheck"
+            ],
+            "input_key": "6d004605923170157528dc99a4a27decab33785e8f9d3e44e9fbf8b4f10aa07e",
+            "duration_ms": 19704,
+            "exit_code": 0
+          },
+          {
+            "id": "build",
+            "command": [
+              "pnpm",
+              "run",
+              "build"
+            ],
+            "input_key": "c4aec7a1a87c43bd7831ac0e6e12b7f0323da7b2ea76637f8f7a180342ac55ef",
+            "duration_ms": 7784,
+            "exit_code": 0
+          },
+          {
+            "id": "regression-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test"
+            ],
+            "input_key": "6b4b34deebb95f01d984d27e96295315ba39adee86d2030d3b46332f10c9503f",
+            "duration_ms": 951371,
+            "exit_code": 1
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/CERT-bootstrap-0.13/verification/1791177397335-447860-receipt.json",
+        "sha256": "d59e2d156466fe972a936e1caa0332791b9456643a385139c4afc0a2b7e76307",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "RECOVERY_BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 4846
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/CERT-bootstrap-0.13/verification/1791177582517-448204-receipt.json",
+        "sha256": "3d4b8ba4cc8a5b151f6c542e6d2cc7a6971a70442d0fbaa3bda8e62be3f54f01",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "certification",
+        "horizon": "40",
+        "status": "RECOVERY_BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 4938
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/FOUL-CARD-SEVERITY/verification/1791160637547-436831-receipt.json",
+        "sha256": "c9b401e4c906196707d737458a75c244169979b39e182206539e3829c50dabe8",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "objective",
+        "horizon": "39",
+        "status": "RECOVERY_BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 2605
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/FOUL-CARD-SEVERITY/verification/1791212766727-470288-receipt.json",
+        "sha256": "32db845f7b6f908fd4f52521d70d28cde518ddb0de25d7963bf97558da4f045b",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "objective",
+        "horizon": "40",
+        "status": "BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 13119
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791177722769-448517-receipt.json",
+        "sha256": "155b4053ac7ddf5b8ac1dda148858ac5c0f59e9a29d62ffa3c7fd394b6cebe76",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "objective",
+        "horizon": "40",
+        "status": "BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 2877
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791367795209-605545-receipt.json",
+        "sha256": "f1b963f63e38377ea9cf8cd08bcf831b5d079841b5434515d9b2dec018ee44f9",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "objective",
+        "horizon": "40",
+        "status": "RECOVERY_BLOCKED",
+        "metrics": {
+          "executed_checks": 0,
+          "reused_checks": 0,
+          "verification_ms": 0,
+          "full_suite_executions": 0,
+          "wall_ms": 20037
+        },
+        "executed_commands": []
+      },
+      {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791419909506-796899-receipt.json",
+        "sha256": "10e74250d16fa13a8b21cf8e267fa19145d738884be96d9940a2b0eb59858e4f",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "objective",
+        "horizon": "40",
+        "status": "FAIL",
+        "metrics": {
+          "executed_checks": 3,
+          "reused_checks": 0,
+          "verification_ms": 1022056,
+          "full_suite_executions": 1,
+          "wall_ms": 1109205
+        },
+        "executed_commands": [
+          {
+            "id": "typecheck",
+            "command": [
+              "pnpm",
+              "run",
+              "typecheck"
+            ],
+            "input_key": "b3b990af2f29cf8cc3d102abd7723827c4d90d62c426cae4c9eb51cd3567db35",
+            "duration_ms": 18601,
+            "exit_code": 0
+          },
+          {
+            "id": "build",
+            "command": [
+              "pnpm",
+              "run",
+              "build"
+            ],
+            "input_key": "253affa22fc4afdcd43d2e13b940e2ebf683a11c96663527c8cc4520b58d4317",
+            "duration_ms": 7044,
+            "exit_code": 0
+          },
+          {
+            "id": "regression-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test"
+            ],
+            "input_key": "e1bad868047ed2a5f1aaf22cf51d5686ff3f2d85503ada793552f6bc086b9a65",
+            "duration_ms": 996411,
+            "exit_code": 1
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791527517335-131577-receipt.json",
+        "sha256": "a3aed60267c785e52e79636525b206aa02402ff18119ffcf9ea417324ef30f2f",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "objective",
+        "horizon": "40",
+        "status": "PASS",
+        "metrics": {
+          "executed_checks": 7,
+          "reused_checks": 0,
+          "verification_ms": 1787814,
+          "full_suite_executions": 1,
+          "wall_ms": 1869054
+        },
+        "executed_commands": [
+          {
+            "id": "typecheck",
+            "command": [
+              "pnpm",
+              "run",
+              "typecheck"
+            ],
+            "input_key": "1348586f7816e687590a5c9ac4b13b6a9ad6ea227ea4520fc3683b932ec719cd",
+            "duration_ms": 20203,
+            "exit_code": 0
+          },
+          {
+            "id": "build",
+            "command": [
+              "pnpm",
+              "run",
+              "build"
+            ],
+            "input_key": "f808eb942ccadf9fc922bd996b2312f3882a891454cac9949faa52867df6b367",
+            "duration_ms": 7265,
+            "exit_code": 0
+          },
+          {
+            "id": "regression-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test"
+            ],
+            "input_key": "4e24152f924498b146b9ea02bf482b17a77f988f5ca4ceac906fdf7a854f4b7b",
+            "duration_ms": 1027724,
+            "exit_code": 0
+          },
+          {
+            "id": "gauntlet-eval",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:eval"
+            ],
+            "input_key": "c8e0736a06ba01f648f31c8041638cbf538280b80b819d6a4a6c1509ac9cc8a7",
+            "duration_ms": 2052,
+            "exit_code": 0
+          },
+          {
+            "id": "state-audit",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:eval:state"
+            ],
+            "input_key": "3cad7a343bc762f6a222bac1d8b9f3b1d8dd78ba8139405819d4cab3b47a6fa5",
+            "duration_ms": 95515,
+            "exit_code": 0
+          },
+          {
+            "id": "browser-tests",
+            "command": [
+              "pnpm",
+              "run",
+              "test-browser"
+            ],
+            "input_key": "a28fd4bab9884be1637d6385299e64cc6b5205e713fb6e0f13b0cf17411edd24",
+            "duration_ms": 631793,
+            "exit_code": 0
+          },
+          {
+            "id": "sim-smoke",
+            "command": [
+              "pnpm",
+              "run",
+              "sim-smoke"
+            ],
+            "input_key": "2051dd3a135a929ef6edf9219ece8b00a2935dd14c8454a2c160ee57c6820c26",
+            "duration_ms": 3262,
+            "exit_code": 0
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791528183305-150970-receipt.json",
+        "sha256": "fa7b63644942d2bb30eb63b9d3f1e32b5fd79e62382ccea8436b26f03a05cfb9",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "objective",
+        "horizon": "40",
+        "status": "PASS",
+        "metrics": {
+          "executed_checks": 1,
+          "reused_checks": 6,
+          "verification_ms": 89524,
+          "full_suite_executions": 0,
+          "wall_ms": 190533
+        },
+        "executed_commands": [
+          {
+            "id": "state-audit",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:eval:state"
+            ],
+            "input_key": "3cad7a343bc762f6a222bac1d8b9f3b1d8dd78ba8139405819d4cab3b47a6fa5",
+            "duration_ms": 89524,
+            "exit_code": 0
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791528462761-152291-receipt.json",
+        "sha256": "05a18398e70452beb127f8a4d1b4be3d69a61d4bee5e4dfae1ee3366b282d8d8",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "objective",
+        "horizon": "40",
+        "status": "PASS",
+        "metrics": {
+          "executed_checks": 1,
+          "reused_checks": 6,
+          "verification_ms": 93583,
+          "full_suite_executions": 0,
+          "wall_ms": 196792
+        },
+        "executed_commands": [
+          {
+            "id": "state-audit",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:eval:state"
+            ],
+            "input_key": "3cad7a343bc762f6a222bac1d8b9f3b1d8dd78ba8139405819d4cab3b47a6fa5",
+            "duration_ms": 93583,
+            "exit_code": 0
+          }
+        ]
+      },
+      {
+        "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/verification/1791528789469-153753-receipt.json",
+        "sha256": "7de983105e1beea9a5e8c2831879f5e705eefa378348a0c3a043e1175584f02a",
+        "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+        "scope": "objective",
+        "horizon": "40",
+        "status": "PASS",
+        "metrics": {
+          "executed_checks": 1,
+          "reused_checks": 6,
+          "verification_ms": 87895,
+          "full_suite_executions": 0,
+          "wall_ms": 190692
+        },
+        "executed_commands": [
+          {
+            "id": "state-audit",
+            "command": [
+              "pnpm",
+              "run",
+              "gauntlet:eval:state"
+            ],
+            "input_key": "3cad7a343bc762f6a222bac1d8b9f3b1d8dd78ba8139405819d4cab3b47a6fa5",
+            "duration_ms": 87895,
+            "exit_code": 0
+          }
+        ]
+      }
+    ]
+  },
+  "outcome": {
+    "problem": "The shipped app has no player-facing reference for its control surface — the in-app legend covers slot-1 keys only, while keeper takeover, restart destination steering, difficulty scaling and the referee toggle remain undocumented, so a new player cannot discover them without reading source.",
+    "smallest_playable_slice": "A player can open docs/player-controls.md and docs/how-to-play.md in the repository and discover every shipped control — movement, sprint, first touch, pass/shot/lofted/through, tackles, switching (including the keeper in 5v5 human-vs-CPU), restart steering during award windows, difficulty scaling, and the referee toggle gating fouls/free kicks/cards — with each claim traceable to the shipped sources.",
+    "playtest": {
+      "mode": "normal_shipped_play",
+      "method": "Real Chromium session of the shipped app exercising the documented control surface end to end (setup menu, in-match keys, keeper takeover, restart steering, fulltime flow)",
+      "before": [
+        {
+          "path": "gauntlet/trajectory/horizons/v40/selection.json",
+          "commit": "c6034794f23fe671bea338a941f663ca2686d2a3",
+          "sha256": "6b77c2b6e3ab1edc86d60787dcc8edd07ee00e0b460c706fac0dc426cc8b3124"
+        }
+      ],
+      "after": [
+        {
+          "path": "gauntlet/trajectory/horizons/v40/first-playable.json",
+          "commit": "67b03e79d2974823277f80c9824e36ad2ab4c961",
+          "sha256": "76c6d4b808a183dffcd906a120d53c5d8ddbacc2673196107b5463377f642313"
+        }
+      ],
+      "materially_better": true,
+      "improved": [
+        "A new player can discover every shipped control — including keeper takeover, restart destination steering and the difficulty/referee toggles — from the player-facing reference without reading source."
+      ],
+      "still_wrong": [],
+      "issues_opened": [],
+      "issues_closed": [],
+      "regressions": []
+    },
+    "quality": {
+      "baseline_pass": true,
+      "affected_domains_pass": false,
+      "sources": [
+        {
+          "path": "docs/evidence/PLAYER-CONTROLS-REFERENCE/units/A/local-quality.json",
+          "commit": "704235321677b0061ada97d85473c808f1518ba8",
+          "sha256": "c515288acc6426911ca1662a7afefd2ca620a805a0553bbdc4dd421d6efee297"
+        }
+      ],
+      "no_known_accepted_regression": true
+    },
+    "changed_for_player": [
+      "docs/player-controls.md: complete shipped keyboard control table, setup-menu options (mode, difficulty, referee toggle), keeper takeover, restart destination steering, switching, automatic behaviors — every claim traceable to shipped sources",
+      "docs/how-to-play.md: getting-started guide and match-flow overview pointing at player-controls.md"
+    ]
+  },
+  "metrics": {
+    "time_to_playable": {
+      "value": 136480.977,
+      "status": "MEASURED",
+      "sources": [
+        {
+          "path": "gauntlet/trajectory/horizons/v40/selection.json",
+          "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+          "sha256": "6b77c2b6e3ab1edc86d60787dcc8edd07ee00e0b460c706fac0dc426cc8b3124"
+        },
+        {
+          "path": "gauntlet/trajectory/horizons/v40/first-playable.json",
+          "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+          "sha256": "76c6d4b808a183dffcd906a120d53c5d8ddbacc2673196107b5463377f642313"
+        }
+      ],
+      "note": "Seconds between canonical selection and first observed normal-play event; includes idle."
+    },
+    "player_visible_changes": {
+      "value": 2,
+      "status": "MEASURED",
+      "sources": [
+        {
+          "path": "gauntlet/trajectory/horizons/v40/attempt-input.json",
+          "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+          "sha256": "f297f004d0b9117b5a82d84ff1da9ad72897ecf03a14a75e43bcf7d4c6034205"
+        }
+      ],
+      "note": "Distinct useful improvements observed in normal play; one entry per change, not per objective."
+    },
+    "player_visible_changes_per_active_hour": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Missing numerator or positive denominator; no zero substitution."
+    },
+    "process_only_objectives": {
+      "value": 1,
+      "status": "MEASURED",
+      "sources": [
+        {
+          "path": "gauntlet/trajectory/horizons/v40/attempt-input.json",
+          "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+          "sha256": "f297f004d0b9117b5a82d84ff1da9ad72897ecf03a14a75e43bcf7d4c6034205"
+        }
+      ],
+      "note": "Selected objectives without a direct player result, including enabling work."
+    },
+    "playtest_issues_opened": {
+      "value": 0,
+      "status": "MEASURED",
+      "sources": [
+        {
+          "path": "gauntlet/trajectory/horizons/v40/attempt-input.json",
+          "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+          "sha256": "f297f004d0b9117b5a82d84ff1da9ad72897ecf03a14a75e43bcf7d4c6034205"
+        }
+      ],
+      "note": "Issues opened by this playtest."
+    },
+    "playtest_issues_closed": {
+      "value": 0,
+      "status": "MEASURED",
+      "sources": [
+        {
+          "path": "gauntlet/trajectory/horizons/v40/attempt-input.json",
+          "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+          "sha256": "f297f004d0b9117b5a82d84ff1da9ad72897ecf03a14a75e43bcf7d4c6034205"
+        }
+      ],
+      "note": "Previously open issues materially improved and retested."
+    },
+    "gameplay_regressions": {
+      "value": 0,
+      "status": "MEASURED",
+      "sources": [
+        {
+          "path": "gauntlet/trajectory/horizons/v40/attempt-input.json",
+          "commit": "7676089fc75ca8907882ca9c6d78be7603084d9b",
+          "sha256": "f297f004d0b9117b5a82d84ff1da9ad72897ecf03a14a75e43bcf7d4c6034205"
+        }
+      ],
+      "note": "Observed regressions in this run, not a claim of universal absence."
+    },
+    "processed_input_tokens": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Not recorded with complete coverage."
+    },
+    "tokens_per_player_visible_change": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Missing numerator or positive denominator; no zero substitution."
+    },
+    "active_agent_time_per_player_visible_change": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Missing numerator or positive denominator; no zero substitution."
+    },
+    "retries": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Not recorded with complete coverage."
+    },
+    "critic_rejects": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Not recorded with complete coverage."
+    },
+    "integration_rejects": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Not recorded with complete coverage."
+    },
+    "existing_eval_suite_failures": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Not recorded with complete coverage."
+    },
+    "critic_catches": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Not recorded with complete coverage."
+    },
+    "integration_catches": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Not recorded with complete coverage."
+    },
+    "post_acceptance_defects": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Not recorded with complete coverage."
+    },
+    "milestone_playtest_result": {
+      "value": null,
+      "status": "UNAVAILABLE",
+      "sources": [],
+      "note": "Not recorded with complete coverage."
+    }
+  },
+  "objectives": [
+    {
+      "id": "PLAYER-CONTROLS-REFERENCE",
+      "direct_player_result": true,
+      "enables_or_protects": "The player-facing controls reference IS the playable slice: it is how the player discovers the shipped control surface."
+    },
+    {
+      "id": "FOUL-CARD-SEVERITY",
+      "direct_player_result": true,
+      "enables_or_protects": "A card-quality foul in normal shipped play produces an immediate direct red at the foul tick (Referee toggle on) — a player-visible referee behavior."
+    },
+    {
+      "id": "FOUL-CARD-BROWSER-EVIDENCE",
+      "direct_player_result": false,
+      "enables_or_protects": "Event-centered real-Chromium evidence that the direct red is visible in the shipped app; protects the severity path's player visibility."
+    }
+  ],
+  "measurement_profile": "unavailable",
+  "harness": "unavailable",
+  "acceptances": [
+    {
+      "path": "gauntlet/evals/results/2026-10-09/2026-10-09T07-37-58-173Z-PLAYER-CONTROLS-REFERENCE-acceptance.json",
+      "commit": "7aee772bc60593a539204235a49c6bbfb80b2add",
+      "sha256": "6fac7a3a6324ecefc808ceae0c6df04c00e5ecd711dd4b70969bc60a64f5dd5f"
+    },
+    {
+      "path": "gauntlet/evals/results/2026-10-09/2026-10-09T08-44-58-718Z-FOUL-CARD-SEVERITY-acceptance.json",
+      "commit": "90171015be23d06491d16f6d844fc8e05b6bc8e5",
+      "sha256": "705a1ce3537871f74802baeae5fc7ab9a8d382c568c44a404fecd6ba590d71fe"
+    },
+    {
+      "path": "gauntlet/evals/results/2026-10-09/2026-10-09T09-23-39-933Z-FOUL-CARD-BROWSER-EVIDENCE-acceptance.json",
+      "commit": "4e7b1bfe81cc66d64be34e7b290235fa529cd50f",
+      "sha256": "349460a79f3a81248c2ea85b673675c22fe3312bf61bbb81dc5440057410bfcb"
+    }
+  ],
+  "active_agent_hours": {
+    "value": null,
+    "status": "UNAVAILABLE",
+    "sources": [],
+    "note": "No reconciled interval union."
+  }
+}
