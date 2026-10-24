@@ -58,6 +58,12 @@ export function validateCheckpoint(value:unknown):asserts value is World {
     for(const n of [...Object.values(t.memory.touches),...t.memory.flank])number(n,'memoria de equipo',0);
     for(const a of Object.values(t.assignments)){object(a,'asignación');vector(a.anchor,'asignación.anchor');vector(a.target,'asignación.target');if(typeof a.responsibility!=='string')invalid('asignación.responsibility');}
   }
+  // Collisions transfer velocity between players; allow ample headroom over running speed.
+  const playerSpeed=4*Math.max(c.goalkeeper.speed,...w.teams.flatMap(t=>t.players.map(p=>p.capabilities.speed)));
+  // Shots reach 1.1 * power; crosses launch at up to 11 m/s vertically and 7 rad/s spin.
+  const ballSpeed=4*Math.max(26,...w.teams.flatMap(t=>t.players.map(p=>1.1*p.capabilities.power)));
+  const ballMargin=Math.max(10,ballSpeed*c.dt*2,c.physics.radius*2);
+  const ballHeight=Math.max(50,c.pitch.goalHeight*4,c.goalkeeper.highReach+4*11**2/(2*Math.max(c.physics.gravity,.1)));
   for(const p of w.players){
     object(p,'jugador');choice(p.team,[0,1],'equipo del jugador');
     const profile=w.teams[p.team].players.find(q=>q.id===p.id);
@@ -65,7 +71,9 @@ export function validateCheckpoint(value:unknown):asserts value is World {
     try{validateTeam({...w.teams[p.team],players:[{...p,keeper:true}]});}catch(e){throw new Error(`Checkpoint inválido: jugador ${p.id}: ${(e as Error).message}`);}
     choice(p.keeper,[profile.keeper],`arquero ${p.id}`);choice(p.sentOff,[true,false],`expulsión ${p.id}`);
     vector(p,`posición del jugador ${p.id}`);number(p.x,`jugador ${p.id}.x`,-c.pitch.length/2-1,c.pitch.length/2+1);number(p.y,`jugador ${p.id}.y`,-c.pitch.width/2-1,c.pitch.width/2+1);
-    for(const k of ['vx','vy','heading']as const)number(p[k],`jugador ${p.id}.${k}`);
+    for(const k of ['vx','vy']as const)number(p[k],`jugador ${p.id}.${k}`,-playerSpeed,playerSpeed);
+    // Movement normalizes to ±PI, but body-contact stumbles can add an angle afterward.
+    number(p.heading,`jugador ${p.id}.heading`,-2*Math.PI,2*Math.PI);
     for(const k of ['energy','stability']as const)number(p[k],`jugador ${p.id}.${k}`,0,1);
     for(const k of ['touchCooldown','recovery','travel','heldSince','keeperUntil']as const)number(p[k],`jugador ${p.id}.${k}`,0);
     number(p.keeperReaction,`jugador ${p.id}.keeperReaction`);number(p.yellows,`jugador ${p.id}.yellows`,0,2,true);choice(p.keeperMode,['ready','dive','hold','recover'],`jugador ${p.id}.keeperMode`);
@@ -75,8 +83,8 @@ export function validateCheckpoint(value:unknown):asserts value is World {
   for(const i of [0,1]as const){if(w.players.filter(p=>p.team===i).length!==c.teamSize)invalid(`cantidad de jugadores del equipo ${i}`);if(w.players.filter(p=>p.team===i&&p.keeper).length!==1)invalid(`cantidad de arqueros del equipo ${i}`);}
   const ref=(id:unknown,path:string,nullable=true)=>{if(!(nullable&&id===null)&&(typeof id!=='string'||!ids.has(id)))invalid(path);};
   const team=(v:unknown,path:string)=>choice(v,[0,1],path);
-  object(w.ball,'balón');vector(w.ball,'balón');number(w.ball.z,'balón.z',0);for(const k of ['vx','vy','vz']as const)number(w.ball[k],`balón.${k}`);
-  vector(w.ball.spin,'balón.spin');number(w.ball.spin.z,'balón.spin.z');number(w.ball.freeTicks,'balón.freeTicks',0,Number.MAX_SAFE_INTEGER,true);choice(w.ball.flight,['shot','pass','loose'],'balón.flight');
+  object(w.ball,'balón');number(w.ball.x,'balón.x',-c.pitch.length/2-ballMargin,c.pitch.length/2+ballMargin);number(w.ball.y,'balón.y',-c.pitch.width/2-ballMargin,c.pitch.width/2+ballMargin);number(w.ball.z,'balón.z',0,ballHeight);for(const k of ['vx','vy','vz']as const)number(w.ball[k],`balón.${k}`,-ballSpeed,ballSpeed);
+  vector(w.ball.spin,'balón.spin',4*7);number(w.ball.spin.z,'balón.spin.z',-4*7,4*7);number(w.ball.freeTicks,'balón.freeTicks',0,Number.MAX_SAFE_INTEGER,true);choice(w.ball.flight,['shot','pass','loose'],'balón.flight');
   if(w.ball.lastTouch!==null){const t=w.ball.lastTouch;object(t,'último contacto');ref(t.playerId,'último contacto.jugador',false);team(t.team,'último contacto.equipo');number(t.tick,'último contacto.tick',0,w.tick,true);choice(t.surface,['foot','head','hand','body'],'último contacto.superficie');vector(t.point,'último contacto.punto');number(t.point.z,'último contacto.z',0);if(typeof t.id!=='string')invalid('último contacto.id');}
   array(w.selected,'selección',2);w.selected.forEach((id,i)=>{ref(id,'selección');if(id!==null&&!w.players.some(p=>p.id===id&&p.team===i))invalid('selección del equipo');});
   ref(w.carrier,'portador');choice(w.possession,[null,0,1],'posesión');

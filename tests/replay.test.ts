@@ -36,6 +36,22 @@ test('checkpoints recorded during CPU play remain valid',()=>{
   }
 });
 
+test('checkpoints throughout a full eleven-a-side CPU match validate without mutation',()=>{
+  const sim=new Simulation(createConfig({human:[false,false]}),[makeTeam(0),makeTeam(1)]);
+  let checkpoints=0;
+  for(let tick=0;tick<100000&&sim.phase!=='fulltime';tick++){
+    sim.step();
+    if(tick%1800===0){
+      const saved=new Recorder(sim).finish(sim),before=structuredClone(saved);
+      assert.doesNotThrow(()=>parseReplay(saved),`checkpoint at tick ${tick}`);
+      assert.deepEqual(saved,before);checkpoints++;
+    }
+  }
+  assert.equal(sim.phase,'fulltime');
+  assert(checkpoints>=12);
+  assert.doesNotThrow(()=>parseReplay(new Recorder(sim).finish(sim)));
+});
+
 test('goal celebration and immediate human kickoff checkpoints are valid',()=>{
   const sim=new Simulation(createConfig({teamSize:2,human:[true,true]}),[makeTeam(0,2),makeTeam(1,2)]);
   sim.applyInputs([{tick:0,slot:0,move:{x:0,y:0},aim:{x:1,y:0},action:'pass',sprint:false,shield:false}]);sim.step();
@@ -110,3 +126,19 @@ const rejections:[string,(r:Replay)=>void,RegExp][]=[
   ['invalid final hash',r=>{r.finalHash='zzzzzzzz';},/hash final/],
 ];
 for(const [name,mutate,message]of rejections)test(`rejects ${name} with a specific Spanish error`,()=>{const r=replay();mutate(r);assert.throws(()=>parseReplay(r),message);});
+
+for(const key of ['vx','vy','heading']as const)for(const sign of [-1,1])
+  test(`rejects finite out-of-range player ${key} (${sign})`,()=>{
+    const r=replay();r.initial.players[0][key]=sign*10000;
+    assert.throws(()=>parseReplay(r),new RegExp(`jugador.*${key}`));
+  });
+for(const key of ['x','y','z','vx','vy','vz']as const)for(const sign of [-1,1])
+  test(`rejects finite out-of-range ball ${key} (${sign})`,()=>{
+    const r=replay();r.initial.ball[key]=sign*10000;
+    assert.throws(()=>parseReplay(r),new RegExp(`balón.${key}`));
+  });
+for(const key of ['x','y','z']as const)for(const sign of [-1,1])
+  test(`rejects finite out-of-range ball spin ${key} (${sign})`,()=>{
+    const r=replay();r.initial.ball.spin[key]=sign*10000;
+    assert.throws(()=>parseReplay(r),new RegExp(`balón.spin.${key}`));
+  });
