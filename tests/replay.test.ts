@@ -127,7 +127,7 @@ const rejections:[string,(r:Replay)=>void,RegExp][]=[
 ];
 for(const [name,mutate,message]of rejections)test(`rejects ${name} with a specific Spanish error`,()=>{const r=replay();mutate(r);assert.throws(()=>parseReplay(r),message);});
 
-for(const key of ['vx','vy','heading']as const)for(const sign of [-1,1])
+for(const key of ['vx','vy']as const)for(const sign of [-1,1])
   test(`rejects finite out-of-range player ${key} (${sign})`,()=>{
     const r=replay();r.initial.players[0][key]=sign*10000;
     assert.throws(()=>parseReplay(r),new RegExp(`jugador.*${key}`));
@@ -142,3 +142,5 @@ for(const key of ['x','y','z']as const)for(const sign of [-1,1])
     const r=replay();r.initial.ball.spin[key]=sign*10000;
     assert.throws(()=>parseReplay(r),new RegExp(`balón.spin.${key}`));
   });
+
+test('accepts an accumulated finite heading beyond 2π',()=>{const r=replay();r.initial.players[0].heading=40*Math.PI;assert.doesNotThrow(()=>parseReplay(r));});

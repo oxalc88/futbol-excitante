@@ -73,7 +73,8 @@ export function validateCheckpoint(value:unknown):asserts value is World {
     vector(p,`posición del jugador ${p.id}`);number(p.x,`jugador ${p.id}.x`,-c.pitch.length/2-1,c.pitch.length/2+1);number(p.y,`jugador ${p.id}.y`,-c.pitch.width/2-1,c.pitch.width/2+1);
     for(const k of ['vx','vy']as const)number(p[k],`jugador ${p.id}.${k}`,-playerSpeed,playerSpeed);
     // Movement normalizes to ±PI, but body-contact stumbles can add an angle afterward.
-    number(p.heading,`jugador ${p.id}.heading`,-2*Math.PI,2*Math.PI);
+    // Heading is an angle that can accumulate (stumbles add to it); any finite value is valid.
+    number(p.heading,`jugador ${p.id}.heading`);
     for(const k of ['energy','stability']as const)number(p[k],`jugador ${p.id}.${k}`,0,1);
     for(const k of ['touchCooldown','recovery','travel','heldSince','keeperUntil']as const)number(p[k],`jugador ${p.id}.${k}`,0);
     number(p.keeperReaction,`jugador ${p.id}.keeperReaction`);number(p.yellows,`jugador ${p.id}.yellows`,0,2,true);choice(p.keeperMode,['ready','dive','hold','recover'],`jugador ${p.id}.keeperMode`);
