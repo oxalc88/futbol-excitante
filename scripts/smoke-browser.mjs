@@ -72,6 +72,26 @@ try {
   }
   match.clockEnd = (await page.locator('#clock').innerText()).trim();
   match.phase = (await page.locator('#phase').innerText()).trim();
+  match.pauseCase = { pausedClock: null, afterHelp: null, resumedClock: null, passed: false };
+  await page.keyboard.press('KeyP');
+  await page.waitForTimeout(200); // Let the HUD display the last pre-pause tick.
+  match.pauseCase.pausedClock = (await page.locator('#clock').innerText()).trim();
+  await page.locator('#help-btn').click();
+  await page.locator('[data-close="help-dialog"]').first().click();
+  await page.waitForTimeout(2000);
+  match.pauseCase.afterHelp = (await page.locator('#clock').innerText()).trim();
+  if (match.pauseCase.afterHelp !== match.pauseCase.pausedClock) errors.push('game: manually paused clock advanced after closing Help');
+  await page.keyboard.press('KeyP');
+  try {
+    await page.waitForFunction((paused) => document.querySelector('#clock')?.textContent?.trim() !== paused,
+      match.pauseCase.afterHelp, { timeout: clockSeconds * 1000 });
+  } catch {
+    errors.push('game: clock did not advance after resuming manual pause');
+  }
+  match.pauseCase.resumedClock = (await page.locator('#clock').innerText()).trim();
+  match.pauseCase.passed = match.pauseCase.pausedClock === match.pauseCase.afterHelp
+    && match.pauseCase.resumedClock !== match.pauseCase.afterHelp;
+
   const canvases = match.canvases = await page.locator('canvas').count();
   await page.screenshot({ path: `${out}/game.png` });
   if (canvases < 1) errors.push('game: no canvas after match start');

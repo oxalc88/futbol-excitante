@@ -1,5 +1,7 @@
 import './style.css';
 import { cardAlert, CARD_ALERT_TICKS } from './card-alert';
+import { shouldPause } from './pause-state';
+import { isFulltime, rematchSetup } from './fulltime-flow';
 import type { Config, InputFrame, Presentation, Replay, TeamProfile, World } from '../contracts/types';
 import { Simulation } from '../simulation/engine';
 import { createConfig } from '../simulation/config';
@@ -31,7 +33,7 @@ app.innerHTML=`
 <details class="tactics"><summary>Plan de juego y opciones</summary><div class="setup-grid"><label>Formación local<select id="formation"><option>4-3-3</option><option>4-4-2</option><option>3-5-2</option></select></label><label>Presión<input id="pressing" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Amplitud<input id="width" type="range" min="0" max="1" step="0.05" value="0.7" /></label><label>Ritmo<input id="tempo" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Contra presión<input id="counterPress" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Pases cortos<input id="shortPossession" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Marcaje estrecho<input id="tightMarking" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Adaptación CPU<input id="adaptation" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Línea defensiva<input id="defensiveLine" type="range" min="0" max="1" step="0.05" value="0.52" /></label><label>Compactación<input id="compactness" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Apoyo<input id="support" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Controles táctiles<select id="touch-option"><option value="auto">Automático</option><option value="show">Mostrar</option><option value="hide">Ocultar</option></select></label><label>Gráficos<select id="quality"><option value="high">Normal</option><option value="low">Ligero</option></select></label><label>Equipo JSON<input id="roster-file" type="file" accept="application/json,.json" /></label></div><p id="roster-status">Opcional: importa un equipo ficticio propio para el lado local.</p><button type="button" id="export-roster" class="quiet">Descargar equipo de ejemplo</button></details>
 <p id="setup-error" class="error" role="alert"></p><button id="start-btn" class="primary wide" type="submit">Jugar partido <span>→</span></button><div class="secondary-actions"><button type="button" id="online-btn" hidden disabled>Online — próxima etapa</button><button type="button" id="load-replay">Cargar repetición</button></div><p class="fine-print">Física y reglas experimentales inspiradas en la visión del proyecto.</p></form></dialog>
 <dialog id="help-dialog"><div class="dialog-top"><span class="eyebrow">TODO EMPIEZA CON UN PASE</span><button class="close" data-close="help-dialog" aria-label="Cerrar">×</button></div><h2>Controles</h2><div class="table-scroll"><table><thead><tr><th>Acción</th><th>Jugador 1</th><th>Jugador 2</th><th>Xbox / PlayStation</th></tr></thead><tbody><tr><td>Mover / apuntar</td><td>W A S D</td><td>Flechas</td><td>Stick izquierdo · derecho para apuntar</td></tr><tr><td>Pase corto</td><td>J</td><td>Num 1</td><td>A / ✕</td></tr><tr><td>Tiro (mantener y soltar)</td><td>K</td><td>Num 2</td><td>B / ○</td></tr><tr><td>Pase filtrado</td><td>L</td><td>Num 3</td><td>Y / △</td></tr><tr><td>Centro</td><td>I</td><td>Num 5</td><td>X / □</td></tr><tr><td>Entrada</td><td>U</td><td>Num 0</td><td>RB / R1</td></tr><tr><td>Entrada deslizante</td><td>B</td><td>Num 7</td><td>LT + RB / L2 + R1</td></tr><tr><td>Pase elevado</td><td>H</td><td>Num 4</td><td>LB + A / L1 + ✕</td></tr><tr><td>Cabecear</td><td>O</td><td>Num 6</td><td>RT / R2</td></tr><tr><td>Correr</td><td>Shift izquierdo</td><td>Shift derecho</td><td>LT / L2</td></tr><tr><td>Cambiar jugador</td><td>Q</td><td>Enter</td><td>LB / L1</td></tr><tr><td>Proteger balón</td><td>Espacio</td><td>Num .</td><td>L3</td></tr></tbody></table></div><p>Apunta con el movimiento antes de pasar o disparar. Los jugadores aceleran y giran con inercia. Los saques se ejecutan automáticamente.</p><p>Conecta hasta dos mandos y pulsa un botón para activarlos. Se admiten mandos que el navegador reconozca con mapeo estándar.</p><p><kbd>P / Esc</kbd> pausa · <kbd>C</kbd> cámara. En pantalla táctil, mueve el stick y toca las acciones.</p><button data-close="help-dialog" class="primary wide">Entendido</button></dialog>
-<dialog id="stats-dialog"><div class="dialog-top"><span class="eyebrow" id="stats-label">EL PARTIDO EN NÚMEROS</span><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button><button id="new-match">Nuevo partido</button></div></dialog>
+<dialog id="stats-dialog"><div class="dialog-top"><span class="eyebrow" id="stats-label">EL PARTIDO EN NÚMEROS</span><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button><button id="rematch" hidden>Revancha</button><button id="new-match">Nuevo partido</button></div></dialog>
 <dialog id="online-dialog"><div class="dialog-top"><span class="eyebrow">CONEXIÓN ENTRE AMIGOS</span><button class="close" data-close="online-dialog" aria-label="Cerrar">×</button></div><h2>Online experimental</h2><p>El anfitrión simula el partido. Intercambia estos códigos por el medio que prefieras; no se envían automáticamente.</p><label>Servidor STUN (opcional)<input id="stun-url" placeholder="stun:tu-servidor:3478" /></label><p class="fine-print">Sin STUN funciona en redes que permiten una ruta directa. Algunas redes necesitan TURN, que este prototipo no configura.</p><label>Código recibido<textarea id="remote-code" rows="4" placeholder="Pega la invitación o la respuesta de tu amigo"></textarea></label><div class="secondary-actions"><button id="create-offer">1. Crear invitación</button><button id="create-answer">2. Responder invitación</button><button id="accept-answer">3. Aceptar respuesta</button></div><label>Tu código<textarea id="local-code" rows="4" readonly></textarea></label><button id="copy-code">Copiar código</button><p id="network-status" role="status">Esperando conexión.</p><p class="fine-print">Al conectar, el anfitrión inicia un partido de 6 minutos. El invitado controla al visitante. No hay predicción ni compensación de latencia.</p></dialog>
 <input id="replay-file" type="file" accept="application/json,.json" hidden />`;
 
@@ -39,6 +41,10 @@ const input=new BrowserInput(),peer=new PeerSession();let importedTeam:TeamProfi
 let config=createConfig({human:[false,false]}),sim=new Simulation(config,[makeTeam(0),makeTeam(1)]),record=new Recorder(sim);
 let previous=sim.presentation(),current=previous,renderer:FootballRenderer|null=null,paused=false,started=false,last=performance.now(),accumulator=0,hudClock=0;
 let replay:Replay|null=null,replayIndex=0,guest=false,guestCounter=0,networkTick=0,finalShown=false,cameraIndex=0;
+let manualPaused=false;
+let kickoffSetup:ReturnType<typeof rematchSetup>|null=null;
+let kickoffKits=kits(0,1);
+let kickoffMode='';
 let pendingTactics:InputFrame['tactics']|undefined;let replayResult='';
 let renderError='';let audioContext:AudioContext|null=null,sound=false;let notice='',noticeUntil=0;
 const tacticalKeys=['pressing','width','tempo','counterPress','shortPossession','tightMarking','adaptation','defensiveLine','compactness','support']as const;
@@ -47,9 +53,19 @@ function kits(home:number,away:number):[Kit,Kit]{const a=TEAM_CATALOG[home],b=TE
 function makeRenderer(k:[Kit,Kit]){renderer?.dispose();renderError='';try{renderer=new FootballRenderer($('viewport'),$<HTMLCanvasElement>('radar'),config,k);renderer.setQuality($<HTMLSelectElement>('quality').value);}catch(e){renderer=null;renderError='No se pudo iniciar WebGL2. Prueba un navegador compatible con aceleración gráfica.';$('announcement').textContent=renderError;console.error(e);}}
 makeRenderer(kits(0,1));
 function download(name:string,value:unknown){const url=URL.createObjectURL(new Blob([JSON.stringify(value)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-function closeDialog(id:string){$<HTMLDialogElement>(id).close();if(started&&!guest&&!document.querySelector('dialog[open]'))pause(current.phase==='fulltime'||!!replayResult);}
-function showDialog(id:string){if(started&&!guest)pause(true);$<HTMLDialogElement>(id).showModal();}
-function pause(value:boolean){paused=value;input.enabled=started&&!paused&&!replay;input.clear();$('pause-overlay').hidden=!paused||!!document.querySelector('dialog[open]');$('pause-btn').setAttribute('aria-pressed',String(paused));$('pause-btn').innerHTML=paused?'▶ <span>Seguir</span>':'Ⅱ <span>Pausa</span>';accumulator=0;}
+function closeDialog(id:string){$<HTMLDialogElement>(id).close();refreshPause();}
+function showDialog(id:string){$<HTMLDialogElement>(id).showModal();refreshPause();}
+function pause(value:boolean){manualPaused=value;refreshPause();}
+function refreshPause(){paused=shouldPause(manualPaused,started&&!guest&&!!document.querySelector('dialog[open]'),isFulltime(current.phase)||!!replayResult);input.enabled=started&&!paused&&!replay;input.clear();$('pause-overlay').hidden=!paused||!!document.querySelector('dialog[open]');$('pause-btn').setAttribute('aria-pressed',String(paused));$('pause-btn').innerHTML=paused?'▶ <span>Seguir</span>':'Ⅱ <span>Pausa</span>';accumulator=0;}
+function rematch(){
+  if(!kickoffSetup||!isFulltime(current.phase)||peer.role==='host')return;
+  peer.close();
+  const setup=rematchSetup(kickoffSetup.config,kickoffSetup.teams);
+  config=setup.config;sim=new Simulation(config,setup.teams);previous=current=sim.presentation();record=new Recorder(sim);
+  replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;notice='';noticeUntil=0;
+  makeRenderer(kickoffKits);$('match-mode').textContent=kickoffMode;
+  document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);updateHud();
+}
 function start(mode?:string){
   const home=Number($<HTMLSelectElement>('home-team').value),away=Number($<HTMLSelectElement>('away-team').value),size=Number($<HTMLSelectElement>('size').value);
   const chosen=mode??$<HTMLSelectElement>('mode').value;
@@ -59,15 +75,20 @@ function start(mode?:string){
   t1.tactics.formation=$<HTMLSelectElement>('formation').value as TeamProfile['tactics']['formation'];
   for(const k of tacticalKeys)t1.tactics[k]=Number($<HTMLInputElement>(k).value);
   config=createConfig({human:chosen==='watch'?[false,false]:chosen==='local'?[true,true]:[true,false],seed:Number($<HTMLInputElement>('seed').value),teamSize:size,halfSeconds:Number($<HTMLSelectElement>('duration').value)/2});
+  kickoffSetup=rematchSetup(config,[validateTeam(t1),validateTeam(t2)]);kickoffKits=kits(home,away);
   sim=new Simulation(config,[validateTeam(t1),validateTeam(t2)]);previous=current=sim.presentation();record=new Recorder(sim);replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;notice='';noticeUntil=0;
   makeRenderer(kits(home,away));$('match-mode').textContent=chosen==='watch'?'CPU CONTRA CPU':chosen==='local'?'DOS JUGADORES':'TÚ CONTRA LA CPU';
+  kickoffMode=$('match-mode').textContent??'';
   document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);updateHud();
 }
 $('setup-form').addEventListener('submit',e=>{e.preventDefault();try{peer.close();start();$('setup-error').textContent='';}catch(e){$('setup-error').textContent=(e as Error).message;}});
 $('menu-btn').onclick=()=>showDialog('setup-dialog');$('close-setup').onclick=()=>closeDialog('setup-dialog');
 $('pause-btn').onclick=$('resume-btn').onclick=()=>pause(!paused);$('help-btn').onclick=()=>showDialog('help-dialog');
 document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(b=>b.onclick=()=>closeDialog(b.dataset.close!));
-document.querySelectorAll<HTMLDialogElement>('dialog').forEach(d=>d.addEventListener('cancel',()=>{if(started)queueMicrotask(()=>pause(current.phase==='fulltime'||!!replayResult));}));
+document.querySelectorAll<HTMLDialogElement>('dialog').forEach(d=>{
+  d.addEventListener('cancel',e=>{e.preventDefault();closeDialog(d.id);});
+  d.addEventListener('close',refreshPause);
+});
 function changeCamera(){cameraIndex=(cameraIndex+1)%3;renderer?.setCamera((['broadcast','tactical','close']as const)[cameraIndex]);}
 $('camera-btn').onclick=changeCamera;
 window.addEventListener('keydown',e=>{if((e.target as HTMLElement)?.matches('input,textarea,select')||document.querySelector('dialog[open]'))return;if(e.repeat)return;if(e.code==='KeyP'||e.code==='Escape')pause(!paused);if(e.code==='KeyC')changeCamera();});
@@ -88,10 +109,13 @@ function updateHud(){
   $('footer-size').textContent=`${config.teamSize} contra ${config.teamSize} · Equipos ficticios`;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
 }
-function showStats(){const s=current;$('result-title').textContent=`${s.teams[0].shortName} ${s.score[0]} — ${s.score[1]} ${s.teams[1].shortName}`;
+function showStats(){const s=current;
+  $('rematch').hidden=!isFulltime(s.phase)||!kickoffSetup||!!replay||guest||peer.role==='host';
+  $('new-match').textContent=isFulltime(s.phase)?'Volver al menú':'Nuevo partido';$('result-title').textContent=`${s.teams[0].shortName} ${s.score[0]} — ${s.score[1]} ${s.teams[1].shortName}`;
   const total=s.stats[0].possessionTicks+s.stats[1].possessionTicks||1;
   const rows=[['Posesión',`${Math.round(s.stats[0].possessionTicks/total*100)}%`,`${Math.round(s.stats[1].possessionTicks/total*100)}%`],['Tiros',s.stats[0].shots,s.stats[1].shots],['A puerta',s.stats[0].onTarget,s.stats[1].onTarget],['Pases completados',`${s.stats[0].completed}/${s.stats[0].passes}`,`${s.stats[1].completed}/${s.stats[1].passes}`],['Atajadas',s.stats[0].saves,s.stats[1].saves],['Entradas ganadas',s.stats[0].tackles,s.stats[1].tackles],['Faltas',s.stats[0].fouls,s.stats[1].fouls],['Amarillas',s.stats[0].yellows,s.stats[1].yellows],['Expulsiones',s.stats[0].reds,s.stats[1].reds],['Penaltis',s.stats[0].penalties,s.stats[1].penalties],['Córners',s.stats[0].corners,s.stats[1].corners],['Fuera de juego',s.stats[0].offsides,s.stats[1].offsides]];
   $('stats-content').replaceChildren();for(const [label,a,b]of rows){const row=document.createElement('div');row.className='stat-row';for(const value of [a,label,b]){const span=document.createElement('span');span.textContent=String(value);row.append(span);}$('stats-content').append(row);}showDialog('stats-dialog');}
+$('rematch').onclick=rematch;
 $('stats-btn').onclick=showStats;$('new-match').onclick=()=>{closeDialog('stats-dialog');showDialog('setup-dialog');};
 $('save-replay').onclick=()=>{if(guest){$('stats-label').textContent='El anfitrión puede guardar la repetición.';return;}download(`futbol-${config.seed}-${sim.tick}.json`,record.finish(sim));};
 $('export-roster').onclick=()=>download('equipo-ejemplo.json',makeTeam(Number($<HTMLSelectElement>('home-team').value),Number($<HTMLSelectElement>('size').value)));
@@ -103,7 +127,7 @@ $<HTMLInputElement>('replay-file').onchange=async e=>{try{
   const loaded=parseReplay(JSON.parse(await f.text()));
   const loadedSim=replaySimulation(loaded),loadedRecord=new Recorder(loadedSim),loadedPresentation=loadedSim.presentation();
   // Validate and prepare the replacement completely before touching the current match.
-  peer.close();sim=loadedSim;config=loaded.initial.config;record=loadedRecord;
+  peer.close();kickoffSetup=null;sim=loadedSim;config=loaded.initial.config;record=loadedRecord;
   replay=loaded;replayIndex=0;replayResult='';notice='';noticeUntil=0;started=true;guest=false;finalShown=false;
   previous=current=loadedPresentation;makeRenderer(kits(0,1));$('setup-dialog').closest('dialog')?.close();pause(false);$('match-mode').textContent='REPETICIÓN';
 }catch(e){$('setup-error').textContent=(e as Error).message;}};
@@ -127,7 +151,7 @@ $('accept-answer').onclick=()=>networkTask(()=>peer.accept($<HTMLTextAreaElement
 $('copy-code').onclick=async()=>{try{await navigator.clipboard.writeText($<HTMLTextAreaElement>('local-code').value);$('network-status').textContent='Código copiado.';}catch{$<HTMLTextAreaElement>('local-code').select();$('network-status').textContent='Selecciona y copia el código.';}};
 peer.onStatus=s=>{$('network-status').textContent=s;if(s.includes('interrumpida')||s.includes('cerrada')){input.clear();pause(true);}};
 peer.onConnect=()=>{if(peer.role==='host'){start('local');peer.start(sim.snapshot());$('match-mode').textContent='ONLINE · ANFITRIÓN';}};
-peer.onStart=(world:World)=>{try{world.teams.forEach(validateTeam);sim=new Simulation(world.config,world.teams);sim.restore(world);config=world.config;guest=true;started=true;replay=null;previous=current=sim.presentation();makeRenderer(kits(0,1));document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);$('match-mode').textContent='ONLINE · VISITANTE';}catch{peer.close();$('network-status').textContent='Estado inicial incompatible.';}};
+peer.onStart=(world:World)=>{try{world.teams.forEach(validateTeam);sim=new Simulation(world.config,world.teams);sim.restore(world);config=world.config;kickoffSetup=null;guest=true;started=true;replay=null;previous=current=sim.presentation();makeRenderer(kits(0,1));document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);$('match-mode').textContent='ONLINE · VISITANTE';}catch{peer.close();$('network-status').textContent='Estado inicial incompatible.';}};
 peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.tick||!Array.isArray(s.players)||s.players.length!==config.teamSize*2)return;previous=current;current=s;networkTick=performance.now();};
 function loop(now:number){
   const elapsed=Math.min(.1,(now-last)/1000);last=now;
