@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-24 15:40 — [#61](https://github.com/oxalc88/futbol-excitante/pull/61) · La prueba de navegador cierra su servidor
+## 2026-10-24 15:26 — [#61](https://github.com/oxalc88/futbol-excitante/pull/61) · La prueba de navegador cierra su servidor
 - **Qué cambia para el jugador:** nada. La prueba automática de navegador cierra siempre su servidor al terminar, también si falla o si la interrumpes. Si el puerto 4317 ya está ocupado, la prueba se detiene con un mensaje claro y no prueba una versión antigua.
 - **Qué probar:** ejecuta `scripts/verify.sh` dos veces seguidas; las dos deben pasar.
 - **Qué se rompe o cambia:** nada.
