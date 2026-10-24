@@ -49,10 +49,11 @@ try {
   const clockSeconds = Number(process.env.SMOKE_CLOCK_SECONDS ?? 8);
   if (!Number.isFinite(clockSeconds) || clockSeconds <= 0) throw new Error('SMOKE_CLOCK_SECONDS must be positive');
   try {
-    await page.waitForFunction(() => {
+    // The clock must change from the value read at start (and not be 00:00).
+    await page.waitForFunction((start) => {
       const clock = document.querySelector('#clock')?.textContent?.trim();
-      return /^\d+:\d{2}$/.test(clock ?? '') && clock !== '00:00';
-    }, null, { timeout: clockSeconds * 1000 });
+      return /^\d+:\d{2}$/.test(clock ?? '') && clock !== '00:00' && clock !== start;
+    }, match.clockStart, { timeout: clockSeconds * 1000 });
   } catch {
     errors.push(`game: clock did not advance within ${clockSeconds}s`);
   }
