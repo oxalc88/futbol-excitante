@@ -1,22 +1,14 @@
 node_modules/
-.mise-home-tmp/
-.opencode/node_modules/
-.opencode/package.json
-.opencode/package-lock.json
 dist/
-artifacts/*
-!artifacts/.gitkeep
-gauntlet/artifacts/
-gauntlet/evals/artifacts/
-.vite/
-coverage/
-test-results/
-playwright-report/
-blob-report/
-*.log
-*.tsbuildinfo
 .DS_Store
-.worktrees/
-tests/browser/__screenshots__/
+*.local
+.env*
+artifacts/local/
 
-.delivery-local/
+artifacts/traces/
+artifacts/targeted-evaluation.json
+
+# PES campaign raw media (re-download via ACQUISITION.md; do not commit MP4s)
+evidence/pes2017/**/raw/media/*.mp4
+evidence/pes2017/**/raw/audit-*/ffprobe.json
+evidence/pes2017/**/raw/audit-*/frames.jsonl

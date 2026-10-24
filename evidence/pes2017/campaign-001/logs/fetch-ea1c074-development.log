@@ -1,0 +1,12 @@
+[youtube] Extracting URL: https://www.youtube.com/watch?v=8afTHuMZxbI
+[youtube] 8afTHuMZxbI: Downloading webpage
+[youtube] 8afTHuMZxbI: Downloading visionos player API JSON
+[youtube] 8afTHuMZxbI: Downloading m3u8 information
+WARNING: [youtube] 8afTHuMZxbI: Failed to download m3u8 information: HTTPSConnectionPool(host='manifest.googlevideo.com', port=443): Read timed out. (read timeout=30.0)
+[info] 8afTHuMZxbI: Downloading 1 format(s): 298+251-17
+[download] Got error: HTTPSConnectionPool(host='rr2---sn-bg0e6nls.googlevideo.com', port=443): Read timed out. (read timeout=30.0). Retrying (1/1)...
+ERROR:
+[download] Got error: HTTPSConnectionPool(host='rr2---sn-bg0e6nls.googlevideo.com', port=443): Read timed out. (read timeout=30.0). Giving up after 1 retries
+[download] Got error: HTTPSConnectionPool(host='rr2---sn-bg0e6nls.googlevideo.com', port=443): Read timed out. (read timeout=30.0). Retrying (1/1)...
+ERROR:
+[download] Got error: HTTPSConnectionPool(host='rr2---sn-bg0e6nls.googlevideo.com', port=443): Read timed out. (read timeout=30.0). Giving up after 1 retries

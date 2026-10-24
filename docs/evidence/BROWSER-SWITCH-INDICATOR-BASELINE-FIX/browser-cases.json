@@ -1,8 +1,0 @@
-[
-  {
-    "case_id": "BROWSER-SWITCH-INDICATOR-BASELINE-FIX",
-    "result": "PASS",
-    "description": "Single Tab keypress causes exactly one core-native player switch via SWITCH_PLAYER_BIT processing in sim.step(); controlled-player indicator marker follows the switched player; legacy manual setControlledPlayer removed from main.ts and test helpers",
-    "timestamp": "2026-08-26T06:26:00Z"
-  }
-]

@@ -1,0 +1,122 @@
+{
+  "version": "delivered-video-audit-v1",
+  "source_id": "C4-W1u8w-yE",
+  "source_uri": "https://www.youtube.com/watch?v=C4-W1u8w-yE",
+  "media_filename": "C4-W1u8w-yE.mp4",
+  "media_sha256": "7c2d52bf91bd89315f352bf641c8f065c957c7bdb2d2e7166dfbc0eb8204f1fb",
+  "media_bytes": 9760410,
+  "operator": "gauntlet-observer-box",
+  "created_at": "2026-09-06T07:08:49.689248+00:00",
+  "input_known": false,
+  "admitted": false,
+  "status": "PENDING_CONTENT_AND_CAMERA_REVIEW",
+  "original_capture_fps": null,
+  "verified_unique_content_cadence": null,
+  "commands": [
+    [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_streams",
+      "-show_frames",
+      "-show_entries",
+      "stream=index,codec_name,width,height,time_base,r_frame_rate,avg_frame_rate,field_order,pix_fmt,color_range,color_space,color_transfer,color_primaries:frame=pts,pts_time,duration,pkt_duration,width,height,key_frame,pict_type,interlaced_frame,top_field_first,repeat_pict",
+      "-of",
+      "json",
+      "/workspace/futbol-excitante/evidence/pes2017/campaign-001/raw/media/C4-W1u8w-yE.mp4"
+    ],
+    [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-xerror",
+      "-noautorotate",
+      "-copyts",
+      "-i",
+      "/workspace/futbol-excitante/evidence/pes2017/campaign-001/raw/media/C4-W1u8w-yE.mp4",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-sn",
+      "-dn",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgb24",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ]
+  ],
+  "ffprobe_version": "ffprobe version 7.1.5-0+deb13u1 Copyright (c) 2007-2026 the FFmpeg developers",
+  "ffmpeg_version": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "container_timing": {
+    "stream": {
+      "index": 0,
+      "codec_name": "h264",
+      "width": 1280,
+      "height": 720,
+      "pix_fmt": "yuv420p",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709",
+      "field_order": "progressive",
+      "r_frame_rate": "30000/1001",
+      "avg_frame_rate": "30000/1001",
+      "time_base": "1/30000",
+      "disposition": {
+        "default": 1,
+        "dub": 0,
+        "original": 0,
+        "comment": 0,
+        "lyrics": 0,
+        "karaoke": 0,
+        "forced": 0,
+        "hearing_impaired": 0,
+        "visual_impaired": 0,
+        "clean_effects": 0,
+        "attached_pic": 0,
+        "timed_thumbnails": 0,
+        "non_diegetic": 0,
+        "captions": 0,
+        "descriptions": 0,
+        "metadata": 0,
+        "dependent": 0,
+        "still_image": 0,
+        "multilayer": 0
+      },
+      "tags": {
+        "language": "und",
+        "handler_name": "ISO Media file produced by Google Inc.",
+        "vendor_id": "[0][0][0][0]"
+      }
+    },
+    "frame_count": 1725,
+    "time_base_num": 1,
+    "time_base_den": 30000,
+    "first_pts": 0,
+    "last_pts": 1725724,
+    "frame_interval_histogram_ticks": {
+      "1001": 1724
+    },
+    "negative_pts_present": false,
+    "interlaced_frames": 0,
+    "repeat_pict_frames": 0
+  },
+  "content_diagnostics": {
+    "decoded_frames": 1725,
+    "exact_adjacent_repeats": 100,
+    "pixel_format": "rgb24",
+    "near_duplicate_threshold": null,
+    "interpretation": "Diagnostics only. Static scenes, recompression, camera motion and interpolation require frame review; distinct hashes do not establish cadence."
+  },
+  "output_sha256": {
+    "ffmpeg.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ffprobe.json": "8b149bbee3556940667080b77d1add5d15b28c82916aa2b0d0e56e2ecb898d72",
+    "ffprobe.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frames.jsonl": "62d403b21bfe42871f43831f780a971da20c8667272eda39d5c935d6804728c2"
+  }
+}

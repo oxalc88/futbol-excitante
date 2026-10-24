@@ -1,0 +1,9 @@
+SOFTWARE VALIDATION ONLY — NOT PES EVIDENCE
+Tool: scripts/audit-reference-video.py
+Fixture: generated 16x16 lossless FFV1/Matroska, 5 synthetic grayscale images.
+Expected PTS (time base 1/1000): [0, 100, 300, 400, 700].
+Observed PTS: [0, 100, 300, 400, 700].
+Expected and observed exact adjacent repeats: 2.
+PASS: all 5 frames retained, original variable PTS retained, no automatic source admission.
+PASS: unique-content cadence remains unknown pending review.
+Synthetic fixture is outside the PES corpus and was never exported/imported as a ReferenceTarget.

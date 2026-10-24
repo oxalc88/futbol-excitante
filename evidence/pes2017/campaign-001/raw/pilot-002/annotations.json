@@ -1,0 +1,435 @@
+{
+  "version": "pes-endpoint-pilot-annotations-v1",
+  "operator": "codex-visual-review",
+  "source_id": "C4-W1u8w-yE",
+  "source_sha256": "7c2d52bf91bd89315f352bf641c8f065c957c7bdb2d2e7166dfbc0eb8204f1fb",
+  "time_base": {
+    "num": 1,
+    "den": 30000
+  },
+  "image_size": [
+    1280,
+    720
+  ],
+  "input_known": false,
+  "controlledInputs": false,
+  "provenance": "SECONDARY_PUBLIC_MEDIA",
+  "template": {
+    "id": "regulation-internal-markings-local-goal-origin-v1",
+    "origin": "Centre of goal line on ground; x metres into pitch; y metres toward far side",
+    "assumptions": [
+      "PES markings follow standard internal dimensions, not independently surveyed in this game build. No whole-pitch dimensions assumed.",
+      "Goal width 7.32 m, goal-area depth 5.5 m, penalty-area depth 16.5 m, penalty-spot depth 11 m, arc radius 9.15 m."
+    ],
+    "accepted": false
+  },
+  "frames": [
+    {
+      "decode_index": 270,
+      "pts": 270270,
+      "calibration_passes": [
+        {
+          "pass": 1,
+          "points": [
+            {
+              "name": "penalty-area-far-front-corner",
+              "image_xy": [
+                499,
+                217
+              ],
+              "world_xy_m": [
+                16.5,
+                20.16
+              ]
+            },
+            {
+              "name": "penalty-arc-far-intersection",
+              "image_xy": [
+                488,
+                340
+              ],
+              "world_xy_m": [
+                16.5,
+                7.312489316231512
+              ]
+            },
+            {
+              "name": "penalty-arc-near-intersection",
+              "image_xy": [
+                472,
+                573
+              ],
+              "world_xy_m": [
+                16.5,
+                -7.312489316231512
+              ]
+            },
+            {
+              "name": "far-goal-post-ground",
+              "image_xy": [
+                1053,
+                370
+              ],
+              "world_xy_m": [
+                0,
+                3.66
+              ]
+            },
+            {
+              "name": "near-goal-post-ground",
+              "image_xy": [
+                1139,
+                486
+              ],
+              "world_xy_m": [
+                0,
+                -3.66
+              ]
+            },
+            {
+              "name": "goal-area-near-front-corner",
+              "image_xy": [
+                980,
+                600
+              ],
+              "world_xy_m": [
+                5.5,
+                -9.16
+              ]
+            }
+          ]
+        },
+        {
+          "pass": 2,
+          "points": [
+            {
+              "name": "penalty-area-far-front-corner",
+              "image_xy": [
+                499,
+                216
+              ],
+              "world_xy_m": [
+                16.5,
+                20.16
+              ]
+            },
+            {
+              "name": "penalty-arc-far-intersection",
+              "image_xy": [
+                488.5,
+                338.5
+              ],
+              "world_xy_m": [
+                16.5,
+                7.312489316231512
+              ]
+            },
+            {
+              "name": "penalty-arc-near-intersection",
+              "image_xy": [
+                468.5,
+                570
+              ],
+              "world_xy_m": [
+                16.5,
+                -7.312489316231512
+              ]
+            },
+            {
+              "name": "far-goal-post-ground",
+              "image_xy": [
+                1053,
+                370
+              ],
+              "world_xy_m": [
+                0,
+                3.66
+              ]
+            },
+            {
+              "name": "near-goal-post-ground",
+              "image_xy": [
+                1139,
+                486
+              ],
+              "world_xy_m": [
+                0,
+                -3.66
+              ]
+            },
+            {
+              "name": "goal-area-near-front-corner",
+              "image_xy": [
+                978,
+                598.5
+              ],
+              "world_xy_m": [
+                5.5,
+                -9.16
+              ]
+            }
+          ]
+        }
+      ],
+      "held_out_points": [
+        {
+          "name": "goal-area-far-front-corner",
+          "image_xy": [
+            839.5,
+            313
+          ],
+          "world_xy_m": [
+            5.5,
+            9.16
+          ],
+          "used_for_fit": false
+        },
+        {
+          "name": "goal-area-far-goalline-corner",
+          "image_xy": [
+            1001.5,
+            304.5
+          ],
+          "world_xy_m": [
+            0,
+            9.16
+          ],
+          "used_for_fit": false
+        },
+        {
+          "name": "goal-area-near-goalline-corner",
+          "image_xy": [
+            1223,
+            591.5
+          ],
+          "world_xy_m": [
+            0,
+            -9.16
+          ],
+          "used_for_fit": false
+        }
+      ],
+      "player": {
+        "entity_id": "blue-player-training-attempt-01",
+        "support_xy": [
+          575,
+          355
+        ],
+        "support_region_xyxy": [
+          571,
+          351,
+          580,
+          359
+        ],
+        "observable": true,
+        "body_heading": null,
+        "support_description": "Visible trailing-foot ground-support region; exact foot contact point is ambiguous at this resolution."
+      }
+    },
+    {
+      "decode_index": 300,
+      "pts": 300300,
+      "calibration_passes": [
+        {
+          "pass": 1,
+          "points": [
+            {
+              "name": "penalty-area-far-front-corner",
+              "image_xy": [
+                492,
+                188
+              ],
+              "world_xy_m": [
+                16.5,
+                20.16
+              ]
+            },
+            {
+              "name": "penalty-arc-far-intersection",
+              "image_xy": [
+                479,
+                294
+              ],
+              "world_xy_m": [
+                16.5,
+                7.312489316231512
+              ]
+            },
+            {
+              "name": "penalty-arc-near-intersection",
+              "image_xy": [
+                458,
+                488
+              ],
+              "world_xy_m": [
+                16.5,
+                -7.312489316231512
+              ]
+            },
+            {
+              "name": "far-goal-post-ground",
+              "image_xy": [
+                1005,
+                321
+              ],
+              "world_xy_m": [
+                0,
+                3.66
+              ]
+            },
+            {
+              "name": "near-goal-post-ground",
+              "image_xy": [
+                1076,
+                417
+              ],
+              "world_xy_m": [
+                0,
+                -3.66
+              ]
+            },
+            {
+              "name": "goal-area-near-front-corner",
+              "image_xy": [
+                923,
+                516
+              ],
+              "world_xy_m": [
+                5.5,
+                -9.16
+              ]
+            }
+          ]
+        },
+        {
+          "pass": 2,
+          "points": [
+            {
+              "name": "penalty-area-far-front-corner",
+              "image_xy": [
+                492,
+                187
+              ],
+              "world_xy_m": [
+                16.5,
+                20.16
+              ]
+            },
+            {
+              "name": "penalty-arc-far-intersection",
+              "image_xy": [
+                478,
+                296
+              ],
+              "world_xy_m": [
+                16.5,
+                7.312489316231512
+              ]
+            },
+            {
+              "name": "penalty-arc-near-intersection",
+              "image_xy": [
+                458,
+                490
+              ],
+              "world_xy_m": [
+                16.5,
+                -7.312489316231512
+              ]
+            },
+            {
+              "name": "far-goal-post-ground",
+              "image_xy": [
+                1004,
+                322
+              ],
+              "world_xy_m": [
+                0,
+                3.66
+              ]
+            },
+            {
+              "name": "near-goal-post-ground",
+              "image_xy": [
+                1076,
+                418
+              ],
+              "world_xy_m": [
+                0,
+                -3.66
+              ]
+            },
+            {
+              "name": "goal-area-near-front-corner",
+              "image_xy": [
+                920,
+                512
+              ],
+              "world_xy_m": [
+                5.5,
+                -9.16
+              ]
+            }
+          ]
+        }
+      ],
+      "held_out_points": [
+        {
+          "name": "goal-area-far-front-corner",
+          "image_xy": [
+            809,
+            274
+          ],
+          "world_xy_m": [
+            5.5,
+            9.16
+          ],
+          "used_for_fit": false
+        },
+        {
+          "name": "goal-area-far-goalline-corner",
+          "image_xy": [
+            947,
+            270
+          ],
+          "world_xy_m": [
+            0,
+            9.16
+          ],
+          "used_for_fit": false
+        },
+        {
+          "name": "goal-area-near-goalline-corner",
+          "image_xy": [
+            1145,
+            510
+          ],
+          "world_xy_m": [
+            0,
+            -9.16
+          ],
+          "used_for_fit": false
+        }
+      ],
+      "player": {
+        "entity_id": "blue-player-training-attempt-01",
+        "support_xy": [
+          616,
+          294
+        ],
+        "support_region_xyxy": [
+          610,
+          290,
+          621,
+          296
+        ],
+        "observable": true,
+        "body_heading": null,
+        "support_description": "Visible trailing-foot ground-support region; exact foot contact point is ambiguous at this resolution."
+      }
+    }
+  ],
+  "selection": "Fixed PTS window after visible shot. Endpoints chosen because the goal mouth and goal-area markings are on-screen; not an input response, maximum-speed trial, complete stop or preselected catalog scenario.",
+  "annotation_method": "Same operator, original image followed by enlarged shadow-region inspection. Passes are not independent observers. Earlier labels are retained. Regions describe visible support ambiguity; no assumed pixel sigma.",
+  "held_out_caveat": "Goal-area/goalline intersections in shadow are less sharply resolved than goalpost-ground points. Their residuals include annotation ambiguity; they are retained as sensitivity evidence rather than silently corrected to agree with the model."
+}

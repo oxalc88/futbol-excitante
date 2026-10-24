@@ -1,0 +1,27 @@
+==> C4-W1u8w-yE
+[youtube] Extracting URL: https://www.youtube.com/watch?v=C4-W1u8w-yE
+[youtube] C4-W1u8w-yE: Downloading webpage
+WARNING: [youtube] No supported JavaScript runtime could be found. Only deno is enabled by default; to use another runtime add  --js-runtimes RUNTIME[:PATH]  to your command/config. YouTube extraction without a JS runtime has been deprecated, and some formats may be missing. See  https://github.com/yt-dlp/yt-dlp/wiki/EJS  for details on installing one
+[youtube] C4-W1u8w-yE: Downloading visionos player API JSON
+[youtube] C4-W1u8w-yE: Downloading m3u8 information
+WARNING: [youtube] C4-W1u8w-yE: Response data has no m3u header; please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U
+[info] C4-W1u8w-yE: Downloading 1 format(s): 136+251
+[download] Destination: /workspace/sites/futbol-excitante-rebuild/evidence/pes2017/campaign-001/raw/media/C4-W1u8w-yE.f136.mp4
+
+[download] 100.0% of    195.00B at   97.80KiB/s ETA 00:00
+[download] 100% of    195.00B in 00:01:27 at 2.23B/s
+[download] Destination: /workspace/sites/futbol-excitante-rebuild/evidence/pes2017/campaign-001/raw/media/C4-W1u8w-yE.f251.webm
+
+[download] 100.0% of    195.00B at  Unknown B/s ETA Unknown
+[download] 100% of    195.00B in 00:01:32 at 2.11B/s
+[Merger] Merging formats into "/workspace/sites/futbol-excitante-rebuild/evidence/pes2017/campaign-001/raw/media/C4-W1u8w-yE.mp4"
+ERROR: Postprocessing: Error opening input files: Invalid data found when processing input
+Traceback (most recent call last):
+  File "/workspace/sites/futbol-excitante-rebuild/evidence/pes2017/campaign-001/raw/media/fetch_media.py", line 95, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/workspace/sites/futbol-excitante-rebuild/evidence/pes2017/campaign-001/raw/media/fetch_media.py", line 73, in main
+    subprocess.run(cmd, check=True)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['yt-dlp', '--no-playlist', '--retries', '20', '--fragment-retries', '20', '--socket-timeout', '120', '--concurrent-fragments', '4', '-f', 'bv*[height<=720]+ba/b[height<=720]/best', '--merge-output-format', 'mp4', '-o', '/workspace/sites/futbol-excitante-rebuild/evidence/pes2017/campaign-001/raw/media/C4-W1u8w-yE.%(ext)s', 'https://www.youtube.com/watch?v=C4-W1u8w-yE']' returned non-zero exit status 1.

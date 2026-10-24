@@ -1,88 +1,100 @@
-# PES Simulator
+# Fútbol Excitante — etapa local
 
-A headless, deterministic football simulation engine built for laboratory evaluation. Simulation is authoritative; rendering, replay, and evaluation are adapters.
+Juego experimental de fútbol 3D: 11v11, 5v5 y 2v2, contra la CPU o con dos jugadores locales. Motor TypeScript con ticks fijos y presentación Three.js.
 
-## Architecture boundaries
+Rama: `main` (motor Astra). La investigación y las herramientas del sistema Gauntlet legado están en la rama `archive/gauntlet-legacy` y en las etiquetas `history/*`. El juego no necesita Gauntlet para compilar, probar ni ejecutarse.
 
-- **Simulation core** (`src/simulation/`): Synchronous, DOM-free, deterministic. Never reads the wall clock, DOM, devices, network, filesystem, or renderer internals. Uses a seeded PRNG and no `Math.random`.
-- **Ball** (`src/simulation/ball/`): Independent 3D entity. Never parented to a player, never teleported between controllers. Evolves through gravity, restitution, ground resistance, and spin decay.
-- **Input** (`src/contracts/input.ts`, `src/simulation/input/`): Tick-indexed `InputFrame` structs. Devices, AI, replay, and tests all enter through this contract.
-- **Presentation** (`src/contracts/presentation.ts`): One-way contract. The renderer consumes an immutable `PresentationSnapshot` only. Visuals never change football outcomes.
-- **Eval layer** (`eval/`): Reads headless artifacts (replays, hashes, metrics, invariants). Never mutates simulation state. Produces comparison reports in `delta_only` or `mismatch` status — never claims regression pass.
+Se reconstruyó desde cero preservando **sin cambios** `VISION.md`, `research/` y `specs/` del commit `becbcdc0aaaace4f9b98006ae44e0449795c001a`. Sus referencias a implementación histórica no describen necesariamente este motor. El alcance actual se documenta en [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
-## Quick start
+## Jugar en tu equipo
+
+Necesitas Node.js 22.12 o posterior y un navegador con WebGL2. Las comprobaciones usan Node 24.
 
 ```bash
-# Trust the mise configuration and install pinned tools
-mise trust --all
-CI=1 mise install --locked
-
-# Install Node dependencies
-CI=1 mise exec -- pnpm install --frozen-lockfile
+git clone https://github.com/oxalc88/futbol-excitante.git
+cd futbol-excitante
+npm ci
+npm run dev
 ```
 
-## mise tasks (canonical entry)
+Abre la dirección que imprima Vite, elige equipos, modo y duración y pulsa **Jugar partido**. La CPU se calcula dentro del juego; no necesitas cuentas ni servicios externos.
 
-| Task | Description |
-|---|---|
-| `mise run dev` | Start the Vite browser laboratory |
-| `mise run sim-smoke` | Run the versioned foundation scenario headlessly |
-| `mise run replay-verify -- <replay>` | Verify deterministic replay reconstruction |
-| `mise run eval-compare -- <dir-a> <dir-b>` | Compare two artifact directories |
-| `mise run test` | Run Node Vitest project |
-| `mise run test-browser` | Run browser Vitest + Playwright |
-| `mise run test-all` | Full check: frozen-install, typecheck, all tests, smoke, production build |
+- **Tú contra la CPU:** teclado, mando estándar o controles táctiles.
+- **Dos jugadores locales:** dos mandos o teclado compartido con teclado numérico.
+- **CPU contra CPU:** partido autónomo.
+- **Repeticiones:** guarda un partido desde Estadísticas y carga el JSON desde el menú. Se reproduce el estado inicial y sus inputs, verificando el hash final. Los replays v2 requieren esta versión del motor; los antiguos v1 se rechazan.
+- **Equipos propios:** descarga el ejemplo desde Plan de juego, edita sus capacidades ficticias e importa el JSON. Los arquetipos separan aceleración, velocidad, fuerza, equilibrio, control, golpeo, cabeceo y salto.
+- **Táctica:** formación, presión, contra presión, amplitud, ritmo, apoyo, compactación, línea defensiva, pases cortos, marcaje y adaptación. Los cambios durante el partido se registran como inputs con tick.
 
-Equivalent `pnpm run ...` scripts exist in `package.json` for editor and CI integration. `mise run ...` is the canonical entry so tool pinning cannot be bypassed.
+Los partidos incluyen penaltis por faltas en el área, tarjetas, expulsión por segunda amarilla, ventaja y su devolución, fuera de juego con intervención, bandas, córners, saques de meta y tiros libres. El modelo arbitral es una aproximación explícita para este juego, no una implementación certificada de todas las leyes IFAB.
 
-## Iteration loop
+## Controles
 
-The canonical workflow for any change:
+| Acción | Jugador 1 | Jugador 2 | Xbox / PlayStation estándar |
+|---|---|---|---|
+| Mover | WASD | Flechas | Stick izquierdo |
+| Apuntar independientemente | Dirección de movimiento | Dirección de movimiento | Stick derecho |
+| Pase | J | Num 1 | A / ✕ |
+| Tiro: mantener y soltar | K | Num 2 | B / ○ |
+| Pase filtrado | L | Num 3 | Y / △ |
+| Pase elevado | H | Num 4 | LB + A / L1 + ✕ |
+| Centro | I | Num 5 | X / □ |
+| Entrada de pie | U | Num 0 | RB / R1 |
+| Entrada deslizante | B | Num 7 | LT + RB / L2 + R1 |
+| Cabecear | O | Num 6 | RT / R2 |
+| Correr | Shift izquierdo | Shift derecho | LT / L2 |
+| Cambiar jugador | Q | Enter | LB / L1 |
+| Proteger balón | Espacio | Num . | L3 |
+| Pausa | P / Esc | — | Start / Options |
+| Cámara | C | — | Botón en pantalla |
 
-1. **Edit** one mechanism or config file.
-2. **`mise run test`** — verify fast unit and Node integration tests pass.
-3. **`mise run sim-smoke`** — create a candidate headless artifact.
-4. **`mise run eval-compare -- <baseline> <candidate>`** — compare against a chosen immutable artifact. Inspect the output for deltas.
-5. **`mise run replay-verify -- <candidate>/replay.json`** — verify deterministic reconstruction from the artifact.
-6. **`mise run test-browser`** — optional: inspect browser capture for visual correctness.
-7. **Retain or reject** the change based on delta inspection.
+Pulsa un botón del mando para que el navegador lo detecte. El adaptador mantiene la identidad de los dos slots al desconectar un mando y suprime acciones que ya estaban pulsadas al reconectar. Las pruebas usan lecturas simuladas; la compatibilidad física depende del modelo, sistema operativo y navegador.
 
-Never claim a result is `FOUNDATION_LAB_PASS`, a PES match, or a regression `PASS`. The comparison output is the ground truth.
+Los controles táctiles incluyen joystick, todas las acciones, protección y tiro cargado al mantener y soltar. Se pueden activar manualmente en **Plan de juego → Controles táctiles → Mostrar**. En un saque humano, apunta y pulsa pase o tiro; al agotarse seis segundos se ejecuta automáticamente. Los penaltis siempre se lanzan hacia la portería rival.
 
-## Artifact file list
+## Laboratorio y evaluación
 
-A headless run writes to its output directory (default `artifacts/<run-id>/`):
+Abre `/lab.html` en el mismo servidor local. Permite seleccionar cualquiera de los 69 IDs conservados, semilla y variante, reiniciar, avanzar uno o 60 ticks y exportar el estado, hash, cámara y envíos al render. Usa el mismo motor y escenarios que la evaluación headless.
 
-| File | Format | Description |
-|---|---|---|
-| `manifest.json` | JSON | Run metadata: scenario, config hashes, PRNG identity |
-| `inputs.jsonl` | JSON Lines | One `InputFrame` per line |
-| `hashes.jsonl` | JSON Lines | One `{tick, hash}` per line |
-| `telemetry.jsonl` | JSON Lines | One `TelemetryObservation` per line |
-| `events.jsonl` | JSON Lines | One event per line |
-| `metrics.json` | JSON | Computed metrics (player-speed, ball-distance, etc.) |
-| `invariants.json` | JSON | Array of invariant check results |
-| `final-state.json` | JSON | Frozen final world state |
-| `replay.json` | JSON | Full replay structure for reconstruction verification |
+```bash
+npm run typecheck
+npm test
+npm run evaluate
+npm run build
+```
 
-## Troubleshooting
+`scripts/verify.sh` ejecuta todas estas comprobaciones y una prueba de humo en Chrome/Chromium headless (`scripts/smoke-browser.mjs`). Devuelve un resumen PASS/FAIL por comprobación.
 
-### mise errors
+`npm run evaluate` ejecuta 276 casos —69 IDs × dos variantes × dos semillas— y tres partidos CPU de seis minutos. Genera `artifacts/evaluation.json`, con veredictos **por criterio**, métricas, eventos, hashes, bindings, pruebas negativas del evaluador y límites de evidencia.
 
-- **`mise: command not found`** — install mise via the official installer at https://mise.jdx.dev/.
-- **`mise.toml not trusted`** — run `mise trust --all` (or `mise trust mise.toml`).
-- **Tool version mismatch** — run `CI=1 mise install --locked` to reinstall pinned versions from `mise.lock`.
+```bash
+# Un caso y el cierre de sus dependencias de regresión
+npm run evaluate -- --test=BALL-IND-001
+# Guardar también observaciones completas por tick, comprimidas
+npm run evaluate:traces
+# Importar una medición real, sin aplicar cambios al motor
+npm run reference:import -- /ruta/a/referencia.json
+```
 
-### pnpm errors
+La base de regresión de `eval/baseline.json` es un perfil **provisional de este motor**. No es una referencia PES. El evaluador rechaza cambios al oráculo protegido sin revisión de esa base. [EVALUATION.md](EVALUATION.md) explica contratos, observaciones, importación, criterios y reproducción manual.
 
-- **Lockfile mismatch** — run `CI=1 pnpm install --frozen-lockfile`. If the lockfile needs updating, commit the new lockfile.
-- **Missing peer dependencies** — run `pnpm install` (without `--frozen-lockfile`).
+## Pendiente de evidencia externa
 
-### Playwright
+- Revisión visual y de jugabilidad: el navegador de trabajo bloqueó la URL de vista local por política del entorno. No se afirma haber visto el juego funcionando en ese navegador.
+- Pruebas en un iPhone real y con dos mandos físicos. La validación del adaptador con lecturas simuladas no sustituye esas pruebas.
+- Corpus PES 2017 medido y revisión perceptual. Los documentos preservados no contienen esos datos; no se inventaron objetivos ni una calificación de fidelidad.
 
-- **Browser not installed** — run `npx playwright install chromium` or `CI=1 pnpm exec playwright install chromium`.
-- **System dependencies missing** — run `CI=1 pnpm exec playwright install-deps chromium`.
+## Online y publicación: siguiente etapa
 
-### TypeScript
+El botón online está oculto y desactivado. El prototipo de red anterior queda archivado en su adaptador y no recibe trabajo ni validación en esta etapa.
 
-- **Type errors** — run `mise run typecheck` to verify all three tsconfigs compile cleanly.
+El workflow `.github/workflows/ci.yml` se llama **CI — tests, evaluation and build** y se ejecuta en `push` a `main` y en pull requests hacia `main`. Sólo instala dependencias, prueba, evalúa, compila y guarda artefactos. **No tiene job de despliegue ni permisos de Pages.** Subir commits a `main` no publica el juego.
+
+Para preparar una futura distribución estática:
+
+```bash
+npm run build
+npm run preview
+```
+
+El resultado está en `dist/`, con rutas relativas, página de juego y laboratorio. Cuando decidas publicar, necesitarás habilitar el alojamiento elegido y añadir expresamente un workflow de despliegue. No abras los módulos con `file://`; se necesita un servidor HTTP.

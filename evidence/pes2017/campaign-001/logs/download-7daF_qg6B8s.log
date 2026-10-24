@@ -1,0 +1,9 @@
+[youtube] Extracting URL: https://www.youtube.com/watch?v=7daF_qg6B8s
+[youtube] 7daF_qg6B8s: Downloading webpage
+[youtube] 7daF_qg6B8s: Downloading visionos player API JSON
+[youtube] 7daF_qg6B8s: Downloading m3u8 information
+WARNING: [youtube] 7daF_qg6B8s: Failed to download m3u8 information: The read operation timed out
+[info] 7daF_qg6B8s: Downloading 1 format(s): 137
+[info] Writing video metadata as JSON to: /tmp/pes-media/7daF_qg6B8s.info.json
+ERROR:
+[download] Got error: The read operation timed out

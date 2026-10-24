@@ -1,0 +1,207 @@
+{
+  "base_commit": "c10c449711390e69a0fe2df35560587dac8e04de",
+  "protected_files": [
+    {
+      "path": "EVALUATION.md",
+      "sha256": "b6e064e0ff82e13e84e7f8f4aeb0eca643069a02f4593213d220a482218b4674",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "VISION.md",
+      "sha256": "26b30f394b4679f3d3d0cd22e90f076aca4161bd31ee52c4f101ac3c0243ce38",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "eval/baseline.json",
+      "sha256": "e44862cfb309bd0c7663b0adb344514895f5338127728c16fa33b0311b0c2c8c",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "eval/catalog.json",
+      "sha256": "4f999d8a042825aa809103e3ccd63e4a0386dc7eeebc0a1cf6087a0926cba848",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "eval/oracles.ts",
+      "sha256": "9296d994a5b004bab909567487bd3ded791159f3d5e0edca5893167c139e291d",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "eval/reference.ts",
+      "sha256": "238dce73575284f03015a2c14173cb18c3b0e1820129f0a3953d3907a654afc8",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "eval/registry.ts",
+      "sha256": "7483d35e104196026fc2d9cb2345e8877ee5b59016c819ab4ec2cff29b74e156",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "eval/scenarios.ts",
+      "sha256": "ce450a7418f3936f53ce34c7bccf3354cfbd49999bf8370c9407a88118c45697",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "research/01-pes2027-behavior.md",
+      "sha256": "5cd935ea8ccc7cc507cf9f141ca275eb4961d2d601d8335f83dceec7238a87f6",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "research/02-reference-measurement.md",
+      "sha256": "a960c8ca219e60bb27e268db8e66fb741c2dd2878e3fb1336381ba08a9cf7775",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "research/03-simulation-techniques.md",
+      "sha256": "93d3ccc6bcf4cb8bd7e1b97de7ff9d66c908f06e0b3e6bd338b3fb0747124e43",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "research/04-autonomous-evaluation.md",
+      "sha256": "5779a2372724247c50c0cd55819d9ccdb8a9e826b9c5abde47f4cfa6059e959c",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "research/05-browser-architecture.md",
+      "sha256": "926f80b0128c4995663bc39cd627422c09b66bb7f021f1d7ccdee5f0aacf26bc",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "research/06-visual-direction.md",
+      "sha256": "a40e24e10b87d6552930b40ff5e88746eeaa51b0a9eb8b24d5104baa74a8a5df",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "research/RESEARCH_AUDIT.md",
+      "sha256": "b898e0f268873e7ab3b6368707e60c665aff11941dd8651db302b7731cde5491",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "scripts/evaluate.ts",
+      "sha256": "d93a1245962a34601ba88b0074dde9766590d9e5103ff1c361a22aeece9fb08e",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "scripts/import-reference.ts",
+      "sha256": "f3c40b2928b7da907f68c6917b530e35a8c0812640e8fb04a598d210c3bd64cf",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "specs/GAMEPLAY_EVALUATION_SPEC.md",
+      "sha256": "9bbee7e51ee23c27b12fe5346e082e7e548b0f0c9648356ac526152745488cfd",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "specs/GOALKEEPER_SPEC.md",
+      "sha256": "84920e8cd34ef1daaf898bd84971f8a5c301c6c8fc621d34b5aecd197e4c84c6",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "specs/MATCH_RULES_SPEC.md",
+      "sha256": "2f52db2091d0e5a3315d8053752d884dc30eb9d208832bd8b7cc55f629dc20dc",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "specs/SPEC_REVIEW.md",
+      "sha256": "b8f108ace0a60cbfeca8187d4b6280e9c0389448140132645f855ee19729fafe",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "specs/TECHNICAL_SPEC.md",
+      "sha256": "7ec97c82acbd4c4fde3bd7d0b9903aea75e514d79c91cbb9e6c224044af0dc2d",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "specs/VISUAL_SPEC.md",
+      "sha256": "793e2ce491ddac4949b7cb3ac6228104a675b8c2f079108429bffd1b8cd91908",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/adapters/controller.ts",
+      "sha256": "53aea137c8534f194f052e1ddd25dc2ddb8119bfbb7dbf980540418582a90f28",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/adapters/data.ts",
+      "sha256": "2bb94eeb200d95a2851982e696c5ccd6d9936d009d87e699851fba5f03c10bf1",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/adapters/input.ts",
+      "sha256": "26092114bf79480806ff013b9b5d6059f643357b2ca5a3b29c7cc291b33e50c4",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/adapters/network.ts",
+      "sha256": "bc7f29eed1f71fec51ca6f5ab460cc9c004bf535481ce83f4839a7dd3b9fde97",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/adapters/presentation-model.ts",
+      "sha256": "f099b75ba7333770fd37336226b9ea8a657f612f3bd0f16825de0d2531263b24",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/adapters/renderer.ts",
+      "sha256": "23a21792792513fc918a33f15a15617cb07e9e36a9285871a29d8408bdc7e8ca",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/adapters/replay.ts",
+      "sha256": "c5d2889b96befbc2516fd79855b441aab4bc0d5afde116052409c99732465bc4",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/adapters/test-session.ts",
+      "sha256": "db3337e711a422eb5ba319ae73c4f16c4a71d7a74126788483a123185cd9bae2",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/browser/lab.ts",
+      "sha256": "e697ec5ff0505b254b0ffecabd365b11dba7628c093e98e5cc0048aaea238c90",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/browser/main.ts",
+      "sha256": "5e39a4a3caa9ce5bbeb2045e7b4f68c42ad4396561310ca8f5dbf3ee00758f12",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/browser/style.css",
+      "sha256": "2de607cb2d662798b4d3f81b85a57fbfdaedd1757cff6415b84efc456e13b4e6",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/contracts/types.ts",
+      "sha256": "1baa9be7f984a09df5efbf2e7a43e110cb0ab52655da7cf79d59e622cf5c795a",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/simulation/config.ts",
+      "sha256": "19a475bc0b099e64f8ab1535749945c6b115b3c552c5dbbb029708a894f9abee",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/simulation/engine.ts",
+      "sha256": "b988cc21eae325cab98c54ac1e695fa02641906e538deb945cc0e1831c962283",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/simulation/math.ts",
+      "sha256": "1015700421832f424d9807fb0112ebbbde790f4d984ce127430e03ff864759de",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/simulation/rules.ts",
+      "sha256": "f4eec2a91a05e35b7e6d51745e3b8409bec2663f00b92f1afea1ddfdc75c6eba",
+      "unchanged_from_base_commit": true
+    },
+    {
+      "path": "src/simulation/tactics.ts",
+      "sha256": "3702be6b0abe39f4d352a999fd1a27a0215b57ea7d655a0e7dc012e4ea581c55",
+      "unchanged_from_base_commit": true
+    }
+  ],
+  "existing_reference_ids_overwritten": 0,
+  "engine_calibration_performed": false
+}

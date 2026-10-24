@@ -1,4 +1,0 @@
-{
-  "subject": "RESOLVED — Horizon v37 published (remote-durable)",
-  "body": "The human repaired GitHub push access and published the chain. Verified 2026-10-03:\n- origin/main = 026106a (contains the entire Horizon v37 chain).\n- Containment verified via git merge-base --is-ancestor for all three acceptance commits: REFEREE-SHIPPED-WIRING 477e39f ✓, ADVANTAGE-WINDOW-SPEC cd91120 ✓, RELEASE-0.9.8-CONSOLIDATION 42f9585 ✓, plus the final bookkeeping commit 026106a ✓.\n\nHorizon v37 is remote-durable. The next horizon's strategic reassessment may proceed.\n\nNote: the original publication attempt was blocked by (a) missing SSH private keys on the workstation and (b) the gh token account r-quispej lacking push on oxalc88/futbol-excitante; the human resolved it out-of-band and pushed. No repo-side credential changes were made by the orchestrator."
-}

@@ -1,0 +1,12 @@
+Reviewed 2026-09-06T19:07:31.376021+00:00
+Input commit: d8547e08babbac34e26df63b26a3a7a89acf0e91
+Training transfer and decode verified. Camera pilot withheld; no eligible measurements.
+Required provenance/configuration remains unsupported for reference-target-v1.
+npm run reference:import invocations: 0
+Successes: 0
+Importer rejects: 0
+Existing reference IDs overwritten: 0
+This is a not-run log, not fabricated importer output. A withheld camera pilot is not an importer rejection.
+Next command, only after eligibility: npm run reference:import -- <valid-reference.json>
+
+Continuation 2026-09-07: second endpoint pilot recorded; uncertainty exceeds displacement. Still zero eligible targets and zero importer invocations.

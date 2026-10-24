@@ -1,0 +1,78 @@
+{
+  "version": "media-fetch-execution-v1",
+  "recorded_at": "2026-09-06T16:16:30.186823+00:00",
+  "instructions_commit": "ea1c074a862bd4b222e9f7a27adbc3294ad88c74",
+  "instructions_script_sha256": "43da1187738f902af8aeb4e51af978dd2c1d22f4cb3ae613859a2208051fedb1",
+  "status": "BLOCKED_MEDIA_RETRIEVAL",
+  "yt_dlp_version": "2026.08.19",
+  "fallback_ejs_version": "0.8.0",
+  "node_version": "v24.19.0",
+  "python_version": "3.12.13",
+  "ffmpeg_version": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "tls_certificate_verification_enabled": true,
+  "fallback_ca_source": "environment system trust store",
+  "attempts": [
+    {
+      "attempt": "recipe",
+      "source_id": "C4-W1u8w-yE",
+      "exit_code": 1,
+      "outcome": "NONMEDIA_HTML_RESPONSE",
+      "usable_media_files": 0,
+      "log": "logs/fetch-ea1c074-recipe.log"
+    },
+    {
+      "attempt": "default-ca",
+      "source_id": "C4-W1u8w-yE",
+      "exit_code": 1,
+      "outcome": "CERTIFICATE_VERIFICATION_FAILED",
+      "usable_media_files": 0,
+      "log": "logs/fetch-ea1c074-default-ca.log"
+    },
+    {
+      "attempt": "system-ca-formats",
+      "source_id": "C4-W1u8w-yE",
+      "exit_code": 0,
+      "outcome": "FORMAT_METADATA_ONLY",
+      "usable_media_files": 0,
+      "log": "logs/fetch-ea1c074-system-ca-formats.log"
+    },
+    {
+      "attempt": "development",
+      "source_id": "8afTHuMZxbI",
+      "exit_code": 1,
+      "outcome": "MEDIA_READ_TIMEOUT",
+      "usable_media_files": 0,
+      "log": "logs/fetch-ea1c074-development.log"
+    },
+    {
+      "attempt": "held-out",
+      "source_id": "LFvEnk0mcLI",
+      "exit_code": 1,
+      "outcome": "MEDIA_READ_TIMEOUT",
+      "usable_media_files": 0,
+      "log": "logs/fetch-ea1c074-held-out.log"
+    },
+    {
+      "attempt": "training-chunked",
+      "source_id": "C4-W1u8w-yE",
+      "exit_code": 1,
+      "outcome": "MEDIA_READ_TIMEOUT",
+      "usable_media_files": 0,
+      "log": "logs/fetch-ea1c074-training-chunked.log"
+    }
+  ],
+  "nonmedia_response": {
+    "bytes": 195,
+    "sha256": "5b131ca14aa96311d3432b0062c7443d3b0e6346ec279bd376a75f0a76bcd5d7",
+    "hash_scope": "HTML response body, NOT a capture",
+    "file": "logs/fetch-ea1c074-site-unavailable.txt"
+  },
+  "usable_media_files": 0,
+  "captures_hash_verified": 0,
+  "measurements_added": 0,
+  "reference_import_invocations": 0,
+  "reference_ids_overwritten": 0,
+  "manual_user_transfer_available": false,
+  "remote_acquisition_machine_callable": false,
+  "background_jobs_started": false
+}
