@@ -67,4 +67,4 @@ export interface Presentation {
   selected: [string | null, string | null]; ball: BallState; players: PlayerState[]; events: MatchEvent[];
   teams: [Pick<TeamState, 'id' | 'name' | 'shortName' | 'direction' | 'tactics'>, Pick<TeamState, 'id' | 'name' | 'shortName' | 'direction' | 'tactics'>];
 }
-export interface Replay { version: 'replay-v2'; initial: World; inputs: InputFrame[]; endTick: number; finalHash: string }
+export interface Replay { version: 'replay-v2'; engine: string; initial: World; inputs: InputFrame[]; endTick: number; finalHash: string }

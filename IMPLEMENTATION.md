@@ -56,3 +56,7 @@ Esto no convierte las descripciones de investigación en evidencia PES. Las mét
 La vista local fue bloqueada por la política de URL del navegador de trabajo. Las pruebas de `BrowserTestSession` verifican el adaptador sin GPU, no una sesión visual real. Tampoco se verificaron iPhone físico, mandos físicos ni juicio humano ciego. [EVALUATION.md](EVALUATION.md) deja el procedimiento para recoger esa evidencia.
 
 Online y publicación se difieren por decisión del usuario. El workflow sólo prueba, evalúa y compila; no despliega.
+
+## Compatibilidad de repeticiones
+
+`replay-v2` identifica el esquema; `engine` registra `engineVersion` de `src/simulation/config.ts`. La carga rechaza esquemas o motores distintos y también repeticiones anteriores sin `engine`, con un mensaje específico. Cambiar reglas, física, IA, orden de ejecución, RNG, valores por defecto o serialización/hash que pueda alterar el resultado determinista exige incrementar `engineVersion`. Presentación y validación que no cambien resultados no requieren incremento. `tests/fixtures/reference-engine-v1.json` fija un partido CPU 2v2 de 600 ticks y su hash; `scripts/make-reference-replay.ts` genera el fixture de la versión actual. No regenerar un fixture existente para ocultar divergencias: conservarlo y crear el de la nueva versión.
