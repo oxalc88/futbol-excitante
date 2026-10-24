@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-24 15:26 — [#61](https://github.com/oxalc88/futbol-excitante/pull/61) · La prueba de navegador cierra su servidor
+- **Qué cambia para el jugador:** nada. La prueba automática de navegador cierra siempre su servidor al terminar, también si falla o si la interrumpes. Si el puerto 4317 ya está ocupado, la prueba se detiene con un mensaje claro y no prueba una versión antigua.
+- **Qué probar:** ejecuta `scripts/verify.sh` dos veces seguidas; las dos deben pasar.
+- **Qué se rompe o cambia:** nada.
+
 ## 2026-10-24 15:10 — [#60](https://github.com/oxalc88/futbol-excitante/pull/60) · Aviso de tarjeta roja en pantalla · referencia [#29](https://github.com/oxalc88/futbol-excitante/issues/29)
 - **Qué cambia para el jugador:** al mostrarse una tarjeta roja, el aviso en pantalla indica el número, el nombre y el equipo del jugador expulsado. El aviso desaparece después de unos segundos.
 - **Qué probar:** juega un partido con muchas barridas hasta ver una roja y comprueba que el aviso muestra el jugador correcto.
