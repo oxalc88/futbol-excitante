@@ -1,9 +1,9 @@
-import type { MatchEvent, Presentation } from '../contracts/types';
+import type { DeepReadonly, MatchEvent, ReadonlyPresentation } from '../contracts/types';
 
 export const CARD_ALERT_TICKS = 100;
 
 /** Format detached presentation data only; red takes priority over a second caution. */
-export function cardAlert(events: readonly MatchEvent[], state: Pick<Presentation, 'players' | 'teams'>): string | null {
+export function cardAlert(events: DeepReadonly<MatchEvent[]>, state: Pick<ReadonlyPresentation, 'players' | 'teams'>): string | null {
   const event = events.find(e => e.type === 'red-card') ?? events.find(e => e.type === 'yellow-card');
   if (!event) return null;
   const player = state.players.find(p => p.id === event.playerId);

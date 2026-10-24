@@ -1,10 +1,10 @@
-import type { PlayerState, Presentation, Vec3 } from '../contracts/types';
+import type { DeepReadonly, PlayerState, ReadonlyPresentation, Vec3 } from '../contracts/types';
 import { clamp } from '../simulation/math';
 
 export const EMBODIMENT_MAPPING={version:'procedural-rig-v2',metresPerUnit:1,
   surfaces:{foot:{maxHorizontalReach:1.6,maxHeight:1.1},head:{maxHorizontalReach:.7,maxHeight:2.25},hand:{maxHorizontalReach:1.2,maxHeight:2.8}},
   limbs:{leg:[.78,.78],arm:[.72,.72]},contactTolerance:.025} as const;
-export function contactPose(p:PlayerState,s:Presentation){
+export function contactPose(p:DeepReadonly<PlayerState>,s:ReadonlyPresentation){
   const c=s.ball.lastTouch;if(!c||c.playerId!==p.id||s.tick-c.tick>5||s.tick<c.tick)return null;
   if(c.surface==='body')return null;
   const limits=EMBODIMENT_MAPPING.surfaces[c.surface];
@@ -25,7 +25,7 @@ export class CameraRig {
   rotation={x:0,z:0};mode:'broadcast'|'tactical'|'close'='broadcast';
   constructor(private dt=1/60){}
   reset(){this.tick=-1;this.rotation={x:0,z:0};}
-  advance(s:Presentation){
+  advance(s:ReadonlyPresentation){
     if(s.tick<=this.tick)return;
     const wanted={x:clamp(s.ball.x*.7,-33,33),y:clamp(s.ball.y*.5,-13,13)};
     this.previous={...this.target};

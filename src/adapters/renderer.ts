@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Config, PlayerState, Presentation, TeamIndex } from '../contracts/types';
+import type { Config, DeepReadonly, PlayerState, ReadonlyPresentation, TeamIndex } from '../contracts/types';
 import { CameraRig, contactPose, EMBODIMENT_MAPPING, solveLimb } from './presentation-model';
 import { clamp } from '../simulation/math';
 export interface Kit { shirt:string; shorts:string; accent:string; pattern:'band'|'plain' }
@@ -9,13 +9,13 @@ export class FootballRenderer {
   private scene=new THREE.Scene();private camera=new THREE.PerspectiveCamera(42,1,.1,350);
   private renderer:THREE.WebGLRenderer;private actors=new Map<string,Actor>();private ball:THREE.Mesh;private ballShadow:THREE.Mesh;
   private environment=new THREE.Group();private radar:CanvasRenderingContext2D;private target=new THREE.Vector3();private cameraReady=false;
-  private config:Config;private mode:'broadcast'|'tactical'|'close'='broadcast';private resizeObserver:ResizeObserver;
+  private config:DeepReadonly<Config>;private mode:'broadcast'|'tactical'|'close'='broadcast';private resizeObserver:ResizeObserver;
   private cameraRig=new CameraRig();
-  advanceCamera(s:Presentation){this.cameraRig.advance(s);}
+  advanceCamera(s:ReadonlyPresentation){this.cameraRig.advance(s);}
   private kits:[Kit,Kit];private quality='high';private animations=true;
-  constructor(private container:HTMLElement,radar:HTMLCanvasElement,config:Config,kits:[Kit,Kit]){
+  constructor(private container:HTMLElement,radar:HTMLCanvasElement,config:DeepReadonly<Config>,kits:[Kit,Kit],createRenderer:()=>THREE.WebGLRenderer=()=>new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'})){
     this.config=config;this.kits=kits;this.radar=radar.getContext('2d')!;
-    this.renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+    this.renderer=createRenderer();
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.container.append(this.renderer.domElement);
     this.renderer.domElement.setAttribute('aria-label','Cancha de fútbol 3D');
@@ -67,7 +67,7 @@ export class FootballRenderer {
       for(let block=0;block<16;block++)this.box(4.8,.65,.5,block%2?'#2a5961':'#d5b26d',-L/2+3+block*6.4,.55,side*(W/2+3.8));
     }
   }
-  private actor(p:PlayerState):Actor {
+  private actor(p:DeepReadonly<PlayerState>):Actor {
     const kit=this.kits[p.team],root=new THREE.Group(),body=new THREE.Group();root.add(body);
     const skin=['#dfab7c','#a26b47','#724a35','#bd8a65'][p.number%4],shirt=p.keeper?(p.team===0?'#fba83b':'#b991f0'):kit.shirt;
     const scale=[.96,1.03,1.08,1][p.number%4];
@@ -93,7 +93,7 @@ export class FootballRenderer {
     const contact=new THREE.Group();root.add(contact);const segments=[0,1,2].map(i=>{const m=new THREE.Mesh(new THREE.BoxGeometry(i===2?.17:.13,1,i===2?.28:.14),material(i===2?'#202434':skin));contact.add(m);return m;});contact.visible=false;
     return {root,body,arms,legs,ring,label,contact,segments};
   }
-  draw(previous:Presentation,current:Presentation,alpha:number,_frameDt:number){
+  draw(previous:ReadonlyPresentation,current:ReadonlyPresentation,alpha:number,_frameDt:number){
     const teleport=previous.phase!==current.phase||current.events.some(e=>e.type==='restart-awarded');const blend=teleport?1:clamp(alpha,0,1);
     const previousPlayers=new Map(previous.players.map(p=>[p.id,p]));
     for(const p of current.players){let a=this.actors.get(p.id);if(!a){a=this.actor(p);this.actors.set(p.id,a);}a.root.visible=!p.sentOff;if(p.sentOff)continue;const prev=previousPlayers.get(p.id)??p;
@@ -132,7 +132,7 @@ export class FootballRenderer {
     this.camera.position.set(camera.position.x,camera.position.z,camera.position.y);this.camera.lookAt(camera.target.x,0,camera.target.y);
     this.renderer.render(this.scene,this.camera);this.drawRadar(current);
   }
-  private drawRadar(s:Presentation){
+  private drawRadar(s:ReadonlyPresentation){
     const ctx=this.radar,canvas=ctx.canvas,W=canvas.width,H=canvas.height,L=this.config.pitch.length,B=this.config.pitch.width;
     const xy=(x:number,y:number)=>[8+(x/L+.5)*(W-16),8+(y/B+.5)*(H-16)];
     ctx.clearRect(0,0,W,H);ctx.fillStyle='#102a31dd';ctx.fillRect(0,0,W,H);ctx.strokeStyle='#9eb9b477';ctx.lineWidth=1;ctx.strokeRect(8,8,W-16,H-16);ctx.beginPath();ctx.moveTo(W/2,8);ctx.lineTo(W/2,H-8);ctx.stroke();ctx.beginPath();ctx.ellipse(W/2,H/2,(W-16)*9.15/L,(H-16)*9.15/B,0,0,Math.PI*2);ctx.stroke();

@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-24 16:37 — [#62](https://github.com/oxalc88/futbol-excitante/pull/62) · Presentación de solo lectura · referencia [#46](https://github.com/oxalc88/futbol-excitante/issues/46)
+- **Qué cambia para el jugador:** nada visible. La cámara, el HUD y el renderizador reciben datos de solo lectura; una prueba comprueba que no cambian el partido, tick a tick y hasta el resultado final.
+- **Qué probar:** ejecuta `npm run typecheck` y `npm test`; cambia entre las tres cámaras y consulta el HUD durante un partido CPU contra CPU.
+- **Qué se rompe o cambia:** nada. El saque inicial CPU sigue esperando 60 ticks y no cambian los motores ni el baseline de evaluación.
+
 ## 2026-10-24 15:26 — [#61](https://github.com/oxalc88/futbol-excitante/pull/61) · La prueba de navegador cierra su servidor
 - **Qué cambia para el jugador:** nada. La prueba automática de navegador cierra siempre su servidor al terminar, también si falla o si la interrumpes. Si el puerto 4317 ya está ocupado, la prueba se detiene con un mensaje claro y no prueba una versión antigua.
 - **Qué probar:** ejecuta `scripts/verify.sh` dos veces seguidas; las dos deben pasar.

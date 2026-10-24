@@ -1,3 +1,4 @@
+import { renderHud } from './hud';
 import './style.css';
 import { cardAlert, CARD_ALERT_TICKS } from './card-alert';
 import { shouldPause } from './pause-state';
@@ -48,7 +49,6 @@ let kickoffMode='';
 let pendingTactics:InputFrame['tactics']|undefined;let replayResult='';
 let renderError='';let audioContext:AudioContext|null=null,sound=false;let notice='',noticeUntil=0;
 const tacticalKeys=['pressing','width','tempo','counterPress','shortPossession','tightMarking','adaptation','defensiveLine','compactness','support']as const;
-const phaseLabels:Record<string,string>={kickoff:'Saque inicial',playing:'En juego',goal:'¡GOL!',halftime:'Entretiempo',fulltime:'Final del partido','throw-in':'Saque de banda',corner:'Tiro de esquina','goal-kick':'Saque de meta','free-kick':'Tiro libre',offside:'Fuera de juego',penalty:'Penalti · apunta y tira',indirect:'Tiro libre indirecto'};
 function kits(home:number,away:number):[Kit,Kit]{const a=TEAM_CATALOG[home],b=TEAM_CATALOG[away];return[{shirt:a.color,shorts:a.shorts,accent:a.accent,pattern:'band'},{shirt:home===away?'#2052a5':b.color,shorts:b.shorts,accent:b.accent,pattern:'plain'}];}
 function makeRenderer(k:[Kit,Kit]){renderer?.dispose();renderError='';try{renderer=new FootballRenderer($('viewport'),$<HTMLCanvasElement>('radar'),config,k);renderer.setQuality($<HTMLSelectElement>('quality').value);}catch(e){renderer=null;renderError='No se pudo iniciar WebGL2. Prueba un navegador compatible con aceleración gráfica.';$('announcement').textContent=renderError;console.error(e);}}
 makeRenderer(kits(0,1));
@@ -97,16 +97,8 @@ $('fullscreen-btn').onclick=async()=>{try{if(document.fullscreenElement)await do
 $('sound-btn').onclick=()=>{sound=!sound;if(sound){audioContext??=new AudioContext();void audioContext.resume();}$('sound-btn').setAttribute('aria-pressed',String(sound));};
 function beep(frequency:number,duration=.1){if(!sound||!audioContext)return;const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.frequency.value=frequency;osc.connect(gain);gain.connect(audioContext.destination);gain.gain.setValueAtTime(.04,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+duration);osc.start();osc.stop(audioContext.currentTime+duration);}
 function updateHud(){
-  const s=current;const time=(s.half-1)*45*60+s.played/config.halfSeconds*45*60;
-  $('score').textContent=`${s.score[0]} : ${s.score[1]}`;$('clock').textContent=`${Math.floor(time/60).toString().padStart(2,'0')}:${Math.floor(time%60).toString().padStart(2,'0')}`;$('half').textContent=`${s.half}T`;
-  $('home-short').textContent=s.teams[0].shortName;$('away-short').textContent=s.teams[1].shortName;$('phase').textContent=phaseLabels[s.phase]??s.phase;
-  $('footer-match').textContent=`${s.teams[0].name.toUpperCase()} vs ${s.teams[1].name.toUpperCase()}`;
-  const p=s.players.find(p=>p.id===s.selected[guest?1:0]);$('player-name').textContent=p?`${p.number} · ${p.name}`:'—';
-  $('energy-bar').style.width=`${(p?.energy??1)*100}%`;$('player-trait').textContent=p?`${p.capabilities.speed>8?'Ágil y técnico':'Fuerte en el contacto'} · ${p.foot==='left'?'Zurdo':'Diestro'}`:'';
-  $('pad-status').textContent=guest?'JUGADOR 2 · ONLINE':replay?'REPETICIÓN':!config.human.some(Boolean)?'MODO ESPECTADOR':input.gamepads.length?`${input.gamepads.length} MANDO${input.gamepads.length>1?'S':''} CONECTADO${input.gamepads.length>1?'S':''}`:'TECLADO · JUGADOR 1';
-  $('power-meter').hidden=input.charging===0;$('power-bar').style.width=`${input.charging*100}%`;
-  $('announcement').textContent=renderError||replayResult||(s.phase==='fulltime'?'FINAL DEL PARTIDO':s.tick<noticeUntil?notice:s.phase==='goal'?'¡GOOOL!':s.phase==='halftime'?'ENTRETIEMPO':'');
-  $('footer-size').textContent=`${config.teamSize} contra ${config.teamSize} · Equipos ficticios`;
+  renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil},$);
+  const s=current;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
 }
 function showStats(){const s=current;
