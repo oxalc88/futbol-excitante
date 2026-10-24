@@ -13,6 +13,9 @@
 - Use one branch for each task. Open a pull request to `main`.
 - Run `scripts/verify.sh` before you open a pull request. All checks must show PASS.
 - The writer and the reviewer of a change must use different models.
+- Every capability PR updates `docs/PROGRESS.md` with one entry: date (UTC-5), PR and issue links, what changes for the player (in Spanish), what to test, and what breaks.
+- Every capability PR keeps the capability map in `.agents/skills/verify-futbol-excitante/SKILL.md` up to date.
+- Use `.github/pull_request_template.md`.
 - Do not add a deploy job or publish the game without explicit approval.
 
 ## Verification
