@@ -48,6 +48,19 @@ try {
   match.score = (await page.locator('#score').innerText()).trim();
   const clockSeconds = Number(process.env.SMOKE_CLOCK_SECONDS ?? 8);
   if (!Number.isFinite(clockSeconds) || clockSeconds <= 0) throw new Error('SMOKE_CLOCK_SECONDS must be positive');
+  // In human-vs-CPU mode a kickoff taken by the human team waits up to
+  // rules.humanRestartTicks (360 sim ticks, about 6 s) for the human to play. On a slow
+  // headless runner (SwiftShader, low fps, sim capped at 6 steps/frame) that idle wait alone
+  // takes longer than the clock window. So act like a player: press pass (J) until the phase
+  // leaves "Saque inicial", then require the clock to advance as before.
+  const kickoffStart = Date.now();
+  match.kickoffMs = null;
+  while (Date.now() - kickoffStart < clockSeconds * 1000) {
+    if ((await page.locator('#phase').innerText()).trim() !== 'Saque inicial') { match.kickoffMs = Date.now() - kickoffStart; break; }
+    await page.keyboard.press('KeyJ');
+    await page.waitForTimeout(250);
+  }
+  if (match.kickoffMs === null) errors.push(`game: kickoff did not happen within ${clockSeconds}s of pressing pass`);
   try {
     // The clock must change from the value read at start (and not be 00:00).
     await page.waitForFunction((start) => {
