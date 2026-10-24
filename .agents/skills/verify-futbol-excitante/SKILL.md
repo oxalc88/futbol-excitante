@@ -37,7 +37,7 @@ Attach these paths, or the CI artifact, to the PR.
 | Determinism and checkpoints | engine.test.ts "same seed and input stream…", "checkpoints and presentation are detached…" | test output |
 | Input validation | engine.test.ts "rejects non-finite, duplicate, stale input…" | test output |
 | Goals, posts, restarts | engine.test.ts "fast swept crossing scores once…", "post collision…", "throw-in, corner and goal kick…" | test output |
-| Fouls, cards, penalties, advantage (C4 #29) | local-stage.test.ts (penalty, second caution, advantage recall, indirect free kick); discipline.test.ts (direct red, DOGSO, sent-off exclusion, advantage expiry/goal, offside reset, CPU kickoff matrix + determinism) | test output; HUD red-card alert is a gap (C4 wave 2) |
+| Fouls, cards, penalties, advantage (C4 #29) | local-stage.test.ts (penalty, second caution, advantage recall, indirect free kick); discipline.test.ts (direct red, DOGSO, sent-off exclusion, advantage expiry/goal, offside reset, CPU kickoff matrix + determinism); card-alert.test.ts (direct red, second yellow, yellow, unknown player); smoke loads an engine-generated direct-red replay and checks HUD identity and 100-tick expiry | test output; `red-card.png`, `red-card.json` |
 | Offside | engine.test.ts "offside is only called…"; local-stage.test.ts "offside position can interfere…" | test output |
 | Goalkeepers | engine.test.ts "keepers hold bounded goal arcs…"; local-stage.test.ts keeper hands, parry | test output; human keeper control is missing (C10 #53) |
 | Replays (C3 #41) | engine.test.ts "replay reconstructs the exact match…"; replay.test.ts (validation, engine version, reference fixture `tests/fixtures/reference-engine-v1.json`) | test output; browser load round-trip is a gap |

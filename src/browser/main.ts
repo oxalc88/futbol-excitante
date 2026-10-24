@@ -1,4 +1,5 @@
 import './style.css';
+import { cardAlert, CARD_ALERT_TICKS } from './card-alert';
 import { shouldPause } from './pause-state';
 import { isFulltime, rematchSetup } from './fulltime-flow';
 import type { Config, InputFrame, Presentation, Replay, TeamProfile, World } from '../contracts/types';
@@ -61,7 +62,7 @@ function rematch(){
   peer.close();
   const setup=rematchSetup(kickoffSetup.config,kickoffSetup.teams);
   config=setup.config;sim=new Simulation(config,setup.teams);previous=current=sim.presentation();record=new Recorder(sim);
-  replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;notice='';
+  replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;notice='';noticeUntil=0;
   makeRenderer(kickoffKits);$('match-mode').textContent=kickoffMode;
   document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);updateHud();
 }
@@ -75,7 +76,7 @@ function start(mode?:string){
   for(const k of tacticalKeys)t1.tactics[k]=Number($<HTMLInputElement>(k).value);
   config=createConfig({human:chosen==='watch'?[false,false]:chosen==='local'?[true,true]:[true,false],seed:Number($<HTMLInputElement>('seed').value),teamSize:size,halfSeconds:Number($<HTMLSelectElement>('duration').value)/2});
   kickoffSetup=rematchSetup(config,[validateTeam(t1),validateTeam(t2)]);kickoffKits=kits(home,away);
-  sim=new Simulation(config,[validateTeam(t1),validateTeam(t2)]);previous=current=sim.presentation();record=new Recorder(sim);replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;
+  sim=new Simulation(config,[validateTeam(t1),validateTeam(t2)]);previous=current=sim.presentation();record=new Recorder(sim);replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;notice='';noticeUntil=0;
   makeRenderer(kits(home,away));$('match-mode').textContent=chosen==='watch'?'CPU CONTRA CPU':chosen==='local'?'DOS JUGADORES':'TÚ CONTRA LA CPU';
   kickoffMode=$('match-mode').textContent??'';
   document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);updateHud();
@@ -104,7 +105,7 @@ function updateHud(){
   $('energy-bar').style.width=`${(p?.energy??1)*100}%`;$('player-trait').textContent=p?`${p.capabilities.speed>8?'Ágil y técnico':'Fuerte en el contacto'} · ${p.foot==='left'?'Zurdo':'Diestro'}`:'';
   $('pad-status').textContent=guest?'JUGADOR 2 · ONLINE':replay?'REPETICIÓN':!config.human.some(Boolean)?'MODO ESPECTADOR':input.gamepads.length?`${input.gamepads.length} MANDO${input.gamepads.length>1?'S':''} CONECTADO${input.gamepads.length>1?'S':''}`:'TECLADO · JUGADOR 1';
   $('power-meter').hidden=input.charging===0;$('power-bar').style.width=`${input.charging*100}%`;
-  $('announcement').textContent=renderError||replayResult||(s.phase==='goal'?'¡GOOOL!':s.phase==='halftime'?'ENTRETIEMPO':s.phase==='fulltime'?'FINAL DEL PARTIDO':s.tick<noticeUntil?notice:'');
+  $('announcement').textContent=renderError||replayResult||(s.phase==='fulltime'?'FINAL DEL PARTIDO':s.tick<noticeUntil?notice:s.phase==='goal'?'¡GOOOL!':s.phase==='halftime'?'ENTRETIEMPO':'');
   $('footer-size').textContent=`${config.teamSize} contra ${config.teamSize} · Equipos ficticios`;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
 }
@@ -127,7 +128,7 @@ $<HTMLInputElement>('replay-file').onchange=async e=>{try{
   const loadedSim=replaySimulation(loaded),loadedRecord=new Recorder(loadedSim),loadedPresentation=loadedSim.presentation();
   // Validate and prepare the replacement completely before touching the current match.
   peer.close();kickoffSetup=null;sim=loadedSim;config=loaded.initial.config;record=loadedRecord;
-  replay=loaded;replayIndex=0;replayResult='';notice='';started=true;guest=false;finalShown=false;
+  replay=loaded;replayIndex=0;replayResult='';notice='';noticeUntil=0;started=true;guest=false;finalShown=false;
   previous=current=loadedPresentation;makeRenderer(kits(0,1));$('setup-dialog').closest('dialog')?.close();pause(false);$('match-mode').textContent='REPETICIÓN';
 }catch(e){$('setup-error').textContent=(e as Error).message;}};
 for(const key of ['formation',...tacticalKeys])$(key).addEventListener('change',()=>{if(!started||guest||replay)return;pendingTactics={formation:$<HTMLSelectElement>('formation').value as TeamProfile['tactics']['formation'],pressing:Number($<HTMLInputElement>('pressing').value),...Object.fromEntries(tacticalKeys.map(k=>[k,Number($<HTMLInputElement>(k).value)]))};});
@@ -164,7 +165,11 @@ function loop(now:number){
         if(replay){while(replay.inputs[replayIndex]?.tick===sim.tick)frames.push(replay.inputs[replayIndex++]);}
         else for(const slot of [0,1]as const)if(config.human[slot]){const f=slot===1&&peer.role==='host'?peer.hostFrame(sim.tick):input.sample(sim.tick,slot);if(slot===0&&pendingTactics){f.tactics=pendingTactics;pendingTactics=undefined;}frames.push(f);}
         sim.applyInputs(frames);if(!replay)record.record(frames);previous=current;sim.step();current=sim.presentation();renderer?.advanceCamera(current);
-        const alert=current.events.find(e=>['yellow-card','red-card','advantage','advantage-recalled','keeper-time-limit'].includes(e.type));if(alert){const labels:Record<string,string>={'yellow-card':'AMARILLA','red-card':'EXPULSIÓN',advantage:'LEY DE VENTAJA','advantage-recalled':'SE COBRA LA FALTA','keeper-time-limit':'OCHO SEGUNDOS · CÓRNER'};notice=labels[alert.type];noticeUntil=current.tick+100;}
+        const card=cardAlert(current.events,current);
+        const alert=current.events.find(e=>['advantage','advantage-recalled','keeper-time-limit'].includes(e.type));
+        if(card){notice=card;noticeUntil=current.tick+CARD_ALERT_TICKS;}
+        else if(alert&&current.tick>=noticeUntil){const labels:Record<string,string>={advantage:'LEY DE VENTAJA','advantage-recalled':'SE COBRA LA FALTA','keeper-time-limit':'OCHO SEGUNDOS · CÓRNER'};notice=labels[alert.type];noticeUntil=current.tick+100;}
+        $('announcement').dataset.tick=String(current.tick);
         if(current.events.some(e=>e.type==='goal'))beep(720,.6);else if(current.events.some(e=>['shoot','pass','cross'].includes(e.type)))beep(130,.045);
         if(peer.role==='host'&&sim.tick%6===0)peer.snapshot(current);
         accumulator-=config.dt;steps++;
