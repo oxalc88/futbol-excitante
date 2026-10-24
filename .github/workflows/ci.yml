@@ -1,14 +1,16 @@
-name: Local stage — tests and build
+name: CI — tests, evaluation and build
 on:
   push:
-    branches: [rebuild/vision-first-2026-09-05]
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: vision-rebuild-local
+  group: ci-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:

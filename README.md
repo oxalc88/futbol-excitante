@@ -2,7 +2,7 @@
 
 Juego experimental de fútbol 3D: 11v11, 5v5 y 2v2, contra la CPU o con dos jugadores locales. Motor TypeScript con ticks fijos y presentación Three.js.
 
-Rama: `rebuild/vision-first-2026-09-05`.
+Rama: `main` (motor Astra). La investigación y las herramientas del sistema Gauntlet legado están en la rama `archive/gauntlet-legacy` y en las etiquetas `history/*`. El juego no necesita Gauntlet para compilar, probar ni ejecutarse.
 
 Se reconstruyó desde cero preservando **sin cambios** `VISION.md`, `research/` y `specs/` del commit `becbcdc0aaaace4f9b98006ae44e0449795c001a`. Sus referencias a implementación histórica no describen necesariamente este motor. El alcance actual se documenta en [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
@@ -11,7 +11,7 @@ Se reconstruyó desde cero preservando **sin cambios** `VISION.md`, `research/` 
 Necesitas Node.js 22.12 o posterior y un navegador con WebGL2. Las comprobaciones usan Node 24.
 
 ```bash
-git clone --branch rebuild/vision-first-2026-09-05 https://github.com/oxalc88/futbol-excitante.git
+git clone https://github.com/oxalc88/futbol-excitante.git
 cd futbol-excitante
 npm ci
 npm run dev
@@ -63,6 +63,8 @@ npm run evaluate
 npm run build
 ```
 
+`scripts/verify.sh` ejecuta todas estas comprobaciones y una prueba de humo en Chrome/Chromium headless (`scripts/smoke-browser.mjs`). Devuelve un resumen PASS/FAIL por comprobación.
+
 `npm run evaluate` ejecuta 276 casos —69 IDs × dos variantes × dos semillas— y tres partidos CPU de seis minutos. Genera `artifacts/evaluation.json`, con veredictos **por criterio**, métricas, eventos, hashes, bindings, pruebas negativas del evaluador y límites de evidencia.
 
 ```bash
@@ -86,7 +88,7 @@ La base de regresión de `eval/baseline.json` es un perfil **provisional de este
 
 El botón online está oculto y desactivado. El prototipo de red anterior queda archivado en su adaptador y no recibe trabajo ni validación en esta etapa.
 
-El workflow `.github/workflows/pages.yml` se llama **Local stage — tests and build**. Sólo instala dependencias, prueba, evalúa, compila y guarda artefactos. **No tiene job de despliegue ni permisos de Pages.** Subir commits a esta rama no publica el juego.
+El workflow `.github/workflows/ci.yml` se llama **CI — tests, evaluation and build** y se ejecuta en `push` a `main` y en pull requests hacia `main`. Sólo instala dependencias, prueba, evalúa, compila y guarda artefactos. **No tiene job de despliegue ni permisos de Pages.** Subir commits a `main` no publica el juego.
 
 Para preparar una futura distribución estática:
 
