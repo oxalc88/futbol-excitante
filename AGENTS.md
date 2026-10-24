@@ -23,6 +23,8 @@ scripts/verify.sh
 
 The script runs `npm ci`, typecheck, tests, the headless evaluation, the build and a headless browser smoke test (`scripts/smoke-browser.mjs`). It prints PASS or FAIL for each check and exits non-zero if one check fails. Set `CHROME_PATH` to use a specific Chrome or Chromium.
 
+See [.agents/skills/verify-futbol-excitante/SKILL.md](.agents/skills/verify-futbol-excitante/SKILL.md) for verification steps, evidence and capability coverage.
+
 ## Model selection
 
 Select the model by role, not by provider.
