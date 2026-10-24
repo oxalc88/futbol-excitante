@@ -1,8 +1,8 @@
 // Browser smoke test: serve dist/ with vite preview, open the game and the lab,
-// start a CPU match, and fail on page errors or a missing canvas.
+// prove the match clock runs, record CPU play, and fail on browser errors.
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 
 const require = createRequire(process.env.PLAYWRIGHT_CORE_DIR ? `${process.env.PLAYWRIGHT_CORE_DIR}/` : import.meta.url);
 const { chromium } = require('playwright-core');
@@ -25,6 +25,13 @@ async function waitForServer() {
 
 const errors = [];
 let browser;
+let videoContext;
+const match = { clockStart: null, clockEnd: null, score: null, phase: null, canvases: 0, errors };
+function observe(page, label) {
+  page.on('pageerror', (e) => errors.push(`${label} pageerror: ${e.message}`));
+  page.on('console', (m) => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(`${label} console: ${m.text()}`); });
+  page.on('response', (r) => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`${label} http ${r.status()}: ${r.url()}`); });
+}
 try {
   await waitForServer();
   browser = await chromium.launch({
@@ -32,21 +39,62 @@ try {
     args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
   });
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
-  page.on('console', (m) => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(`console: ${m.text()}`); });
-  // Missing resources are errors, except the browser's implicit favicon request.
-  page.on('response', (r) => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`http ${r.status()}: ${r.url()}`); });
+  observe(page, 'game');
 
   await page.goto(`${base}/`, { waitUntil: 'networkidle' });
   await page.locator('#start-btn').waitFor({ state: 'visible', timeout: 15000 });
   await page.locator('#start-btn').click();
-  await page.waitForTimeout(4000);
-  const canvases = await page.locator('canvas').count();
+  match.clockStart = (await page.locator('#clock').innerText()).trim();
+  match.score = (await page.locator('#score').innerText()).trim();
+  const clockSeconds = Number(process.env.SMOKE_CLOCK_SECONDS ?? 8);
+  if (!Number.isFinite(clockSeconds) || clockSeconds <= 0) throw new Error('SMOKE_CLOCK_SECONDS must be positive');
+  // In human-vs-CPU mode a kickoff taken by the human team waits up to
+  // rules.humanRestartTicks (360 sim ticks, about 6 s) for the human to play. On a slow
+  // headless runner (SwiftShader, low fps, sim capped at 6 steps/frame) that idle wait alone
+  // takes longer than the clock window. So act like a player: press pass (J) until the phase
+  // leaves "Saque inicial", then require the clock to advance as before.
+  const kickoffStart = Date.now();
+  match.kickoffMs = null;
+  while (Date.now() - kickoffStart < clockSeconds * 1000) {
+    if ((await page.locator('#phase').innerText()).trim() !== 'Saque inicial') { match.kickoffMs = Date.now() - kickoffStart; break; }
+    await page.keyboard.press('KeyJ');
+    await page.waitForTimeout(250);
+  }
+  if (match.kickoffMs === null) errors.push(`game: kickoff did not happen within ${clockSeconds}s of pressing pass`);
+  try {
+    // The clock must change from the value read at start (and not be 00:00).
+    await page.waitForFunction((start) => {
+      const clock = document.querySelector('#clock')?.textContent?.trim();
+      return /^\d+:\d{2}$/.test(clock ?? '') && clock !== '00:00' && clock !== start;
+    }, match.clockStart, { timeout: clockSeconds * 1000 });
+  } catch {
+    errors.push(`game: clock did not advance within ${clockSeconds}s`);
+  }
+  match.clockEnd = (await page.locator('#clock').innerText()).trim();
+  match.phase = (await page.locator('#phase').innerText()).trim();
+  const canvases = match.canvases = await page.locator('canvas').count();
   await page.screenshot({ path: `${out}/game.png` });
   if (canvases < 1) errors.push('game: no canvas after match start');
 
+  videoContext = await browser.newContext({
+    viewport: { width: 1280, height: 720 },
+    recordVideo: { dir: `${out}/video`, size: { width: 1280, height: 720 } },
+  });
+  const watch = await videoContext.newPage();
+  observe(watch, 'watch');
+  await watch.goto(`${base}/`, { waitUntil: 'networkidle' });
+  await watch.locator('#start-btn').waitFor({ state: 'visible', timeout: 15000 });
+  await watch.locator('#mode').selectOption('watch');
+  await watch.locator('#start-btn').click();
+  await watch.waitForTimeout(6000);
+  if ((await watch.locator('#match-mode').innerText()).trim() !== 'CPU CONTRA CPU') errors.push('watch: CPU mode did not start');
+  if (await watch.locator('canvas').count() < 1) errors.push('watch: no canvas after match start');
+  await watch.screenshot({ path: `${out}/cpu-vs-cpu.png` });
+  await videoContext.close(); // Closing flushes the recorded video to disk.
+  videoContext = undefined;
+
   const lab = await browser.newPage();
-  lab.on('pageerror', (e) => errors.push(`lab pageerror: ${e.message}`));
+  observe(lab, 'lab');
   await lab.goto(`${base}/lab.html`, { waitUntil: 'networkidle' });
   await lab.waitForTimeout(2000);
   await lab.screenshot({ path: `${out}/lab.png` });
@@ -55,8 +103,15 @@ try {
 } catch (e) {
   errors.push(`fatal: ${e.message}`);
 } finally {
-  await browser?.close();
-  stop();
+  try {
+    await videoContext?.close();
+    await browser?.close();
+  } catch (e) {
+    errors.push(`cleanup: ${e.message}`);
+  } finally {
+    stop();
+    writeFileSync(`${out}/match.json`, `${JSON.stringify(match, null, 2)}\n`);
+  }
 }
 for (const e of errors) console.error(e);
 process.exit(errors.length ? 1 : 0);

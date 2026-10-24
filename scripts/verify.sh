@@ -6,9 +6,10 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 
 declare -A result
-order=(install typecheck test evaluate build smoke)
+order=(no-legacy install typecheck test evaluate build smoke)
 run() { local name=$1; shift; echo "=== $name: $*"; if "$@"; then result[$name]=PASS; else result[$name]=FAIL; fi; }
 
+run no-legacy bash scripts/check-no-legacy.sh
 run install npm ci --no-audit --no-fund
 run typecheck npm run typecheck
 run test npm test
@@ -23,6 +24,7 @@ if [ -z "${CHROME_PATH:-}" ]; then
   for c in google-chrome chromium chromium-browser; do command -v "$c" >/dev/null && CHROME_PATH=$(command -v "$c") && break; done
   [ -z "${CHROME_PATH:-}" ] && npx --prefix "$tools" playwright-core install chromium >/dev/null
 fi
+npx --prefix "$tools" playwright-core install ffmpeg >/dev/null
 export CHROME_PATH="${CHROME_PATH:-}"
 run smoke env PLAYWRIGHT_CORE_DIR="$tools/node_modules/playwright-core" node scripts/smoke-browser.mjs
 

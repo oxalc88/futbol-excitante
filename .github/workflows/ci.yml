@@ -22,10 +22,7 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run evaluate
-      - run: npm run build
+      - run: scripts/verify.sh
       - uses: actions/upload-artifact@v4
         with:
           name: simulation-evidence
@@ -34,4 +31,9 @@ jobs:
         with:
           name: local-build
           path: dist
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-smoke
+          path: artifacts/local/smoke/
 # Publishing is intentionally disabled for this stage.
