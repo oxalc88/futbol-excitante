@@ -96,7 +96,16 @@ $('save-replay').onclick=()=>{if(guest){$('stats-label').textContent='El anfitri
 $('export-roster').onclick=()=>download('equipo-ejemplo.json',makeTeam(Number($<HTMLSelectElement>('home-team').value),Number($<HTMLSelectElement>('size').value)));
 $<HTMLInputElement>('roster-file').onchange=async e=>{try{const f=(e.target as HTMLInputElement).files?.[0];if(!f)return;if(f.size>100000)throw new Error('El archivo supera 100 KB.');importedTeam=validateTeam(JSON.parse(await f.text()));$('roster-status').textContent=`${importedTeam.name} · ${importedTeam.players.length} jugadores cargados.`;}catch(e){importedTeam=null;$('roster-status').textContent=(e as Error).message;}};
 $('load-replay').onclick=()=>$<HTMLInputElement>('replay-file').click();
-$<HTMLInputElement>('replay-file').onchange=async e=>{try{const f=(e.target as HTMLInputElement).files?.[0];if(!f)return;if(f.size>30000000)throw new Error('La repetición supera 30 MB.');const loaded=parseReplay(JSON.parse(await f.text()));loaded.initial.teams.forEach(validateTeam);peer.close();sim=replaySimulation(loaded);config=loaded.initial.config;record=new Recorder(sim);replay=loaded;replayIndex=0;replayResult='';notice='';started=true;guest=false;finalShown=false;previous=current=sim.presentation();makeRenderer(kits(0,1));$('setup-dialog').closest('dialog')?.close();pause(false);$('match-mode').textContent='REPETICIÓN';}catch(e){$('setup-error').textContent=(e as Error).message;}};
+$<HTMLInputElement>('replay-file').onchange=async e=>{try{
+  const f=(e.target as HTMLInputElement).files?.[0];if(!f)return;
+  if(f.size>30000000)throw new Error('La repetición supera 30 MB.');
+  const loaded=parseReplay(JSON.parse(await f.text()));
+  const loadedSim=replaySimulation(loaded),loadedRecord=new Recorder(loadedSim),loadedPresentation=loadedSim.presentation();
+  // Validate and prepare the replacement completely before touching the current match.
+  peer.close();sim=loadedSim;config=loaded.initial.config;record=loadedRecord;
+  replay=loaded;replayIndex=0;replayResult='';notice='';started=true;guest=false;finalShown=false;
+  previous=current=loadedPresentation;makeRenderer(kits(0,1));$('setup-dialog').closest('dialog')?.close();pause(false);$('match-mode').textContent='REPETICIÓN';
+}catch(e){$('setup-error').textContent=(e as Error).message;}};
 for(const key of ['formation',...tacticalKeys])$(key).addEventListener('change',()=>{if(!started||guest||replay)return;pendingTactics={formation:$<HTMLSelectElement>('formation').value as TeamProfile['tactics']['formation'],pressing:Number($<HTMLInputElement>('pressing').value),...Object.fromEntries(tacticalKeys.map(k=>[k,Number($<HTMLInputElement>(k).value)]))};});
 const joystick=$('joystick'),stick=$('stick');let stickPointer:number|null=null;
 function stickMove(e:PointerEvent){const r=joystick.getBoundingClientRect(),x=(e.clientX-r.left-r.width/2)/(r.width*.36),y=(e.clientY-r.top-r.height/2)/(r.height*.36),d=Math.max(1,Math.hypot(x,y));input.setTouchMove({x:x/d,y:y/d});stick.style.transform=`translate(${x/d*34}px,${y/d*34}px)`;}
