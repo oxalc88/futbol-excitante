@@ -37,7 +37,7 @@ Attach these paths, or the CI artifact, to the PR.
 | Determinism and checkpoints | engine.test.ts "same seed and input stream…", "checkpoints and presentation are detached…" | test output |
 | Input validation | engine.test.ts "rejects non-finite, duplicate, stale input…" | test output |
 | Goals, posts, restarts | engine.test.ts "fast swept crossing scores once…", "post collision…", "throw-in, corner and goal kick…" | test output |
-| Fouls, cards, penalties, advantage (C4 #29) | local-stage.test.ts (penalty, second caution, advantage recall, indirect free kick) | test output; HUD screenshot is a gap (C4 wave 2) |
+| Fouls, cards, penalties, advantage (C4 #29) | local-stage.test.ts (penalty, second caution, advantage recall, indirect free kick); card-alert.test.ts (direct red, second yellow, yellow, unknown player); smoke loads an engine-generated direct-red replay and checks HUD identity and 100-tick expiry | test output; artifacts/local/smoke/red-card.png and red-card.json (requires browser smoke to pass) |
 | Offside | engine.test.ts "offside is only called…"; local-stage.test.ts "offside position can interfere…" | test output |
 | Goalkeepers | engine.test.ts "keepers hold bounded goal arcs…"; local-stage.test.ts keeper hands, parry | test output; human keeper control is missing (C10 #53) |
 | Replays (C3 #41) | engine.test.ts "replay reconstructs the exact match…" | test output; invalid-checkpoint rejection is a gap |

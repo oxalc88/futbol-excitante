@@ -13,3 +13,6 @@ button{min-height:44px}.close{min-width:44px;min-height:44px}.touch-buttons{max-
 @media(max-height:560px) and (orientation:landscape){.touch-buttons{grid-template-columns:repeat(4,1fr);max-width:330px}.bottom-hud{bottom:12px;right:345px}.field-toolbar{top:7px}.touch-controls{align-items:flex-end}.touch-buttons button{min-height:40px;padding:5px;font-size:12px}}
 
 .lab{max-width:1280px;margin:auto;padding:24px}.lab h1{font-size:2rem}.lab-controls{display:flex;align-items:end;gap:12px;flex-wrap:wrap}.lab-controls label{max-width:210px}.lab-controls input{width:130px}#lab-field{position:relative;height:60vh;min-height:300px;border:1px solid #658780;border-radius:8px;overflow:hidden;isolation:isolate}#lab-field>canvas:not(#lab-radar){position:absolute;inset:0;z-index:-1}#lab-radar{position:absolute;bottom:12px;right:12px;width:150px}.lab output{display:block;padding:16px 0;color:#efcb77}.lab pre{font-size:13px;max-height:240px;overflow:auto;background:#112331;padding:16px}
+
+/* Keep card identity readable as a separate line at all viewport sizes. */
+#announcement{white-space:pre-line;font-size:clamp(1.1rem,3vw,2.5rem);padding:0 20px;box-sizing:border-box}

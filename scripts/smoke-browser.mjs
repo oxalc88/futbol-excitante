@@ -1,8 +1,8 @@
 // Browser smoke test: serve dist/ with vite preview, open the game and the lab,
 // prove the match clock runs, record CPU play, and fail on browser errors.
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 
 const require = createRequire(process.env.PLAYWRIGHT_CORE_DIR ? `${process.env.PLAYWRIGHT_CORE_DIR}/` : import.meta.url);
 const { chromium } = require('playwright-core');
@@ -92,6 +92,24 @@ try {
   await watch.screenshot({ path: `${out}/cpu-vs-cpu.png` });
   await videoContext.close(); // Closing flushes the recorded video to disk.
   videoContext = undefined;
+
+  // Load a real engine replay through the same public UI used by players.
+  const redStart = Date.now();
+  execFileSync(process.execPath, ['--import', 'tsx', 'scripts/red-card-replay.ts', `${out}/red-card-replay.json`, `${out}/red-card-expected.json`]);
+  const expected = JSON.parse(readFileSync(`${out}/red-card-expected.json`, 'utf8'));
+  const red = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  observe(red, 'red-card');
+  await red.goto(`${base}/`, { waitUntil: 'networkidle' });
+  await red.locator('#replay-file').setInputFiles(`${out}/red-card-replay.json`);
+  await red.waitForFunction(text => document.querySelector('#announcement')?.textContent === text, expected.text, { timeout: 20000 });
+  const evidence = await red.locator('#announcement').evaluate(el => ({text:el.textContent,tick:Number(el.dataset.tick)}));
+  await red.screenshot({ path: `${out}/red-card.png` });
+  await red.waitForFunction(() => document.querySelector('#announcement')?.textContent === '', null, { timeout: 20000 });
+  const expiredTick = Number(await red.locator('#announcement').getAttribute('data-tick'));
+  if (expiredTick < expected.tick + 100 || expiredTick > expected.tick + 112) throw new Error(`red-card: unexpected expiry tick ${expiredTick}`);
+  const elapsedMs = Date.now() - redStart; // informational only; correctness is checked in sim ticks above
+  writeFileSync(`${out}/red-card.json`, `${JSON.stringify({...evidence,eventTick:expected.tick,event:expected.event,expiredTick,elapsedMs},null,2)}\n`);
+  await red.close();
 
   const lab = await browser.newPage();
   observe(lab, 'lab');
