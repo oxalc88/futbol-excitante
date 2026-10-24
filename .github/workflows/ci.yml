@@ -23,8 +23,6 @@ jobs:
           node-version: '24'
           cache: npm
       - run: scripts/verify.sh
-        env:
-          CHROME_PATH: /usr/bin/google-chrome
       - uses: actions/upload-artifact@v4
         with:
           name: simulation-evidence

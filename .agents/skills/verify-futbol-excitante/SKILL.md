@@ -33,7 +33,7 @@ Attach these paths, or the CI artifact, to the PR.
 
 | Capability | How it is tested | Evidence |
 |---|---|---|
-| Match flow (kickoff, halftime, fulltime) | engine.test.ts "halftime changes direction and a complete CPU match reaches fulltime" | smoke `match.json`, `game.png` |
+| Match flow (kickoff, halftime, fulltime) | engine.test.ts "halftime changes direction and a complete CPU match reaches fulltime" | test output (smoke covers only kickoff and clock in browser) |
 | Determinism and checkpoints | engine.test.ts "same seed and input stream…", "checkpoints and presentation are detached…" | test output |
 | Input validation | engine.test.ts "rejects non-finite, duplicate, stale input…" | test output |
 | Goals, posts, restarts | engine.test.ts "fast swept crossing scores once…", "post collision…", "throw-in, corner and goal kick…" | test output |
@@ -44,7 +44,7 @@ Attach these paths, or the CI artifact, to the PR.
 | Presentation boundary (C6 #46) | local-stage.test.ts "camera changes and repeated draws cannot change authoritative state" | test output |
 | Browser match + CPU vs CPU (C1 #45) | smoke | `match.json`, `cpu-vs-cpu.png`, `video/` |
 | Pause and dialogs (C2 #42) | none yet | gap |
-| Controls / devices (C5 #44) | none (no unit tests for `input.ts`/`controller.ts`) | gap; physical devices are manual |
+| Controls / devices (C5 #44) | local-stage.test.ts "two controller identities keep their slots…", "controller charge fires once…" (`controller.ts`); keyboard/touch `input.ts` untested | test output; physical devices are manual (gap) |
 | Game feel vs PES (C7 #48) | evaluate (design targets only) | manual review |
 | Teams data, online (C8 #49, C9 #50) | none | gap |
 
