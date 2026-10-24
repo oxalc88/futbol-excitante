@@ -43,7 +43,7 @@ Attach these paths, or the CI artifact, to the PR.
 | Replays (C3 #41) | engine.test.ts "replay reconstructs the exact match…"; replay.test.ts (validation, engine version, reference fixture `tests/fixtures/reference-engine-v1.json`) | test output; browser load round-trip is a gap |
 | Presentation boundary (C6 #46) | local-stage.test.ts "camera changes and repeated draws cannot change authoritative state" | test output |
 | Browser match + CPU vs CPU (C1 #45) | smoke (kickoff taken, clock advances, no page errors) | `match.json`, `cpu-vs-cpu.png`, `video/` |
-| Pause and dialogs (C2 #42) | none yet | gap |
+| Pause and dialogs / fulltime (C2 #42) | pause.test.ts: manual pause, dialog close/cancel decision, terminal state, detached rematch kickoff; smoke: P → Help → close → clock frozen 2s → P → clock advances | test output; `match.json` → `pauseCase`; fulltime buttons require manual browser review |
 | Controls / devices (C5 #44) | local-stage.test.ts "two controller identities keep their slots…", "controller charge fires once…" (`controller.ts`); input.test.ts (keyboard, touch, charge, switch, pause, blur, two players, pad dead zone) | test output; real devices: `docs/manual-device-test.md` (pending) |
 | Game feel vs PES (C7 #48) | evaluate (design targets only) | manual review |
 | Teams data, online (C8 #49, C9 #50) | none | gap |

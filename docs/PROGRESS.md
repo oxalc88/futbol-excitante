@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-24 14:50 — [#59](https://github.com/oxalc88/futbol-excitante/pull/59) · Pausa y fin de partido · cierra [#42](https://github.com/oxalc88/futbol-excitante/issues/42)
+- **Qué cambia para el jugador:** la pausa manual se mantiene al abrir y cerrar diálogos (también con Escape). Sin pausa manual, el partido sigue al cerrar el último diálogo. Al final aparece una pantalla con estadísticas, «Revancha» (mismos equipos, desde el saque inicial) y «Volver al menú». En partidos online no aparece «Revancha».
+- **Qué probar:** pausa con P, abre Controles, ciérralo y comprueba que el reloj no avanza. Juega hasta el final y prueba los dos botones.
+- **Qué se rompe o cambia:** nada.
+
 ## 2026-10-24 14:09 — [#54](https://github.com/oxalc88/futbol-excitante/pull/54) · Partido verificable en el navegador · cierra [#45](https://github.com/oxalc88/futbol-excitante/issues/45)
 - **Qué cambia para el jugador:** nada visible. Cada cambio se prueba ahora en un navegador automático sin pantalla (Chromium headless; no reemplaza probar en tu dispositivo): se inicia un partido, se toma el saque inicial y se comprueba que el reloj avanza. Después se graba un partido CPU contra CPU.
 - **Qué probar:** abre la pestaña Actions de un PR y descarga el artefacto `browser-smoke`. Mira las capturas y el video.
