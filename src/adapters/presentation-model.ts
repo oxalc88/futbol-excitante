@@ -44,7 +44,7 @@ export class CameraRig {
 /** Linear-light value bands: quiet ground, clear teams, and a white ball. */
 export interface Kit { shirt:string; shorts:string; accent:string; pattern:'band'|'plain' }
 export const PITCH_PALETTES={
-  viva:{pitch:['#238c35','#29963c'],surround:'#206c32',stands:['#243438','#29393c']},
+  viva:{pitch:['#378a43','#3d9349'],surround:'#2e6a39',stands:['#243438','#29393c']},
   sobria:{pitch:['#4c6e57','#50725b'],surround:'#3a5446',stands:['#243438','#29393c']}
 } as const;
 export type PitchPaletteId=keyof typeof PITCH_PALETTES;
