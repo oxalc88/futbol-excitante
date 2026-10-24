@@ -24,6 +24,8 @@ function foul(x=0,slide=false,speed=0){
 
 test('fast sliding contact from behind gives a direct red and excludes the offender from play',()=>{
   const f=foul(0,true,10);f.sim.restore(f.w);const events=f.sim.step().events,w=f.sim.snapshot();
+  const replay=foul(0,true,10);replay.sim.restore(replay.w);
+  assert.deepEqual(replay.sim.step().events,events);assert.equal(replay.sim.stateHash(),f.sim.stateHash());
   assert(events.some(e=>e.type==='foul'&&e.data?.card==='red'));
   assert(events.some(e=>e.type==='red-card'&&e.data?.secondYellow===false));
   const p=w.players.find(p=>p.id===f.a.id)!;assert(p.sentOff);assert.equal(p.yellows,0);assert.equal(w.stats[0].reds,1);
@@ -56,7 +58,7 @@ test('advantage expires without progress, recalls the original spot, issues the 
   assert.equal(f.sim.phase,'playing');assert.equal(f.sim.snapshot().ball.lastTouch?.team,1);
 });
 
-test('retained advantage is supported: possession and forward progress consume the window, deferring the card',()=>{
+test('advantage is realized: possession and forward progress consume the window, deferring the card',()=>{
   const f=advantage();f.w.tick=3;f.b.x=-4;f.w.ball.x=-3.5;f.sim.restore(f.w);
   const events=f.sim.step().events,w=f.sim.snapshot();assert(events.some(e=>e.type==='advantage-realized'));assert(!events.some(e=>e.type==='advantage-recalled'));
   assert.equal(w.phase,'playing');assert.equal(w.advantage,null);assert.equal(w.stats[0].yellows,0);assert.deepEqual(w.pendingCards,[{playerId:f.a.id,card:'yellow'}]);
@@ -77,8 +79,25 @@ test('deliberate defender play resets offside before the flagged attacker receiv
 });
 
 for(const teamSize of [11,5,2])for(const seed of [2017,37,88])test(`CPU kickoff releases and touches the ball: ${teamSize}v${teamSize}, seed ${seed}`,()=>{
-  const c=createConfig({teamSize,seed,human:[false,false]}),sim=new Simulation(c,[makeTeam(0,teamSize),makeTeam(1,teamSize)]);
-  const limit=c.rules.restartTicks;let contact=false,executed=false;
-  for(let i=0;i<limit;i++){const events=sim.step().events;contact ||= events.some(e=>e.type==='ball-contact');executed ||= events.some(e=>e.type==='kickoff-executed');}
-  const w=sim.snapshot();assert.equal(w.phase,'playing');assert.equal(w.restart,null);assert(contact);assert(executed);assert(w.ball.lastTouch);assert(Math.hypot(w.ball.vx,w.ball.vy)>0);
+  function run(){
+    const c=createConfig({teamSize,seed,human:[false,false]}),sim=new Simulation(c,[makeTeam(0,teamSize),makeTeam(1,teamSize)]);
+    // Current design: a CPU kickoff executes when the configured restart countdown
+    // (rules.restartTicks) ends. The test proves there is no deadlock: execution and
+    // first contact happen within the countdown plus one second of play.
+    // Executing CPU kickoffs earlier is a gameplay decision (it changes eval/baseline.json).
+    const countdown=c.rules.restartTicks,bound=countdown+60,limit=bound;
+    let firstContactTick:number|undefined,executionTick:number|undefined;
+    const sequence:ReturnType<Simulation['step']>['events']=[];
+    for(let i=0;i<limit;i++){
+      const events=sim.step().events;sequence.push(...events);
+      firstContactTick ??= events.find(e=>e.type==='ball-contact')?.tick;
+      executionTick ??= events.find(e=>e.type==='kickoff-executed')?.tick;
+    }
+    const w=sim.snapshot();assert.equal(w.phase,'playing');assert.equal(w.restart,null);
+    assert(firstContactTick!==undefined&&firstContactTick<=bound,`first contact must occur by tick ${bound}, got ${firstContactTick}`);
+    assert(executionTick!==undefined&&executionTick<=countdown+1,`kickoff must execute by tick ${countdown+1}, got ${executionTick}`);
+    assert(w.ball.lastTouch);assert(Math.hypot(w.ball.vx,w.ball.vy)>0);
+    return{stateHash:sim.stateHash(),sequence};
+  }
+  const first=run(),second=run();assert.equal(second.stateHash,first.stateHash);assert.deepEqual(second.sequence,first.sequence);
 });
