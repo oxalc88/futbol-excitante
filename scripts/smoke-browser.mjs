@@ -2,6 +2,7 @@
 // prove the match clock runs, record CPU play, and fail on browser errors.
 import { spawn, execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { connect } from 'node:net';
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 
 const require = createRequire(process.env.PLAYWRIGHT_CORE_DIR ? `${process.env.PLAYWRIGHT_CORE_DIR}/` : import.meta.url);
@@ -11,12 +12,31 @@ const base = `http://127.0.0.1:${port}`;
 const out = 'artifacts/local/smoke';
 mkdirSync(out, { recursive: true });
 
-const server = spawn('npx', ['vite', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'], { stdio: 'ignore' });
-const stop = () => { try { server.kill('SIGTERM'); } catch {} };
+// Fail fast if an old server holds the port: it would serve an old build.
+const portBusy = await new Promise((resolve) => {
+  const sock = connect({ host: '127.0.0.1', port, timeout: 1000 });
+  sock.once('connect', () => { sock.destroy(); resolve(true); });
+  sock.once('timeout', () => { sock.destroy(); resolve(true); });
+  sock.once('error', () => resolve(false));
+});
+if (portBusy) { console.error(`smoke: port ${port} is already in use; stop the old server first`); process.exit(1); }
+
+// detached: the server gets its own process group, so stop() also kills vite's children.
+const server = spawn('npx', ['vite', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'], { stdio: 'ignore', detached: true });
+let stopped = false;
+let serverExit = null;
+server.once('exit', (code) => { serverExit = code; });
+const stop = () => {
+  if (stopped) return;
+  stopped = true;
+  try { process.kill(-server.pid, 'SIGTERM'); } catch { try { server.kill('SIGTERM'); } catch {} }
+};
 process.on('exit', stop);
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { stop(); process.exit(130); });
 
 async function waitForServer() {
   for (let i = 0; i < 60; i++) {
+    if (serverExit !== null) throw new Error(`preview server exited with code ${serverExit}`);
     try { if ((await fetch(base)).ok) return; } catch {}
     await new Promise((r) => setTimeout(r, 500));
   }
