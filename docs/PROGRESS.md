@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-24 17:13 — PR pendiente · Jugadores en silueta con paleta controlada · referencia [#63](https://github.com/oxalc88/futbol-excitante/issues/63)
+- **Qué cambia para el jugador:** los jugadores se distinguen como siluetas claras: equipo local claro (crema), visitante oscuro y saturado (azul) y arqueros con color propio. El cuerpo, la cabeza y el balón tienen un contorno oscuro fino; el balón es lo más brillante. La cancha es más apagada y tiene franjas suaves para que resalten los jugadores y el balón. Todo se lee bien en las tres cámaras. En calidad baja no hay contornos (móvil).
+- **Qué probar:** juega un partido, cambia de cámara con C y compara con las capturas de `docs/evidence/c11/`.
+- **Qué se rompe o cambia:** nada en el partido; la simulación, el saque CPU de 60 ticks y la evaluación no cambian.
+
 ## 2026-10-24 16:37 — [#62](https://github.com/oxalc88/futbol-excitante/pull/62) · Presentación de solo lectura · referencia [#46](https://github.com/oxalc88/futbol-excitante/issues/46)
 - **Qué cambia para el jugador:** nada visible. La cámara, el HUD y el renderizador reciben datos de solo lectura; una prueba comprueba que no cambian el partido, tick a tick y hasta el resultado final.
 - **Qué probar:** ejecuta `npm run typecheck` y `npm test`; cambia entre las tres cámaras y consulta el HUD durante un partido CPU contra CPU.
