@@ -8,7 +8,7 @@ The loop is:
 player problem → smallest playable slice → build → baseline + affected assurance → normal play → materially better? accept : iterate
 ```
 
-All Gauntlet agents, skills, routing, deterministic evals, and contracts live in this repository. NaN endpoint registration/auth remains user-level runtime configuration; the repo only declares which registered model IDs each role uses.
+All Gauntlet agents, skills, routing, deterministic evals, and contracts live in this repository. NaN endpoint registration/auth remains user-level runtime configuration; the repo only declares which registered model IDs each role uses. NaN Builders models are available until 2026-10-30 only; from 2026-10-31 use Codex only (see `AGENTS.md`, "Model selection").
 
 ## Gauntlet system version
 
@@ -173,6 +173,8 @@ The current orchestrator routes are:
 - OpenCode: `grok-4.6`.
 
 OMP has no Grok dependency. Its project adapter uses NaN models only. See `.omp/README.md`.
+
+> **Transition:** NaN Builders models are available until 2026-10-30 only. From 2026-10-31, do not use this NaN configuration. Use Codex only. See "Model selection" in `AGENTS.md`.
 
 ## Product-first planning
 

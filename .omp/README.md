@@ -6,6 +6,8 @@ OMP reads project settings from `.omp/config.yml` in the directory where OMP sta
 
 ## NaN provider
 
+> **Transition:** NaN Builders models are available until 2026-10-30 only. From 2026-10-31, do not use this NaN configuration. Use Codex only. See "Model selection" in `AGENTS.md`.
+
 Do not commit a NaN API key.
 
 OMP custom provider definitions normally live in `~/.omp/agent/models.yml`. Use `models.nan.example.yml` as the repository reference and copy/merge its `nan` provider into your user file.

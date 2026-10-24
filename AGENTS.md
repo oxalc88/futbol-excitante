@@ -48,8 +48,30 @@ Do not skip the architecture boundaries to jump to 11v11, tactics, polished art,
 - After the toolchain exists, use `mise run ...` as the canonical entry.
 - Fast evidence is better than prose: run the tests named by the current bootstrap step or suite.
 
+## Model selection
+
+Select the model by role, not by provider.
+
+| Role | Model |
+|---|---|
+| Coordination, review, hard coding | Codex |
+| Scoped coding | `deepseek-v4-flash` or `glm5.3-flash` |
+| Verification, second opinion | `qwen3.8-flash` or `mimo-v2.6-flash` |
+| Mechanical tasks | `gemma4` or `qwen3.6` |
+
+- The writer and the reviewer must use different models.
+- If a flash model fails verification two times, escalate the task to Codex.
+- Codex default: GPT-6.1 Sol (or the available Sol model) at effort `medium`. Use `high` or `xhigh` only when verification fails or the task is clearly hard. Effort levels: `low`, `medium`, `high`, `xhigh`, `max`.
+
+### Transition on 2026-10-31
+
+- NaN Builders models (through `pi`) are available until 2026-10-30 only.
+- From 2026-10-31, use Codex only. Coding moves to Codex at effort `low` or `medium`. For a second opinion, use a separate Codex session or a different effort level.
+- From 2026-10-31, do not start `pi`, OMP, OpenCode or Grok routes that use NaN models. Do not set `NAN_API_KEY`.
+
 ## Gauntlet roles
 
+- Routes in this section that use NaN models are valid until 2026-10-30 only. From 2026-10-31, see "Model selection".
 - `orchestrator` (Grok 4.6), `orchestrator-deepseek` (DeepSeek Flash), and `orchestrator-glm` (GLM 5.3 Flash) follow the same canonical orchestration contract in `gauntlet/PROMPT.md` and continue the same persisted Gauntlet work. The selected entry point changes the parent orchestrator model, not the workflow.
 - `orchestrator` additionally owns the ≥89% SuperGrok weekly handoff trigger.
 - `builder-structured` implements structured/tooling/contracts/deterministic/evaluator/test objectives. Current route: `deepseek-v4-flash`.

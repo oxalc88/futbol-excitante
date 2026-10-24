@@ -1,3 +1,5 @@
+# Transition: NaN Builders models are available until 2026-10-30 only.
+# From 2026-10-31, do not use this file. Use Codex only (see AGENTS.md, "Model selection").
 providers:
   nan:
     baseUrl: https://api.nan.builders/v1
