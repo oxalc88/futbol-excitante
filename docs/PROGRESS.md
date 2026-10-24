@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-24 15:10 — [#PRNUM](https://github.com/oxalc88/futbol-excitante/pull/PRNUM) · Aviso de tarjeta roja en pantalla · referencia [#29](https://github.com/oxalc88/futbol-excitante/issues/29)
+## 2026-10-24 15:10 — [#60](https://github.com/oxalc88/futbol-excitante/pull/60) · Aviso de tarjeta roja en pantalla · referencia [#29](https://github.com/oxalc88/futbol-excitante/issues/29)
 - **Qué cambia para el jugador:** al mostrarse una tarjeta roja, el aviso en pantalla indica el número, el nombre y el equipo del jugador expulsado. El aviso desaparece después de unos segundos.
 - **Qué probar:** juega un partido con muchas barridas hasta ver una roja y comprueba que el aviso muestra el jugador correcto.
 - **Qué se rompe o cambia:** nada. Las reglas de tarjetas no cambian.
