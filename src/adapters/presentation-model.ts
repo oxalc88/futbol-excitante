@@ -43,7 +43,12 @@ export class CameraRig {
 // Palette
 /** Linear-light value bands: quiet ground, clear teams, and a white ball. */
 export interface Kit { shirt:string; shorts:string; accent:string; pattern:'band'|'plain' }
-export const PALETTE={pitch:['#4c6e57','#50725b'],surround:'#3a5446',stands:['#243438','#29393c'],barrier:'#304145',outline:'#17232b',lines:'#dce3d8',ball:'#ffffff'} as const;
+export const PITCH_PALETTES={
+  viva:{pitch:['#238c35','#29963c'],surround:'#206c32',stands:['#243438','#29393c']},
+  sobria:{pitch:['#4c6e57','#50725b'],surround:'#3a5446',stands:['#243438','#29393c']}
+} as const;
+export type PitchPaletteId=keyof typeof PITCH_PALETTES;
+export const PALETTE={...PITCH_PALETTES.viva,barrier:'#304145',outline:'#17232b',lines:'#dce3d8',ball:'#ffffff'} as const;
 type RGB=[number,number,number];
 const linear=(v:number)=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4;
 const rgb=(color:string):RGB=>[1,3,5].map(i=>linear(parseInt(color.slice(i,i+2),16)/255)) as RGB;

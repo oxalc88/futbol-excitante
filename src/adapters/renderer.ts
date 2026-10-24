@@ -1,17 +1,19 @@
 import * as THREE from 'three';
 import type { Config, DeepReadonly, PlayerState, ReadonlyPresentation, TeamIndex } from '../contracts/types';
-import { CameraRig, contactPose, EMBODIMENT_MAPPING, solveLimb, PALETTE, teamSilhouettes, keeperSilhouette, type Kit, type SilhouetteColors } from './presentation-model';
+import { CameraRig, contactPose, EMBODIMENT_MAPPING, solveLimb, PALETTE, PITCH_PALETTES, type PitchPaletteId, teamSilhouettes, keeperSilhouette, type Kit, type SilhouetteColors } from './presentation-model';
 import { clamp } from '../simulation/math';
 export type { Kit } from './presentation-model';
 interface Actor { contact:THREE.Group; segments:THREE.Mesh[]; root:THREE.Group; body:THREE.Group; arms:THREE.Group[]; legs:THREE.Group[]; ring:THREE.Mesh; label:THREE.Sprite; }
 export class FootballRenderer {
   private scene=new THREE.Scene();private camera=new THREE.PerspectiveCamera(42,1,.1,350);
-  private renderer:THREE.WebGLRenderer;private actors=new Map<string,Actor>();private ball:THREE.Mesh;private ballShadow:THREE.Mesh;
+  private renderer:THREE.WebGLRenderer;private actors=new Map<string,Actor>();private ball:THREE.Mesh;private ballShadow:THREE.Mesh;private ballMarker:THREE.Mesh;
   private environment=new THREE.Group();private radar:CanvasRenderingContext2D;private target=new THREE.Vector3();private cameraReady=false;
   private config:DeepReadonly<Config>;private mode:'broadcast'|'tactical'|'close'='broadcast';private resizeObserver:ResizeObserver;
   private cameraRig=new CameraRig();
   private materials=new Map<string,THREE.MeshToonMaterial>();private outlines:THREE.Mesh[]=[];
   private outlineMaterial=new THREE.MeshBasicMaterial({color:PALETTE.outline,side:THREE.BackSide});
+  private pitchMaterials=PALETTE.pitch.map(color=>new THREE.MeshToonMaterial({color}));
+  private surroundMaterial=new THREE.MeshToonMaterial({color:PALETTE.surround});
   private teams:[SilhouetteColors,SilhouetteColors];private keeper:SilhouetteColors;
   private material(color:string){let m=this.materials.get(color);if(!m){m=new THREE.MeshToonMaterial({color});this.materials.set(color,m);}return m;}
   // Three hulls per player. Reuse each source geometry and one unlit material.
@@ -29,13 +31,15 @@ export class FootballRenderer {
     const sun=new THREE.DirectionalLight('#ffffff',1.7);sun.position.set(-35,65,20);sun.castShadow=true;
     sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-65,right:65,top:48,bottom:-48,near:1,far:160});sun.shadow.camera.updateProjectionMatrix();sun.shadow.bias=-.0005;sun.shadow.normalBias=.03;this.scene.add(sun);
     this.scene.add(this.environment);this.pitch();
-    this.ball=new THREE.Mesh(new THREE.IcosahedronGeometry(config.physics.radius,2),this.material(PALETTE.ball));this.ball.castShadow=true;
-    this.outline(this.ball,1.09);this.scene.add(this.ball);
-    this.ballShadow=new THREE.Mesh(new THREE.CircleGeometry(.18,20),new THREE.MeshBasicMaterial({color:'#102524',transparent:true,opacity:.55,depthWrite:false}));this.ballShadow.rotation.x=-Math.PI/2;this.scene.add(this.ballShadow);
+    this.ball=new THREE.Mesh(new THREE.IcosahedronGeometry(config.physics.radius*1.8,2),new THREE.MeshBasicMaterial({color:PALETTE.ball,toneMapped:false}));this.ball.castShadow=true;
+    const ballHull=new THREE.Mesh(this.ball.geometry,this.outlineMaterial);ballHull.scale.setScalar(1.14);this.ball.add(ballHull);this.scene.add(this.ball);
+    this.ballShadow=new THREE.Mesh(new THREE.CircleGeometry(.21,32),new THREE.MeshBasicMaterial({color:'#07100c',transparent:true,opacity:.85,depthWrite:false}));this.ballShadow.rotation.x=-Math.PI/2;this.scene.add(this.ballShadow);
+    this.ballMarker=new THREE.Mesh(new THREE.RingGeometry(.32,.5,32),new THREE.MeshBasicMaterial({color:'#ffffff',transparent:true,opacity:.9,side:THREE.DoubleSide,depthWrite:false}));this.ballMarker.rotation.x=-Math.PI/2;this.scene.add(this.ballMarker);
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(container);this.resize();
   }
   setCamera(mode:'broadcast'|'tactical'|'close'){this.mode=mode;this.cameraRig.mode=mode;this.cameraReady=false;}
   setQuality(quality:string){this.quality=quality;this.outlines.forEach(o=>o.visible=quality!=='low');this.renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='low'?1:1.8));this.renderer.shadowMap.enabled=quality!=='low';this.resize();}
+  setPitchPalette(id:PitchPaletteId){const palette=PITCH_PALETTES[id];this.pitchMaterials.forEach((m,i)=>m.color.set(palette.pitch[i]));this.surroundMaterial.color.set(palette.surround);}
   setAnimations(value:boolean){this.animations=value;}
   private resize(){const r=this.container.getBoundingClientRect();this.renderer.setSize(r.width,r.height);this.camera.aspect=r.width/Math.max(1,r.height);this.camera.updateProjectionMatrix();}
   private box(w:number,h:number,d:number,color:string,x:number,y:number,z:number,parent:THREE.Object3D=this.environment){
@@ -46,8 +50,8 @@ export class FootballRenderer {
   }
   private pitch(){
     const {length:L,width:W,goalWidth:G,goalHeight:H}=this.config.pitch;
-    this.box(L+34,.5,W+36,PALETTE.surround,0,-.35,0);
-    for(let i=0;i<12;i++)this.box(L/12,.07,W,PALETTE.pitch[i%2],-L/2+(i+.5)*L/12,-.035,0);
+    this.box(L+34,.5,W+36,PALETTE.surround,0,-.35,0).material=this.surroundMaterial;
+    for(let i=0;i<12;i++)this.box(L/12,.07,W,PALETTE.pitch[i%2],-L/2+(i+.5)*L/12,-.035,0).material=this.pitchMaterials[i%2];
     const y=.025;this.line([[-L/2,y,-W/2],[L/2,y,-W/2],[L/2,y,W/2],[-L/2,y,W/2],[-L/2,y,-W/2]]);
     this.line([[0,y,-W/2],[0,y,W/2]]);
     const circle=(x:number,z:number,r:number,start=0,end=Math.PI*2)=>this.line(Array.from({length:81},(_,i)=>[x+Math.cos(start+(end-start)*i/80)*r,y,z+Math.sin(start+(end-start)*i/80)*r]));
@@ -133,9 +137,10 @@ export class FootballRenderer {
     }
     const b=current.ball,pb=previous.ball;this.ball.position.set(THREE.MathUtils.lerp(pb.x,b.x,blend),THREE.MathUtils.lerp(pb.z,b.z,blend),THREE.MathUtils.lerp(pb.y,b.y,blend));
     this.ball.rotation.x=this.cameraRig.rotation.x;this.ball.rotation.z=this.cameraRig.rotation.z;
-    this.ballShadow.position.set(this.ball.position.x,.03,this.ball.position.z);this.ballShadow.scale.setScalar(1+Math.min(b.z,8)*.13);(this.ballShadow.material as THREE.MeshBasicMaterial).opacity=.55/(1+b.z*.2);
+    this.ballShadow.position.set(this.ball.position.x,.03,this.ball.position.z);this.ballShadow.scale.setScalar(1+Math.min(b.z,8)*.13);(this.ballShadow.material as THREE.MeshBasicMaterial).opacity=.85/(1+b.z*.2);
     this.cameraRig.advance(current);const camera=this.cameraRig.pose(this.camera.aspect,blend);
     this.camera.position.set(camera.position.x,camera.position.z,camera.position.y);this.camera.lookAt(camera.target.x,0,camera.target.y);
+    this.ballMarker.position.set(this.ball.position.x,.04,this.ball.position.z);this.ballMarker.scale.setScalar(clamp(this.camera.position.distanceTo(this.ball.position)/45,1,2.2));
     this.renderer.render(this.scene,this.camera);this.drawRadar(current);
   }
   private drawRadar(s:ReadonlyPresentation){
