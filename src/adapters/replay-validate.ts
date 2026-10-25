@@ -16,6 +16,11 @@ export function validateReplayInput(v:unknown):asserts v is InputFrame {
   if(v.power!==undefined)number(v.power,'entrada.power',0,1);
   if(v.switchKeeper!==undefined)choice(v.switchKeeper,[true,false],'entrada.switchKeeper');
   if(v.switchPlayer!==undefined)choice(v.switchPlayer,[true,false],'entrada.switchPlayer');
+  if(v.keeperRush!==undefined)choice(v.keeperRush,[true,false],'entrada.keeperRush');
+  if(v.keeperDrop!==undefined)choice(v.keeperDrop,[true,false],'entrada.keeperDrop');
+  if(v.keeperFeint!==undefined)choice(v.keeperFeint,[true,false],'entrada.keeperFeint');
+  if(v.simulateDive!==undefined)choice(v.simulateDive,[true,false],'entrada.simulateDive');
+  if(v.keeperKick!==undefined)choice(v.keeperKick,['punt','high'],'entrada.keeperKick');
   if(v.tactics!==undefined){object(v.tactics,'entrada.tactics');
     const defaults=['defensiveLine','compactness','pressing','tempo','width','support','buildUp','counterPress','shortPossession','tightMarking','adaptation'];
     for(const [k,n]of Object.entries(v.tactics)){if(k==='formation')choice(n,['4-3-3','4-4-2','3-5-2'],'entrada.tactics.formation');else {if(!defaults.includes(k))invalid(`entrada.tactics.${k}`);number(n,`entrada.tactics.${k}`,0,1);}}
@@ -79,9 +84,11 @@ export function validateCheckpoint(value:unknown):asserts value is World {
     for(const k of ['energy','stability']as const)number(p[k],`jugador ${p.id}.${k}`,0,1);
     for(const k of ['touchCooldown','recovery','travel','heldSince','keeperUntil']as const)number(p[k],`jugador ${p.id}.${k}`,0);
     if(p.manualControl!==undefined)choice(p.manualControl,[true,false],`jugador ${p.id}.manualControl`);
+    if(p.keeperRushing!==undefined)choice(p.keeperRushing,[true,false],`jugador ${p.id}.keeperRushing`);
+    if(p.keeperDropped!==undefined)choice(p.keeperDropped,[true,false],`jugador ${p.id}.keeperDropped`);
     number(p.keeperReaction,`jugador ${p.id}.keeperReaction`);number(p.yellows,`jugador ${p.id}.yellows`,0,2,true);choice(p.keeperMode,['ready','dive','hold','recover'],`jugador ${p.id}.keeperMode`);
     intent(p.intent,`jugador ${p.id}.intent`);number(p.intent.power,`jugador ${p.id}.intent.power`,0,1);
-    if(p.action!==null){object(p.action,'acción');choice(p.action.kind,actions,'acción.kind');for(const k of ['start','contact','end']as const)number(p.action[k],`acción.${k}`,k==='start'?-7:0,Number.MAX_SAFE_INTEGER,true);vector(p.action.aim,'acción.aim');number(p.action.power,'acción.power',0,1);choice(p.action.resolved,[true,false],'acción.resolved');}
+    if(p.action!==null){object(p.action,'acción');choice(p.action.kind,actions,'acción.kind');for(const k of ['start','contact','end']as const)number(p.action[k],`acción.${k}`,k==='start'?-7:0,Number.MAX_SAFE_INTEGER,true);vector(p.action.aim,'acción.aim');number(p.action.power,'acción.power',0,1);choice(p.action.resolved,[true,false],'acción.resolved');if(p.action.keeperKick!==undefined)choice(p.action.keeperKick,['punt','high'],'acción.keeperKick');}
   }
   for(const i of [0,1]as const){if(w.players.filter(p=>p.team===i).length!==c.teamSize)invalid(`cantidad de jugadores del equipo ${i}`);if(w.players.filter(p=>p.team===i&&p.keeper).length!==1)invalid(`cantidad de arqueros del equipo ${i}`);}
   const ref=(id:unknown,path:string,nullable=true)=>{if(!(nullable&&id===null)&&(typeof id!=='string'||!ids.has(id)))invalid(path);};

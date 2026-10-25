@@ -6,7 +6,7 @@
 
 import type { ActionKind } from '../contracts/types';
 
-export type PadContext = 'attack' | 'defense' | 'system';
+export type PadContext = 'attack' | 'defense' | 'system' | 'keeper';
 /** identical: FE has the same control. remapped: FE has another button. missing: FE has no control. */
 export type PadState = 'identical' | 'remapped' | 'missing';
 
@@ -98,6 +98,38 @@ export const PES_2017_PS4_ROWS: readonly PadPresetRow[] = [
   { id: 'pressure', state: 'missing', context: 'defense', pes: 'Pressure', text: '✕ hold', glyphs: ['✕'], button: PS_BUTTON.cross,
     keys: { p1: ['KeyU'], p2: ['Numpad0'] }, shares: ['standingTackle'],
     note: 'Hold ✕. Separate gesture from the tackle double tap. Pressure is a missing mechanic (phase 2), so a hold gives no action.' },
+  // 10 keeper rows (PES table: "Arquero", plus the foul-dive chord row).
+  { id: 'keeperRush', state: 'missing', context: 'keeper', pes: 'Keeper rush out', text: 'Hold △', glyphs: ['△'], button: PS_BUTTON.triangle,
+    keys: { p1: ['KeyL'], p2: ['Numpad3'] }, shares: ['keeperThrowSpace'],
+    note: 'Without the ball. The keeper leaves the goal radius while the key is held. R1 + △ is the sprint rush. C10 control.' },
+  { id: 'keeperRushSprint', state: 'missing', context: 'keeper', pes: 'Keeper rush out in sprint', text: 'R1 + hold △', glyphs: ['R1'], button: PS_BUTTON.r1,
+    keys: { p1: ['ShiftLeft'], p2: ['ShiftRight'] }, shares: ['keeperDropPick'],
+    note: 'Sprint rush: 1.25x goalkeeper speed while △ is held. Keyboard: hold Shift + L / Num 3.' },
+  { id: 'keeperHandThrow', state: 'missing', context: 'keeper', pes: 'Hand throw', text: '✕', glyphs: ['✕'], button: PS_BUTTON.cross,
+    keys: { p1: ['KeyJ'], p2: ['Numpad1'] }, shares: ['keeperFeint'],
+    note: 'With the ball in the hands: low hand throw. Keyboard: J / Num 1.' },
+  { id: 'keeperThrowSpace', state: 'missing', context: 'keeper', pes: 'Hand throw into space', text: '△', glyphs: ['△'], button: PS_BUTTON.triangle,
+    keys: { p1: ['KeyL'], p2: ['Numpad3'] }, shares: ['keeperRush'],
+    note: 'With the ball in the hands: hand throw ahead of the best receiver. Keyboard: L / Num 3.' },
+  { id: 'keeperPunt', state: 'missing', context: 'keeper', pes: 'Volley punt', text: '○ hold', glyphs: ['○'], button: PS_BUTTON.circle,
+    keys: { p1: ['KeyI'], p2: ['Numpad5'] }, shares: ['keeperHighPunt'],
+    note: 'With the ball in the hands: hold to charge power, release to volley with the foot. Keyboard: hold I / Num 5.' },
+  { id: 'keeperHighPunt', state: 'missing', context: 'keeper', pes: 'High volley punt', text: 'R2 + ○ hold', glyphs: ['○'], button: PS_BUTTON.circle,
+    keys: { p1: ['KeyG'], p2: ['Numpad6'] }, shares: ['keeperPunt'],
+    note: 'R2 raises the punt: higher apex and longer flight. Keyboard: hold G / Num 6 + hold I / Num 5.' },
+  { id: 'keeperDropPick', state: 'missing', context: 'keeper', pes: 'Put down / pick up the ball', text: 'R1 + left stick released', glyphs: ['R1'], button: PS_BUTTON.r1,
+    keys: { p1: ['ShiftLeft'], p2: ['ShiftRight'] }, shares: ['keeperRushSprint'],
+    note: 'While holding: put the ball down at the feet. Without the ball and inside the own box: pick it up. Keyboard: Shift with the movement keys released.' },
+  { id: 'keeperRun', state: 'missing', context: 'keeper', pes: 'Run with the ball', text: 'Left stick (+ R1 sprint)', glyphs: [], button: null,
+    keys: { p1: ['KeyW', 'KeyS', 'KeyA', 'KeyD'], p2: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'] },
+    shares: [], axis: 'left', note: 'With the ball in the hands: goalkeeper speed inside the own penalty area. R1 sprints at 1.25x.' },
+  { id: 'keeperFeint', state: 'missing', context: 'keeper', pes: 'Keeper pass feint', text: '✕ before release', glyphs: ['✕'], button: PS_BUTTON.cross,
+    keys: { p1: ['KeyJ'], p2: ['Numpad1'] }, shares: ['keeperHandThrow'],
+    note: 'While a throw or kick charge is held, press ✕ before the release: no ball leaves the hands. Keyboard: J / Num 1.' },
+  // Foul dive chord (PES table row "Simular falta", decided without R2).
+  { id: 'simulateDive', state: 'missing', context: 'attack', pes: 'Simulate foul (dive)', text: 'L1 + L2 + L3 + R3 (no R2)', glyphs: ['L3'], button: PS_BUTTON.l3,
+    keys: { p1: ['KeyF'], p2: ['Numpad4'] }, shares: [],
+    note: 'All four held in the same sample, R2 not held: the selected player falls. No foul and no card. Keyboard: F / Num 4.' },
 ];
 
 export interface PadPreset { name: string; source: string; rows: readonly PadPresetRow[] }
@@ -147,10 +179,18 @@ export interface KeyRole {
   sprint?: boolean;
   /** Press edge changes the controlled player. */
   switchPlayer?: boolean;
+  /** Held by the keeper cursor without the ball: run out to the ball. */
+  keeperRush?: boolean;
+  /** Held by the keeper cursor with the ball: charge the volley punt. */
+  keeperKick?: boolean;
+  /** Held with the kick key: raise the volley punt to the high punt. */
+  keeperHigh?: boolean;
+  /** Press edge: the selected player falls (foul dive). */
+  simulateDive?: boolean;
 }
 
 /** Engine action role of each row. Rows without a role need no key action. */
-const KEY_ROLE: Readonly<Record<string, Pick<KeyRole, 'attack' | 'defense' | 'sprint' | 'switchPlayer'>>> = {
+const KEY_ROLE: Readonly<Record<string, Pick<KeyRole, 'attack' | 'defense' | 'sprint' | 'switchPlayer' | 'keeperRush' | 'keeperKick' | 'keeperHigh' | 'simulateDive'>>> = {
   pass: { attack: 'pass' },
   through: { attack: 'through' },
   cross: { attack: 'cross' },
@@ -164,6 +204,10 @@ const KEY_ROLE: Readonly<Record<string, Pick<KeyRole, 'attack' | 'defense' | 'sp
   standingTackle: { defense: 'tackle' },
   slide: { defense: 'slide' },
   clearance: { defense: 'shoot' },
+  keeperRush: { keeperRush: true },
+  keeperPunt: { keeperKick: true },
+  keeperHighPunt: { keeperHigh: true },
+  simulateDive: { simulateDive: true },
 };
 
 function keyboardRoles(player: 'p1' | 'p2'): Record<string, KeyRole> {
@@ -181,7 +225,8 @@ function keyboardRoles(player: 'p1' | 'p2'): Record<string, KeyRole> {
 }
 
 /** KeyboardEvent.code roles per player, derived from the preset rows.
- * L1 (switch key) plus ○ (cross key) plays the lob. */
+ * L1 (switch key) plus ○ (cross key) plays the lob. The keeper rows add the
+ * run-out key (△), the punt charge (○ with the high modifier G) and the foul-dive key. */
 export const KEYBOARD_MAP: Record<'p1' | 'p2', Readonly<Record<string, KeyRole>>> = {
   p1: keyboardRoles('p1'),
   p2: keyboardRoles('p2'),

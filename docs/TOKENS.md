@@ -48,5 +48,10 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-25 | #76 Model roles and docs-only CI | Codex CLI | review | gpt-6.1-sol | medium | 1 | 81,348 | 16,881 | 1,160 | ~/.codex/sessions (wt-model-roles) |
 | 2026-10-25 | pad-smoke flaky fix | pi | write | nan/mimo-v2.6-flash | default | 1 | 16,471 | 5,208 | 1,151 | ~/.pi/agent/sessions (wt-padflaky) |
 | 2026-10-25 | pad-smoke flaky fix | Codex CLI | review | gpt-6.1-sol | medium | 1 | 95,612 | 25,657 | 512 | ~/.codex/sessions (wt-padflaky) |
+| 2026-10-25 | Keeper controls | pi | write | nan/mimo-v2.6-flash | default | 6 | 31,239,710 | 1,052,593 | 460,525 | ~/.pi/agent/sessions (wt-keeper) |
+| 2026-10-25 | Keeper controls | Codex CLI | review | gpt-6.1-sol | medium | 6 | 2,638,956 | 311,288 | 14,708 | ~/.codex/sessions (wt-keeper) |
+| 2026-10-25 | Keeper e2e (#79) | pi | write | nan/mimo-v2.6-flash | default | 3 | 1,635,976 | 285,838 | 83,194 | ~/.pi/agent/sessions (wt-keeper) |
+| 2026-10-25 | Keeper e2e (#79) | pi | write | nan/glm5.3-flash | default | 1 | 66,328 | 20,863 | 14,233 | ~/.pi/agent/sessions (wt-keeper) |
+| 2026-10-25 | Keeper e2e (#79) | Codex CLI | review | gpt-6.1-sol | medium | 1 | 151,099 | 30,637 | 1,038 | ~/.codex/sessions (wt-keeper) |
 
-Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty values at 03:16 Lima; PS4 pad preset values at 03:08 Lima; C7 part 3 values at 07:21 Lima; #76 values at 08:10 Lima; pad-smoke fix (#78) values at 08:33 Lima (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
+Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty values at 03:16 Lima; PS4 pad preset values at 03:08 Lima; C7 part 3 values at 07:21 Lima; #76 values at 08:10 Lima; pad-smoke fix (#78) values at 08:33 Lima; keeper controls values at 11:33 Lima; keeper e2e values at 13:30 Lima (two mimo sessions gave no code, one hung 27 min; glm wrote the script) (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.

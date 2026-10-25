@@ -17,6 +17,9 @@ const ACCELERATION_SCALE=3.0;
 // Extra turn rate above a 90-degree heading error; 0 at 90 degrees, +REVERSAL_TURN_BOOST at 180 degrees.
 // Part 3 changes only this scale (1.9 -> 3.0). It sets the sprint ramp and the 180-degree velocity reversal.
 const REVERSAL_TURN_BOOST=2.6;
+// A keeper counts as out of the goal radius with this extra distance in meters.
+// The clamp lands on the border, and rounding can place him a nanometer outside it.
+const GOAL_RADIUS_EPSILON=1e-9;
 
 export class Simulation {
   private world: World;
@@ -44,7 +47,7 @@ export class Simulation {
   stateHash(){return hash(this.world);}
   presentation():Presentation {
     const w=this.world;
-    return clone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players.map(({manualControl,...player})=>player),events:w.events,teams:w.teams.map(t=>({id:t.id,name:t.name,shortName:t.shortName,direction:t.direction,tactics:t.tactics})) as Presentation['teams']});
+    return clone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players.map(({manualControl,...player})=>player),events:w.events,carrier:w.carrier,keeperHold:w.keeperHold,teams:w.teams.map(t=>({id:t.id,name:t.name,shortName:t.shortName,direction:t.direction,tactics:t.tactics})) as Presentation['teams']});
   }
   applyInputs(frames:readonly InputFrame[]){
     const w=this.world, incoming:InputFrame[]=[];
@@ -52,6 +55,8 @@ export class Simulation {
       if(!Number.isInteger(f.tick)||f.tick<w.tick||f.tick>w.tick+600||![0,1].includes(f.slot)) throw new Error('Invalid input tick or control slot');
       for(const v of [f.move?.x,f.move?.y,f.aim?.x,f.aim?.y,f.power??.5]) if(!Number.isFinite(v)) throw new Error('Non-finite input');
       if(f.action&&!ACTIONS.includes(f.action))throw new Error('Unknown action');
+      for(const k of ['keeperRush','keeperDrop','keeperFeint','simulateDive']as const)if(f[k]!==undefined&&typeof f[k]!=='boolean')throw new Error('Invalid keeper input flag');
+      if(f.keeperKick!==undefined&&!['punt','high'].includes(f.keeperKick))throw new Error('Unknown keeper kick');
       if(w.inputs.some(q=>q.tick===f.tick&&q.slot===f.slot)||incoming.some(q=>q.tick===f.tick&&q.slot===f.slot))throw new Error('Duplicate input frame');
       if(f.tactics) for(const [k,v]of Object.entries(f.tactics)){if(!(k in w.teams[f.slot].tactics)|| (k==='formation'?!['4-3-3','4-4-2','3-5-2'].includes(String(v)):typeof v!=='number'||!Number.isFinite(v)||v<0||v>1))throw new Error('Invalid tactical command');}
       incoming.push({...clone(f),move:length(f.move)>1?unit(f.move):clone(f.move),aim:length(f.aim)>1?unit(f.aim):clone(f.aim),power:clamp(f.power??.5,0,1)});
@@ -80,7 +85,7 @@ export class Simulation {
     if(!taker)throw new Error('Restart requires an outfield player');
     w.restart={kind,team,point:clone(point),taker:taker.id,remaining:c.human[team]?c.rules.humanRestartTicks:c.rules.restartTicks};
     w.ball={x:point.x,y:point.y,z:c.physics.radius,vx:0,vy:0,vz:0,spin:{x:0,y:0,z:0},lastTouch:null,freeTicks:0,flight:'loose'};
-    for(const p of w.players){p.vx=p.vy=0;p.action=null;p.intent=idle();p.touchCooldown=0;p.keeperMode='ready';
+    for(const p of w.players){p.vx=p.vy=0;p.action=null;p.intent=idle();p.touchCooldown=0;p.keeperMode='ready';delete p.keeperRushing;delete p.keeperDropped;
       if(p.id!==taker.id&&!p.keeper&&distance(p,point)<5){const u=unit(delta(point,p));p.x=clamp(point.x+(u.x||-w.teams[team].direction)*6,-c.pitch.length/2+1,c.pitch.length/2-1);p.y=clamp(point.y+(u.y||.5)*6,-c.pitch.width/2+1,c.pitch.width/2-1);}
     }
     taker.x=point.x-w.teams[team].direction*.5;taker.y=point.y;taker.heading=w.teams[team].direction===1?0:Math.PI;
@@ -122,10 +127,10 @@ export class Simulation {
       const previous=this.player(w.selected[f.slot]);
       const keeper=w.players.find(p=>p.team===f.slot&&p.keeper&&!p.sentOff);
       w.selected[f.slot]=previous?.keeper?this.closestOutfield(f.slot):keeper?.id??this.closestOutfield(f.slot);
-      if(previous?.keeper){delete previous.manualControl;previous.intent=decidePlayer(w,previous);if(w.keeperHold?.playerId===previous.id)this.scheduleKeeperRelease(previous);}
+      if(previous?.keeper){delete previous.manualControl;delete previous.keeperRushing;previous.intent=decidePlayer(w,previous);if(w.keeperHold?.playerId===previous.id)this.scheduleKeeperRelease(previous);}
       if(keeper&&w.selected[f.slot]===keeper.id){keeper.manualControl=true;keeper.action=null;keeper.intent=idle();}
       this.emit('control-switched',this.player(w.selected[f.slot]),f.slot);
-    }if(f.switchPlayer){const previous=this.player(w.selected[f.slot]);if(previous?.keeper)delete previous.manualControl;if(previous?.keeper&&w.keeperHold?.playerId===previous.id)this.scheduleKeeperRelease(previous);w.selected[f.slot]=this.closestOutfield(f.slot);if(previous?.keeper)previous.intent=decidePlayer(w,previous);this.emit('control-switched',this.player(w.selected[f.slot]),f.slot);}}
+    }if(f.switchPlayer){const previous=this.player(w.selected[f.slot]);if(previous?.keeper)delete previous.manualControl;if(previous?.keeper)delete previous.keeperRushing;if(previous?.keeper&&w.keeperHold?.playerId===previous.id)this.scheduleKeeperRelease(previous);w.selected[f.slot]=this.closestOutfield(f.slot);if(previous?.keeper)previous.intent=decidePlayer(w,previous);this.emit('control-switched',this.player(w.selected[f.slot]),f.slot);}}
     if(w.phase==='fulltime'){w.tick++;return this.result();}
     if(w.phase==='goal'||w.phase==='halftime'){
       w.countdown--;
@@ -158,6 +163,13 @@ export class Simulation {
       const carrier=this.player(w.carrier);if(carrier&&carrier.team===slot&&!carrier.keeper&&!(this.player(w.selected[slot])?.manualControl)&&w.selected[slot]!==carrier.id){w.selected[slot]=carrier.id;this.emit('control-switched',carrier,slot);}
       let p=this.player(w.selected[slot]);if(p?.sentOff){w.selected[slot]=this.closestOutfield(slot);p=this.player(w.selected[slot]);}if(!p)continue;
       const f=frames.find(f=>f.slot===slot);if(f&&(length(f.move)>.1||f.action))this.emit('input-intent',p,slot,{inputTick:f.tick,action:f.action??null,move:f.move});p.intent=f?{move:f.move,aim:f.aim,sprint:f.sprint,shield:f.shield,action:f.action,power:f.power??.5}:idle();
+      // Foul dive (PES row: L1+L2+L3+R3 without R2): the selected player falls
+      // without foul and without card. Keeper mode changes only for the keeper.
+      if(f?.simulateDive&&p.recovery===0){
+        p.recovery=c.goalkeeper.recoveryTicks;
+        if(p.keeper){p.keeperMode='recover';p.keeperUntil=w.tick+c.goalkeeper.recoveryTicks;}
+        this.emit('simulate-dive',p,slot);
+      }
       if(this.humanKeeper(p)){
         // Defer manual high claims, feints, and keeper actions outside the goal arc.
         if(p.keeperMode==='dive'&&w.tick>=p.keeperUntil){p.keeperMode='recover';p.recovery=c.goalkeeper.recoveryTicks;p.keeperUntil=w.tick+c.goalkeeper.recoveryTicks;}
@@ -166,8 +178,47 @@ export class Simulation {
           p.vx+=f.aim.x*c.goalkeeper.speed;p.vy+=f.aim.y*c.goalkeeper.speed;
           this.emit('keeper-dive',p,slot,{aim:f.aim});
         }
-        p.intent.action=w.keeperHold?.playerId===p.id&&['pass','shoot'].includes(f?.action??'')?f!.action:undefined;
-        if(f?.sprint&&!w.keeperHold)p.intent.move=unit(delta(p,w.ball));
+        // Pass feint: the held kick never releases. A feint also cancels the
+        // wind-up that the pass key already started (hand throw, kick or punt
+        // from the hands), so the throw pressed a few ticks earlier never leaves
+        // the hands. A resolved contact keeps its recovery.
+        // The feint never restarts the hold timer. Only the first feint in a row
+        // delays the auto-release by one tick, so the eight-second limit still ends the hold.
+        if(f?.keeperFeint&&w.keeperHold?.playerId===p.id){
+          if(w.keeperHold.feintTick!==w.tick-1)w.keeperHold.feintTick=w.tick;
+          if(p.action&&!p.action.resolved)p.action=null;
+          this.emit('keeper-feint',p,slot);
+        }
+        // Run out to the ball without the ball; R1 adds the sprint rush speed.
+        const rush=!!f?.keeperRush&&!w.keeperHold;
+        if(rush){p.intent.move=unit(delta(p,w.ball));if(p.keeperRushing!==true){p.keeperRushing=true;this.emit('keeper-rush',p,slot);}}
+        else if(p.keeperRushing!==undefined)delete p.keeperRushing;
+        // R1 with the stick released: put the held ball down at the feet, or pick
+        // up a low ball inside the own penalty area.
+        if(f?.keeperDrop&&w.keeperHold?.playerId===p.id&&p.recovery===0){
+          w.keeperHold=null;p.keeperMode='ready';p.action=null;p.keeperDropped=true;
+          const b=w.ball;b.x=p.x+Math.cos(p.heading)*.5;b.y=p.y+Math.sin(p.heading)*.5;b.z=c.physics.radius;b.vx=b.vy=b.vz=0;b.spin={x:0,y:0,z:0};b.flight='loose';
+          this.emit('keeper-put-down',p,slot);
+        }else if(f?.keeperDrop&&!w.keeperHold&&p.recovery===0&&distance(p,w.ball)<c.goalkeeper.reach&&w.ball.z<1.1&&inPenaltyArea(w,p.team,w.ball)&&this.canPickUp(p)&&!this.checkOffside(p)&&!this.checkDoubleTouch(p)){
+          w.keeperHold={playerId:p.id,since:w.tick};p.keeperMode='hold';p.action=null;
+          const b=w.ball;b.x=p.x;b.y=p.y;b.z=.8;b.vx=b.vy=b.vz=0;
+          // The pick-up is a hand touch, the same path as a keeper claim. It sets
+          // the last touch and it resolves the pending pass and the restart.
+          this.touch(p,'hand');delete p.keeperDropped;
+          this.emit('keeper-pick-up',p,slot);
+        }
+        // Volley punt from the hands: wind up, the kick releases at contact.
+        if(w.keeperHold?.playerId===p.id&&f?.keeperKick&&!p.action&&p.recovery===0){
+          const aim=length(f.aim)>.15?unit(f.aim):{x:w.teams[p.team].direction,y:.15};
+          p.action={kind:'cross',start:w.tick,contact:w.tick+c.actions.preparationTicks,end:w.tick+c.actions.preparationTicks+c.actions.recoveryTicks,aim,power:f.power??.5,resolved:false,keeperKick:f.keeperKick};
+          this.emit('action-start',p,p.team,{kind:'cross',intentTick:w.tick,contactTick:p.action.contact,recoveryTick:p.action.end,aim});
+        }
+        // With the ball in the hands the keys throw the ball. Without the hold
+        // the same keys are normal foot actions of the keeper: pass, through,
+        // cross, lob and shoot.
+        const heldByKeeper=w.keeperHold?.playerId===p.id;
+        const allowed=!w.keeperHold?['pass','through','cross','lob','shoot']:heldByKeeper?['pass','through','shoot']:[];
+        p.intent.action=allowed.includes(f?.action??'')?f!.action:undefined;
       }
     }
     for(const p of w.players){
@@ -214,9 +265,12 @@ export class Simulation {
     const w=this.world,c=w.config,dt=c.dt;
     for(const p of w.players){
       if(p.sentOff)continue;
-      if(w.keeperHold?.playerId===p.id){p.vx=p.vy=0;continue;}
+      // Only a non-human holder stays frozen; the human keeper runs with the ball.
+      if(w.keeperHold?.playerId===p.id&&!this.humanKeeper(p)){p.vx=p.vy=0;continue;}
       const a=p.capabilities;let input=p.intent.move; if(p.recovery>0||p.keeperMode==='recover'||p.action?.kind==='slide')input={x:0,y:0};
-      const speedLimit=p.keeper?c.goalkeeper.speed*(p.keeperMode==='recover'?.1:1):a.speed*(p.intent.sprint?1:c.movement.jog)*(.65+.35*p.energy)*(p.intent.shield ? .73 : 1);
+      // Sprint boost only for a human keeper: the rush key or the run with the ball.
+      const gkSprint=p.keeper===true&&this.humanKeeper(p)===true&&p.intent.sprint===true&&(p.keeperRushing===true||w.keeperHold?.playerId===p.id);
+      const speedLimit=p.keeper?c.goalkeeper.speed*(p.keeperMode==='recover'?.1:1)*(gkSprint?1.25:1):a.speed*(p.intent.sprint?1:c.movement.jog)*(.65+.35*p.energy)*(p.intent.shield ? .73 : 1);
       const desired={x:input.x*speedLimit,y:input.y*speedLimit};
       if(length(input)>.1){const wanted=Math.atan2(input.y,input.x),turn=angleDelta(p.heading,wanted);const turnRate=a.turnRate*(1+REVERSAL_TURN_BOOST*Math.max(0,Math.abs(turn)-Math.PI/2)/(Math.PI/2));p.heading+=clamp(turn,-turnRate*dt,turnRate*dt);p.heading=Math.atan2(Math.sin(p.heading),Math.cos(p.heading));}
       const speed=Math.hypot(p.vx,p.vy),turn=length(input)>.1&&speed>.1?Math.abs(angleDelta(Math.atan2(p.vy,p.vx),Math.atan2(input.y,input.x))):0;
@@ -224,9 +278,44 @@ export class Simulation {
       const change={x:desired.x*targetScale-p.vx,y:desired.y*targetScale-p.vy},amount=length(change);
       const rate=(length(input)<.1?a.braking:a.acceleration*ACCELERATION_SCALE)*(p.action&&!p.action.resolved ? .7 : 1)*dt;
       const ratio=amount>rate?rate/amount:1;p.vx+=change.x*ratio;p.vy+=change.y*ratio;
+      // The human keeper checks his place before he moves. Out of the goal radius,
+      // with no run-out and no ball at his feet, he drops the outward part of his
+      // velocity. So he walks back to the goal and he never runs farther from it.
+      // A position snap never moves him.
+      let outsideRadius=false;
+      if(this.humanKeeper(p)&&w.keeperHold?.playerId!==p.id){
+        const goal={x:-w.teams[p.team].direction*c.pitch.length/2,y:0};
+        outsideRadius=distance(p,goal)>c.goalkeeper.radius+GOAL_RADIUS_EPSILON;
+        const atFeet=p.keeperDropped===true&&w.ball.z<1.1&&distance(p,w.ball)<=c.goalkeeper.reach;
+        if(outsideRadius&&p.keeperRushing!==true&&!atFeet){
+          const u=unit(delta(goal,p)),outward=p.vx*u.x+p.vy*u.y;
+          if(outward>0){p.vx-=u.x*outward;p.vy-=u.y*outward;}
+        }
+      }
       const dx=p.vx*dt,dy=p.vy*dt;p.x=clamp(p.x+dx,-c.pitch.length/2+.3,c.pitch.length/2-.3);p.y=clamp(p.y+dy,-c.pitch.width/2+.3,c.pitch.width/2-.3);p.travel+=Math.hypot(dx,dy);
       if(w.events.some(e=>e.type==='input-intent'&&e.playerId===p.id)&&(amount>1e-6||Math.abs(turn)>1e-6))this.emit('kinematic-response',p,p.team,{inputTick:w.tick,velocity:{x:p.vx,y:p.vy},heading:p.heading});
-      if(p.keeper&&(!c.human[p.team]||this.humanKeeper(p))){const goal={x:-w.teams[p.team].direction*c.pitch.length/2,y:0};const d=distance(p,goal);if(d>c.goalkeeper.radius){const u=unit(delta(goal,p));p.x=goal.x+u.x*c.goalkeeper.radius;p.y=u.y*c.goalkeeper.radius;}p.y=clamp(p.y,-c.goalkeeper.lateral,c.goalkeeper.lateral);}
+      if(p.keeper&&(!c.human[p.team]||this.humanKeeper(p))){
+        if(w.keeperHold?.playerId===p.id){
+          // Run with the ball: the holder stays inside the own penalty area
+          // (the same box as inPenaltyArea in rules.ts).
+          const dir=w.teams[p.team].direction,goal=-dir*c.pitch.length/2;
+          p.x=clamp(p.x,Math.min(goal,goal+dir*16.5),Math.max(goal,goal+dir*16.5));p.y=clamp(p.y,-20.16,20.16);
+        }else{
+          const goal={x:-w.teams[p.team].direction*c.pitch.length/2,y:0};const d=distance(p,goal);
+          // The rush may leave the goal radius clamp until the run-out ends.
+          // A human keeper keeps his place with the ball at his feet as well.
+          // The keeperDropped flag marks the ball that he put down. A CPU
+          // keeper keeps the clamp unchanged.
+          const withBall=this.humanKeeper(p)===true&&p.keeperDropped===true&&w.ball.z<1.1&&distance(p,w.ball)<=c.goalkeeper.reach;
+          // A human keeper who is already out of the radius never returns with a
+          // snap. The velocity strip above holds his place. He walks back with the
+          // stick.
+          if(d>c.goalkeeper.radius&&p.keeperRushing!==true&&!withBall&&!outsideRadius){const u=unit(delta(goal,p));p.x=goal.x+u.x*c.goalkeeper.radius;p.y=u.y*c.goalkeeper.radius;}
+        }
+        // The lateral clamp moves a keeper too. It waits until the human keeper is
+        // back inside the goal radius. Every other keeper keeps the clamp.
+        if(!outsideRadius)p.y=clamp(p.y,-c.goalkeeper.lateral,c.goalkeeper.lateral);
+      }
       p.energy=clamp(p.energy+(p.intent.sprint&&speed>3?-c.movement.sprintDrain/(.6+a.stamina):c.movement.recoveryRate)*dt,.1,1);
     }
   }
@@ -244,6 +333,14 @@ export class Simulation {
       if(overlap>1e-5)this.emit('body-contact',a,a.team,{other:b.id,point:{x:(a.x+b.x)/2,y:(a.y+b.y)/2}});
     }
     w.players.forEach((p,i)=>{if(!p.keeper&&!p.sentOff){p.x=clamp(p.x+corrections[i].x,-w.config.pitch.length/2+.3,w.config.pitch.length/2-.3);p.y=clamp(p.y+corrections[i].y,-w.config.pitch.width/2+.3,w.config.pitch.width/2-.3);}});
+  }
+  /** Hand legality of a manual pick-up. It is the same rule as a normal claim. */
+  private canPickUp(p:PlayerState){
+    const w=this.world;
+    if(canUseHands(w,p))return true;
+    // One exception: he put the ball down and no other player touched it after.
+    const last=w.ball.lastTouch;
+    return p.keeperDropped===true&&last!==null&&last!==undefined&&last.playerId===p.id;
   }
   private checkDoubleTouch(p:PlayerState){
     const w=this.world;if(w.restartRestriction?.taker!==p.id)return false;
@@ -314,10 +411,15 @@ export class Simulation {
     if(a.kind==='cross'||a.kind==='lob'){speed=(a.kind==='lob'?12:14)+a.power*12;vz=6+a.power*5;}
     if(a.kind==='shoot'){speed=p.capabilities.power*(.6+a.power*.5);vz=1.2+a.power*3.3;}
     if(isHeader){const challenge=w.players.filter(q=>!q.sentOff&&q.team!==p.team&&distance(q,p)<1.2).length;speed=(13+a.power*9)*(.8+.2*p.capabilities.heading)*(1-challenge*.12)*( .8+.2*p.stability);vz=-1.3;}
+    // Keeper volley punts from the hands: the high punt flies higher and farther.
+    if(a.keeperKick==='punt'){speed=20+a.power*8;vz=6+a.power*4;}
+    if(a.keeperKick==='high'){speed=22+a.power*8;vz=9+a.power*5;}
     b.vx=Math.cos(ang)*speed;b.vy=Math.sin(ang)*speed;b.vz=vz;
-    b.spin={x:0,y:0,z:(a.kind==='cross'?7:2)*p.capabilities.curve*(p.foot==='left'?-1:1)};
-    this.touch(p,handRelease&&(!this.humanKeeper(p)||a.kind!=='shoot')?'hand':isHeader?'head':'foot');b.flight=['shoot','header'].includes(a.kind)?'shot':'pass';p.touchCooldown=c.actions.touchTicks+8;
+    b.spin={x:0,y:0,z:a.keeperKick?0:(a.kind==='cross'?7:2)*p.capabilities.curve*(p.foot==='left'?-1:1)};
+    this.touch(p,handRelease&&!a.keeperKick&&(!this.humanKeeper(p)||a.kind!=='shoot')?'hand':isHeader?'head':'foot');b.flight=['shoot','header'].includes(a.kind)?'shot':'pass';p.touchCooldown=c.actions.touchTicks+8;
     this.emit(a.kind==='through'?'through-pass':a.kind,p,p.team,{velocity:{x:b.vx,y:b.vy,z:b.vz},power:a.power});
+    if(a.keeperKick)this.emit('keeper-punt',p,p.team,{high:a.keeperKick==='high'});
+    else if(handRelease&&this.humanKeeper(p)&&(a.kind==='pass'||a.kind==='through'))this.emit('keeper-throw',p,p.team,{kind:a.kind});
     if(['shoot','header'].includes(a.kind)){
       w.stats[p.team].shots++;const goalX=w.teams[p.team].direction*c.pitch.length/2,time=(goalX-b.x)/b.vx;
       const y=b.y+b.vy*time,z=b.z+b.vz*time-.5*c.physics.gravity*time*time;
@@ -343,12 +445,19 @@ export class Simulation {
     if(w.pendingPass&&p.id!==w.pendingPass.playerId){if(p.team===w.pendingPass.team){w.stats[p.team].completed++;this.emit('pass-completed',p,p.team);}else this.emit('interception',p,p.team);w.pendingPass=null;}
     if(w.offside&&w.offside.team!==p.team&&deliberate)w.offside=null;
     if(w.restartRestriction&&w.restartRestriction.taker!==p.id)w.restartRestriction=null;
+    // A foot kick or foot touch of the keeper ends the ball that he put down
+    // himself. Every touch by another player ends it as well.
+    for(const q of w.players)if(q.keeperDropped===true&&(q.id!==p.id||surface==='foot'))delete q.keeperDropped;
     b.lastTouch={id:contact.id,tick:w.tick,playerId:p.id,team:p.team,surface,point:{x:b.x,y:b.y,z:b.z}};b.freeTicks=0;
   }
   private integrateBall(){
     const w=this.world,c=w.config,b=w.ball,dt=c.dt/c.physics.substeps,r=c.physics.radius;
     b.freeTicks++;
-    if(w.keeperHold){const p=this.player(w.keeperHold.playerId)!;if(w.tick-w.keeperHold.since>=Math.round(8/c.dt)){this.emit('keeper-time-limit',p,p.team);this.startRestart('corner',other(p.team),{x:-w.teams[p.team].direction*c.pitch.length/2,y:(p.y>=0?1:-1)*c.pitch.width/2});}return;}
+    if(w.keeperHold){const p=this.player(w.keeperHold.playerId)!;
+      // The human holder keeps the ball in the hands at the keeper position.
+      if(this.humanKeeper(p)){b.x=p.x;b.y=p.y;}
+      // The eight-second limit ends the hold. A feint delays the end by one tick.
+      if(w.tick-w.keeperHold.since>=Math.round(8/c.dt)&&w.keeperHold.feintTick!==w.tick){this.emit('keeper-time-limit',p,p.team);this.startRestart('corner',other(p.team),{x:-w.teams[p.team].direction*c.pitch.length/2,y:(p.y>=0?1:-1)*c.pitch.width/2});}return;}
     for(let i=0;i<c.physics.substeps&&w.phase==='playing';i++){
       const prev={x:b.x,y:b.y,z:b.z};
       const speed=Math.hypot(b.vx,b.vy);const grounded=b.z<=r+.001&&Math.abs(b.vz)<.25;

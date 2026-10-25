@@ -10,7 +10,7 @@ import { isFulltime, rematchSetup } from './fulltime-flow';
 import type { Config, InputFrame, Presentation, Replay, TeamProfile, World } from '../contracts/types';
 import { Simulation } from '../simulation/engine';
 import { createConfig } from '../simulation/config';
-import { BrowserInput } from '../adapters/input';
+import { BrowserInput, defendingFlags } from '../adapters/input';
 import { FootballRenderer, type Kit } from '../adapters/renderer';
 import { makeTeam, TEAM_CATALOG, validateTeam } from '../adapters/data';
 import { Recorder, parseReplay, replaySimulation } from '../adapters/replay';
@@ -27,7 +27,7 @@ app.innerHTML=`
   <div id="announcement" role="status" aria-live="polite"></div>
   <div class="field-toolbar"><button id="pause-btn" title="Pausar (P)">Ⅱ <span>Pausa</span></button><button id="camera-btn" title="Cambiar cámara (C)">◈ <span>Cámara</span></button><button id="stats-btn">▥ <span>Estadísticas</span></button><button id="sound-btn" aria-pressed="false">♪ <span>Sonido</span></button><label>Volumen <input id="sound-volume" type="range" min="0" max="1" step="0.05" aria-label="Volumen del partido" /></label><button id="fullscreen-btn" title="Pantalla completa">⛶</button></div>
   <div id="pause-overlay" hidden><strong>PAUSA</strong><button id="resume-btn" class="primary">Seguir jugando</button></div>
-  <div class="bottom-hud"><div class="player-card"><span class="eyebrow">CONTROLAS A</span><strong id="player-name">—</strong><div class="energy"><span id="energy-bar"></span></div><span id="player-trait">—</span><div class="power" id="power-meter" hidden><span id="power-bar"></span></div></div><canvas id="radar" width="252" height="162" aria-label="Radar con posiciones de jugadores y balón"></canvas><div class="input-hint"><span id="pad-status">TECLADO · JUGADOR 1</span><p><kbd>W A S D</kbd> mover · <kbd>J</kbd> pase<br><kbd>K</kbd> tiro · <kbd>Q</kbd> cambiar</p></div></div>
+  <div class="bottom-hud"><div class="player-card"><span class="eyebrow">CONTROLAS A</span><strong id="player-name">—</strong><div class="energy"><span id="energy-bar"></span></div><span id="player-trait">—</span><div class="power" id="power-meter" hidden><span id="power-bar"></span></div></div><canvas id="radar" width="252" height="162" aria-label="Radar con posiciones de jugadores y balón"></canvas><div class="input-hint"><span id="pad-status">TECLADO · JUGADOR 1</span><p><kbd>W A S D</kbd> mover · <kbd>J</kbd> pase<br><kbd>K</kbd> tiro · <kbd>Q</kbd> cambiar<br><kbd>R</kbd> arquero · <kbd>L</kbd> sale △ · <kbd>I</kbd> volea ○</p></div></div>
   <div class="touch-controls"><div id="joystick" aria-label="Joystick táctil"><div id="stick"></div></div><div class="touch-buttons"><button data-action="cross">Centro</button><button data-action="lob">Elevado</button><button data-action="header">Cabeza</button><button data-action="slide">Barrida</button><button id="touch-shield">Proteger</button><button data-action="through">Filtrado</button><button id="touch-sprint">Correr</button><button data-action="tackle">Entrada</button><button data-action="pass">Pase</button><button id="touch-shoot" class="shoot">Tiro</button><button id="touch-switch">Cambiar</button><button id="touch-keeper">Arquero</button></div></div>
  </section>
  <footer><span id="footer-match">ATLÉTICO COSTA <i>vs</i> DEPORTIVO SIERRA</span><span id="footer-size">11 contra 11 · Equipos ficticios</span><button id="help-btn">Controles</button></footer>
@@ -41,7 +41,7 @@ app.innerHTML=`
 <details class="tactics"><summary>Plan de juego y opciones</summary><div class="setup-grid"><label>Formación local<select id="formation"><option>4-3-3</option><option>4-4-2</option><option>3-5-2</option></select></label><label>Presión<input id="pressing" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Amplitud<input id="width" type="range" min="0" max="1" step="0.05" value="0.7" /></label><label>Ritmo<input id="tempo" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Contra presión<input id="counterPress" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Pases cortos<input id="shortPossession" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Marcaje estrecho<input id="tightMarking" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Adaptación CPU<input id="adaptation" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Línea defensiva<input id="defensiveLine" type="range" min="0" max="1" step="0.05" value="0.52" /></label><label>Compactación<input id="compactness" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Apoyo<input id="support" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Controles táctiles<select id="touch-option"><option value="auto">Automático</option><option value="show">Mostrar</option><option value="hide">Ocultar</option></select></label><label>Gráficos<select id="quality"><option value="high">Normal</option><option value="low">Ligero</option></select></label><label>Paleta de cancha<select id="pitch-palette"><option value="viva">Viva</option><option value="sobria">Sobria</option></select></label><label>Equipo JSON<input id="roster-file" type="file" accept="application/json,.json" /></label></div><p id="roster-status">Opcional: importa un equipo ficticio propio para el lado local.</p><button type="button" id="export-roster" class="quiet">Descargar equipo de ejemplo</button></details>
 <p id="setup-error" class="error" role="alert"></p><button id="start-btn" class="primary wide" type="submit">Jugar partido <span>→</span></button><div class="secondary-actions"><button type="button" id="menu-help-btn">Controles</button><button type="button" id="show-tips-btn">Ver consejos</button><button type="button" id="online-btn" hidden disabled>Online — próxima etapa</button><button type="button" id="load-replay">Cargar repetición</button></div><p class="fine-print">Física y reglas experimentales inspiradas en la visión del proyecto.</p></form></dialog>
 <dialog id="tips-dialog"><div class="dialog-top"><span class="eyebrow">PRIMER PARTIDO</span><button type="button" class="close" data-close="tips-dialog" aria-label="Cerrar">×</button></div><h2>Consejos para empezar</h2><ul class="tips-list"><li><b>Teclado:</b> <kbd>W A S D</kbd> para mover, <kbd>J</kbd> pase, <kbd>K</kbd> tiro y <kbd>Q</kbd> para cambiar.</li><li><b>Mando:</b> sticks para mover y apuntar, <kbd>✕</kbd> para pasar y <kbd>□</kbd> para tirar.</li><li><b>Táctil:</b> mueve el stick de la izquierda y toca los botones de acción.</li><li><b>Pausa:</b> pulsa <kbd>P</kbd> o <kbd>Esc</kbd> para pausar el partido.</li></ul><button type="button" id="tips-close" data-close="tips-dialog" class="primary wide">Entendido</button></dialog>
-<dialog id="help-dialog"><div class="dialog-top"><span class="eyebrow">TODO EMPIEZA CON UN PASE</span><button class="close" data-close="help-dialog" aria-label="Cerrar">×</button></div><h2>Controles</h2><div class="table-scroll"><table><thead><tr><th>Acción</th><th>Jugador 1</th><th>Jugador 2</th><th>Mando (PS4)</th></tr></thead><tbody><tr><td>Mover / apuntar</td><td>W A S D</td><td>Flechas</td><td>Stick izquierdo · derecho para apuntar</td></tr><tr><td>Pase corto</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Pase alto / centro</td><td>I</td><td>Num 5</td><td>○</td></tr><tr><td>Tiro (mantener y soltar)</td><td>K</td><td>Num 2</td><td>□</td></tr><tr><td>Pase filtrado</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Pase elevado</td><td>Q + I</td><td>Enter + Num 5</td><td>L1 + ○</td></tr><tr><td>Cambio de frente</td><td>WASD hacia la otra banda + I</td><td>Flechas hacia la otra banda + Num 5</td><td>Stick izq. a la otra banda + ○</td></tr><tr><td>Correr</td><td>Shift izquierdo</td><td>Shift derecho</td><td>R1</td></tr><tr><td>Cambiar jugador</td><td>Q</td><td>Enter</td><td>L1</td></tr><tr><td>Entrada de pie</td><td>U ×2</td><td>Num 0 ×2</td><td>✕ ✕ (doble toque)</td></tr><tr><td>Presión (mantener) · próximamente</td><td>U (mantener)</td><td>Num 0 (mantener)</td><td>✕ mantener</td></tr><tr><td>Entrada deslizante (sin balón)</td><td>B</td><td>Num 7</td><td>○</td></tr><tr><td>Despeje (sin balón)</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cabezazo (balón a la altura de la cabeza)</td><td>K o J</td><td>Num 2 o Num 1</td><td>□ o pase</td></tr><tr><td>Proteger balón</td><td>Automático</td><td>Automático</td><td>Automático (sin botón)</td></tr><tr><td>Controlar portero / volver</td><td>R</td><td>Num 8</td><td>R3</td></tr><tr><td>Portero: lanzarse</td><td>U</td><td>Num 0</td><td>✕</td></tr><tr><td>Portero: salir (correr)</td><td>Shift izquierdo</td><td>Shift derecho</td><td>R1</td></tr><tr><td>Portero: pase / saque con la mano</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Portero: saque con el pie</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cámara</td><td>C</td><td>C</td><td>Touchpad (clic)</td></tr><tr><td>Pausa</td><td>P / Esc</td><td>P / Esc</td><td>OPTIONS</td></tr></tbody></table></div><p>Con el balón: <kbd>✕</kbd> pase, <kbd>○</kbd> centro, <kbd>□</kbd> tiro, <kbd>△</kbd> filtrado. Sin balón: <kbd>✕</kbd> entrada, <kbd>○</kbd> barrida, <kbd>□</kbd> despeje. Mantener <kbd>✕</kbd> será la presión, todavía sin acción en FE (próximamente). Apunta con el movimiento antes de pasar o disparar. Los jugadores aceleran y giran con inercia. Los saques se ejecutan automáticamente.</p><p>Conecta hasta dos mandos y pulsa un botón para activarlos. Se admiten mandos que el navegador reconozca con mapeo estándar.</p><p><kbd>P / Esc</kbd> pausa · <kbd>C</kbd> o clic en el touchpad: cámara. En pantalla táctil, mueve el stick y toca las acciones.</p><button data-close="help-dialog" class="primary wide">Entendido</button></dialog>
+<dialog id="help-dialog"><div class="dialog-top"><span class="eyebrow">TODO EMPIEZA CON UN PASE</span><button class="close" data-close="help-dialog" aria-label="Cerrar">×</button></div><h2>Controles</h2><div class="table-scroll"><table><thead><tr><th>Acción</th><th>Jugador 1</th><th>Jugador 2</th><th>Mando (PS4)</th></tr></thead><tbody><tr><td>Mover / apuntar</td><td>W A S D</td><td>Flechas</td><td>Stick izquierdo · derecho para apuntar</td></tr><tr><td>Pase corto</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Pase alto / centro</td><td>I</td><td>Num 5</td><td>○</td></tr><tr><td>Tiro (mantener y soltar)</td><td>K</td><td>Num 2</td><td>□</td></tr><tr><td>Pase filtrado</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Pase elevado</td><td>Q + I</td><td>Enter + Num 5</td><td>L1 + ○</td></tr><tr><td>Cambio de frente</td><td>WASD hacia la otra banda + I</td><td>Flechas hacia la otra banda + Num 5</td><td>Stick izq. a la otra banda + ○</td></tr><tr><td>Correr</td><td>Shift izquierdo</td><td>Shift derecho</td><td>R1</td></tr><tr><td>Cambiar jugador</td><td>Q</td><td>Enter</td><td>L1</td></tr><tr><td>Entrada de pie</td><td>U ×2</td><td>Num 0 ×2</td><td>✕ ✕ (doble toque)</td></tr><tr><td>Presión (mantener) · próximamente</td><td>U (mantener)</td><td>Num 0 (mantener)</td><td>✕ mantener</td></tr><tr><td>Entrada deslizante (sin balón)</td><td>B</td><td>Num 7</td><td>○</td></tr><tr><td>Despeje (sin balón)</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cabezazo (balón a la altura de la cabeza)</td><td>K o J</td><td>Num 2 o Num 1</td><td>□ o pase</td></tr><tr><td>Proteger balón</td><td>Automático</td><td>Automático</td><td>Automático (sin botón)</td></tr><tr><td>Controlar portero / volver</td><td>R</td><td>Num 8</td><td>R3</td></tr><tr><td>Portero: lanzarse</td><td>U</td><td>Num 0</td><td>✕</td></tr><tr><td>Portero: salir (mantener)</td><td>L (mantener)</td><td>Num 3 (mantener)</td><td>△ (mantener)</td></tr><tr><td>Portero: salir en sprint</td><td>Shift izq. + L</td><td>Shift der. + Num 3</td><td>R1 + △</td></tr><tr><td>Portero: saque con la mano al espacio</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Portero: saque de volea</td><td>I (mantener y soltar)</td><td>Num 5 (mantener y soltar)</td><td>○</td></tr><tr><td>Portero: volea alta</td><td>G + I</td><td>Num 6 + Num 5</td><td>R2 + ○</td></tr><tr><td>Portero: soltar / recoger el balón</td><td>Shift (stick centrado)</td><td>Shift der. (stick centrado)</td><td>R1 + stick centrado</td></tr><tr><td>Portero: correr con el balón</td><td>W A S D (Shift = sprint)</td><td>Flechas (Shift der.)</td><td>Stick izq. (R1)</td></tr><tr><td>Portero: amago de pase</td><td>J antes de soltar</td><td>Num 1 antes de soltar</td><td>✕ antes de soltar</td></tr><tr><td>Simular falta (caer)</td><td>F</td><td>Num 4</td><td>L1 + L2 + L3 + R3 (sin R2)</td></tr><tr><td>Portero: pase / saque con la mano</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Portero: saque con el pie</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cámara</td><td>C</td><td>C</td><td>Touchpad (clic)</td></tr><tr><td>Pausa</td><td>P / Esc</td><td>P / Esc</td><td>OPTIONS</td></tr></tbody></table></div><p>Con el balón: <kbd>✕</kbd> pase, <kbd>○</kbd> centro, <kbd>□</kbd> tiro, <kbd>△</kbd> filtrado. Sin balón: <kbd>✕</kbd> entrada, <kbd>○</kbd> barrida, <kbd>□</kbd> despeje. Mantener <kbd>✕</kbd> será la presión, todavía sin acción en FE (próximamente). Apunta con el movimiento antes de pasar o disparar. Los jugadores aceleran y giran con inercia. Los saques se ejecutan automáticamente.</p><p>Conecta hasta dos mandos y pulsa un botón para activarlos. Se admiten mandos que el navegador reconozca con mapeo estándar.</p><p><kbd>P / Esc</kbd> pausa · <kbd>C</kbd> o clic en el touchpad: cámara. En pantalla táctil, mueve el stick y toca las acciones.</p><button data-close="help-dialog" class="primary wide">Entendido</button></dialog>
 <dialog id="stats-dialog"><div class="dialog-top"><span class="eyebrow" id="stats-label">EL PARTIDO EN NÚMEROS</span><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button><button id="rematch" hidden>Revancha</button><button id="new-match">Nuevo partido</button></div></dialog>
 <dialog id="online-dialog"><div class="dialog-top"><span class="eyebrow">CONEXIÓN ENTRE AMIGOS</span><button class="close" data-close="online-dialog" aria-label="Cerrar">×</button></div><h2>Online experimental</h2><p>El anfitrión simula el partido. Intercambia estos códigos por el medio que prefieras; no se envían automáticamente.</p><label>Servidor STUN (opcional)<input id="stun-url" placeholder="stun:tu-servidor:3478" /></label><p class="fine-print">Sin STUN funciona en redes que permiten una ruta directa. Algunas redes necesitan TURN, que este prototipo no configura.</p><label>Código recibido<textarea id="remote-code" rows="4" placeholder="Pega la invitación o la respuesta de tu amigo"></textarea></label><div class="secondary-actions"><button id="create-offer">1. Crear invitación</button><button id="create-answer">2. Responder invitación</button><button id="accept-answer">3. Aceptar respuesta</button></div><label>Tu código<textarea id="local-code" rows="4" readonly></textarea></label><button id="copy-code">Copiar código</button><p id="network-status" role="status">Esperando conexión.</p><p class="fine-print">Al conectar, el anfitrión inicia un partido de 6 minutos. El invitado controla al visitante. No hay predicción ni compensación de latencia.</p></dialog>
 <input id="replay-file" type="file" accept="application/json,.json" hidden />`;
@@ -139,9 +139,10 @@ function updateHud(){
   const s=current;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
 }
-// A team defends while the ball has no touch of that team. A restart resets the
-// last touch, so the taker uses the attack keys. With no touch yet both teams attack.
-function defendingFlags(s:Presentation):[boolean,boolean]{const owner=s.ball.lastTouch?s.ball.lastTouch.team:null;return [owner!==null&&owner!==0,owner!==null&&owner!==1];}
+// A team defends while the ball has no touch of that team. The classification
+// lives with the input layer: defendingFlags in adapters/input.ts. The selected
+// carrier of a team, the keeper with the ball at his feet after a put-down, never
+// defends with his own team.
 // Header context of each team, next to defending. Engine limits
 // (simulation/engine.ts requestAction): a kick needs distance <= actions.reach + 1.1
 // and, above 1.15 m, only a header can kick, up to actions.headerHeight. The 1.15 m
@@ -157,6 +158,12 @@ function aerialFlags(s:Presentation,c:Config):[boolean,boolean]{
 // fires one press instead of the tackle double tap.
 function keeperFlags(s:Presentation):[boolean,boolean]{
   const flag=(slot:0|1)=>{const id=s.selected[slot];return !!s.players.find(p=>p.id===id)?.keeper;};
+  return [flag(0),flag(1)];
+}
+// Hold of each team: the selected keeper holds the ball in the hands, so the
+// keeper row uses throws and kicks instead of the dive.
+function keeperHoldFlags(s:Presentation):[boolean,boolean]{
+  const flag=(slot:0|1)=>!!s.keeperHold&&s.selected[slot]===s.keeperHold.playerId;
   return [flag(0),flag(1)];
 }
 function showStats(){const s=current;
@@ -209,8 +216,9 @@ peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.ti
 // Detached read-only evidence at the browser boundary. No engine access is exposed.
 let inputEvidence:InputFrame[]=[];
 const shotEvidence={actions:[0,0],events:[0,0],power:[0,0]};
+const keeperEvidence={punts:[0,0],highPunts:[0,0],throws:[0,0]};
 let browserFrames=0;
-Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
+Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},keeper:{punts:[...keeperEvidence.punts],highPunts:[...keeperEvidence.highPunts],throws:[...keeperEvidence.throws]},keeperHold:current.keeperHold?{playerId:current.keeperHold.playerId}:null,ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,keeper:p.keeper,keeperRushing:p.keeperRushing===true,keeperDropped:p.keeperDropped===true,keeperMode:p.keeperMode,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
 // Smoke only: exists only when navigator.webdriver is true. It is not a game feature. The recorder replay is not valid after this call.
 if(navigator.webdriver)Object.defineProperty(window,'__feSmoke',{configurable:false,enumerable:false,value:{ballAtFeet(slot:0|1){
   if(!started||guest||replay||current.phase!=='playing')return false;
@@ -229,6 +237,73 @@ if(navigator.webdriver)Object.defineProperty(window,'__feSmoke',{configurable:fa
     const ux=d>0?dx/d:(q.team===0?1:-1),uy=d>0?dy/d:0;
     q.x=Math.max(-limitX,Math.min(limitX,w.ball.x+ux*12));
     q.y=Math.max(-limitY,Math.min(limitY,w.ball.y+uy*12));
+    q.vx=0;q.vy=0;q.action=null;
+  }
+  w.pendingPass=null;
+  w.restartRestriction=null;
+  sim.restore(w);
+  previous=current=sim.presentation();
+  return true;
+},
+// Smoke only: puts the slot keeper in control with the ball in the hands.
+keeperHold(slot:0|1){
+  if(!started||guest||replay||current.phase!=='playing')return false;
+  const w=sim.snapshot();
+  const keeper=w.players.find(p=>p.keeper&&p.team===slot);
+  if(!keeper)return false;
+  w.selected[slot]=keeper.id;keeper.manualControl=true;
+  keeper.action=null;keeper.recovery=0;keeper.keeperMode='hold';
+  w.keeperHold={playerId:keeper.id,since:w.tick};
+  w.ball.x=keeper.x;w.ball.y=keeper.y;w.ball.z=.8;
+  w.ball.vx=0;w.ball.vy=0;w.ball.vz=0;w.ball.spin={x:0,y:0,z:0};
+  const limitX=config.pitch.length/2,limitY=config.pitch.width/2;
+  for(const q of w.players){
+    if(q.team===slot)continue;
+    const dx=q.x-w.ball.x,dy=q.y-w.ball.y,d=Math.hypot(dx,dy);
+    if(d>=12)continue;
+    const ux=d>0?dx/d:(q.team===0?1:-1),uy=d>0?dy/d:0;
+    q.x=Math.max(-limitX,Math.min(limitX,w.ball.x+ux*12));
+    q.y=Math.max(-limitY,Math.min(limitY,w.ball.y+uy*12));
+    q.vx=0;q.vy=0;q.action=null;
+  }
+  w.pendingPass=null;
+  w.restartRestriction=null;
+  sim.restore(w);
+  previous=current=sim.presentation();
+  return true;
+},
+// Smoke only: a one-on-one drill: the slot keeper faces the nearest attacker.
+oneOnOne(slot:0|1){
+  if(!started||guest||replay||current.phase!=='playing')return false;
+  const w=sim.snapshot();
+  const keeper=w.players.find(p=>p.keeper&&p.team===slot);
+  if(!keeper)return false;
+  w.selected[slot]=keeper.id;keeper.manualControl=true;
+  keeper.action=null;keeper.recovery=0;keeper.keeperMode='ready';
+  keeper.vx=0;keeper.vy=0;
+  w.keeperHold=null;
+  const rest=config.physics.radius;
+  w.ball.x=keeper.x-Math.sign(keeper.x)*16;w.ball.y=keeper.y;w.ball.z=rest;
+  w.ball.vx=0;w.ball.vy=0;w.ball.vz=0;w.ball.spin={x:0,y:0,z:0};
+  const awayX=w.ball.x-keeper.x,awayY=w.ball.y-keeper.y,away=Math.hypot(awayX,awayY);
+  const ax=away>0?awayX/away:(slot===0?1:-1),ay=away>0?awayY/away:0;
+  let attacker:typeof keeper|null=null,best=Infinity;
+  for(const q of w.players){
+    if(q.keeper||q.team===slot)continue;
+    const d=Math.hypot(q.x-w.ball.x,q.y-w.ball.y);
+    if(d<best){best=d;attacker=q;}
+  }
+  if(!attacker)return false;
+  attacker.x=w.ball.x+ax;attacker.y=w.ball.y+ay;
+  attacker.vx=0;attacker.vy=0;attacker.action=null;
+  const limitX=config.pitch.length/2,limitY=config.pitch.width/2;
+  for(const q of w.players){
+    if(q===keeper||q===attacker)continue;
+    const dx=q.x-w.ball.x,dy=q.y-w.ball.y,d=Math.hypot(dx,dy);
+    if(d>=20)continue;
+    const ux=d>0?dx/d:(q.team===0?1:-1),uy=d>0?dy/d:0;
+    q.x=Math.max(-limitX,Math.min(limitX,w.ball.x+ux*20));
+    q.y=Math.max(-limitY,Math.min(limitY,w.ball.y+uy*20));
     q.vx=0;q.vy=0;q.action=null;
   }
   w.pendingPass=null;
@@ -270,6 +345,8 @@ function loop(now:number){
   input.setAerial(guest?[aerial[1],aerial[0]]:aerial);
   const keeper=keeperFlags(current);
   input.setKeeper(guest?[keeper[1],keeper[0]]:keeper);
+  const keeperHolding=keeperHoldFlags(current);
+  input.setKeeperHold(guest?[keeperHolding[1],keeperHolding[0]]:keeperHolding);
   if(started&&!document.querySelector('dialog[open]')){
     if(input.pauseRequested())pause(!paused);
     if(input.cameraRequested())changeCamera();
@@ -285,7 +362,11 @@ function loop(now:number){
         inputEvidence=structuredClone(frames);
         for(const f of frames)if(f.action==='shoot'){shotEvidence.actions[f.slot]++;shotEvidence.power[f.slot]=f.power??0;}
         sim.applyInputs(frames);if(!replay)record.record(frames);previous=current;sim.step();current=sim.presentation();renderer?.advanceCamera(current);
-        for(const e of current.events)if(e.type==='shoot'&&e.team!==undefined)shotEvidence.events[e.team]++;
+        for(const e of current.events){
+          if(e.type==='shoot'&&e.team!==undefined)shotEvidence.events[e.team]++;
+          if(e.type==='keeper-punt'&&e.team!==undefined){keeperEvidence.punts[e.team]++;if(e.data?.high===true)keeperEvidence.highPunts[e.team]++;}
+          if(e.type==='keeper-throw'&&e.team!==undefined)keeperEvidence.throws[e.team]++;
+        }
         const card=cardAlert(current.events,current);
         const alert=current.events.find(e=>['advantage','advantage-recalled','keeper-time-limit'].includes(e.type));
         if(card){notice=card;noticeUntil=current.tick+CARD_ALERT_TICKS;}

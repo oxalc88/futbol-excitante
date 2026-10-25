@@ -204,6 +204,30 @@ try {
   await wait(n => window.__fe.shots.actions[0]===n+1,touch.shots.actions[0]);
   await ticks(12); check((await snapshot()).shots.actions[0]===touch.shots.actions[0]+1,'Touch shot repeated');
   await evidence(6,{coverage:'Emulated touch shot tap only; real iPhone testing is pending.'});
+  stage='keeper punt';
+  // 7: The keeper hook holds the ball. R2 + ○ is the high punt: one event,
+  // counted once as a punt and never repeated.
+  await wait(() => ['kickoff','playing'].includes(window.__fe.phase));
+  if ((await snapshot()).phase==='kickoff') {
+    await button(0,0,true); await button(1,0,true);
+    await wait(() => window.__fe.phase==='playing');
+    await button(0,0,false); await button(1,0,false);
+  }
+  check(await page.evaluate(() => window.__feSmoke.keeperHold(0)),'Keeper smoke hook failed');
+  const keeperState=await snapshot();
+  const keeperPlayer=keeperState.players.find(p=>p.id===keeperState.selected[0]);
+  check(keeperPlayer&&keeperPlayer.keeper,'Slot 0 keeper not selected');
+  const keeperBefore=keeperState.keeper;
+  await button(0,7,true); await ticks();
+  await button(0,1,true); await ticks(2); await button(0,1,false);
+  await wait(n => window.__fe.keeper.highPunts[0]===n+1, keeperBefore.highPunts[0]);
+  await ticks(18);
+  const keeperAfter=await snapshot();
+  check(keeperAfter.keeper.highPunts[0]===keeperBefore.highPunts[0]+1,'Duplicate high punt');
+  check(keeperAfter.keeper.punts[0]===keeperBefore.punts[0]+1,'High punt must count once as a punt');
+  check(keeperAfter.keeper.throws[0]===keeperBefore.throws[0],'Keeper throw fired without a pass');
+  await button(0,7,false); await ticks();
+  await evidence(7,{punts:keeperAfter.keeper.punts[0],highPunts:keeperAfter.keeper.highPunts[0],throws:keeperAfter.keeper.throws[0]});
 } catch (e) { errors.push(`fatal (${stage}): ${e.message}`);
   try { results.push({shotSetup,failureState:await activePage?.evaluate(() => window.__fe)}); } catch {}
 }

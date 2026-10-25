@@ -3,7 +3,8 @@ import { clamp, length, unit } from '../simulation/math';
 import { PS_BUTTON, pesButton, TACKLE_TAP_TICKS } from '../browser/pad-presets';
 
 export interface PadReading { index:number; id:string; mapping:string; connected:boolean; axes:readonly number[]; buttons:readonly {pressed:boolean}[] }
-export interface PadFrame { move:Vec2; aim?:Vec2; action?:ActionKind; power:number; sprint:boolean; shield:boolean; switchPlayer:boolean; switchKeeper:boolean }
+export interface PadFrame { move:Vec2; aim?:Vec2; action?:ActionKind; power:number; sprint:boolean; shield:boolean; switchPlayer:boolean; switchKeeper:boolean;
+  keeperRush?:boolean; keeperKick?:'punt'|'high'; keeperDrop?:boolean; keeperFeint?:boolean; simulateDive?:boolean }
 const identity=(p:PadReading)=>`${p.index}:${p.id}`;
 const neutral=():PadFrame=>({move:{x:0,y:0},power:.55,sprint:false,shield:false,switchPlayer:false,switchKeeper:false});
 // Buttons of the PES 2017 PS4 preset. The preset is the default pad mapping.
@@ -15,19 +16,24 @@ const B={
   clearance:pesButton('clearance'),pause:pesButton('pause'),camera:pesButton('camera'),
   // R3 keeps the keeper switch; there is no preset row for it.
   keeper:PS_BUTTON.r3,
+  // Foul-dive chord buttons (L1 + L2 + L3 + R3, R2 decides against the dive).
+  l2:PS_BUTTON.l2,r2:PS_BUTTON.r2,l3:PS_BUTTON.l3,
 };
 export class ControllerMapper {
   private slots:(string|null)[]=[null,null];
   private previous:boolean[][]=[[],[]];
   private charge=[0,0];
   private armed=[false,false];
+  // Charge of the keeper volley punt (○) per slot, while the ball is held.
+  private punt=[0,0];
+  private puntArmed=[true,true];
   private lastTick=[-1,-1];
   private cached:PadFrame[]=[neutral(),neutral()];
   private starts=new Map<string,boolean>();
   private cameraStarts=new Map<string,boolean>();
   // Tick of the last defending ✕ tap, or -1 when no tackle is armed.
   private tackleTap=[-1,-1];
-  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];}
+  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];}
   assignments(){return [...this.slots];}
   /** One press edge of a system button per pad. Disconnected pads forget their edge. */
   private startEdge(pads:readonly PadReading[],button:number,starts:Map<string,boolean>){
@@ -45,10 +51,12 @@ export class ControllerMapper {
    * header row replaces the kick buttons.
    * keeper: the slot controls the goalkeeper, so one press of the tackle button
    * dives. The outfield player keeps the double tap. The keeper row wins over
-   * the header row, so a press at head height still dives. */
-  sample(pads:readonly PadReading[],tick:number,slot:TeamIndex,defending=false,aerial=false,keeper=false):PadFrame {
+   * the header row, so a press at head height still dives.
+   * hold: the keeper of the slot holds the ball in the hands, so the keeper row
+   * uses the throw and kick gestures instead of the dive and the pressure. */
+  sample(pads:readonly PadReading[],tick:number,slot:TeamIndex,defending=false,aerial=false,keeper=false,hold=false):PadFrame {
     const connected=pads.filter(p=>p.connected&&p.mapping==='standard');
-    for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.lastTick[i]=-1;this.tackleTap[i]=-1;}
+    for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.punt[i]=0;this.puntArmed[i]=true;this.lastTick[i]=-1;this.tackleTap[i]=-1;}
     for(const p of connected){const id=identity(p);if(!this.slots.includes(id)){const i=this.slots.indexOf(null);if(i>=0){this.slots[i]=id;this.previous[i]=p.buttons.map(b=>b.pressed);this.armed[i]=!p.buttons[B.shot]?.pressed;}}}
     const p=connected.find(p=>identity(p)===this.slots[slot]);if(!p)return neutral();
     if(this.lastTick[slot]===tick)return structuredClone(this.cached[slot]);
@@ -58,20 +66,42 @@ export class ControllerMapper {
     f.move={x:dead(p.axes[0]??0),y:dead(p.axes[1]??0)};if(length(f.move)>1)f.move=unit(f.move);
     const right={x:dead(p.axes[2]??0),y:dead(p.axes[3]??0)};if(length(right)>.1)f.aim=unit(right);
     const edge=(i:number)=>!!pressed[i]&&!prev[i],held=(i:number)=>!!pressed[i];
+    // Foul dive: all four chord buttons held in this sample and R2 not held, on the edge.
+    const chordCore=held(B.switchPlayer)&&held(B.l2)&&held(B.l3)&&held(B.keeper);
+    const chord=chordCore&&!held(B.r2);
+    const prevChord=!!prev[B.switchPlayer]&&!!prev[B.l2]&&!!prev[B.l3]&&!!prev[B.keeper]&&!prev[B.r2];
+    if(chord&&!prevChord)f.simulateDive=true;
+    // The keeper volley punt charges on a held ○ while the ball is held. The pass
+    // feint spends the charge, so the release gives no kick.
+    if(hold&&keeper&&held(B.cross)&&this.puntArmed[slot])this.punt[slot]=Math.min(1,this.punt[slot]+1/51);
+    else if(!held(B.cross)){if(prev[B.cross]&&this.puntArmed[slot]&&this.punt[slot]>0&&hold&&keeper){f.keeperKick=held(B.r2)?'high':'punt';f.power=Math.max(.15,this.punt[slot]);}this.punt[slot]=0;this.puntArmed[slot]=true;}
+    // The kick or throw charge that a ✕ press can feint: the ○ punt charge, the
+    // □ kick charge, or any other pass button held down (△ throw into space and
+    // the ○ high pass). The ✕ button is the feint key itself, so its own hold
+    // never counts: an edge of ✕ while ✕ is held cannot exist, and counting it
+    // would stop every hand throw.
+    const passHeld=held(B.through)||held(B.cross);
+    const kickChargeHeld=hold&&keeper&&(passHeld||this.punt[slot]>0||(held(B.shot)&&this.armed[slot]&&this.charge[slot]>0));
+    if(hold&&keeper&&kickChargeHeld&&edge(B.pass)){
+      f.keeperFeint=true;
+      // Drop both charges: the pending ○ and □ releases give no ball release.
+      this.charge[slot]=0;this.armed[slot]=false;this.punt[slot]=0;this.puntArmed[slot]=false;
+    }
     // With the ball: ✕ pass, ○ cross (L1 + ○ lob), △ through, □ shot charge.
     // Without the ball: hold ✕ is pressure, ✕ ×2 is the tackle, ○ is the slide
     // and □ charges the clearance.
     // The goalkeeper row wins over the header row: with the cursor on the keeper
     // one ✕ press dives even at head height. Outside defense and the aerial band
-    // the keeper keeps the attack keys, as before.
-    const dive=keeper&&(defending||aerial);
+    // the keeper keeps the attack keys, as before. The holder of the ball uses
+    // the attack keys in every context: ✕ throws, △ throws into space.
+    const dive=keeper&&(defending||aerial)&&!hold;
     if(dive){
       this.tackleTap[slot]=-1;
       if(edge(B.tackle))f.action='tackle';
       if(edge(B.cross))f.action='slide';
       // A □ press spent at head height never becomes a shot release.
       if(aerial&&edge(B.shot))this.armed[slot]=false;
-    }else if(aerial){
+    }else if(aerial&&!hold){
       // Header row: □, ✕, △ and ○ head the ball instead of their kick.
       // The double tap never arms in the air and □ skips its shot charge.
       this.tackleTap[slot]=-1;
@@ -79,28 +109,37 @@ export class ControllerMapper {
       // The header spends the □ press: disarm the shot until □ is up, so the
       // release never fires a shot.
       if(edge(B.shot))this.armed[slot]=false;
-    }else if(defending){
+    }else if(defending&&!hold){
       // Pressure is a missing mechanic (phase 2), so the first tap only arms the
       // tackle and the second tap inside the window fires it.
       if(edge(B.tackle)){if(this.tackleTap[slot]>=0&&tick-this.tackleTap[slot]<=TACKLE_TAP_TICKS){f.action='tackle';this.tackleTap[slot]=-1;}else this.tackleTap[slot]=tick;}
       if(edge(B.cross))f.action='slide';
     }else{
       this.tackleTap[slot]=-1;
-      if(edge(B.pass))f.action='pass';
-      if(edge(B.cross))f.action=held(B.switchPlayer)?'lob':'cross';
-      if(edge(B.through))f.action='through';
+      if(edge(B.pass)&&!f.keeperFeint)f.action='pass';
+      // While the ball is in the hands ○ is the punt charge, never a cross.
+      if(edge(B.cross)&&!hold)f.action=held(B.switchPlayer)?'lob':'cross';
+      // A feint in this sample wins over the △ edge of the same sample.
+      if(edge(B.through)&&!f.keeperFeint)f.action='through';
     }
     // At head height □ heads at once and never charges. Otherwise □ charges in
     // both contexts: shot with the ball, clearance without it. A press spent on a
     // header stays disarmed until the release, so the release gives no shot and
-    // the next press charges again.
-    if(aerial){this.charge[slot]=0;if(!held(B.shot))this.armed[slot]=true;}
+    // the next press charges again. The holder of the ball keeps the charge at
+    // head height, because the kick never heads.
+    if(aerial&&!hold){this.charge[slot]=0;if(!held(B.shot))this.armed[slot]=true;}
     else if(held(B.shot)&&this.armed[slot])this.charge[slot]=Math.min(1,this.charge[slot]+1/51);
     else if(!held(B.shot)){if(prev[B.shot]&&this.armed[slot]){f.action='shoot';f.power=Math.max(.15,this.charge[slot]);}this.charge[slot]=0;this.armed[slot]=true;}
     f.sprint=held(B.sprint);
     // Shield is automatic on contact: the preset has no shield button.
-    f.switchPlayer=edge(B.switchPlayer)&&!held(B.pass)&&!held(B.cross);
-    f.switchKeeper=edge(B.keeper);
+    // R1 with the stick released puts the held ball down or picks a low ball up.
+    // R1 + △ is the sprint rush chord, so it never drops the ball.
+    if(keeper&&edge(B.sprint)&&length(f.move)<.1&&!held(B.through))f.keeperDrop=true;
+    // Hold △ without the ball: run out to the ball; R1 adds the sprint rush.
+    if(keeper&&!hold&&held(B.through))f.keeperRush=true;
+    // The chord never switches cursor or player in the same sample.
+    f.switchPlayer=edge(B.switchPlayer)&&!held(B.pass)&&!held(B.cross)&&!chordCore;
+    f.switchKeeper=edge(B.keeper)&&!chordCore;
     this.previous[slot]=pressed;this.lastTick[slot]=tick;this.cached[slot]=f;return structuredClone(f);
   }
 }

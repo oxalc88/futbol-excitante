@@ -16,6 +16,12 @@ test('stored reference verifies without changing its engine version or final has
   assert.equal(result.verified,true);
   assert.equal(result.sim.stateHash(),r.finalHash);
 });
+test('the stored engine-v4 reference is rejected: the current engine is the only one that verifies',()=>{
+  const old=JSON.parse(readFileSync(new URL('./fixtures/reference-engine-v4.json',import.meta.url),'utf8')) as Replay;
+  assert.equal(old.engine,'engine-v4');
+  assert.notEqual(old.engine,engineVersion,'engine-v4 is an old version now');
+  assert.throws(()=>parseReplay(old),new RegExp(`Versión de motor incompatible: engine-v4; se requiere ${engineVersion}`));
+});
 test('valid save/load round-trip is pure and records the engine version',()=>{
   const sim=new Simulation(createConfig({teamSize:2,human:[false,false]}),[makeTeam(0,2),makeTeam(1,2)]);
   const recorder=new Recorder(sim);
