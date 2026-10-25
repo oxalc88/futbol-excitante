@@ -80,13 +80,14 @@ try {
     };
   });
   const snapshot = () => page.evaluate(() => window.__fe);
-  const wait = async (fn, arg, stepMs=100) => {
+  const wait = async (fn, arg, stepMs=100, maxMs=20000, soft=false) => {
     // Advance browser frames directly. Use a small step for a check that also steers a player.
-    for (let i=0;i<Math.ceil(20000/stepMs);i++) {
+    for (let i=0;i<Math.ceil(maxMs/stepMs);i++) {
       const ready=await page.evaluate(({source,arg}) => (0,eval)(`(${source})`)(arg), {source:String(fn),arg});
       if (ready) return page.waitForFunction(fn,arg,{polling:10,timeout:1000});
       await page.clock.fastForward(stepMs);
     }
+    if (soft) return false;
     throw new Error(`State did not arrive: ${String(fn)}`);
   };
   const button = (slot, n, pressed) => page.evaluate(([s,n,p]) => window.__pad.button(s,n,p), [slot,n,pressed]);
@@ -119,7 +120,8 @@ try {
   await axes(0,[0,0,-1,0]); await button(0,0,true);
   await wait(() => window.__fe.phase==='playing');
   await button(0,0,false); await axes(0,[0,0,0,0]);
-  await wait(id => {
+  // The receiver steers in the page at frame rate (17 ms steps).
+  const control = id => {
     const s=window.__fe,p=s.players.find(p=>p.id===s.selected[0]);
     if (!p || s.selected[0]===id) return false;
     const dx=s.ball.x-p.x,dy=s.ball.y-p.y,d=Math.hypot(dx,dy);
@@ -129,24 +131,36 @@ try {
     // Run at full speed to a far ball. The backward pass rolls at about 4.5 m/s, and a 0.6 stick (about 2 m/s) cannot catch it.
     const k=d>2?1:.6;
     window.__pad.axes(0,d>1?[dx/d*k,dy/d*k,1,0]:[0,0,1,0]);
-    return s.phase==='playing' && !p.action && p.recovery===0 && d<1 && Math.hypot(p.vx,p.vy)<.2 && Math.hypot(s.ball.vx,s.ball.vy)<.5 && s.ball.z<.3;
-  },taker,17);
-  await axes(0,[0,0,1,0]); await axes(1,[0,0,0,0]);
-  stage='charged shot';
-  const before = await snapshot();
-  // Keep the receiver at the ball while the shot charges and fires. A CPU player can press it, and
-  // without input the ball can roll out of kick reach before the contact tick.
+    // Start the shot only with no opponent near the ball.
+    const side=p.id.split('-')[0],free=s.players.every(q=>q.id.split('-')[0]===side||Math.hypot(q.x-s.ball.x,q.y-s.ball.y)>2.5);
+    return free && s.phase==='playing' && !p.action && p.recovery===0 && d<1 && Math.hypot(p.vx,p.vy)<.2 && Math.hypot(s.ball.vx,s.ball.vy)<.5 && s.ball.z<.3;
+  };
+  // Keep the receiver at the ball while the shot charges and fires.
   const keepBall = n => { const s=window.__fe,p=s.players.find(p=>p.id===s.selected[0]);
-    if (p) { const dx=s.ball.x-p.x,dy=s.ball.y-p.y,d=Math.hypot(dx,dy); window.__pad.axes(0,d>.9?[dx/d*.6,dy/d*.6,1,0]:[0,0,1,0]); }
+    if (p) { const dx=s.ball.x-p.x,dy=s.ball.y-p.y,d=Math.hypot(dx,dy); window.__pad.axes(0,d>1.1?[dx/d*.6,dy/d*.6,1,0]:[0,0,1,0]); }
     return n; };
-  await button(0,2,true);
-  await wait(([src,n]) => (0,eval)(src)(true) && window.__fe.tick>=n, [String(keepBall),before.tick+12], 17);
-  shotSetup={before,release:await snapshot()};
-  check((await snapshot()).shots.actions[0]===before.shots.actions[0],'Shot fired while held');
-  await button(0,2,false);
-  await wait(([src,n]) => (0,eval)(src)(true) && window.__fe.shots.actions[0]===n+1, [String(keepBall),before.shots.actions[0]], 17);
-  await wait(([src,n]) => (0,eval)(src)(true) && window.__fe.shots.events[0]===n+1, [String(keepBall),before.shots.events[0]], 17);
-  await axes(0,[0,0,1,0]);
+  // With engine-v4 acceleration a CPU presser can take the ball before the contact tick. Then the
+  // attempt has a shot input but no shot event. Try again from the next ball control (max. 5 attempts).
+  // Each attempt still checks: no shot while held, one input on release, and one shot event.
+  let before;
+  for (let attempt=0;;attempt++) {
+    stage='kickoff receiver';
+    await wait(control, attempt===0?taker:null, 17, 45000);
+    await axes(0,[0,0,1,0]); await axes(1,[0,0,0,0]);
+    stage='charged shot';
+    before = await snapshot();
+    await button(0,2,true);
+    await wait(([src,n]) => (0,eval)(src)(true) && window.__fe.tick>=n, [String(keepBall),before.tick+12], 17);
+    shotSetup={attempt,before,release:await snapshot()};
+    check((await snapshot()).shots.actions[0]===before.shots.actions[0],'Shot fired while held');
+    await button(0,2,false);
+    await wait(([src,n]) => (0,eval)(src)(true) && window.__fe.shots.actions[0]===n+1, [String(keepBall),before.shots.actions[0]], 17);
+    const shot=await wait(([src,n]) => (0,eval)(src)(true) && window.__fe.shots.events[0]===n+1, [String(keepBall),before.shots.events[0]], 17, 1500, true);
+    await axes(0,[0,0,1,0]);
+    if (shot) break;
+    check(attempt<4,'No shot event after 5 attempts');
+    check((await snapshot()).shots.events[0]===before.shots.events[0],'Late shot event');
+  }
   await ticks(18);
   const fired=await snapshot();
   check(fired.shots.actions[0]===before.shots.actions[0]+1 && fired.shots.events[0]===before.shots.events[0]+1,'Duplicate shot');
