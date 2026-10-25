@@ -311,7 +311,28 @@ oneOnOne(slot:0|1){
   sim.restore(w);
   previous=current=sim.presentation();
   return true;
-}}});
+},
+// Smoke only: starts the restart of `kind` for `team`, with a four-man wall on the free kick.
+setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
+  if(!started||guest||replay||current.phase!=='playing')return false;
+  const L=config.pitch.length/2,W=config.pitch.width/2;
+  const dir=sim.snapshot().teams[team].direction;
+  const point=kind==='free-kick'?{x:dir*(L-24),y:0}:kind==='corner'?{x:dir*(L-.3),y:W-.3}:kind==='penalty'?{x:dir*(L-11),y:0}:kind==='throw-in'?{x:dir*10,y:W-.1}:{x:-dir*(L-5.5),y:6};
+  (sim as any).startRestart(kind,team,point);
+  if(kind==='free-kick'){
+    const w=sim.snapshot();
+    const wall=w.players.filter(p=>p.team===1-team&&!p.keeper&&!p.sentOff).sort((a,b)=>Math.hypot(a.x-point.x,a.y-point.y)-Math.hypot(b.x-point.x,b.y-point.y)||a.id.localeCompare(b.id)).slice(0,4);
+    const row=[-1.5,-.5,.5,1.5];
+    wall.forEach((p,i)=>{p.x=point.x+dir*9.15;p.y=row[i];p.vx=0;p.vy=0;});
+    w.pendingPass=null;
+    sim.restore(w);
+  }
+  previous=current=sim.presentation();
+  return true;
+},
+// Smoke only: reads back the waiting restart, the wall jumps, the keepers and the cursors.
+setPieceState(){const w=sim.snapshot();return {phase:w.phase,tick:w.tick,restart:w.restart?structuredClone(w.restart):null,wallJump:w.players.filter(p=>p.wallJump!==undefined&&p.wallJump>w.tick).map(p=>p.id),keepers:w.players.filter(p=>p.keeper).map(p=>({id:p.id,team:p.team,x:p.x,y:p.y})),selected:[...w.selected]};}
+}});
 // A / Cross (button 0) on any pad: start quick play from the menu, close the tips.
 // Button 0 or 1 closes the tips. Nothing acts while another dialog sits on the setup.
 interface PadMenuState{a:boolean;b:boolean}
