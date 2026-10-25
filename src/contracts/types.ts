@@ -20,17 +20,31 @@ export interface Tactics {
   counterPress: number; shortPossession: number; tightMarking: number; adaptation: number;
 }
 export interface TeamProfile { id: string; name: string; shortName: string; players: PlayerProfile[]; tactics: Tactics }
+export type KeeperKick = 'punt' | 'high';
 export interface InputFrame {
   tick: number; slot: TeamIndex; move: Vec2; aim: Vec2; sprint: boolean; shield: boolean;
   action?: ActionKind; power?: number; switchPlayer?: boolean; switchKeeper?: boolean; tactics?: Partial<Tactics>;
+  /** Human keeper only: hold the run-out key without the ball. */
+  keeperRush?: boolean;
+  /** Human keeper only: release of the volley kick while the ball is held. */
+  keeperKick?: KeeperKick;
+  /** Human keeper only: R1 with the stick released puts the ball down or picks it up. */
+  keeperDrop?: boolean;
+  /** Human keeper only: press the pass key before a held kick release to feint. */
+  keeperFeint?: boolean;
+  /** Foul-dive chord (L1+L2+L3+R3 without R2) of the selected player. */
+  simulateDive?: boolean;
 }
 export interface Intent { move: Vec2; aim: Vec2; sprint: boolean; shield: boolean; action?: ActionKind; power: number }
 export interface PlayerState extends PlayerProfile, Vec2 {
   // Set only by the keeper switch command. Keep absent for legacy CPU checkpoints.
   manualControl?: boolean;
+  // Set only by human keeper commands. Keep absent for CPU-only checkpoints.
+  keeperRushing?: boolean;
+  keeperDropped?: boolean;
   sentOff: boolean; yellows: number; keeperMode: 'ready' | 'dive' | 'hold' | 'recover'; keeperUntil: number;
   team: TeamIndex; vx: number; vy: number; heading: number; energy: number; stability: number;
-  intent: Intent; action: { kind: ActionKind; start: number; contact: number; end: number; aim: Vec2; power: number; resolved: boolean } | null;
+  intent: Intent; action: { kind: ActionKind; start: number; contact: number; end: number; aim: Vec2; power: number; resolved: boolean; keeperKick?: KeeperKick } | null;
   touchCooldown: number; recovery: number; travel: number; keeperReaction: number; heldSince: number;
 }
 export interface Contact { id: string; tick: number; playerId: string; team: TeamIndex; surface: 'foot' | 'head' | 'hand' | 'body'; point: Vec3 }
@@ -67,6 +81,8 @@ export interface World {
 export interface Presentation {
   tick: number; phase: Phase; half: number; played: number; score: [number, number]; stats: [Stats, Stats];
   selected: [string | null, string | null]; ball: BallState; players: Omit<PlayerState,'manualControl'>[]; events: MatchEvent[];
+  /** Holder of the ball in the keeper's hands, or null. */
+  keeperHold: { playerId: string; since: number } | null;
   teams: [Pick<TeamState, 'id' | 'name' | 'shortName' | 'direction' | 'tactics'>, Pick<TeamState, 'id' | 'name' | 'shortName' | 'direction' | 'tactics'>];
 }
 export interface Replay { version: 'replay-v2'; engine: string; initial: World; inputs: InputFrame[]; endTick: number; finalHash: string }

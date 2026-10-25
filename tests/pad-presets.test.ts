@@ -14,6 +14,9 @@ const REMAPPED = ['cross', 'switchPlay', 'crossHigh', 'shot', 'header', 'sprint'
 const MISSING = ['pressure'] as const;
 /** The 17 phase-1 rows of the research: 5 identical and 12 remapped. */
 const PHASE_1 = [...IDENTICAL, ...REMAPPED];
+/** The 10 C10 keeper rows: 9 Arquero rows plus the foul-dive chord of row 107. */
+const KEEPER_ROWS = ['keeperRush', 'keeperRushSprint', 'keeperHandThrow', 'keeperThrowSpace', 'keeperPunt',
+  'keeperHighPunt', 'keeperDropPick', 'keeperRun', 'keeperFeint', 'simulateDive'] as const;
 
 const TABLE: readonly [string, PadPresetRow['state'], PadContext, number | null, readonly PsGlyph[], string][] = [
   ['move', 'identical', 'attack', null, [], 'Left stick'],
@@ -34,6 +37,16 @@ const TABLE: readonly [string, PadPresetRow['state'], PadContext, number | null,
   ['shoulderCharge', 'remapped', 'defense', null, [], 'Automatic'],
   ['camera', 'remapped', 'system', 17, ['TOUCHPAD'], 'Touchpad click'],
   ['pressure', 'missing', 'defense', 0, ['✕'], '✕ hold'],
+  ['keeperRush', 'missing', 'keeper', 3, ['△'], 'Hold △'],
+  ['keeperRushSprint', 'missing', 'keeper', 5, ['R1'], 'R1 + hold △'],
+  ['keeperHandThrow', 'missing', 'keeper', 0, ['✕'], '✕'],
+  ['keeperThrowSpace', 'missing', 'keeper', 3, ['△'], '△'],
+  ['keeperPunt', 'missing', 'keeper', 1, ['○'], '○ hold'],
+  ['keeperHighPunt', 'missing', 'keeper', 1, ['○'], 'R2 + ○ hold'],
+  ['keeperDropPick', 'missing', 'keeper', 5, ['R1'], 'R1 + left stick released'],
+  ['keeperRun', 'missing', 'keeper', null, [], 'Left stick (+ R1 sprint)'],
+  ['keeperFeint', 'missing', 'keeper', 0, ['✕'], '✕ before release'],
+  ['simulateDive', 'missing', 'attack', 10, ['L3'], 'L1 + L2 + L3 + R3 (no R2)'],
 ];
 
 const KEYS: readonly [string, readonly string[], readonly string[]][] = [
@@ -55,16 +68,27 @@ const KEYS: readonly [string, readonly string[], readonly string[]][] = [
   ['shoulderCharge', [], []],
   ['camera', ['KeyC'], ['KeyC']],
   ['pressure', ['KeyU'], ['Numpad0']],
+  ['keeperRush', ['KeyL'], ['Numpad3']],
+  ['keeperRushSprint', ['ShiftLeft'], ['ShiftRight']],
+  ['keeperHandThrow', ['KeyJ'], ['Numpad1']],
+  ['keeperThrowSpace', ['KeyL'], ['Numpad3']],
+  ['keeperPunt', ['KeyI'], ['Numpad5']],
+  ['keeperHighPunt', ['KeyG'], ['Numpad6']],
+  ['keeperDropPick', ['ShiftLeft'], ['ShiftRight']],
+  ['keeperRun', ['KeyW', 'KeyS', 'KeyA', 'KeyD'], ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']],
+  ['keeperFeint', ['KeyJ'], ['Numpad1']],
+  ['simulateDive', ['KeyF'], ['Numpad4']],
 ];
 
-test('preset has the 17 phase-1 rows and 1 missing row with the PES table ids', () => {
+test('preset has the 17 phase-1 rows, 1 missing row and the 10 keeper rows', () => {
   assert.equal(PHASE_1.length, 17);
-  assert.equal(PES_2017_PS4_ROWS.length, 18);
+  assert.equal(KEEPER_ROWS.length, 10);
+  assert.equal(PES_2017_PS4_ROWS.length, 28);
   assert.deepEqual(pesRows('identical').map((row) => row.id), [...IDENTICAL]);
   assert.deepEqual(pesRows('remapped').map((row) => row.id), [...REMAPPED]);
-  assert.deepEqual(pesRows('missing').map((row) => row.id), [...MISSING]);
+  assert.deepEqual(pesRows('missing').map((row) => row.id), [...MISSING, ...KEEPER_ROWS]);
   assert.equal(PES_2017_PS4_PRESET.rows, PES_2017_PS4_ROWS);
-  assert.deepEqual(PES_2017_PS4_ROWS.map((row) => row.id), [...PHASE_1, ...MISSING]);
+  assert.deepEqual(PES_2017_PS4_ROWS.map((row) => row.id), [...PHASE_1, ...MISSING, ...KEEPER_ROWS]);
   assert.equal(PHASE_1.filter((id) => pesRow(id).state === 'identical').length, 5);
   assert.equal(PHASE_1.filter((id) => pesRow(id).state === 'remapped').length, 12);
 });
@@ -115,13 +139,14 @@ test('shield is automatic: the row has no button, no glyph and no key', () => {
   assert.deepEqual([...shield.keys.p1], []);
   assert.deepEqual([...shield.keys.p2], []);
   assert.throws(() => pesButton('shield'), /no button/);
-  // No row maps R2, L2 or L3: shield, jockey and the old FE key are gone.
+  // No one-button row maps R2 or L2. The foul-dive chord row owns L3 alone.
   for (const row of PES_2017_PS4_ROWS) {
-    if (row.button === null) continue;
+    if (row.button === null || row.id === 'simulateDive') continue;
     assert.notEqual(row.button, PS_BUTTON.r2, row.id);
     assert.notEqual(row.button, PS_BUTTON.l2, row.id);
     assert.notEqual(row.button, PS_BUTTON.l3, row.id);
   }
+  assert.equal(pesRow('simulateDive').button, PS_BUTTON.l3);
 });
 
 test('pressure (hold ✕) and standing tackle (✕ ×2) are separate gestures', () => {
@@ -177,7 +202,8 @@ test('no two actions in one context share a button unless the PES table says so'
 });
 
 test('attack and defense use the PES buttons, and both contexts stay free', () => {
-  const attack = PES_2017_PS4_ROWS.filter((row) => row.context === 'attack' && row.button !== null);
+  // The foul-dive chord is a multi-button row and stays out of the one-button list.
+  const attack = PES_2017_PS4_ROWS.filter((row) => row.context === 'attack' && row.button !== null && row.id !== 'simulateDive');
   const defense = PES_2017_PS4_ROWS.filter((row) => row.context === 'defense' && row.button !== null);
   assert.deepEqual(attack.map((row) => [row.id, row.button]),
     [['pass', 0], ['through', 3], ['cross', 1], ['switchPlay', 1], ['crossHigh', 1], ['shot', 2], ['header', 2], ['sprint', 5]]);
@@ -211,14 +237,18 @@ test('the exported keyboard map derives from the preset rows', () => {
   assert.deepEqual(KEYBOARD_MOVE.p1, ['KeyW', 'KeyS', 'KeyA', 'KeyD']);
   assert.deepEqual(KEYBOARD_MOVE.p2, ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
   assert.deepEqual(KEYBOARD_MAP.p1.KeyJ, { attack: 'pass' });
-  assert.deepEqual(KEYBOARD_MAP.p1.KeyL, { attack: 'through' });
-  assert.deepEqual(KEYBOARD_MAP.p1.KeyI, { attack: 'cross' });
+  assert.deepEqual(KEYBOARD_MAP.p1.KeyL, { attack: 'through', keeperRush: true });
+  assert.deepEqual(KEYBOARD_MAP.p1.KeyI, { attack: 'cross', keeperKick: true });
+  assert.deepEqual(KEYBOARD_MAP.p1.KeyG, { keeperHigh: true });
+  assert.deepEqual(KEYBOARD_MAP.p1.KeyF, { simulateDive: true });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyK, { attack: 'shoot', defense: 'shoot', charge: true });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyU, { defense: 'tackle' });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyB, { defense: 'slide' });
   assert.deepEqual(KEYBOARD_MAP.p1.ShiftLeft, { sprint: true });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyQ, { switchPlayer: true });
   assert.deepEqual(KEYBOARD_MAP.p2.Numpad1, { attack: 'pass' });
+  assert.deepEqual(KEYBOARD_MAP.p2.Numpad4, { simulateDive: true });
+  assert.deepEqual(KEYBOARD_MAP.p2.Numpad6, { keeperHigh: true });
   assert.deepEqual(KEYBOARD_MAP.p2.Numpad2, { attack: 'shoot', defense: 'shoot', charge: true });
   assert.deepEqual(KEYBOARD_MAP.p2.Numpad0, { defense: 'tackle' });
   assert.deepEqual(KEYBOARD_MAP.p2.ShiftRight, { sprint: true });

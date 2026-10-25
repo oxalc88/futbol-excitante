@@ -3,7 +3,7 @@ import { clamp } from '../simulation/math';
 type Message={type:string;[key:string]:unknown};
 export class PeerSession {
   private pc:RTCPeerConnection|null=null;private channel:RTCDataChannel|null=null;private latest:Partial<InputFrame>={};
-  private receivedSequence=0;private sentInputSequence=0;private pendingAction:InputFrame['action'];private pendingSwitch=false;private pendingKeeperSwitch=false;private lastInputAt=0;
+  private receivedSequence=0;private sentInputSequence=0;private pendingAction:InputFrame['action'];private pendingSwitch=false;private pendingKeeperSwitch=false;private pendingKeeperKick:InputFrame['keeperKick'];private pendingKeeperDrop=false;private pendingKeeperFeint=false;private pendingSimulateDive=false;private lastInputAt=0;
   role:'host'|'guest'|null=null;onStatus:(status:string)=>void=()=>{};onStart:(world:World)=>void=()=>{};onSnapshot:(s:Presentation)=>void=()=>{};onConnect:()=>void=()=>{};
   private guestSnapshot:Presentation|null=null;
   get connected(){return this.channel?.readyState==='open';}
@@ -16,10 +16,11 @@ export class PeerSession {
     channel.onmessage=e=>{try{if(typeof e.data!=='string'||e.data.length>150000)return;const m=JSON.parse(e.data)as Message;
       if(m.type==='input'&&this.role==='host'){
         const f=m.frame as Partial<InputFrame>;if(!f?.move||!f.aim||![f.move.x,f.move.y,f.aim.x,f.aim.y,f.power??.5].every(Number.isFinite))return;
-        this.latest={move:{x:clamp(f.move.x,-1,1),y:clamp(f.move.y,-1,1)},aim:{x:clamp(f.aim.x,-1,1),y:clamp(f.aim.y,-1,1)},power:clamp(f.power??.5,0,1),sprint:!!f.sprint,shield:!!f.shield};this.lastInputAt=performance.now();
-        if(Number.isInteger(m.sequence)&&Number(m.sequence)>this.receivedSequence){this.receivedSequence=Number(m.sequence);if(f.action&&['pass','shoot','cross','through','tackle','header'].includes(f.action))this.pendingAction=f.action;this.pendingSwitch||=!!f.switchPlayer;this.pendingKeeperSwitch||=!!f.switchKeeper;}
+        this.latest={move:{x:clamp(f.move.x,-1,1),y:clamp(f.move.y,-1,1)},aim:{x:clamp(f.aim.x,-1,1),y:clamp(f.aim.y,-1,1)},power:clamp(f.power??.5,0,1),sprint:!!f.sprint,shield:!!f.shield,keeperRush:!!f.keeperRush};this.lastInputAt=performance.now();
+        const keeperKick=f.keeperKick==='punt'||f.keeperKick==='high'?f.keeperKick:undefined;
+        if(Number.isInteger(m.sequence)&&Number(m.sequence)>this.receivedSequence){this.receivedSequence=Number(m.sequence);if(f.action&&['pass','shoot','cross','through','tackle','header'].includes(f.action))this.pendingAction=f.action;this.pendingSwitch||=!!f.switchPlayer;this.pendingKeeperSwitch||=!!f.switchKeeper;this.pendingKeeperKick||=keeperKick;this.pendingKeeperDrop||=!!f.keeperDrop;this.pendingKeeperFeint||=!!f.keeperFeint;this.pendingSimulateDive||=!!f.simulateDive;}
       }
-      if(m.type==='start'&&this.role==='guest'){const w=m.world as World;this.guestSnapshot=structuredClone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players,events:w.events,teams:w.teams});this.onStart(w);}
+      if(m.type==='start'&&this.role==='guest'){const w=m.world as World;this.guestSnapshot=structuredClone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players,events:w.events,keeperHold:w.keeperHold,teams:w.teams});this.onStart(w);}
       if(m.type==='snapshot'&&this.role==='guest'&&this.guestSnapshot){
         const patch=m.patch as Omit<Presentation,'players'> & {players:Partial<Presentation['players'][number]>[]};
         if(!patch||!Number.isInteger(patch.tick)||patch.tick<=this.guestSnapshot.tick||!Array.isArray(patch.players)||patch.players.length!==this.guestSnapshot.players.length)return;
@@ -41,10 +42,15 @@ export class PeerSession {
     const {players,...metadata}=snapshot;
     this.send({type:'snapshot',patch:{...metadata,players:players.map(p=>({id:p.id,x:p.x,y:p.y,vx:p.vx,vy:p.vy,heading:p.heading,energy:p.energy,travel:p.travel,recovery:p.recovery,action:p.action}))}});
   }
-  input(frame:InputFrame){if(frame.action||frame.switchPlayer||frame.switchKeeper)this.sentInputSequence++;this.send({type:'input',sequence:this.sentInputSequence,frame});}
+  input(frame:InputFrame){if(frame.action||frame.switchPlayer||frame.switchKeeper||frame.keeperKick||frame.keeperDrop||frame.keeperFeint||frame.simulateDive)this.sentInputSequence++;this.send({type:'input',sequence:this.sentInputSequence,frame});}
   hostFrame(tick:number):InputFrame {
     const fresh=this.connected&&performance.now()-this.lastInputAt<350;
-    const result:InputFrame={tick,slot:1,move:{x:0,y:0},aim:{x:-1,y:0},sprint:false,shield:false,...(fresh?this.latest:{}),action:fresh?this.pendingAction:undefined,switchPlayer:fresh&&this.pendingSwitch,switchKeeper:fresh&&this.pendingKeeperSwitch};this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;return result;
+    const result:InputFrame={tick,slot:1,move:{x:0,y:0},aim:{x:-1,y:0},sprint:false,shield:false,...(fresh?this.latest:{}),action:fresh?this.pendingAction:undefined,switchPlayer:fresh&&this.pendingSwitch,switchKeeper:fresh&&this.pendingKeeperSwitch};
+    if(fresh&&this.pendingKeeperKick)result.keeperKick=this.pendingKeeperKick;
+    if(fresh&&this.pendingKeeperDrop)result.keeperDrop=true;
+    if(fresh&&this.pendingKeeperFeint)result.keeperFeint=true;
+    if(fresh&&this.pendingSimulateDive)result.simulateDive=true;
+    this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;return result;
   }
-  close(){if(this.channel){this.channel.onclose=null;this.channel.onmessage=null;this.channel.onopen=null;this.channel.close();}if(this.pc){this.pc.onconnectionstatechange=null;this.pc.ondatachannel=null;this.pc.close();}this.channel=null;this.pc=null;this.role=null;this.latest={};this.receivedSequence=0;this.sentInputSequence=0;this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;this.guestSnapshot=null;}
+  close(){if(this.channel){this.channel.onclose=null;this.channel.onmessage=null;this.channel.onopen=null;this.channel.close();}if(this.pc){this.pc.onconnectionstatechange=null;this.pc.ondatachannel=null;this.pc.close();}this.channel=null;this.pc=null;this.role=null;this.latest={};this.receivedSequence=0;this.sentInputSequence=0;this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;this.guestSnapshot=null;}
 }
