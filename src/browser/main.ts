@@ -154,7 +154,7 @@ peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.ti
 let inputEvidence:InputFrame[]=[];
 const shotEvidence={actions:[0,0],events:[0,0],power:[0,0]};
 let browserFrames=0;
-Object.defineProperty(window,'__fe',{get:()=>structuredClone({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence,shots:shotEvidence,ball:current.ball,selected:current.selected,players:current.players.map(p=>({id:p.id,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
+Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
 function loop(now:number){
   browserFrames++;
   const elapsed=Math.min(.1,(now-last)/1000);last=now;

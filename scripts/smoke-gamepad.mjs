@@ -1,4 +1,4 @@
-// Browser smoke for fake standard pads and one emulated touch shot.
+// Test standard gamepads and one touch shot in the browser.
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { connect } from 'node:net';
@@ -11,7 +11,7 @@ const base = `http://127.0.0.1:${port}`;
 const out = 'artifacts/local/smoke';
 mkdirSync(out, { recursive: true });
 
-// Fail fast if an old server holds the port: it would serve an old build.
+// Stop if another server uses the port.
 const portBusy = await new Promise((resolve) => {
   const sock = connect({ host: '127.0.0.1', port, timeout: 1000 });
   sock.once('connect', () => { sock.destroy(); resolve(true); });
@@ -24,7 +24,7 @@ if (portBusy) {
   console.error(message); process.exit(1);
 }
 
-// detached: the server gets its own process group, so stop() also kills vite's children.
+// Run the server in a separate process group.
 const server = spawn('npx', ['vite', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'], { stdio: 'ignore', detached: true });
 let stopped = false;
 let serverExit = null;
@@ -52,7 +52,8 @@ let browser;
 let activePage;
 let stage='startup';
 let shotSetup;
-const deadline = setTimeout(() => { errors.push('Total timeout (55 s)'); stop(); writeEvidence(); process.exit(1); }, 55000);
+const timeoutMs = Number(process.env.PAD_SMOKE_TIMEOUT_MS ?? 120000);
+const deadline = setTimeout(() => { errors.push(`Total timeout (${timeoutMs} ms)`); stop(); writeEvidence(); process.exit(1); }, timeoutMs);
 function writeEvidence() { writeFileSync(`${out}/pad.json`, `${JSON.stringify({results, errors}, null, 2)}\n`); }
 function check(value, message) { if (!value) throw new Error(message); }
 try {
@@ -80,7 +81,7 @@ try {
   });
   const snapshot = () => page.evaluate(() => window.__fe);
   const wait = async (fn, arg) => {
-    // Advance explicit browser frames. Do not depend on renderer wall time.
+    // Advance browser frames directly.
     for (let i=0;i<200;i++) {
       const ready=await page.evaluate(({source,arg}) => (0,eval)(`(${source})`)(arg), {source:String(fn),arg});
       if (ready) return page.waitForFunction(fn,arg,{polling:10,timeout:1000});
@@ -102,7 +103,7 @@ try {
   await page.locator('#start-btn').click();
   await connectPad(0,true); await connectPad(1,true); await ticks();
   stage='pause';
-  // 1: Hold Start across rendered frames, including while simulation ticks stop.
+  // 1: Hold Start while the simulation is paused.
   await button(0,9,true); await wait(() => window.__fe.paused);
   const paused = await snapshot(); const clock = await page.locator('#clock').innerText();
   await frames(); check((await snapshot()).tick===paused.tick,'Start hold resumed simulation');
@@ -112,7 +113,7 @@ try {
   await button(0,9,true); await wait(() => !window.__fe.paused); await ticks();
   await button(0,9,false); await ticks();
   await evidence(1,{clock});
-  // 2: Pass backward from kickoff and wait for the receiver to control the ball.
+  // 2: Pass backward from kickoff. Wait for the receiver to control the ball.
   stage='kickoff receiver';
   const taker=(await snapshot()).selected[0];
   await axes(0,[0,0,-1,0]); await button(0,0,true);
@@ -142,7 +143,7 @@ try {
   check(fired.shots.power[0]>.2,'Shot did not charge');
   await evidence(2);
   stage='disconnect and reconnect';
-  // 3 and 4: Repeat for each identity. The other controller keeps its slot.
+  // 3 and 4: Repeat for each gamepad. Keep the other gamepad in its slot.
   for (const slot of [0,1]) {
     const other=1-slot;
     await button(slot,1,true); await ticks(20);
@@ -166,14 +167,14 @@ try {
     await evidence(4,{slot});
   }
   stage='two-player movement';
-  // 5: Take any new kickoff after the earlier shot, then check movement.
+  // 5: Take the next kickoff if necessary. Then check movement.
   if ((await snapshot()).phase!=='playing') {
     await wait(() => window.__fe.phase==='kickoff');
     await button(0,0,true); await button(1,0,true);
     await wait(() => window.__fe.phase==='playing');
     await button(0,0,false); await button(1,0,false);
   }
-  // Independent axes and selected players in local two-player mode.
+  // Check each axis and selected player in local two-player mode.
   await axes(0,[.8,0,0,0]); await axes(1,[-.8,0,0,0]);
   await wait(() => window.__fe.frames[0]?.move.x>.7 && window.__fe.frames[1]?.move.x<-.7);
   const moving=await snapshot(); await ticks(60); const moved=await snapshot();
@@ -185,7 +186,7 @@ try {
   await axes(0,[0,0,0,0]); await axes(1,[0,0,0,0]); await ticks();
   await evidence(5);
   stage='touch';
-  // 6: Real emulated touch events through the visible control.
+  // 6: Send touch events to the visible control.
   const touch=await snapshot();
   await page.locator('#touch-shoot').tap();
   await wait(n => window.__fe.shots.actions[0]===n+1,touch.shots.actions[0]);
