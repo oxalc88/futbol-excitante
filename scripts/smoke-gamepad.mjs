@@ -131,10 +131,10 @@ try {
   check((await page.locator('#pad-status').innerText()).includes('2 MANDOS'),'Two-pad HUD missing');
   stage='charged shot';
   const before = await snapshot();
-  await button(0,1,true); await ticks(12);
+  await button(0,2,true); await ticks(12);
   shotSetup={before,release:await snapshot()};
   check((await snapshot()).shots.actions[0]===before.shots.actions[0],'Shot fired while held');
-  await button(0,1,false);
+  await button(0,2,false);
   await wait(n => window.__fe.shots.actions[0]===n+1, before.shots.actions[0]);
   await wait(n => window.__fe.shots.events[0]===n+1, before.shots.events[0]);
   await ticks(18);
@@ -146,7 +146,7 @@ try {
   // 3 and 4: Repeat for each gamepad. Keep the other gamepad in its slot.
   for (const slot of [0,1]) {
     const other=1-slot;
-    await button(slot,1,true); await ticks(20);
+    await button(slot,2,true); await ticks(20);
     const start=await snapshot();
     await connectPad(slot,false); await ticks();
     await axes(other,[0,.8,0,0]);
@@ -156,9 +156,9 @@ try {
     const disconnected=await snapshot();
     check(disconnected.shots.actions[slot]===start.shots.actions[slot] && disconnected.shots.events[slot]===start.shots.events[slot],'Disconnect fired a shot');
     await evidence(3,{slot});
-    await connectPad(slot,true); await ticks(15); await button(slot,1,false); await ticks(15);
+    await connectPad(slot,true); await ticks(15); await button(slot,2,false); await ticks(15);
     check((await snapshot()).shots.actions[slot]===start.shots.actions[slot],'Reconnect release caused phantom shot');
-    await button(slot,1,true); await ticks(2); await button(slot,1,false);
+    await button(slot,2,true); await ticks(2); await button(slot,2,false);
     await wait(([s,n]) => window.__fe.shots.actions[s]===n+1,[slot,start.shots.actions[slot]]);
     await ticks(12);
     const fresh=await snapshot();
@@ -168,8 +168,11 @@ try {
   }
   stage='two-player movement';
   // 5: Take the next kickoff if necessary. Then check movement.
-  if ((await snapshot()).phase!=='playing') {
-    await wait(() => window.__fe.phase==='kickoff');
+  // A shot can end in a goal (kickoff) or in an automatic restart (goal kick,
+  // corner, throw-in) that goes back to 'playing' with no kickoff.
+  // Wait for either phase. Press ✕ only at a kickoff.
+  await wait(() => ['kickoff','playing'].includes(window.__fe.phase));
+  if ((await snapshot()).phase==='kickoff') {
     await button(0,0,true); await button(1,0,true);
     await wait(() => window.__fe.phase==='playing');
     await button(0,0,false); await button(1,0,false);
