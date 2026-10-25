@@ -80,12 +80,12 @@ try {
     };
   });
   const snapshot = () => page.evaluate(() => window.__fe);
-  const wait = async (fn, arg) => {
-    // Advance browser frames directly.
-    for (let i=0;i<200;i++) {
+  const wait = async (fn, arg, stepMs=100) => {
+    // Advance browser frames directly. Use a small step for a check that also steers a player.
+    for (let i=0;i<Math.ceil(20000/stepMs);i++) {
       const ready=await page.evaluate(({source,arg}) => (0,eval)(`(${source})`)(arg), {source:String(fn),arg});
       if (ready) return page.waitForFunction(fn,arg,{polling:10,timeout:1000});
-      await page.clock.fastForward(100);
+      await page.clock.fastForward(stepMs);
     }
     throw new Error(`State did not arrive: ${String(fn)}`);
   };
@@ -123,24 +123,37 @@ try {
     const s=window.__fe,p=s.players.find(p=>p.id===s.selected[0]);
     if (!p || s.selected[0]===id) return false;
     const dx=s.ball.x-p.x,dy=s.ball.y-p.y,d=Math.hypot(dx,dy);
-    window.__pad.axes(0,d>1?[dx/d*.6,dy/d*.6,1,0]:[0,0,1,0]);
+    // Move the pad 2 player away from the ball, so it does not take the ball from the receiver.
+    const q=s.players.find(q=>q.id===s.selected[1]);
+    if (q) { const ex=q.x-s.ball.x,ey=q.y-s.ball.y,e=Math.hypot(ex,ey)||1; window.__pad.axes(1,e<8?[ex/e,ey/e,0,0]:[0,0,0,0]); }
+    // Run at full speed to a far ball. The backward pass rolls at about 4.5 m/s, and a 0.6 stick (about 2 m/s) cannot catch it.
+    const k=d>2?1:.6;
+    window.__pad.axes(0,d>1?[dx/d*k,dy/d*k,1,0]:[0,0,1,0]);
     return s.phase==='playing' && !p.action && p.recovery===0 && d<1 && Math.hypot(p.vx,p.vy)<.2 && Math.hypot(s.ball.vx,s.ball.vy)<.5 && s.ball.z<.3;
-  },taker);
-  await axes(0,[0,0,1,0]);
-  await wait(() => document.querySelector('#clock')?.textContent!=='00:00');
-  check((await page.locator('#pad-status').innerText()).includes('2 MANDOS'),'Two-pad HUD missing');
+  },taker,17);
+  await axes(0,[0,0,1,0]); await axes(1,[0,0,0,0]);
   stage='charged shot';
   const before = await snapshot();
-  await button(0,2,true); await ticks(12);
+  // Keep the receiver at the ball while the shot charges and fires. A CPU player can press it, and
+  // without input the ball can roll out of kick reach before the contact tick.
+  const keepBall = n => { const s=window.__fe,p=s.players.find(p=>p.id===s.selected[0]);
+    if (p) { const dx=s.ball.x-p.x,dy=s.ball.y-p.y,d=Math.hypot(dx,dy); window.__pad.axes(0,d>.9?[dx/d*.6,dy/d*.6,1,0]:[0,0,1,0]); }
+    return n; };
+  await button(0,2,true);
+  await wait(([src,n]) => (0,eval)(src)(true) && window.__fe.tick>=n, [String(keepBall),before.tick+12], 17);
   shotSetup={before,release:await snapshot()};
   check((await snapshot()).shots.actions[0]===before.shots.actions[0],'Shot fired while held');
   await button(0,2,false);
-  await wait(n => window.__fe.shots.actions[0]===n+1, before.shots.actions[0]);
-  await wait(n => window.__fe.shots.events[0]===n+1, before.shots.events[0]);
+  await wait(([src,n]) => (0,eval)(src)(true) && window.__fe.shots.actions[0]===n+1, [String(keepBall),before.shots.actions[0]], 17);
+  await wait(([src,n]) => (0,eval)(src)(true) && window.__fe.shots.events[0]===n+1, [String(keepBall),before.shots.events[0]], 17);
+  await axes(0,[0,0,1,0]);
   await ticks(18);
   const fired=await snapshot();
   check(fired.shots.actions[0]===before.shots.actions[0]+1 && fired.shots.events[0]===before.shots.events[0]+1,'Duplicate shot');
   check(fired.shots.power[0]>.2,'Shot did not charge');
+  // Check the clock and HUD after the shot. A wait before the shot lets the ball roll out of reach.
+  await wait(() => document.querySelector('#clock')?.textContent!=='00:00');
+  check((await page.locator('#pad-status').innerText()).includes('2 MANDOS'),'Two-pad HUD missing');
   await evidence(2);
   stage='disconnect and reconnect';
   // 3 and 4: Repeat for each gamepad. Keep the other gamepad in its slot.

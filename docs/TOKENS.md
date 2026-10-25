@@ -36,5 +36,7 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-25 | PS4 pad preset | Codex CLI | review | gpt-6.1-sol | default | 4 | 1,182,064 | 179,471 | 6,168 | ~/.codex/sessions (wt-ps-preset) |
 | 2026-10-25 | C7 part 3 acceleration and turn | pi | write | nan/mimo-v2.6-flash | default | 3 | 6,475,746 | 271,245 | 151,381 | ~/.pi/agent/sessions (wt-c7p3) |
 | 2026-10-25 | C7 part 3 acceleration and turn | Codex CLI | review | gpt-6.1-sol | default | 2 | 444,439 | 67,253 | 3,071 | ~/.codex/sessions (wt-c7p3) |
+| 2026-10-25 | C7 part 3 pad-smoke fix | pi | write | nan/mimo-v2.6-flash | default | 2 | 45,888 | 8,132 | 1,532 | ~/.pi/agent/sessions (wt-c7p3) |
+| 2026-10-25 | C7 part 3 pad-smoke fix | Codex CLI | review | gpt-6.1-sol | default | 1 | 127,871 | 19,920 | 559 | ~/.codex/sessions (wt-c7p3) |
 
-Values at 2026-10-25 04:40 Lima. C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
+Values at 2026-10-25 05:55 Lima. C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
