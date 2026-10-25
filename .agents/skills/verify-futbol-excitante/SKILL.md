@@ -24,7 +24,7 @@ Every step must print PASS. The script exits non-zero if one fails. CI (`.github
 | dist-check | `scripts/check-dist.mjs`: allowlist: only .html, .js, .css; rejects lab output, forbidden directories, absolute asset paths and oversized output (2 MiB/file, 5 MiB total); prints sizes. |
 | build-lab | `npm run build:lab` includes `lab.html` for the following smoke. Rebuild public output before publication. |
 | smoke | `scripts/smoke-browser.mjs`: starts a match, takes the human kickoff (presses J until the phase leaves "Saque inicial"), fails on page errors, missing canvas, or a clock stuck at `00:00`. Then the script tests quick play. It uses a new browser profile. The tips show only on the first match. The match does not run while the tips are open. The Enter key starts the match from the focused button. The match starts against the CPU. The clock advances. Then the page loads again. The tips do not show a second time. At the end, the script runs a match with two CPU teams and records a video. |
-| pad-smoke | `scripts/smoke-gamepad.mjs`: fake standard pads; Start edges, charged shot (scenario 2 starts from the smoke hook `window.__feSmoke.ballAtFeet`, which exists only under `navigator.webdriver`), disconnect, held reconnect, stable local slots, and emulated touch shot. Runs after smoke with a separate preview server. |
+| pad-smoke | `scripts/smoke-gamepad.mjs`: fake standard pads; Start edges, charged shot (scenarios 2 and 5 start from the smoke hook `window.__feSmoke.ballAtFeet`, which exists only under `navigator.webdriver`; in scenario 5 it stops a rolling shot so no goal freezes the movement check), disconnect, held reconnect, stable local slots, and emulated touch shot. Runs after smoke with a separate preview server. |
 
 ## Evidence
 
