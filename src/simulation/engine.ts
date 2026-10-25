@@ -195,6 +195,8 @@ export class Simulation {
     w.ball.vx=aim.x*speed;w.ball.vy=aim.y*speed;w.ball.vz=vz;if(curl!==null)w.ball.spin.z=curl;
     this.touch(p,r.kind==='throw-in'?'hand':'foot');w.ball.flight=shot?'shot':'pass';
     p.touchCooldown=w.config.actions.touchTicks+8;
+    // A second-taker kick passes the taker at the ball: he must not touch it at once.
+    if(p.id!==r.taker){const taker=this.player(r.taker);if(taker)taker.touchCooldown=w.config.actions.touchTicks+8;}
     p.action={kind:r.kind==='corner'?'cross':'pass',start:w.tick-7,contact:w.tick,end:w.tick+20,aim,power:.5,resolved:true};
     w.restartRestriction={taker:p.id,team:p.team,indirect:['throw-in','offside','indirect'].includes(r.kind),kind:r.kind};
     if(!['throw-in','corner','goal-kick'].includes(r.kind))this.offsideSnapshot(p);

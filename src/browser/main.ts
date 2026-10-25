@@ -332,7 +332,7 @@ setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
   return true;
 },
 // Smoke only: reads back the waiting restart, the wall jumps, the keepers and the cursors.
-setPieceState(){const w=sim.snapshot();return {phase:w.phase,tick:w.tick,restart:w.restart?structuredClone(w.restart):null,wallJump:w.players.filter(p=>p.wallJump!==undefined&&p.wallJump>w.tick).map(p=>p.id),keepers:w.players.filter(p=>p.keeper).map(p=>({id:p.id,team:p.team,x:p.x,y:p.y})),selected:[...w.selected]};}
+setPieceState(){const w=sim.snapshot();return {phase:w.phase,tick:w.tick,restart:w.restart?structuredClone(w.restart):null,wallJump:w.players.filter(p=>p.wallJump!==undefined&&p.wallJump>w.tick).map(p=>p.id),keepers:w.players.filter(p=>p.keeper).map(p=>({id:p.id,team:p.team,x:p.x,y:p.y})),selected:[...w.selected],restriction:w.restartRestriction?{...w.restartRestriction}:null};}
 }});
 // A / Cross (button 0) on any pad: start quick play from the menu, close the tips.
 // Button 0 or 1 closes the tips. Nothing acts while another dialog sits on the setup.
