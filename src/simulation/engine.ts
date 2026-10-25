@@ -1,6 +1,6 @@
 import type { ActionKind, Config, InputFrame, Intent, MatchEvent, Phase, PlayerState, Presentation, TeamIndex, TeamProfile, Vec2, World } from '../contracts/types';
 import { angleDelta, canonical, clamp, clone, delta, distance, hash, length, segmentPoint, unit } from './math';
-import { canUseHands, foulCard, inPenaltyArea, offsideInterferer, visibleBall } from './rules';
+import { canUseHands, CORNER_ATTACK, CORNER_DEFENCE, foulCard, inPenaltyArea, offsideInterferer, secondTakerFor, setKickCurl, setKeeperMove, setPiecePower, visibleBall, wallPlayers } from './rules';
 import { cpuErrorScale, cpuReactionTicks, isCpuDifficulty } from './config';
 import { bestPass, decidePlayer, decideTeams, formationAnchors } from './tactics';
 
@@ -20,6 +20,8 @@ const REVERSAL_TURN_BOOST=2.6;
 // A keeper counts as out of the goal radius with this extra distance in meters.
 // The clamp lands on the border, and rounding can place him a nanometer outside it.
 const GOAL_RADIUS_EPSILON=1e-9;
+// Ticks that a pressed set-piece wall jump stays in the air.
+const WALL_JUMP_TICKS=40;
 
 export class Simulation {
   private world: World;
@@ -56,10 +58,16 @@ export class Simulation {
       for(const v of [f.move?.x,f.move?.y,f.aim?.x,f.aim?.y,f.power??.5]) if(!Number.isFinite(v)) throw new Error('Non-finite input');
       if(f.action&&!ACTIONS.includes(f.action))throw new Error('Unknown action');
       for(const k of ['keeperRush','keeperDrop','keeperFeint','simulateDive']as const)if(f[k]!==undefined&&typeof f[k]!=='boolean')throw new Error('Invalid keeper input flag');
+      // Set-piece flags: booleans, the two taker placements, the dpad and the wall charge.
+      for(const k of ['setKick','secondKick','setFeint','shortRoll','panenka','wallJump']as const)if(f[k]!==undefined&&typeof f[k]!=='boolean')throw new Error('Invalid set-piece input flag');
+      if(f.secondTaker!==undefined&&!['side','behind'].includes(f.secondTaker))throw new Error('Unknown second taker');
+      if(f.cornerSide!==undefined&&!['up','down','left','right'].includes(f.cornerSide))throw new Error('Unknown set-piece direction');
+      if(f.wallCharge!==undefined&&(!Number.isFinite(f.wallCharge)||f.wallCharge<0||f.wallCharge>1))throw new Error('Invalid wall charge');
+      if(f.keeperMove!==undefined)for(const v of[f.keeperMove.x,f.keeperMove.y])if(!Number.isFinite(v))throw new Error('Non-finite input');
       if(f.keeperKick!==undefined&&!['punt','high'].includes(f.keeperKick))throw new Error('Unknown keeper kick');
       if(w.inputs.some(q=>q.tick===f.tick&&q.slot===f.slot)||incoming.some(q=>q.tick===f.tick&&q.slot===f.slot))throw new Error('Duplicate input frame');
       if(f.tactics) for(const [k,v]of Object.entries(f.tactics)){if(!(k in w.teams[f.slot].tactics)|| (k==='formation'?!['4-3-3','4-4-2','3-5-2'].includes(String(v)):typeof v!=='number'||!Number.isFinite(v)||v<0||v>1))throw new Error('Invalid tactical command');}
-      incoming.push({...clone(f),move:length(f.move)>1?unit(f.move):clone(f.move),aim:length(f.aim)>1?unit(f.aim):clone(f.aim),power:clamp(f.power??.5,0,1)});
+      incoming.push({...clone(f),move:length(f.move)>1?unit(f.move):clone(f.move),aim:length(f.aim)>1?unit(f.aim):clone(f.aim),power:clamp(f.power??.5,0,1),...(f.keeperMove?{keeperMove:length(f.keeperMove)>1?unit(f.keeperMove):clone(f.keeperMove)}:{})});
     }
     w.inputs.push(...incoming);w.inputs.sort((a,b)=>a.tick-b.tick||a.slot-b.slot);
   }
@@ -85,7 +93,7 @@ export class Simulation {
     if(!taker)throw new Error('Restart requires an outfield player');
     w.restart={kind,team,point:clone(point),taker:taker.id,remaining:c.human[team]?c.rules.humanRestartTicks:c.rules.restartTicks};
     w.ball={x:point.x,y:point.y,z:c.physics.radius,vx:0,vy:0,vz:0,spin:{x:0,y:0,z:0},lastTouch:null,freeTicks:0,flight:'loose'};
-    for(const p of w.players){p.vx=p.vy=0;p.action=null;p.intent=idle();p.touchCooldown=0;p.keeperMode='ready';delete p.keeperRushing;delete p.keeperDropped;
+    for(const p of w.players){p.vx=p.vy=0;p.action=null;p.intent=idle();p.touchCooldown=0;p.keeperMode='ready';delete p.keeperRushing;delete p.keeperDropped;delete p.wallJump;
       if(p.id!==taker.id&&!p.keeper&&distance(p,point)<5){const u=unit(delta(point,p));p.x=clamp(point.x+(u.x||-w.teams[team].direction)*6,-c.pitch.length/2+1,c.pitch.length/2-1);p.y=clamp(point.y+(u.y||.5)*6,-c.pitch.width/2+1,c.pitch.width/2-1);}
     }
     taker.x=point.x-w.teams[team].direction*.5;taker.y=point.y;taker.heading=w.teams[team].direction===1?0:Math.PI;
@@ -102,22 +110,82 @@ export class Simulation {
     p.action={kind:'pass',start:w.tick,contact:w.tick+w.config.goalkeeper.releaseTicks,end:w.tick+w.config.goalkeeper.releaseTicks+20,aim:bestPass(w,p)?unit(delta(p,bestPass(w,p)!)):{x:w.teams[p.team].direction,y:.25},power:.6,resolved:false};
   }
   private closestOutfield(team:TeamIndex){return this.world.players.filter(p=>p.team===team&&!p.keeper&&!p.sentOff).sort((a,b)=>distance(a,this.world.ball)-distance(b,this.world.ball)||a.id.localeCompare(b.id))[0]?.id??null;}
+  /** Placement, wall and keeper commands of a waiting restart. Only human slots write state. */
+  private applySetPiece(frames:readonly InputFrame[]){
+    const w=this.world,c=w.config,r=w.restart;if(!r)return;
+    const team=r.team,foe=other(team),setPiece=r.kind!=='kickoff';
+    const attack=frames.find(f=>f.slot===team),defence=frames.find(f=>f.slot===foe);
+    if(setPiece&&attack&&c.human[team]){
+      // L1 + dpad up or down puts the second taker beside or behind the ball.
+      if(attack.secondTaker&&r.kind!=='penalty'){
+        const second=secondTakerFor(w,team,r.point,r.taker);
+        if(second){
+          const dir=w.teams[team].direction,side=attack.secondTaker==='side';
+          second.x=clamp(r.point.x-(side?0:dir*2),-c.pitch.length/2+1,c.pitch.length/2-1);
+          second.y=clamp(r.point.y+(side?1.5:0),-c.pitch.width/2+1,c.pitch.width/2-1);
+          second.vx=second.vy=0;second.heading=dir===1?0:Math.PI;
+          if(r.second?.id!==second.id||r.second.placement!==attack.secondTaker){
+            r.second={id:second.id,placement:attack.secondTaker};
+            this.emit('second-taker',second,team,{placement:attack.secondTaker});
+          }
+        }
+      }
+      // Corner attack of the dpad: fast, near post, in line, far post.
+      if(r.kind==='corner'&&attack.cornerSide){const value=CORNER_ATTACK[attack.cornerSide];
+        if(value!==undefined&&!r.strategy?.attack){r.strategy={...r.strategy,attack:value};this.emit('corner-strategy',undefined,team,{attack:value});}}
+    }
+    if(setPiece&&defence&&c.human[foe]){
+      // Corner defence of the dpad: mixed, man to man, zonal.
+      if(r.kind==='corner'&&defence.cornerSide){const value=CORNER_DEFENCE[defence.cornerSide];
+        if(value!==undefined&&!r.strategy?.defence){r.strategy={...r.strategy,defence:value};this.emit('corner-strategy',undefined,foe,{defence:value});}}
+      const wall=r.kind==='free-kick'||r.kind==='indirect';
+      // One □ press without a held ✕ jumps the wall of the free kick.
+      if(wall&&defence.wallJump)for(const p of wallPlayers(w,foe,r.point)){if(p.wallJump===undefined)this.emit('wall-jump',p,foe);p.wallJump=w.tick+WALL_JUMP_TICKS;}
+      // The held ○ gives the wall the speed that sends it out to the ball at the kick.
+      if(wall&&defence.wallCharge!==undefined)for(const p of wallPlayers(w,foe,r.point)){const u=unit(delta(p,r.point)),out=2+defence.wallCharge*6;p.vx=u.x*out;p.vy=u.y*out;}
+      // △ + stick walks the keeper. On a penalty the stick alone does it.
+      if(wall||r.kind==='penalty'){
+        const stick=defence.keeperMove??(r.kind==='penalty'?defence.move:undefined);
+        const keeper=w.players.find(p=>p.team===foe&&p.keeper&&!p.sentOff);
+        if(keeper&&stick&&length(stick)>.1){const next=setKeeperMove(w,keeper,unit(stick),r.kind==='penalty');keeper.x=next.x;keeper.y=next.y;}
+      }
+    }
+  }
   private executeRestart(frame?:InputFrame){
-    const w=this.world,r=w.restart;if(!r)return;const p=this.player(r.taker)!;const dir=w.teams[r.team].direction;
+    const w=this.world,c=w.config,r=w.restart;if(!r)return;
+    // L2 plays the restart with the second taker. Every other kick uses the taker.
+    const setFrame=frame!==undefined&&c.human[r.team]?frame:undefined;
+    const second=r.second?this.player(r.second.id):undefined;
+    const p=setFrame?.secondKick&&second?second:this.player(r.taker)!;
+    const dir=w.teams[r.team].direction;
+    const setPiece=r.kind!=='kickoff';
     const receiver=bestPass(w,p), target=receiver?{x:receiver.x+receiver.vx*.25,y:receiver.y+receiver.vy*.25}:{x:p.x+dir*14,y:p.y>0?p.y-8:p.y+8};
-    let aim=unit(delta(p,target)),speed=12,vz=.7;
+    let aim=unit(delta(p,target)),speed=12,vz=.7,curl:number|null=null;
     if(r.kind==='corner'){aim=unit(delta(p,{x:dir*(w.config.pitch.length/2-8),y:0}));speed=17;vz=8;w.stats[r.team].corners++;}
     if(r.kind==='throw-in'){w.ball.z=1.5;aim=unit({x:target.x-p.x,y:p.y>0?-Math.max(6,Math.abs(target.y-p.y)):Math.max(6,Math.abs(target.y-p.y))});vz=3;}
     if(r.kind==='goal-kick'){speed=17;vz=5;}
     if((r.kind==='penalty'||r.kind==='free-kick')&&distance(p,{x:dir*w.config.pitch.length/2,y:0})<28){aim=unit(delta(p,{x:dir*w.config.pitch.length/2,y:0}));speed=25;vz=3.5;}
     if(frame&&length(frame.aim)>.1){aim=unit(frame.aim);speed=r.kind==='penalty'?p.capabilities.power*(.6+(frame.power??.5)*.5):10+(frame.power??.5)*16;vz=r.kind==='penalty'?1.5+(frame.power??.5)*2:vz;}
     if(r.kind==='penalty'){aim=unit({x:dir*Math.max(.75,Math.abs(aim.x)),y:clamp(aim.y,-.28,.28)});speed=Math.max(20,speed);vz=Math.min(3.5,vz);}
-    w.ball.vx=aim.x*speed;w.ball.vy=aim.y*speed;w.ball.vz=vz;this.touch(p,r.kind==='throw-in'?'hand':'foot');w.ball.flight=(r.kind==='penalty'||(r.kind==='free-kick'&&speed>=25))?'shot':'pass';
+    // Set-piece rows of a human kick: the stick gives the direction, the power bar
+    // the height and the deviation from the facing curls the flight.
+    const kick=setFrame!==undefined&&setPiece&&setFrame.setKick===true&&setFrame.action!==undefined&&!setFrame.shortRoll&&!setFrame.panenka&&length(setFrame.aim)>.1;
+    if(kick){const row=setPiecePower(setFrame.power??.5,setFrame.action!);aim=unit(setFrame.aim);speed=row.speed;vz=row.vz;curl=setKickCurl(p,aim);}
+    // Short roll: L1 + ✕ sends the ball low to the nearest teammate.
+    if(setFrame?.shortRoll===true&&setPiece&&r.kind!=='penalty'&&receiver){aim=unit(delta(p,receiver));speed=6+(setFrame.power??.5)*4;vz=0;}
+    // Panenka: L1 + □ chips the ball slow and down the middle.
+    if(setFrame?.panenka===true&&r.kind==='penalty'){aim=unit({x:dir,y:0});speed=16;vz=4.5;}
+    // A free-kick shot with □ counts as a shot even when it leaves slowly.
+    const shot=r.kind==='penalty'||(r.kind==='free-kick'&&(speed>=25||(kick&&setFrame?.action==='shoot')));
+    w.ball.vx=aim.x*speed;w.ball.vy=aim.y*speed;w.ball.vz=vz;if(curl!==null)w.ball.spin.z=curl;
+    this.touch(p,r.kind==='throw-in'?'hand':'foot');w.ball.flight=shot?'shot':'pass';
     p.touchCooldown=w.config.actions.touchTicks+8;
     p.action={kind:r.kind==='corner'?'cross':'pass',start:w.tick-7,contact:w.tick,end:w.tick+20,aim,power:.5,resolved:true};
     w.restartRestriction={taker:p.id,team:p.team,indirect:['throw-in','offside','indirect'].includes(r.kind),kind:r.kind};
     if(!['throw-in','corner','goal-kick'].includes(r.kind))this.offsideSnapshot(p);
     if(w.ball.flight==='shot'){w.stats[p.team].shots++;for(const g of w.players.filter(g=>g.keeper&&g.team!==p.team))g.keeperReaction=w.tick;}
+    // The cursor follows the second taker after his kick.
+    if(p.id!==r.taker)w.selected[r.team]=p.id;
     this.emit(`${r.kind}-executed`,p,r.team);w.phase='playing';w.restart=null;w.pendingPass={playerId:p.id,team:p.team};w.stats[p.team].passes++;
   }
   step(){
@@ -141,7 +209,16 @@ export class Simulation {
       }
       w.tick++;return this.result();
     }
-    if(w.restart){const f=frames.find(f=>f.slot===w.restart!.team);w.restart.remaining--;if(w.restart.remaining<=0||f?.action)this.executeRestart(f);w.tick++;return this.result();}
+    // Set-piece commands are read while the restart waits. Only human slots write state.
+    if(w.restart){
+      const r=w.restart;this.applySetPiece(frames);
+      const f=frames.find(q=>q.slot===r.team);
+      // A feint fakes the kick: no ball leaves the foot and the restart stays alive.
+      const feint=!!(f?.setFeint&&w.config.human[r.team]&&['free-kick','indirect'].includes(r.kind));
+      if(feint)this.emit('set-feint',this.player(r.taker),r.team);
+      else{r.remaining--;if(r.remaining<=0||f?.action)this.executeRestart(f);}
+      w.tick++;return this.result();
+    }
     this.derivePossession();this.resolveAdvantage();
     if(w.phase!=='playing'){w.tick++;return this.result();}
     const interferer=offsideInterferer(w);if(interferer&&this.checkOffside(interferer)){w.tick++;return this.result();}
@@ -222,6 +299,7 @@ export class Simulation {
       }
     }
     for(const p of w.players){
+      if(p.wallJump!==undefined&&w.tick>=p.wallJump)delete p.wallJump;
       if(p.sentOff){p.intent=idle();p.vx=p.vy=0;p.action=null;continue;}
       if(p.keeperMode==='recover'&&w.tick>=p.keeperUntil)p.keeperMode='ready';
       if(p.touchCooldown>0)p.touchCooldown--;if(p.recovery>0)p.recovery--;p.stability=Math.min(1,p.stability+c.dt*.7);
@@ -536,8 +614,10 @@ export class Simulation {
         this.emit(save?'save':'keeper-claim',p,p.team,{surface,catch:catchable});if(save)w.stats[p.team].saves++;
         b.flight='loose';p.touchCooldown=c.actions.touchTicks;p.heldSince=w.tick;return;
       }
-      if(z>.8||p.keeper){
-        if(!p.keeper&&z<1.65&&distance(hit,p)<c.movement.radius+c.physics.radius){const n=unit(delta(p,hit)),dot=b.vx*n.x+b.vy*n.y;if(dot<0){b.vx-=1.5*dot*n.x;b.vy-=1.5*dot*n.y;this.touch(p,'body',false);p.touchCooldown=c.actions.touchTicks;this.emit('body-deflection',p,p.team);return;}}
+      // A wall player that jumps reaches the ball higher with the chest or the head.
+      const jump=w.tick<(p.wallJump??-1)?1.1:0;
+      if(z>.8+jump||p.keeper){
+        if(!p.keeper&&z<1.65+jump&&distance(hit,p)<c.movement.radius+c.physics.radius){const n=unit(delta(p,hit)),dot=b.vx*n.x+b.vy*n.y;if(dot<0){b.vx-=1.5*dot*n.x;b.vy-=1.5*dot*n.y;this.touch(p,'body',false);p.touchCooldown=c.actions.touchTicks;this.emit('body-deflection',p,p.team);return;}}
         continue;
       }
       if(this.checkOffside(p)||this.checkDoubleTouch(p))return;
