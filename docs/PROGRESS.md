@@ -116,3 +116,4 @@ Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en ho
 - **Qué cambia para el jugador:** el juego de `main` es ahora la reconstrucción Astra, con partido 3D, CPU contra CPU y laboratorio. El motor anterior queda en `archive/gauntlet-legacy` y en las etiquetas `history/*`.
 - **Qué probar:** juega un partido completo hasta el final.
 - **Qué se rompe o cambia:** el juego anterior ya no está en `main`.
+
