@@ -142,6 +142,70 @@ test('the touch pad owns slot 0 while a physical pad hands it back on disable',t
   assert.equal(input.sample(6,1).action,undefined);
 });
 
+test('a touch toggle keeps each physical pad on its own slot',t=>{
+  const {input,pads}=browser(t);
+  pads.push(pad(0),pad(1));input.sample(0,0);input.sample(0,1);
+  // Both pads leave, pad 1 returns first: it keeps slot 0, pad 0 takes slot 1.
+  pads.length=0;input.sample(1,0);input.sample(1,1);
+  pads.push(pad(1));input.sample(2,0);input.sample(2,1);
+  pads.unshift(pad(0));input.sample(3,0);input.sample(3,1);
+  pads[1]=pad(1,[0]);
+  assert.equal(input.sample(4,0).action,'pass','pad 1 owns slot 0');
+  pads[1]=pad(1);
+  // The touch reading takes slot 0 and hands it back with no swap.
+  input.setTouchActive(true);
+  input.sample(5,0);
+  input.touch.press(9,'cross');
+  assert.equal(input.sample(6,0).action,'pass','the touch pad owns slot 0');
+  input.touch.release(9);
+  input.setTouchActive(false);
+  // The first sample after the restore only re-seeds the pad state.
+  input.sample(7,0);input.sample(7,1);
+  pads[1]=pad(1,[0]);
+  assert.equal(input.sample(8,0).action,'pass','pad 1 keeps slot 0 after the toggle');
+  pads[1]=pad(1);
+  pads[0]=pad(0,[0]);
+  assert.equal(input.sample(9,1).action,'pass','pad 0 keeps slot 1 after the toggle');
+});
+
+test('a cancelled charged square gives no shot',t=>{
+  const {input,time}=browser(t);
+  input.setTouchActive(true);
+  input.sample(0,0);
+  time(0);input.touch.press(1,'square');
+  input.sample(1,0);input.sample(2,0);input.sample(3,0);
+  assert(input.charging>0,'the charge builds');
+  input.touch.cancel(1);
+  const f=input.sample(4,0);
+  assert.equal(f.action,undefined,'the cancel fires nothing');
+  assert.equal(input.charging,0,'the charge is gone');
+  assert.equal(input.touch.held('square'),false);
+  // A press after the cancel charges and shoots again.
+  input.touch.press(2,'square');
+  input.sample(5,0);
+  assert(input.charging>0,'a press after the cancel charges again');
+  input.touch.release(2);
+  assert.equal(input.sample(6,0).action,'shoot');
+});
+
+test('a cancelled charged circle gives no keeper kick',t=>{
+  const {input,time}=browser(t);
+  input.setKeeper([true,false]);input.setKeeperHold([true,false]);
+  input.setTouchActive(true);
+  input.sample(0,0);
+  time(0);input.touch.press(1,'circle');
+  input.sample(1,0);input.sample(2,0);
+  input.touch.cancel(1);
+  const f=input.sample(3,0);
+  assert.equal(f.keeperKick,undefined,'the cancel gives no kick');
+  assert.equal(f.action,undefined);
+  // A normal release still kicks.
+  input.touch.press(2,'circle');
+  input.sample(4,0);input.sample(5,0);
+  input.touch.release(2);
+  assert.equal(input.sample(6,0).keeperKick,'punt');
+});
+
 test('disabled and editing targets ignore keydown; browser defaults are prevented for game keys',t=>{
   const {input,key}=browser(t);input.enabled=false;key('keydown','KeyD');assert.deepEqual(input.sample(0,0).move,{x:0,y:0});input.enabled=true;
   for(const target of [new ElementStub('INPUT'),new ElementStub('SELECT'),new ElementStub('TEXTAREA'),new ElementStub('DIV',true)])key('keydown','KeyD',target);

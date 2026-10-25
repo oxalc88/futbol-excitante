@@ -21,7 +21,7 @@ const markup = `<div id="touch-pad" hidden>
 <div class="tp-stick" hidden><span class="tp-knob"></span></div>
 ${faceButtons}
 ${shoulder('r1', '<b>R1</b><span class="tp-label">Correr</span>', 'Correr')}
-${shoulder('r2', '<b>R2</b>', 'R2')}
+${shoulder('r2', '<b>R2</b>', 'R2, con L1: portero')}
 ${shoulder('l1', '<b>L1</b><span class="tp-label">Cambiar</span>', 'Cambiar')}
 </div>
 <div id="rotate-notice" hidden>Gira el teléfono para jugar en horizontal.</div>`;
@@ -94,8 +94,16 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
     if (!input.touch.stick.active) hideStick();
     refresh();
   };
+  // A cancelled pointer drops its buttons without a release action: a charged
+  // □ or ○ never fires on a system cancel.
+  const cancel = (e: PointerEvent) => {
+    input.touch.cancel(e.pointerId);
+    buttonPointers.delete(e.pointerId);
+    if (!input.touch.stick.active) hideStick();
+    refresh();
+  };
   window.addEventListener('pointerup', end);
-  window.addEventListener('pointercancel', end);
+  window.addEventListener('pointercancel', cancel);
 
   pad.addEventListener('contextmenu', e => e.preventDefault());
   pad.addEventListener('selectstart', e => e.preventDefault());

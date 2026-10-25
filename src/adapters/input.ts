@@ -71,8 +71,9 @@ export class BrowserInput {
   /** The match shell sets the ball-in-hands state of both keepers. */
   setKeeperHold(flags:[boolean,boolean]){this.keeperHold=[...flags];}
   clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.punt.clear();this.tackleTap=[-1,-1];this.aerial=[false,false];this.keeper=[false,false];this.keeperHold=[false,false];this.controller.reset();this.touch.clear();this.lastTick=-1;}
-  /** Shows or hides the on-screen touch pad. A change drops every held touch. */
-  setTouchActive(on:boolean){if(on===this.touchOn)return;this.touchOn=on;this.touch.clear();this.controller.releaseSlots();}
+  /** Shows or hides the on-screen touch pad. A change drops every held touch.
+   * The physical pads keep their slots: the touch reading takes slot 0 only. */
+  setTouchActive(on:boolean){if(on===this.touchOn)return;this.touchOn=on;this.touch.clear();if(on)this.controller.stashSlots();else this.controller.restoreSlots();}
   get touchActive(){return this.touchOn;}
   /** Pad readings of this sample. The touch reading comes first, so it owns slot 0. */
   private pads(){return this.touchOn?[this.touch.reading(true),...this.gamepads]:this.gamepads;}
@@ -177,6 +178,9 @@ export class BrowserInput {
       if(kind&&!keeperFeint&&!(hold&&role.keeperKick))action=(kind==='cross'&&switchHeld(roles,this.keys))?'lob':kind;
     }
     let switchKeeper=this.edges.delete(KEEPER_KEYS[slot]);
+    // A cancelled touch pointer must not fire its pending release: drop the
+    // charge and the previous state of slot 0 before the mapper samples.
+    if(this.touch.takeCancelled())this.controller.discardCharge();
     const pad=this.controller.sample(this.pads(),tick,slot,defending,aerial,keeper,hold);
     if(length(pad.move)>.1)movement=pad.move;
     sprint||=pad.sprint;shield||=pad.shield;switchPlayer||=pad.switchPlayer;switchKeeper||=pad.switchKeeper;

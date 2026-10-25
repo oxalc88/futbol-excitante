@@ -23,11 +23,12 @@ export const STICK_DEAD = .12;
 /** Game state that picks one label row of the touch buttons. */
 export interface TouchContext { defending: boolean; aerial: boolean; keeper: boolean; hold: boolean }
 
-/** Label row of the four kick buttons. The hold row wins over every other row. */
+/** Label row of the four kick buttons. The hold row wins over every other
+ * row, then the keeper dive row wins over the aerial row, as the mapper does. */
 export function touchLabels(c: TouchContext): Record<'cross'|'circle'|'square'|'triangle', string> {
   if (c.hold) return { cross: 'Mano', circle: 'Volea', square: 'Patear', triangle: 'Al espacio' };
+  if (c.keeper && (c.defending || c.aerial)) return { cross: 'Lanzarse', circle: 'Barrida', square: 'Despeje', triangle: 'Salir' };
   if (c.aerial) return { cross: 'Cabeza', circle: 'Cabeza', square: 'Cabeza', triangle: 'Cabeza' };
-  if (c.defending && c.keeper) return { cross: 'Lanzarse', circle: 'Barrida', square: 'Despeje', triangle: 'Salir' };
   if (c.defending) return { cross: 'Entrada', circle: 'Barrida', square: 'Despeje', triangle: 'Presión' };
   return { cross: 'Pase', circle: 'Centro', square: 'Tiro', triangle: 'Filtrado' };
 }
@@ -48,6 +49,8 @@ export class TouchPad {
   private ax = 0;
   private ay = 0;
   private buttons = new Map<number, Set<TouchButton>>();
+  // Set by cancel(): the next reading must not turn a lift into a release.
+  private cancelled = false;
 
   /** Starts the stick at the origin for the first pointer only. */
   stickDown(id: number, x: number, y: number): boolean {
@@ -91,6 +94,20 @@ export class TouchPad {
     this.stickUp(id);
   }
 
+  /** System cancel of pointer `id`: drop its buttons and arm the discard,
+   * so the mapper never turns the lift into a shot or a kick. */
+  cancel(id: number) {
+    this.release(id);
+    this.cancelled = true;
+  }
+
+  /** True once after a cancel, then clears the flag. */
+  takeCancelled(): boolean {
+    const c = this.cancelled;
+    this.cancelled = false;
+    return c;
+  }
+
   /** True when any pointer holds `b`. */
   held(b: TouchButton): boolean {
     for (const set of this.buttons.values()) if (set.has(b)) return true;
@@ -99,16 +116,21 @@ export class TouchPad {
 
   /** Drops all pointers, the stick and the axes. */
   clear() {
-    this.buttons.clear(); this.stickId = -1; this.ox = 0; this.oy = 0; this.ax = 0; this.ay = 0;
+    this.buttons.clear(); this.stickId = -1; this.ox = 0; this.oy = 0; this.ax = 0; this.ay = 0; this.cancelled = false;
   }
 
-  /** Standard-mapping reading that ControllerMapper consumes. */
+  /** Standard-mapping reading that ControllerMapper consumes. L1 + R2 held
+   * together is the touch keeper switch: the reading presses R3 only, so it
+   * never also switches player through the L1 edge. */
   reading(connected: boolean): PadReading {
+    const keeperSwitch = this.held('l1') && this.held('r2');
     const buttons: { pressed: boolean }[] = [];
     for (let i = 0; i < 17; i++) {
       const b = TOUCH_BY_INDEX[i];
-      buttons.push({ pressed: b !== undefined && this.held(b) });
+      const combo = keeperSwitch && (b === 'l1' || b === 'r2');
+      buttons.push({ pressed: b !== undefined && this.held(b) && !combo });
     }
+    if (keeperSwitch) buttons[PS_BUTTON.r3] = { pressed: true };
     return { index: 99, id: 'touch-pad', mapping: 'standard', connected, axes: [this.ax, this.ay, 0, 0], buttons };
   }
 }

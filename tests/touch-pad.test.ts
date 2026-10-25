@@ -4,6 +4,7 @@ import {
   TOUCH_BUTTONS, TOUCH_BUTTON_INDEX, STICK_RADIUS, STICK_DEAD, TouchPad, touchLabels,
 } from '../src/adapters/touch-pad';
 import { ControllerMapper } from '../src/adapters/controller';
+import { PS_BUTTON } from '../src/browser/pad-presets';
 
 /** One sample of the virtual pad in slot 0. */
 function sample(pad: TouchPad, mapper: ControllerMapper, tick: number) {
@@ -123,6 +124,75 @@ test('labels pick one row per context', () => {
       assert(row[key].length > 0, 'empty label');
     }
   }
+});
+
+test('cancel drops the pointer buttons and arms one discard', () => {
+  const pad = new TouchPad();
+  pad.press(1, 'square');
+  pad.press(2, 'cross');
+  pad.cancel(1);
+  assert.equal(pad.held('square'), false);
+  assert.equal(pad.held('cross'), true);
+  assert.equal(pad.takeCancelled(), true);
+  assert.equal(pad.takeCancelled(), false, 'the flag clears after one read');
+  pad.cancel(2);
+  assert.equal(pad.held('cross'), false);
+  assert.equal(pad.takeCancelled(), true);
+  pad.clear();
+  assert.equal(pad.takeCancelled(), false, 'clear drops the flag');
+});
+
+test('a cancelled charged square never fires the shot on lift', () => {
+  const pad = new TouchPad();
+  const mapper = new ControllerMapper();
+  mapper.sample([pad.reading(true)], 0, 0);
+  pad.press(1, 'square');
+  for (let tick = 1; tick <= 12; tick++) mapper.sample([pad.reading(true)], tick, 0);
+  assert(mapper.chargeLevel(0) > 0, 'the charge builds');
+  // The view cancels the pointer: the adapter discards the charge, so the
+  // lift reads as no press at all.
+  pad.cancel(1);
+  mapper.discardCharge();
+  const f = mapper.sample([pad.reading(true)], 13, 0);
+  assert.equal(f.action, undefined);
+  assert.equal(mapper.chargeLevel(0), 0);
+});
+
+test('l1 + r2 held together reads r3 and no l1 or r2', () => {
+  const pad = new TouchPad();
+  const mapper = new ControllerMapper();
+  // One empty sample assigns the reading, so the first press is an edge.
+  assert.equal(sample(pad, mapper, 0).switchPlayer, false);
+  pad.press(1, 'l1');
+  assert.equal(pad.reading(true).buttons[PS_BUTTON.l1].pressed, true);
+  assert.equal(sample(pad, mapper, 1).switchPlayer, true, 'l1 alone still switches player');
+  pad.press(2, 'r2');
+  const reading = pad.reading(true);
+  assert.equal(reading.buttons[PS_BUTTON.l1].pressed, false);
+  assert.equal(reading.buttons[PS_BUTTON.r2].pressed, false);
+  assert.equal(reading.buttons[PS_BUTTON.r3].pressed, true);
+  assert.equal(pad.held('l1'), true, 'the pointers keep their buttons');
+  assert.equal(pad.held('r2'), true);
+  const f = sample(pad, mapper, 2);
+  assert.equal(f.switchKeeper, true, 'the combo edges r3');
+  assert.equal(f.switchPlayer, false, 'the combo never switches player');
+  // The l1 lift ends the combo: r2 reads alone again and r3 is up.
+  pad.release(1);
+  assert.equal(pad.reading(true).buttons[PS_BUTTON.r2].pressed, true);
+  assert.equal(pad.reading(true).buttons[PS_BUTTON.r3].pressed, false);
+  assert.equal(sample(pad, mapper, 3).switchKeeper, false);
+});
+
+test('keeper dive labels win over the aerial row, as the mapper dives', () => {
+  // A keeper at head height dives, so the dive row shows, not the header row.
+  const dive = touchLabels({ defending: true, aerial: true, keeper: true, hold: false });
+  assert.deepEqual(dive, { cross: 'Lanzarse', circle: 'Barrida', square: 'Despeje', triangle: 'Salir' });
+  // The keeper row needs no defense flag: at head height the keeper dives too.
+  const airKeeper = touchLabels({ defending: false, aerial: true, keeper: true, hold: false });
+  assert.deepEqual(airKeeper, { cross: 'Lanzarse', circle: 'Barrida', square: 'Despeje', triangle: 'Salir' });
+  // An outfield player at head height still gets the header row.
+  const aerial = touchLabels({ defending: true, aerial: true, keeper: false, hold: false });
+  assert.deepEqual(aerial, { cross: 'Cabeza', circle: 'Cabeza', square: 'Cabeza', triangle: 'Cabeza' });
 });
 
 test('mapper: cross press edge plays the pass and the release gives nothing', () => {

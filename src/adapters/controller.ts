@@ -22,6 +22,7 @@ const B={
 export class ControllerMapper {
   private slots:(string|null)[]=[null,null];
   private previous:boolean[][]=[[],[]];
+  private stash:(string|null)[]|null=null;
   private charge=[0,0];
   private armed=[false,false];
   // Charge of the keeper volley punt (○) per slot, while the ball is held.
@@ -33,9 +34,22 @@ export class ControllerMapper {
   private cameraStarts=new Map<string,boolean>();
   // Tick of the last defending ✕ tap, or -1 when no tackle is armed.
   private tackleTap=[-1,-1];
-  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];}
+  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.stash=null;}
   /** Frees both slots: the next sample assigns the pads again in list order. */
   releaseSlots(){this.slots=[null,null];this.previous=[[],[]];}
+  /** The touch pad takes slot 0: stash the physical slot ids and reset only
+   * slot 0. Slot 1 keeps its pad, so no physical pad swaps slots. */
+  stashSlots(){
+    this.stash=[...this.slots];
+    this.slots[0]=null;this.previous[0]=[];this.charge[0]=0;this.armed[0]=false;
+    this.punt[0]=0;this.puntArmed[0]=true;this.lastTick[0]=-1;this.tackleTap[0]=-1;
+  }
+  /** The touch pad leaves slot 0: put the stashed physical ids back. */
+  restoreSlots(){const ids=this.stash;this.stash=null;this.releaseSlots();if(ids)this.slots=[ids[0]??null,ids[1]??null];}
+  /** Drops the pending slot 0 releases: a cancelled touch pointer must not
+   * fire the shot or the keeper kick on lift. The next sample re-seeds the
+   * previous state, so no false edge comes out either. */
+  discardCharge(){this.previous[0]=[];this.charge[0]=0;this.armed[0]=false;this.punt[0]=0;}
   /** Charge level of a slot, for the HUD power meter. */
   chargeLevel(slot:TeamIndex){return this.charge[slot];}
   assignments(){return [...this.slots];}
