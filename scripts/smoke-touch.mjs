@@ -1,5 +1,5 @@
-// Touch pad e2e: geometry, safe areas, visibility rules and context labels.
-// Criteria 1-3 (buttons 4-5 come later). No fake pads: mode 'local' with the
+// Touch pad e2e: geometry, safe areas, visibility rules, context labels,
+// multitouch, keeper rush and shot charge. No fake pads: mode 'local' with the
 // on-screen pad driven by synthetic PointerEvents (pointerType 'touch').
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -99,10 +99,31 @@ try {
       pointerType: 'touch', pointerId: id, isPrimary: true, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2 }));
     return true;
   }, [sel, id]);
-  const touchUp = (page, id) => page.evaluate(id => {
+  const touchUp = (page, id, x = 0, y = 0) => page.evaluate(([id, x, y]) => {
     document.body.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true, composed: true,
-      pointerType: 'touch', pointerId: id, isPrimary: true }));
-  }, id);
+      pointerType: 'touch', pointerId: id, isPrimary: true, clientX: x, clientY: y }));
+  }, [id, x, y]);
+  // Touch press at a point: the pad routes it by the element under the point.
+  const touchDownAt = (page, x, y, id) => page.evaluate(([x, y, id]) => {
+    const el = document.elementFromPoint(x, y);
+    if (!el) return false;
+    el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, composed: true,
+      pointerType: 'touch', pointerId: id, isPrimary: true, clientX: x, clientY: y }));
+    return true;
+  }, [x, y, id]);
+  const touchMove = (page, id, x, y) => page.evaluate(([id, x, y]) => {
+    document.body.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, cancelable: true, composed: true,
+      pointerType: 'touch', pointerId: id, isPrimary: true, clientX: x, clientY: y }));
+  }, [id, x, y]);
+  // Activates the pad and takes the kickoff, the common start of stages 4-5.
+  const beginPlay = async (page) => {
+    await startLocal(page);
+    await touchDown(page, null, 10);
+    await page.waitForFunction(() => !document.querySelector('#touch-pad').hidden
+      && document.body.classList.contains('touch-on'), null, {timeout:5000, polling:100});
+    await takeKickoff(page);
+    check(await page.evaluate(() => window.__fe.phase) === 'playing', 'Match did not reach playing');
+  };
 
   const startLocal = async (page) => {
     await page.goto(base, {waitUntil:'networkidle'});
@@ -227,6 +248,112 @@ try {
     check(JSON.stringify(await labelRow(page))===JSON.stringify(ROWS.hold), 'Keeper hold labels are wrong');
     await evidence(page, '3c-keeper-hold', { row: ROWS.hold });
     await touchUp(page, 10);
+    await context.close();
+  }
+
+  // 4a: Multitouch: stick + R1 sprint, then a third finger passes. The pass
+  // frame lives one tick, so the lasting ball effects back the assertion too.
+  stage='multitouch';
+  {
+    const { context, page } = await newPage(844, 390, true);
+    await beginPlay(page);
+    await runHook(page, 'ballAtFeet', 0);
+    const zone = await page.evaluate(() => {
+      const r = document.querySelector('.tp-zone[data-zone=stick]')?.getBoundingClientRect();
+      return r ? { x: r.x + r.width * .3, y: r.y + r.height / 2 } : null;
+    });
+    check(!!zone, 'Stick zone not found');
+    check(await touchDownAt(page, zone.x, zone.y, 21), 'Stick zone press did not land');
+    await touchMove(page, 21, zone.x + 50, zone.y);
+    check(await touchDown(page, '.tp-r1', 22), 'Pad R1 button not found');
+    await page.waitForTimeout(600);
+    const sprintFrame = await page.evaluate(() =>
+      window.__fe.frames.find(f => f.slot === 0 && f.sprint === true && f.move.x > 0.5) ?? null);
+    check(!!sprintFrame, 'No slot-0 frame with sprint and move.x > 0.5');
+    const prePass = await page.evaluate(() => ({ touch: window.__fe.ball.lastTouch?.playerId ?? null,
+      speed: Math.hypot(window.__fe.ball.vx, window.__fe.ball.vy) }));
+    check(await touchDown(page, '.tp-cross', 23), 'Pad ✕ button not found');
+    await page.waitForTimeout(150);
+    await touchUp(page, 23);
+    await page.waitForFunction(pre => window.__fe.frames.some(f => f.slot === 0 && f.action === 'pass')
+      || window.__fe.ball.lastTouch?.playerId !== pre.touch
+      || Math.hypot(window.__fe.ball.vx, window.__fe.ball.vy) > pre.speed + 4, prePass,
+      {timeout:8000, polling:50});
+    await evidence(page, '4a-multitouch', { sprint: sprintFrame,
+      passSpeed: await page.evaluate(() => Math.hypot(window.__fe.ball.vx, window.__fe.ball.vy)) });
+    for (const id of [21, 22, 23]) await touchUp(page, id);
+    await context.close();
+  }
+
+  // 4b: Keeper rush by touch: △ alone, then R1 + △ must sprint faster.
+  stage='keeper-rush';
+  {
+    const { context, page } = await newPage(844, 390, true);
+    await beginPlay(page);
+    const rushState = () => page.evaluate(() => {
+      const k = window.__fe.players.find(p => p.id === window.__fe.selected[0]);
+      return { rushing: k?.keeperRushing === true, speed: Math.hypot(k?.vx ?? 0, k?.vy ?? 0) };
+    });
+    const waitRush = () => page.waitForFunction(() => {
+      const k = window.__fe.players.find(p => p.id === window.__fe.selected[0]);
+      return k?.keeperRushing === true;
+    }, null, {timeout:5000, polling:100});
+    await runHook(page, 'oneOnOne', 0);
+    check(await touchDown(page, '.tp-triangle', 30), 'Pad △ button not found');
+    await waitRush();
+    await page.waitForTimeout(500);
+    const a = await rushState();
+    check(a.rushing, 'Keeper did not rush on △');
+    await evidence(page, '4b-rush', { speedA: a.speed });
+    await touchUp(page, 30);
+    await runHook(page, 'oneOnOne', 0);
+    check(await touchDown(page, '.tp-r1', 31), 'Pad R1 button not found');
+    check(await touchDown(page, '.tp-triangle', 32), 'Pad △ button not found');
+    await waitRush();
+    await page.waitForTimeout(500);
+    const b = await rushState();
+    check(b.rushing, 'Keeper did not rush while sprinting');
+    check(b.speed > a.speed * 1.1, `Sprint rush ${b.speed.toFixed(2)} is not faster than ${a.speed.toFixed(2)}`);
+    await evidence(page, '4b-sprint-rush', { speedA: a.speed, speedB: b.speed });
+    await touchUp(page, 31);
+    await touchUp(page, 32);
+    await context.close();
+  }
+
+  // 5: Shot charge: a longer □ hold kicks harder. The lift may land anywhere:
+  // a pointerup outside the pad still ends the press and executes the shot.
+  stage='shot-power';
+  {
+    const { context, page } = await newPage(844, 390, true);
+    await beginPlay(page);
+    // Screen centre: outside the stick zone and every pad button.
+    const centre = { x: 422, y: 195 };
+    const shot = async (hold, id) => {
+      await runHook(page, 'ballAtFeet', 0);
+      const before = await page.evaluate(() => window.__fe.shots.actions[0]);
+      check(await touchDown(page, '.tp-square', id), 'Pad □ button not found');
+      await page.waitForTimeout(hold);
+      await touchUp(page, id, centre.x, centre.y);
+      const sampler = page.evaluate(() => new Promise(res => {
+        let max = 0;
+        const iv = setInterval(() => { const b = window.__fe.ball;
+          max = Math.max(max, Math.hypot(b.vx, b.vy)); }, 40);
+        setTimeout(() => { clearInterval(iv); res(max); }, 1000);
+      }));
+      await page.waitForFunction(prev => window.__fe.shots.actions[0] > prev, before,
+        {timeout:6000, polling:50});
+      const maxSpeed = await sampler;
+      const after = await page.evaluate(() => ({ actions: window.__fe.shots.actions[0],
+        power: window.__fe.shots.power[0] }));
+      check(after.actions > before, `Shot did not count after a ${hold} ms hold`);
+      return { hold, maxSpeed, ...after };
+    };
+    const s200 = await shot(200, 40);
+    await evidence(page, '5-shot-200', s200);
+    const s800 = await shot(800, 41);
+    await evidence(page, '5-shot-800', s800);
+    check(s800.power > s200.power, `Power after 800 ms (${s800.power}) is not above 200 ms (${s200.power})`);
+    check(s800.maxSpeed > s200.maxSpeed, `Ball speed after 800 ms (${s800.maxSpeed.toFixed(2)}) is not above 200 ms (${s200.maxSpeed.toFixed(2)})`);
     await context.close();
   }
 } catch (e) { errors.push(`fatal (${stage}): ${e.message}`);
