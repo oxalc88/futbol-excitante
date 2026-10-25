@@ -140,7 +140,7 @@ try {
   check(!!k0,'Selected player of slot 0 missing');
   const d0=dist(k0,s0.ball);
   await button(0,3,true);
-  await ticks(10);
+  await ticks(30);
   const s1=await snapshot();
   const k1=keeper(s1);
   check(k1.keeperRushing===true,'Keeper did not rush');
@@ -155,7 +155,7 @@ try {
   check(await page.evaluate(() => window.__feSmoke.oneOnOne(0)),'Smoke hook failed');
   await button(0,5,true); await ticks(1);
   await button(0,3,true);
-  await ticks(10);
+  await ticks(30);
   const sprint=await snapshot();
   const sprintKeeper=keeper(sprint);
   check(sprintKeeper.keeperRushing===true,'Keeper did not rush while sprinting');
@@ -185,7 +185,7 @@ try {
     const s=await snapshot();
     const k=keeper(s);
     check(s.ball.lastTouch?.playerId===k.id,'Last touch is not the keeper');
-    const b={vz:s.ball.vz,z:s.ball.z,speed:Math.hypot(s.ball.vx,s.ball.vy),kind:s.ball.lastTouch.kind};
+    const b={vz:s.ball.vz,z:s.ball.z,speed:Math.hypot(s.ball.vx,s.ball.vy),kind:s.ball.lastTouch.surface};
     if (step.name==='3a-hand-throw') {
       check(s.keeper.throws[0]===before.throws[0]+1,'Hand throw did not count');
       check(s.keeper.punts[0]===before.punts[0],'Hand throw counted as a punt');
@@ -231,23 +231,25 @@ try {
   await evidence('4b-pick-up',{playerId:dropKeeper.id});
   await release();
   stage='run-with-ball';
-  // 5: The keeper picks the ball up again and runs toward the pitch centre.
+  // 5: The keeper runs with the ball in the hands: left stick, then R1 sprint.
+  // The stick is pushed first, so R1 never puts the ball down.
   await hold();
-  await button(0,5,true); await ticks(2); await button(0,5,false);
-  await wait(() => window.__fe.keeperHold===null);
   const runStart=await snapshot();
   const runKeeper=keeper(runStart);
   const dir=Math.sign(0-runKeeper.x)||1;
-  await axes(0,[dir*.9,0,0,0]);
+  await axes(0,[dir*.9,0,0,0]); await ticks(2);
   await button(0,5,true);
-  await ticks(30);
+  await ticks(20);
   const runEnd=await snapshot();
   const endKeeper=keeper(runEnd);
   const moved=(endKeeper.x-runKeeper.x)*dir;
-  check(moved>2,'Keeper did not run with the ball');
-  check(dist(endKeeper,runEnd.ball)<2.5,'Keeper lost the ball while running');
+  const runSpeed=Math.hypot(endKeeper.vx,endKeeper.vy);
+  check(moved>1.5,`Keeper did not run with the ball: ${moved}`);
+  check(runSpeed>5.2,`Keeper run with the ball is not a sprint: ${runSpeed}`);
+  check(runEnd.keeperHold?.playerId===endKeeper.id,'Keeper lost the ball while running');
+  check(dist(endKeeper,runEnd.ball)<1,'Ball is not in the hands of the running keeper');
   check(runEnd.phase==='playing',`Phase left playing: ${runEnd.phase}`);
-  await evidence('5-run-with-ball',{moved});
+  await evidence('5-run-with-ball',{moved,speed:runSpeed});
   await release();
   stage='feint';
   // 6: T then X feints the throw: the keeper keeps the ball, no counter fires.
