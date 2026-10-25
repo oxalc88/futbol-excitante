@@ -42,8 +42,10 @@ export class ControllerMapper {
   /** defending: the team has no ball. It defaults to false, so the pad uses
    * the attack keys when no possession state is given. input.ts passes the state.
    * aerial: the ball is at head height and the player can reach it, so the
-   * header row replaces the kick buttons. */
-  sample(pads:readonly PadReading[],tick:number,slot:TeamIndex,defending=false,aerial=false):PadFrame {
+   * header row replaces the kick buttons.
+   * keeper: the slot controls the goalkeeper, so one press of the tackle button
+   * dives. The outfield player keeps the double tap. */
+  sample(pads:readonly PadReading[],tick:number,slot:TeamIndex,defending=false,aerial=false,keeper=false):PadFrame {
     const connected=pads.filter(p=>p.connected&&p.mapping==='standard');
     for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.lastTick[i]=-1;this.tackleTap[i]=-1;}
     for(const p of connected){const id=identity(p);if(!this.slots.includes(id)){const i=this.slots.indexOf(null);if(i>=0){this.slots[i]=id;this.previous[i]=p.buttons.map(b=>b.pressed);this.armed[i]=!p.buttons[B.shot]?.pressed;}}}
@@ -63,10 +65,15 @@ export class ControllerMapper {
       // The double tap never arms in the air and □ skips its shot charge.
       this.tackleTap[slot]=-1;
       if(edge(B.pass)||edge(B.through)||edge(B.cross)||edge(B.shot))f.action='header';
+      // The header spends the □ press: disarm the shot until □ is up, so the
+      // release never fires a shot.
+      if(edge(B.shot))this.armed[slot]=false;
     }else if(defending){
       // Pressure is a missing mechanic (phase 2), so the first tap only arms the
       // tackle and the second tap inside the window fires it.
-      if(edge(B.tackle)){if(this.tackleTap[slot]>=0&&tick-this.tackleTap[slot]<=TACKLE_TAP_TICKS){f.action='tackle';this.tackleTap[slot]=-1;}else this.tackleTap[slot]=tick;}
+      // The goalkeeper dives on one press of the same button.
+      if(keeper){this.tackleTap[slot]=-1;if(edge(B.tackle))f.action='tackle';}
+      else if(edge(B.tackle)){if(this.tackleTap[slot]>=0&&tick-this.tackleTap[slot]<=TACKLE_TAP_TICKS){f.action='tackle';this.tackleTap[slot]=-1;}else this.tackleTap[slot]=tick;}
       if(edge(B.cross))f.action='slide';
     }else{
       this.tackleTap[slot]=-1;
@@ -75,9 +82,10 @@ export class ControllerMapper {
       if(edge(B.through))f.action='through';
     }
     // At head height □ heads at once and never charges. Otherwise □ charges in
-    // both contexts: shot with the ball, clearance without it. The arming state
-    // stays untouched, so the first press after an aerial ball still charges.
-    if(aerial)this.charge[slot]=0;
+    // both contexts: shot with the ball, clearance without it. A press spent on a
+    // header stays disarmed until the release, so the release gives no shot and
+    // the next press charges again.
+    if(aerial){this.charge[slot]=0;if(!held(B.shot))this.armed[slot]=true;}
     else if(held(B.shot)&&this.armed[slot])this.charge[slot]=Math.min(1,this.charge[slot]+1/51);
     else if(!held(B.shot)){if(prev[B.shot]&&this.armed[slot]){f.action='shoot';f.power=Math.max(.15,this.charge[slot]);}this.charge[slot]=0;this.armed[slot]=true;}
     f.sprint=held(B.sprint);

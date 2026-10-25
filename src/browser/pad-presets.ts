@@ -39,7 +39,7 @@ export interface PadPresetRow {
   context: PadContext;
   /** PES 2017 table row. */
   pes: string;
-  /** PES button text, e.g. "✕" or "R1 + stick izq.". */
+  /** PES button text, e.g. "✕" or "R1 + left stick". */
   text: string;
   glyphs: readonly PsGlyph[];
   /** Standard-mapping button index, or null when the row has no button. */
@@ -55,7 +55,7 @@ export const PES_2017_PS4_ROWS: readonly PadPresetRow[] = [
   // 5 identical rows.
   { id: 'move', state: 'identical', context: 'attack', pes: 'Move player', text: 'Left stick', glyphs: [], button: null,
     keys: { p1: ['KeyW', 'KeyS', 'KeyA', 'KeyD'], p2: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'] },
-    shares: [], axis: 'left', note: 'Stick left. Same as FE.' },
+    shares: [], axis: 'left', note: 'Left stick. Same as FE.' },
   { id: 'pass', state: 'identical', context: 'attack', pes: 'Short pass', text: '✕', glyphs: ['✕'], button: PS_BUTTON.cross,
     keys: { p1: ['KeyJ'], p2: ['Numpad1'] }, shares: ['header'], note: 'Same as FE. While defending, ✕ is the tackle.' },
   { id: 'through', state: 'identical', context: 'attack', pes: 'Through ball', text: '△', glyphs: ['△'], button: PS_BUTTON.triangle,
@@ -67,7 +67,7 @@ export const PES_2017_PS4_ROWS: readonly PadPresetRow[] = [
   // 12 remapped rows.
   { id: 'cross', state: 'remapped', context: 'attack', pes: 'High pass / cross', text: '○', glyphs: ['○'], button: PS_BUTTON.circle,
     keys: { p1: ['KeyI'], p2: ['Numpad5'] }, shares: ['switchPlay', 'crossHigh', 'header'], note: 'FE uses □ for cross.' },
-  { id: 'switchPlay', state: 'remapped', context: 'attack', pes: 'Switch play', text: 'Stick left to other wing + ○', glyphs: ['○'],
+  { id: 'switchPlay', state: 'remapped', context: 'attack', pes: 'Switch play', text: 'Left stick to other wing + ○', glyphs: ['○'],
     button: PS_BUTTON.circle, keys: { p1: ['KeyI'], p2: ['Numpad5'] }, shares: ['cross', 'crossHigh'],
     note: 'Same ○ button with a direction. FE uses a directed lob (L1 + ✕).' },
   { id: 'crossHigh', state: 'remapped', context: 'attack', pes: 'High cross in wing', text: '○', glyphs: ['○'], button: PS_BUTTON.circle,
@@ -78,7 +78,7 @@ export const PES_2017_PS4_ROWS: readonly PadPresetRow[] = [
     button: PS_BUTTON.square, keys: { p1: ['KeyK'], p2: ['Numpad2'] },
     shares: ['shot', 'pass', 'through', 'cross'],
     note: 'There is no separate header button. Use □ or a pass button when the ball is at head height. Shares □ with shot and pass buttons with pass rows.' },
-  { id: 'sprint', state: 'remapped', context: 'attack', pes: 'Sprint', text: 'R1 + stick left', glyphs: ['R1'], button: PS_BUTTON.r1,
+  { id: 'sprint', state: 'remapped', context: 'attack', pes: 'Sprint', text: 'R1 + left stick', glyphs: ['R1'], button: PS_BUTTON.r1,
     keys: { p1: ['ShiftLeft'], p2: ['ShiftRight'] }, shares: [], note: 'R1 sprints in both contexts. FE uses L2 for sprint.' },
   { id: 'shield', state: 'remapped', context: 'attack', pes: 'Shield ball', text: 'Automatic', glyphs: [], button: null,
     keys: { p1: [], p2: [] }, shares: [], note: 'Automatic on contact. No button, no glyph and no key. FE uses L3.' },

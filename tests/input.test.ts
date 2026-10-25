@@ -279,3 +279,75 @@ for(const source of ['keyboard','touch','gamepad'] as const)test(`browser ${sour
   }
  }
 });
+
+test('an aerial pad □ press heads once and its release never shoots',()=>{
+  const m=new ControllerMapper();
+  let tick=0;
+  assert.equal(m.sample([pad(0)],tick++,0,false,true).action,undefined);
+  // □ down while aerial: the header fires and the press is spent.
+  assert.equal(m.sample([pad(0,[2])],tick++,0,false,true).action,'header');
+  assert.equal(m.sample([pad(0,[2])],tick++,0,false,true).action,undefined);
+  // Release with aerial off: the spent press gives no shot.
+  assert.equal(m.sample([pad(0)],tick++,0,false,false).action,undefined);
+  // The next press below head height charges and shoots again.
+  assert.equal(m.sample([pad(0,[2])],tick++,0,false,false).action,undefined);
+  assert.equal(m.sample([pad(0)],tick++,0,false,false).action,'shoot');
+});
+
+test('an aerial keyboard □ press heads once and its release never shoots',t=>{
+  const {input,key}=browser(t);
+  input.sample(0,0);
+  input.setAerial([true,true]);
+  key('keydown','KeyK');
+  assert.equal(input.sample(1,0).action,'header');
+  input.setAerial([false,false]);
+  key('keyup','KeyK');
+  assert.equal(input.sample(2,0).action,undefined);
+  // The next press below head height charges and shoots again.
+  key('keydown','KeyK');
+  assert.equal(input.sample(3,0).action,undefined);
+  key('keyup','KeyK');
+  assert.equal(input.sample(4,0).action,'shoot');
+});
+
+test('the keeper dive key fires one press while the outfield tackle keeps the double tap',t=>{
+  const {input,key,pads}=browser(t);
+  pads.push(pad(0),pad(1));input.sample(0,0);input.sample(0,1);
+  input.setDefending([true,true]);
+  // Outfield: the first keyboard tap only arms, the second tap inside the window fires.
+  key('keydown','KeyU');assert.equal(input.sample(1,0).action,undefined);key('keyup','KeyU');
+  key('keydown','KeyU');assert.equal(input.sample(2,0).action,'tackle');key('keyup','KeyU');
+  // Outfield: the pad keeps the same double tap on ✕.
+  pads[0]=pad(0,[0]);assert.equal(input.sample(3,0).action,undefined);
+  pads[0]=pad(0);input.sample(4,0);
+  pads[0]=pad(0,[0]);assert.equal(input.sample(5,0).action,'tackle');
+  pads[0]=pad(0);input.sample(6,0);
+  // Keeper: one keyboard press dives, for both players.
+  input.setKeeper([true,true]);
+  key('keydown','KeyU');assert.equal(input.sample(7,0).action,'tackle');key('keyup','KeyU');
+  assert.equal(input.sample(8,0).action,undefined);
+  key('keydown','Numpad0');assert.equal(input.sample(9,1).action,'tackle');key('keyup','Numpad0');
+  // Keeper: one pad press dives too.
+  pads[0]=pad(0,[0]);assert.equal(input.sample(10,0).action,'tackle');
+  pads[0]=pad(0);assert.equal(input.sample(11,0).action,undefined);
+  // Away from the keeper cursor the double tap returns.
+  input.setKeeper([false,false]);
+  key('keydown','KeyU');assert.equal(input.sample(12,0).action,undefined);key('keyup','KeyU');
+  key('keydown','KeyU');assert.equal(input.sample(13,0).action,'tackle');key('keyup','KeyU');
+});
+
+test('a keyboard □ press made in the air arms no shot until the key is up',t=>{
+  const {input,key}=browser(t);
+  input.sample(0,0);
+  // The press starts in the air, the band ends before the next sample.
+  input.setAerial([true,true]);
+  key('keydown','KeyK');
+  input.setAerial([false,false]);
+  key('keyup','KeyK');
+  assert.equal(input.sample(1,0).action,undefined);
+  // The next press below head height charges and shoots again.
+  key('keydown','KeyK');
+  assert.equal(input.sample(2,0).action,undefined);
+  key('keyup','KeyK');
+  assert.equal(input.sample(3,0).action,'shoot');
+});

@@ -22,11 +22,11 @@ const TABLE: readonly [string, PadPresetRow['state'], PadContext, number | null,
   ['switchPlayer', 'identical', 'defense', 4, ['L1'], 'L1'],
   ['pause', 'identical', 'system', 9, ['OPTIONS'], 'OPTIONS'],
   ['cross', 'remapped', 'attack', 1, ['○'], '○'],
-  ['switchPlay', 'remapped', 'attack', 1, ['○'], 'Stick left to other wing + ○'],
+  ['switchPlay', 'remapped', 'attack', 1, ['○'], 'Left stick to other wing + ○'],
   ['crossHigh', 'remapped', 'attack', 1, ['○'], '○'],
   ['shot', 'remapped', 'attack', 2, ['□'], '□ hold'],
   ['header', 'remapped', 'attack', 2, ['□'], '□ or pass at head height'],
-  ['sprint', 'remapped', 'attack', 5, ['R1'], 'R1 + stick left'],
+  ['sprint', 'remapped', 'attack', 5, ['R1'], 'R1 + left stick'],
   ['shield', 'remapped', 'attack', null, [], 'Automatic'],
   ['standingTackle', 'remapped', 'defense', 0, ['✕'], '✕ ×2'],
   ['slide', 'remapped', 'defense', 1, ['○'], '○ (defending)'],
@@ -493,4 +493,21 @@ test('R3 keeps the keeper switch as an edge', () => {
   assert.equal(frames[1].switchKeeper, true);
   assert.equal(frames[2].switchKeeper, false);
   assert.equal(frames[3].switchKeeper, false);
+});
+
+test('help shows the player keys, the tackle double tap and the single-press keeper dive', () => {
+  const main = readFileSync(new URL('../src/browser/main.ts', import.meta.url), 'utf8');
+  // Switch play uses the movement keys of each player column; only the pad keeps the stick.
+  const switchPlay = main.split('<tr>').find((row) => row.includes('Cambio de frente'))!;
+  assert.equal(switchPlay.includes('WASD hacia la otra banda + I'), true, 'player 1 keys');
+  assert.equal(switchPlay.includes('Flechas hacia la otra banda + Num 5'), true, 'player 2 keys');
+  assert.equal(switchPlay.includes('Stick izq. a la otra banda + ○'), true, 'pad keeps the left stick');
+  assert.equal(switchPlay.includes('Stick izq. a la otra banda + I'), false, 'no pad keys in the player column');
+  // The outfield tackle reads as a double tap on the pad.
+  const tackle = main.split('<tr>').find((row) => row.includes('Entrada de pie'))!;
+  assert.equal(tackle.includes('✕ ✕ (doble toque)'), true);
+  // The keeper dive stays one press, as before the preset.
+  const dive = main.split('<tr>').find((row) => row.includes('Portero: lanzarse'))!;
+  assert.equal(dive.includes('✕ ×2'), false);
+  assert.equal(dive.includes('<td>U</td>') && dive.includes('<td>Num 0</td>') && dive.includes('<td>✕</td>'), true);
 });
