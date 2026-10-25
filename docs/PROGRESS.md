@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-25 03:08 — PR pendiente · Mando PS4 al estilo PES 2017 por defecto
+- **Qué cambia para el jugador:** el mando usa los botones de PES 2017 en PS4. Con balón: ✕ pase raso, ○ pase alto o centro, L1 + ○ pase elevado, △ pase en profundidad, □ tiro (mantener y soltar), R1 correr, L1 cambiar jugador. Sin balón: ✕ ✕ (doble toque) entrada, ○ barrida, □ despeje. El cabezazo sale con □ o con un pase cuando el balón llega a la altura de la cabeza. Proteger el balón es automático en el contacto. El clic del touchpad cambia la cámara. OPTIONS pausa y R3 controla al arquero. El teclado sigue la misma lógica y la ayuda muestra los símbolos de PlayStation.
+- **Qué probar:** con un mando PS4 o PS5, juega un partido: pasa con ✕, centra con ○, tira con □ y corre con R1. Sin balón, haz doble toque en ✕ para la entrada y mantén ✕ (no debe pasar nada). Prueba un cabezazo en un centro, el arquero con R3 (un solo toque para lanzarse) y el touchpad. Repite con teclado.
+- **Qué se rompe o cambia:** cambian los botones por defecto: ○ ya no tira (ahora □), □ ya no centra, R1 ya no es entrada sino correr, L2 ya no corre, R2 ya no cabecea, L3 ya no protege. En el teclado desaparecen las teclas propias de cabezazo, elevado y proteger. Mantener ✕ (presión) aún no hace nada: llega en la fase 2. La simulación y `eval/baseline.json` no cambian. El saque CPU sigue en 60 ticks.
+
 ## 2026-10-25 01:22 — PR pendiente ([#71](https://github.com/oxalc88/futbol-excitante/pull/71)) · Sonido de partido
 - **Qué cambia para el jugador:** se oyen golpes de balón, silbatos de saque inicial, descanso y final, red y festejo de gol, y público de fondo. M o el botón Sonido silencia el partido. El control Volumen ajusta el nivel. El volumen y el silencio se guardan en este navegador. El sonido empieza tras pulsar una tecla, tocar la pantalla o pulsar un botón del mando.
 - **Qué probar:** inicia un partido, pasa, tira y marca un gol. Escucha los silbatos y el público. Ajusta Volumen, pulsa M y recarga para comprobar los ajustes guardados. Ejecuta `npm run typecheck` y `npm test`; `tests/audio.test.ts` comprueba sonidos, volumen, silencio y activación por gesto.
