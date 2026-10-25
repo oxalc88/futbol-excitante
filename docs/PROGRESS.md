@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-25 01:30 — PR pendiente · Mando simulado en prueba de navegador · referencia [#44](https://github.com/oxalc88/futbol-excitante/issues/44)
+## 2026-10-25 01:09 — PR pendiente ([#69](https://github.com/oxalc88/futbol-excitante/pull/69)) · Mando simulado en prueba de navegador · referencia [#44](https://github.com/oxalc88/futbol-excitante/issues/44)
 - **Qué cambia para el jugador:** nada en el partido. Una prueba de navegador comprueba pausa con Start, tiro cargado único, desconexión durante la carga, reconexión con tiro pulsado, dos mandos con puestos estables y un toque en Tiro. Guarda resultados en `artifacts/local/smoke/pad.json`.
 - **Qué probar:** ejecuta `scripts/verify.sh`; revisa `pad-smoke`. Completa `docs/manual-device-test.md` con mandos Xbox y PlayStation y un iPhone con Safari. Quedan pendientes la latencia, la zona muerta real, los botones físicos, la comodidad y el cambio de aplicación en iOS.
 - **Qué se rompe o cambia:** nada en la simulación. Se agrega una vista de diagnóstico de solo lectura en el navegador. La prueba táctil emulada cubre un toque, no gestos simultáneos ni Safari real.
