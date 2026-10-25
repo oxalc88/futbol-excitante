@@ -127,3 +127,16 @@ test('aim follows movement, persists at rest and resets when playing direction c
   key('keydown','KeyW');input.sample(1,0);key('keyup','KeyW');assert.deepEqual(input.sample(2,0).aim,{x:0,y:-1});
   input.setDirections([-1,1]);assert.deepEqual(input.sample(3,0).aim,{x:-1,y:0});assert.deepEqual(input.sample(3,1).aim,{x:1,y:0});
 });
+
+test('keeper keyboard and pad switches are isolated edges and clear on pause',t=>{
+ const {input,key,pads}=browser(t);
+ key('keydown','KeyR');key('keydown','Numpad8');
+ assert(input.sample(0,0).switchKeeper);assert(input.sample(0,1).switchKeeper);
+ assert(!input.sample(1,0).switchKeeper);assert(!input.sample(1,1).switchKeeper);
+ pads.push(pad(0),pad(1));input.sample(2,0);input.sample(2,1);
+ pads[0]=pad(0,[11]);pads[1]=pad(1,[11]);
+ assert(input.sample(3,0).switchKeeper);assert(input.sample(3,1).switchKeeper);
+ input.clear();input.enabled=false;
+ assert(!input.sample(4,0).switchKeeper);
+ input.enabled=true;assert(!input.sample(5,0).switchKeeper);
+});

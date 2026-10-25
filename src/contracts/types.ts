@@ -22,10 +22,12 @@ export interface Tactics {
 export interface TeamProfile { id: string; name: string; shortName: string; players: PlayerProfile[]; tactics: Tactics }
 export interface InputFrame {
   tick: number; slot: TeamIndex; move: Vec2; aim: Vec2; sprint: boolean; shield: boolean;
-  action?: ActionKind; power?: number; switchPlayer?: boolean; tactics?: Partial<Tactics>;
+  action?: ActionKind; power?: number; switchPlayer?: boolean; switchKeeper?: boolean; tactics?: Partial<Tactics>;
 }
 export interface Intent { move: Vec2; aim: Vec2; sprint: boolean; shield: boolean; action?: ActionKind; power: number }
 export interface PlayerState extends PlayerProfile, Vec2 {
+  // Set only by the keeper switch command. Keep absent for legacy CPU checkpoints.
+  manualControl?: boolean;
   sentOff: boolean; yellows: number; keeperMode: 'ready' | 'dive' | 'hold' | 'recover'; keeperUntil: number;
   team: TeamIndex; vx: number; vy: number; heading: number; energy: number; stability: number;
   intent: Intent; action: { kind: ActionKind; start: number; contact: number; end: number; aim: Vec2; power: number; resolved: boolean } | null;

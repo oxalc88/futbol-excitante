@@ -14,6 +14,7 @@ function intent(v:unknown,path:string){object(v,path);vector(v.move,`${path}.mov
 export function validateReplayInput(v:unknown):asserts v is InputFrame {
   object(v,'entrada');number(v.tick,'entrada.tick',0,250000,true);choice(v.slot,[0,1],'entrada.slot');intent(v,'entrada');
   if(v.power!==undefined)number(v.power,'entrada.power',0,1);
+  if(v.switchKeeper!==undefined)choice(v.switchKeeper,[true,false],'entrada.switchKeeper');
   if(v.switchPlayer!==undefined)choice(v.switchPlayer,[true,false],'entrada.switchPlayer');
   if(v.tactics!==undefined){object(v.tactics,'entrada.tactics');
     const defaults=['defensiveLine','compactness','pressing','tempo','width','support','buildUp','counterPress','shortPossession','tightMarking','adaptation'];
@@ -77,6 +78,7 @@ export function validateCheckpoint(value:unknown):asserts value is World {
     number(p.heading,`jugador ${p.id}.heading`);
     for(const k of ['energy','stability']as const)number(p[k],`jugador ${p.id}.${k}`,0,1);
     for(const k of ['touchCooldown','recovery','travel','heldSince','keeperUntil']as const)number(p[k],`jugador ${p.id}.${k}`,0);
+    if(p.manualControl!==undefined)choice(p.manualControl,[true,false],`jugador ${p.id}.manualControl`);
     number(p.keeperReaction,`jugador ${p.id}.keeperReaction`);number(p.yellows,`jugador ${p.id}.yellows`,0,2,true);choice(p.keeperMode,['ready','dive','hold','recover'],`jugador ${p.id}.keeperMode`);
     intent(p.intent,`jugador ${p.id}.intent`);number(p.intent.power,`jugador ${p.id}.intent.power`,0,1);
     if(p.action!==null){object(p.action,'acción');choice(p.action.kind,actions,'acción.kind');for(const k of ['start','contact','end']as const)number(p.action[k],`acción.${k}`,k==='start'?-7:0,Number.MAX_SAFE_INTEGER,true);vector(p.action.aim,'acción.aim');number(p.action.power,'acción.power',0,1);choice(p.action.resolved,[true,false],'acción.resolved');}
