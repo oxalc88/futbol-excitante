@@ -45,6 +45,7 @@ Attach these paths, or the CI artifact, to the PR.
 | Browser match + CPU vs CPU (C1 #45) | smoke (kickoff taken, clock advances, no page errors) | `match.json`, `cpu-vs-cpu.png`, `video/` |
 | Pause and dialogs / fulltime (C2 #42) | pause.test.ts: manual pause, dialog close/cancel decision, terminal state, detached rematch kickoff; smoke: P → Help → close → clock frozen 2s → P → clock advances | test output; `match.json` → `pauseCase`; fulltime buttons require manual browser review |
 | Controls / devices (C5 #44) | local-stage.test.ts "two controller identities keep their slots…", "controller charge fires once…" (`controller.ts`); input.test.ts (keyboard, touch, charge, switch, pause, blur, two players, pad dead zone) | test output; real devices: `docs/manual-device-test.md` (pending) |
+| Visual style: silhouettes and palette (C11 #63) | palette.test.ts (team value bands separate for any kit pair, ball brightest, keeper distinct); presentation-boundary.test.ts unchanged | before/after screenshots for the 3 cameras in `docs/evidence/c11/` |
 | Game feel vs PES (C7 #48) | evaluate (design targets only) | manual review |
 | Teams data, online (C8 #49, C9 #50) | none | gap |
 

@@ -39,3 +39,35 @@ export class CameraRig {
     return {version:'camera-rig-v2',tick:this.tick,target:{x,y,z:0},position:{x,y:y+(tactical?45:(portrait?56:38)*zoom),z:tactical?95:(portrait?70:38)*zoom},fov:42};
   }
 }
+
+// Palette
+/** Linear-light value bands: quiet ground, clear teams, and a white ball. */
+export interface Kit { shirt:string; shorts:string; accent:string; pattern:'band'|'plain' }
+export const PITCH_PALETTES={
+  viva:{pitch:['#378a43','#3d9349'],surround:'#2e6a39',stands:['#243438','#29393c']},
+  sobria:{pitch:['#4c6e57','#50725b'],surround:'#3a5446',stands:['#243438','#29393c']}
+} as const;
+export type PitchPaletteId=keyof typeof PITCH_PALETTES;
+export const PALETTE={...PITCH_PALETTES.viva,barrier:'#304145',outline:'#17232b',lines:'#dce3d8',ball:'#ffffff'} as const;
+type RGB=[number,number,number];
+const linear=(v:number)=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4;
+const rgb=(color:string):RGB=>[1,3,5].map(i=>linear(parseInt(color.slice(i,i+2),16)/255)) as RGB;
+const value=(c:RGB)=>c[0]*.2126+c[1]*.7152+c[2]*.0722;
+/** Relative luminance in linear sRGB. Kit colors use six-digit hex. */
+export const luminance=(color:string)=>value(rgb(color));
+function atValue(color:string,target:number){
+  const c=rgb(color),v=value(c),up=v<target,t=up?(target-v)/(1-v):(v-target)/v;
+  return '#'+c.map(n=>{const x=up?n+(1-n)*t:n*(1-t);return Math.round(255*(x<=.0031308?12.92*x:1.055*x**(1/2.4)-.055)).toString(16).padStart(2,'0');}).join('');
+}
+export interface SilhouetteColors { body:string; trim:string; limb:string; outline:string }
+/** Keep team 0 light and team 1 dark, even when their source kits match. */
+export function teamSilhouettes(kits:readonly [Kit,Kit]):[SilhouetteColors,SilhouetteColors]{
+  return kits.map((kit,i)=>{const target=i===0?.66:.11,body=atValue(kit.shirt,target);return {body,trim:atValue(kit.accent,target*.9),limb:atValue(kit.shirt,target*.96),outline:PALETTE.outline};}) as [SilhouetteColors,SilhouetteColors];
+}
+/** Choose a keeper hue far from both teams. Its value sits between the two team bands. */
+export function keeperSilhouette(teams:readonly SilhouetteColors[]):SilhouetteColors {
+  const candidates=['#f3cb32','#df62de','#35d9dc'].map(c=>atValue(c,.4));
+  const distance=(a:string,b:string)=>rgb(a).reduce((sum,n,i)=>sum+(n-rgb(b)[i])**2,0);
+  const body=candidates.reduce((best,c)=>Math.min(...teams.map(t=>distance(c,t.body)))>Math.min(...teams.map(t=>distance(best,t.body)))?c:best);
+  return {body,trim:atValue(body,.36),limb:atValue(body,.39),outline:PALETTE.outline};
+}
