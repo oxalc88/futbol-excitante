@@ -148,13 +148,32 @@ test('cornerSide: the dpad stores the corner strategy of the attack and of the d
   assert.equal(other.events.some(e=>e.type==='corner-strategy'),false);
 });
 
-test('human defender strategy does not change a CPU corner taker path',()=>{
-  const config=createConfig({teamSize:11,human:[false,true],seed:41});
-  const teams:[ReturnType<typeof makeTeam>,ReturnType<typeof makeTeam>]=[makeTeam(0,11),makeTeam(1,11)];
-  const left=new Simulation(config,teams),right=new Simulation(config,teams);
-  setRestart(left,'corner',0,{x:52.5,y:34});right.restore(left.snapshot());
-  left.applyInputs([frame(left,1,{cornerSide:'left'})]);left.step();right.step();
-  assert.deepEqual(left.snapshot(),right.snapshot());
+test('human corner defence against a CPU taker moves defenders in either slot only',()=>{
+  for(const taker of [0,1] as const){
+    const defender=taker===0?1:0;
+    const human:[boolean,boolean]=taker===0?[false,true]:[true,false];
+    const events:MatchEvent[]=[];
+    const s=new Simulation(createConfig({teamSize:11,human,seed:41}),[makeTeam(0,11),makeTeam(1,11)],e=>events.push(...e));
+    setRestart(s,'corner',taker,{x:taker===0?52.5:-52.5,y:34});
+    const before=s.snapshot();
+    run(s,defender,{cornerSide:'left'});
+    const after=s.snapshot();
+    assert.equal(after.restart?.strategy?.defence,'man');
+    assert.deepEqual(events.filter(e=>e.type==='corner-strategy').map(e=>({team:e.team,data:e.data})),[{team:defender,data:{defence:'man'}}]);
+    assert.ok(after.players.some(p=>p.team===defender&&before.players.some(q=>q.id===p.id&&(p.x!==q.x||p.y!==q.y))),`defenders move in slot ${defender}`);
+    assert.deepEqual(after.players.filter(p=>p.team===taker).map(p=>({id:p.id,x:p.x,y:p.y})),before.players.filter(p=>p.team===taker).map(p=>({id:p.id,x:p.x,y:p.y})),`CPU attackers stay in place for slot ${taker}`);
+  }
+});
+
+test('CPU corner defenders ignore strategy commands',()=>{
+  for(const human of [[true,false],[false,false]] as const){
+    const config=createConfig({teamSize:11,human:[...human],seed:41});
+    const teams:[ReturnType<typeof makeTeam>,ReturnType<typeof makeTeam>]=[makeTeam(0,11),makeTeam(1,11)];
+    const left=new Simulation(config,teams),right=new Simulation(config,teams);
+    setRestart(left,'corner',0,{x:52.5,y:34});right.restore(left.snapshot());
+    left.applyInputs([frame(left,1,{cornerSide:'left'})]);left.step();right.step();
+    assert.deepEqual(left.snapshot(),right.snapshot());
+  }
 });
 
 test('wallJump: one □ press lifts the four wall players for 40 ticks and clears after expiry',()=>{

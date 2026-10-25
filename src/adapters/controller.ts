@@ -168,7 +168,7 @@ export class ControllerMapper {
       // While the ball is in the hands ○ is the punt charge, never a cross.
       if(edge(B.cross)&&!hold&&!restart)f.action=held(B.switchPlayer)?'lob':'cross';
       // A feint in this sample wins over the △ edge of the same sample.
-      if(edge(B.through)&&!f.keeperFeint&&!restart)f.action='through';
+      if(edge(B.through)&&!f.keeperFeint&&(!restart||restart.attacking))f.action='through';
     }
     // At head height □ heads at once and never charges. Otherwise □ charges in
     // both contexts: shot with the ball, clearance without it. A press spent on a
