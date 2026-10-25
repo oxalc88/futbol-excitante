@@ -21,13 +21,13 @@ Every step must print PASS. The script exits non-zero if one fails. CI (`.github
 | test | `node --test tests/*.test.ts` (engine, local-stage, evaluation, replay, discipline, input). |
 | evaluate | Headless evaluation (`scripts/evaluate.ts`); regenerates `artifacts/evaluation.json`, the committed copy is restored. |
 | build | Vite build into `dist/`. |
-| smoke | `scripts/smoke-browser.mjs`: starts a match, takes the human kickoff (presses J until the phase leaves "Saque inicial"), fails on page errors, missing canvas, or a clock stuck at `00:00`; then a CPU-vs-CPU match with video. |
+| smoke | `scripts/smoke-browser.mjs`: starts a match, takes the human kickoff (presses J until the phase leaves "Saque inicial"), fails on page errors, missing canvas, or a clock stuck at `00:00`. Then the script tests quick play. It uses a new browser profile. The tips show only on the first match. The match does not run while the tips are open. The Enter key starts the match from the focused button. The match starts against the CPU. The clock advances. Then the page loads again. The tips do not show a second time. At the end, the script runs a match with two CPU teams and records a video. |
 | pad-smoke | `scripts/smoke-gamepad.mjs`: fake standard pads; Start edges, charged shot, disconnect, held reconnect, stable local slots, and emulated touch shot. Runs after smoke with a separate preview server. |
 
 ## Evidence
 
 `artifacts/local/smoke/` (git-ignored; CI uploads it as `browser-smoke`):
-`pad.json` (scenario snapshots and errors), `game.png`, `match.json` (clock start/end, kickoffMs, score, phase, canvases, errors), `cpu-vs-cpu.png`, `video/*.webm`, `lab.png`.
+`pad.json` (scenario snapshots and errors), `game.png`, `match.json` (clock start/end, kickoffMs, score, phase, canvases, quick-play flow `quick`, Enter flow `enter`, errors), `quick-play.png`, `cpu-vs-cpu.png`, `video/*.webm`, `lab.png`.
 Attach these paths, or the CI artifact, to the PR.
 
 ## Capability map
@@ -45,6 +45,7 @@ Attach these paths, or the CI artifact, to the PR.
 | Replays (C3 #41) | engine.test.ts "replay reconstructs the exact match…"; replay.test.ts (validation, engine version, reference fixture `tests/fixtures/reference-engine-v2.json`) | test output; browser load round-trip is a gap |
 | Presentation boundary (C6 #46) | presentation-boundary.test.ts "presentation attached matches headless authority every tick and at fulltime" (frozen snapshots, three camera modes, HUD states, real renderer/radar with fake GPU/DOM, CPU kickoff at tick 60); "presentation imports cannot reach simulation mutators or orchestration"; typecheck rejects nested snapshot writes; local-stage.test.ts "camera changes and repeated draws cannot change authoritative state" | test output; per-tick hashes and final full-world comparison |
 | Browser match + CPU vs CPU (C1 #45) | smoke (kickoff taken, clock advances, no page errors) | `match.json`, `cpu-vs-cpu.png`, `video/` |
+| Start menu: quick play and first-time tips (C1 #45) | start-menu.test.ts (quick play defaults, `fe.tipsSeen` flag with throwing/missing storage, session flag with a successful read and a failing write, menu reducer); smoke quick-play flow (tips on first match only, sim tick frozen while the tips are open, Enter on the focused button, solo CPU mode, clock advances, no tips after reload); manual: pad A/Cross starts and pauses, pad A ignored while a match runs or a dialog covers the setup | test output; `match.json` → `quick`, `enter`, `quick-play.png` |
 | Pause and dialogs / fulltime (C2 #42) | pause.test.ts: manual pause, dialog close/cancel decision, terminal state, detached rematch kickoff; smoke: P → Help → close → clock frozen 2s → P → clock advances | test output; `match.json` → `pauseCase`; fulltime buttons require manual browser review |
 | Controls / devices (C5 #44) | local-stage.test.ts "two controller identities keep their slots…", "controller charge fires once…" (`controller.ts`); input.test.ts (keyboard, touch, charge, switch, pause, blur, two players, pad dead zone) | test output; `scripts/smoke-gamepad.mjs` scenarios 1–6, `artifacts/local/smoke/pad.json`; real devices: `docs/manual-device-test.md` (pending) |
 | Visual style: silhouettes and palette (C11 #63) | palette.test.ts (team value bands separate for any kit pair, ball brightest, keeper distinct); presentation-boundary.test.ts unchanged | before/after screenshots for the 3 cameras in `docs/evidence/c11/` |
