@@ -34,6 +34,10 @@ export class ControllerMapper {
   // Tick of the last defending ✕ tap, or -1 when no tackle is armed.
   private tackleTap=[-1,-1];
   reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];}
+  /** Frees both slots: the next sample assigns the pads again in list order. */
+  releaseSlots(){this.slots=[null,null];this.previous=[[],[]];}
+  /** Charge level of a slot, for the HUD power meter. */
+  chargeLevel(slot:TeamIndex){return this.charge[slot];}
   assignments(){return [...this.slots];}
   /** One press edge of a system button per pad. Disconnected pads forget their edge. */
   private startEdge(pads:readonly PadReading[],button:number,starts:Map<string,boolean>){

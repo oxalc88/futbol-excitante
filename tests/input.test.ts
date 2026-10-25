@@ -82,15 +82,64 @@ test('keyboard shots charge until release, clamp power and fire once for each pl
   }
 });
 
-test('touch joystick, buttons, switching and charge/release affect only player one',t=>{
+test('the touch pad drives player one only: press edges, stick and shot charge',t=>{
   const {input,time}=browser(t);
-  input.setTouchMove({x:1,y:1});input.setTouchSprint(true);input.setTouchShield(true);input.switchTouch();input.touchAction('pass');
-  const other=input.sample(0,1);assert.deepEqual(other.move,{x:0,y:0});assert(!other.sprint&&!other.shield&&!other.switchPlayer);assert.equal(other.action,undefined);
-  const f=input.sample(0,0);assert(Math.abs(Math.hypot(f.move.x,f.move.y)-1)<1e-12);assert(f.sprint&&f.shield&&f.switchPlayer);assert.equal(f.action,'pass');assert.equal(input.sample(1,0).action,undefined);assert.equal(input.sample(1,0).switchPlayer,false);
-  for(const action of ['through','cross','tackle','header','lob','slide'] as const){input.touchAction(action);assert.equal(input.sample(2,0).action,action);}
-  time(0);input.startTouchShot();time(425);assert.equal(input.charging,.5);assert.equal(input.sample(3,0).action,undefined);input.endTouchShot();assert.equal(input.charging,0);const shot=input.sample(4,0);assert.equal(shot.action,'shoot');assert.equal(shot.power,.5);assert.equal(input.sample(5,0).action,undefined);
-  input.startTouchShot();time(2000);assert.equal(input.charging,1);input.endTouchShot(true);assert.equal(input.sample(6,0).action,undefined);
-  input.setTouchMove({x:.05,y:0});input.setTouchSprint(false);input.setTouchShield(false);const stopped=input.sample(7,0);assert.deepEqual(stopped.move,{x:0,y:0});assert(!stopped.sprint&&!stopped.shield);
+  input.setTouchActive(true);
+  assert.equal(input.touchActive,true);
+  // Assign the touch reading with no button held, so the first press is an edge.
+  input.sample(0,0);
+  input.touch.press(1,'cross');input.touch.press(2,'r1');
+  // Same value again changes nothing and keeps the held buttons.
+  input.setTouchActive(true);
+  assert.equal(input.touch.held('cross'),true);
+  const other=input.sample(1,1);
+  assert.deepEqual(other.move,{x:0,y:0});assert(!other.sprint&&!other.switchPlayer);assert.equal(other.action,undefined);
+  const f=input.sample(1,0);
+  assert(f.sprint);assert.equal(f.action,'pass');assert.equal(f.switchPlayer,false);
+  assert.equal(input.sample(2,0).action,undefined);assert.equal(input.sample(2,0).sprint,true);
+  // The stick moves only slot 0 and only past the dead zone.
+  input.touch.stickDown(3,100,200);input.touch.stickMove(3,100+56,200);
+  assert(Math.abs(input.sample(3,0).move.x-1)<1e-12);
+  assert.deepEqual(input.sample(3,1).move,{x:0,y:0});
+  // A held □ charges in the mapper and the release fires one shot.
+  time(0);input.touch.press(4,'square');
+  input.sample(4,0);input.sample(5,0);
+  assert(input.charging>0,'the touch charge feeds the HUD meter');
+  input.touch.release(4);
+  const shot=input.sample(6,0);
+  assert.equal(shot.action,'shoot');assert.equal(input.charging,0);
+  assert.equal(input.sample(7,0).action,undefined);
+  // Switching the touch pad off drops every held pointer and its reading.
+  input.setTouchActive(false);
+  assert.equal(input.touchActive,false);
+  assert.equal(input.touch.held('cross'),false);assert.equal(input.touch.held('r1'),false);
+  assert.equal(input.touch.stick.active,false);
+  const idle=input.sample(8,0);
+  assert(!idle.sprint);assert.deepEqual(idle.move,{x:0,y:0});assert.equal(idle.action,undefined);
+});
+
+test('the touch pad owns slot 0 while a physical pad hands it back on disable',t=>{
+  const {input,pads}=browser(t);
+  input.setTouchActive(true);
+  input.sample(0,0);
+  input.touch.press(1,'cross');
+  assert.equal(input.sample(1,0).action,'pass');
+  assert.equal(input.sample(1,1).action,undefined);
+  pads.push(pad(0),pad(1));
+  // The readings are assigned in list order: the touch keeps slot 0, pad 0 takes slot 1.
+  input.sample(2,0);input.sample(2,1);
+  pads[0]=pad(0,[0]);
+  assert.equal(input.sample(3,0).action,undefined,'the touch reading owns slot 0');
+  assert.equal(input.sample(3,1).action,'pass','pad 0 moved to slot 1');
+  // Disabling releases both slots: pad 0 retakes slot 0 on the next sample.
+  input.setTouchActive(false);
+  assert.equal(input.touch.held('cross'),false);
+  pads[0]=pad(0,[]);
+  input.sample(4,0);input.sample(4,1);
+  input.sample(5,0);
+  pads[0]=pad(0,[0]);
+  assert.equal(input.sample(6,0).action,'pass');
+  assert.equal(input.sample(6,1).action,undefined);
 });
 
 test('disabled and editing targets ignore keydown; browser defaults are prevented for game keys',t=>{
@@ -101,13 +150,17 @@ test('disabled and editing targets ignore keydown; browser defaults are prevente
   assert.equal(key('keydown','KeyD'),false);key('keyup','KeyD',new ElementStub('INPUT'));assert.equal(input.sample(2,0).move.x,0);
 });
 
-test('blur and hidden-document transitions clear held keys, queued actions and touch charges',t=>{
+test('blur and hidden-document transitions clear held keys and the whole touch pad',t=>{
   const {input,key,emit,doc}=browser(t);
+  input.setTouchActive(true);
   for(const event of ['blur','visibilitychange']){
     for(const code of ['KeyD','KeyJ','KeyQ','KeyK','Numpad2'])key('keydown',code);
-    input.setTouchMove({x:1,y:0});input.setTouchSprint(true);input.setTouchShield(true);input.touchAction('cross');input.switchTouch();input.startTouchShot();
-    doc.hidden=true;emit(event);key('keyup','KeyK');key('keyup','Numpad2');input.endTouchShot();assert.equal(input.charging,0);
-    for(const slot of [0,1] as const){const f=input.sample(0,slot);assert.deepEqual(f.move,{x:0,y:0});assert(!f.sprint&&!f.shield&&!f.switchPlayer);assert.equal(f.action,undefined);}
+    input.touch.press(1,'cross');input.touch.stickDown(1,10,10);input.touch.stickMove(1,10+56,10);
+    doc.hidden=true;emit(event);key('keyup','KeyK');key('keyup','Numpad2');
+    assert.equal(input.touch.held('cross'),false,`cross survived ${event}`);
+    assert.equal(input.touch.stick.active,false,`stick survived ${event}`);
+    assert.equal(input.charging,0);
+    for(const slot of [0,1] as const){const f=input.sample(0,slot);assert.deepEqual(f.move,{x:0,y:0});assert(!f.sprint&&!f.switchPlayer);assert.equal(f.action,undefined);}
   }
   key('keydown','KeyD');doc.hidden=false;emit('visibilitychange');assert.equal(input.sample(1,0).move.x,1);
 });
@@ -248,25 +301,25 @@ test('keeper keyboard and pad switches are isolated edges and clear on pause',t=
 });
 
 
-test('touch keeper switch is a player-one edge and clears with browser input',t=>{
- const {input,emit}=browser(t);
- input.switchKeeperTouch();assert(!input.sample(0,1).switchKeeper);
- assert(input.sample(0,0).switchKeeper);assert(!input.sample(1,0).switchKeeper);
- input.switchKeeperTouch();emit('blur');assert(!input.sample(2,0).switchKeeper);
- input.enabled=false;input.switchKeeperTouch();assert(!input.sample(3,0).switchKeeper);
- input.clear();input.enabled=true;assert(!input.sample(4,0).switchKeeper);
+test('touch keeper switch is gone: the touch pad has no keeper switch button',t=>{
+ const {input}=browser(t);
+ input.setTouchActive(true);
+ input.touch.press(1,'r1');
+ assert.equal(input.sample(0,0).switchKeeper,false);
+ assert.equal(input.sample(1,0).switchKeeper,false);
+ input.setTouchActive(false);
+ assert.equal(input.sample(2,0).switchKeeper,false);
 });
 
-for(const source of ['keyboard','touch','gamepad'] as const)test(`browser ${source} adapter switches keeper in and out`,t=>{
+for(const source of ['keyboard','gamepad'] as const)test(`browser ${source} adapter switches keeper in and out`,t=>{
  const {input,key,pads}=browser(t);
  const sim=new Simulation(createConfig({teamSize:2,human:[true,true],seed:41}),[makeTeam(0,2),makeTeam(1,2)]);
  const initial=sim.snapshot();initial.phase='playing';initial.restart=null;sim.restore(initial);
  pads.push(pad(0),pad(1));input.sample(-1,0);input.sample(-1,1);
- for(const slot of (source==='touch'?[0] as const:[0,1] as const)){
+ for(const slot of [0,1] as const){
   const keeper=initial.players.find(p=>p.team===slot&&p.keeper)!;
   for(const entering of [true,false]){
    if(source==='keyboard')key('keydown',slot===0?'KeyR':'Numpad8');
-   if(source==='touch')input.switchKeeperTouch();
    if(source==='gamepad')pads[slot]=pad(slot,[11]);
    sim.applyInputs([input.sample(sim.tick,0),input.sample(sim.tick,1)]);sim.step();
    const world=sim.snapshot();assert.equal(world.selected[slot]===keeper.id,entering);

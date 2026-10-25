@@ -1,4 +1,4 @@
-// Test standard gamepads and one touch shot in the browser.
+// Test standard gamepads in the browser.
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { connect } from 'node:net';
@@ -197,13 +197,6 @@ try {
   }
   await axes(0,[0,0,0,0]); await axes(1,[0,0,0,0]); await ticks();
   await evidence(5);
-  stage='touch';
-  // 6: Send touch events to the visible control.
-  const touch=await snapshot();
-  await page.locator('#touch-shoot').tap();
-  await wait(n => window.__fe.shots.actions[0]===n+1,touch.shots.actions[0]);
-  await ticks(12); check((await snapshot()).shots.actions[0]===touch.shots.actions[0]+1,'Touch shot repeated');
-  await evidence(6,{coverage:'Emulated touch shot tap only; real iPhone testing is pending.'});
   stage='keeper punt';
   // 7: The keeper hook holds the ball. R2 + ○ is the high punt: one event,
   // counted once as a punt and never repeated.

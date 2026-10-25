@@ -1,5 +1,6 @@
 import type { ActionKind, InputFrame, TeamIndex, Vec2 } from '../contracts/types';
 import { ControllerMapper } from './controller';
+import { TouchPad, type TouchContext } from './touch-pad';
 import { KEYBOARD_MAP, KEYBOARD_MOVE, pesHeader, TACKLE_TAP_TICKS, type KeyRole } from '../browser/pad-presets';
 import { clamp, length, unit } from '../simulation/math';
 // The keeper switch has no preset row. Keep the FE keys.
@@ -43,7 +44,9 @@ export class BrowserInput {
   private punt=new Map<string,number>();
   // Millisecond time of the last defending tackle key tap, or -1 when disarmed.
   private tackleTap=[-1,-1];
-  private touchMove:Vec2={x:0,y:0};private touchActions:ActionKind[]=[];private touchSprint=false;private touchShield=false;private touchCharge:number|null=null;private touchPower=.55;
+  // On-screen PS-style touch pad: one virtual gamepad reading for slot 0.
+  readonly touch=new TouchPad();
+  private touchOn=false;
   private aim:Vec2[]=[{x:1,y:0},{x:-1,y:0}];
   private lastTick=-1;private directions:[number,number]=[1,-1];
   enabled=false;
@@ -67,16 +70,18 @@ export class BrowserInput {
   setKeeper(flags:[boolean,boolean]){this.keeper=[...flags];}
   /** The match shell sets the ball-in-hands state of both keepers. */
   setKeeperHold(flags:[boolean,boolean]){this.keeperHold=[...flags];}
-  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.punt.clear();this.tackleTap=[-1,-1];this.aerial=[false,false];this.keeper=[false,false];this.keeperHold=[false,false];this.controller.reset();this.touchMove={x:0,y:0};this.touchActions=[];this.touchSprint=false;this.touchShield=false;this.touchCharge=null;this.lastTick=-1;}
-  setTouchMove(move:Vec2){this.touchMove=move;}
-  setTouchSprint(pressed:boolean){this.touchSprint=pressed;}
-  setTouchShield(pressed:boolean){this.touchShield=pressed;}
-  startTouchShot(){if(this.enabled)this.touchCharge=performance.now();}
-  endTouchShot(cancel=false){if(this.touchCharge!==null&&!cancel){this.touchPower=clamp((performance.now()-this.touchCharge)/850,.15,1);this.touchActions.push('shoot');}this.touchCharge=null;}
-  pauseRequested(){return this.controller.pauseRequested(this.gamepads);}
-  cameraRequested(){return this.controller.cameraRequested(this.gamepads);}
-  touchAction(action:ActionKind){this.touchActions.push(action);}
-  get charging(){const start=this.touchCharge??this.charges.get(firstCharge('p1'));return start===undefined?0:clamp((performance.now()-start)/850,0,1);}
+  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.punt.clear();this.tackleTap=[-1,-1];this.aerial=[false,false];this.keeper=[false,false];this.keeperHold=[false,false];this.controller.reset();this.touch.clear();this.lastTick=-1;}
+  /** Shows or hides the on-screen touch pad. A change drops every held touch. */
+  setTouchActive(on:boolean){if(on===this.touchOn)return;this.touchOn=on;this.touch.clear();this.controller.releaseSlots();}
+  get touchActive(){return this.touchOn;}
+  /** Pad readings of this sample. The touch reading comes first, so it owns slot 0. */
+  private pads(){return this.touchOn?[this.touch.reading(true),...this.gamepads]:this.gamepads;}
+  /** Label row of the touch buttons for the game state of one slot. */
+  context(slot:TeamIndex):TouchContext{const keeper=this.keeper[slot],hold=keeper&&this.keeperHold[slot];return{defending:this.defending[slot],aerial:this.aerial[slot],keeper,hold};}
+  pauseRequested(){return this.controller.pauseRequested(this.pads());}
+  cameraRequested(){return this.controller.cameraRequested(this.pads());}
+  // Keyboard charge first: with no key held the touch pad reads its own charge.
+  get charging(){const start=this.charges.get(firstCharge('p1'));if(start!==undefined)return clamp((performance.now()-start)/850,0,1);return this.touchOn?this.controller.chargeLevel(0):0;}
   get gamepads(){return Array.from(navigator.getGamepads?.()??[]).filter((p):p is Gamepad=>!!p&&p.connected);}
   sample(tick:number,slot:TeamIndex):InputFrame {
     if(!this.enabled)return{tick,slot,move:{x:0,y:0},aim:this.aim[slot],sprint:false,shield:false};
@@ -172,8 +177,7 @@ export class BrowserInput {
       if(kind&&!keeperFeint&&!(hold&&role.keeperKick))action=(kind==='cross'&&switchHeld(roles,this.keys))?'lob':kind;
     }
     let switchKeeper=this.edges.delete(KEEPER_KEYS[slot]);
-    if(slot===0){if(length(this.touchMove)>.1)movement=this.touchMove;sprint||=this.touchSprint;shield||=this.touchShield;const touched=this.touchActions.shift();if(!action&&touched){action=touched;power=touched==='shoot'?this.touchPower:.55;}switchPlayer||=this.edges.delete('touch-switch');switchKeeper||=this.edges.delete('touch-keeper');}
-    const pad=this.controller.sample(this.gamepads,tick,slot,defending,aerial,keeper,hold);
+    const pad=this.controller.sample(this.pads(),tick,slot,defending,aerial,keeper,hold);
     if(length(pad.move)>.1)movement=pad.move;
     sprint||=pad.sprint;shield||=pad.shield;switchPlayer||=pad.switchPlayer;switchKeeper||=pad.switchKeeper;
     if(pad.action){action=pad.action;power=pad.power;}
@@ -194,6 +198,4 @@ export class BrowserInput {
     if(simulateDive)frame.simulateDive=true;
     return frame;
   }
-  switchTouch(){this.edges.add('touch-switch');}
-  switchKeeperTouch(){this.edges.add('touch-keeper');}
 }
