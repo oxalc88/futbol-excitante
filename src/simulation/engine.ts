@@ -132,12 +132,12 @@ export class Simulation {
       }
       // Corner attack of the dpad: fast, near post, in line, far post.
       if(r.kind==='corner'&&attack.cornerSide){const value=CORNER_ATTACK[attack.cornerSide];
-        if(value!==undefined&&!r.strategy?.attack){r.strategy={...r.strategy,attack:value};this.emit('corner-strategy',undefined,team,{attack:value});}}
+        if(value!==undefined&&!r.strategy?.attack){r.strategy={...r.strategy,attack:value};this.placeCornerStrategy();this.emit('corner-strategy',undefined,team,{attack:value});}}
     }
     if(setPiece&&defence&&c.human[foe]){
       // Corner defence of the dpad: mixed, man to man, zonal.
-      if(r.kind==='corner'&&defence.cornerSide){const value=CORNER_DEFENCE[defence.cornerSide];
-        if(value!==undefined&&!r.strategy?.defence){r.strategy={...r.strategy,defence:value};this.emit('corner-strategy',undefined,foe,{defence:value});}}
+      if(r.kind==='corner'&&c.human[team]&&defence.cornerSide){const value=CORNER_DEFENCE[defence.cornerSide];
+        if(value!==undefined&&!r.strategy?.defence){r.strategy={...r.strategy,defence:value};this.placeCornerStrategy();this.emit('corner-strategy',undefined,foe,{defence:value});}}
       const wall=r.kind==='free-kick'||r.kind==='indirect';
       // One □ press without a held ✕ jumps the wall of the free kick.
       if(wall&&defence.wallJump)for(const p of wallPlayers(w,foe,r.point)){if(p.wallJump===undefined)this.emit('wall-jump',p,foe);p.wallJump=w.tick+WALL_JUMP_TICKS;}
@@ -149,6 +149,21 @@ export class Simulation {
         const keeper=w.players.find(p=>p.team===foe&&p.keeper&&!p.sentOff);
         if(keeper&&stick&&length(stick)>.1){const next=setKeeperMove(w,keeper,unit(stick),r.kind==='penalty');keeper.x=next.x;keeper.y=next.y;}
       }
+    }
+  }
+  /** Move players for a human corner. Use fixed positions for each strategy. */
+  private placeCornerStrategy(){
+    const w=this.world,r=w.restart;if(!r||r.kind!=='corner'||!w.config.human[r.team])return;
+    const dir=w.teams[r.team].direction,goal=dir*w.config.pitch.length/2,side=r.point.y>=0?1:-1;
+    const attack=w.players.filter(p=>p.team===r.team&&!p.keeper&&!p.sentOff&&p.id!==r.taker&&p.id!==r.second?.id).sort((a,b)=>a.id.localeCompare(b.id)).slice(0,2);
+    const targets=r.strategy?.attack==='near'?[[goal-dir*5,side*2],[goal-dir*7,0]]:r.strategy?.attack==='far'?[[goal-dir*7,-side*5],[goal-dir*9,-side*2]]:r.strategy?.attack==='line'?[[goal-dir*11,side*7],[goal-dir*13,side*4]]:r.strategy?.attack==='fast'?[[goal-dir*8,side*1],[goal-dir*10,-side*2]]:[];
+    for(let i=0;i<targets.length&&i<attack.length;i++){attack[i].x=clamp(targets[i][0],-w.config.pitch.length/2+1,w.config.pitch.length/2-1);attack[i].y=clamp(targets[i][1],-w.config.pitch.width/2+1,w.config.pitch.width/2-1);attack[i].vx=attack[i].vy=0;}
+    const defenders=w.players.filter(p=>p.team!==r.team&&!p.keeper&&!p.sentOff).sort((a,b)=>a.id.localeCompare(b.id)).slice(0,2);
+    if(r.strategy?.defence)for(let i=0;i<defenders.length;i++){
+      const mark=attack[i];if(!mark)break;
+      const offset=r.strategy.defence==='man'?{x:-dir*.8,y:side*.5}:r.strategy.defence==='zonal'?{x:-dir*2,y:i===0?2:-2}:{x:-dir*1.5,y:i===0?1:-1};
+      defenders[i].x=clamp((r.strategy.defence==='zonal'?goal-dir*7:mark.x)+offset.x,-w.config.pitch.length/2+1,w.config.pitch.length/2-1);
+      defenders[i].y=clamp((r.strategy.defence==='zonal'?0:mark.y)+offset.y,-w.config.pitch.width/2+1,w.config.pitch.width/2-1);defenders[i].vx=defenders[i].vy=0;
     }
   }
   private executeRestart(frame?:InputFrame){

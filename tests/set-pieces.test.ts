@@ -121,12 +121,14 @@ test('secondKick: hold L2 and the restart leaves the second taker, the cursor fo
 test('cornerSide: the dpad stores the corner strategy of the attack and of the defence',()=>{
   const {s,events}=match();
   setRestart(s,'corner',0,{x:52.5,y:34});
+  const before=s.snapshot().players.map(p=>({id:p.id,x:p.x,y:p.y}));
   // dpad up of the attacking slot: fast delivery.
   run(s,0,{cornerSide:'up'});
   let r=restartOf(s);
   assert.equal(r.strategy?.attack,'fast');
   assert.equal(events.filter(e=>e.type==='corner-strategy').length,1);
   assert.deepEqual(events.at(-1)?.data,{attack:'fast'});
+  assert.ok(s.snapshot().players.some(p=>p.team===0&&before.some(q=>q.id===p.id&&(q.x!==p.x||q.y!==p.y))),'attack strategy moves off-ball runners');
   // A second direction never overwrites the stored attack strategy.
   run(s,0,{cornerSide:'left'});
   assert.equal(restartOf(s).strategy?.attack,'fast');
@@ -137,12 +139,22 @@ test('cornerSide: the dpad stores the corner strategy of the attack and of the d
   assert.equal(r.strategy?.defence,'man');
   assert.equal(events.filter(e=>e.type==='corner-strategy').length,2);
   assert.deepEqual(events.at(-1)?.data,{defence:'man'});
+  assert.ok(s.snapshot().players.some(p=>p.team===1&&before.some(q=>q.id===p.id&&(q.x!==p.x||q.y!==p.y))),'defence strategy moves markers');
   // The defence has no down row: nothing is stored and nothing is emitted.
   const other=match();
   setRestart(other.s,'corner',0,{x:52.5,y:34});
   run(other.s,1,{cornerSide:'down'});
   assert.equal(restartOf(other.s).strategy?.defence,undefined);
   assert.equal(other.events.some(e=>e.type==='corner-strategy'),false);
+});
+
+test('human defender strategy does not change a CPU corner taker path',()=>{
+  const config=createConfig({teamSize:11,human:[false,true],seed:41});
+  const teams:[ReturnType<typeof makeTeam>,ReturnType<typeof makeTeam>]=[makeTeam(0,11),makeTeam(1,11)];
+  const left=new Simulation(config,teams),right=new Simulation(config,teams);
+  setRestart(left,'corner',0,{x:52.5,y:34});right.restore(left.snapshot());
+  left.applyInputs([frame(left,1,{cornerSide:'left'})]);left.step();right.step();
+  assert.deepEqual(left.snapshot(),right.snapshot());
 });
 
 test('wallJump: one □ press lifts the four wall players for 40 ticks and clears after expiry',()=>{

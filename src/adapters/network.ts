@@ -3,22 +3,34 @@ import { clamp } from '../simulation/math';
 type Message={type:string;[key:string]:unknown};
 export class PeerSession {
   private pc:RTCPeerConnection|null=null;private channel:RTCDataChannel|null=null;private latest:Partial<InputFrame>={};
-  private receivedSequence=0;private sentInputSequence=0;private pendingAction:InputFrame['action'];private pendingSwitch=false;private pendingKeeperSwitch=false;private pendingKeeperKick:InputFrame['keeperKick'];private pendingKeeperDrop=false;private pendingKeeperFeint=false;private pendingSimulateDive=false;private lastInputAt=0;
+  private receivedSequence=0;private sentInputSequence=0;private pendingAction:InputFrame['action'];private pendingSwitch=false;private pendingKeeperSwitch=false;private pendingKeeperKick:InputFrame['keeperKick'];private pendingKeeperDrop=false;private pendingKeeperFeint=false;private pendingSimulateDive=false;private pendingSet:Partial<InputFrame>={};private pendingKick:Partial<InputFrame>={};private lastInputAt=0;
   role:'host'|'guest'|null=null;onStatus:(status:string)=>void=()=>{};onStart:(world:World)=>void=()=>{};onSnapshot:(s:Presentation)=>void=()=>{};onConnect:()=>void=()=>{};
   private guestSnapshot:Presentation|null=null;
   get connected(){return this.channel?.readyState==='open';}
   private init(role:'host'|'guest',stun:string){
     this.close();this.role=role;this.pc=new RTCPeerConnection({iceServers:stun?[{urls:stun}]:[]});
-    this.pc.onconnectionstatechange=()=>{const s=this.pc?.connectionState;this.onStatus(s==='connected'?'Conectado':s==='failed'?'No se pudo conectar. Prueba un servidor STUN/TURN compatible.':s==='disconnected'?'Conexión interrumpida':s==='closed'?'Conexión cerrada':'Conectando…');};
+    this.pc.onconnectionstatechange=()=>{const s=this.pc?.connectionState;if(s==='disconnected'||s==='failed'||s==='closed')this.clearInput();this.onStatus(s==='connected'?'Conectado':s==='failed'?'No se pudo conectar. Prueba un servidor STUN/TURN compatible.':s==='disconnected'?'Conexión interrumpida':s==='closed'?'Conexión cerrada':'Conectando…');};
     if(role==='host')this.bind(this.pc.createDataChannel('match-v1',{ordered:true}));else this.pc.ondatachannel=e=>this.bind(e.channel);
   }
-  private bind(channel:RTCDataChannel){this.channel=channel;channel.onopen=()=>{this.onStatus('Conectado');this.onConnect();};channel.onclose=()=>this.onStatus('Conexión cerrada');
+  private bind(channel:RTCDataChannel){this.channel=channel;channel.onopen=()=>{this.onStatus('Conectado');this.onConnect();};channel.onclose=()=>{this.clearInput();this.onStatus('Conexión cerrada');};
     channel.onmessage=e=>{try{if(typeof e.data!=='string'||e.data.length>150000)return;const m=JSON.parse(e.data)as Message;
       if(m.type==='input'&&this.role==='host'){
         const f=m.frame as Partial<InputFrame>;if(!f?.move||!f.aim||![f.move.x,f.move.y,f.aim.x,f.aim.y,f.power??.5].every(Number.isFinite))return;
-        this.latest={move:{x:clamp(f.move.x,-1,1),y:clamp(f.move.y,-1,1)},aim:{x:clamp(f.aim.x,-1,1),y:clamp(f.aim.y,-1,1)},power:clamp(f.power??.5,0,1),sprint:!!f.sprint,shield:!!f.shield,keeperRush:!!f.keeperRush};this.lastInputAt=performance.now();
+        if(!Number.isInteger(m.sequence)||Number(m.sequence)<this.receivedSequence||Number(m.sequence)>Number.MAX_SAFE_INTEGER)return;
+        const aim={x:clamp(f.aim.x,-1,1),y:clamp(f.aim.y,-1,1)},power=clamp(f.power??.5,0,1);
+        const keeperMove=f.keeperMove&&[f.keeperMove.x,f.keeperMove.y].every(Number.isFinite)?{x:clamp(f.keeperMove.x,-1,1),y:clamp(f.keeperMove.y,-1,1)}:undefined;
+        const wallCharge=typeof f.wallCharge==='number'&&Number.isFinite(f.wallCharge)?clamp(f.wallCharge,0,1):undefined;
+        this.latest={move:{x:clamp(f.move.x,-1,1),y:clamp(f.move.y,-1,1)},aim,power,sprint:!!f.sprint,shield:!!f.shield,keeperRush:!!f.keeperRush,keeperMove,wallCharge,secondKick:f.secondKick===true||undefined};this.lastInputAt=performance.now();
         const keeperKick=f.keeperKick==='punt'||f.keeperKick==='high'?f.keeperKick:undefined;
-        if(Number.isInteger(m.sequence)&&Number(m.sequence)>this.receivedSequence){this.receivedSequence=Number(m.sequence);if(f.action&&['pass','shoot','cross','through','tackle','header'].includes(f.action))this.pendingAction=f.action;this.pendingSwitch||=!!f.switchPlayer;this.pendingKeeperSwitch||=!!f.switchKeeper;this.pendingKeeperKick||=keeperKick;this.pendingKeeperDrop||=!!f.keeperDrop;this.pendingKeeperFeint||=!!f.keeperFeint;this.pendingSimulateDive||=!!f.simulateDive;}
+        if(Number(m.sequence)>this.receivedSequence){this.receivedSequence=Number(m.sequence);
+          const action=['pass','shoot','cross','through','tackle','header','lob','slide'].includes(f.action??'')?f.action:undefined;
+          const transient:Partial<InputFrame>={};
+          for(const key of ['setKick','secondKick','setFeint','shortRoll','panenka','wallJump'] as const)if(f[key]===true)transient[key]=true;
+          if(f.secondTaker==='side'||f.secondTaker==='behind')transient.secondTaker=f.secondTaker;
+          if(f.cornerSide==='up'||f.cornerSide==='down'||f.cornerSide==='left'||f.cornerSide==='right')transient.cornerSide=f.cornerSide;
+          if(action){this.pendingAction=action;this.pendingKick={aim,power,secondKick:transient.secondKick,...transient};}else for(const key of ['secondTaker','setFeint','wallJump','cornerSide'] as const)if(transient[key]!==undefined)(this.pendingSet as any)[key]=transient[key];
+          this.pendingSwitch||=f.switchPlayer===true;this.pendingKeeperSwitch||=f.switchKeeper===true;this.pendingKeeperKick||=keeperKick;this.pendingKeeperDrop||=f.keeperDrop===true;this.pendingKeeperFeint||=f.keeperFeint===true;this.pendingSimulateDive||=f.simulateDive===true;
+        }
       }
       if(m.type==='start'&&this.role==='guest'){const w=m.world as World;this.guestSnapshot=structuredClone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players,events:w.events,carrier:w.carrier,keeperHold:w.keeperHold,restart:w.restart?{team:w.restart.team,kind:w.restart.kind}:null,teams:w.teams});this.onStart(w);}
       if(m.type==='snapshot'&&this.role==='guest'&&this.guestSnapshot){
@@ -42,15 +54,16 @@ export class PeerSession {
     const {players,...metadata}=snapshot;
     this.send({type:'snapshot',patch:{...metadata,players:players.map(p=>({id:p.id,x:p.x,y:p.y,vx:p.vx,vy:p.vy,heading:p.heading,energy:p.energy,travel:p.travel,recovery:p.recovery,action:p.action}))}});
   }
-  input(frame:InputFrame){if(frame.action||frame.switchPlayer||frame.switchKeeper||frame.keeperKick||frame.keeperDrop||frame.keeperFeint||frame.simulateDive)this.sentInputSequence++;this.send({type:'input',sequence:this.sentInputSequence,frame});}
+  input(frame:InputFrame){if(frame.action||frame.switchPlayer||frame.switchKeeper||frame.keeperKick||frame.keeperDrop||frame.keeperFeint||frame.simulateDive||frame.setKick||frame.secondTaker||frame.secondKick||frame.setFeint||frame.shortRoll||frame.panenka||frame.wallJump||frame.cornerSide)this.sentInputSequence++;this.send({type:'input',sequence:this.sentInputSequence,frame});}
   hostFrame(tick:number):InputFrame {
     const fresh=this.connected&&performance.now()-this.lastInputAt<350;
-    const result:InputFrame={tick,slot:1,move:{x:0,y:0},aim:{x:-1,y:0},sprint:false,shield:false,...(fresh?this.latest:{}),action:fresh?this.pendingAction:undefined,switchPlayer:fresh&&this.pendingSwitch,switchKeeper:fresh&&this.pendingKeeperSwitch};
+    const result:InputFrame={tick,slot:1,move:{x:0,y:0},aim:{x:-1,y:0},sprint:false,shield:false,...(fresh?this.latest:{}),...(fresh?this.pendingSet:{}),...(fresh?this.pendingKick:{}),action:fresh?this.pendingAction:undefined,switchPlayer:fresh&&this.pendingSwitch,switchKeeper:fresh&&this.pendingKeeperSwitch};
     if(fresh&&this.pendingKeeperKick)result.keeperKick=this.pendingKeeperKick;
     if(fresh&&this.pendingKeeperDrop)result.keeperDrop=true;
     if(fresh&&this.pendingKeeperFeint)result.keeperFeint=true;
     if(fresh&&this.pendingSimulateDive)result.simulateDive=true;
-    this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;return result;
+    this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;this.pendingSet={};this.pendingKick={};return result;
   }
-  close(){if(this.channel){this.channel.onclose=null;this.channel.onmessage=null;this.channel.onopen=null;this.channel.close();}if(this.pc){this.pc.onconnectionstatechange=null;this.pc.ondatachannel=null;this.pc.close();}this.channel=null;this.pc=null;this.role=null;this.latest={};this.receivedSequence=0;this.sentInputSequence=0;this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;this.guestSnapshot=null;}
+  private clearInput(){this.latest={};this.lastInputAt=0;this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;this.pendingSet={};this.pendingKick={};}
+  close(){if(this.channel){this.channel.onclose=null;this.channel.onmessage=null;this.channel.onopen=null;this.channel.close();}if(this.pc){this.pc.onconnectionstatechange=null;this.pc.ondatachannel=null;this.pc.close();}this.channel=null;this.pc=null;this.role=null;this.clearInput();this.receivedSequence=0;this.sentInputSequence=0;this.guestSnapshot=null;}
 }

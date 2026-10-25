@@ -156,7 +156,7 @@ export const PES_2017_PS4_ROWS: readonly PadPresetRow[] = [
     note: 'Rolls the ball short along the ground to a teammate. Keyboard: Q + J, Enter + Num 1.' },
   { id: 'panenka', state: 'missing', context: 'set-piece', pes: 'Penalty chip (panenka)', text: 'L1 + □', glyphs: ['□'], button: PS_BUTTON.square,
     keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: ['setPower', 'wallJump'],
-    note: 'Penalty only: one press, no power bar, a slow chip down the middle. Keyboard: Q + K, Enter + Num 2.' },
+    note: 'Penalty only: hold L1 + □, then release □ for a slow chip down the middle. Keyboard: Q + K, Enter + Num 2.' },
   { id: 'wallJump', state: 'missing', context: 'set-piece', pes: 'Wall: jump', text: '□', glyphs: ['□'], button: PS_BUTTON.square,
     keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: ['setPower', 'panenka'],
     note: 'Defending a free kick: one press jumps the wall, hold ✕ to keep it down. Keyboard: K / Num 2.' },

@@ -29,8 +29,10 @@ test('attacking free kick: kick, second taker, second kick, feint and short roll
   input.setRestart([{kind:'free-kick',attacking:true},null] as Restart);
   key('keydown','KeyK');
   let frame=input.sample(1,0);
-  assert.equal(frame.setKick,true);
+  assert.equal(frame.setKick,undefined);
   key('keyup','KeyK');
+  frame=input.sample(2,0);
+  assert.equal(frame.action,'shoot');assert.equal(frame.setKick,true);
   // Q held + up edge places the second taker beside the ball.
   key('keydown','KeyQ');key('keydown','KeyW');key('keyup','KeyW');
   frame=input.sample(2,0);
