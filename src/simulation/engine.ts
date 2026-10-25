@@ -40,7 +40,7 @@ export class Simulation {
   stateHash(){return hash(this.world);}
   presentation():Presentation {
     const w=this.world;
-    return clone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players,events:w.events,teams:w.teams.map(t=>({id:t.id,name:t.name,shortName:t.shortName,direction:t.direction,tactics:t.tactics})) as Presentation['teams']});
+    return clone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players.map(({manualControl,...player})=>player),events:w.events,teams:w.teams.map(t=>({id:t.id,name:t.name,shortName:t.shortName,direction:t.direction,tactics:t.tactics})) as Presentation['teams']});
   }
   applyInputs(frames:readonly InputFrame[]){
     const w=this.world, incoming:InputFrame[]=[];

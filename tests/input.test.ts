@@ -1,5 +1,8 @@
 import test, { type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
+import { Simulation } from '../src/simulation/engine';
+import { createConfig } from '../src/simulation/config';
+import { makeTeam } from '../src/adapters/data';
 import { BrowserInput } from '../src/adapters/input';
 import { ControllerMapper, type PadReading } from '../src/adapters/controller';
 import type { ActionKind } from '../src/contracts/types';
@@ -139,4 +142,37 @@ test('keeper keyboard and pad switches are isolated edges and clear on pause',t=
  input.clear();input.enabled=false;
  assert(!input.sample(4,0).switchKeeper);
  input.enabled=true;assert(!input.sample(5,0).switchKeeper);
+});
+
+
+test('touch keeper switch is a player-one edge and clears with browser input',t=>{
+ const {input,emit}=browser(t);
+ input.switchKeeperTouch();assert(!input.sample(0,1).switchKeeper);
+ assert(input.sample(0,0).switchKeeper);assert(!input.sample(1,0).switchKeeper);
+ input.switchKeeperTouch();emit('blur');assert(!input.sample(2,0).switchKeeper);
+ input.enabled=false;input.switchKeeperTouch();assert(!input.sample(3,0).switchKeeper);
+ input.clear();input.enabled=true;assert(!input.sample(4,0).switchKeeper);
+});
+
+for(const source of ['keyboard','touch','gamepad'] as const)test(`browser ${source} adapter switches keeper in and out`,t=>{
+ const {input,key,pads}=browser(t);
+ const sim=new Simulation(createConfig({teamSize:2,human:[true,true],seed:41}),[makeTeam(0,2),makeTeam(1,2)]);
+ const initial=sim.snapshot();initial.phase='playing';initial.restart=null;sim.restore(initial);
+ pads.push(pad(0),pad(1));input.sample(-1,0);input.sample(-1,1);
+ for(const slot of (source==='touch'?[0] as const:[0,1] as const)){
+  const keeper=initial.players.find(p=>p.team===slot&&p.keeper)!;
+  for(const entering of [true,false]){
+   if(source==='keyboard')key('keydown',slot===0?'KeyR':'Numpad8');
+   if(source==='touch')input.switchKeeperTouch();
+   if(source==='gamepad')pads[slot]=pad(slot,[11]);
+   sim.applyInputs([input.sample(sim.tick,0),input.sample(sim.tick,1)]);sim.step();
+   const world=sim.snapshot();assert.equal(world.selected[slot]===keeper.id,entering);
+   assert.equal(world.players.find(p=>p.id===keeper.id)!.manualControl,entering?true:undefined);
+   const hash=sim.stateHash();assert(sim.presentation().players.every(p=>!('manualControl' in p)));assert.equal(sim.stateHash(),hash);
+   if(source==='keyboard')key('keyup',slot===0?'KeyR':'Numpad8');
+   if(source==='gamepad')pads[slot]=pad(slot);
+   sim.applyInputs([input.sample(sim.tick,0),input.sample(sim.tick,1)]);sim.step();
+   assert.equal(sim.snapshot().selected[slot]===keeper.id,entering,'held/released input must not toggle again');
+  }
+ }
 });

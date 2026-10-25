@@ -39,7 +39,7 @@ export class BrowserInput {
       if(kind==='shoot'){const release=this.releases.get(code);if(release!==undefined){action='shoot';power=release;this.releases.delete(code);}}
       else if(this.edges.delete(code))action=kind;
     }
-    if(slot===0){if(length(this.touchMove)>.1)move=this.touchMove;sprint||=this.touchSprint;shield||=this.touchShield;const touched=this.touchActions.shift();if(!action&&touched){action=touched;power=touched==='shoot'?this.touchPower:.55;}switchPlayer||=this.edges.delete('touch-switch');}
+    if(slot===0){if(length(this.touchMove)>.1)move=this.touchMove;sprint||=this.touchSprint;shield||=this.touchShield;const touched=this.touchActions.shift();if(!action&&touched){action=touched;power=touched==='shoot'?this.touchPower:.55;}switchPlayer||=this.edges.delete('touch-switch');switchKeeper||=this.edges.delete('touch-keeper');}
     const pad=this.controller.sample(this.gamepads,tick,slot);
     if(length(pad.move)>.1)move=pad.move;
     sprint||=pad.sprint;shield||=pad.shield;switchPlayer||=pad.switchPlayer;switchKeeper||=pad.switchKeeper;
@@ -48,4 +48,5 @@ export class BrowserInput {
     return{tick,slot,move,aim:this.aim[slot],sprint,shield,action,power,switchPlayer,switchKeeper};
   }
   switchTouch(){this.edges.add('touch-switch');}
+  switchKeeperTouch(){this.edges.add('touch-keeper');}
 }
