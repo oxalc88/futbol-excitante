@@ -5,14 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && FE_BUILD_LAB=0 vite build",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "evaluate": "node --import tsx scripts/evaluate.ts",
     "reference:import": "node --import tsx scripts/import-reference.ts",
     "evaluate:traces": "node --import tsx scripts/evaluate.ts --traces",
-    "timing:compare": "node --import tsx scripts/measure-game-timing.ts"
+    "timing:compare": "node --import tsx scripts/measure-game-timing.ts",
+    "build:lab": "tsc --noEmit && FE_BUILD_LAB=1 vite build",
+    "check:dist": "node scripts/check-dist.mjs"
   },
   "dependencies": {
     "three": "0.180.0"
