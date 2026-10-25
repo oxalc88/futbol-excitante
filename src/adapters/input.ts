@@ -34,17 +34,19 @@ export class BrowserInput {
     let move={x:Number(this.keys.has(movement[1]))-Number(this.keys.has(movement[0])),y:Number(this.keys.has(movement[3]))-Number(this.keys.has(movement[2]))};
     let sprint=this.keys.has(slot===0?'ShiftLeft':'ShiftRight'),shield=this.keys.has(slot===0?'Space':'NumpadDecimal'),action:ActionKind|undefined,power=.55;
     let switchPlayer=this.edges.delete(slot===0?'KeyQ':'Enter');
+    let switchKeeper=this.edges.delete(slot===0?'KeyR':'Numpad8');
     for(const [code,kind]of Object.entries(BUTTONS)){if((slot===0)!==code.startsWith('Key'))continue;
       if(kind==='shoot'){const release=this.releases.get(code);if(release!==undefined){action='shoot';power=release;this.releases.delete(code);}}
       else if(this.edges.delete(code))action=kind;
     }
-    if(slot===0){if(length(this.touchMove)>.1)move=this.touchMove;sprint||=this.touchSprint;shield||=this.touchShield;const touched=this.touchActions.shift();if(!action&&touched){action=touched;power=touched==='shoot'?this.touchPower:.55;}switchPlayer||=this.edges.delete('touch-switch');}
+    if(slot===0){if(length(this.touchMove)>.1)move=this.touchMove;sprint||=this.touchSprint;shield||=this.touchShield;const touched=this.touchActions.shift();if(!action&&touched){action=touched;power=touched==='shoot'?this.touchPower:.55;}switchPlayer||=this.edges.delete('touch-switch');switchKeeper||=this.edges.delete('touch-keeper');}
     const pad=this.controller.sample(this.gamepads,tick,slot);
     if(length(pad.move)>.1)move=pad.move;
-    sprint||=pad.sprint;shield||=pad.shield;switchPlayer||=pad.switchPlayer;
+    sprint||=pad.sprint;shield||=pad.shield;switchPlayer||=pad.switchPlayer;switchKeeper||=pad.switchKeeper;
     if(pad.action){action=pad.action;power=pad.power;}
     if(length(move)>1)move=unit(move);if(length(move)>.1)this.aim[slot]=unit(move);if(pad.aim)this.aim[slot]=pad.aim;
-    return{tick,slot,move,aim:this.aim[slot],sprint,shield,action,power,switchPlayer};
+    return{tick,slot,move,aim:this.aim[slot],sprint,shield,action,power,switchPlayer,switchKeeper};
   }
   switchTouch(){this.edges.add('touch-switch');}
+  switchKeeperTouch(){this.edges.add('touch-keeper');}
 }

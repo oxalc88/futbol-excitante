@@ -2,9 +2,9 @@ import type { ActionKind, TeamIndex, Vec2 } from '../contracts/types';
 import { clamp, length, unit } from '../simulation/math';
 
 export interface PadReading { index:number; id:string; mapping:string; connected:boolean; axes:readonly number[]; buttons:readonly {pressed:boolean}[] }
-export interface PadFrame { move:Vec2; aim?:Vec2; action?:ActionKind; power:number; sprint:boolean; shield:boolean; switchPlayer:boolean }
+export interface PadFrame { move:Vec2; aim?:Vec2; action?:ActionKind; power:number; sprint:boolean; shield:boolean; switchPlayer:boolean; switchKeeper:boolean }
 const identity=(p:PadReading)=>`${p.index}:${p.id}`;
-const neutral=():PadFrame=>({move:{x:0,y:0},power:.55,sprint:false,shield:false,switchPlayer:false});
+const neutral=():PadFrame=>({move:{x:0,y:0},power:.55,sprint:false,shield:false,switchPlayer:false,switchKeeper:false});
 export class ControllerMapper {
   private slots:(string|null)[]=[null,null];
   private previous:boolean[][]=[[],[]];
@@ -37,6 +37,7 @@ export class ControllerMapper {
     if(pressed[1]&&this.armed[slot])this.charge[slot]=Math.min(1,this.charge[slot]+1/51);
     else if(!pressed[1]){if(prev[1]&&this.armed[slot]){f.action='shoot';f.power=Math.max(.15,this.charge[slot]);}this.charge[slot]=0;this.armed[slot]=true;}
     f.sprint=!!pressed[6];f.shield=!!pressed[10];f.switchPlayer=!!pressed[4]&&!prev[4]&&!pressed[0];
+    f.switchKeeper=!!pressed[11]&&!prev[11];
     this.previous[slot]=pressed;this.lastTick[slot]=tick;this.cached[slot]=f;return structuredClone(f);
   }
 }
