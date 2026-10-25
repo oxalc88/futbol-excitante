@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-25 01:09 — PR pendiente ([#69](https://github.com/oxalc88/futbol-excitante/pull/69)) · Mando simulado en prueba de navegador · referencia [#44](https://github.com/oxalc88/futbol-excitante/issues/44)
+- **Qué cambia para el jugador:** nada en el partido. Una prueba de navegador comprueba pausa con Start, tiro cargado único, desconexión durante la carga, reconexión con tiro pulsado, dos mandos con puestos estables y un toque en Tiro. Guarda resultados en `artifacts/local/smoke/pad.json`.
+- **Qué probar:** ejecuta `scripts/verify.sh`; revisa `pad-smoke`. Completa `docs/manual-device-test.md` con mandos Xbox y PlayStation y un iPhone con Safari. Quedan pendientes la latencia, la zona muerta real, los botones físicos, la comodidad y el cambio de aplicación en iOS.
+- **Qué se rompe o cambia:** nada en la simulación. Se agrega una vista de diagnóstico de solo lectura en el navegador. La prueba táctil emulada cubre un toque, no gestos simultáneos ni Safari real.
+
 ## 2026-10-25 01:05 — PR pendiente ([#68](https://github.com/oxalc88/futbol-excitante/pull/68)) · Control manual del arquero · referencia [#53](https://github.com/oxalc88/futbol-excitante/issues/53)
 - **Qué cambia para el jugador:** puedes tomar el control de tu arquero. Pulsa R (jugador 1), 8 del teclado numérico (jugador 2), R3 en el mando o el botón táctil «Arquero». Con el arquero: muévete con la dirección (no sale de su arco), corre hacia el balón con sprint para salir a cortar, y lánzate con U / 0 numérico / RB hacia la dirección que marcas. Si atrapas el balón, pasa o lanza con la mano con J / A y despeja con el pie con K / B. Pulsa otra vez el botón del arquero o «Cambiar» (Q / Enter / LB) para volver al jugador de campo más cercano al balón. Con control manual, el arquero solo ataja si te lanzas: si no reaccionas, el gol es tuyo.
 - **Qué probar:** en un partido, toma el arquero antes de un tiro rival, lánzate al lado del tiro y comprueba que ataja y que luego puedes pasar o despejar. Sal a cortar con sprint. Vuelve al campo con «Cambiar». Prueba con dos jugadores a la vez y con pausa. Ejecuta `npm test` (pruebas tick a tick con entradas guionadas) y `scripts/verify.sh`.
