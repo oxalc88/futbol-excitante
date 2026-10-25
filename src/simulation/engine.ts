@@ -254,7 +254,8 @@ export class Simulation {
     }else if(w.tick%c.ai.cadence===0){decideTeams(w);const intents=w.players.map(p=>decidePlayer(w,p));w.players.forEach((p,i)=>{p.intent=intents[i];});}
     for(const slot of [0,1]as const){
       if(!c.human[slot])continue;
-      const carrier=this.player(w.carrier);if(carrier&&carrier.team===slot&&!carrier.keeper&&!(this.player(w.selected[slot])?.manualControl)&&w.selected[slot]!==carrier.id){w.selected[slot]=carrier.id;this.emit('control-switched',carrier,slot);}
+      // A player who cannot touch the ball yet (the taker after a second-taker kick) does not take the cursor.
+      const carrier=this.player(w.carrier);if(carrier&&carrier.team===slot&&!carrier.keeper&&!(carrier.touchCooldown>0&&w.ball.lastTouch?.playerId!==carrier.id)&&!(this.player(w.selected[slot])?.manualControl)&&w.selected[slot]!==carrier.id){w.selected[slot]=carrier.id;this.emit('control-switched',carrier,slot);}
       let p=this.player(w.selected[slot]);if(p?.sentOff){w.selected[slot]=this.closestOutfield(slot);p=this.player(w.selected[slot]);}if(!p)continue;
       const f=frames.find(f=>f.slot===slot);if(f&&(length(f.move)>.1||f.action))this.emit('input-intent',p,slot,{inputTick:f.tick,action:f.action??null,move:f.move});p.intent=f?{move:f.move,aim:f.aim,sprint:f.sprint,shield:f.shield,action:f.action,power:f.power??.5}:idle();
       // Foul dive (PES row: L1+L2+L3+R3 without R2): the selected player falls

@@ -123,6 +123,7 @@ test('secondKick: hold L2 and the restart leaves the second taker, the cursor fo
   run(behind.s,0,{secondKick:true,action:'pass',power:.35,setKick:true,aim:{x:1,y:0}});
   run(behind.s,0,{},5);
   assert.equal(behind.s.snapshot().ball.lastTouch?.playerId,second3.id,'the taker took the ball back');
+  assert.equal(behind.s.snapshot().selected[0],second3.id,'the taker near the ball took the cursor back');
 });
 
 test('cornerSide: the dpad stores the corner strategy of the attack and of the defence',()=>{
