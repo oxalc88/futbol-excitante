@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import type { Config, DeepReadonly, PlayerState, ReadonlyPresentation, TeamIndex } from '../contracts/types';
-import { CameraRig, contactPose, EMBODIMENT_MAPPING, solveLimb, PALETTE, PITCH_PALETTES, type PitchPaletteId, teamSilhouettes, keeperSilhouette, type Kit, type SilhouetteColors } from './presentation-model';
+import { CameraRig, PLAYER_PROPORTIONS, playerHeightScale, playerPose, contactPose, EMBODIMENT_MAPPING, solveLimb, PALETTE, PITCH_PALETTES, type PitchPaletteId, teamSilhouettes, keeperSilhouette, type Kit, type SilhouetteColors } from './presentation-model';
 import { clamp } from '../simulation/math';
 export type { Kit } from './presentation-model';
-interface Actor { contact:THREE.Group; segments:THREE.Mesh[]; root:THREE.Group; body:THREE.Group; arms:THREE.Group[]; legs:THREE.Group[]; ring:THREE.Mesh; label:THREE.Sprite; }
+interface Actor { contact:THREE.Group; segments:THREE.Mesh[]; root:THREE.Group; body:THREE.Group; arms:THREE.Group[]; legs:THREE.Group[]; elbows:THREE.Group[]; knees:THREE.Group[]; ring:THREE.Mesh; label:THREE.Sprite; }
 export class FootballRenderer {
   private scene=new THREE.Scene();private camera=new THREE.PerspectiveCamera(42,1,.1,350);
   private renderer:THREE.WebGLRenderer;private actors=new Map<string,Actor>();private ball:THREE.Mesh;private ballShadow:THREE.Mesh;private ballMarker:THREE.Mesh;
@@ -15,6 +15,9 @@ export class FootballRenderer {
   private pitchMaterials=PALETTE.pitch.map(color=>new THREE.MeshToonMaterial({color}));
   private surroundMaterial=new THREE.MeshToonMaterial({color:PALETTE.surround});
   private teams:[SilhouetteColors,SilhouetteColors];private keeper:SilhouetteColors;
+  private geometries=new Map<string,THREE.BufferGeometry>();
+  // Players share limb geometries; only transforms differ.
+  private geometry(key:string,make:()=>THREE.BufferGeometry){let g=this.geometries.get(key);if(!g){g=make();this.geometries.set(key,g);}return g;}
   private material(color:string){let m=this.materials.get(color);if(!m){m=new THREE.MeshToonMaterial({color});this.materials.set(color,m);}return m;}
   // Three hulls per player. Reuse each source geometry and one unlit material.
   private outline(mesh:THREE.Mesh,scale:number){const hull=new THREE.Mesh(mesh.geometry,this.outlineMaterial);hull.scale.setScalar(scale);hull.visible=this.quality!=='low';mesh.add(hull);this.outlines.push(hull);}
@@ -79,29 +82,39 @@ export class FootballRenderer {
   private actor(p:DeepReadonly<PlayerState>):Actor {
     const kit=this.kits[p.team],root=new THREE.Group(),body=new THREE.Group();root.add(body);
     const colors=p.keeper?this.keeper:this.teams[p.team],skin=colors.limb,shirt=colors.body;
-    const scale=[.96,1.03,1.08,1][p.number%4];
-    const torso=this.box(.46,.57,.25,shirt,0,1.2,0,body);torso.castShadow=true;
-    const shorts=this.box(.41,.24,.28,shirt,0,.81,0,body);this.outline(torso,1.1);this.outline(shorts,1.1);
-    if(!p.keeper&&kit.pattern==='band')this.box(.475,.13,.262,colors.trim,0,1.22,0,body);
-    const head=new THREE.Mesh(new THREE.SphereGeometry(.16,8,6),this.material(skin));head.position.y=1.65;head.castShadow=true;body.add(head);
-    this.outline(head,1.12);
-    // A broad front panel and forward boots give a cheap facing cue.
-    this.box(.27,.2,.02,colors.trim,0,1.32,.135,body);
-    const arms:THREE.Group[]=[],legs:THREE.Group[]=[];
+    const d=PLAYER_PROPORTIONS,scale=playerHeightScale(p),hip=.1+d.lowerLeg+d.upperLeg,waist=hip+d.hips,shoulder=waist+d.torso;
+    const rounded=(top:number,bottom:number,height:number,color:string,x:number,y:number,z:number,parent:THREE.Object3D)=>{
+      const mesh=new THREE.Mesh(this.geometry(`c${top}/${bottom}/${height}`,()=>new THREE.CylinderGeometry(top,bottom,height,10)),this.material(color));mesh.position.set(x,y,z);mesh.scale.z=.7;parent.add(mesh);return mesh;
+    };
+    const oval=(x:number,y:number,z:number,color:string,parent:THREE.Object3D,px=0,py=0,pz=0)=>{
+      const mesh=new THREE.Mesh(this.geometry('s',()=>new THREE.SphereGeometry(1,10,8)),this.material(color));mesh.scale.set(x,y,z);mesh.position.set(px,py,pz);parent.add(mesh);return mesh;
+    };
+    const torso=rounded(d.shoulderWidth/2,d.waistWidth/2,d.torso,shirt,0,waist+d.torso/2,0,body);
+    const shorts=rounded(d.waistWidth/2,.19,d.hips,shirt,0,hip+d.hips/2,0,body);this.outline(torso,1.08);this.outline(shorts,1.08);
+    if(!p.keeper&&kit.pattern==='band')rounded(.211,.192,.10,colors.trim,0,waist+d.torso*.56,0,body);
+    rounded(.065,.07,d.neck,skin,0,shoulder+d.neck/2,0,body);
+    const head=oval(.095,d.head/2,.105,skin,body,0,shoulder+d.neck+d.head/2);this.outline(head,1.1);
+    const arms:THREE.Group[]=[],legs:THREE.Group[]=[],elbows:THREE.Group[]=[],knees:THREE.Group[]=[];
     for(const side of [-1,1]){
-      const arm=new THREE.Group();arm.position.set(side*.28,1.43,0);body.add(arm);
-      this.box(.15,.24,.17,shirt,0,-.1,0,arm);this.box(.12,.28,.12,skin,0,-.34,0,arm);if(p.keeper)this.box(.16,.14,.17,colors.trim,0,-.48,0,arm);arms.push(arm);
-      const leg=new THREE.Group();leg.position.set(side*.12,.76,0);body.add(leg);
-      this.box(.16,.28,.18,skin,0,-.12,0,leg);this.box(.14,.27,.16,shirt,0,-.37,0,leg);this.box(.17,.12,.3,colors.trim,0,-.61,.07,leg);legs.push(leg);
+      const arm=new THREE.Group();arm.position.set(side*d.shoulderWidth/2,shoulder-.04,0);body.add(arm);
+      oval(.085,.09,.075,shirt,arm);
+      rounded(.075,.055,d.upperArm,shirt,0,-d.upperArm/2,0,arm);
+      const elbow=new THREE.Group();elbow.position.y=-d.upperArm;arm.add(elbow);
+      oval(.055,.055,.055,skin,elbow);rounded(.055,.04,d.forearm,skin,0,-d.forearm/2,0,elbow);
+      oval(.05,.07,.045,p.keeper?colors.trim:skin,elbow,0,-d.forearm);arms.push(arm);elbows.push(elbow);
+      const leg=new THREE.Group();leg.position.set(side*.105,hip,0);body.add(leg);
+      rounded(.085,.065,d.upperLeg,skin,0,-d.upperLeg/2,0,leg);
+      const knee=new THREE.Group();knee.position.y=-d.upperLeg;leg.add(knee);
+      oval(.065,.065,.06,skin,knee);rounded(.065,.045,d.lowerLeg,shirt,0,-d.lowerLeg/2,0,knee);
+      oval(.075,.05,.15,colors.trim,knee,0,-d.lowerLeg-.05,.065);legs.push(leg);knees.push(knee);
     }
-    // Keep contact heights fixed while widening the visible form.
-    body.scale.set(1.15,1,1.15);torso.scale.x=scale;
+    body.scale.setScalar(scale);
     const ring=new THREE.Mesh(new THREE.RingGeometry(.52,.64,32),new THREE.MeshBasicMaterial({color:'#ffe16b',side:THREE.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=.03;root.add(ring);
     const canvas=document.createElement('canvas');canvas.width=128;canvas.height=64;const ctx=canvas.getContext('2d')!;ctx.fillStyle='#112139';ctx.fillRect(0,0,128,64);ctx.fillStyle='#fff7dd';ctx.font='bold 42px sans-serif';ctx.textAlign='center';ctx.fillText(String(p.number),64,48);
     const label=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),depthTest:false}));label.position.set(0,2.5,0);label.scale.set(1.1,.55,1);root.add(label);
     root.traverse(o=>{if(o instanceof THREE.Mesh)o.castShadow=o.material!==this.outlineMaterial;});this.scene.add(root);
     const contact=new THREE.Group();root.add(contact);const segments=[0,1,2].map(i=>{const m=new THREE.Mesh(new THREE.BoxGeometry(i===2?.17:.13,1,i===2?.28:.14),this.material(i===2?colors.trim:skin));contact.add(m);return m;});contact.visible=false;
-    return {root,body,arms,legs,ring,label,contact,segments};
+    return {root,body,arms,legs,elbows,knees,ring,label,contact,segments};
   }
   draw(previous:ReadonlyPresentation,current:ReadonlyPresentation,alpha:number,_frameDt:number){
     const teleport=previous.phase!==current.phase||current.events.some(e=>e.type==='restart-awarded');const blend=teleport?1:clamp(alpha,0,1);
@@ -109,17 +122,13 @@ export class FootballRenderer {
     for(const p of current.players){let a=this.actors.get(p.id);if(!a){a=this.actor(p);this.actors.set(p.id,a);}a.root.visible=!p.sentOff;if(p.sentOff)continue;const prev=previousPlayers.get(p.id)??p;
       a.root.position.set(THREE.MathUtils.lerp(prev.x,p.x,blend),0,THREE.MathUtils.lerp(prev.y,p.y,blend));
       const turn=Math.atan2(Math.sin(p.heading-prev.heading),Math.cos(p.heading-prev.heading));a.root.rotation.y=Math.PI/2-(prev.heading+turn*blend);
-      const gait=this.animations?Math.sin(p.travel*4):0,speed=Math.min(1,Math.hypot(p.vx,p.vy)/7);
-      a.legs[0].rotation.x=gait*.65*speed;a.legs[1].rotation.x=-gait*.65*speed;a.arms[0].rotation.x=-gait*.45*speed;a.arms[1].rotation.x=gait*.45*speed;
-      a.arms[0].rotation.z=.12;a.arms[1].rotation.z=-.12;a.body.position.y=Math.abs(gait)*.035*speed;a.body.rotation.x=.1*speed;
-      if(p.action&&this.animations){const time=current.tick-p.action.contact;
-        if(['tackle','slide'].includes(p.action.kind)){a.body.rotation.x=-.7;a.legs[1].rotation.x=-1.25;}
-        else if(p.action.kind==='header'){a.body.position.y+=Math.max(0,Math.sin((current.tick-p.action.start)/28*Math.PI))*.28;a.arms[0].rotation.z=.7;a.arms[1].rotation.z=-.7;}
-        else{a.legs[p.foot==='left'?0:1].rotation.x=time<0?.55:-Math.max(0,1-time/20)*1.1;}
-      }
-      if(p.recovery>0){a.body.rotation.x=.8;a.body.position.y=-.35;}
-      if(p.keeperMode==='recover'){a.body.rotation.z=(p.vy>=0?1:-1)*1.1;a.body.position.y=-.55;}else a.body.rotation.z=0;
-      if(p.keeperMode==='dive'){a.arms[0].rotation.x=-1.3;a.arms[1].rotation.x=-1.3;a.body.position.y+=.25;}
+      const motion=this.animations?playerPose(p,current.tick,blend,prev.heading):{hipL:0,hipR:0,kneeL:0,kneeR:0,shoulderL:0,shoulderR:0,elbowL:0,elbowR:0,lean:0,roll:0,bob:0,armSpread:.12};
+      a.legs[0].rotation.x=motion.hipL;a.legs[1].rotation.x=motion.hipR;
+      a.knees[0].rotation.x=motion.kneeL;a.knees[1].rotation.x=motion.kneeR;
+      a.arms[0].rotation.x=motion.shoulderL;a.arms[1].rotation.x=motion.shoulderR;
+      a.elbows[0].rotation.x=-motion.elbowL;a.elbows[1].rotation.x=-motion.elbowR;
+      a.arms[0].rotation.z=-motion.armSpread;a.arms[1].rotation.z=motion.armSpread;
+      a.body.position.y=motion.bob;a.body.rotation.set(motion.lean,0,motion.roll);
       a.legs.forEach(l=>l.visible=true);a.arms.forEach(l=>l.visible=true);a.contact.visible=false;
       const pose=contactPose(p,current);
       if(this.animations&&pose?.reachable&&pose.surface!=='head'){

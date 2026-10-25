@@ -1,6 +1,35 @@
 import type { DeepReadonly, PlayerState, ReadonlyPresentation, Vec3 } from '../contracts/types';
 import { clamp } from '../simulation/math';
 
+/** Standing dimensions in metres; boots account for the remaining .10 m. */
+export const PLAYER_PROPORTIONS={height:1.8,head:.24,neck:.07,torso:.43,hips:.16,upperLeg:.4,lowerLeg:.4,upperArm:.29,forearm:.26,shoulderWidth:.46,waistWidth:.30} as const;
+export const playerHeightScale=(p:DeepReadonly<PlayerState>)=>[.96,1.03,1.08,1][p.number%4];
+/** Local +Z faces forward: negative X rotation swings a hanging limb forward. */
+export function playerPose(p:DeepReadonly<PlayerState>,tick:number,alpha=1,previousHeading=p.heading){
+  const speed=clamp(Math.hypot(p.vx,p.vy)/7,0,1),phase=p.travel/(1.6*playerHeightScale(p))*Math.PI*2;
+  const swing=Math.sin(phase),breath=Math.sin((tick-1+clamp(alpha,0,1))*.045+[...p.id].reduce((n,c)=>n+c.charCodeAt(0),p.number));
+  const pose={state:(speed>.03?'run':'idle') as 'idle'|'run'|'kick'|'tackle'|'header'|'down'|'dive',phase,
+    hipL:swing*.75*speed,hipR:-swing*.75*speed,kneeL:Math.max(0,-swing)*.95*speed,kneeR:Math.max(0,swing)*.95*speed,
+    shoulderL:-swing*.5*speed,shoulderR:swing*.5*speed,elbowL:.12+.45*speed,elbowR:.12+.45*speed,
+    lean:.16*speed,roll:clamp(Math.atan2(Math.sin(p.heading-previousHeading),Math.cos(p.heading-previousHeading))*60*speed*.06,-.3,.3),
+    bob:Math.abs(swing)*.035*speed+breath*.006*(1-speed),armSpread:.12};
+  if(p.action){
+    const a=p.action,time=tick-1+clamp(alpha,0,1),before=time<a.contact;
+    if(a.kind==='tackle'||a.kind==='slide'){pose.state='tackle';pose.lean=-.7;if(p.foot==='left'){pose.hipL=-1.25;pose.kneeL=0;}else{pose.hipR=-1.25;pose.kneeR=0;}}
+    else if(a.kind==='header'){pose.state='header';pose.bob+=Math.max(0,Math.sin((time-a.start)/Math.max(1,a.end-a.start)*Math.PI))*.28;pose.armSpread=.7;}
+    else {
+      pose.state='kick';const wind=clamp((time-a.start)/Math.max(1,a.contact-a.start),0,1),follow=clamp((time-a.contact)/Math.max(1,a.end-a.contact),0,1);
+      const hip=before?.2+.65*wind:-1.15*(1-follow),knee=before?.3+wind*.9:.08+follow*.35;
+      if(p.foot==='left'){pose.hipL=hip;pose.kneeL=knee;}else{pose.hipR=hip;pose.kneeR=knee;}
+      pose.armSpread=.65;pose.lean=before?-.08:.2;
+    }
+  }
+  if(p.recovery>0){pose.state='down';pose.lean=.8;pose.bob=-.35;}
+  if(p.keeperMode==='recover'){pose.state='down';pose.roll=(p.vy>=0?1:-1)*1.1;pose.bob=-.55;}
+  if(p.keeperMode==='dive'){pose.state='dive';pose.shoulderL=pose.shoulderR=-1.3;pose.roll=(p.vy>=0?1:-1)*.7;pose.bob+=.25;}
+  return pose;
+}
+
 export const EMBODIMENT_MAPPING={version:'procedural-rig-v2',metresPerUnit:1,
   surfaces:{foot:{maxHorizontalReach:1.6,maxHeight:1.1},head:{maxHorizontalReach:.7,maxHeight:2.25},hand:{maxHorizontalReach:1.2,maxHeight:2.8}},
   limbs:{leg:[.78,.78],arm:[.72,.72]},contactTolerance:.025} as const;
