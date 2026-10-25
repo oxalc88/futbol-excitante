@@ -75,7 +75,13 @@ export class ControllerMapper {
     // feint spends the charge, so the release gives no kick.
     if(hold&&keeper&&held(B.cross)&&this.puntArmed[slot])this.punt[slot]=Math.min(1,this.punt[slot]+1/51);
     else if(!held(B.cross)){if(prev[B.cross]&&this.puntArmed[slot]&&this.punt[slot]>0&&hold&&keeper){f.keeperKick=held(B.r2)?'high':'punt';f.power=Math.max(.15,this.punt[slot]);}this.punt[slot]=0;this.puntArmed[slot]=true;}
-    const kickChargeHeld=hold&&keeper&&(this.punt[slot]>0||(held(B.shot)&&this.armed[slot]&&this.charge[slot]>0));
+    // The kick or throw charge that a ✕ press can feint: the ○ punt charge, the
+    // □ kick charge, or any other pass button held down (△ throw into space and
+    // the ○ high pass). The ✕ button is the feint key itself, so its own hold
+    // never counts: an edge of ✕ while ✕ is held cannot exist, and counting it
+    // would stop every hand throw.
+    const passHeld=held(B.through)||held(B.cross);
+    const kickChargeHeld=hold&&keeper&&(passHeld||this.punt[slot]>0||(held(B.shot)&&this.armed[slot]&&this.charge[slot]>0));
     if(hold&&keeper&&kickChargeHeld&&edge(B.pass)){
       f.keeperFeint=true;
       // Drop both charges: the pending ○ and □ releases give no ball release.
@@ -113,7 +119,8 @@ export class ControllerMapper {
       if(edge(B.pass)&&!f.keeperFeint)f.action='pass';
       // While the ball is in the hands ○ is the punt charge, never a cross.
       if(edge(B.cross)&&!hold)f.action=held(B.switchPlayer)?'lob':'cross';
-      if(edge(B.through))f.action='through';
+      // A feint in this sample wins over the △ edge of the same sample.
+      if(edge(B.through)&&!f.keeperFeint)f.action='through';
     }
     // At head height □ heads at once and never charges. Otherwise □ charges in
     // both contexts: shot with the ball, clearance without it. A press spent on a

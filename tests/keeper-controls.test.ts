@@ -828,3 +828,50 @@ test('review finding 6: the keyboard charge and feint keep the keeper hold over 
   key('keyup','KeyK');
   input.sample(h.next++,0);
 });
+
+// ------------------------------------------------- review findings, round 4
+
+test('pass feint: △ held then ✕ = feint, no throw',t=>{
+  // Pad: hold △, press ✕ before the release, then release both buttons.
+  const h:KeeperHarness=keeperBrowser(t);const {input,key,pads}=h;
+  input.setKeeperHold([true,true]);
+  pads[0]=pad(0,[3]);
+  assert.equal(input.sample(h.next++,0).action,'through','the △ edge is the throw into space');
+  pads[0]=pad(0,[3,0]);
+  const padFeint=input.sample(h.next++,0);
+  assert.equal(padFeint.keeperFeint,true,'△ held and ✕ pressed is the pass feint');
+  assert.equal(padFeint.action,undefined,'the feint never queues a hand throw');
+  pads[0]=pad(0,[]);
+  assert.equal(input.sample(h.next++,0).action,undefined,'the release of both buttons throws nothing');
+  assert.equal(input.sample(h.next++,0).keeperFeint,undefined,'the feint is one frame');
+  // Keyboard: hold △, press ✕ before the release, then release both keys.
+  key('keydown','KeyL');
+  assert.equal(input.sample(h.next++,0).action,'through','the keyboard △ edge is the throw into space');
+  key('keydown','KeyJ');
+  const typedFeint=input.sample(h.next++,0);
+  assert.equal(typedFeint.keeperFeint,true,'△ held and ✕ pressed feints on the keyboard too');
+  assert.equal(typedFeint.action,undefined,'the keyboard feint never queues a hand throw');
+  key('keyup','KeyJ');key('keyup','KeyL');
+  assert.equal(input.sample(h.next++,0).action,undefined,'the release of both keys throws nothing');
+  // Engine: the wind-up of the △ press never releases the ball after the feint.
+  const {s,events,id}=heldKeeper();
+  s.applyInputs([frame(s,0,{action:'through'})]);s.step();
+  const started=s.snapshot(),pending=started.players.find(p=>p.id===id)!;
+  assert(pending.action,'the △ press starts the throw wind-up');
+  assert.equal(started.keeperHold?.playerId,id,'the ball is still in the hands');
+  s.applyInputs([frame(s,0,{keeperFeint:true})]);s.step();
+  const feinted=s.snapshot();
+  assert(events.some((e)=>e.type==='keeper-feint'),'keeper-feint event missing');
+  assert.equal(feinted.keeperHold?.playerId,id,'the feint keeps the ball in the hands');
+  assert.equal(feinted.players.find((p)=>p.id===id)!.action,null,'the feint cancels the pending throw');
+  for(let i=0;i<40;i++)s.step();
+  const after=s.snapshot();
+  assert.equal(after.keeperHold?.playerId,id,'the pending throw never leaves the hands');
+  assert(!events.some((e)=>e.type==='keeper-throw'),'the feint never throws');
+  assert(!events.some((e)=>e.type==='through-pass'),'the feint never passes');
+  assert.equal(after.stats[0].passes,0,'no pass of the keeper after the feint');
+  // A fresh △ press throws again: the feint never wedges the hold.
+  s.applyInputs([frame(s,0,{action:'through'})]);
+  until(s,60,()=>s.snapshot().keeperHold===null);
+  assert(events.some((e)=>e.type==='keeper-throw'),'a new △ press throws after the feint');
+});

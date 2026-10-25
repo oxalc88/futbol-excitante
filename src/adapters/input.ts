@@ -109,8 +109,13 @@ export class BrowserInput {
         if(start>=0&&hold){keeperKick=highHeld?'high':'punt';power=clamp((performance.now()-start)/850,.15,1);}
       }
     }
-    // The kick charge that a ✕ press can feint: the punt charge or the □ charge.
-    const kickChargeHeld=hold&&(Object.entries(roles).some(([code,role])=>role.keeperKick&&this.punt.has(code)&&this.punt.get(code)!==-1)
+    // The release that a ✕ press can feint: the ○ punt charge, the □ charge, or
+    // any other pass button held down (△ throw into space and the ○ high pass).
+    // The ✕ key is the feint key itself, so its own hold never counts: the edge
+    // of ✕ while ✕ is held cannot exist, and counting it would stop every throw.
+    const passHeld=Object.entries(roles).some(([code,role])=>(role.attack==='through'||role.attack==='cross'||role.keeperKick)&&this.keys.has(code));
+    const kickChargeHeld=hold&&(passHeld
+      ||Object.entries(roles).some(([code,role])=>role.keeperKick&&this.punt.has(code)&&this.punt.get(code)!==-1)
       ||Object.entries(roles).some(([code,role])=>role.charge&&this.keys.has(code)&&this.charges.has(code)));
     // The run-out key held: its chord with R1 is the sprint rush, never a drop.
     const rushKeyHeld=Object.entries(roles).some(([code,role])=>role.keeperRush&&this.keys.has(code));
@@ -163,7 +168,8 @@ export class BrowserInput {
         continue;
       }
       // While the ball is in the hands ○ charges the punt, never a cross.
-      if(kind&&!(hold&&role.keeperKick))action=(kind==='cross'&&switchHeld(roles,this.keys))?'lob':kind;
+      // A feint in this sample wins over the pass edge of the same sample.
+      if(kind&&!keeperFeint&&!(hold&&role.keeperKick))action=(kind==='cross'&&switchHeld(roles,this.keys))?'lob':kind;
     }
     let switchKeeper=this.edges.delete(KEEPER_KEYS[slot]);
     if(slot===0){if(length(this.touchMove)>.1)movement=this.touchMove;sprint||=this.touchSprint;shield||=this.touchShield;const touched=this.touchActions.shift();if(!action&&touched){action=touched;power=touched==='shoot'?this.touchPower:.55;}switchPlayer||=this.edges.delete('touch-switch');switchKeeper||=this.edges.delete('touch-keeper');}

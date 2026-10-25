@@ -178,10 +178,17 @@ export class Simulation {
           p.vx+=f.aim.x*c.goalkeeper.speed;p.vy+=f.aim.y*c.goalkeeper.speed;
           this.emit('keeper-dive',p,slot,{aim:f.aim});
         }
-        // Pass feint: the held kick never releases. The feint never restarts the
-        // hold timer. Only the first feint in a row delays the auto-release by one
-        // tick, so the eight-second limit still ends the hold.
-        if(f?.keeperFeint&&w.keeperHold?.playerId===p.id){if(w.keeperHold.feintTick!==w.tick-1)w.keeperHold.feintTick=w.tick;this.emit('keeper-feint',p,slot);}
+        // Pass feint: the held kick never releases. A feint also cancels the
+        // wind-up that the pass key already started (hand throw, kick or punt
+        // from the hands), so the throw pressed a few ticks earlier never leaves
+        // the hands. A resolved contact keeps its recovery.
+        // The feint never restarts the hold timer. Only the first feint in a row
+        // delays the auto-release by one tick, so the eight-second limit still ends the hold.
+        if(f?.keeperFeint&&w.keeperHold?.playerId===p.id){
+          if(w.keeperHold.feintTick!==w.tick-1)w.keeperHold.feintTick=w.tick;
+          if(p.action&&!p.action.resolved)p.action=null;
+          this.emit('keeper-feint',p,slot);
+        }
         // Run out to the ball without the ball; R1 adds the sprint rush speed.
         const rush=!!f?.keeperRush&&!w.keeperHold;
         if(rush){p.intent.move=unit(delta(p,w.ball));if(p.keeperRushing!==true){p.keeperRushing=true;this.emit('keeper-rush',p,slot);}}

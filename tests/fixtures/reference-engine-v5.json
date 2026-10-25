@@ -1,0 +1,632 @@
+{
+  "version": "replay-v2",
+  "engine": "engine-v5",
+  "initial": {
+    "version": "world-v2",
+    "advantage": null,
+    "pendingCards": [],
+    "keeperHold": null,
+    "restartRestriction": null,
+    "tick": 0,
+    "rng": 41,
+    "config": {
+      "version": "vision-rebuild-config-v2",
+      "dt": 0.016666666666666666,
+      "halfSeconds": 5,
+      "teamSize": 2,
+      "seed": 41,
+      "human": [
+        false,
+        false
+      ],
+      "pitch": {
+        "length": 105,
+        "width": 68,
+        "goalWidth": 7.32,
+        "goalHeight": 2.44
+      },
+      "physics": {
+        "radius": 0.11,
+        "gravity": 9.81,
+        "rolling": 1.35,
+        "drag": 0.015,
+        "restitution": 0.48,
+        "spinDecay": 0.8,
+        "magnus": 0.0018,
+        "substeps": 4
+      },
+      "movement": {
+        "radius": 0.38,
+        "jog": 0.67,
+        "turnLoss": 0.46,
+        "recoverySeconds": 0.65,
+        "sprintDrain": 0.012,
+        "recoveryRate": 0.007
+      },
+      "actions": {
+        "reach": 0.95,
+        "preparationTicks": 7,
+        "recoveryTicks": 20,
+        "touchTicks": 10,
+        "tackleReach": 1.4,
+        "headerHeight": 2.25,
+        "error": 0.075
+      },
+      "ai": {
+        "cadence": 6,
+        "transitionTicks": 120,
+        "passDistance": 29,
+        "shotDistance": 26,
+        "hysteresis": 1.4
+      },
+      "rules": {
+        "restartTicks": 60,
+        "celebrationTicks": 90,
+        "halftimeTicks": 120,
+        "offside": true,
+        "fouls": true,
+        "advantageTicks": 120,
+        "humanRestartTicks": 360,
+        "cards": true
+      },
+      "goalkeeper": {
+        "radius": 4,
+        "lateral": 2.5,
+        "speed": 2,
+        "reach": 1.2,
+        "reactionTicks": 12,
+        "releaseTicks": 45,
+        "highReach": 2.8,
+        "recoveryTicks": 42
+      }
+    },
+    "teams": [
+      {
+        "id": "costa",
+        "name": "Atlético Costa",
+        "shortName": "COS",
+        "tactics": {
+          "formation": "4-3-3",
+          "defensiveLine": 0.52,
+          "compactness": 0.65,
+          "pressing": 0.6,
+          "tempo": 0.65,
+          "width": 0.7,
+          "support": 0.6,
+          "buildUp": 0.55,
+          "counterPress": 0.5,
+          "shortPossession": 0.3,
+          "tightMarking": 0.3,
+          "adaptation": 0.5
+        },
+        "players": [
+          {
+            "id": "costa-00",
+            "name": "R. Vega",
+            "number": 1,
+            "keeper": true,
+            "foot": "left",
+            "capabilities": {
+              "speed": 7.2,
+              "acceleration": 4.4,
+              "braking": 7.2,
+              "turnRate": 3.5,
+              "control": 0.71,
+              "passing": 0.73,
+              "finishing": 0.67,
+              "power": 31,
+              "physical": 90,
+              "balance": 0.7,
+              "stamina": 0.85,
+              "tackling": 0.86,
+              "curve": 0.5,
+              "weakFoot": 0.6,
+              "keeper": 0.85,
+              "heading": 0.86,
+              "jump": 0.48
+            }
+          },
+          {
+            "id": "costa-01",
+            "name": "A. Salas",
+            "number": 2,
+            "keeper": false,
+            "foot": "right",
+            "capabilities": {
+              "speed": 8.6,
+              "acceleration": 6.8,
+              "braking": 9,
+              "turnRate": 5.8,
+              "control": 0.91,
+              "passing": 0.8,
+              "finishing": 0.72,
+              "power": 27,
+              "physical": 64,
+              "balance": 0.93,
+              "stamina": 0.9,
+              "tackling": 0.6,
+              "curve": 0.8,
+              "weakFoot": 0.75,
+              "keeper": 0.2,
+              "heading": 0.75,
+              "jump": 0.55
+            }
+          }
+        ],
+        "direction": 1,
+        "phase": "defence",
+        "phaseTick": 0,
+        "assignments": {
+          "costa-00": {
+            "anchor": {
+              "x": -50.7,
+              "y": 0
+            },
+            "target": {
+              "x": -49.9,
+              "y": 0
+            },
+            "responsibility": "goal-arc"
+          },
+          "costa-01": {
+            "anchor": {
+              "x": -8,
+              "y": 0
+            },
+            "target": {
+              "x": 0,
+              "y": 0
+            },
+            "responsibility": "press"
+          }
+        },
+        "chaser": "costa-01",
+        "memory": {
+          "touches": {},
+          "flank": [
+            0,
+            0
+          ],
+          "lastContact": null,
+          "focal": null
+        }
+      },
+      {
+        "id": "sierra",
+        "name": "Deportivo Sierra",
+        "shortName": "SIE",
+        "tactics": {
+          "formation": "4-4-2",
+          "defensiveLine": 0.52,
+          "compactness": 0.65,
+          "pressing": 0.6,
+          "tempo": 0.65,
+          "width": 0.7,
+          "support": 0.6,
+          "buildUp": 0.55,
+          "counterPress": 0.5,
+          "shortPossession": 0.3,
+          "tightMarking": 0.3,
+          "adaptation": 0.5
+        },
+        "players": [
+          {
+            "id": "sierra-00",
+            "name": "M. Torres",
+            "number": 1,
+            "keeper": true,
+            "foot": "left",
+            "capabilities": {
+              "speed": 7.2,
+              "acceleration": 4.4,
+              "braking": 7.2,
+              "turnRate": 3.5,
+              "control": 0.71,
+              "passing": 0.73,
+              "finishing": 0.67,
+              "power": 31,
+              "physical": 90,
+              "balance": 0.7,
+              "stamina": 0.85,
+              "tackling": 0.86,
+              "curve": 0.5,
+              "weakFoot": 0.6,
+              "keeper": 0.85,
+              "heading": 0.86,
+              "jump": 0.48
+            }
+          },
+          {
+            "id": "sierra-01",
+            "name": "J. Luna",
+            "number": 2,
+            "keeper": false,
+            "foot": "right",
+            "capabilities": {
+              "speed": 8.6,
+              "acceleration": 6.8,
+              "braking": 9,
+              "turnRate": 5.8,
+              "control": 0.91,
+              "passing": 0.8,
+              "finishing": 0.72,
+              "power": 27,
+              "physical": 64,
+              "balance": 0.93,
+              "stamina": 0.9,
+              "tackling": 0.6,
+              "curve": 0.8,
+              "weakFoot": 0.75,
+              "keeper": 0.2,
+              "heading": 0.75,
+              "jump": 0.55
+            }
+          }
+        ],
+        "direction": -1,
+        "phase": "defence",
+        "phaseTick": 0,
+        "assignments": {
+          "sierra-00": {
+            "anchor": {
+              "x": 50.7,
+              "y": 0
+            },
+            "target": {
+              "x": 49.9,
+              "y": 0
+            },
+            "responsibility": "goal-arc"
+          },
+          "sierra-01": {
+            "anchor": {
+              "x": 8,
+              "y": 0
+            },
+            "target": {
+              "x": 0,
+              "y": 0
+            },
+            "responsibility": "press"
+          }
+        },
+        "chaser": "sierra-01",
+        "memory": {
+          "touches": {},
+          "flank": [
+            0,
+            0
+          ],
+          "lastContact": null,
+          "focal": null
+        }
+      }
+    ],
+    "players": [
+      {
+        "id": "costa-00",
+        "name": "R. Vega",
+        "number": 1,
+        "keeper": true,
+        "foot": "left",
+        "capabilities": {
+          "speed": 7.2,
+          "acceleration": 4.4,
+          "braking": 7.2,
+          "turnRate": 3.5,
+          "control": 0.71,
+          "passing": 0.73,
+          "finishing": 0.67,
+          "power": 31,
+          "physical": 90,
+          "balance": 0.7,
+          "stamina": 0.85,
+          "tackling": 0.86,
+          "curve": 0.5,
+          "weakFoot": 0.6,
+          "keeper": 0.85,
+          "heading": 0.86,
+          "jump": 0.48
+        },
+        "team": 0,
+        "x": -50.7,
+        "y": 0,
+        "vx": 0,
+        "vy": 0,
+        "heading": 0,
+        "energy": 1,
+        "stability": 1,
+        "intent": {
+          "move": {
+            "x": 0,
+            "y": 0
+          },
+          "aim": {
+            "x": 0,
+            "y": 0
+          },
+          "sprint": false,
+          "shield": false,
+          "power": 0.5
+        },
+        "action": null,
+        "touchCooldown": 0,
+        "recovery": 0,
+        "travel": 0,
+        "keeperReaction": -1000,
+        "heldSince": 0,
+        "sentOff": false,
+        "yellows": 0,
+        "keeperMode": "ready",
+        "keeperUntil": 0
+      },
+      {
+        "id": "costa-01",
+        "name": "A. Salas",
+        "number": 2,
+        "keeper": false,
+        "foot": "right",
+        "capabilities": {
+          "speed": 8.6,
+          "acceleration": 6.8,
+          "braking": 9,
+          "turnRate": 5.8,
+          "control": 0.91,
+          "passing": 0.8,
+          "finishing": 0.72,
+          "power": 27,
+          "physical": 64,
+          "balance": 0.93,
+          "stamina": 0.9,
+          "tackling": 0.6,
+          "curve": 0.8,
+          "weakFoot": 0.75,
+          "keeper": 0.2,
+          "heading": 0.75,
+          "jump": 0.55
+        },
+        "team": 0,
+        "x": -0.5,
+        "y": 0,
+        "vx": 0,
+        "vy": 0,
+        "heading": 0,
+        "energy": 1,
+        "stability": 1,
+        "intent": {
+          "move": {
+            "x": 0,
+            "y": 0
+          },
+          "aim": {
+            "x": 0,
+            "y": 0
+          },
+          "sprint": false,
+          "shield": false,
+          "power": 0.5
+        },
+        "action": null,
+        "touchCooldown": 0,
+        "recovery": 0,
+        "travel": 0,
+        "keeperReaction": -1000,
+        "heldSince": 0,
+        "sentOff": false,
+        "yellows": 0,
+        "keeperMode": "ready",
+        "keeperUntil": 0
+      },
+      {
+        "id": "sierra-00",
+        "name": "M. Torres",
+        "number": 1,
+        "keeper": true,
+        "foot": "left",
+        "capabilities": {
+          "speed": 7.2,
+          "acceleration": 4.4,
+          "braking": 7.2,
+          "turnRate": 3.5,
+          "control": 0.71,
+          "passing": 0.73,
+          "finishing": 0.67,
+          "power": 31,
+          "physical": 90,
+          "balance": 0.7,
+          "stamina": 0.85,
+          "tackling": 0.86,
+          "curve": 0.5,
+          "weakFoot": 0.6,
+          "keeper": 0.85,
+          "heading": 0.86,
+          "jump": 0.48
+        },
+        "team": 1,
+        "x": 50.7,
+        "y": 0,
+        "vx": 0,
+        "vy": 0,
+        "heading": 3.141592653589793,
+        "energy": 1,
+        "stability": 1,
+        "intent": {
+          "move": {
+            "x": 0,
+            "y": 0
+          },
+          "aim": {
+            "x": 0,
+            "y": 0
+          },
+          "sprint": false,
+          "shield": false,
+          "power": 0.5
+        },
+        "action": null,
+        "touchCooldown": 0,
+        "recovery": 0,
+        "travel": 0,
+        "keeperReaction": -1000,
+        "heldSince": 0,
+        "sentOff": false,
+        "yellows": 0,
+        "keeperMode": "ready",
+        "keeperUntil": 0
+      },
+      {
+        "id": "sierra-01",
+        "name": "J. Luna",
+        "number": 2,
+        "keeper": false,
+        "foot": "right",
+        "capabilities": {
+          "speed": 8.6,
+          "acceleration": 6.8,
+          "braking": 9,
+          "turnRate": 5.8,
+          "control": 0.91,
+          "passing": 0.8,
+          "finishing": 0.72,
+          "power": 27,
+          "physical": 64,
+          "balance": 0.93,
+          "stamina": 0.9,
+          "tackling": 0.6,
+          "curve": 0.8,
+          "weakFoot": 0.75,
+          "keeper": 0.2,
+          "heading": 0.75,
+          "jump": 0.55
+        },
+        "team": 1,
+        "x": 8,
+        "y": 0,
+        "vx": 0,
+        "vy": 0,
+        "heading": 3.141592653589793,
+        "energy": 1,
+        "stability": 1,
+        "intent": {
+          "move": {
+            "x": 0,
+            "y": 0
+          },
+          "aim": {
+            "x": 0,
+            "y": 0
+          },
+          "sprint": false,
+          "shield": false,
+          "power": 0.5
+        },
+        "action": null,
+        "touchCooldown": 0,
+        "recovery": 0,
+        "travel": 0,
+        "keeperReaction": -1000,
+        "heldSince": 0,
+        "sentOff": false,
+        "yellows": 0,
+        "keeperMode": "ready",
+        "keeperUntil": 0
+      }
+    ],
+    "ball": {
+      "x": 0,
+      "y": 0,
+      "z": 0.11,
+      "vx": 0,
+      "vy": 0,
+      "vz": 0,
+      "spin": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "lastTouch": null,
+      "freeTicks": 0,
+      "flight": "loose"
+    },
+    "phase": "kickoff",
+    "half": 1,
+    "played": 0,
+    "score": [
+      0,
+      0
+    ],
+    "stats": [
+      {
+        "shots": 0,
+        "onTarget": 0,
+        "passes": 0,
+        "completed": 0,
+        "saves": 0,
+        "tackles": 0,
+        "fouls": 0,
+        "possessionTicks": 0,
+        "corners": 0,
+        "offsides": 0,
+        "yellows": 0,
+        "reds": 0,
+        "penalties": 0
+      },
+      {
+        "shots": 0,
+        "onTarget": 0,
+        "passes": 0,
+        "completed": 0,
+        "saves": 0,
+        "tackles": 0,
+        "fouls": 0,
+        "possessionTicks": 0,
+        "corners": 0,
+        "offsides": 0,
+        "yellows": 0,
+        "reds": 0,
+        "penalties": 0
+      }
+    ],
+    "selected": [
+      "costa-01",
+      "sierra-01"
+    ],
+    "restart": {
+      "kind": "kickoff",
+      "team": 0,
+      "point": {
+        "x": 0,
+        "y": 0
+      },
+      "taker": "costa-01",
+      "remaining": 60
+    },
+    "countdown": 0,
+    "possession": null,
+    "carrier": null,
+    "offside": null,
+    "pendingPass": null,
+    "inputs": [],
+    "events": [
+      {
+        "id": "0:0",
+        "tick": 0,
+        "type": "restart-awarded",
+        "playerId": "costa-01",
+        "team": 0,
+        "data": {
+          "kind": "kickoff",
+          "point": {
+            "x": 0,
+            "y": 0
+          },
+          "discontinuity": true
+        }
+      }
+    ],
+    "eventSeq": 1
+  },
+  "inputs": [],
+  "endTick": 600,
+  "finalHash": "3a1704f0"
+}
