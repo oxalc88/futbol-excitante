@@ -40,7 +40,7 @@ export class Simulation {
   stateHash(){return hash(this.world);}
   presentation():Presentation {
     const w=this.world;
-    return clone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players,events:w.events,teams:w.teams.map(t=>({id:t.id,name:t.name,shortName:t.shortName,direction:t.direction,tactics:t.tactics})) as Presentation['teams']});
+    return clone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players.map(({manualControl,...player})=>player),events:w.events,teams:w.teams.map(t=>({id:t.id,name:t.name,shortName:t.shortName,direction:t.direction,tactics:t.tactics})) as Presentation['teams']});
   }
   applyInputs(frames:readonly InputFrame[]){
     const w=this.world, incoming:InputFrame[]=[];
@@ -87,6 +87,11 @@ export class Simulation {
     }
     this.emit('restart-awarded',taker,team,{kind,point,discontinuity:true});
   }
+  private humanKeeper(p:PlayerState){return p.manualControl===true&&p.keeper&&this.world.config.human[p.team]&&this.world.selected[p.team]===p.id;}
+  private scheduleKeeperRelease(p:PlayerState){
+    const w=this.world;
+    p.action={kind:'pass',start:w.tick,contact:w.tick+w.config.goalkeeper.releaseTicks,end:w.tick+w.config.goalkeeper.releaseTicks+20,aim:bestPass(w,p)?unit(delta(p,bestPass(w,p)!)):{x:w.teams[p.team].direction,y:.25},power:.6,resolved:false};
+  }
   private closestOutfield(team:TeamIndex){return this.world.players.filter(p=>p.team===team&&!p.keeper&&!p.sentOff).sort((a,b)=>distance(a,this.world.ball)-distance(b,this.world.ball)||a.id.localeCompare(b.id))[0]?.id??null;}
   private executeRestart(frame?:InputFrame){
     const w=this.world,r=w.restart;if(!r)return;const p=this.player(r.taker)!;const dir=w.teams[r.team].direction;
@@ -109,7 +114,14 @@ export class Simulation {
   step(){
     const w=this.world,c=w.config;w.events=[];w.eventSeq=0;
     const frames=w.inputs.filter(f=>f.tick===w.tick);w.inputs=w.inputs.filter(f=>f.tick>w.tick);
-    for(const f of frames){if(f.tactics){Object.assign(w.teams[f.slot].tactics,f.tactics);this.emit('tactics-changed',undefined,f.slot,{tactics:f.tactics});}if(f.switchPlayer){w.selected[f.slot]=this.closestOutfield(f.slot);this.emit('control-switched',this.player(w.selected[f.slot]),f.slot);}}
+    for(const f of frames){if(f.tactics){Object.assign(w.teams[f.slot].tactics,f.tactics);this.emit('tactics-changed',undefined,f.slot,{tactics:f.tactics});}if(f.switchKeeper&&c.human[f.slot]){
+      const previous=this.player(w.selected[f.slot]);
+      const keeper=w.players.find(p=>p.team===f.slot&&p.keeper&&!p.sentOff);
+      w.selected[f.slot]=previous?.keeper?this.closestOutfield(f.slot):keeper?.id??this.closestOutfield(f.slot);
+      if(previous?.keeper){delete previous.manualControl;previous.intent=decidePlayer(w,previous);if(w.keeperHold?.playerId===previous.id)this.scheduleKeeperRelease(previous);}
+      if(keeper&&w.selected[f.slot]===keeper.id){keeper.manualControl=true;keeper.action=null;keeper.intent=idle();}
+      this.emit('control-switched',this.player(w.selected[f.slot]),f.slot);
+    }if(f.switchPlayer){const previous=this.player(w.selected[f.slot]);if(previous?.keeper)delete previous.manualControl;if(previous?.keeper&&w.keeperHold?.playerId===previous.id)this.scheduleKeeperRelease(previous);w.selected[f.slot]=this.closestOutfield(f.slot);if(previous?.keeper)previous.intent=decidePlayer(w,previous);this.emit('control-switched',this.player(w.selected[f.slot]),f.slot);}}
     if(w.phase==='fulltime'){w.tick++;return this.result();}
     if(w.phase==='goal'||w.phase==='halftime'){
       w.countdown--;
@@ -127,9 +139,20 @@ export class Simulation {
     if(w.tick%c.ai.cadence===0){decideTeams(w);const intents=w.players.map(p=>decidePlayer(w,p));w.players.forEach((p,i)=>{p.intent=intents[i];});}
     for(const slot of [0,1]as const){
       if(!c.human[slot])continue;
-      const carrier=this.player(w.carrier);if(carrier&&carrier.team===slot&&!carrier.keeper&&w.selected[slot]!==carrier.id){w.selected[slot]=carrier.id;this.emit('control-switched',carrier,slot);}
+      const carrier=this.player(w.carrier);if(carrier&&carrier.team===slot&&!carrier.keeper&&!(this.player(w.selected[slot])?.manualControl)&&w.selected[slot]!==carrier.id){w.selected[slot]=carrier.id;this.emit('control-switched',carrier,slot);}
       let p=this.player(w.selected[slot]);if(p?.sentOff){w.selected[slot]=this.closestOutfield(slot);p=this.player(w.selected[slot]);}if(!p)continue;
       const f=frames.find(f=>f.slot===slot);if(f&&(length(f.move)>.1||f.action))this.emit('input-intent',p,slot,{inputTick:f.tick,action:f.action??null,move:f.move});p.intent=f?{move:f.move,aim:f.aim,sprint:f.sprint,shield:f.shield,action:f.action,power:f.power??.5}:idle();
+      if(this.humanKeeper(p)){
+        // Defer manual high claims, feints, and keeper actions outside the goal arc.
+        if(p.keeperMode==='dive'&&w.tick>=p.keeperUntil){p.keeperMode='recover';p.recovery=c.goalkeeper.recoveryTicks;p.keeperUntil=w.tick+c.goalkeeper.recoveryTicks;}
+        if(f?.action==='tackle'&&p.keeperMode==='ready'&&p.recovery===0&&!w.keeperHold){
+          p.keeperMode='dive';p.keeperUntil=w.tick+c.goalkeeper.recoveryTicks;
+          p.vx+=f.aim.x*c.goalkeeper.speed;p.vy+=f.aim.y*c.goalkeeper.speed;
+          this.emit('keeper-dive',p,slot,{aim:f.aim});
+        }
+        p.intent.action=w.keeperHold?.playerId===p.id&&['pass','shoot'].includes(f?.action??'')?f!.action:undefined;
+        if(f?.sprint&&!w.keeperHold)p.intent.move=unit(delta(p,w.ball));
+      }
     }
     for(const p of w.players){
       if(p.sentOff){p.intent=idle();p.vx=p.vy=0;p.action=null;continue;}
@@ -161,7 +184,7 @@ export class Simulation {
   }
   private requestAction(p:PlayerState,kind:ActionKind){
     const w=this.world,c=w.config,d=distance(p,w.ball);
-    if(!['tackle','slide'].includes(kind)&&(d>c.actions.reach+1.1||w.ball.z>(kind==='header'?c.actions.headerHeight:1.15)))return;
+    if(!(this.humanKeeper(p)&&w.keeperHold?.playerId===p.id)&&!['tackle','slide'].includes(kind)&&(d>c.actions.reach+1.1||w.ball.z>(kind==='header'?c.actions.headerHeight:1.15)))return;
     if(['tackle','slide'].includes(kind)&&d>c.actions.tackleReach+1.5)return;
     let aim=length(p.intent.aim)>.15?unit(p.intent.aim):length(p.intent.move)>.15?unit(p.intent.move):{x:Math.cos(p.heading),y:Math.sin(p.heading)};
     if(kind==='pass'||kind==='through'||kind==='cross'||kind==='lob'){
@@ -187,7 +210,7 @@ export class Simulation {
       const ratio=amount>rate?rate/amount:1;p.vx+=change.x*ratio;p.vy+=change.y*ratio;
       const dx=p.vx*dt,dy=p.vy*dt;p.x=clamp(p.x+dx,-c.pitch.length/2+.3,c.pitch.length/2-.3);p.y=clamp(p.y+dy,-c.pitch.width/2+.3,c.pitch.width/2-.3);p.travel+=Math.hypot(dx,dy);
       if(w.events.some(e=>e.type==='input-intent'&&e.playerId===p.id)&&(amount>1e-6||Math.abs(turn)>1e-6))this.emit('kinematic-response',p,p.team,{inputTick:w.tick,velocity:{x:p.vx,y:p.vy},heading:p.heading});
-      if(p.keeper&&!c.human[p.team]){const goal={x:-w.teams[p.team].direction*c.pitch.length/2,y:0};const d=distance(p,goal);if(d>c.goalkeeper.radius){const u=unit(delta(goal,p));p.x=goal.x+u.x*c.goalkeeper.radius;p.y=u.y*c.goalkeeper.radius;}p.y=clamp(p.y,-c.goalkeeper.lateral,c.goalkeeper.lateral);}
+      if(p.keeper&&(!c.human[p.team]||this.humanKeeper(p))){const goal={x:-w.teams[p.team].direction*c.pitch.length/2,y:0};const d=distance(p,goal);if(d>c.goalkeeper.radius){const u=unit(delta(goal,p));p.x=goal.x+u.x*c.goalkeeper.radius;p.y=u.y*c.goalkeeper.radius;}p.y=clamp(p.y,-c.goalkeeper.lateral,c.goalkeeper.lateral);}
       p.energy=clamp(p.energy+(p.intent.sprint&&speed>3?-c.movement.sprintDrain/(.6+a.stamina):c.movement.recoveryRate)*dt,.1,1);
     }
   }
@@ -276,7 +299,7 @@ export class Simulation {
     if(isHeader){const challenge=w.players.filter(q=>!q.sentOff&&q.team!==p.team&&distance(q,p)<1.2).length;speed=(13+a.power*9)*(.8+.2*p.capabilities.heading)*(1-challenge*.12)*( .8+.2*p.stability);vz=-1.3;}
     b.vx=Math.cos(ang)*speed;b.vy=Math.sin(ang)*speed;b.vz=vz;
     b.spin={x:0,y:0,z:(a.kind==='cross'?7:2)*p.capabilities.curve*(p.foot==='left'?-1:1)};
-    this.touch(p,handRelease?'hand':isHeader?'head':'foot');b.flight=['shoot','header'].includes(a.kind)?'shot':'pass';p.touchCooldown=c.actions.touchTicks+8;
+    this.touch(p,handRelease&&(!this.humanKeeper(p)||a.kind!=='shoot')?'hand':isHeader?'head':'foot');b.flight=['shoot','header'].includes(a.kind)?'shot':'pass';p.touchCooldown=c.actions.touchTicks+8;
     this.emit(a.kind==='through'?'through-pass':a.kind,p,p.team,{velocity:{x:b.vx,y:b.vy,z:b.vz},power:a.power});
     if(['shoot','header'].includes(a.kind)){
       w.stats[p.team].shots++;const goalX=w.teams[p.team].direction*c.pitch.length/2,time=(goalX-b.x)/b.vx;
@@ -367,7 +390,8 @@ export class Simulation {
     for(const {p,hit}of candidates){
       const z=prev.z+(b.z-prev.z)*hit.t,speed=Math.hypot(b.vx,b.vy);
       if(p.action&&!p.action.resolved)continue;
-      if(p.keeper&&p.keeperMode!=='recover'&&z<c.goalkeeper.highReach&&worldGoalDistance(w,p)<=c.goalkeeper.radius&&w.tick-p.keeperReaction>=c.goalkeeper.reactionTicks){
+      if(this.humanKeeper(p)&&p.keeperMode!=='dive')continue;
+      if(p.keeper&&p.keeperMode!=='recover'&&z<c.goalkeeper.highReach&&worldGoalDistance(w,p)<=c.goalkeeper.radius&&(this.humanKeeper(p)||w.tick-p.keeperReaction>=c.goalkeeper.reactionTicks)){
         const hands=canUseHands(w,p),low=z<.42,reachable=z<(p.keeperMode==='dive'?c.goalkeeper.highReach:2.1);
         if(!reachable||(!hands&&!low))continue;
         if(this.checkOffside(p)||this.checkDoubleTouch(p))return;
@@ -376,7 +400,7 @@ export class Simulation {
         const surface=low?'foot':'hand';
         if(catchable){
           b.vx=b.vy=b.vz=0;this.touch(p,'hand',false);w.keeperHold={playerId:p.id,since:w.tick};p.keeperMode='hold';
-          p.action={kind:'pass',start:w.tick,contact:w.tick+c.goalkeeper.releaseTicks,end:w.tick+c.goalkeeper.releaseTicks+20,aim:bestPass(w,p)?unit(delta(p,bestPass(w,p)!)):{x:w.teams[p.team].direction,y:.25},power:.6,resolved:false};
+          if(!this.humanKeeper(p))this.scheduleKeeperRelease(p);
         }else{
           const n=unit(delta(p,hit));const outward=unit({x:n.x||w.teams[p.team].direction,y:n.y+(b.y>=0?.4:-.4)});
           const outgoing=speed*(low?.48:.32);b.vx=outward.x*outgoing;b.vy=outward.y*outgoing;b.vz=low?1.4:2.2;

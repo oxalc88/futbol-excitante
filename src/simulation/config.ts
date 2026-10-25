@@ -1,5 +1,5 @@
 import type { Config } from '../contracts/types';
-export const engineVersion = 'engine-v2';
+export const engineVersion = 'engine-v3';
 // Fictional design values, VERSIONED_PROVISIONAL. No PES reference calibration.
 export function createConfig(options: Partial<Pick<Config, 'seed' | 'halfSeconds' | 'teamSize' | 'human'>> = {}): Config {
   return {
