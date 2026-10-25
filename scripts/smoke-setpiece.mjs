@@ -279,7 +279,8 @@ try {
   const r9 = await kick(2,20);
   check(r9.s.ball.lastTouch?.playerId===s9.restart.taker,
     `${stage}: last touch ${r9.s.ball.lastTouch?.playerId} is not the taker ${s9.restart.taker}`);
-  check(r9.speed>=20, `${stage}: speed ${r9.speed} below 20`);
+  // □ held ~20 ticks: setPiecePower gives 16+10p, about 19.6 m/s after a tick of drag.
+  check(r9.speed>=18, `${stage}: speed ${r9.speed} below 18`);
   await evidence(stage,{speed:r9.speed,vz:r9.s.ball.vz});
   await release();
   stage='10-panenka';
