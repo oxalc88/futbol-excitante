@@ -23,6 +23,14 @@ export interface Tactics {
 }
 export interface TeamProfile { id: string; name: string; shortName: string; players: PlayerProfile[]; tactics: Tactics }
 export type KeeperKick = 'punt' | 'high';
+/** Dpad direction of a set-piece command. */
+export type SetDirection = 'up' | 'down' | 'left' | 'right';
+/** Second taker of a set piece: beside the ball (dpad up) or behind it (dpad down). */
+export type SecondTaker = 'side' | 'behind';
+/** Corner attack strategy of the dpad: fast, near post, in line, far post. */
+export type CornerAttack = 'fast' | 'near' | 'line' | 'far';
+/** Corner defence strategy of the dpad: mixed, man to man, zonal. */
+export type CornerDefence = 'mixed' | 'man' | 'zonal';
 export interface InputFrame {
   tick: number; slot: TeamIndex; move: Vec2; aim: Vec2; sprint: boolean; shield: boolean;
   action?: ActionKind; power?: number; switchPlayer?: boolean; switchKeeper?: boolean; tactics?: Partial<Tactics>;
@@ -36,6 +44,26 @@ export interface InputFrame {
   keeperFeint?: boolean;
   /** Foul-dive chord (L1+L2+L3+R3 without R2) of the selected player. */
   simulateDive?: boolean;
+  /** Human set piece only: the kick uses the set-piece rows (stick trajectory, power height and curl). */
+  setKick?: boolean;
+  /** Set piece only: L1 + dpad up or down places the second taker beside or behind the ball. */
+  secondTaker?: SecondTaker;
+  /** Set piece only: hold L2 while the kick to play it with the second taker. */
+  secondKick?: boolean;
+  /** Free-kick feint: press ✕ while the ○ charge is held. No kick leaves the foot. */
+  setFeint?: boolean;
+  /** Set piece only: L1 + ✕ rolls the ball short along the ground. */
+  shortRoll?: boolean;
+  /** Penalty only: L1 + □ chips the ball down the middle (panenka). */
+  panenka?: boolean;
+  /** Free-kick wall of the defending slot: one □ press (no ✕ held) jumps. */
+  wallJump?: boolean;
+  /** Free-kick wall: power of the held ○ that sends the wall out at the kick. */
+  wallCharge?: number;
+  /** Free kick: hold △ + stick. Penalty: stick alone. Moves the slot keeper. */
+  keeperMove?: Vec2;
+  /** Corner only: dpad direction of the attack or defence strategy. */
+  cornerSide?: SetDirection;
 }
 export interface Intent { move: Vec2; aim: Vec2; sprint: boolean; shield: boolean; action?: ActionKind; power: number }
 export interface PlayerState extends PlayerProfile, Vec2 {
@@ -44,6 +72,8 @@ export interface PlayerState extends PlayerProfile, Vec2 {
   // Set only by human keeper commands. Keep absent for CPU-only checkpoints.
   keeperRushing?: boolean;
   keeperDropped?: boolean;
+  // Tick until which a free-kick wall player jumps. Absent on CPU-only checkpoints.
+  wallJump?: number;
   sentOff: boolean; yellows: number; keeperMode: 'ready' | 'dive' | 'hold' | 'recover'; keeperUntil: number;
   team: TeamIndex; vx: number; vy: number; heading: number; energy: number; stability: number;
   intent: Intent; action: { kind: ActionKind; start: number; contact: number; end: number; aim: Vec2; power: number; resolved: boolean; keeperKick?: KeeperKick } | null;
@@ -56,7 +86,13 @@ export interface TeamState extends TeamProfile {
   assignments: Record<string, { anchor: Vec2; target: Vec2; responsibility: string }>;
   chaser: string | null; memory: { touches: Record<string, number>; flank: [number, number]; lastContact: string | null; focal: string | null; };
 }
-export interface Restart { team: TeamIndex; point: Vec2; taker: string; remaining: number; kind: Phase }
+export interface Restart {
+  team: TeamIndex; point: Vec2; taker: string; remaining: number; kind: Phase;
+  /** Second taker placed with L1 + dpad; the kick uses him while L2 is held. */
+  second?: { id: string; placement: SecondTaker };
+  /** Corner strategies chosen with the dpad before the kick. */
+  strategy?: { attack?: CornerAttack; defence?: CornerDefence };
+}
 export interface MatchEvent { id: string; tick: number; type: string; playerId?: string; team?: TeamIndex; data?: Record<string, unknown> }
 export interface Stats { shots: number; onTarget: number; passes: number; completed: number; saves: number; tackles: number; fouls: number; possessionTicks: number; corners: number; offsides: number; yellows: number; reds: number; penalties: number }
 export interface Config {
