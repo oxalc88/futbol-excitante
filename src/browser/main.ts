@@ -218,7 +218,7 @@ let inputEvidence:InputFrame[]=[];
 const shotEvidence={actions:[0,0],events:[0,0],power:[0,0]};
 const keeperEvidence={punts:[0,0],highPunts:[0,0],throws:[0,0]};
 let browserFrames=0;
-Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},keeper:{punts:[...keeperEvidence.punts],highPunts:[...keeperEvidence.highPunts],throws:[...keeperEvidence.throws]},ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,keeper:p.keeper,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
+Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},keeper:{punts:[...keeperEvidence.punts],highPunts:[...keeperEvidence.highPunts],throws:[...keeperEvidence.throws]},keeperHold:current.keeperHold?{playerId:current.keeperHold.playerId}:null,ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,keeper:p.keeper,keeperRushing:p.keeperRushing===true,keeperDropped:p.keeperDropped===true,keeperMode:p.keeperMode,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
 // Smoke only: exists only when navigator.webdriver is true. It is not a game feature. The recorder replay is not valid after this call.
 if(navigator.webdriver)Object.defineProperty(window,'__feSmoke',{configurable:false,enumerable:false,value:{ballAtFeet(slot:0|1){
   if(!started||guest||replay||current.phase!=='playing')return false;
@@ -264,6 +264,46 @@ keeperHold(slot:0|1){
     const ux=d>0?dx/d:(q.team===0?1:-1),uy=d>0?dy/d:0;
     q.x=Math.max(-limitX,Math.min(limitX,w.ball.x+ux*12));
     q.y=Math.max(-limitY,Math.min(limitY,w.ball.y+uy*12));
+    q.vx=0;q.vy=0;q.action=null;
+  }
+  w.pendingPass=null;
+  w.restartRestriction=null;
+  sim.restore(w);
+  previous=current=sim.presentation();
+  return true;
+},
+// Smoke only: a one-on-one drill: the slot keeper faces the nearest attacker.
+oneOnOne(slot:0|1){
+  if(!started||guest||replay||current.phase!=='playing')return false;
+  const w=sim.snapshot();
+  const keeper=w.players.find(p=>p.keeper&&p.team===slot);
+  if(!keeper)return false;
+  w.selected[slot]=keeper.id;keeper.manualControl=true;
+  keeper.action=null;keeper.recovery=0;keeper.keeperMode='ready';
+  keeper.vx=0;keeper.vy=0;
+  w.keeperHold=null;
+  const rest=config.physics.radius;
+  w.ball.x=keeper.x-Math.sign(keeper.x)*16;w.ball.y=keeper.y;w.ball.z=rest;
+  w.ball.vx=0;w.ball.vy=0;w.ball.vz=0;w.ball.spin={x:0,y:0,z:0};
+  const awayX=w.ball.x-keeper.x,awayY=w.ball.y-keeper.y,away=Math.hypot(awayX,awayY);
+  const ax=away>0?awayX/away:(slot===0?1:-1),ay=away>0?awayY/away:0;
+  let attacker:typeof keeper|null=null,best=Infinity;
+  for(const q of w.players){
+    if(q.keeper||q.team===slot)continue;
+    const d=Math.hypot(q.x-w.ball.x,q.y-w.ball.y);
+    if(d<best){best=d;attacker=q;}
+  }
+  if(!attacker)return false;
+  attacker.x=w.ball.x+ax;attacker.y=w.ball.y+ay;
+  attacker.vx=0;attacker.vy=0;attacker.action=null;
+  const limitX=config.pitch.length/2,limitY=config.pitch.width/2;
+  for(const q of w.players){
+    if(q===keeper||q===attacker)continue;
+    const dx=q.x-w.ball.x,dy=q.y-w.ball.y,d=Math.hypot(dx,dy);
+    if(d>=20)continue;
+    const ux=d>0?dx/d:(q.team===0?1:-1),uy=d>0?dy/d:0;
+    q.x=Math.max(-limitX,Math.min(limitX,w.ball.x+ux*20));
+    q.y=Math.max(-limitY,Math.min(limitY,w.ball.y+uy*20));
     q.vx=0;q.vy=0;q.action=null;
   }
   w.pendingPass=null;
