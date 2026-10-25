@@ -24,11 +24,12 @@ Every step must print PASS. The script exits non-zero if one fails. CI (`.github
 | dist-check | `scripts/check-dist.mjs`: allowlist: only .html, .js, .css; rejects lab output, forbidden directories, absolute asset paths and oversized output (2 MiB/file, 5 MiB total); prints sizes. |
 | build-lab | `npm run build:lab` includes `lab.html` for the following smoke. Rebuild public output before publication. |
 | smoke | `scripts/smoke-browser.mjs`: starts a match, takes the human kickoff (presses J until the phase leaves "Saque inicial"), fails on page errors, missing canvas, or a clock stuck at `00:00`; then a CPU-vs-CPU match with video. |
+| pad-smoke | `scripts/smoke-gamepad.mjs`: fake standard pads; Start edges, charged shot, disconnect, held reconnect, stable local slots, and emulated touch shot. Runs after smoke with a separate preview server. |
 
 ## Evidence
 
 `artifacts/local/smoke/` (git-ignored; CI uploads it as `browser-smoke`):
-`game.png`, `match.json` (clock start/end, kickoffMs, score, phase, canvases, errors), `cpu-vs-cpu.png`, `video/*.webm`, `lab.png`.
+`pad.json` (scenario snapshots and errors), `game.png`, `match.json` (clock start/end, kickoffMs, score, phase, canvases, errors), `cpu-vs-cpu.png`, `video/*.webm`, `lab.png`.
 Attach these paths, or the CI artifact, to the PR.
 
 ## Capability map
@@ -47,7 +48,7 @@ Attach these paths, or the CI artifact, to the PR.
 | Presentation boundary (C6 #46) | presentation-boundary.test.ts "presentation attached matches headless authority every tick and at fulltime" (frozen snapshots, three camera modes, HUD states, real renderer/radar with fake GPU/DOM, CPU kickoff at tick 60); "presentation imports cannot reach simulation mutators or orchestration"; typecheck rejects nested snapshot writes; local-stage.test.ts "camera changes and repeated draws cannot change authoritative state" | test output; per-tick hashes and final full-world comparison |
 | Browser match + CPU vs CPU (C1 #45) | smoke (kickoff taken, clock advances, no page errors) | `match.json`, `cpu-vs-cpu.png`, `video/` |
 | Pause and dialogs / fulltime (C2 #42) | pause.test.ts: manual pause, dialog close/cancel decision, terminal state, detached rematch kickoff; smoke: P → Help → close → clock frozen 2s → P → clock advances | test output; `match.json` → `pauseCase`; fulltime buttons require manual browser review |
-| Controls / devices (C5 #44) | local-stage.test.ts "two controller identities keep their slots…", "controller charge fires once…" (`controller.ts`); input.test.ts (keyboard, touch, charge, switch, pause, blur, two players, pad dead zone) | test output; real devices: `docs/manual-device-test.md` (pending) |
+| Controls / devices (C5 #44) | local-stage.test.ts "two controller identities keep their slots…", "controller charge fires once…" (`controller.ts`); input.test.ts (keyboard, touch, charge, switch, pause, blur, two players, pad dead zone) | test output; `scripts/smoke-gamepad.mjs` scenarios 1–6, `artifacts/local/smoke/pad.json`; real devices: `docs/manual-device-test.md` (pending) |
 | Visual style: silhouettes and palette (C11 #63) | palette.test.ts (team value bands separate for any kit pair, ball brightest, keeper distinct); presentation-boundary.test.ts unchanged | before/after screenshots for the 3 cameras in `docs/evidence/c11/` |
 | Player figures and animation (C11 #63) | player-figure.test.ts (pose is pure and does not change frozen snapshots; run, idle and kick poses differ; swing grows with speed; kick uses the preferred foot; turn lean sign; human proportions; only `simulation/math` import); presentation-boundary.test.ts unchanged | before/after screenshots (close, close zoom, broadcast, tactical) in `docs/evidence/c12/` |
 | Game feel vs PES (C7 #48) | pes-timing.test.ts / npm run timing:compare: five seeded game timings, approximate public-video PTS validation, exact known-gap and missing-reference register | eval/reference/pes-observed.json (32 tiempos: 12 viajes de pase, 11 controles, 6 giros, 3 arranques; 20 nuevos de B, 1 pase elevado descartado; acuerdo numérico 10/12, c03/c05 discrepan y giros A con fases distintas; slice 2 tuning: giro180 0.333 s y velocidad máxima 0.617 s WITHIN; brechas: pase/control BELOW; coverage_shortfall: 3/15 arranques, 2/15 giros180), pes-known-gaps.json; evaluate still uses design targets and DIRECT_CAPTURE only; replay fixture tests/fixtures/reference-engine-v2.json |

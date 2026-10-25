@@ -150,7 +150,13 @@ peer.onStatus=s=>{$('network-status').textContent=s;if(s.includes('interrumpida'
 peer.onConnect=()=>{if(peer.role==='host'){start('local');peer.start(sim.snapshot());$('match-mode').textContent='ONLINE · ANFITRIÓN';}};
 peer.onStart=(world:World)=>{try{world.teams.forEach(validateTeam);sim=new Simulation(world.config,world.teams);sim.restore(world);config=world.config;kickoffSetup=null;guest=true;started=true;replay=null;previous=current=sim.presentation();makeRenderer(kits(0,1));document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);$('match-mode').textContent='ONLINE · VISITANTE';}catch{peer.close();$('network-status').textContent='Estado inicial incompatible.';}};
 peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.tick||!Array.isArray(s.players)||s.players.length!==config.teamSize*2)return;previous=current;current=s;networkTick=performance.now();};
+// Detached read-only evidence at the browser boundary. No engine access is exposed.
+let inputEvidence:InputFrame[]=[];
+const shotEvidence={actions:[0,0],events:[0,0],power:[0,0]};
+let browserFrames=0;
+Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
 function loop(now:number){
+  browserFrames++;
   const elapsed=Math.min(.1,(now-last)/1000);last=now;
   if(started&&!document.querySelector('dialog[open]')&&input.pauseRequested())pause(!paused);
   try{
@@ -161,7 +167,10 @@ function loop(now:number){
         const frames:InputFrame[]=[];
         if(replay){while(replay.inputs[replayIndex]?.tick===sim.tick)frames.push(replay.inputs[replayIndex++]);}
         else for(const slot of [0,1]as const)if(config.human[slot]){const f=slot===1&&peer.role==='host'?peer.hostFrame(sim.tick):input.sample(sim.tick,slot);if(slot===0&&pendingTactics){f.tactics=pendingTactics;pendingTactics=undefined;}frames.push(f);}
+        inputEvidence=structuredClone(frames);
+        for(const f of frames)if(f.action==='shoot'){shotEvidence.actions[f.slot]++;shotEvidence.power[f.slot]=f.power??0;}
         sim.applyInputs(frames);if(!replay)record.record(frames);previous=current;sim.step();current=sim.presentation();renderer?.advanceCamera(current);
+        for(const e of current.events)if(e.type==='shoot'&&e.team!==undefined)shotEvidence.events[e.team]++;
         const card=cardAlert(current.events,current);
         const alert=current.events.find(e=>['advantage','advantage-recalled','keeper-time-limit'].includes(e.type));
         if(card){notice=card;noticeUntil=current.tick+CARD_ALERT_TICKS;}
