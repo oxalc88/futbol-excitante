@@ -1,4 +1,6 @@
-// Pure start-menu logic: quick play defaults, first-time tips and menu state.
+// Pure start-menu logic: quick play defaults, first-time tips, CPU difficulty and menu state.
+
+import type { CpuDifficulty } from '../contracts/types';
 
 export interface StartMenuStorage { getItem(key:string):string|null; setItem(key:string,value:string):void }
 
@@ -10,6 +12,7 @@ export function quickPlaySetup():QuickPlaySetup {
 }
 
 const tipsKey='fe.tipsSeen';
+const difficultyKey='fe.cpuDifficulty';
 
 // Session flag: one write failure must not bring the tips back on every match.
 let tipsSeenThisSession=false;
@@ -28,6 +31,29 @@ export function markTipsSeen(storage?:StartMenuStorage):void {
 
 /** Test hook: forget the session flag so each test starts from storage only. */
 export function resetTipsSession():void {tipsSeenThisSession=false;}
+
+/** Menu value to level. A missing or invalid value gives Normal. */
+export function parseCpuDifficulty(value:string|null|undefined):CpuDifficulty {
+  return value==='easy'||value==='hard'?value:'normal';
+}
+
+/** Saved level. Missing, invalid or blocked storage gives Normal. */
+export function loadCpuDifficulty(storage?:StartMenuStorage):CpuDifficulty {
+  if(!storage)return 'normal';
+  try{return parseCpuDifficulty(storage.getItem(difficultyKey));}catch{return 'normal';}
+}
+
+/** Save the level and return it, so the menu shows what is stored. */
+export function saveCpuDifficulty(storage:StartMenuStorage|undefined,value:string|null|undefined):CpuDifficulty {
+  const level=parseCpuDifficulty(value);
+  try{storage?.setItem(difficultyKey,level);}catch{}
+  return level;
+}
+
+/** Online play ignores the menu level and always runs Normal. */
+export function matchCpuDifficulty(online:boolean,value:string|null|undefined):CpuDifficulty {
+  return online?'normal':parseCpuDifficulty(value);
+}
 
 /** Which start-menu screen is active; tips always return to the screen that opened them. */
 export type MenuView='setup'|'tips'|'match'|'closed';

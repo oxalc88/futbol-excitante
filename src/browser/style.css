@@ -21,6 +21,9 @@ button{min-height:44px}.close{min-width:44px;min-height:44px}.touch-buttons{max-
 #quick-play-btn{min-height:64px;font-size:1.15rem;padding:1.05rem 1.2rem;margin:0 0 8px;touch-action:manipulation}
 #quick-play-btn span{font-size:1.3rem;font-weight:900}
 .quick-note{font-size:.8125rem;color:#9db4bb;text-align:center;margin:0}
+.difficulty-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:12px 0 0;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:#12253440}
+.difficulty-row label{flex-direction:row;align-items:center;gap:0;font-size:.875rem;color:#ccdad9}
+.difficulty-row select{width:auto;min-width:140px;padding:8px 10px}
 .section-title{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);margin:14px 0 12px;padding-top:12px}
 dialog.setup{max-height:96dvh}
 dialog{overflow:auto}

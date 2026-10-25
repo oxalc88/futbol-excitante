@@ -3,7 +3,7 @@ import { renderHud } from './hud';
 import './style.css';
 import { cardAlert, CARD_ALERT_TICKS } from './card-alert';
 import { loadPitchPalette, savePitchPalette, type PitchPaletteStorage } from './pitch-palette';
-import { quickPlaySetup, shouldShowTips, markTipsSeen, menuReducer, initialMenuState, type QuickPlaySetup, type StartMenuStorage } from './start-menu';
+import { quickPlaySetup, shouldShowTips, markTipsSeen, menuReducer, initialMenuState, loadCpuDifficulty, saveCpuDifficulty, matchCpuDifficulty, type QuickPlaySetup, type StartMenuStorage } from './start-menu';
 import type { PitchPaletteId } from '../adapters/presentation-model';
 import { shouldPause } from './pause-state';
 import { isFulltime, rematchSetup } from './fulltime-flow';
@@ -34,6 +34,7 @@ app.innerHTML=`
 </main>
 <dialog id="setup-dialog" class="setup"><form id="setup-form"><div class="dialog-top"><span class="eyebrow">FÚTBOL EXCITANTE</span><button type="button" id="close-setup" class="close" aria-label="Cerrar">×</button></div><h1>A la cancha.</h1>
 <button type="button" id="quick-play-btn" class="primary wide" autofocus>Jugar rápido <span>→</span></button><p class="quick-note">Tú contra la CPU · 6 minutos · 11 contra 11 · Empieza ya.</p>
+<div class="difficulty-row"><label for="difficulty">Dificultad de la CPU</label><select id="difficulty" aria-label="Dificultad de la CPU"><option value="easy">Fácil</option><option value="normal" selected>Normal</option><option value="hard">Difícil</option></select></div>
 <p class="section-title">Partido personalizado · elige tus equipos</p>
 <div class="team-selection"><label>LOCAL<select id="home-team">${TEAM_CATALOG.map((t,i)=>`<option value="${i}">${t.name}</option>`).join('')}</select><span class="team-stripe cream"></span></label><span class="versus">VS</span><label>VISITANTE<select id="away-team">${TEAM_CATALOG.map((t,i)=>`<option value="${i}" ${i===1?'selected':''}>${t.name}</option>`).join('')}</select><span class="team-stripe blue"></span></label></div>
 <div class="setup-grid"><label>Modo<select id="mode"><option value="solo">Tú contra la CPU</option><option value="local">Dos jugadores locales</option><option value="watch">CPU contra CPU</option></select></label><label>Duración<select id="duration"><option value="120">2 minutos</option><option value="360" selected>6 minutos</option><option value="600">10 minutos</option></select></label><label>Jugadores<select id="size"><option value="11">11 contra 11</option><option value="5">5 contra 5</option><option value="2">2 contra 2</option></select></label><label>Semilla<input id="seed" type="number" min="1" max="2147483647" value="2017" required /></label></div>
@@ -47,8 +48,10 @@ app.innerHTML=`
 
 let paletteStorage:PitchPaletteStorage|undefined;try{paletteStorage=window.localStorage;}catch{}
 let tipsStorage:StartMenuStorage|undefined;try{tipsStorage=window.localStorage;}catch{}
+let difficultyStorage:StartMenuStorage|undefined;try{difficultyStorage=window.localStorage;}catch{}
 let menu=initialMenuState;
 let pitchPalette=loadPitchPalette(paletteStorage);$<HTMLSelectElement>('pitch-palette').value=pitchPalette;
+$<HTMLSelectElement>('difficulty').value=loadCpuDifficulty(difficultyStorage);
 const input=new BrowserInput(),peer=new PeerSession();let importedTeam:TeamProfile|null=null;
 let config=createConfig({human:[false,false]}),sim=new Simulation(config,[makeTeam(0),makeTeam(1)]),record=new Recorder(sim);
 let previous=sim.presentation(),current=previous,renderer:FootballRenderer|null=null,paused=false,started=false,last=performance.now(),accumulator=0,hudClock=0;
@@ -80,8 +83,9 @@ function rematch(){
   makeRenderer(kickoffKits);$('match-mode').textContent=kickoffMode;
   document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);updateHud();
 }
-// `forced` is the quick-play path: it ignores every form value and uses the defaults.
-function start(mode?:string,forced?:QuickPlaySetup){
+// `forced` is the quick-play path: it ignores the match form and uses the defaults.
+// The menu difficulty applies to quick play and to custom match; online play always runs Normal.
+function start(mode?:string,forced?:QuickPlaySetup,online=false){
   const home=forced?.home??Number($<HTMLSelectElement>('home-team').value),away=forced?.away??Number($<HTMLSelectElement>('away-team').value),size=forced?.teamSize??Number($<HTMLSelectElement>('size').value);
   const chosen=mode??forced?.mode??$<HTMLSelectElement>('mode').value;
   if(!forced&&importedTeam&&importedTeam.players.length!==size)throw new Error(`El equipo importado tiene ${importedTeam.players.length} jugadores. Elige esa cantidad.`);
@@ -91,7 +95,7 @@ function start(mode?:string,forced?:QuickPlaySetup){
     t1.tactics.formation=$<HTMLSelectElement>('formation').value as TeamProfile['tactics']['formation'];
     for(const k of tacticalKeys)t1.tactics[k]=Number($<HTMLInputElement>(k).value);
   }
-  config=createConfig({human:chosen==='watch'?[false,false]:chosen==='local'?[true,true]:[true,false],seed:forced?.seed??Number($<HTMLInputElement>('seed').value),teamSize:size,halfSeconds:(forced?.duration??Number($<HTMLSelectElement>('duration').value))/2});
+  config=createConfig({human:chosen==='watch'?[false,false]:chosen==='local'?[true,true]:[true,false],seed:forced?.seed??Number($<HTMLInputElement>('seed').value),teamSize:size,halfSeconds:(forced?.duration??Number($<HTMLSelectElement>('duration').value))/2,difficulty:matchCpuDifficulty(online,$<HTMLSelectElement>('difficulty').value)});
   kickoffSetup=rematchSetup(config,[validateTeam(t1),validateTeam(t2)]);kickoffKits=kits(home,away);
   sim=new Simulation(config,[validateTeam(t1),validateTeam(t2)]);previous=current=sim.presentation();record=new Recorder(sim);replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;notice='';noticeUntil=0;
   makeRenderer(kits(home,away));$('match-mode').textContent=chosen==='watch'?'CPU CONTRA CPU':chosen==='local'?'DOS JUGADORES':'TÚ CONTRA LA CPU';
@@ -169,6 +173,8 @@ $('touch-shoot').onpointerup=()=>input.endTouchShot();$('touch-shoot').onpointer
 $('touch-shield').onpointerdown=e=>{e.preventDefault();$('touch-shield').setPointerCapture(e.pointerId);input.setTouchShield(true);};$('touch-shield').onpointerup=$('touch-shield').onpointercancel=$('touch-shield').onlostpointercapture=()=>input.setTouchShield(false);
 $('touch-option').onchange=()=>{document.body.dataset.touch=$<HTMLSelectElement>('touch-option').value;};
 $('pitch-palette').onchange=()=>{pitchPalette=$<HTMLSelectElement>('pitch-palette').value as PitchPaletteId;savePitchPalette(paletteStorage,pitchPalette);renderer?.setPitchPalette(pitchPalette);};
+// The choice is saved at once and read back on the next page load.
+$('difficulty').onchange=()=>{$<HTMLSelectElement>('difficulty').value=saveCpuDifficulty(difficultyStorage,$<HTMLSelectElement>('difficulty').value);};
 $('quality').onchange=()=>renderer?.setQuality($<HTMLSelectElement>('quality').value);
 $('online-btn').onclick=()=>showDialog('online-dialog');
 async function networkTask(work:()=>Promise<string|void>){try{$('network-status').textContent='Preparando conexión…';const code=await work();if(code)$<HTMLTextAreaElement>('local-code').value=code;$('network-status').textContent='Código listo. Intercámbialo con tu amigo.';}catch(e){$('network-status').textContent=(e as Error).message;}}
@@ -177,7 +183,7 @@ $('create-answer').onclick=()=>networkTask(()=>peer.answer($<HTMLTextAreaElement
 $('accept-answer').onclick=()=>networkTask(()=>peer.accept($<HTMLTextAreaElement>('remote-code').value));
 $('copy-code').onclick=async()=>{try{await navigator.clipboard.writeText($<HTMLTextAreaElement>('local-code').value);$('network-status').textContent='Código copiado.';}catch{$<HTMLTextAreaElement>('local-code').select();$('network-status').textContent='Selecciona y copia el código.';}};
 peer.onStatus=s=>{$('network-status').textContent=s;if(s.includes('interrumpida')||s.includes('cerrada')){input.clear();pause(true);}};
-peer.onConnect=()=>{if(peer.role==='host'){start('local');peer.start(sim.snapshot());$('match-mode').textContent='ONLINE · ANFITRIÓN';}};
+peer.onConnect=()=>{if(peer.role==='host'){start('local',undefined,true);peer.start(sim.snapshot());$('match-mode').textContent='ONLINE · ANFITRIÓN';}};
 peer.onStart=(world:World)=>{try{world.teams.forEach(validateTeam);sim=new Simulation(world.config,world.teams);sim.restore(world);config=world.config;kickoffSetup=null;guest=true;started=true;replay=null;previous=current=sim.presentation();makeRenderer(kits(0,1));document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);$('match-mode').textContent='ONLINE · VISITANTE';}catch{peer.close();$('network-status').textContent='Estado inicial incompatible.';}};
 peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.tick||!Array.isArray(s.players)||s.players.length!==config.teamSize*2)return;audio.play(soundCues(current,s));previous=current;current=s;networkTick=performance.now();};
 // Detached read-only evidence at the browser boundary. No engine access is exposed.
