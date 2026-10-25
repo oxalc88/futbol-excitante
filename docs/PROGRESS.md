@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-25 01:40 — PR pendiente · Versión web lista para publicar (sin publicar)
+## 2026-10-25 01:40 — PR pendiente ([#70](https://github.com/oxalc88/futbol-excitante/pull/70)) · Versión web lista para publicar (sin publicar)
 - **Qué cambia para el jugador:** nada dentro del partido. `npm run build` deja en `dist/` sólo el juego, listo para subir a cualquier alojamiento estático con rutas relativas. El laboratorio ya no va en esa versión pública; sigue en `npm run dev` y en `npm run build:lab`.
 - **Qué probar:** `npm run build`, `npm run check:dist` y `npm run preview`; abre el enlace, elige equipos y juega un partido. Si copias un JPG o un video a `dist/`, el control debe fallar.
 - **Qué se rompe o cambia:** no se publica nada ni se configura alojamiento; Rolando decide dónde. El control rechaza el laboratorio, medios (incluidos los de PES), datos, mapas de código, rutas absolutas y archivos de más de 2 MiB (5 MiB en total).
