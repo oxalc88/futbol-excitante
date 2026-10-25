@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-25 01:25 — PR pendiente · Sonido de partido
+## 2026-10-25 01:22 — PR pendiente ([#71](https://github.com/oxalc88/futbol-excitante/pull/71)) · Sonido de partido
 - **Qué cambia para el jugador:** se oyen golpes de balón, silbatos de saque inicial, descanso y final, red y festejo de gol, y público de fondo. M o el botón Sonido silencia el partido. El control Volumen ajusta el nivel. El volumen y el silencio se guardan en este navegador. El sonido empieza tras pulsar una tecla, tocar la pantalla o pulsar un botón del mando.
 - **Qué probar:** inicia un partido, pasa, tira y marca un gol. Escucha los silbatos y el público. Ajusta Volumen, pulsa M y recarga para comprobar los ajustes guardados. Ejecuta `npm run typecheck` y `npm test`; `tests/audio.test.ts` comprueba sonidos, volumen, silencio y activación por gesto.
 - **Qué se rompe o cambia:** cambia el sonido del navegador. La simulación y `eval/baseline.json` no cambian. Si el navegador bloquea el audio o el almacenamiento, el partido sigue. Límite conocido: en línea, el visitante recibe una foto cada 6 ticks, así que puede no oír algunos golpes de balón y algunos silbatos de saque; los goles sí suenan. El saque CPU sigue en 60 ticks.
