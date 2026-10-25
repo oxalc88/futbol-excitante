@@ -135,7 +135,7 @@ $('sound-btn').onclick=toggleSound;updateSoundButton();
 $<HTMLInputElement>('sound-volume').value=String(audio.volume);
 $('sound-volume').oninput=()=>audio.setVolume(Number($<HTMLInputElement>('sound-volume').value));
 function updateHud(){
-  renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil},$);
+  renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil,setHint:setHint(current,guest)},$);
   const s=current;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
 }
@@ -307,6 +307,9 @@ function loop(now:number){
   input.setKeeper(guest?[keeper[1],keeper[0]]:keeper);
   const keeperHolding=keeperHoldFlags(current);
   input.setKeeperHold(guest?[keeperHolding[1],keeperHolding[0]]:keeperHolding);
+  // Set-piece keys: the waiting restart, with the team that takes it.
+  const rs=current.restart;const restart=([0,1] as const).map(t=>rs?{kind:rs.kind,attacking:rs.team===t}:null) as [{kind:string,attacking:boolean}|null,{kind:string,attacking:boolean}|null];
+  input.setRestart(guest?[restart[1],restart[0]]:restart);
   if(started&&!document.querySelector('dialog[open]')){
     if(input.pauseRequested())pause(!paused);
     if(input.cameraRequested())changeCamera();
@@ -344,3 +347,13 @@ function loop(now:number){
   requestAnimationFrame(loop);
 }
 updateHud();showDialog('setup-dialog');requestAnimationFrame(loop);
+
+/** HUD hint with the PS glyphs of the set-piece controls while a restart waits. */
+function setHint(s:typeof current,guest:boolean):string{
+  const r=s.restart;if(!r||!config.human[guest?1:0])return '';
+  const attacking=r.team===(guest?1:0);
+  if(r.kind==='penalty')return attacking?'□ tiro · L1+□ panenka · R2 fijar':'Stick: mueve al arquero';
+  if(!attacking)return r.kind==='free-kick'?'□ salta · mantén ✕ quieta · ○ sale la barrera · △+stick arquero':r.kind==='corner'?'Cruceta: ↑ mixta · ← al hombre · → zonal':'';
+  const base='□ / ○ / ✕ potencia · L1+✕ corto · R2 fijar';
+  return r.kind==='corner'?`${base} · Cruceta: ↑ rápido ↓ 1er palo ← en línea → 2º palo`:r.kind==='free-kick'?`${base} · L1+↑/↓ 2º lanzador · L2 tira el 2º · ○ y ✕ amago`:base;
+}

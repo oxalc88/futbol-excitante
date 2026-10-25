@@ -126,6 +126,8 @@ export interface Presentation {
   carrier: string | null;
   /** Holder of the ball in the keeper's hands, or null. */
   keeperHold: { playerId: string; since: number; feintTick?: number } | null;
+  /** Waiting restart (team and kind), or null in play. Read by the set-piece keys. */
+  restart?: { team: TeamIndex; kind: Phase } | null;
   teams: [Pick<TeamState, 'id' | 'name' | 'shortName' | 'direction' | 'tactics'>, Pick<TeamState, 'id' | 'name' | 'shortName' | 'direction' | 'tactics'>];
 }
 export interface Replay { version: 'replay-v2'; engine: string; initial: World; inputs: InputFrame[]; endTick: number; finalHash: string }
