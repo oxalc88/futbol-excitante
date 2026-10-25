@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-25 11:33 — PR pendiente (PRLINK) · Controles del arquero de PES 2017 PS4
+## 2026-10-25 11:33 — PR pendiente ([#79](https://github.com/oxalc88/futbol-excitante/pull/79)) · Controles del arquero de PES 2017 PS4
 - **Qué cambia para el jugador:** el arquero humano se controla como en PES 2017 PS4. Mantener △ = salida del arquero (R1 + △ = salida en sprint). Con el balón en las manos: ✕ = saque con la mano, △ = saque al espacio, ○ = saque de volea, R2 + ○ = despeje alto. Soltar el stick + R1 = soltar o recoger el balón; el stick izquierdo lo mueve con el balón (R1 para correr). Amago de pase: cualquier pase y luego ✕ antes de soltarlo. Estirada: L1 + L2 + L3 + R3 sin R2. Los glifos PS y el mapa de teclado muestran los botones nuevos.
 - **Qué probar:** cambia al arquero, sal con △ ante un mano a mano, atrapa el balón y prueba cada saque, el despeje alto con R2 + ○, soltar y recoger con R1, correr con el balón y el amago (△ mantenido y luego ✕: no sale el saque).
 - **Qué se rompe o cambia:** el motor pasa a `engine-v5`: las repeticiones de `engine-v4` ya no se reproducen. `eval/baseline.json` no cambia (0 de 276 huellas): la CPU no usa los controles nuevos. Los hashes de dificultad tampoco cambian. El saque CPU sigue en 60 ticks.
