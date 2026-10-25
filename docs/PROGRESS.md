@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-25 08:33 — PR pendiente ([#78](https://github.com/oxalc88/futbol-excitante/pull/78)) · Prueba de mandos estable (pad-smoke)
+- **Qué cambia para el jugador:** nada en el juego. Solo cambia la prueba automática de mandos.
+- **Qué probar:** ejecuta `scripts/verify.sh`; pad-smoke debe pasar siempre. Causa del fallo intermitente: en el escenario 5 un tiro anterior seguía rodando y a veces entraba en el arco durante los 60 ticks medidos; la fase pasaba a «goal», los jugadores se congelaban y la prueba fallaba. Ahora la prueba detiene el balón con el gancho de prueba y comprueba que la fase sigue en «playing».
+- **Qué se rompe o cambia:** nada. Sin cambios en el motor ni en `eval/baseline.json`. Sin esperas más largas ni reintentos. 10 de 10 ejecuciones locales en verde con la CPU cargada.
+
 ## 2026-10-25 04:40 — PR pendiente ([#75](https://github.com/oxalc88/futbol-excitante/pull/75)) · Arranque y media vuelta al ritmo de PES 2017 (C7 parte 3)
 - **Qué cambia para el jugador:** los jugadores arrancan más rápido. Desde parado llegan a su velocidad máxima en 383 ms (antes 600 ms; objetivo PES 384 ms, rango 300–434). La media vuelta de 180° en carrera tarda 500 ms, igual que antes (objetivo 500 ms, rango 434–534). Afecta a todos: humanos, CPU y arqueros. Con jugadores más rápidos hay más entradas y más faltas en los partidos de prueba.
 - **Qué probar:** arranca desde parado con R1 y siente si la salida es más viva. Corre y gira 180° con el stick: el giro debe sentirse igual. Juega un partido completo contra la CPU y mira si las faltas y tarjetas son razonables. `npm run timing:c7` muestra los dos tiempos frente al objetivo.
