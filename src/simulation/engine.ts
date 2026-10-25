@@ -9,9 +9,12 @@ const stats=()=>({shots:0,onTarget:0,passes:0,completed:0,saves:0,tackles:0,foul
 const ACTIONS: ActionKind[]=['pass','through','cross','shoot','tackle','slide','lob','header'];
 
 /** Synchronous, DOM-free match authority. All clocks, random state and queued inputs serialize. */
-// C7 (#48): approximate PES 2017 timing. Run start to top speed ~0.62 s; 180-degree body turn ~0.33 s.
-const ACCELERATION_SCALE=1.9;
+// C7 (#48) part 3 (resumen_final.md targets, they supersede the slice-2 comment below):
+// time_to_top_speed ~384 ms (300-434), turn180 ~500 ms (434-534), measured by scripts/measure-c7-movement.ts.
+// Slice 2 history: run start to top speed ~0.62 s; 180-degree body turn ~0.33 s.
+const ACCELERATION_SCALE=3.0;
 // Extra turn rate above a 90-degree heading error; 0 at 90 degrees, +REVERSAL_TURN_BOOST at 180 degrees.
+// Part 3 changes only this scale (1.9 -> 3.0). It sets the sprint ramp and the 180-degree velocity reversal.
 const REVERSAL_TURN_BOOST=2.6;
 
 export class Simulation {

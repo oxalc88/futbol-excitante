@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-25 04:40 — PR pendiente ([#PRNUM](https://github.com/oxalc88/futbol-excitante/pull/PRNUM)) · Arranque y media vuelta al ritmo de PES 2017 (C7 parte 3)
+- **Qué cambia para el jugador:** los jugadores arrancan más rápido. Desde parado llegan a su velocidad máxima en 383 ms (antes 600 ms; objetivo PES 384 ms, rango 300–434). La media vuelta de 180° en carrera tarda 500 ms, igual que antes (objetivo 500 ms, rango 434–534). Afecta a todos: humanos, CPU y arqueros. Con jugadores más rápidos hay más entradas y más faltas en los partidos de prueba.
+- **Qué probar:** arranca desde parado con R1 y siente si la salida es más viva. Corre y gira 180° con el stick: el giro debe sentirse igual. Juega un partido completo contra la CPU y mira si las faltas y tarjetas son razonables. `npm run timing:c7` muestra los dos tiempos frente al objetivo.
+- **Qué se rompe o cambia:** el motor pasa a `engine-v4`: las repeticiones guardadas con `engine-v3` ya no se reproducen. Se regenera `eval/baseline.json` (180 de 276 huellas cambian). En los 3 partidos de evaluación: goles 3 → 2, entradas 33 → 69, faltas 35 → 61, amarillas 18 → 25, rojas 3 → 6. El saque CPU sigue en 60 ticks.
+
 ## 2026-10-25 03:08 — PR pendiente ([#73](https://github.com/oxalc88/futbol-excitante/pull/73)) · Mando PS4 al estilo PES 2017 por defecto
 - **Qué cambia para el jugador:** el mando usa los botones de PES 2017 en PS4. Con balón: ✕ pase raso, ○ pase alto o centro, L1 + ○ pase elevado, △ pase en profundidad, □ tiro (mantener y soltar), R1 correr, L1 cambiar jugador. Sin balón: ✕ ✕ (doble toque) entrada, ○ barrida, □ despeje. El cabezazo sale con □ o con un pase cuando el balón llega a la altura de la cabeza. Proteger el balón es automático en el contacto. El clic del touchpad cambia la cámara. OPTIONS pausa y R3 controla al arquero. El teclado sigue la misma lógica y la ayuda muestra los símbolos de PlayStation.
 - **Qué probar:** con un mando PS4 o PS5, juega un partido: pasa con ✕, centra con ○, tira con □ y corre con R1. Sin balón, haz doble toque en ✕ para la entrada y mantén ✕ (no debe pasar nada). Prueba un cabezazo en un centro, el arquero con R3 (un solo toque para lanzarse) y el touchpad. Repite con teclado.

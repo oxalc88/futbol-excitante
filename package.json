@@ -13,6 +13,7 @@
     "reference:import": "node --import tsx scripts/import-reference.ts",
     "evaluate:traces": "node --import tsx scripts/evaluate.ts --traces",
     "timing:compare": "node --import tsx scripts/measure-game-timing.ts",
+    "timing:c7": "node --import tsx scripts/measure-c7-movement.ts",
     "build:lab": "tsc --noEmit && FE_BUILD_LAB=1 vite build",
     "check:dist": "node scripts/check-dist.mjs"
   },

@@ -55,7 +55,7 @@ test('both keepers stay selected; pause does not advance authority',()=>{
  for(const slot of [0,1] as const)assert(s.snapshot().players.find(p=>p.id===s.snapshot().selected[slot])!.keeper);
 });
 
-test('CPU state hashes match the engine before C10 on every tick, kickoff stays at 60',async()=>{
+test('CPU state hashes match the engine-v4 fixture on every tick, kickoff stays at 60',async()=>{
  const {readFileSync}=await import('node:fs');
  const hashes=JSON.parse(readFileSync(new URL('./fixtures/c10-cpu-hashes.json',import.meta.url),'utf8')) as string[];
  const s=new Simulation(createConfig({teamSize:2,human:[false,false],seed:41,halfSeconds:5}),[makeTeam(0,2),makeTeam(1,2)]);
