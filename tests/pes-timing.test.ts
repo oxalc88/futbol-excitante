@@ -32,6 +32,9 @@ test('PES timing: deterministic game observations, delta table and exact known-g
     turn90_s:'WITHIN',turn180_s:'WITHIN',pass_to_first_touch_s:'BELOW',
     control_to_next_pass_s:'BELOW',time_to_top_speed_s:'WITHIN',
   });
+  // Lock the C7 slice 2 tuning in ticks at 60 Hz: 180-degree turn 20 ticks, top speed 37 ticks.
+  assert.equal(game.turn180_s.end_tick-game.turn180_s.start_tick,20);
+  assert.equal(game.time_to_top_speed_s.end_tick-game.time_to_top_speed_s.start_tick,37);
   console.log('KNOWN GAPS: both pass metrics BELOW; turn180_s and time_to_top_speed_s WITHIN after C7 slice 2 tuning. Approximate; second pass done.');
   const introduced=structuredClone(rows);introduced.find(r=>r.metric==='turn90_s')!.status='ABOVE';
   assert.throws(()=>checkKnownGaps(introduced,known),/gaps changed/);
