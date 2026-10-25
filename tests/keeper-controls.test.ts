@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { Simulation } from '../src/simulation/engine';
 import { createConfig } from '../src/simulation/config';
 import { makeTeam } from '../src/adapters/data';
-import { BrowserInput } from '../src/adapters/input';
+import { BrowserInput, defendingFlags } from '../src/adapters/input';
 import { PeerSession } from '../src/adapters/network';
 import type { PadReading } from '../src/adapters/controller';
 import type { InputFrame, MatchEvent, PlayerState, TeamIndex, World } from '../src/contracts/types';
@@ -202,14 +202,14 @@ test('keeper run with the ball: the stick moves him at goalkeeper speed inside t
   assert(Math.abs(keeper.x-(-36))<1e-6,'the box edge stops the run');
 });
 
-test('keeper pass feint: no release and the hold timer restarts in the same tick',()=>{
+test('keeper pass feint: no release and the hold timer never restarts',()=>{
   const {s,events,id}=heldKeeper();
   const w=s.snapshot();w.keeperHold={playerId:id,since:w.tick-500};s.restore(w);
-  const tick=s.tick;
+  const since=w.keeperHold!.since;
   s.applyInputs([frame(s,0,{keeperFeint:true})]);s.step();
   const after=s.snapshot();
   assert.equal(after.keeperHold?.playerId,id,'the feint keeps the ball in the hands');
-  assert.equal(after.keeperHold?.since,tick,'the hold timer restarts at the feint tick');
+  assert.equal(after.keeperHold?.since,since,'the feint never restarts the hold timer');
   assert(events.some((e)=>e.type==='keeper-feint'),'keeper-feint event missing');
   assert(!events.some((e)=>e.type==='keeper-time-limit'),'the auto-release must not run');
   assert(!events.some((e)=>e.type==='keeper-throw'),'the feint must not throw');
@@ -648,4 +648,102 @@ test('review fix 1: the host carries and sequences every keeper control field',(
   session.input({...base,tick:5});
   const sequences=sent.map((raw)=>(JSON.parse(raw)as {sequence:number}).sequence);
   assert.deepEqual(sequences,[1,1],'only the edge frame spends a sequence');
+});
+
+// ------------------------------------------------- review findings, round 2
+
+test('review finding 1: the foot kick of the keeper ends the ball that he put down',()=>{
+  const {s,events,id}=heldKeeper();
+  s.applyInputs([frame(s,0,{keeperDrop:true})]);s.step();
+  let w=s.snapshot(),k=w.players.find((p)=>p.id===id)!;
+  assert.equal(k.keeperDropped,true,'the put-down marks his own ball');
+  const base=w.stats[0].passes;
+  s.applyInputs([frame(s,0,{action:'pass',aim:{x:1,y:0}})]);
+  until(s,60,()=>s.snapshot().stats[0].passes>base);
+  const kicked=s.snapshot(),keeper=kicked.players.find((p)=>p.id===id)!;
+  assert(kicked.stats[0].passes>base,'the foot pass never left his foot');
+  assert.equal(kicked.ball.lastTouch?.playerId,id);
+  assert.equal(kicked.ball.lastTouch?.surface,'foot');
+  assert.equal(keeper.keeperDropped,undefined,'his own foot touch ends the ball that he put down');
+  // The ball lies at his feet again. The hands stay closed after his own kick.
+  Object.assign(keeper,{vx:0,vy:0,recovery:0,touchCooldown:0,action:null});
+  Object.assign(kicked.ball,{x:keeper.x+.3,y:keeper.y,z:kicked.config.physics.radius,vx:0,vy:0,vz:0,spin:{x:0,y:0,z:0},flight:'loose',freeTicks:0});
+  kicked.offside=null;kicked.restartRestriction=null;kicked.pendingPass=null;
+  s.restore(kicked);
+  const from=events.length;
+  s.applyInputs([frame(s,0,{keeperDrop:true})]);s.step();
+  const refused=s.snapshot();
+  assert.equal(refused.keeperHold,null,'the ball of his own foot kick never returns to the hands');
+  assert(!events.slice(from).some((e)=>e.type==='keeper-pick-up'),'no keeper-pick-up after his own foot kick');
+  assert.equal(refused.players.find((p)=>p.id===id)!.keeperDropped,undefined,'the marker stays gone');
+});
+
+test('review finding 2: the pick-up is a hand touch and the carrier keeper attacks',t=>{
+  // The pick-up runs the same touch path as a keeper claim.
+  const {s,events,id}=looseBallBox();
+  const w=s.snapshot(),rival=w.players.find((p)=>p.team===1)!;
+  w.pendingPass={playerId:rival.id,team:1};
+  w.restartRestriction={taker:rival.id,team:1,indirect:false,kind:'free-kick'};
+  s.restore(w);
+  s.applyInputs([frame(s,0,{keeperDrop:true})]);s.step();
+  const after=s.snapshot();
+  assert.equal(after.keeperHold?.playerId,id,'the keeper takes the ball');
+  assert.equal(after.ball.lastTouch?.playerId,id,'the pick-up sets the last touch');
+  assert.equal(after.ball.lastTouch?.surface,'hand','the pick-up uses the hand');
+  assert.equal(after.pendingPass,null,'the pending pass resolves at the pick-up');
+  assert.equal(after.restartRestriction,null,'the restart restriction clears at the pick-up');
+  assert(events.some((e)=>e.type==='keeper-ball-contact'&&e.playerId===id),'the hand claim touch path runs');
+  assert(events.some((e)=>e.type==='interception'&&e.playerId===id),'the pending pass resolves as an interception');
+  // The shell: the selected keeper with the ball at his feet is the carrier, so
+  // his team attacks and the pass key gives a normal pass.
+  const h=keeperBrowser(t);
+  const held=defendingFlags({ball:{lastTouch:{team:1}},selected:[id,null],carrier:id});
+  assert.deepEqual(held,[false,false],'the carrier keeper of team 0 attacks although team 1 touched the ball last');
+  h.input.setDefending(held);
+  h.pads[0]=pad(0,[0]);
+  assert.equal(h.input.sample(h.next++,0).action,'pass','✕ gives a normal pass to the carrier keeper');
+  h.pads[0]=pad(0,[]);h.input.sample(h.next++,0);
+  const free=defendingFlags({ball:{lastTouch:{team:1}},selected:[id,null],carrier:null});
+  assert.deepEqual(free,[true,false],'without the ball at his feet team 0 defends');
+  h.input.setDefending(free);
+  h.pads[0]=pad(0,[0]);
+  assert.equal(h.input.sample(h.next++,0).action,'tackle','without the ball the same press dives');
+});
+
+test('review finding 3: the feints never restart the eight-second hold limit',()=>{
+  const {s,events,id}=heldKeeper();
+  const limit=Math.round(8/s.snapshot().config.dt);
+  const w=s.snapshot();w.keeperHold={playerId:id,since:s.tick-limit+2};s.restore(w);
+  const since=w.keeperHold!.since;
+  let releasedAt=-1;
+  for(let i=0;i<8;i++){
+    s.applyInputs([frame(s,0,{keeperFeint:true})]);
+    const at=s.tick;s.step();
+    const hold=s.snapshot().keeperHold;
+    if(hold===null){releasedAt=at;break;}
+    assert.equal(hold.since,since,`the feint never restarts the timer at tick ${at}`);
+  }
+  assert(releasedAt>=0,'the eight-second limit ends the hold despite a feint on every tick');
+  assert(events.filter((e)=>e.type==='keeper-feint').length>=2,'the feints still run');
+  assert(events.some((e)=>e.type==='keeper-time-limit'&&e.tick===releasedAt),'the keeper-time-limit ends the hold');
+  assert(events.some((e)=>e.type==='restart-awarded'&&e.data?.kind==='corner'),'the corner follows the time limit');
+});
+
+test('review finding 4: every foot action of the keeper leaves his foot after the put-down',()=>{
+  for(const action of ['pass','through','cross','lob','shoot'] as const){
+    const {s,events,id}=heldKeeper();
+    s.applyInputs([frame(s,0,{keeperDrop:true})]);s.step();
+    assert.equal(s.snapshot().keeperHold,null,'the put-down clears the hold');
+    const stats=s.snapshot().stats[0],base=stats.passes+stats.shots;
+    const from=events.length;
+    s.applyInputs([frame(s,0,{action,aim:{x:1,y:0}})]);
+    until(s,60,()=>{const n=s.snapshot().stats[0];return n.passes+n.shots>base;});
+    const after=s.snapshot(),log=events.slice(from);
+    assert(after.stats[0].passes+after.stats[0].shots>base,`${action} never left his foot`);
+    assert.equal(after.keeperHold,null,'the foot action never needs the hold');
+    assert.equal(after.ball.lastTouch?.playerId,id,`${action} touches the ball for the keeper`);
+    assert.equal(after.ball.lastTouch?.surface,'foot',`${action} uses the foot, not the hand`);
+    assert(log.some((e)=>e.type==='action-start'&&e.playerId===id&&e.data?.kind===action),`${action} action-start event missing`);
+    assert(!log.some((e)=>e.type==='keeper-throw'),`${action} is a foot action, not a throw`);
+  }
 });

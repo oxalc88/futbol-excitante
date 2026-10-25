@@ -10,7 +10,7 @@ import { isFulltime, rematchSetup } from './fulltime-flow';
 import type { Config, InputFrame, Presentation, Replay, TeamProfile, World } from '../contracts/types';
 import { Simulation } from '../simulation/engine';
 import { createConfig } from '../simulation/config';
-import { BrowserInput } from '../adapters/input';
+import { BrowserInput, defendingFlags } from '../adapters/input';
 import { FootballRenderer, type Kit } from '../adapters/renderer';
 import { makeTeam, TEAM_CATALOG, validateTeam } from '../adapters/data';
 import { Recorder, parseReplay, replaySimulation } from '../adapters/replay';
@@ -139,9 +139,10 @@ function updateHud(){
   const s=current;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
 }
-// A team defends while the ball has no touch of that team. A restart resets the
-// last touch, so the taker uses the attack keys. With no touch yet both teams attack.
-function defendingFlags(s:Presentation):[boolean,boolean]{const owner=s.ball.lastTouch?s.ball.lastTouch.team:null;return [owner!==null&&owner!==0,owner!==null&&owner!==1];}
+// A team defends while the ball has no touch of that team. The classification
+// lives with the input layer: defendingFlags in adapters/input.ts. The selected
+// carrier of a team, the keeper with the ball at his feet after a put-down, never
+// defends with his own team.
 // Header context of each team, next to defending. Engine limits
 // (simulation/engine.ts requestAction): a kick needs distance <= actions.reach + 1.1
 // and, above 1.15 m, only a header can kick, up to actions.headerHeight. The 1.15 m

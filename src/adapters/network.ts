@@ -20,7 +20,7 @@ export class PeerSession {
         const keeperKick=f.keeperKick==='punt'||f.keeperKick==='high'?f.keeperKick:undefined;
         if(Number.isInteger(m.sequence)&&Number(m.sequence)>this.receivedSequence){this.receivedSequence=Number(m.sequence);if(f.action&&['pass','shoot','cross','through','tackle','header'].includes(f.action))this.pendingAction=f.action;this.pendingSwitch||=!!f.switchPlayer;this.pendingKeeperSwitch||=!!f.switchKeeper;this.pendingKeeperKick||=keeperKick;this.pendingKeeperDrop||=!!f.keeperDrop;this.pendingKeeperFeint||=!!f.keeperFeint;this.pendingSimulateDive||=!!f.simulateDive;}
       }
-      if(m.type==='start'&&this.role==='guest'){const w=m.world as World;this.guestSnapshot=structuredClone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players,events:w.events,keeperHold:w.keeperHold,teams:w.teams});this.onStart(w);}
+      if(m.type==='start'&&this.role==='guest'){const w=m.world as World;this.guestSnapshot=structuredClone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players,events:w.events,carrier:w.carrier,keeperHold:w.keeperHold,teams:w.teams});this.onStart(w);}
       if(m.type==='snapshot'&&this.role==='guest'&&this.guestSnapshot){
         const patch=m.patch as Omit<Presentation,'players'> & {players:Partial<Presentation['players'][number]>[]};
         if(!patch||!Number.isInteger(patch.tick)||patch.tick<=this.guestSnapshot.tick||!Array.isArray(patch.players)||patch.players.length!==this.guestSnapshot.players.length)return;

@@ -74,7 +74,8 @@ export interface Config {
 export interface World {
   advantage: { team: TeamIndex; point: Vec2; until: number; offender: string; card: 'yellow' | 'red' | null } | null;
   pendingCards: { playerId: string; card: 'yellow' | 'red' }[];
-  keeperHold: { playerId: string; since: number } | null;
+  /** Tick of the last pass feint. The feint never restarts `since`. */
+  keeperHold: { playerId: string; since: number; feintTick?: number } | null;
   restartRestriction: { taker: string; team: TeamIndex; indirect: boolean; kind: Phase } | null;
   version: string; tick: number; rng: number; config: Config; teams: [TeamState, TeamState]; players: PlayerState[];
   ball: BallState; phase: Phase; half: 1 | 2; played: number; score: [number, number]; stats: [Stats, Stats];
@@ -85,8 +86,10 @@ export interface World {
 export interface Presentation {
   tick: number; phase: Phase; half: number; played: number; score: [number, number]; stats: [Stats, Stats];
   selected: [string | null, string | null]; ball: BallState; players: Omit<PlayerState,'manualControl'>[]; events: MatchEvent[];
+  /** Player at the ball: in the hands of the keeper or at the feet of a player. */
+  carrier: string | null;
   /** Holder of the ball in the keeper's hands, or null. */
-  keeperHold: { playerId: string; since: number } | null;
+  keeperHold: { playerId: string; since: number; feintTick?: number } | null;
   teams: [Pick<TeamState, 'id' | 'name' | 'shortName' | 'direction' | 'tactics'>, Pick<TeamState, 'id' | 'name' | 'shortName' | 'direction' | 'tactics'>];
 }
 export interface Replay { version: 'replay-v2'; engine: string; initial: World; inputs: InputFrame[]; endTick: number; finalHash: string }

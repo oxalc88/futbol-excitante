@@ -44,7 +44,7 @@ export class Simulation {
   stateHash(){return hash(this.world);}
   presentation():Presentation {
     const w=this.world;
-    return clone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players.map(({manualControl,...player})=>player),events:w.events,keeperHold:w.keeperHold,teams:w.teams.map(t=>({id:t.id,name:t.name,shortName:t.shortName,direction:t.direction,tactics:t.tactics})) as Presentation['teams']});
+    return clone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players.map(({manualControl,...player})=>player),events:w.events,carrier:w.carrier,keeperHold:w.keeperHold,teams:w.teams.map(t=>({id:t.id,name:t.name,shortName:t.shortName,direction:t.direction,tactics:t.tactics})) as Presentation['teams']});
   }
   applyInputs(frames:readonly InputFrame[]){
     const w=this.world, incoming:InputFrame[]=[];
@@ -175,9 +175,10 @@ export class Simulation {
           p.vx+=f.aim.x*c.goalkeeper.speed;p.vy+=f.aim.y*c.goalkeeper.speed;
           this.emit('keeper-dive',p,slot,{aim:f.aim});
         }
-        // Pass feint: the held kick never releases and the hold timer restarts,
-        // so the eight-second limit cannot end the hold in this tick.
-        if(f?.keeperFeint&&w.keeperHold?.playerId===p.id){w.keeperHold.since=w.tick;this.emit('keeper-feint',p,slot);}
+        // Pass feint: the held kick never releases. The feint never restarts the
+        // hold timer. Only the first feint in a row delays the auto-release by one
+        // tick, so the eight-second limit still ends the hold.
+        if(f?.keeperFeint&&w.keeperHold?.playerId===p.id){if(w.keeperHold.feintTick!==w.tick-1)w.keeperHold.feintTick=w.tick;this.emit('keeper-feint',p,slot);}
         // Run out to the ball without the ball; R1 adds the sprint rush speed.
         const rush=!!f?.keeperRush&&!w.keeperHold;
         if(rush){p.intent.move=unit(delta(p,w.ball));if(p.keeperRushing!==true){p.keeperRushing=true;this.emit('keeper-rush',p,slot);}}
@@ -189,8 +190,11 @@ export class Simulation {
           const b=w.ball;b.x=p.x+Math.cos(p.heading)*.5;b.y=p.y+Math.sin(p.heading)*.5;b.z=c.physics.radius;b.vx=b.vy=b.vz=0;b.spin={x:0,y:0,z:0};b.flight='loose';
           this.emit('keeper-put-down',p,slot);
         }else if(f?.keeperDrop&&!w.keeperHold&&p.recovery===0&&distance(p,w.ball)<c.goalkeeper.reach&&w.ball.z<1.1&&inPenaltyArea(w,p.team,w.ball)&&this.canPickUp(p)&&!this.checkOffside(p)&&!this.checkDoubleTouch(p)){
-          w.keeperHold={playerId:p.id,since:w.tick};p.keeperMode='hold';p.action=null;delete p.keeperDropped;
+          w.keeperHold={playerId:p.id,since:w.tick};p.keeperMode='hold';p.action=null;
           const b=w.ball;b.x=p.x;b.y=p.y;b.z=.8;b.vx=b.vy=b.vz=0;
+          // The pick-up is a hand touch, the same path as a keeper claim. It sets
+          // the last touch and it resolves the pending pass and the restart.
+          this.touch(p,'hand');delete p.keeperDropped;
           this.emit('keeper-pick-up',p,slot);
         }
         // Volley punt from the hands: wind up, the kick releases at contact.
@@ -200,9 +204,11 @@ export class Simulation {
           this.emit('action-start',p,p.team,{kind:'cross',intentTick:w.tick,contactTick:p.action.contact,recoveryTick:p.action.end,aim});
         }
         // With the ball in the hands the keys throw the ball. Without the hold
-        // the same keys are normal foot actions of the keeper.
-        const notHolding=!w.keeperHold||w.keeperHold.playerId===p.id;
-        p.intent.action=notHolding&&['pass','through','shoot'].includes(f?.action??'')?f!.action:undefined;
+        // the same keys are normal foot actions of the keeper: pass, through,
+        // cross, lob and shoot.
+        const heldByKeeper=w.keeperHold?.playerId===p.id;
+        const allowed=!w.keeperHold?['pass','through','cross','lob','shoot']:heldByKeeper?['pass','through','shoot']:[];
+        p.intent.action=allowed.includes(f?.action??'')?f!.action:undefined;
       }
     }
     for(const p of w.players){
@@ -410,8 +416,9 @@ export class Simulation {
     if(w.pendingPass&&p.id!==w.pendingPass.playerId){if(p.team===w.pendingPass.team){w.stats[p.team].completed++;this.emit('pass-completed',p,p.team);}else this.emit('interception',p,p.team);w.pendingPass=null;}
     if(w.offside&&w.offside.team!==p.team&&deliberate)w.offside=null;
     if(w.restartRestriction&&w.restartRestriction.taker!==p.id)w.restartRestriction=null;
-    // A touch by another player ends the ball that a keeper put down himself.
-    for(const q of w.players)if(q.keeperDropped===true&&q.id!==p.id)delete q.keeperDropped;
+    // A foot kick or foot touch of the keeper ends the ball that he put down
+    // himself. Every touch by another player ends it as well.
+    for(const q of w.players)if(q.keeperDropped===true&&(q.id!==p.id||surface==='foot'))delete q.keeperDropped;
     b.lastTouch={id:contact.id,tick:w.tick,playerId:p.id,team:p.team,surface,point:{x:b.x,y:b.y,z:b.z}};b.freeTicks=0;
   }
   private integrateBall(){
@@ -420,7 +427,8 @@ export class Simulation {
     if(w.keeperHold){const p=this.player(w.keeperHold.playerId)!;
       // The human holder keeps the ball in the hands at the keeper position.
       if(this.humanKeeper(p)){b.x=p.x;b.y=p.y;}
-      if(w.tick-w.keeperHold.since>=Math.round(8/c.dt)){this.emit('keeper-time-limit',p,p.team);this.startRestart('corner',other(p.team),{x:-w.teams[p.team].direction*c.pitch.length/2,y:(p.y>=0?1:-1)*c.pitch.width/2});}return;}
+      // The eight-second limit ends the hold. A feint delays the end by one tick.
+      if(w.tick-w.keeperHold.since>=Math.round(8/c.dt)&&w.keeperHold.feintTick!==w.tick){this.emit('keeper-time-limit',p,p.team);this.startRestart('corner',other(p.team),{x:-w.teams[p.team].direction*c.pitch.length/2,y:(p.y>=0?1:-1)*c.pitch.width/2});}return;}
     for(let i=0;i<c.physics.substeps&&w.phase==='playing';i++){
       const prev={x:b.x,y:b.y,z:b.z};
       const speed=Math.hypot(b.vx,b.vy);const grounded=b.z<=r+.001&&Math.abs(b.vz)<.25;

@@ -15,6 +15,19 @@ const firstCharge=(player:'p1'|'p2')=>Object.keys(KEYBOARD_MAP[player]).find(cod
 const switchHeld=(roles:Readonly<Record<string,KeyRole>>,keys:Set<string>)=>Object.entries(roles).some(([code,role])=>role.switchPlayer&&keys.has(code));
 /** Codes that play pass or cross (✕ and ○ on the pad). */
 const passOrCrossHeld=(roles:Readonly<Record<string,KeyRole>>,keys:Set<string>)=>Object.entries(roles).some(([code,role])=>(role.attack==='pass'||role.attack==='cross')&&keys.has(code));
+/** State of the ball and of the cursor that the match shell reads each frame. */
+export interface DefendingState{ball:{lastTouch:{team:TeamIndex}|null};selected:[string|null,string|null];carrier:string|null}
+/**
+ * A team defends while the ball has no touch of that team. A restart resets the
+ * last touch, so the taker uses the attack keys. With no touch both teams attack.
+ * The selected keeper with the ball at his feet is the carrier of his team, so his
+ * team attacks as well: after a put-down the pass key gives a normal pass.
+ */
+export function defendingFlags(s:DefendingState):[boolean,boolean]{
+  const owner=s.ball.lastTouch?s.ball.lastTouch.team:null;
+  const carries=(slot:0|1)=>s.carrier!==null&&s.selected[slot]===s.carrier;
+  return [(owner!==null&&owner!==0)&&!carries(0),(owner!==null&&owner!==1)&&!carries(1)];
+}
 export class BrowserInput {
   private keys=new Set<string>();private edges=new Set<string>();private releases=new Map<string,number>();private charges=new Map<string,number>();
   private controller=new ControllerMapper();
