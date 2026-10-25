@@ -1,5 +1,6 @@
 import type { Intent, PlayerState, TeamIndex, Vec2, World } from '../contracts/types';
 import { visibleBall } from './rules';
+import { cpuPressingScale } from './config';
 import { clamp, delta, distance, length, unit } from './math';
 
 export function formationAnchors(world: World, team: TeamIndex): Record<string, Vec2> {
@@ -34,8 +35,9 @@ export function bestPass(world: World, p: PlayerState, aim?: Vec2): PlayerState 
   }
   return best;
 }
-export function decideTeams(world: World) {
-  for(const ti of [0,1] as const) {
+/** Decides team-level state for `teams` (default: both, in slot order). Difficulty runs it per team cadence. */
+export function decideTeams(world: World, teams: readonly TeamIndex[] = [0, 1]) {
+  for(const ti of teams) {
     const team=world.teams[ti], dir=team.direction, own=world.players.filter(p=>p.team===ti&&!p.sentOff), anchors=formationAnchors(world,ti), c=world.config;
     const attacking=world.possession===ti;
     const contact=world.ball.lastTouch, memory=team.memory;
@@ -48,7 +50,7 @@ export function decideTeams(world: World) {
     candidates.sort((a,b)=>(reachTime(a,prediction)-(a.id===team.chaser?.toString()?c.ai.hysteresis*.1:0))-(reachTime(b,prediction)-(b.id===team.chaser?c.ai.hysteresis*.1:0)) || a.id.localeCompare(b.id));
     team.chaser=candidates[0]?.id??null;
     const assignments: typeof team.assignments={};
-    const counterpress=!attacking&&team.phase==='to-defence'&&team.tactics.counterPress>.5&&world.tick-team.phaseTick<c.ai.transitionTicks&&Math.abs(world.ball.x)<40;
+    const counterpress=!attacking&&team.phase==='to-defence'&&team.tactics.counterPress*cpuPressingScale(c,ti)>.5&&world.tick-team.phaseTick<c.ai.transitionTicks&&Math.abs(world.ball.x)<40;
     const secondPresser=counterpress?candidates[1]?.id:null;
     const marked=new Set<string>();
     for(const p of own) {
@@ -113,5 +115,7 @@ export function decidePlayer(world: World, p: PlayerState): Intent {
   // Separation changes intentions, never authoritative positions.
   if(!p.keeper) for(const q of world.players) {const gap=distance(p,q);if(!q.sentOff&&q.id!==p.id && gap>0 && gap<1.5){move.x+=(p.x-q.x)/gap*(1.5-gap)*.6;move.y+=(p.y-q.y)/gap*(1.5-gap)*.6;}}
   if(length(move)>1) move=unit(move);
-    return {move,aim,sprint:!p.keeper&&(isCarrier||(['press','counterpress'].includes(assignment?.responsibility??'')&&t.tactics.pressing>.45)||d>14),shield:isCarrier&&p.capabilities.physical>80,action,power};
+    // Difficulty scales pressing for CPU teams. Human teams keep their own value.
+    const pressing=t.tactics.pressing*cpuPressingScale(c,p.team);
+    return {move,aim,sprint:!p.keeper&&(isCarrier||(['press','counterpress'].includes(assignment?.responsibility??'')&&pressing>.45)||d>14),shield:isCarrier&&p.capabilities.physical>80,action,power};
 }
