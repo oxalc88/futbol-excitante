@@ -9,6 +9,11 @@ const stats=()=>({shots:0,onTarget:0,passes:0,completed:0,saves:0,tackles:0,foul
 const ACTIONS: ActionKind[]=['pass','through','cross','shoot','tackle','slide','lob','header'];
 
 /** Synchronous, DOM-free match authority. All clocks, random state and queued inputs serialize. */
+// C7 (#48): approximate PES 2017 timing. Run start to top speed ~0.62 s; 180-degree body turn ~0.33 s.
+const ACCELERATION_SCALE=1.9;
+// Extra turn rate above a 90-degree heading error; 0 at 90 degrees, +REVERSAL_TURN_BOOST at 180 degrees.
+const REVERSAL_TURN_BOOST=2.6;
+
 export class Simulation {
   private world: World;
   private observer?: (events: readonly MatchEvent[])=>void;
@@ -174,11 +179,11 @@ export class Simulation {
       const a=p.capabilities;let input=p.intent.move; if(p.recovery>0||p.keeperMode==='recover'||p.action?.kind==='slide')input={x:0,y:0};
       const speedLimit=p.keeper?c.goalkeeper.speed*(p.keeperMode==='recover'?.1:1):a.speed*(p.intent.sprint?1:c.movement.jog)*(.65+.35*p.energy)*(p.intent.shield ? .73 : 1);
       const desired={x:input.x*speedLimit,y:input.y*speedLimit};
-      if(length(input)>.1){const wanted=Math.atan2(input.y,input.x),turn=angleDelta(p.heading,wanted);p.heading+=clamp(turn,-a.turnRate*dt,a.turnRate*dt);p.heading=Math.atan2(Math.sin(p.heading),Math.cos(p.heading));}
+      if(length(input)>.1){const wanted=Math.atan2(input.y,input.x),turn=angleDelta(p.heading,wanted);const turnRate=a.turnRate*(1+REVERSAL_TURN_BOOST*Math.max(0,Math.abs(turn)-Math.PI/2)/(Math.PI/2));p.heading+=clamp(turn,-turnRate*dt,turnRate*dt);p.heading=Math.atan2(Math.sin(p.heading),Math.cos(p.heading));}
       const speed=Math.hypot(p.vx,p.vy),turn=length(input)>.1&&speed>.1?Math.abs(angleDelta(Math.atan2(p.vy,p.vx),Math.atan2(input.y,input.x))):0;
       const targetScale=1-c.movement.turnLoss*(turn/Math.PI)*(speed/a.speed);
       const change={x:desired.x*targetScale-p.vx,y:desired.y*targetScale-p.vy},amount=length(change);
-      const rate=(length(input)<.1?a.braking:a.acceleration)*(p.action&&!p.action.resolved ? .7 : 1)*dt;
+      const rate=(length(input)<.1?a.braking:a.acceleration*ACCELERATION_SCALE)*(p.action&&!p.action.resolved ? .7 : 1)*dt;
       const ratio=amount>rate?rate/amount:1;p.vx+=change.x*ratio;p.vy+=change.y*ratio;
       const dx=p.vx*dt,dy=p.vy*dt;p.x=clamp(p.x+dx,-c.pitch.length/2+.3,c.pitch.length/2-.3);p.y=clamp(p.y+dy,-c.pitch.width/2+.3,c.pitch.width/2-.3);p.travel+=Math.hypot(dx,dy);
       if(w.events.some(e=>e.type==='input-intent'&&e.playerId===p.id)&&(amount>1e-6||Math.abs(turn)>1e-6))this.emit('kinematic-response',p,p.team,{inputTick:w.tick,velocity:{x:p.vx,y:p.vy},heading:p.heading});

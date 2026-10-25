@@ -7,20 +7,24 @@
       "reason": "The immediate-return fixture releases sooner than the public-match range. PES samples include player decision and carry time; this is a protocol/context gap as well as a timing difference, not proof of engine error. No tuning applied."
     },
     {
-      "metric": "turn180_s",
-      "direction": "ABOVE",
-      "reason": "The game body reversal is slower than the two-sample range. A turn has unmatched phase identity; angles and conditions are approximate. Approximate public-video comparison only; no tuning applied."
-    },
-    {
       "metric": "pass_to_first_touch_s",
       "direction": "BELOW",
       "reason": "The 10 m ground-pass fixture is faster than the public-match range. Pass lengths and player conditions are unmatched. Approximate public-video comparison only; no tuning applied."
-    },
-    {
-      "metric": "time_to_top_speed_s",
-      "direction": "ABOVE",
-      "reason": "The game speed-plateau time exceeds the three visual training estimates. Visual plateau and the game 95% speed rule are different protocols. Approximate public-video comparison only; no tuning applied."
     }
   ],
-  "missing_reference": []
+  "missing_reference": [],
+  "coverage_shortfall": [
+    {
+      "metric": "time_to_top_speed_s",
+      "target_n": 15,
+      "accepted_n": 3,
+      "reason": "Slice 2 review of new 60 fps match footage (L5UpjGxDseE 120-480 s; 8afTHuMZxbI 150-270 s) accepted no event. Wide broadcast camera and camera pan hide sprint onset and plateau."
+    },
+    {
+      "metric": "turn180_s",
+      "target_n": 15,
+      "accepted_n": 2,
+      "reason": "Slice 2 review of the same footage accepted no event. Players are approximately 15 px tall; body orientation is not reliable at that scale."
+    }
+  ]
 }

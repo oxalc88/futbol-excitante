@@ -29,15 +29,18 @@ test('PES timing: deterministic game observations, delta table and exact known-g
   for(const invalid of [NaN,Infinity,-1,0]){const bad=structuredClone(game);bad.turn90_s.value_s=invalid;assert.throws(()=>compareTiming(reference,bad),/Invalid game timing/);}
   const rows=compareTiming(reference,game);checkKnownGaps(rows,known);printTiming(rows);
   assert.deepEqual(Object.fromEntries(rows.map(r=>[r.metric,r.status])),{
-    turn90_s:'WITHIN',turn180_s:'ABOVE',pass_to_first_touch_s:'BELOW',
-    control_to_next_pass_s:'BELOW',time_to_top_speed_s:'ABOVE',
+    turn90_s:'WITHIN',turn180_s:'WITHIN',pass_to_first_touch_s:'BELOW',
+    control_to_next_pass_s:'BELOW',time_to_top_speed_s:'WITHIN',
   });
-  console.log('KNOWN GAPS: turn180_s and time_to_top_speed_s ABOVE; both pass metrics BELOW. Approximate; second pass done.');
+  // Lock the C7 slice 2 tuning in ticks at 60 Hz: 180-degree turn 20 ticks, top speed 37 ticks.
+  assert.equal(game.turn180_s.end_tick-game.turn180_s.start_tick,20);
+  assert.equal(game.time_to_top_speed_s.end_tick-game.time_to_top_speed_s.start_tick,37);
+  console.log('KNOWN GAPS: both pass metrics BELOW; turn180_s and time_to_top_speed_s WITHIN after C7 slice 2 tuning. Approximate; second pass done.');
   const introduced=structuredClone(rows);introduced.find(r=>r.metric==='turn90_s')!.status='ABOVE';
   assert.throws(()=>checkKnownGaps(introduced,known),/gaps changed/);
   const fixed=structuredClone(rows);fixed.find(r=>r.metric==='control_to_next_pass_s')!.status='WITHIN';
   assert.throws(()=>checkKnownGaps(fixed,known),/gaps changed/);
-  assert.throws(()=>checkKnownGaps(rows,{...known,missing_reference:['time_to_top_speed_s']}),/Invalid known-gap register/);
+  assert.throws(()=>checkKnownGaps(rows,{...known,missing_reference:['control_to_next_pass_s']}),/Invalid known-gap register/);
 });
 
 test('timing classification uses range_s with inclusive bounds rather than the median',()=>{
