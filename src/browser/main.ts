@@ -314,7 +314,8 @@ oneOnOne(slot:0|1){
 },
 // Smoke only: starts the restart of `kind` for `team`, with a four-man wall on the free kick.
 setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
-  if(!started||guest||replay||current.phase!=='playing')return false;
+  // A ball out of play from the last step may leave a waiting restart: replace it.
+  if(!started||guest||replay||!(current.phase==='playing'||(current.restart&&current.phase!=='kickoff')))return false;
   const L=config.pitch.length/2,W=config.pitch.width/2;
   const dir=sim.snapshot().teams[team].direction;
   const point=kind==='free-kick'?{x:dir*(L-24),y:0}:kind==='corner'?{x:dir*(L-.3),y:W-.3}:kind==='penalty'?{x:dir*(L-11),y:0}:kind==='throw-in'?{x:dir*10,y:W-.1}:{x:-dir*(L-5.5),y:6};
