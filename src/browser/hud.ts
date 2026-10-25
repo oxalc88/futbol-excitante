@@ -20,6 +20,8 @@ export function renderHud(s:ReadonlyPresentation,config:DeepReadonly<Config>,vie
   $('pad-status').textContent=guest?'JUGADOR 2 · ONLINE':replay?'REPETICIÓN':!config.human.some(Boolean)?'MODO ESPECTADOR':gamepadCount?`${gamepadCount} MANDO${gamepadCount>1?'S':''} CONECTADO${gamepadCount>1?'S':''}`:'TECLADO · JUGADOR 1';
   $('power-meter').hidden=charging===0;$('power-bar').style.width=`${charging*100}%`;
   const announcement=renderError||replayResult||(s.phase==='fulltime'?'FINAL DEL PARTIDO':s.tick<noticeUntil?notice:s.phase==='goal'?'¡GOOOL!':s.phase==='halftime'?'ENTRETIEMPO':'');
-  $('announcement').textContent=announcement||(setHint??'');
+  $('announcement').textContent=announcement;
+  // Set-piece glyph hint: its own line, so the announcement text stays the same.
+  const hint=$('set-hint');hint.textContent=setHint??'';hint.hidden=!setHint;
   $('footer-size').textContent=`${config.teamSize} contra ${config.teamSize} · Equipos ficticios`;
 }
