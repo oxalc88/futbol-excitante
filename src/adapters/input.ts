@@ -48,7 +48,9 @@ export class BrowserInput {
   private lastTick=-1;private directions:[number,number]=[1,-1];
   enabled=false;
   constructor(){
-    window.addEventListener('keydown',e=>{if(!this.enabled||this.isEditing(e.target))return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(e.code))e.preventDefault();if(!this.keys.has(e.code)){this.edges.add(e.code);const slot=chargeSlot.get(e.code);if(slot===undefined||!this.aerial[slot])this.charges.set(e.code,performance.now());}this.keys.add(e.code);});
+    // The keeper hold wins over the header row. With the ball in the hands the
+    // □ key charges at head height too, as the charge of the pad does.
+    window.addEventListener('keydown',e=>{if(!this.enabled||this.isEditing(e.target))return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(e.code))e.preventDefault();if(!this.keys.has(e.code)){this.edges.add(e.code);const slot=chargeSlot.get(e.code);if(slot===undefined||!this.aerial[slot]||this.keeper[slot]&&this.keeperHold[slot])this.charges.set(e.code,performance.now());}this.keys.add(e.code);});
     window.addEventListener('keyup',e=>{this.keys.delete(e.code);const start=this.charges.get(e.code);if(start!==undefined){this.releases.set(e.code,clamp((performance.now()-start)/850,.15,1));this.charges.delete(e.code);}});
     window.addEventListener('blur',()=>this.clear());
     document.addEventListener('visibilitychange',()=>{if(document.hidden)this.clear();});

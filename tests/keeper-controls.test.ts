@@ -45,7 +45,7 @@ function until(s:Simulation,limit:number,predicate:()=>boolean){
   for(let i=0;i<limit&&!predicate();i++)s.step();
 }
 
-test('keeper rush: one keeper-rush event, the radius opens while held and closes on release',()=>{
+test('keeper rush: one keeper-rush event, the radius opens while held and he walks back on release',()=>{
   const {s,events}=match();
   const id=selectKeeper(s,0);
   parkOthers(s,0);
@@ -58,9 +58,15 @@ test('keeper rush: one keeper-rush event, the radius opens while held and closes
   assert.equal(events.filter((e)=>e.type==='keeper-rush').length,1,'one rush event on start');
   const ball=s.snapshot().ball;
   assert(Math.hypot(keeperOf(s.snapshot(),0).x-ball.x,keeperOf(s.snapshot(),0).y-ball.y)<1.5,'the keeper runs to the ball');
+  const atRelease=goalDistance(s.snapshot(),0);
   for(let i=0;i<20;i++){s.applyInputs([frame(s,0)]);s.step();}
-  assert(goalDistance(s.snapshot(),0)<=4+1e-9,'the clamp returns on release');
+  const released=goalDistance(s.snapshot(),0);
+  assert(released>4,'on release no snap pulls the keeper back into the radius');
+  assert(released<=atRelease+0.15,'out of the radius he stops instead of running farther');
   assert.equal(events.filter((e)=>e.type==='keeper-rush').length,1,'a held run never repeats the event');
+  // With the stick he walks back into the radius; no jump brings him home.
+  for(let i=0;i<600;i++){s.applyInputs([frame(s,0,{move:{x:-1,y:0}})]);s.step();}
+  assert(goalDistance(s.snapshot(),0)<=4+1e-9,'he walks back into the goal radius');
 });
 
 test('sprint rush: R1 + △ runs at1.25x the plain rush speed',()=>{
@@ -316,9 +322,22 @@ test('review fix 3: the put-down out of the goal radius never teleports the keep
   const stayed=s.snapshot(),stayedKeeper=stayed.players.find((p)=>p.id===id)!;
   assert(goalDistance(stayed,0)>radius+4,'the keeper stays by the ball he put down');
   assert(Math.hypot(stayed.ball.x-stayedKeeper.x,stayed.ball.y-stayedKeeper.y)<=s.snapshot().config.goalkeeper.reach+1e-9,'the ball stays at his feet');
-  // Away from the ball the old clamp returns.
-  for(let i=0;i<180;i++){s.applyInputs([frame(s,0,{move:{x:1,y:0}})]);s.step();}
-  assert(goalDistance(s.snapshot(),0)<=radius+1e-9,'the goal radius clamp returns when he leaves the ball');
+  // Away from the ball his feet stop him; the clamp never snaps him back.
+  const fromBall=goalDistance(s.snapshot(),0);
+  const cfg=s.snapshot().config,maxStep=cfg.goalkeeper.speed*1.25*cfg.dt*2;
+  let far=0,jumps=0;
+  for(let i=0;i<180;i++){
+    const from=s.snapshot().players.find((p)=>p.id===id)!;
+    s.applyInputs([frame(s,0,{move:{x:1,y:0}})]);s.step();
+    const to=s.snapshot().players.find((p)=>p.id===id)!;
+    if(Math.hypot(to.x-from.x,to.y-from.y)>maxStep)jumps++;
+    far=Math.max(far,goalDistance(s.snapshot(),0));
+  }
+  assert.equal(jumps,0,'no tick moves him with a snap when he leaves the ball');
+  assert(far>radius,'the ball at his feet carries him out of the goal radius');
+  assert(far<=fromBall+2,'the ball out of his reach stops him; no snap pulls him back');
+  for(let i=0;i<600;i++){s.applyInputs([frame(s,0,{move:{x:-1,y:0}})]);s.step();}
+  assert(goalDistance(s.snapshot(),0)<=radius+1e-9,'he walks back into the goal radius');
 });
 
 test('review fix 4: after the put-down the keeper plays the pass and the shot with the foot',()=>{
@@ -746,4 +765,66 @@ test('review finding 4: every foot action of the keeper leaves his foot after th
     assert(log.some((e)=>e.type==='action-start'&&e.playerId===id&&e.data?.kind===action),`${action} action-start event missing`);
     assert(!log.some((e)=>e.type==='keeper-throw'),`${action} is a foot action, not a throw`);
   }
+});
+
+// ------------------------------------------------- review findings, round 3
+
+test('review finding 5: the goal radius never moves the human keeper with a snap',()=>{
+  const {s,id}=heldKeeper();
+  const cfg=s.snapshot().config,radius=cfg.goalkeeper.radius;
+  const maxStep=cfg.goalkeeper.speed*1.25*cfg.dt*2;
+  // The holder runs out of the goal radius with the ball in the hands.
+  for(let i=0;i<300;i++){s.applyInputs([frame(s,0,{move:{x:1,y:0},sprint:true})]);s.step();}
+  assert(goalDistance(s.snapshot(),0)>radius+4,'the holder leaves the goal radius');
+  // He puts the ball down and plays the pass with the foot.
+  s.applyInputs([frame(s,0,{keeperDrop:true})]);s.step();
+  assert.equal(s.snapshot().players.find((p)=>p.id===id)!.keeperDropped,true,'the put-down marks his own ball');
+  const base=s.snapshot().stats[0].passes;
+  s.applyInputs([frame(s,0,{action:'pass',aim:{x:1,y:0}})]);
+  until(s,60,()=>s.snapshot().stats[0].passes>base);
+  const kicked=s.snapshot(),before=kicked.players.find((p)=>p.id===id)!;
+  assert(kicked.stats[0].passes>base,'the foot pass never left his foot');
+  assert.equal(before.keeperDropped,undefined,'the foot kick clears the put-down marker');
+  const place=goalDistance(kicked,0);
+  assert(place>radius,'the keeper is still out of the goal radius');
+  // The foot kick clears the marker, and the next ticks never pull him back.
+  for(let i=0;i<60;i++){
+    const from=s.snapshot().players.find((p)=>p.id===id)!;
+    s.applyInputs([frame(s,0,{move:{x:1,y:0}})]);s.step();
+    const to=s.snapshot().players.find((p)=>p.id===id)!;
+    assert(Math.hypot(to.x-from.x,to.y-from.y)<=maxStep,`the keeper teleports at tick ${s.tick}`);
+    const at=goalDistance(s.snapshot(),0);
+    assert(at>=place-1e-9,'the goal radius never pulls him back to the goal');
+    assert(at<=place+1e-9,'out of the radius he never runs farther from the goal');
+  }
+  // With the stick he walks back into the radius; no jump brings him home.
+  for(let i=0;i<600;i++){s.applyInputs([frame(s,0,{move:{x:-1,y:0}})]);s.step();}
+  assert(goalDistance(s.snapshot(),0)<=radius+1e-9,'he walks back into the goal radius');
+});
+
+test('review finding 6: the keyboard charge and feint keep the keeper hold over the aerial row',t=>{
+  const h:KeeperHarness=keeperBrowser(t);const {input,key,time}=h;
+  // After a high catch the shell reports the head-height band and the hold.
+  input.setAerial([true,true]);input.setKeeperHold([true,true]);
+  time(0);key('keydown','KeyK');
+  input.sample(h.next++,0);
+  time(425);
+  assert(input.charging>.4,'the keyboard shot charge starts at head height with the ball in the hands');
+  // One ✕ press before the release is the feint, never a throw.
+  key('keydown','KeyJ');
+  const feint=input.sample(h.next++,0);
+  assert.equal(feint.keeperFeint,true,'the keeper hold wins over the aerial row');
+  assert.equal(feint.action,undefined,'the feint keeps the ball in the hands');
+  key('keyup','KeyJ');key('keyup','KeyK');
+  const released=input.sample(h.next++,0);
+  assert.equal(released.action,undefined,'the feint spends the keyboard charge');
+  assert.equal(released.keeperKick,undefined,'the spent charge never kicks');
+  // Without the hold the same press at head height spends its charge.
+  input.setKeeperHold([false,false]);
+  time(0);key('keydown','KeyK');
+  input.sample(h.next++,0);
+  time(425);
+  assert.equal(input.charging,0,'without the hold the aerial row spends the keyboard press');
+  key('keyup','KeyK');
+  input.sample(h.next++,0);
 });

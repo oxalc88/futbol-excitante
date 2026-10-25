@@ -17,6 +17,9 @@ const ACCELERATION_SCALE=3.0;
 // Extra turn rate above a 90-degree heading error; 0 at 90 degrees, +REVERSAL_TURN_BOOST at 180 degrees.
 // Part 3 changes only this scale (1.9 -> 3.0). It sets the sprint ramp and the 180-degree velocity reversal.
 const REVERSAL_TURN_BOOST=2.6;
+// A keeper counts as out of the goal radius with this extra distance in meters.
+// The clamp lands on the border, and rounding can place him a nanometer outside it.
+const GOAL_RADIUS_EPSILON=1e-9;
 
 export class Simulation {
   private world: World;
@@ -268,6 +271,20 @@ export class Simulation {
       const change={x:desired.x*targetScale-p.vx,y:desired.y*targetScale-p.vy},amount=length(change);
       const rate=(length(input)<.1?a.braking:a.acceleration*ACCELERATION_SCALE)*(p.action&&!p.action.resolved ? .7 : 1)*dt;
       const ratio=amount>rate?rate/amount:1;p.vx+=change.x*ratio;p.vy+=change.y*ratio;
+      // The human keeper checks his place before he moves. Out of the goal radius,
+      // with no run-out and no ball at his feet, he drops the outward part of his
+      // velocity. So he walks back to the goal and he never runs farther from it.
+      // A position snap never moves him.
+      let outsideRadius=false;
+      if(this.humanKeeper(p)&&w.keeperHold?.playerId!==p.id){
+        const goal={x:-w.teams[p.team].direction*c.pitch.length/2,y:0};
+        outsideRadius=distance(p,goal)>c.goalkeeper.radius+GOAL_RADIUS_EPSILON;
+        const atFeet=p.keeperDropped===true&&w.ball.z<1.1&&distance(p,w.ball)<=c.goalkeeper.reach;
+        if(outsideRadius&&p.keeperRushing!==true&&!atFeet){
+          const u=unit(delta(goal,p)),outward=p.vx*u.x+p.vy*u.y;
+          if(outward>0){p.vx-=u.x*outward;p.vy-=u.y*outward;}
+        }
+      }
       const dx=p.vx*dt,dy=p.vy*dt;p.x=clamp(p.x+dx,-c.pitch.length/2+.3,c.pitch.length/2-.3);p.y=clamp(p.y+dy,-c.pitch.width/2+.3,c.pitch.width/2-.3);p.travel+=Math.hypot(dx,dy);
       if(w.events.some(e=>e.type==='input-intent'&&e.playerId===p.id)&&(amount>1e-6||Math.abs(turn)>1e-6))this.emit('kinematic-response',p,p.team,{inputTick:w.tick,velocity:{x:p.vx,y:p.vy},heading:p.heading});
       if(p.keeper&&(!c.human[p.team]||this.humanKeeper(p))){
@@ -283,9 +300,14 @@ export class Simulation {
           // The keeperDropped flag marks the ball that he put down. A CPU
           // keeper keeps the clamp unchanged.
           const withBall=this.humanKeeper(p)===true&&p.keeperDropped===true&&w.ball.z<1.1&&distance(p,w.ball)<=c.goalkeeper.reach;
-          if(d>c.goalkeeper.radius&&p.keeperRushing!==true&&!withBall){const u=unit(delta(goal,p));p.x=goal.x+u.x*c.goalkeeper.radius;p.y=u.y*c.goalkeeper.radius;}
+          // A human keeper who is already out of the radius never returns with a
+          // snap. The velocity strip above holds his place. He walks back with the
+          // stick.
+          if(d>c.goalkeeper.radius&&p.keeperRushing!==true&&!withBall&&!outsideRadius){const u=unit(delta(goal,p));p.x=goal.x+u.x*c.goalkeeper.radius;p.y=u.y*c.goalkeeper.radius;}
         }
-        p.y=clamp(p.y,-c.goalkeeper.lateral,c.goalkeeper.lateral);
+        // The lateral clamp moves a keeper too. It waits until the human keeper is
+        // back inside the goal radius. Every other keeper keeps the clamp.
+        if(!outsideRadius)p.y=clamp(p.y,-c.goalkeeper.lateral,c.goalkeeper.lateral);
       }
       p.energy=clamp(p.energy+(p.intent.sprint&&speed>3?-c.movement.sprintDrain/(.6+a.stamina):c.movement.recoveryRate)*dt,.1,1);
     }
