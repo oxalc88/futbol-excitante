@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-25 01:25 — PR pendiente · Sonido de partido
+- **Qué cambia para el jugador:** se oyen golpes de balón, silbatos de saque inicial, descanso y final, red y festejo de gol, y público de fondo. M o el botón Sonido silencia el partido. El control Volumen ajusta el nivel. El volumen y el silencio se guardan en este navegador. El sonido empieza tras pulsar una tecla, tocar la pantalla o pulsar un botón del mando.
+- **Qué probar:** inicia un partido, pasa, tira y marca un gol. Escucha los silbatos y el público. Ajusta Volumen, pulsa M y recarga para comprobar los ajustes guardados. Ejecuta `npm run typecheck` y `npm test`; `tests/audio.test.ts` comprueba sonidos, volumen, silencio y activación por gesto.
+- **Qué se rompe o cambia:** cambia el sonido del navegador. La simulación y `eval/baseline.json` no cambian. Si el navegador bloquea el audio o el almacenamiento, el partido sigue. Límite conocido: en línea, el visitante recibe una foto cada 6 ticks, así que puede no oír algunos golpes de balón y algunos silbatos de saque; los goles sí suenan. El saque CPU sigue en 60 ticks.
+
 ## 2026-10-25 01:10 — PR pendiente · Jugadores con cuerpo humano y animación legible · referencia [#63](https://github.com/oxalc88/futbol-excitante/issues/63)
 - **Qué cambia para el jugador:** los jugadores ya no parecen fichas de lego. Tienen torso más ancho en los hombros que en la cintura, cuello, cabeza de tamaño humano, brazos con codo y piernas con rodilla, y botines hacia adelante. Miden entre 1,73 m y 1,94 m según el jugador. Al correr, piernas y brazos se balancean opuestos y con más amplitud cuanto más rápido van; el cuerpo se inclina hacia adelante con la velocidad y hacia el lado al girar. Al pasar o tirar se ve la carga de la pierna, el golpe y el acompañamiento con el pie hábil. Quietos, respiran un poco. Se mantienen los colores de equipo, los contornos y el balón como lo más brillante.
 - **Qué probar:** juega un partido y mira de cerca (C para cambiar de cámara) a un jugador que arranca, gira y pasa. Compara con `docs/evidence/c12/`. Prueba calidad baja: no hay contornos y debe ir fluido.

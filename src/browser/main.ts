@@ -1,3 +1,4 @@
+import { MatchAudio, soundCues } from './audio';
 import { renderHud } from './hud';
 import './style.css';
 import { cardAlert, CARD_ALERT_TICKS } from './card-alert';
@@ -23,7 +24,7 @@ app.innerHTML=`
   <div class="scoreboard"><span class="team-tag home" id="home-short">COS</span><strong id="score">0 : 0</strong><span class="team-tag away" id="away-short">SIE</span><span id="clock">00:00</span><span id="half">1T</span></div>
   <div class="live-strip"><span id="match-mode">PARTIDO DE EXHIBICIÓN</span><span id="phase">Saque inicial</span></div>
   <div id="announcement" role="status" aria-live="polite"></div>
-  <div class="field-toolbar"><button id="pause-btn" title="Pausar (P)">Ⅱ <span>Pausa</span></button><button id="camera-btn" title="Cambiar cámara (C)">◈ <span>Cámara</span></button><button id="stats-btn">▥ <span>Estadísticas</span></button><button id="sound-btn" aria-pressed="false">♪ <span>Sonido</span></button><button id="fullscreen-btn" title="Pantalla completa">⛶</button></div>
+  <div class="field-toolbar"><button id="pause-btn" title="Pausar (P)">Ⅱ <span>Pausa</span></button><button id="camera-btn" title="Cambiar cámara (C)">◈ <span>Cámara</span></button><button id="stats-btn">▥ <span>Estadísticas</span></button><button id="sound-btn" aria-pressed="false">♪ <span>Sonido</span></button><label>Volumen <input id="sound-volume" type="range" min="0" max="1" step="0.05" aria-label="Volumen del partido" /></label><button id="fullscreen-btn" title="Pantalla completa">⛶</button></div>
   <div id="pause-overlay" hidden><strong>PAUSA</strong><button id="resume-btn" class="primary">Seguir jugando</button></div>
   <div class="bottom-hud"><div class="player-card"><span class="eyebrow">CONTROLAS A</span><strong id="player-name">—</strong><div class="energy"><span id="energy-bar"></span></div><span id="player-trait">—</span><div class="power" id="power-meter" hidden><span id="power-bar"></span></div></div><canvas id="radar" width="252" height="162" aria-label="Radar con posiciones de jugadores y balón"></canvas><div class="input-hint"><span id="pad-status">TECLADO · JUGADOR 1</span><p><kbd>W A S D</kbd> mover · <kbd>J</kbd> pase<br><kbd>K</kbd> tiro · <kbd>Q</kbd> cambiar</p></div></div>
   <div class="touch-controls"><div id="joystick" aria-label="Joystick táctil"><div id="stick"></div></div><div class="touch-buttons"><button data-action="cross">Centro</button><button data-action="lob">Elevado</button><button data-action="header">Cabeza</button><button data-action="slide">Barrida</button><button id="touch-shield">Proteger</button><button data-action="through">Filtrado</button><button id="touch-sprint">Correr</button><button data-action="tackle">Entrada</button><button data-action="pass">Pase</button><button id="touch-shoot" class="shoot">Tiro</button><button id="touch-switch">Cambiar</button></div></div>
@@ -51,7 +52,10 @@ let kickoffSetup:ReturnType<typeof rematchSetup>|null=null;
 let kickoffKits=kits(0,1);
 let kickoffMode='';
 let pendingTactics:InputFrame['tactics']|undefined;let replayResult='';
-let renderError='';let audioContext:AudioContext|null=null,sound=false;let notice='',noticeUntil=0;
+const audio=new MatchAudio(undefined,paletteStorage);
+window.addEventListener('pointerdown',()=>audio.gesture());
+window.addEventListener('keydown',()=>audio.gesture());
+let renderError='';let notice='',noticeUntil=0;
 const tacticalKeys=['pressing','width','tempo','counterPress','shortPossession','tightMarking','adaptation','defensiveLine','compactness','support']as const;
 function kits(home:number,away:number):[Kit,Kit]{const a=TEAM_CATALOG[home],b=TEAM_CATALOG[away];return[{shirt:a.color,shorts:a.shorts,accent:a.accent,pattern:'band'},{shirt:home===away?'#2052a5':b.color,shorts:b.shorts,accent:b.accent,pattern:'plain'}];}
 function makeRenderer(k:[Kit,Kit]){renderer?.dispose();renderError='';try{renderer=new FootballRenderer($('viewport'),$<HTMLCanvasElement>('radar'),config,k);renderer.setQuality($<HTMLSelectElement>('quality').value);renderer.setPitchPalette(pitchPalette);}catch(e){renderer=null;renderError='No se pudo iniciar WebGL2. Prueba un navegador compatible con aceleración gráfica.';$('announcement').textContent=renderError;console.error(e);}}
@@ -95,11 +99,14 @@ document.querySelectorAll<HTMLDialogElement>('dialog').forEach(d=>{
 });
 function changeCamera(){cameraIndex=(cameraIndex+1)%3;renderer?.setCamera((['broadcast','tactical','close']as const)[cameraIndex]);}
 $('camera-btn').onclick=changeCamera;
-window.addEventListener('keydown',e=>{if((e.target as HTMLElement)?.matches('input,textarea,select')||document.querySelector('dialog[open]'))return;if(e.repeat)return;if(e.code==='KeyP'||e.code==='Escape')pause(!paused);if(e.code==='KeyC')changeCamera();});
+window.addEventListener('keydown',e=>{if((e.target as HTMLElement)?.matches('input,textarea,select')||document.querySelector('dialog[open]'))return;if(e.repeat)return;if(e.code==='KeyP'||e.code==='Escape')pause(!paused);if(e.code==='KeyC')changeCamera();if(e.code==='KeyM')toggleSound();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&started&&!guest)pause(true);});
 $('fullscreen-btn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('app').requestFullscreen();}catch{$('announcement').textContent='Pantalla completa no disponible en este navegador.';}};
-$('sound-btn').onclick=()=>{sound=!sound;if(sound){audioContext??=new AudioContext();void audioContext.resume();}$('sound-btn').setAttribute('aria-pressed',String(sound));};
-function beep(frequency:number,duration=.1){if(!sound||!audioContext)return;const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.frequency.value=frequency;osc.connect(gain);gain.connect(audioContext.destination);gain.gain.setValueAtTime(.04,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+duration);osc.start();osc.stop(audioContext.currentTime+duration);}
+function updateSoundButton(){$('sound-btn').setAttribute('aria-pressed',String(!audio.muted));$('sound-btn').title='Activar o silenciar sonido (M)';}
+function toggleSound(){audio.setMuted(!audio.muted);updateSoundButton();}
+$('sound-btn').onclick=toggleSound;updateSoundButton();
+$<HTMLInputElement>('sound-volume').value=String(audio.volume);
+$('sound-volume').oninput=()=>audio.setVolume(Number($<HTMLInputElement>('sound-volume').value));
 function updateHud(){
   renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil},$);
   const s=current;
@@ -149,8 +156,10 @@ $('copy-code').onclick=async()=>{try{await navigator.clipboard.writeText($<HTMLT
 peer.onStatus=s=>{$('network-status').textContent=s;if(s.includes('interrumpida')||s.includes('cerrada')){input.clear();pause(true);}};
 peer.onConnect=()=>{if(peer.role==='host'){start('local');peer.start(sim.snapshot());$('match-mode').textContent='ONLINE · ANFITRIÓN';}};
 peer.onStart=(world:World)=>{try{world.teams.forEach(validateTeam);sim=new Simulation(world.config,world.teams);sim.restore(world);config=world.config;kickoffSetup=null;guest=true;started=true;replay=null;previous=current=sim.presentation();makeRenderer(kits(0,1));document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);$('match-mode').textContent='ONLINE · VISITANTE';}catch{peer.close();$('network-status').textContent='Estado inicial incompatible.';}};
-peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.tick||!Array.isArray(s.players)||s.players.length!==config.teamSize*2)return;previous=current;current=s;networkTick=performance.now();};
+peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.tick||!Array.isArray(s.players)||s.players.length!==config.teamSize*2)return;audio.play(soundCues(current,s));previous=current;current=s;networkTick=performance.now();};
 function loop(now:number){
+  if(input.gamepads.some(p=>p.buttons.some(b=>b.pressed)))audio.gesture();
+  audio.setActive(started&&!paused&&!document.hidden&&current.phase!=='fulltime');
   const elapsed=Math.min(.1,(now-last)/1000);last=now;
   if(started&&!document.querySelector('dialog[open]')&&input.pauseRequested())pause(!paused);
   try{
@@ -167,7 +176,7 @@ function loop(now:number){
         if(card){notice=card;noticeUntil=current.tick+CARD_ALERT_TICKS;}
         else if(alert&&current.tick>=noticeUntil){const labels:Record<string,string>={advantage:'LEY DE VENTAJA','advantage-recalled':'SE COBRA LA FALTA','keeper-time-limit':'OCHO SEGUNDOS · CÓRNER'};notice=labels[alert.type];noticeUntil=current.tick+100;}
         $('announcement').dataset.tick=String(current.tick);
-        if(current.events.some(e=>e.type==='goal'))beep(720,.6);else if(current.events.some(e=>['shoot','pass','cross'].includes(e.type)))beep(130,.045);
+        audio.play(soundCues(previous,current));
         if(peer.role==='host'&&sim.tick%6===0)peer.snapshot(current);
         accumulator-=config.dt;steps++;
         if(current.phase==='fulltime'&&started&&!finalShown&&!replay){finalShown=true;showStats();break;}
