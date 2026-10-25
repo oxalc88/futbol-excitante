@@ -5,6 +5,7 @@ import { continuity, mutationProof, reachContacts, designOracle } from '../eval/
 import { implementationBindings, impactClosure, reduceOutcomes } from '../eval/registry';
 import { validateReference, type ReferenceTarget } from '../eval/reference';
 import { BrowserTestSession } from '../src/adapters/test-session';
+import { referenceImportPlan } from '../scripts/reference-import-plan';
 
 test('catalog IDs, criterion bindings, dependency closure and precedence resolve without a vacuous PASS',()=>{
   const bindings=implementationBindings();assert.equal(TEST_IDS.length,69);assert.equal(new Set(TEST_IDS).size,69);assert.equal(bindings.length,69);assert(bindings.every(b=>Object.keys(b.criterion_bindings).length>=2));assert(impactClosure(['BALL-IND-001']).includes('GK-PARRY-001'));assert.throws(()=>impactClosure(['FAKE']));assert.equal(reduceOutcomes([]),'INVALID_RUN');assert.equal(reduceOutcomes(['PASS','BLOCKED_MISSING_REFERENCE']),'BLOCKED_MISSING_REFERENCE');assert.equal(reduceOutcomes(['FAIL','NEEDS_PERCEPTUAL_REVIEW']),'FAIL');assert.equal(reduceOutcomes(['INVALID_RUN','FAIL']),'INVALID_RUN');
@@ -23,5 +24,7 @@ test('browser test session reset and stepping reproduce headless state and captu
 });
 test('reference import fails closed on missing input provenance, PTS, observability or units',()=>{
   const r:ReferenceTarget={version:'reference-target-v1',id:'unit-fixture',testId:'LOC-ACC-002',measurementClass:'C',source:{game:'PES 2017',platform:'fixture',build:'fixture',mode:'fixture',difficulty:'fixture',gameSpeed:'fixture',controller:'fixture',camera:'fixture'},capture:{uri:'fixture://not-real-evidence',sha256:'a'.repeat(64),provenance:'DIRECT_CAPTURE',timebase:'PTS',pts:[0,1],controlledInputs:true,inputLogSha256:'b'.repeat(64),operator:'unit-test'},strata:{scenario_id:'LOC-ACC-002:0'},measurements:[{metric:'earlyDistance',units:'m',estimate:1,uncertainty:.1,sampleSize:3,observable:true,method:'test fixture',startPTS:0,endPTS:1}]};
+  assert.deepEqual(referenceImportPlan(r),{directory:'eval/references',filename:'unit-fixture.json',target:r,message:'Validated unit-fixture: 1 measurements. No calibration applied.'});
+  assert.throws(()=>referenceImportPlan({...r,capture:{...r.capture,controlledInputs:false}}));
   assert.doesNotThrow(()=>validateReference(r));for(const mutate of [(r:ReferenceTarget)=>r.capture.controlledInputs=false,(r:ReferenceTarget)=>r.capture.pts=[1,0],(r:ReferenceTarget)=>r.measurements[0].observable=false,(r:ReferenceTarget)=>r.measurements[0].units='pixels']){const copy=structuredClone(r);mutate(copy);assert.throws(()=>validateReference(copy));}
 });
