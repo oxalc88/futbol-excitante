@@ -37,18 +37,39 @@ function browser(t:TestContext) {
 
 test('keyboard movement, modifiers, aim and key-up are independent for both players',t=>{
   const {input,key}=browser(t);
-  for(const code of ['KeyD','KeyW','ShiftLeft','Space','ArrowLeft','ArrowDown','ShiftRight','NumpadDecimal'])key('keydown',code);
-  for(const slot of [0,1] as const){const f=input.sample(0,slot);const sign=slot===0?1:-1;assert(Math.abs(f.move.x-sign/Math.sqrt(2))<1e-12);assert(Math.abs(f.move.y+sign/Math.sqrt(2))<1e-12);assert.deepEqual(f.aim,f.move);assert(f.sprint);assert(f.shield);}
-  for(const code of ['KeyD','KeyW','ShiftLeft','Space'])key('keyup',code);
+  for(const code of ['KeyD','KeyW','ShiftLeft','ArrowLeft','ArrowDown','ShiftRight'])key('keydown',code);
+  for(const slot of [0,1] as const){const f=input.sample(0,slot);const sign=slot===0?1:-1;assert(Math.abs(f.move.x-sign/Math.sqrt(2))<1e-12);assert(Math.abs(f.move.y+sign/Math.sqrt(2))<1e-12);assert.deepEqual(f.aim,f.move);assert(f.sprint);assert.equal(f.shield,false);}
+  for(const code of ['KeyD','KeyW','ShiftLeft'])key('keyup',code);
   assert.deepEqual(input.sample(1,0).move,{x:0,y:0});assert(input.sample(1,1).sprint);
   key('keyup','ArrowLeft');key('keyup','ArrowDown');assert.deepEqual(input.sample(2,1).move,{x:0,y:0});
 });
 
-test('every keyboard action is an edge and each player consumes only their own keys',t=>{
+test('with the ball each keyboard action is an edge and each player consumes only their own keys',t=>{
   const {input,key}=browser(t);
-  const pairs:[string,string,ActionKind][]=[['KeyJ','Numpad1','pass'],['KeyL','Numpad3','through'],['KeyI','Numpad5','cross'],['KeyU','Numpad0','tackle'],['KeyO','Numpad6','header'],['KeyH','Numpad4','lob'],['KeyB','Numpad7','slide']];
+  const pairs:[string,string,ActionKind][]=[['KeyJ','Numpad1','pass'],['KeyL','Numpad3','through'],['KeyI','Numpad5','cross']];
   for(const [a,b,action] of pairs){key('keydown',a);key('keydown',b);assert.equal(input.sample(0,1).action,action);assert.equal(input.sample(0,0).action,action);key('keydown',a);assert.equal(input.sample(1,0).action,undefined);assert.equal(input.sample(1,1).action,undefined);key('keyup',a);key('keyup',b);}
   key('keydown','KeyQ');key('keydown','Enter');assert(input.sample(2,1).switchPlayer);assert(input.sample(2,0).switchPlayer);assert.equal(input.sample(3,0).switchPlayer,false);assert.equal(input.sample(3,1).switchPlayer,false);
+  // L1 (switch key) + ○ (cross key) is the lob.
+  key('keydown','KeyQ');key('keydown','KeyI');const lob=input.sample(4,0);assert.equal(lob.action,'lob');assert.equal(lob.switchPlayer,false);key('keyup','KeyQ');key('keyup','KeyI');
+  assert.equal(input.sample(5,0).action,undefined);
+});
+
+test('without the ball the defensive keys act and the attack keys do not',t=>{
+  const {input,key,time}=browser(t);
+  input.setDefending([true,true]);
+  for(const [code,other] of [['KeyJ','Numpad1'],['KeyI','Numpad5'],['KeyL','Numpad3']] as const){
+    key('keydown',code);key('keydown',other);assert.equal(input.sample(0,0).action,undefined,code);assert.equal(input.sample(0,1).action,undefined,other);key('keyup',code);key('keyup',other);
+  }
+  // Pressure is a hold: the press starts one tackle and the hold adds nothing.
+  key('keydown','KeyU');assert.equal(input.sample(1,0).action,'tackle');assert.equal(input.sample(2,0).action,undefined);key('keyup','KeyU');
+  // Standing tackle is a double tap: each press is one edge.
+  key('keydown','KeyU');assert.equal(input.sample(3,0).action,'tackle');key('keyup','KeyU');
+  key('keydown','Numpad0');assert.equal(input.sample(3,1).action,'tackle');key('keyup','Numpad0');
+  key('keydown','KeyB');assert.equal(input.sample(4,0).action,'slide');key('keyup','KeyB');
+  // The clearance key charges like the shot key.
+  time(0);key('keydown','KeyK');time(425);key('keyup','KeyK');const clear=input.sample(5,0);assert.equal(clear.action,'shoot');assert.equal(clear.power,.5);
+  // The shield key of FE is gone: shielding is automatic.
+  key('keydown','Space');assert.equal(input.sample(6,0).shield,false);key('keyup','Space');
 });
 
 test('keyboard shots charge until release, clamp power and fire once for each player',t=>{
@@ -117,11 +138,20 @@ test('browser routes two connected pads and applies their movement, aim and acti
   pads.push({...pad(9,[0],[1,0]),connected:false},pad(0),pad(1));
   input.sample(0,0);input.sample(0,1);
   key('keydown','KeyA');key('keydown','KeyJ');key('keydown','ArrowRight');
-  pads[1]=pad(0,[2,6,10],[1,0,0,-1]);pads[2]=pad(1,[0],[-1,0,0,1]);
+  pads[1]=pad(0,[1,5],[1,0,0,-1]);pads[2]=pad(1,[0],[-1,0,0,1]);
   const first=input.sample(1,0),second=input.sample(1,1);
-  assert.deepEqual(first.move,{x:1,y:0});assert.deepEqual(first.aim,{x:0,y:-1});assert.equal(first.action,'cross');assert(first.sprint&&first.shield);
+  assert.deepEqual(first.move,{x:1,y:0});assert.deepEqual(first.aim,{x:0,y:-1});assert.equal(first.action,'cross');assert(first.sprint);assert.equal(first.shield,false);
   assert.deepEqual(second.move,{x:-1,y:0});assert.deepEqual(second.aim,{x:0,y:1});assert.equal(second.action,'pass');assert(!second.sprint&&!second.shield);
   assert.equal(input.sample(2,0).action,undefined);assert.equal(input.sample(2,1).action,undefined);
+});
+
+test('the pad follows the defending flag that input passes to the mapper',t=>{
+  const {input,pads}=browser(t);pads.push(pad(0),pad(1));input.sample(0,0);input.sample(0,1);
+  input.setDefending([true,true]);pads[0]=pad(0,[0]);assert.equal(input.sample(1,0).action,'tackle');
+  input.setDefending([false,false]);pads[0]=pad(0,[]);input.sample(2,0);pads[0]=pad(0,[0]);assert.equal(input.sample(3,0).action,'pass');
+  // The flag of one player does not touch the other player.
+  input.setDefending([true,false]);pads[0]=pad(0,[]);pads[1]=pad(1,[0]);input.sample(4,0);pads[0]=pad(0,[0]);
+  assert.equal(input.sample(5,0).action,'tackle');assert.equal(input.sample(5,1).action,'pass');
 });
 
 test('aim follows movement, persists at rest and resets when playing direction changes',t=>{
