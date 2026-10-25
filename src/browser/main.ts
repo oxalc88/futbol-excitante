@@ -3,6 +3,7 @@ import { renderHud } from './hud';
 import './style.css';
 import { cardAlert, CARD_ALERT_TICKS } from './card-alert';
 import { loadPitchPalette, savePitchPalette, type PitchPaletteStorage } from './pitch-palette';
+import { quickPlaySetup, shouldShowTips, markTipsSeen, menuReducer, initialMenuState, loadCpuDifficulty, saveCpuDifficulty, matchCpuDifficulty, type QuickPlaySetup, type StartMenuStorage } from './start-menu';
 import type { PitchPaletteId } from '../adapters/presentation-model';
 import { shouldPause } from './pause-state';
 import { isFulltime, rematchSetup } from './fulltime-flow';
@@ -31,18 +32,26 @@ app.innerHTML=`
  </section>
  <footer><span id="footer-match">ATLÉTICO COSTA <i>vs</i> DEPORTIVO SIERRA</span><span id="footer-size">11 contra 11 · Equipos ficticios</span><button id="help-btn">Controles</button></footer>
 </main>
-<dialog id="setup-dialog" class="setup"><form id="setup-form"><div class="dialog-top"><span class="eyebrow">FÚTBOL EXCITANTE</span><button type="button" id="close-setup" class="close" aria-label="Cerrar">×</button></div><h1>A la cancha.</h1><p class="intro">Elige tus equipos. El partido empieza aquí.</p>
+<dialog id="setup-dialog" class="setup"><form id="setup-form"><div class="dialog-top"><span class="eyebrow">FÚTBOL EXCITANTE</span><button type="button" id="close-setup" class="close" aria-label="Cerrar">×</button></div><h1>A la cancha.</h1>
+<button type="button" id="quick-play-btn" class="primary wide" autofocus>Jugar rápido <span>→</span></button><p class="quick-note">Tú contra la CPU · 6 minutos · 11 contra 11 · Empieza ya.</p>
+<div class="difficulty-row"><label for="difficulty">Dificultad de la CPU</label><select id="difficulty" aria-label="Dificultad de la CPU"><option value="easy">Fácil</option><option value="normal" selected>Normal</option><option value="hard">Difícil</option></select></div>
+<p class="section-title">Partido personalizado · elige tus equipos</p>
 <div class="team-selection"><label>LOCAL<select id="home-team">${TEAM_CATALOG.map((t,i)=>`<option value="${i}">${t.name}</option>`).join('')}</select><span class="team-stripe cream"></span></label><span class="versus">VS</span><label>VISITANTE<select id="away-team">${TEAM_CATALOG.map((t,i)=>`<option value="${i}" ${i===1?'selected':''}>${t.name}</option>`).join('')}</select><span class="team-stripe blue"></span></label></div>
 <div class="setup-grid"><label>Modo<select id="mode"><option value="solo">Tú contra la CPU</option><option value="local">Dos jugadores locales</option><option value="watch">CPU contra CPU</option></select></label><label>Duración<select id="duration"><option value="120">2 minutos</option><option value="360" selected>6 minutos</option><option value="600">10 minutos</option></select></label><label>Jugadores<select id="size"><option value="11">11 contra 11</option><option value="5">5 contra 5</option><option value="2">2 contra 2</option></select></label><label>Semilla<input id="seed" type="number" min="1" max="2147483647" value="2017" required /></label></div>
 <details class="tactics"><summary>Plan de juego y opciones</summary><div class="setup-grid"><label>Formación local<select id="formation"><option>4-3-3</option><option>4-4-2</option><option>3-5-2</option></select></label><label>Presión<input id="pressing" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Amplitud<input id="width" type="range" min="0" max="1" step="0.05" value="0.7" /></label><label>Ritmo<input id="tempo" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Contra presión<input id="counterPress" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Pases cortos<input id="shortPossession" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Marcaje estrecho<input id="tightMarking" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Adaptación CPU<input id="adaptation" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Línea defensiva<input id="defensiveLine" type="range" min="0" max="1" step="0.05" value="0.52" /></label><label>Compactación<input id="compactness" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Apoyo<input id="support" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Controles táctiles<select id="touch-option"><option value="auto">Automático</option><option value="show">Mostrar</option><option value="hide">Ocultar</option></select></label><label>Gráficos<select id="quality"><option value="high">Normal</option><option value="low">Ligero</option></select></label><label>Paleta de cancha<select id="pitch-palette"><option value="viva">Viva</option><option value="sobria">Sobria</option></select></label><label>Equipo JSON<input id="roster-file" type="file" accept="application/json,.json" /></label></div><p id="roster-status">Opcional: importa un equipo ficticio propio para el lado local.</p><button type="button" id="export-roster" class="quiet">Descargar equipo de ejemplo</button></details>
-<p id="setup-error" class="error" role="alert"></p><button id="start-btn" class="primary wide" type="submit">Jugar partido <span>→</span></button><div class="secondary-actions"><button type="button" id="online-btn" hidden disabled>Online — próxima etapa</button><button type="button" id="load-replay">Cargar repetición</button></div><p class="fine-print">Física y reglas experimentales inspiradas en la visión del proyecto.</p></form></dialog>
+<p id="setup-error" class="error" role="alert"></p><button id="start-btn" class="primary wide" type="submit">Jugar partido <span>→</span></button><div class="secondary-actions"><button type="button" id="menu-help-btn">Controles</button><button type="button" id="show-tips-btn">Ver consejos</button><button type="button" id="online-btn" hidden disabled>Online — próxima etapa</button><button type="button" id="load-replay">Cargar repetición</button></div><p class="fine-print">Física y reglas experimentales inspiradas en la visión del proyecto.</p></form></dialog>
+<dialog id="tips-dialog"><div class="dialog-top"><span class="eyebrow">PRIMER PARTIDO</span><button type="button" class="close" data-close="tips-dialog" aria-label="Cerrar">×</button></div><h2>Consejos para empezar</h2><ul class="tips-list"><li><b>Teclado:</b> <kbd>W A S D</kbd> para mover, <kbd>J</kbd> pase, <kbd>K</kbd> tiro y <kbd>Q</kbd> para cambiar.</li><li><b>Mando:</b> sticks para mover y apuntar, <kbd>✕</kbd> para pasar y <kbd>□</kbd> para tirar.</li><li><b>Táctil:</b> mueve el stick de la izquierda y toca los botones de acción.</li><li><b>Pausa:</b> pulsa <kbd>P</kbd> o <kbd>Esc</kbd> para pausar el partido.</li></ul><button type="button" id="tips-close" data-close="tips-dialog" class="primary wide">Entendido</button></dialog>
 <dialog id="help-dialog"><div class="dialog-top"><span class="eyebrow">TODO EMPIEZA CON UN PASE</span><button class="close" data-close="help-dialog" aria-label="Cerrar">×</button></div><h2>Controles</h2><div class="table-scroll"><table><thead><tr><th>Acción</th><th>Jugador 1</th><th>Jugador 2</th><th>Mando (PS4)</th></tr></thead><tbody><tr><td>Mover / apuntar</td><td>W A S D</td><td>Flechas</td><td>Stick izquierdo · derecho para apuntar</td></tr><tr><td>Pase corto</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Pase alto / centro</td><td>I</td><td>Num 5</td><td>○</td></tr><tr><td>Tiro (mantener y soltar)</td><td>K</td><td>Num 2</td><td>□</td></tr><tr><td>Pase filtrado</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Pase elevado</td><td>Q + I</td><td>Enter + Num 5</td><td>L1 + ○</td></tr><tr><td>Cambio de frente</td><td>WASD hacia la otra banda + I</td><td>Flechas hacia la otra banda + Num 5</td><td>Stick izq. a la otra banda + ○</td></tr><tr><td>Correr</td><td>Shift izquierdo</td><td>Shift derecho</td><td>R1</td></tr><tr><td>Cambiar jugador</td><td>Q</td><td>Enter</td><td>L1</td></tr><tr><td>Entrada de pie</td><td>U ×2</td><td>Num 0 ×2</td><td>✕ ✕ (doble toque)</td></tr><tr><td>Presión (mantener) · próximamente</td><td>U (mantener)</td><td>Num 0 (mantener)</td><td>✕ mantener</td></tr><tr><td>Entrada deslizante (sin balón)</td><td>B</td><td>Num 7</td><td>○</td></tr><tr><td>Despeje (sin balón)</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cabezazo (balón a la altura de la cabeza)</td><td>K o J</td><td>Num 2 o Num 1</td><td>□ o pase</td></tr><tr><td>Proteger balón</td><td>Automático</td><td>Automático</td><td>Automático (sin botón)</td></tr><tr><td>Controlar portero / volver</td><td>R</td><td>Num 8</td><td>R3</td></tr><tr><td>Portero: lanzarse</td><td>U</td><td>Num 0</td><td>✕</td></tr><tr><td>Portero: salir (correr)</td><td>Shift izquierdo</td><td>Shift derecho</td><td>R1</td></tr><tr><td>Portero: pase / saque con la mano</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Portero: saque con el pie</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cámara</td><td>C</td><td>C</td><td>Touchpad (clic)</td></tr><tr><td>Pausa</td><td>P / Esc</td><td>P / Esc</td><td>OPTIONS</td></tr></tbody></table></div><p>Con el balón: <kbd>✕</kbd> pase, <kbd>○</kbd> centro, <kbd>□</kbd> tiro, <kbd>△</kbd> filtrado. Sin balón: <kbd>✕</kbd> entrada, <kbd>○</kbd> barrida, <kbd>□</kbd> despeje. Mantener <kbd>✕</kbd> será la presión, todavía sin acción en FE (próximamente). Apunta con el movimiento antes de pasar o disparar. Los jugadores aceleran y giran con inercia. Los saques se ejecutan automáticamente.</p><p>Conecta hasta dos mandos y pulsa un botón para activarlos. Se admiten mandos que el navegador reconozca con mapeo estándar.</p><p><kbd>P / Esc</kbd> pausa · <kbd>C</kbd> o clic en el touchpad: cámara. En pantalla táctil, mueve el stick y toca las acciones.</p><button data-close="help-dialog" class="primary wide">Entendido</button></dialog>
 <dialog id="stats-dialog"><div class="dialog-top"><span class="eyebrow" id="stats-label">EL PARTIDO EN NÚMEROS</span><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button><button id="rematch" hidden>Revancha</button><button id="new-match">Nuevo partido</button></div></dialog>
 <dialog id="online-dialog"><div class="dialog-top"><span class="eyebrow">CONEXIÓN ENTRE AMIGOS</span><button class="close" data-close="online-dialog" aria-label="Cerrar">×</button></div><h2>Online experimental</h2><p>El anfitrión simula el partido. Intercambia estos códigos por el medio que prefieras; no se envían automáticamente.</p><label>Servidor STUN (opcional)<input id="stun-url" placeholder="stun:tu-servidor:3478" /></label><p class="fine-print">Sin STUN funciona en redes que permiten una ruta directa. Algunas redes necesitan TURN, que este prototipo no configura.</p><label>Código recibido<textarea id="remote-code" rows="4" placeholder="Pega la invitación o la respuesta de tu amigo"></textarea></label><div class="secondary-actions"><button id="create-offer">1. Crear invitación</button><button id="create-answer">2. Responder invitación</button><button id="accept-answer">3. Aceptar respuesta</button></div><label>Tu código<textarea id="local-code" rows="4" readonly></textarea></label><button id="copy-code">Copiar código</button><p id="network-status" role="status">Esperando conexión.</p><p class="fine-print">Al conectar, el anfitrión inicia un partido de 6 minutos. El invitado controla al visitante. No hay predicción ni compensación de latencia.</p></dialog>
 <input id="replay-file" type="file" accept="application/json,.json" hidden />`;
 
 let paletteStorage:PitchPaletteStorage|undefined;try{paletteStorage=window.localStorage;}catch{}
+let tipsStorage:StartMenuStorage|undefined;try{tipsStorage=window.localStorage;}catch{}
+let difficultyStorage:StartMenuStorage|undefined;try{difficultyStorage=window.localStorage;}catch{}
+let menu=initialMenuState;
 let pitchPalette=loadPitchPalette(paletteStorage);$<HTMLSelectElement>('pitch-palette').value=pitchPalette;
+$<HTMLSelectElement>('difficulty').value=loadCpuDifficulty(difficultyStorage);
 const input=new BrowserInput(),peer=new PeerSession();let importedTeam:TeamProfile|null=null;
 let config=createConfig({human:[false,false]}),sim=new Simulation(config,[makeTeam(0),makeTeam(1)]),record=new Recorder(sim);
 let previous=sim.presentation(),current=previous,renderer:FootballRenderer|null=null,paused=false,started=false,last=performance.now(),accumulator=0,hudClock=0;
@@ -62,7 +71,7 @@ function makeRenderer(k:[Kit,Kit]){renderer?.dispose();renderError='';try{render
 makeRenderer(kits(0,1));
 function download(name:string,value:unknown){const url=URL.createObjectURL(new Blob([JSON.stringify(value)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function closeDialog(id:string){$<HTMLDialogElement>(id).close();refreshPause();}
-function showDialog(id:string){$<HTMLDialogElement>(id).showModal();refreshPause();}
+function showDialog(id:string){const d=$<HTMLDialogElement>(id);if(!d.open)d.showModal();if(id==='setup-dialog')$<HTMLButtonElement>('quick-play-btn').focus();refreshPause();}
 function pause(value:boolean){manualPaused=value;refreshPause();}
 function refreshPause(){paused=shouldPause(manualPaused,started&&!guest&&!!document.querySelector('dialog[open]'),isFulltime(current.phase)||!!replayResult);input.enabled=started&&!paused&&!replay;input.clear();$('pause-overlay').hidden=!paused||!!document.querySelector('dialog[open]');$('pause-btn').setAttribute('aria-pressed',String(paused));$('pause-btn').innerHTML=paused?'▶ <span>Seguir</span>':'Ⅱ <span>Pausa</span>';accumulator=0;}
 function rematch(){
@@ -74,28 +83,46 @@ function rematch(){
   makeRenderer(kickoffKits);$('match-mode').textContent=kickoffMode;
   document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);updateHud();
 }
-function start(mode?:string){
-  const home=Number($<HTMLSelectElement>('home-team').value),away=Number($<HTMLSelectElement>('away-team').value),size=Number($<HTMLSelectElement>('size').value);
-  const chosen=mode??$<HTMLSelectElement>('mode').value;
-  if(importedTeam&&importedTeam.players.length!==size)throw new Error(`El equipo importado tiene ${importedTeam.players.length} jugadores. Elige esa cantidad.`);
-  const t1=importedTeam?structuredClone(importedTeam):makeTeam(home,size),t2=makeTeam(away,size);
+// `forced` is the quick-play path: it ignores the match form and uses the defaults.
+// The menu difficulty applies to quick play and to custom match; online play always runs Normal.
+function start(mode?:string,forced?:QuickPlaySetup,online=false){
+  const home=forced?.home??Number($<HTMLSelectElement>('home-team').value),away=forced?.away??Number($<HTMLSelectElement>('away-team').value),size=forced?.teamSize??Number($<HTMLSelectElement>('size').value);
+  const chosen=mode??forced?.mode??$<HTMLSelectElement>('mode').value;
+  if(!forced&&importedTeam&&importedTeam.players.length!==size)throw new Error(`El equipo importado tiene ${importedTeam.players.length} jugadores. Elige esa cantidad.`);
+  const t1=forced?makeTeam(home,size):importedTeam?structuredClone(importedTeam):makeTeam(home,size),t2=makeTeam(away,size);
   if(t1.id===t2.id){t2.id+='-away';t2.players=t2.players.map(p=>({...p,id:p.id+'-away'}));}
-  t1.tactics.formation=$<HTMLSelectElement>('formation').value as TeamProfile['tactics']['formation'];
-  for(const k of tacticalKeys)t1.tactics[k]=Number($<HTMLInputElement>(k).value);
-  config=createConfig({human:chosen==='watch'?[false,false]:chosen==='local'?[true,true]:[true,false],seed:Number($<HTMLInputElement>('seed').value),teamSize:size,halfSeconds:Number($<HTMLSelectElement>('duration').value)/2});
+  if(!forced){
+    t1.tactics.formation=$<HTMLSelectElement>('formation').value as TeamProfile['tactics']['formation'];
+    for(const k of tacticalKeys)t1.tactics[k]=Number($<HTMLInputElement>(k).value);
+  }
+  config=createConfig({human:chosen==='watch'?[false,false]:chosen==='local'?[true,true]:[true,false],seed:forced?.seed??Number($<HTMLInputElement>('seed').value),teamSize:size,halfSeconds:(forced?.duration??Number($<HTMLSelectElement>('duration').value))/2,difficulty:matchCpuDifficulty(online,$<HTMLSelectElement>('difficulty').value)});
   kickoffSetup=rematchSetup(config,[validateTeam(t1),validateTeam(t2)]);kickoffKits=kits(home,away);
   sim=new Simulation(config,[validateTeam(t1),validateTeam(t2)]);previous=current=sim.presentation();record=new Recorder(sim);replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;notice='';noticeUntil=0;
   makeRenderer(kits(home,away));$('match-mode').textContent=chosen==='watch'?'CPU CONTRA CPU':chosen==='local'?'DOS JUGADORES':'TÚ CONTRA LA CPU';
   kickoffMode=$('match-mode').textContent??'';
   document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);updateHud();
+  menu=menuReducer(menu,{type:'start-match'});
+  if(shouldShowTips(tipsStorage))showTips(); // First visit: the tips pause the kickoff until dismissed.
 }
 $('setup-form').addEventListener('submit',e=>{e.preventDefault();try{peer.close();start();$('setup-error').textContent='';}catch(e){$('setup-error').textContent=(e as Error).message;}});
-$('menu-btn').onclick=()=>showDialog('setup-dialog');$('close-setup').onclick=()=>closeDialog('setup-dialog');
+// Quick play ignores the form: one click (or a pad A press) starts the default match.
+function quickPlay(){try{peer.close();start(undefined,quickPlaySetup());$('setup-error').textContent='';}catch(e){$('setup-error').textContent=(e as Error).message;}}
+function showTips(){if($<HTMLDialogElement>('tips-dialog').open)return;markTipsSeen(tipsStorage);menu=menuReducer(menu,{type:'show-tips'});showDialog('tips-dialog');}
+function matchInProgress(){return started&&!replay&&!replayResult&&!isFulltime(current.phase);}
+$('quick-play-btn').onclick=quickPlay;
+$('menu-help-btn').onclick=()=>showDialog('help-dialog');
+$('show-tips-btn').onclick=showTips;
+$('menu-btn').onclick=()=>{menu=menuReducer(menu,{type:'open-setup'});showDialog('setup-dialog');};$('close-setup').onclick=()=>closeDialog('setup-dialog');
 $('pause-btn').onclick=$('resume-btn').onclick=()=>pause(!paused);$('help-btn').onclick=()=>showDialog('help-dialog');
 document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(b=>b.onclick=()=>closeDialog(b.dataset.close!));
 document.querySelectorAll<HTMLDialogElement>('dialog').forEach(d=>{
   d.addEventListener('cancel',e=>{e.preventDefault();closeDialog(d.id);});
-  d.addEventListener('close',refreshPause);
+  d.addEventListener('close',()=>{
+    // A queued setup close must not hide an open tips screen.
+    if(d.id==='setup-dialog'&&!$<HTMLDialogElement>('tips-dialog').open)menu=menuReducer(menu,{type:started?'start-match':'close-setup'});
+    if(d.id==='tips-dialog')menu=menuReducer(menu,{type:'close-tips'});
+    refreshPause();
+  });
 });
 function changeCamera(){cameraIndex=(cameraIndex+1)%3;renderer?.setCamera((['broadcast','tactical','close']as const)[cameraIndex]);}
 $('camera-btn').onclick=changeCamera;
@@ -139,7 +166,7 @@ function showStats(){const s=current;
   const rows=[['Posesión',`${Math.round(s.stats[0].possessionTicks/total*100)}%`,`${Math.round(s.stats[1].possessionTicks/total*100)}%`],['Tiros',s.stats[0].shots,s.stats[1].shots],['A puerta',s.stats[0].onTarget,s.stats[1].onTarget],['Pases completados',`${s.stats[0].completed}/${s.stats[0].passes}`,`${s.stats[1].completed}/${s.stats[1].passes}`],['Atajadas',s.stats[0].saves,s.stats[1].saves],['Entradas ganadas',s.stats[0].tackles,s.stats[1].tackles],['Faltas',s.stats[0].fouls,s.stats[1].fouls],['Amarillas',s.stats[0].yellows,s.stats[1].yellows],['Expulsiones',s.stats[0].reds,s.stats[1].reds],['Penaltis',s.stats[0].penalties,s.stats[1].penalties],['Córners',s.stats[0].corners,s.stats[1].corners],['Fuera de juego',s.stats[0].offsides,s.stats[1].offsides]];
   $('stats-content').replaceChildren();for(const [label,a,b]of rows){const row=document.createElement('div');row.className='stat-row';for(const value of [a,label,b]){const span=document.createElement('span');span.textContent=String(value);row.append(span);}$('stats-content').append(row);}showDialog('stats-dialog');}
 $('rematch').onclick=rematch;
-$('stats-btn').onclick=showStats;$('new-match').onclick=()=>{closeDialog('stats-dialog');showDialog('setup-dialog');};
+$('stats-btn').onclick=showStats;$('new-match').onclick=()=>{closeDialog('stats-dialog');menu=menuReducer(menu,{type:'open-setup'});showDialog('setup-dialog');};
 $('save-replay').onclick=()=>{if(guest){$('stats-label').textContent='El anfitrión puede guardar la repetición.';return;}download(`futbol-${config.seed}-${sim.tick}.json`,record.finish(sim));};
 $('export-roster').onclick=()=>download('equipo-ejemplo.json',makeTeam(Number($<HTMLSelectElement>('home-team').value),Number($<HTMLSelectElement>('size').value)));
 $<HTMLInputElement>('roster-file').onchange=async e=>{try{const f=(e.target as HTMLInputElement).files?.[0];if(!f)return;if(f.size>100000)throw new Error('El archivo supera 100 KB.');importedTeam=validateTeam(JSON.parse(await f.text()));$('roster-status').textContent=`${importedTeam.name} · ${importedTeam.players.length} jugadores cargados.`;}catch(e){importedTeam=null;$('roster-status').textContent=(e as Error).message;}};
@@ -166,6 +193,8 @@ $('touch-shoot').onpointerup=()=>input.endTouchShot();$('touch-shoot').onpointer
 $('touch-shield').onpointerdown=e=>{e.preventDefault();$('touch-shield').setPointerCapture(e.pointerId);input.setTouchShield(true);};$('touch-shield').onpointerup=$('touch-shield').onpointercancel=$('touch-shield').onlostpointercapture=()=>input.setTouchShield(false);
 $('touch-option').onchange=()=>{document.body.dataset.touch=$<HTMLSelectElement>('touch-option').value;};
 $('pitch-palette').onchange=()=>{pitchPalette=$<HTMLSelectElement>('pitch-palette').value as PitchPaletteId;savePitchPalette(paletteStorage,pitchPalette);renderer?.setPitchPalette(pitchPalette);};
+// The choice is saved at once and read back on the next page load.
+$('difficulty').onchange=()=>{$<HTMLSelectElement>('difficulty').value=saveCpuDifficulty(difficultyStorage,$<HTMLSelectElement>('difficulty').value);};
 $('quality').onchange=()=>renderer?.setQuality($<HTMLSelectElement>('quality').value);
 $('online-btn').onclick=()=>showDialog('online-dialog');
 async function networkTask(work:()=>Promise<string|void>){try{$('network-status').textContent='Preparando conexión…';const code=await work();if(code)$<HTMLTextAreaElement>('local-code').value=code;$('network-status').textContent='Código listo. Intercámbialo con tu amigo.';}catch(e){$('network-status').textContent=(e as Error).message;}}
@@ -174,7 +203,7 @@ $('create-answer').onclick=()=>networkTask(()=>peer.answer($<HTMLTextAreaElement
 $('accept-answer').onclick=()=>networkTask(()=>peer.accept($<HTMLTextAreaElement>('remote-code').value));
 $('copy-code').onclick=async()=>{try{await navigator.clipboard.writeText($<HTMLTextAreaElement>('local-code').value);$('network-status').textContent='Código copiado.';}catch{$<HTMLTextAreaElement>('local-code').select();$('network-status').textContent='Selecciona y copia el código.';}};
 peer.onStatus=s=>{$('network-status').textContent=s;if(s.includes('interrumpida')||s.includes('cerrada')){input.clear();pause(true);}};
-peer.onConnect=()=>{if(peer.role==='host'){start('local');peer.start(sim.snapshot());$('match-mode').textContent='ONLINE · ANFITRIÓN';}};
+peer.onConnect=()=>{if(peer.role==='host'){start('local',undefined,true);peer.start(sim.snapshot());$('match-mode').textContent='ONLINE · ANFITRIÓN';}};
 peer.onStart=(world:World)=>{try{world.teams.forEach(validateTeam);sim=new Simulation(world.config,world.teams);sim.restore(world);config=world.config;kickoffSetup=null;guest=true;started=true;replay=null;previous=current=sim.presentation();makeRenderer(kits(0,1));document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);$('match-mode').textContent='ONLINE · VISITANTE';}catch{peer.close();$('network-status').textContent='Estado inicial incompatible.';}};
 peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.tick||!Array.isArray(s.players)||s.players.length!==config.teamSize*2)return;audio.play(soundCues(current,s));previous=current;current=s;networkTick=performance.now();};
 // Detached read-only evidence at the browser boundary. No engine access is exposed.
@@ -182,6 +211,28 @@ let inputEvidence:InputFrame[]=[];
 const shotEvidence={actions:[0,0],events:[0,0],power:[0,0]};
 let browserFrames=0;
 Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
+// A / Cross (button 0) on any pad: start quick play from the menu, close the tips.
+// Button 0 or 1 closes the tips. Nothing acts while another dialog sits on the setup.
+interface PadMenuState{a:boolean;b:boolean}
+let padMenuDown:PadMenuState[]=[];
+function pollMenuPad(){
+  let pads:(Gamepad|null)[]=[];
+  try{pads=Array.from(navigator.getGamepads?.()??[]);}catch{return;}
+  const tips=$<HTMLDialogElement>('tips-dialog'),setup=$<HTMLDialogElement>('setup-dialog');
+  const onlySetupOpen=setup.open&&document.querySelectorAll('dialog[open]').length===1;
+  for(let i=0;i<pads.length||i<padMenuDown.length;i++){
+    const buttons=pads[i]?.buttons;
+    const prev=padMenuDown[i]??{a:false,b:false};
+    const state={a:!!buttons?.[0]?.pressed,b:!!buttons?.[1]?.pressed};
+    padMenuDown[i]=state;
+    const aEdge=state.a&&!prev.a,bEdge=state.b&&!prev.b;
+    if(!aEdge&&!bEdge)continue;
+    if(tips.open&&menu.view==='tips'){tips.close();break;}
+    if(aEdge&&onlySetupOpen&&menu.view==='setup'&&!matchInProgress()){quickPlay();break;}
+  }
+}
+// Sampling on a timer catches short presses even when frames run slowly.
+setInterval(pollMenuPad,50);
 function loop(now:number){
   browserFrames++;
   if(input.gamepads.some(p=>p.buttons.some(b=>b.pressed)))audio.gesture();
@@ -225,4 +276,4 @@ function loop(now:number){
   }catch(e){pause(true);$('announcement').textContent=`El partido se detuvo: ${(e as Error).message}`;console.error(e);}
   requestAnimationFrame(loop);
 }
-updateHud();$<HTMLDialogElement>('setup-dialog').showModal();requestAnimationFrame(loop);
+updateHud();showDialog('setup-dialog');requestAnimationFrame(loop);
