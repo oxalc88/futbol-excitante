@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  PES_2017_PS4_PRESET, PES_2017_PS4_ROWS, KEYBOARD_MAP, KEYBOARD_MOVE, PS_GLYPHS, PS_GLYPH_BY_BUTTON, PS_BUTTON,
-  buttonConflicts, keyboardConflicts, pesButton, pesRow, pesRows,
+  PES_2017_PS4_PRESET, PES_2017_PS4_ROWS, KEYBOARD_MAP, KEYBOARD_MOVE, PS_GLYPHS, PS_GLYPH_BY_BUTTON, PS_BUTTON, TACKLE_TAP_TICKS,
+  buttonConflicts, keyboardConflicts, pesButton, pesHeader, pesRow, pesRows,
   type PadContext, type PadPresetRow, type PsGlyph,
 } from '../src/browser/pad-presets';
 import { ControllerMapper, type PadReading } from '../src/adapters/controller';
@@ -32,7 +32,7 @@ const TABLE: readonly [string, PadPresetRow['state'], PadContext, number | null,
   ['slide', 'remapped', 'defense', 1, ['○'], '○ (defending)'],
   ['clearance', 'remapped', 'defense', 2, ['□'], '□'],
   ['shoulderCharge', 'remapped', 'defense', null, [], 'Automatic'],
-  ['camera', 'remapped', 'system', null, [], 'Touchpad click'],
+  ['camera', 'remapped', 'system', 17, ['TOUCHPAD'], 'Touchpad click'],
   ['pressure', 'missing', 'defense', 0, ['✕'], '✕ hold'],
 ];
 
@@ -82,9 +82,9 @@ test('each mapping row matches the PES 2017 PS4 table', () => {
 });
 
 test('the full PS button and glyph tables match literal values', () => {
-  assert.deepEqual([...PS_GLYPHS], ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'OPTIONS']);
+  assert.deepEqual([...PS_GLYPHS], ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'OPTIONS', 'TOUCHPAD']);
   assert.deepEqual({ ...PS_BUTTON },
-    { cross: 0, circle: 1, square: 2, triangle: 3, l1: 4, r1: 5, l2: 6, r2: 7, options: 9, l3: 10, r3: 11 });
+    { cross: 0, circle: 1, square: 2, triangle: 3, l1: 4, r1: 5, l2: 6, r2: 7, options: 9, l3: 10, r3: 11, touchpad: 17 });
   assert.equal(PS_BUTTON.cross, 0);
   assert.equal(PS_BUTTON.circle, 1);
   assert.equal(PS_BUTTON.square, 2);
@@ -96,14 +96,15 @@ test('the full PS button and glyph tables match literal values', () => {
   assert.equal(PS_BUTTON.options, 9);
   assert.equal(PS_BUTTON.l3, 10);
   assert.equal(PS_BUTTON.r3, 11);
+  assert.equal(PS_BUTTON.touchpad, 17);
   assert.deepEqual({ ...PS_GLYPH_BY_BUTTON },
-    { 0: '✕', 1: '○', 2: '□', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 9: 'OPTIONS', 10: 'L3', 11: 'R3' });
+    { 0: '✕', 1: '○', 2: '□', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 9: 'OPTIONS', 10: 'L3', 11: 'R3', 17: 'TOUCHPAD' });
   for (const row of PES_2017_PS4_ROWS) {
     for (const glyph of row.glyphs) assert.ok((PS_GLYPHS as readonly string[]).includes(glyph), `${row.id}: ${glyph}`);
     if (row.button === null) continue;
     assert.equal(PS_GLYPH_BY_BUTTON[row.button], row.glyphs[0], `${row.id}: glyph for button ${row.button}`);
   }
-  for (const index of Object.keys(PS_GLYPH_BY_BUTTON)) assert.ok(Number(index) >= 0 && Number(index) <= 11);
+  for (const index of Object.keys(PS_GLYPH_BY_BUTTON)) assert.ok(Number(index) >= 0 && Number(index) <= 17);
 });
 
 test('shield is automatic: the row has no button, no glyph and no key', () => {
@@ -126,6 +127,7 @@ test('shield is automatic: the row has no button, no glyph and no key', () => {
 test('pressure (hold ✕) and standing tackle (✕ ×2) are separate gestures', () => {
   const pressure = pesRow('pressure');
   const tackle = pesRow('standingTackle');
+  assert.equal(TACKLE_TAP_TICKS, 15);
   assert.equal(pressure.text, '✕ hold');
   assert.equal(tackle.text, '✕ ×2');
   assert.equal(pressure.context, 'defense');
@@ -244,19 +246,19 @@ test('the preset is wired into the input, controller and help UI', () => {
 });
 
 function pad(index = 0, buttons: number[] = [], axes: number[] = []): PadReading {
-  return { index, id: `pad${index}`, mapping: 'standard', connected: true, axes, buttons: Array.from({ length: 17 }, (_, i) => ({ pressed: buttons.includes(i) })) };
+  return { index, id: `pad${index}`, mapping: 'standard', connected: true, axes, buttons: Array.from({ length: 24 }, (_, i) => ({ pressed: buttons.includes(i) })) };
 }
-/** One pressed frame after a clean frame. attacking by default. */
-function press(buttons: number[], defending = false, axes: number[] = []) {
+/** One pressed frame after a clean frame. attacking by default. `aerial` turns the header context on. */
+function press(buttons: number[], defending = false, axes: number[] = [], aerial = false) {
   const mapper = new ControllerMapper();
-  mapper.sample([pad()], 0, 0, defending);
-  return mapper.sample([pad(0, buttons, axes)], 1, 0, defending);
+  mapper.sample([pad()], 0, 0, defending, aerial);
+  return mapper.sample([pad(0, buttons, axes)], 1, 0, defending, aerial);
 }
 /** A script of frames for one pad. */
-function run(frames: readonly { buttons: number[]; axes?: number[] }[], defending = false) {
+function run(frames: readonly { buttons: number[]; axes?: number[] }[], defending = false, aerial = false) {
   const mapper = new ControllerMapper();
-  const out = [mapper.sample([pad()], 0, 0, defending)];
-  frames.forEach((frame, i) => out.push(mapper.sample([pad(0, frame.buttons, frame.axes ?? [0, 0, 0, 0])], i + 1, 0, defending)));
+  const out = [mapper.sample([pad()], 0, 0, defending, aerial)];
+  frames.forEach((frame, i) => out.push(mapper.sample([pad(0, frame.buttons, frame.axes ?? [0, 0, 0, 0])], i + 1, 0, defending, aerial)));
   return out;
 }
 
@@ -268,10 +270,11 @@ test('move row: the left stick moves the player', () => {
   assert.equal(frame.action, undefined);
 });
 
-test('pass row: ✕ passes with the ball and tackles without it', () => {
+test('pass row: ✕ passes with the ball and arms the tackle without it', () => {
   assert.equal(pesRow('pass').button, PS_BUTTON.cross);
   assert.equal(press([PS_BUTTON.cross]).action, 'pass');
-  assert.equal(press([PS_BUTTON.cross], true).action, 'tackle');
+  // Without the ball the first ✕ tap is the pressure hold: no tackle yet.
+  assert.equal(press([PS_BUTTON.cross], true).action, undefined);
   // No defending flag: the pad keeps the attack mapping.
   assert.equal(press([pesButton('pass')]).action, 'pass');
 });
@@ -333,7 +336,7 @@ test('shot row: □ charges and the release shoots', () => {
   assert.equal(tap.at(-1)!.power, .15);
 });
 
-test('header row: no own button, it shares the shot and pass gestures', () => {
+test('header row: there is no separate button, it shares the shot and pass gestures', () => {
   const header = pesRow('header');
   assert.equal(header.button, PS_BUTTON.square);
   assert.equal(header.button, pesRow('shot').button);
@@ -342,6 +345,28 @@ test('header row: no own button, it shares the shot and pass gestures', () => {
   assert.equal(press([PS_BUTTON.square]).action, undefined);
   // The pass gesture stays a pass with the ball.
   assert.equal(press([PS_BUTTON.cross]).action, 'pass');
+  // Aerial: □, ✕, △ and ○ head the ball instead of their kick.
+  assert.equal(press([PS_BUTTON.square], false, [], true).action, 'header');
+  assert.equal(press([PS_BUTTON.cross], false, [], true).action, 'header');
+  assert.equal(press([PS_BUTTON.triangle], false, [], true).action, 'header');
+  assert.equal(press([PS_BUTTON.circle], false, [], true).action, 'header');
+  // Aerial also replaces the defensive kick of the same buttons.
+  assert.equal(press([PS_BUTTON.square], true, [], true).action, 'header');
+  assert.equal(press([PS_BUTTON.cross], true, [], true).action, 'header');
+  // Aerial □ heads at once and never charges.
+  const held = run(Array.from({ length: 8 }, () => ({ buttons: [PS_BUTTON.square] })), false, true);
+  assert.equal(held[1].action, 'header');
+  for (const frame of held.slice(2)) assert.equal(frame.action, undefined);
+  // Aerial keeps the kick buttons out of their normal action.
+  assert.equal(pesHeader('shoot', true), 'header');
+  assert.equal(pesHeader('pass', true), 'header');
+  assert.equal(pesHeader('cross', true), 'header');
+  assert.equal(pesHeader('lob', true), 'header');
+  assert.equal(pesHeader('through', true), 'header');
+  // Without the aerial context, and for actions out of the row, nothing changes.
+  assert.equal(pesHeader('shoot', false), 'shoot');
+  assert.equal(pesHeader('tackle', true), 'tackle');
+  assert.equal(pesHeader('header', true), 'header');
 });
 
 test('sprint row: R1 runs with and without the ball', () => {
@@ -359,20 +384,54 @@ test('shield row: the pad never sets shield, it is automatic', () => {
   }
 });
 
-test('pressure row: a hold gives one tackle and no hold-then-tap sequence', () => {
-  const held = run([{ buttons: [PS_BUTTON.cross] }, { buttons: [PS_BUTTON.cross] },
-    { buttons: [PS_BUTTON.cross] }, { buttons: [PS_BUTTON.cross] }], true);
-  assert.equal(held[1].action, 'tackle');
-  for (const frame of held.slice(2)) assert.equal(frame.action, undefined);
-  // The hold does nothing with the ball.
+test('pressure row: a hold stays pressure and never fires the tackle', () => {
+  const held = run(Array.from({ length: 6 }, () => ({ buttons: [PS_BUTTON.cross] })), true);
+  for (const frame of held) assert.equal(frame.action, undefined);
+  assert.equal(held.filter((frame) => frame.action === 'tackle').length, 0);
+  // The same hold with the ball is a pass.
   assert.equal(press([PS_BUTTON.cross], false).action, 'pass');
+  // A single tap in defense gives no action either.
+  const single = run([{ buttons: [PS_BUTTON.cross] }, { buttons: [] }], true);
+  assert.equal(single[1].action, undefined);
+  assert.equal(single[2].action, undefined);
 });
 
-test('standing tackle row: a double tap gives two tackle edges', () => {
+test('standing tackle row: ✕ ×2 fires exactly one tackle and a slow pair does not', () => {
   const frames = run([{ buttons: [PS_BUTTON.cross] }, { buttons: [] }, { buttons: [PS_BUTTON.cross] }], true);
-  assert.equal(frames[1].action, 'tackle');
-  assert.equal(frames[2].action, undefined);
-  assert.equal(frames[3].action, 'tackle');
+  assert.equal(frames[1].action, undefined); // first tap arms the tackle
+  assert.equal(frames[2].action, undefined); // release
+  assert.equal(frames[3].action, 'tackle');  // second tap inside the window
+  assert.equal(frames.filter((frame) => frame.action === 'tackle').length, 1);
+  // Each tackle needs a new ×2: the tap after a fired tackle only arms.
+  const pair = run([{ buttons: [PS_BUTTON.cross] }, { buttons: [] }, { buttons: [PS_BUTTON.cross] },
+    { buttons: [] }, { buttons: [PS_BUTTON.cross] }], true);
+  assert.equal(pair[3].action, 'tackle');
+  assert.equal(pair[5].action, undefined);
+  assert.equal(pair.filter((frame) => frame.action === 'tackle').length, 1);
+  // A pair beyond the 15-tick window is not a tackle.
+  const slow = run([{ buttons: [PS_BUTTON.cross] },
+    ...Array.from({ length: 60 }, () => ({ buttons: [] as number[] })),
+    { buttons: [PS_BUTTON.cross] }], true);
+  assert.equal(slow.at(-1)!.action, undefined);
+  assert.equal(slow.filter((frame) => frame.action === 'tackle').length, 0);
+});
+
+test('the tackle tap never survives a reset or a pad disconnect', () => {
+  const mapper = new ControllerMapper();
+  // Arm the first tap, then reset: the next tap only arms a fresh pair.
+  mapper.sample([pad()], 0, 0, true);
+  mapper.sample([pad(0, [PS_BUTTON.cross])], 1, 0, true);
+  mapper.reset();
+  mapper.sample([pad(0, [])], 2, 0, true);
+  assert.equal(mapper.sample([pad(0, [PS_BUTTON.cross])], 3, 0, true).action, undefined);
+  // Arm again, disconnect the pad, reconnect and tap: still no tackle.
+  mapper.sample([pad(0, [])], 4, 0, true);
+  mapper.sample([{ ...pad(0, [PS_BUTTON.cross]), connected: false }], 5, 0, true);
+  mapper.sample([pad(0, [])], 6, 0, true);
+  assert.equal(mapper.sample([pad(0, [PS_BUTTON.cross])], 7, 0, true).action, undefined);
+  // A fresh pair fires again.
+  mapper.sample([pad(0, [])], 8, 0, true);
+  assert.equal(mapper.sample([pad(0, [PS_BUTTON.cross])], 9, 0, true).action, 'tackle');
 });
 
 test('slide row: ○ slides only without the ball', () => {
@@ -397,12 +456,36 @@ test('shoulder charge row: automatic, no button and no action', () => {
   assert.equal(frame.sprint, false);
 });
 
-test('camera row: the touchpad click is outside the standard mapping', () => {
-  assert.equal(pesRow('camera').button, null);
+test('camera row: the touchpad click carries no engine action', () => {
+  assert.equal(pesRow('camera').button, 17);
+  assert.equal(pesRow('camera').button, PS_BUTTON.touchpad);
   assert.deepEqual([...pesRow('camera').keys.p1], ['KeyC']);
-  // OPTIONS only pauses; it plays no action.
+  // OPTIONS only pauses and the touchpad changes no action.
   assert.equal(press([PS_BUTTON.options]).action, undefined);
   assert.equal(press([PS_BUTTON.options], true).action, undefined);
+  assert.equal(press([PS_BUTTON.touchpad]).action, undefined);
+  assert.equal(press([PS_BUTTON.touchpad], true).action, undefined);
+});
+
+test('camera row: the touchpad click starts one camera change on an edge', () => {
+  const mapper = new ControllerMapper();
+  assert.equal(mapper.cameraRequested([pad()]), false);
+  assert.equal(mapper.cameraRequested([pad(0, [PS_BUTTON.touchpad])]), true);
+  assert.equal(mapper.cameraRequested([pad(0, [PS_BUTTON.touchpad])]), false);
+  // A disconnected pad forgets its edge, so a reconnect needs a fresh click.
+  assert.equal(mapper.cameraRequested([{ ...pad(0, [PS_BUTTON.touchpad]), connected: false }]), false);
+  assert.equal(mapper.cameraRequested([pad(0, [PS_BUTTON.touchpad])]), false);
+  assert.equal(mapper.cameraRequested([pad(0, [PS_BUTTON.touchpad])]), false);
+  // The pause edge and the camera edge are independent.
+  assert.equal(mapper.pauseRequested([pad()]), false);
+  assert.equal(mapper.pauseRequested([pad(0, [PS_BUTTON.options])]), true);
+  assert.equal(mapper.pauseRequested([pad(0, [PS_BUTTON.options])]), false);
+  assert.equal(mapper.cameraRequested([pad()]), false);
+  assert.equal(mapper.cameraRequested([pad(0, [PS_BUTTON.touchpad])]), true);
+  // A non-standard pad reaches neither system edge.
+  const unknown = { ...pad(0, [PS_BUTTON.touchpad, PS_BUTTON.options]), mapping: '' };
+  assert.equal(mapper.cameraRequested([unknown]), false);
+  assert.equal(mapper.pauseRequested([unknown]), false);
 });
 
 test('R3 keeps the keeper switch as an edge', () => {

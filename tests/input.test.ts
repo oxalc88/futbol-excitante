@@ -12,7 +12,7 @@ class ElementStub {
 }
 function pad(index=0, buttons:number[]=[], axes:number[]=[]):PadReading {
   return {index,id:`pad${index}`,mapping:'standard',connected:true,axes,
-    buttons:Array.from({length:17},(_,i)=>({pressed:buttons.includes(i)}))};
+    buttons:Array.from({length:24},(_,i)=>({pressed:buttons.includes(i)}))};
 }
 function browser(t:TestContext) {
   const listeners=new Map<string,((event:any)=>void)[]>();
@@ -60,16 +60,17 @@ test('without the ball the defensive keys act and the attack keys do not',t=>{
   for(const [code,other] of [['KeyJ','Numpad1'],['KeyI','Numpad5'],['KeyL','Numpad3']] as const){
     key('keydown',code);key('keydown',other);assert.equal(input.sample(0,0).action,undefined,code);assert.equal(input.sample(0,1).action,undefined,other);key('keyup',code);key('keyup',other);
   }
-  // Pressure is a hold: the press starts one tackle and the hold adds nothing.
-  key('keydown','KeyU');assert.equal(input.sample(1,0).action,'tackle');assert.equal(input.sample(2,0).action,undefined);key('keyup','KeyU');
-  // Standing tackle is a double tap: each press is one edge.
+  // Pressure hold: the first ✕ tap alone gives no tackle.
+  key('keydown','KeyU');assert.equal(input.sample(1,0).action,undefined);assert.equal(input.sample(2,0).action,undefined);key('keyup','KeyU');
+  // Standing tackle: the second tap inside the window gives the tackle.
   key('keydown','KeyU');assert.equal(input.sample(3,0).action,'tackle');key('keyup','KeyU');
-  key('keydown','Numpad0');assert.equal(input.sample(3,1).action,'tackle');key('keyup','Numpad0');
-  key('keydown','KeyB');assert.equal(input.sample(4,0).action,'slide');key('keyup','KeyB');
+  key('keydown','Numpad0');assert.equal(input.sample(3,1).action,undefined);key('keyup','Numpad0');
+  key('keydown','Numpad0');assert.equal(input.sample(4,1).action,'tackle');key('keyup','Numpad0');
+  key('keydown','KeyB');assert.equal(input.sample(5,0).action,'slide');key('keyup','KeyB');
   // The clearance key charges like the shot key.
-  time(0);key('keydown','KeyK');time(425);key('keyup','KeyK');const clear=input.sample(5,0);assert.equal(clear.action,'shoot');assert.equal(clear.power,.5);
+  time(0);key('keydown','KeyK');time(425);key('keyup','KeyK');const clear=input.sample(6,0);assert.equal(clear.action,'shoot');assert.equal(clear.power,.5);
   // The shield key of FE is gone: shielding is automatic.
-  key('keydown','Space');assert.equal(input.sample(6,0).shield,false);key('keyup','Space');
+  key('keydown','Space');assert.equal(input.sample(7,0).shield,false);key('keyup','Space');
 });
 
 test('keyboard shots charge until release, clamp power and fire once for each player',t=>{
@@ -111,8 +112,45 @@ test('blur and hidden-document transitions clear held keys, queued actions and t
   key('keydown','KeyD');doc.hidden=false;emit('visibilitychange');assert.equal(input.sample(1,0).move.x,1);
 });
 
+test('keyboard tackle: hold, single tap and slow pair give no action, the fast pair gives one',t=>{
+  const {input,key,time}=browser(t);
+  input.setDefending([true,true]);
+  // Hold: the press edge arms and the hold adds nothing.
+  time(0);key('keydown','KeyU');assert.equal(input.sample(0,0).action,undefined);
+  assert.equal(input.sample(1,0).action,undefined);time(400);assert.equal(input.sample(2,0).action,undefined);key('keyup','KeyU');
+  // Single tap: no action.
+  time(800);key('keydown','KeyU');assert.equal(input.sample(3,0).action,undefined);key('keyup','KeyU');
+  assert.equal(input.sample(4,0).action,undefined);
+  // A pair beyond the 250 ms window is not a tackle.
+  time(1200);key('keydown','KeyU');assert.equal(input.sample(5,0).action,undefined);key('keyup','KeyU');
+  time(2000);key('keydown','KeyU');assert.equal(input.sample(6,0).action,undefined);key('keyup','KeyU');
+  // The fast pair fires exactly one tackle, and a third tap only arms.
+  time(2100);key('keydown','KeyU');assert.equal(input.sample(7,0).action,'tackle');key('keyup','KeyU');
+  assert.equal(input.sample(8,0).action,undefined);
+  time(2200);key('keydown','KeyU');assert.equal(input.sample(9,0).action,undefined);key('keyup','KeyU');
+});
+
+test('the keyboard tackle tap resets with clear and needs a fresh pair',t=>{
+  const {input,key,time}=browser(t);
+  input.setDefending([true,true]);
+  time(0);key('keydown','KeyU');assert.equal(input.sample(0,0).action,undefined);key('keyup','KeyU');
+  // clear() drops the armed tap: the next tap only arms again.
+  input.clear();time(50);key('keydown','KeyU');assert.equal(input.sample(1,0).action,undefined);key('keyup','KeyU');
+  time(100);key('keydown','KeyU');assert.equal(input.sample(2,0).action,'tackle');key('keyup','KeyU');
+});
+
 test('browser pause delegates standard-pad start edges and ignores disconnected pads',t=>{
   const {input,pads}=browser(t);pads.push(pad());assert.equal(input.pauseRequested(),false);pads[0]=pad(0,[9]);assert(input.pauseRequested());assert.equal(input.pauseRequested(),false);pads[0].connected=false;assert.equal(input.pauseRequested(),false);pads[0]=pad(0,[9]);assert.equal(input.pauseRequested(),false);
+});
+
+test('browser camera delegates the touchpad click edge and ignores disconnected pads',t=>{
+  const {input,pads}=browser(t);pads.push(pad());assert.equal(input.cameraRequested(),false);
+  pads[0]=pad(0,[17]);assert.equal(input.cameraRequested(),true);assert.equal(input.cameraRequested(),false);
+  // A disconnected pad forgets its edge, so a reconnect needs a fresh click.
+  pads[0].connected=false;assert.equal(input.cameraRequested(),false);
+  pads[0]=pad(0,[17]);assert.equal(input.cameraRequested(),false);
+  // Non-standard pads never reach the camera.
+  pads[0]={...pad(0,[17]),mapping:''};assert.equal(input.cameraRequested(),false);
 });
 
 test('controller dead-zone boundaries, clamping and invalid axes stay finite',()=>{
@@ -147,11 +185,46 @@ test('browser routes two connected pads and applies their movement, aim and acti
 
 test('the pad follows the defending flag that input passes to the mapper',t=>{
   const {input,pads}=browser(t);pads.push(pad(0),pad(1));input.sample(0,0);input.sample(0,1);
-  input.setDefending([true,true]);pads[0]=pad(0,[0]);assert.equal(input.sample(1,0).action,'tackle');
-  input.setDefending([false,false]);pads[0]=pad(0,[]);input.sample(2,0);pads[0]=pad(0,[0]);assert.equal(input.sample(3,0).action,'pass');
+  // The first ✕ tap arms the tackle, the ✕ ×2 tap fires it.
+  input.setDefending([true,true]);pads[0]=pad(0,[0]);assert.equal(input.sample(1,0).action,undefined);
+  pads[0]=pad(0,[]);input.sample(2,0);pads[0]=pad(0,[0]);assert.equal(input.sample(3,0).action,'tackle');
+  input.setDefending([false,false]);pads[0]=pad(0,[]);input.sample(4,0);pads[0]=pad(0,[0]);assert.equal(input.sample(5,0).action,'pass');
   // The flag of one player does not touch the other player.
-  input.setDefending([true,false]);pads[0]=pad(0,[]);pads[1]=pad(1,[0]);input.sample(4,0);pads[0]=pad(0,[0]);
-  assert.equal(input.sample(5,0).action,'tackle');assert.equal(input.sample(5,1).action,'pass');
+  input.setDefending([true,false]);pads[0]=pad(0,[]);pads[1]=pad(1,[0]);input.sample(6,0);
+  assert.equal(input.sample(6,1).action,'pass');
+  pads[0]=pad(0,[0]);assert.equal(input.sample(7,0).action,undefined);
+  pads[0]=pad(0,[]);input.sample(8,0);pads[0]=pad(0,[0]);assert.equal(input.sample(9,0).action,'tackle');
+});
+
+test('with the aerial context every kick button and key heads the ball',t=>{
+  const {input,key,pads}=browser(t);
+  pads.push(pad(0));input.sample(0,0);
+  let tick=1;
+  // Without the aerial context each key keeps its own action.
+  for(const [code,action] of [['KeyJ','pass'],['KeyL','through'],['KeyI','cross']] as const){
+    key('keydown',code);assert.equal(input.sample(tick++,0).action,action,code);key('keyup',code);
+  }
+  // Aerial: ✕, △, ○ and □ keys head the ball, the defense keys of the same
+  // buttons included, and □ skips its shot charge.
+  input.setAerial([true,true]);
+  for(const code of ['KeyJ','KeyL','KeyI','KeyB','KeyU','KeyK']){
+    key('keydown',code);assert.equal(input.sample(tick++,0).action,'header',code);key('keyup',code);
+    assert.equal(input.sample(tick++,0).action,undefined,code);
+  }
+  // The pad buttons ✕, △, ○ and □ head the ball too, with and without the ball.
+  for(const defending of [false,true]){
+    input.setDefending([defending,defending]);
+    for(const button of [0,3,1,2]){
+      pads[0]=pad(0,[button]);assert.equal(input.sample(tick++,0).action,'header',`button ${button} defending=${defending}`);
+      pads[0]=pad(0);assert.equal(input.sample(tick++,0).action,undefined,`button ${button} release`);
+    }
+  }
+  input.setDefending([false,false]);
+  // Below head height the same pad press charges the shot again.
+  input.setAerial([false,false]);
+  pads[0]=pad(0,[2]);assert.equal(input.sample(tick++,0).action,undefined);pads[0]=pad(0);
+  assert.equal(input.sample(tick++,0).action,'shoot');
+  key('keydown','KeyJ');assert.equal(input.sample(tick++,0).action,'pass');key('keyup','KeyJ');
 });
 
 test('aim follows movement, persists at rest and resets when playing direction changes',t=>{

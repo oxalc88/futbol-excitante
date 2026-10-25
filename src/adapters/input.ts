@@ -1,9 +1,11 @@
 import type { ActionKind, InputFrame, TeamIndex, Vec2 } from '../contracts/types';
 import { ControllerMapper } from './controller';
-import { KEYBOARD_MAP, KEYBOARD_MOVE, type KeyRole } from '../browser/pad-presets';
+import { KEYBOARD_MAP, KEYBOARD_MOVE, pesHeader, TACKLE_TAP_TICKS, type KeyRole } from '../browser/pad-presets';
 import { clamp, length, unit } from '../simulation/math';
 // The keeper switch has no preset row. Keep the FE keys.
 const KEEPER_KEYS=['KeyR','Numpad8'] as const;
+// Keyboard window of the ✕ ×2 tackle tap: the same time as on the pad.
+const TAP_MS=TACKLE_TAP_TICKS*1000/60;
 const chargeCodes=new Set<string>();
 for(const map of Object.values(KEYBOARD_MAP))for(const [code,role] of Object.entries(map))if(role.charge)chargeCodes.add(code);
 const firstCharge=(player:'p1'|'p2')=>Object.keys(KEYBOARD_MAP[player]).find(code=>KEYBOARD_MAP[player][code].charge)??'';
@@ -16,6 +18,10 @@ export class BrowserInput {
   private controller=new ControllerMapper();
   // A team defends while the ball has no touch of that team. Default: attack keys.
   private defending:[boolean,boolean]=[false,false];
+  // Header row: set by the match shell when the ball is at head height.
+  private aerial:[boolean,boolean]=[false,false];
+  // Millisecond time of the last defending tackle key tap, or -1 when disarmed.
+  private tackleTap=[-1,-1];
   private touchMove:Vec2={x:0,y:0};private touchActions:ActionKind[]=[];private touchSprint=false;private touchShield=false;private touchCharge:number|null=null;private touchPower=.55;
   private aim:Vec2[]=[{x:1,y:0},{x:-1,y:0}];
   private lastTick=-1;private directions:[number,number]=[1,-1];
@@ -30,13 +36,16 @@ export class BrowserInput {
   setDirections(d:[number,number]){if(d[0]!==this.directions[0]){this.aim=[{x:d[0],y:0},{x:d[1],y:0}];}this.directions=d;}
   /** The match shell sets the state of both teams from the ball. */
   setDefending(flags:[boolean,boolean]){this.defending=[...flags];}
-  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.controller.reset();this.touchMove={x:0,y:0};this.touchActions=[];this.touchSprint=false;this.touchShield=false;this.touchCharge=null;this.lastTick=-1;}
+  /** The match shell sets the head-height band of the ball for both teams. */
+  setAerial(flags:[boolean,boolean]){this.aerial=[...flags];}
+  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.tackleTap=[-1,-1];this.aerial=[false,false];this.controller.reset();this.touchMove={x:0,y:0};this.touchActions=[];this.touchSprint=false;this.touchShield=false;this.touchCharge=null;this.lastTick=-1;}
   setTouchMove(move:Vec2){this.touchMove=move;}
   setTouchSprint(pressed:boolean){this.touchSprint=pressed;}
   setTouchShield(pressed:boolean){this.touchShield=pressed;}
   startTouchShot(){if(this.enabled)this.touchCharge=performance.now();}
   endTouchShot(cancel=false){if(this.touchCharge!==null&&!cancel){this.touchPower=clamp((performance.now()-this.touchCharge)/850,.15,1);this.touchActions.push('shoot');}this.touchCharge=null;}
   pauseRequested(){return this.controller.pauseRequested(this.gamepads);}
+  cameraRequested(){return this.controller.cameraRequested(this.gamepads);}
   touchAction(action:ActionKind){this.touchActions.push(action);}
   get charging(){const start=this.touchCharge??this.charges.get(firstCharge('p1'));return start===undefined?0:clamp((performance.now()-start)/850,0,1);}
   get gamepads(){return Array.from(navigator.getGamepads?.()??[]).filter((p):p is Gamepad=>!!p&&p.connected);}
@@ -44,14 +53,18 @@ export class BrowserInput {
     if(!this.enabled)return{tick,slot,move:{x:0,y:0},aim:this.aim[slot],sprint:false,shield:false};
     this.lastTick=tick;
     const player: 'p1'|'p2' = slot===0?'p1':'p2';
-    const move=KEYBOARD_MOVE[player],roles=KEYBOARD_MAP[player],defending=this.defending[slot];
+    const move=KEYBOARD_MOVE[player],roles=KEYBOARD_MAP[player],defending=this.defending[slot],aerial=this.aerial[slot];
+    // A stale tap never survives into the header row, and at head height □ skips
+    // its shot charge, so the hold queues no release.
+    if(aerial){this.tackleTap[slot]=-1;for(const code of Object.keys(roles))if(chargeCodes.has(code)){this.charges.delete(code);this.releases.delete(code);}}
     let movement={x:Number(this.keys.has(move[3]))-Number(this.keys.has(move[2])),y:Number(this.keys.has(move[1]))-Number(this.keys.has(move[0]))};
     let sprint=false,shield=false,action:ActionKind|undefined,power=.55,switchPlayer=false;
     for(const [code,role] of Object.entries(roles)){
       if(role.sprint&&this.keys.has(code))sprint=true;
-      const kind=defending?role.defense:role.attack;
+      // At head height the key plays the header with or without the ball.
+      const kind=aerial?(role.attack??role.defense):(defending?role.defense:role.attack);
       const edge=this.edges.delete(code);
-      if(role.charge&&kind==='shoot'){
+      if(role.charge&&kind==='shoot'&&!aerial){
         // Hold to charge power. The release fires the shot or the clearance.
         const release=this.releases.get(code);
         if(release!==undefined){action='shoot';power=release;this.releases.delete(code);}
@@ -60,14 +73,26 @@ export class BrowserInput {
       if(!edge)continue;
       // L1 (switch key) + ○ (cross key) plays the lob, as in the PES table.
       if(role.switchPlayer&&!passOrCrossHeld(roles,this.keys))switchPlayer=true;
+      // Header row: □, ✕, △ and ○ head the ball, so □ skips its shot charge.
+      if(aerial&&kind){action='header';continue;}
+      // Pressure is a missing mechanic (phase 2), so the first tap arms the
+      // tackle and the second tap inside the window fires it.
+      if(kind==='tackle'){
+        const now=performance.now();
+        if(this.tackleTap[slot]>=0&&now-this.tackleTap[slot]<=TAP_MS){action='tackle';this.tackleTap[slot]=-1;}
+        else this.tackleTap[slot]=now;
+        continue;
+      }
       if(kind)action=(kind==='cross'&&switchHeld(roles,this.keys))?'lob':kind;
     }
     let switchKeeper=this.edges.delete(KEEPER_KEYS[slot]);
     if(slot===0){if(length(this.touchMove)>.1)movement=this.touchMove;sprint||=this.touchSprint;shield||=this.touchShield;const touched=this.touchActions.shift();if(!action&&touched){action=touched;power=touched==='shoot'?this.touchPower:.55;}switchPlayer||=this.edges.delete('touch-switch');switchKeeper||=this.edges.delete('touch-keeper');}
-    const pad=this.controller.sample(this.gamepads,tick,slot,defending);
+    const pad=this.controller.sample(this.gamepads,tick,slot,defending,aerial);
     if(length(pad.move)>.1)movement=pad.move;
     sprint||=pad.sprint;shield||=pad.shield;switchPlayer||=pad.switchPlayer;switchKeeper||=pad.switchKeeper;
     if(pad.action){action=pad.action;power=pad.power;}
+    // Header row: at head height □ or a pass button heads the ball.
+    if(action)action=pesHeader(action,aerial);
     if(length(movement)>1)movement=unit(movement);if(length(movement)>.1)this.aim[slot]=unit(movement);if(pad.aim)this.aim[slot]=pad.aim;
     return{tick,slot,move:movement,aim:this.aim[slot],sprint,shield,action,power,switchPlayer,switchKeeper};
   }

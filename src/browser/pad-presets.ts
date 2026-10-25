@@ -11,19 +11,23 @@ export type PadContext = 'attack' | 'defense' | 'system';
 export type PadState = 'identical' | 'remapped' | 'missing';
 
 /** PS glyph labels of the preset. */
-export const PS_GLYPHS = ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'OPTIONS'] as const;
+export const PS_GLYPHS = ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'OPTIONS', 'TOUCHPAD'] as const;
 export type PsGlyph = (typeof PS_GLYPHS)[number];
 
-/** Gamepad standard-mapping button indices (W3C). */
+/** Gamepad standard-mapping button indices (W3C). Chrome exposes the DS4 touchpad as button 17. */
 export const PS_BUTTON = {
   cross: 0, circle: 1, square: 2, triangle: 3,
-  l1: 4, r1: 5, l2: 6, r2: 7, options: 9, l3: 10, r3: 11,
+  l1: 4, r1: 5, l2: 6, r2: 7, options: 9, l3: 10, r3: 11, touchpad: 17,
 } as const;
 
 /** Glyph label for each standard button index used here. */
 export const PS_GLYPH_BY_BUTTON: Readonly<Record<number, PsGlyph>> = {
-  0: '✕', 1: '○', 2: '□', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 9: 'OPTIONS', 10: 'L3', 11: 'R3',
+  0: '✕', 1: '○', 2: '□', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 9: 'OPTIONS', 10: 'L3', 11: 'R3', 17: 'TOUCHPAD',
 };
+
+/** Two tackle edges at most this many ticks apart play the standing tackle (✕ x2).
+ * One edge, a hold or a slower pair gives no action: pressure is a missing mechanic (phase 2). */
+export const TACKLE_TAP_TICKS = 15;
 
 /** KeyboardEvent.code list per player. For movement: up, down, left, right. */
 export interface PadKeys { p1: readonly string[]; p2: readonly string[] }
@@ -38,7 +42,7 @@ export interface PadPresetRow {
   /** PES button text, e.g. "✕" or "R1 + stick izq.". */
   text: string;
   glyphs: readonly PsGlyph[];
-  /** Standard-mapping button index, or null when PES has no button. */
+  /** Standard-mapping button index, or null when the row has no button. */
   button: number | null;
   keys: PadKeys;
   /** Rows in the same context that use the same button. The PES table says so. */
@@ -73,26 +77,27 @@ export const PES_2017_PS4_ROWS: readonly PadPresetRow[] = [
   { id: 'header', state: 'remapped', context: 'attack', pes: 'Header', text: '□ or pass at head height', glyphs: ['□'],
     button: PS_BUTTON.square, keys: { p1: ['KeyK'], p2: ['Numpad2'] },
     shares: ['shot', 'pass', 'through', 'cross'],
-    note: 'PES has no own button. Use □ or a pass button when the ball is at head height. Shares □ with shot and pass buttons with pass rows.' },
+    note: 'There is no separate header button. Use □ or a pass button when the ball is at head height. Shares □ with shot and pass buttons with pass rows.' },
   { id: 'sprint', state: 'remapped', context: 'attack', pes: 'Sprint', text: 'R1 + stick left', glyphs: ['R1'], button: PS_BUTTON.r1,
     keys: { p1: ['ShiftLeft'], p2: ['ShiftRight'] }, shares: [], note: 'R1 sprints in both contexts. FE uses L2 for sprint.' },
   { id: 'shield', state: 'remapped', context: 'attack', pes: 'Shield ball', text: 'Automatic', glyphs: [], button: null,
     keys: { p1: [], p2: [] }, shares: [], note: 'Automatic on contact. No button, no glyph and no key. FE uses L3.' },
   { id: 'standingTackle', state: 'remapped', context: 'defense', pes: 'Standing tackle', text: '✕ ×2', glyphs: ['✕'],
     button: PS_BUTTON.cross, keys: { p1: ['KeyU'], p2: ['Numpad0'] }, shares: ['pressure'],
-    note: 'Double tap ✕. Not a hold. FE uses R1 for tackle.' },
+    note: 'Two ✕ edges within 15 ticks. A single tap or a hold gives no action. FE uses R1 for tackle.' },
   { id: 'slide', state: 'remapped', context: 'defense', pes: 'Slide tackle', text: '○ (defending)', glyphs: ['○'],
     button: PS_BUTTON.circle, keys: { p1: ['KeyB'], p2: ['Numpad7'] }, shares: [], note: 'FE uses L2 + R1 for slide.' },
   { id: 'clearance', state: 'remapped', context: 'defense', pes: 'Clearance (no ball: shot)', text: '□', glyphs: ['□'],
     button: PS_BUTTON.square, keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: [], note: 'Hold to charge. FE uses ○ for the clearance shot.' },
   { id: 'shoulderCharge', state: 'remapped', context: 'defense', pes: 'Shoulder charge', text: 'Automatic', glyphs: [], button: null,
     keys: { p1: [], p2: [] }, shares: [], note: 'Automatic while running into a rival. No button.' },
-  { id: 'camera', state: 'remapped', context: 'system', pes: 'Change camera (fixed camera)', text: 'Touchpad click', glyphs: [], button: null,
-    keys: { p1: ['KeyC'], p2: ['KeyC'] }, shares: [], note: 'Touchpad click. Not in standard mapping. FE uses key C.' },
+  { id: 'camera', state: 'remapped', context: 'system', pes: 'Change camera (fixed camera)', text: 'Touchpad click', glyphs: ['TOUCHPAD'],
+    button: PS_BUTTON.touchpad, keys: { p1: ['KeyC'], p2: ['KeyC'] }, shares: [],
+    note: 'Touchpad click on standard-mapping button 17. FE keeps key C.' },
   // 1 missing row.
   { id: 'pressure', state: 'missing', context: 'defense', pes: 'Pressure', text: '✕ hold', glyphs: ['✕'], button: PS_BUTTON.cross,
     keys: { p1: ['KeyU'], p2: ['Numpad0'] }, shares: ['standingTackle'],
-    note: 'Hold ✕. Separate gesture from the tackle tap. FE has no pressure action, so the hold keeps one tackle ready.' },
+    note: 'Hold ✕. Separate gesture from the tackle double tap. Pressure is a missing mechanic (phase 2), so a hold gives no action.' },
 ];
 
 export interface PadPreset { name: string; source: string; rows: readonly PadPresetRow[] }
@@ -118,6 +123,16 @@ export function pesButton(id: string): number {
   const button = pesRow(id).button;
   if (button === null) throw new Error(`preset row has no button: ${id}`);
   return button;
+}
+
+/** Actions that the header row replaces when the aerial context is on. */
+export const HEADER_ACTIONS: readonly ActionKind[] = ['pass', 'through', 'cross', 'lob', 'shoot'];
+
+/** Header row: with the ball at head height, □ or a pass button heads the ball.
+ * `aerial` is the context that the match shell computes from the ball and the
+ * selected player of each team. */
+export function pesHeader(action: ActionKind, aerial: boolean): ActionKind {
+  return aerial && HEADER_ACTIONS.includes(action) ? 'header' : action;
 }
 
 /** Engine action role of one keyboard code. Derived from the preset rows. */
