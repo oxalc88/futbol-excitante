@@ -18,13 +18,13 @@ Every step must print PASS. The script exits non-zero if one fails. CI (`.github
 | no-legacy | No workflow references `gauntlet/`, `.omp/`, `.opencode/` or `.grok/` (`scripts/check-no-legacy.sh`). |
 | install | `npm ci` from the lockfile. |
 | typecheck | `tsc --noEmit`. |
-| test | `node --test tests/*.test.ts` (engine, local-stage, evaluation, replay, discipline, input). |
+| test | `node --test tests/*.test.ts` (engine, local-stage, evaluation, replay, discipline, input, kickoff-receiver). |
 | evaluate | Headless evaluation (`scripts/evaluate.ts`); regenerates `artifacts/evaluation.json`, the committed copy is restored. |
 | build | Public Vite build into `dist/`: only `index.html`, with relative paths and no lab. |
 | dist-check | `scripts/check-dist.mjs`: allowlist: only .html, .js, .css; rejects lab output, forbidden directories, absolute asset paths and oversized output (2 MiB/file, 5 MiB total); prints sizes. |
 | build-lab | `npm run build:lab` includes `lab.html` for the following smoke. Rebuild public output before publication. |
 | smoke | `scripts/smoke-browser.mjs`: starts a match, takes the human kickoff (presses J until the phase leaves "Saque inicial"), fails on page errors, missing canvas, or a clock stuck at `00:00`; then a CPU-vs-CPU match with video. |
-| pad-smoke | `scripts/smoke-gamepad.mjs`: fake standard pads; Start edges, charged shot, disconnect, held reconnect, stable local slots, and emulated touch shot. Runs after smoke with a separate preview server. |
+| pad-smoke | `scripts/smoke-gamepad.mjs`: fake standard pads; Start edges, charged shot (scenario 2 starts from the smoke hook `window.__feSmoke.ballAtFeet`, which exists only under `navigator.webdriver`), disconnect, held reconnect, stable local slots, and emulated touch shot. Runs after smoke with a separate preview server. |
 
 ## Evidence
 
@@ -36,7 +36,7 @@ Attach these paths, or the CI artifact, to the PR.
 
 | Capability | How it is tested | Evidence |
 |---|---|---|
-| Match flow (kickoff, halftime, fulltime) | engine.test.ts "halftime changes direction and a complete CPU match reaches fulltime" | test output (smoke covers only kickoff and clock in browser) |
+| Match flow (kickoff, halftime, fulltime) | engine.test.ts "halftime changes direction and a complete CPU match reaches fulltime"; kickoff-receiver.test.ts "kickoff backward pass reaches a team-0 receiver before any team-1 touch" and "kickoff receiver run is deterministic" (the kickoff receiver check lives here now) | test output (smoke covers only kickoff and clock in browser) |
 | Determinism and checkpoints | engine.test.ts "same seed and input stream…", "checkpoints and presentation are detached…" | test output |
 | Input validation | engine.test.ts "rejects non-finite, duplicate, stale input…" | test output |
 | Goals, posts, restarts | engine.test.ts "fast swept crossing scores once…", "post collision…", "throw-in, corner and goal kick…" | test output |
@@ -49,7 +49,7 @@ Attach these paths, or the CI artifact, to the PR.
 | Match sound | audio.test.ts (pure cue mapping, synthesized cues and ambient loop, mute and volume persistence, no context before gesture, missing storage and audio) | test output; browser listening review pending |
 | Browser match + CPU vs CPU (C1 #45) | smoke (kickoff taken, clock advances, no page errors) | `match.json`, `cpu-vs-cpu.png`, `video/` |
 | Pause and dialogs / fulltime (C2 #42) | pause.test.ts: manual pause, dialog close/cancel decision, terminal state, detached rematch kickoff; smoke: P → Help → close → clock frozen 2s → P → clock advances | test output; `match.json` → `pauseCase`; fulltime buttons require manual browser review |
-| Controls / devices (C5 #44) | local-stage.test.ts "two controller identities keep their slots…", "controller charge fires once…" (`controller.ts`); input.test.ts (keyboard, touch, charge, switch, pause, blur, two players, pad dead zone) | test output; `scripts/smoke-gamepad.mjs` scenarios 1–6, `artifacts/local/smoke/pad.json`; real devices: `docs/manual-device-test.md` (pending) |
+| Controls / devices (C5 #44) | local-stage.test.ts "two controller identities keep their slots…", "controller charge fires once…" (`controller.ts`); input.test.ts (keyboard, touch, charge, switch, pause, blur, two players, pad dead zone) | test output; `scripts/smoke-gamepad.mjs` scenarios 1–6 (scenario 2 starts from the smoke hook `window.__feSmoke.ballAtFeet`, webdriver only; the kickoff receiver is checked in `tests/kickoff-receiver.test.ts`), `artifacts/local/smoke/pad.json`; real devices: `docs/manual-device-test.md` (pending) |
 | PES 2017 PS4 pad preset (default) | pad-presets.test.ts (literal button and glyph tables, 17 phase-1 rows, no R2 shield, ✕ hold vs ✕ ×2, aerial header, touchpad camera, keyboard map); input.test.ts (pad and keyboard per row, keeper dive priority, tap reset); smoke-gamepad shot on □ | test output; real PS4 pad feel pending (#44) |
 | Visual style: silhouettes and palette (C11 #63) | palette.test.ts (team value bands separate for any kit pair, ball brightest, keeper distinct); presentation-boundary.test.ts unchanged | before/after screenshots for the 3 cameras in `docs/evidence/c11/` |
 | Player figures and animation (C11 #63) | player-figure.test.ts (pose is pure and does not change frozen snapshots; run, idle and kick poses differ; swing grows with speed; kick uses the preferred foot; turn lean sign; human proportions; only `simulation/math` import); presentation-boundary.test.ts unchanged | before/after screenshots (close, close zoom, broadcast, tactical) in `docs/evidence/c12/` |

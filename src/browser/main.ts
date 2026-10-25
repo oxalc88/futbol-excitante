@@ -182,6 +182,32 @@ let inputEvidence:InputFrame[]=[];
 const shotEvidence={actions:[0,0],events:[0,0],power:[0,0]};
 let browserFrames=0;
 Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
+// Smoke only: exists only when navigator.webdriver is true. It is not a game feature. The recorder replay is not valid after this call.
+if(navigator.webdriver)Object.defineProperty(window,'__feSmoke',{configurable:false,enumerable:false,value:{ballAtFeet(slot:0|1){
+  if(!started||guest||replay||current.phase!=='playing')return false;
+  const w=sim.snapshot();
+  const p=w.players.find(p=>p.id===w.selected[slot]);
+  if(!p)return false;
+  p.vx=p.vy=0;p.action=null;p.recovery=0;
+  const rest=config.physics.radius;
+  w.ball.x=p.x+Math.cos(p.heading)*.5;w.ball.y=p.y+Math.sin(p.heading)*.5;w.ball.z=rest;
+  w.ball.vx=0;w.ball.vy=0;w.ball.vz=0;w.ball.spin={x:0,y:0,z:0};
+  const limitX=config.pitch.length/2,limitY=config.pitch.width/2;
+  for(const q of w.players){
+    if(q.team===p.team)continue;
+    const dx=q.x-w.ball.x,dy=q.y-w.ball.y,d=Math.hypot(dx,dy);
+    if(d>=12)continue;
+    const ux=d>0?dx/d:(q.team===0?1:-1),uy=d>0?dy/d:0;
+    q.x=Math.max(-limitX,Math.min(limitX,w.ball.x+ux*12));
+    q.y=Math.max(-limitY,Math.min(limitY,w.ball.y+uy*12));
+    q.vx=0;q.vy=0;q.action=null;
+  }
+  w.pendingPass=null;
+  w.restartRestriction=null;
+  sim.restore(w);
+  previous=current=sim.presentation();
+  return true;
+}}});
 function loop(now:number){
   browserFrames++;
   if(input.gamepads.some(p=>p.buttons.some(b=>b.pressed)))audio.gesture();
