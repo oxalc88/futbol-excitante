@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-25 15:20 — PR pendiente ([#81](https://github.com/oxalc88/futbol-excitante/pull/81)) · Mando táctil estilo PS
+- **Qué cambia para el jugador:** en pantalla táctil el panel de botones con texto se reemplaza por un mando PS: stick flotante a la izquierda, ✕ ○ □ △ redondos con su color y una palabra que cambia según la jugada (ataque, defensa, arquero con el balón), y R1 (correr), R2 y L1 (cambiar). Mismo mapeo que el mando físico: □ tiro, ○ centro. Mantén para cargar y suelta para ejecutar. Varios dedos a la vez. Aparece solo al tocar la pantalla y se oculta con teclado o mando. En vertical pide girar el teléfono.
+- **Qué probar:** en un teléfono en horizontal, toca la pantalla, corre con stick + R1 y pasa con ✕; mantén □ poco y mucho y compara el tiro; en defensa sal con el arquero con △ y con R1 + △. Las pruebas automáticas (`touch-e2e` y `keeper-e2e-touch`) ya lo comprueban.
+- **Qué se rompe o cambia:** desaparecen el panel táctil con texto y la opción «Controles táctiles» del Plan de juego; cabeza, proteger, elevado, barrida y «Arquero» ya no son botones aparte, salen por contexto o combo. Una ventana chica de PC ya no muestra el mando. `eval/baseline.json` no cambia (0 de 276 huellas).
+
 ## 2026-10-25 11:33 — PR pendiente ([#79](https://github.com/oxalc88/futbol-excitante/pull/79)) · Controles del arquero de PES 2017 PS4
 - **Qué cambia para el jugador:** el arquero humano se controla como en PES 2017 PS4. Mantener △ = salida del arquero (R1 + △ = salida en sprint). Con el balón en las manos: ✕ = saque con la mano, △ = saque al espacio, ○ = saque de volea, R2 + ○ = despeje alto. Soltar el stick + R1 = soltar o recoger el balón; el stick izquierdo lo mueve con el balón (R1 para correr). Amago de pase: cualquier pase y luego ✕ antes de soltarlo. Estirada: L1 + L2 + L3 + R3 sin R2. Los glifos PS y el mapa de teclado muestran los botones nuevos.
 - **Qué probar:** cambia al arquero, sal con △ ante un mano a mano, atrapa el balón y prueba cada saque, el despeje alto con R2 + ○, soltar y recoger con R1, correr con el balón y el amago (△ mantenido y luego ✕: no sale el saque).

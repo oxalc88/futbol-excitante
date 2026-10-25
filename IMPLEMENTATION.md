@@ -28,7 +28,7 @@ Orden por tick: comandos → reglas pendientes → posesión e interferencia →
 | Táctica | Formación, perseguidor con histéresis, cobertura, apoyos, desmarques, línea, amplitud, compactación, contra presión temporal y retorno a estructura |
 | Adaptación | Memoria de contactos y bandas observadas con decaimiento; prioridad de marca y desplazamiento del bloque, siempre serializados |
 | Presentación | Cancha, kits, figuras articuladas, animaciones de golpeo/entrada/cabeceo/portero, radar, tres cámaras, HUD, estadísticas, sonido opcional |
-| Controles | Teclado, dos mandos estándar, stick derecho para apuntar, botones táctiles completos, tiro cargado, pausa y neutralización al perder foco |
+| Controles | Teclado, dos mandos estándar, stick derecho para apuntar, mando táctil PS en pantalla (7 controles, misma capa PS que el Gamepad API), tiro cargado, pausa y neutralización al perder foco |
 
 ## Reglas experimentales v2
 
@@ -54,7 +54,7 @@ Hay 69 IDs materializados como escenarios diagnósticos ejecutables con variante
 
 Esto no convierte las descripciones de investigación en evidencia PES. Las métricas instrumentadas están enumeradas en el reporte y en `eval/reference.ts`; las comparaciones perceptuales y causales sin datos permanecen abiertas. No hay un resultado global de fidelidad ni una promoción automática de milestone.
 
-La vista local fue bloqueada por la política de URL del navegador de trabajo. Las pruebas de `BrowserTestSession` verifican el adaptador sin GPU, no una sesión visual real. Tampoco se verificaron iPhone físico, mandos físicos ni juicio humano ciego. [EVALUATION.md](EVALUATION.md) deja el procedimiento para recoger esa evidencia.
+La vista local fue bloqueada por la política de URL del navegador de trabajo. Las pruebas de `BrowserTestSession` verifican el adaptador sin GPU, no una sesión visual real. El mando táctil se verifica con emulación táctil en `scripts/smoke-touch.mjs` y `KEEPER_PATH=touch scripts/smoke-keeper.mjs`. Tampoco se verificaron iPhone físico, mandos físicos ni juicio humano ciego. [EVALUATION.md](EVALUATION.md) deja el procedimiento para recoger esa evidencia.
 
 Online y publicación se difieren por decisión del usuario. El workflow sólo prueba, evalúa y compila; no despliega.
 
