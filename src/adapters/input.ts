@@ -39,7 +39,9 @@ export class BrowserInput {
   private isEditing(target:EventTarget|null){return target instanceof HTMLElement && (['INPUT','SELECT','TEXTAREA'].includes(target.tagName)||target.isContentEditable);}
   setDirections(d:[number,number]){if(d[0]!==this.directions[0]){this.aim=[{x:d[0],y:0},{x:d[1],y:0}];}this.directions=d;}
   /** The match shell sets the state of both teams from the ball. */
-  setDefending(flags:[boolean,boolean]){this.defending=[...flags];}
+  setDefending(flags:[boolean,boolean]){this.defending=[...flags];
+    // The attack context disarms the armed tackle tap, as the pad path does.
+    for(const slot of [0,1] as const)if(!flags[slot])this.tackleTap[slot]=-1;}
   /** The match shell sets the head-height band of the ball for both teams. */
   setAerial(flags:[boolean,boolean]){this.aerial=[...flags];}
   /** The match shell sets the goalkeeper cursor of both teams. */
@@ -63,12 +65,18 @@ export class BrowserInput {
     // A stale tap never survives into the header row, and at head height □ skips
     // its shot charge, so the hold queues no release.
     if(aerial){this.tackleTap[slot]=-1;for(const code of Object.keys(roles))if(chargeCodes.has(code)){this.charges.delete(code);this.releases.delete(code);}}
+    // The attack context disarms the armed tap too, as the pad path does.
+    if(!defending)this.tackleTap[slot]=-1;
     let movement={x:Number(this.keys.has(move[3]))-Number(this.keys.has(move[2])),y:Number(this.keys.has(move[1]))-Number(this.keys.has(move[0]))};
     let sprint=false,shield=false,action:ActionKind|undefined,power=.55,switchPlayer=false;
+    // The keeper row wins over the header row: with the cursor on the keeper the
+    // defense keys stay live at head height, so one press of the tackle key dives.
+    const dive=keeper&&(defending||aerial);
     for(const [code,role] of Object.entries(roles)){
       if(role.sprint&&this.keys.has(code))sprint=true;
-      // At head height the key plays the header with or without the ball.
-      const kind=aerial?(role.attack??role.defense):(defending?role.defense:role.attack);
+      // At head height the key plays the header with or without the ball, except
+      // for the keeper, that keeps its own row.
+      const kind=dive?role.defense:aerial?(role.attack??role.defense):(defending?role.defense:role.attack);
       const edge=this.edges.delete(code);
       if(role.charge&&kind==='shoot'&&!aerial){
         // Hold to charge power. The release fires the shot or the clearance.
@@ -79,8 +87,12 @@ export class BrowserInput {
       if(!edge)continue;
       // L1 (switch key) + ○ (cross key) plays the lob, as in the PES table.
       if(role.switchPlayer&&!passOrCrossHeld(roles,this.keys))switchPlayer=true;
+      // The keeper □ key stays a clearance key: at head height it charges nothing
+      // and never heads.
+      if(dive&&kind==='shoot')continue;
       // Header row: □, ✕, △ and ○ head the ball, so □ skips its shot charge.
-      if(aerial&&kind){action='header';continue;}
+      // The keeper row wins over it, so no key of the keeper heads the ball.
+      if(aerial&&kind&&!dive){action='header';continue;}
       // Pressure is a missing mechanic (phase 2), so the first tap arms the
       // tackle and the second tap inside the window fires it. The goalkeeper
       // dives on one press of the same key, as before the preset.

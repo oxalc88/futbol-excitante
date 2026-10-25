@@ -44,7 +44,8 @@ export class ControllerMapper {
    * aerial: the ball is at head height and the player can reach it, so the
    * header row replaces the kick buttons.
    * keeper: the slot controls the goalkeeper, so one press of the tackle button
-   * dives. The outfield player keeps the double tap. */
+   * dives. The outfield player keeps the double tap. The keeper row wins over
+   * the header row, so a press at head height still dives. */
   sample(pads:readonly PadReading[],tick:number,slot:TeamIndex,defending=false,aerial=false,keeper=false):PadFrame {
     const connected=pads.filter(p=>p.connected&&p.mapping==='standard');
     for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.lastTick[i]=-1;this.tackleTap[i]=-1;}
@@ -60,7 +61,17 @@ export class ControllerMapper {
     // With the ball: ✕ pass, ○ cross (L1 + ○ lob), △ through, □ shot charge.
     // Without the ball: hold ✕ is pressure, ✕ ×2 is the tackle, ○ is the slide
     // and □ charges the clearance.
-    if(aerial){
+    // The goalkeeper row wins over the header row: with the cursor on the keeper
+    // one ✕ press dives even at head height. Outside defense and the aerial band
+    // the keeper keeps the attack keys, as before.
+    const dive=keeper&&(defending||aerial);
+    if(dive){
+      this.tackleTap[slot]=-1;
+      if(edge(B.tackle))f.action='tackle';
+      if(edge(B.cross))f.action='slide';
+      // A □ press spent at head height never becomes a shot release.
+      if(aerial&&edge(B.shot))this.armed[slot]=false;
+    }else if(aerial){
       // Header row: □, ✕, △ and ○ head the ball instead of their kick.
       // The double tap never arms in the air and □ skips its shot charge.
       this.tackleTap[slot]=-1;
@@ -71,9 +82,7 @@ export class ControllerMapper {
     }else if(defending){
       // Pressure is a missing mechanic (phase 2), so the first tap only arms the
       // tackle and the second tap inside the window fires it.
-      // The goalkeeper dives on one press of the same button.
-      if(keeper){this.tackleTap[slot]=-1;if(edge(B.tackle))f.action='tackle';}
-      else if(edge(B.tackle)){if(this.tackleTap[slot]>=0&&tick-this.tackleTap[slot]<=TACKLE_TAP_TICKS){f.action='tackle';this.tackleTap[slot]=-1;}else this.tackleTap[slot]=tick;}
+      if(edge(B.tackle)){if(this.tackleTap[slot]>=0&&tick-this.tackleTap[slot]<=TACKLE_TAP_TICKS){f.action='tackle';this.tackleTap[slot]=-1;}else this.tackleTap[slot]=tick;}
       if(edge(B.cross))f.action='slide';
     }else{
       this.tackleTap[slot]=-1;

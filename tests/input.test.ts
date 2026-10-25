@@ -336,6 +336,70 @@ test('the keeper dive key fires one press while the outfield tackle keeps the do
   key('keydown','KeyU');assert.equal(input.sample(13,0).action,'tackle');key('keyup','KeyU');
 });
 
+test('the pad keeper dive wins over the aerial header conversion on one ✕ press',()=>{
+  const m=new ControllerMapper();let tick=0;
+  // Connect the pad without an edge first.
+  assert.equal(m.sample([pad(0)],tick++,0,false,false,true).action,undefined);
+  // Keeper + aerial: one ✕ press dives instead of heading, defending or not.
+  for(const defending of [false,true]){
+    assert.equal(m.sample([pad(0)],tick++,0,defending,true,true).action,undefined,`clean defending=${defending}`);
+    assert.equal(m.sample([pad(0,[0])],tick++,0,defending,true,true).action,'tackle',`press defending=${defending}`);
+    assert.equal(m.sample([pad(0)],tick++,0,defending,true,true).action,undefined,`release defending=${defending}`);
+  }
+  // Without the keeper cursor the header row still converts the same press.
+  assert.equal(m.sample([pad(0,[0])],tick++,0,false,true,false).action,'header');
+  assert.equal(m.sample([pad(0)],tick++,0,false,true,false).action,undefined);
+  // Away from head height the keeper still dives on one press, and the outfield
+  // player of the same team keeps the double tap.
+  assert.equal(m.sample([pad(0,[0])],tick++,0,true,false,true).action,'tackle');
+  assert.equal(m.sample([pad(0)],tick++,0,true,false,true).action,undefined);
+  assert.equal(m.sample([pad(0,[0])],tick++,0,true,false,false).action,undefined);
+  assert.equal(m.sample([pad(0)],tick++,0,true,false,false).action,undefined);
+  assert.equal(m.sample([pad(0,[0])],tick++,0,true,false,false).action,'tackle');
+});
+
+test('the keeper keyboard and pad dive win over the aerial header conversion',t=>{
+  const {input,key,pads}=browser(t);
+  pads.push(pad(0),pad(1));input.sample(0,0);input.sample(0,1);
+  input.setAerial([true,true]);input.setKeeper([true,true]);
+  let tick=1;
+  // One press dives at head height, for both players and both devices.
+  for(const defending of [false,true]){
+    input.setDefending([defending,defending]);
+    key('keydown','KeyU');assert.equal(input.sample(tick++,0).action,'tackle',`KeyU defending=${defending}`);key('keyup','KeyU');
+    assert.equal(input.sample(tick++,0).action,undefined,`KeyU release defending=${defending}`);
+    key('keydown','Numpad0');assert.equal(input.sample(tick++,1).action,'tackle',`Num 0 defending=${defending}`);key('keyup','Numpad0');
+    assert.equal(input.sample(tick++,1).action,undefined,`Num 0 release defending=${defending}`);
+    pads[0]=pad(0,[0]);assert.equal(input.sample(tick++,0).action,'tackle',`pad ✕ defending=${defending}`);
+    pads[0]=pad(0);assert.equal(input.sample(tick++,0).action,undefined,`pad release defending=${defending}`);
+  }
+  // Away from the keeper cursor the header row returns at the same height.
+  input.setKeeper([false,false]);
+  key('keydown','KeyU');assert.equal(input.sample(tick++,0).action,'header');key('keyup','KeyU');
+  pads[0]=pad(0,[0]);assert.equal(input.sample(tick++,0).action,'header');pads[0]=pad(0);
+  assert.equal(input.sample(tick++,0).action,undefined);
+});
+
+test('the keyboard tackle tap disarms when the context goes to attack',t=>{
+  const {input,key,time}=browser(t);
+  input.setDefending([true,true]);
+  // The first tap in defense only arms.
+  time(0);key('keydown','KeyU');assert.equal(input.sample(0,0).action,undefined);key('keyup','KeyU');
+  // The context goes to attack and comes back: the armed tap is dropped even
+  // when no sample runs in the attack context.
+  input.setDefending([false,false]);input.setDefending([true,true]);
+  time(100);key('keydown','KeyU');assert.equal(input.sample(1,0).action,undefined);key('keyup','KeyU');
+  // The fresh pair inside the 250 ms window still fires.
+  time(300);key('keydown','KeyU');assert.equal(input.sample(2,0).action,'tackle');key('keyup','KeyU');
+  // Same disarm when the attack context is sampled, as the pad path does.
+  time(0);key('keydown','KeyU');assert.equal(input.sample(3,0).action,undefined);key('keyup','KeyU');
+  input.setDefending([false,false]);
+  time(50);key('keydown','KeyU');assert.equal(input.sample(4,0).action,undefined);key('keyup','KeyU');
+  input.setDefending([true,true]);
+  time(150);key('keydown','KeyU');assert.equal(input.sample(5,0).action,undefined);key('keyup','KeyU');
+  time(250);key('keydown','KeyU');assert.equal(input.sample(6,0).action,'tackle');key('keyup','KeyU');
+});
+
 test('a keyboard □ press made in the air arms no shot until the key is up',t=>{
   const {input,key}=browser(t);
   input.sample(0,0);
