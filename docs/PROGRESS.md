@@ -2,10 +2,15 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-25 00:55 — PR pendiente · Mando simulado en prueba de navegador · referencia [#44](https://github.com/oxalc88/futbol-excitante/issues/44)
+## 2026-10-25 01:30 — PR pendiente · Mando simulado en prueba de navegador · referencia [#44](https://github.com/oxalc88/futbol-excitante/issues/44)
 - **Qué cambia para el jugador:** nada en el partido. Una prueba de navegador comprueba pausa con Start, tiro cargado único, desconexión durante la carga, reconexión con tiro pulsado, dos mandos con puestos estables y un toque en Tiro. Guarda resultados en `artifacts/local/smoke/pad.json`.
 - **Qué probar:** ejecuta `scripts/verify.sh`; revisa `pad-smoke`. Completa `docs/manual-device-test.md` con mandos Xbox y PlayStation y un iPhone con Safari. Quedan pendientes la latencia, la zona muerta real, los botones físicos, la comodidad y el cambio de aplicación en iOS.
 - **Qué se rompe o cambia:** nada en la simulación. Se agrega una vista de diagnóstico de solo lectura en el navegador. La prueba táctil emulada cubre un toque, no gestos simultáneos ni Safari real.
+
+## 2026-10-25 01:10 — PR pendiente · Jugadores con cuerpo humano y animación legible · referencia [#63](https://github.com/oxalc88/futbol-excitante/issues/63)
+- **Qué cambia para el jugador:** los jugadores ya no parecen fichas de lego. Tienen torso más ancho en los hombros que en la cintura, cuello, cabeza de tamaño humano, brazos con codo y piernas con rodilla, y botines hacia adelante. Miden entre 1,73 m y 1,94 m según el jugador. Al correr, piernas y brazos se balancean opuestos y con más amplitud cuanto más rápido van; el cuerpo se inclina hacia adelante con la velocidad y hacia el lado al girar. Al pasar o tirar se ve la carga de la pierna, el golpe y el acompañamiento con el pie hábil. Quietos, respiran un poco. Se mantienen los colores de equipo, los contornos y el balón como lo más brillante.
+- **Qué probar:** juega un partido y mira de cerca (C para cambiar de cámara) a un jugador que arranca, gira y pasa. Compara con `docs/evidence/c12/`. Prueba calidad baja: no hay contornos y debe ir fluido.
+- **Qué se rompe o cambia:** nada en el partido. Solo cambia el dibujo: la simulación, los hashes, el baseline y el saque CPU de 60 ticks no cambian.
 
 ## 2026-10-24 23:10 — PR pendiente · Arranque y giro más rápidos, como en PES · referencia [#48](https://github.com/oxalc88/futbol-excitante/issues/48)
 - **Qué cambia para el jugador:** todos los jugadores, también los arqueros, arrancan más rápido: llegan a velocidad máxima en 0,62 s (antes 1,18 s; PES 0,63 s). El giro de 180° es más rápido: 0,33 s (antes 0,48 s; PES 0,29 s). El giro de 90° no cambia (0,22 s). El cambio de dirección se siente más vivo y el regate hacia atrás responde antes. El viaje del pase (0,52 s) y el pase tras controlar (0,13 s) no cambian y siguen más rápidos que en PES.
