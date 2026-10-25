@@ -69,6 +69,8 @@ try {
   page.on('console', m => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(m.text()); });
   page.on('response', r => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`HTTP ${r.status()} ${r.url()}`); });
   await page.addInitScript(() => {
+    // This flow clicks #start-btn: skip the first-visit tips dialog.
+    try { localStorage.setItem('fe.tipsSeen','1'); } catch {}
     window.__fakePads = Array.from({length:4}, (_, index) => ({id:`Fake standard ${index}`,index,connected:false,mapping:'standard',axes:[0,0,0,0],
       buttons:Array.from({length:17}, () => ({pressed:false,value:0,touched:false})),timestamp:0}));
     Object.defineProperty(navigator, 'getGamepads', {value:() => window.__fakePads.map(p => p.connected ? p : null)});
@@ -180,10 +182,14 @@ try {
     await wait(() => window.__fe.phase==='playing');
     await button(0,0,false); await button(1,0,false);
   }
+  // A shot from scenario 3 or 4 can still roll. It can score in the test.
+  // Stop the ball at player 0's feet. This keeps the phase 'playing'.
+  check(await page.evaluate(() => window.__feSmoke.ballAtFeet(0)),'Smoke hook failed');
   // Check each axis and selected player in local two-player mode.
   await axes(0,[.8,0,0,0]); await axes(1,[-.8,0,0,0]);
   await wait(() => window.__fe.frames[0]?.move.x>.7 && window.__fe.frames[1]?.move.x<-.7);
   const moving=await snapshot(); await ticks(60); const moved=await snapshot();
+  check(moving.phase==='playing'&&moved.phase==='playing', `Phase left playing during movement: ${moving.phase} -> ${moved.phase}`);
   for (const slot of [0,1]) {
     const a=moving.players.find(p=>p.id===moving.selected[slot]);
     const b=moved.players.find(p=>p.id===a.id);

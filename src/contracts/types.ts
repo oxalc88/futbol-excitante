@@ -4,6 +4,8 @@ export type Vec3 = Vec2 & { z: number };
 export type ActionKind = 'pass' | 'through' | 'cross' | 'shoot' | 'tackle' | 'slide' | 'lob' | 'header';
 export type Phase = 'kickoff' | 'playing' | 'goal' | 'throw-in' | 'corner' | 'goal-kick' | 'free-kick' | 'offside' | 'penalty' | 'indirect' | 'halftime' | 'fulltime';
 export type Formation = '4-3-3' | '4-4-2' | '3-5-2';
+/** CPU strength in the menu. Only existing CPU parameters change between levels. */
+export type CpuDifficulty = 'easy' | 'normal' | 'hard';
 export interface Capabilities {
   speed: number; acceleration: number; braking: number; turnRate: number;
   control: number; passing: number; finishing: number; power: number;
@@ -66,6 +68,8 @@ export interface Config {
   ai: { cadence: number; transitionTicks: number; passDistance: number; shotDistance: number; hysteresis: number };
   rules: { restartTicks: number; celebrationTicks: number; halftimeTicks: number; offside: boolean; fouls: boolean; advantageTicks: number; humanRestartTicks: number; cards: boolean };
   goalkeeper: { radius: number; lateral: number; speed: number; reach: number; reactionTicks: number; releaseTicks: number; highReach: number; recoveryTicks: number };
+  // Absent means Normal. An absent key keeps the config hash of a Normal match unchanged.
+  difficulty?: CpuDifficulty;
 }
 export interface World {
   advantage: { team: TeamIndex; point: Vec2; until: number; offender: string; card: 'yellow' | 'red' | null } | null;

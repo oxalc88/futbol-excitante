@@ -1,6 +1,7 @@
 import type { ActionKind, Config, InputFrame, Intent, MatchEvent, Phase, PlayerState, Presentation, TeamIndex, TeamProfile, Vec2, World } from '../contracts/types';
 import { angleDelta, canonical, clamp, clone, delta, distance, hash, length, segmentPoint, unit } from './math';
 import { canUseHands, foulCard, inPenaltyArea, offsideInterferer, visibleBall } from './rules';
+import { cpuErrorScale, cpuReactionTicks, isCpuDifficulty } from './config';
 import { bestPass, decidePlayer, decideTeams, formationAnchors } from './tactics';
 
 const other=(t:TeamIndex):TeamIndex=>t===0?1:0;
@@ -141,7 +142,19 @@ export class Simulation {
     this.derivePossession();this.resolveAdvantage();
     if(w.phase!=='playing'){w.tick++;return this.result();}
     const interferer=offsideInterferer(w);if(interferer&&this.checkOffside(interferer)){w.tick++;return this.result();}
-    if(w.tick%c.ai.cadence===0){decideTeams(w);const intents=w.players.map(p=>decidePlayer(w,p));w.players.forEach((p,i)=>{p.intent=intents[i];});}
+    // Difficulty only changes the delay between CPU decisions; a human team always keeps ai.cadence.
+    // Normal (or an absent/unknown level) takes the original path: one decideTeams call and one intent pass.
+    if(isCpuDifficulty(c.difficulty)&&c.difficulty!=='normal'){
+      const chosen:[PlayerState,Intent][]=[];
+      for(const team of[0,1]as const){
+        const cadence=c.human[team]?c.ai.cadence:cpuReactionTicks(c);
+        if(w.tick%cadence!==0)continue;
+        decideTeams(w,[team]);
+        for(const p of w.players)if(p.team===team)chosen.push([p,decidePlayer(w,p)]);
+      }
+      // Every chosen intent is computed from the same world state, then all are assigned.
+      for(const[p,intent]of chosen)p.intent=intent;
+    }else if(w.tick%c.ai.cadence===0){decideTeams(w);const intents=w.players.map(p=>decidePlayer(w,p));w.players.forEach((p,i)=>{p.intent=intents[i];});}
     for(const slot of [0,1]as const){
       if(!c.human[slot])continue;
       const carrier=this.player(w.carrier);if(carrier&&carrier.team===slot&&!carrier.keeper&&!(this.player(w.selected[slot])?.manualControl)&&w.selected[slot]!==carrier.id){w.selected[slot]=carrier.id;this.emit('control-switched',carrier,slot);}
@@ -356,7 +369,8 @@ export class Simulation {
     const bodyAngle=Math.abs(angleDelta(p.heading,Math.atan2(a.aim.y,a.aim.x)));
     const pressure=w.players.some(q=>q.team!==p.team&&distance(p,q)<2)?1.6:1;
     const weak=(a.aim.y*Math.cos(p.heading)-a.aim.x*Math.sin(p.heading))*(p.foot==='left'?1:-1)<0?1+(1-p.capabilities.weakFoot):1;
-    const error=(this.random()-.5)*c.actions.error*(1.2-skill)*pressure*weak*(1+bodyAngle);
+    // Difficulty scales the kick error of CPU teams only. The random draw stays the same.
+    const error=(this.random()-.5)*c.actions.error*cpuErrorScale(c,p.team)*(1.2-skill)*pressure*weak*(1+bodyAngle);
     const ang=Math.atan2(a.aim.y,a.aim.x)+error;let speed=10+a.power*12,vz=.25;
     if(a.kind==='through')speed=16+a.power*10;
     if(a.kind==='cross'||a.kind==='lob'){speed=(a.kind==='lob'?12:14)+a.power*12;vz=6+a.power*5;}
