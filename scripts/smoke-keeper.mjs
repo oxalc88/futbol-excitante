@@ -9,7 +9,8 @@ const { chromium } = require('playwright-core');
 const port = Number(process.env.KEEPER_SMOKE_PORT ?? 4318);
 const base = `http://127.0.0.1:${port}`;
 const out = 'artifacts/local/smoke';
-const shots = process.env.KEEPER_SHOTS ?? '/workspace/keeper-e2e';
+// CI has no /workspace: keep the screenshots in the local artifacts there.
+const shots = process.env.KEEPER_SHOTS ?? (process.env.CI ? 'artifacts/local/keeper-e2e' : '/workspace/keeper-e2e');
 mkdirSync(out, { recursive: true });
 mkdirSync(shots, { recursive: true });
 
