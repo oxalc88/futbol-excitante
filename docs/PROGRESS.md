@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-25 08:10 — PR pendiente ([#76](https://github.com/oxalc88/futbol-excitante/pull/76)) · Reglas de modelos y CI rápido para PR de solo documentación
+- **Qué cambia para el jugador:** nada en el juego. Cambian las reglas de trabajo: `AGENTS.md` fija qué modelo implementa y cuál revisa hasta el 30 de octubre y desde el 31 de octubre (Luna implementa tareas acotadas, Sol implementa tareas complejas, Sol siempre revisa, Luna nunca revisa). El CI detecta si una PR solo cambia documentación (`*.md`, `docs/`, `LICENSE`, `.agents/**/*.md`); en ese caso el check `build` termina en verde en segundos sin ejecutar `scripts/verify.sh`.
+- **Qué probar:** abre una PR que solo cambie un `.md` y comprueba que `build` pasa en menos de 2 minutos. Abre una PR con código y comprueba que `build` ejecuta todo `scripts/verify.sh`. Un push a `main` siempre ejecuta todo.
+- **Qué se rompe o cambia:** las PR de solo documentación ya no suben artefactos de evidencia. Mover un archivo de código a `docs/` cuenta como cambio de código. La simulación y `eval/baseline.json` no cambian.
+
 ## 2026-10-25 04:40 — PR pendiente ([#75](https://github.com/oxalc88/futbol-excitante/pull/75)) · Arranque y media vuelta al ritmo de PES 2017 (C7 parte 3)
 - **Qué cambia para el jugador:** los jugadores arrancan más rápido. Desde parado llegan a su velocidad máxima en 383 ms (antes 600 ms; objetivo PES 384 ms, rango 300–434). La media vuelta de 180° en carrera tarda 500 ms, igual que antes (objetivo 500 ms, rango 434–534). Afecta a todos: humanos, CPU y arqueros. Con jugadores más rápidos hay más entradas y más faltas en los partidos de prueba.
 - **Qué probar:** arranca desde parado con R1 y siente si la salida es más viva. Corre y gira 180° con el stick: el giro debe sentirse igual. Juega un partido completo contra la CPU y mira si las faltas y tarjetas son razonables. `npm run timing:c7` muestra los dos tiempos frente al objetivo.

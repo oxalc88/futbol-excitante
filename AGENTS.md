@@ -30,21 +30,9 @@ See [.agents/skills/verify-futbol-excitante/SKILL.md](.agents/skills/verify-futb
 
 ## Model selection
 
-Select the model by role, not by provider.
+The writer and the reviewer must use different models.
 
-| Role | Model |
-|---|---|
-| Coordination, review, hard coding | Codex |
-| Scoped coding | `deepseek-v4-flash` or `glm5.3-flash` |
-| Verification, second opinion | `qwen3.8-flash` or `mimo-v2.6-flash` |
-| Mechanical tasks | `gemma4` or `qwen3.6` |
-
-- The writer and the reviewer must use different models.
-- If a flash model fails verification two times, escalate the task to Codex.
-- Codex default: GPT-6.1 Sol (or the available Sol model) at effort `medium`. Use `high` or `xhigh` only when verification fails or the task is clearly hard. Effort levels: `low`, `medium`, `high`, `xhigh`, `max`.
-
-### Transition on 2026-10-31
-
-- NaN Builders models (through `pi`) are available until 2026-10-30 only.
-- From 2026-10-31, use Codex only. Coding moves to Codex at effort `low` or `medium`. For a second opinion, use a separate Codex session or a different effort level.
+- Until 2026-10-30: use `pi` with `mimo-v2.6-flash` to implement. Use Codex `gpt-6.1-sol` to review. If a task fails verification two times, use `glm5.3-flash`. If that also fails, use Sol to implement.
+- From 2026-10-31: use Codex only. Use GPT-6 Luna to implement bounded tasks: UI, presets, tests and repetitive work. Use Sol to implement complex or long tasks: C5/C10 class tasks and PES mechanics blocks. Always use Sol at effort `medium` to review. Do not use Luna to review.
+- From 2026-10-31, record the first 3 or 4 PRs that Luna implements in `docs/TOKENS.md`. Record the tokens and the number of rounds.
 - From 2026-10-31, do not start `pi`, OMP, OpenCode or Grok routes that use NaN models. Do not set `NAN_API_KEY`.
