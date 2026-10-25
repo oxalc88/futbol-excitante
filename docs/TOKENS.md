@@ -22,9 +22,11 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-25 | C10 keeper control | Codex CLI | write | gpt-6.1-sol | default | 2 | 4,454,301 | 108,115 | 23,770 | ~/.codex/sessions (wt-c10) |
 | 2026-10-25 | C10 keeper control | Codex CLI | helper | gpt-6-sol | medium | 1 | 1,221,661 | 61,276 | 7,694 | ~/.codex/sessions (wt-c10) |
 | 2026-10-25 | C10 keeper control | Codex CLI | review | gpt-6-luna | default | 2 | 442,021 | 85,006 | 6,748 | ~/.codex/sessions (wt-c10) |
-| 2026-10-25 | Static build ready | Codex CLI | write | gpt-6.1-sol | default | 2 | 651,800 | 33,737 | 6,066 | ~/.codex/sessions (wt-static) |
-| 2026-10-25 | Static build ready | Codex CLI | review | gpt-6-luna | default | 2 | 130,943 | 29,414 | 3,708 | ~/.codex/sessions (wt-static) |
-| 2026-10-25 | Match sound | Codex CLI | write | gpt-6.1-sol | default | 1 | 656,045 | 64,539 | 6,935 | ~/.codex/sessions (wt-audio) |
-| 2026-10-25 | Match sound | Codex CLI | review | gpt-6-luna | default | 1 | 159,974 | 32,031 | 3,878 | ~/.codex/sessions (wt-audio) |
+| 2026-10-25 | #70 Static build ready | Codex CLI | write | gpt-6.1-sol | default | 2 | 651,800 | 33,737 | 6,066 | ~/.codex/sessions (wt-static) |
+| 2026-10-25 | #70 Static build ready | Codex CLI | review | gpt-6-luna | default | 2 | 130,943 | 29,414 | 3,708 | ~/.codex/sessions (wt-static) |
+| 2026-10-25 | #71 Match sound | Codex CLI | write | gpt-6.1-sol | default | 1 | 656,045 | 64,539 | 6,935 | ~/.codex/sessions (wt-audio) |
+| 2026-10-25 | #71 Match sound | Codex CLI | review | gpt-6-luna | default | 1 | 159,974 | 32,031 | 3,878 | ~/.codex/sessions (wt-audio) |
+| 2026-10-25 | Quick play menu and tips | pi | write | nan/mimo-v2.6-flash | default | 4 | 7,130,679 | 273,925 | 129,586 | ~/.pi/agent/sessions (wt-menu) |
+| 2026-10-25 | Quick play menu and tips | Codex CLI | review | gpt-6.1-sol | default | 1 | 345,410 | 38,148 | 2,093 | ~/.codex/sessions (wt-menu) |
 
-Values at 2026-10-25 01:20 Lima. C10 (#68) and C5 (#69) values are final. Static build and sound were still in progress; their PRs update their rows.
+Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.

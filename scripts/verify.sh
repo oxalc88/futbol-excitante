@@ -6,7 +6,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 
 declare -A result
-order=(no-legacy install typecheck test evaluate build smoke pad-smoke)
+order=(no-legacy install typecheck test evaluate build dist-check build-lab smoke pad-smoke)
 run() { local name=$1; shift; echo "=== $name: $*"; if "$@"; then result[$name]=PASS; else result[$name]=FAIL; fi; }
 
 run no-legacy bash scripts/check-no-legacy.sh
@@ -15,6 +15,8 @@ run typecheck npm run typecheck
 run test npm test
 run evaluate npm run evaluate
 run build npm run build
+run dist-check npm run check:dist
+run build-lab npm run build:lab
 
 tools="${VERIFY_TOOLS_DIR:-${TMPDIR:-/tmp}/futbol-excitante-verify-tools}"
 if [ ! -d "$tools/node_modules/playwright-core" ]; then
