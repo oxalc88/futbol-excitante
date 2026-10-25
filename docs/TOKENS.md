@@ -30,5 +30,13 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-25 | Quick play menu and tips | Codex CLI | review | gpt-6.1-sol | default | 1 | 345,410 | 38,148 | 2,093 | ~/.codex/sessions (wt-menu) |
 | 2026-10-25 | CPU difficulty selector | pi | write | nan/mimo-v2.6-flash | default | 2 | 5,364,702 | 177,966 | 67,248 | ~/.pi/agent/sessions (wt-difficulty) |
 | 2026-10-25 | CPU difficulty selector | Codex CLI | review | gpt-6.1-sol | default | 2 | 286,475 | 43,618 | 1,162 | ~/.codex/sessions (wt-difficulty) |
+| 2026-10-25 | pi comparison (throwaway) | pi | write | nan/deepseek-v4-flash | default | 1 | 782,894 | 58,990 | 27,968 | ~/.pi/agent/sessions (wt-cmp-deepseek-v4-flash) |
+| 2026-10-25 | pi comparison (throwaway) | Codex CLI | review | gpt-6.1-sol | default | 1 | 241,071 | 40,159 | 1,765 | ~/.codex/sessions (wt-cmp-deepseek-v4-flash) |
+| 2026-10-25 | pi comparison (throwaway) | pi | write | nan/glm5.3-flash | default | 1 | 513,456 | 34,868 | 12,668 | ~/.pi/agent/sessions (wt-cmp-glm5.3-flash) |
+| 2026-10-25 | pi comparison (throwaway) | Codex CLI | review | gpt-6.1-sol | default | 1 | 178,774 | 35,374 | 1,641 | ~/.codex/sessions (wt-cmp-glm5.3-flash) |
+| 2026-10-25 | pi comparison (throwaway) | pi | write | nan/mimo-v2.6-flash | default | 1 | 602,421 | 45,955 | 24,498 | ~/.pi/agent/sessions (wt-cmp-mimo-v2.6-flash) |
+| 2026-10-25 | pi comparison (throwaway) | Codex CLI | review | gpt-6.1-sol | default | 1 | 187,616 | 42,808 | 1,336 | ~/.codex/sessions (wt-cmp-mimo-v2.6-flash) |
+| 2026-10-25 | PS4 pad preset | pi | write | nan/mimo-v2.6-flash | default | 8 | 23,306,567 | 794,917 | 358,306 | ~/.pi/agent/sessions (wt-ps-preset) |
+| 2026-10-25 | PS4 pad preset | Codex CLI | review | gpt-6.1-sol | default | 4 | 1,182,064 | 179,471 | 6,168 | ~/.codex/sessions (wt-ps-preset) |
 
-Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty values at 03:16 Lima (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
+Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty values at 03:16 Lima; PS4 pad preset values at 03:08 Lima (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
