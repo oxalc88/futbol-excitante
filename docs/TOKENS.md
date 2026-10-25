@@ -28,5 +28,7 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-25 | #71 Match sound | Codex CLI | review | gpt-6-luna | default | 1 | 159,974 | 32,031 | 3,878 | ~/.codex/sessions (wt-audio) |
 | 2026-10-25 | Quick play menu and tips | pi | write | nan/mimo-v2.6-flash | default | 4 | 7,130,679 | 273,925 | 129,586 | ~/.pi/agent/sessions (wt-menu) |
 | 2026-10-25 | Quick play menu and tips | Codex CLI | review | gpt-6.1-sol | default | 1 | 345,410 | 38,148 | 2,093 | ~/.codex/sessions (wt-menu) |
+| 2026-10-25 | CPU difficulty selector | pi | write | nan/mimo-v2.6-flash | default | 2 | 5,364,702 | 177,966 | 67,248 | ~/.pi/agent/sessions (wt-difficulty) |
+| 2026-10-25 | CPU difficulty selector | Codex CLI | review | gpt-6.1-sol | default | 2 | 286,475 | 43,618 | 1,162 | ~/.codex/sessions (wt-difficulty) |
 
-Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
+Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty values at 03:16 Lima (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
