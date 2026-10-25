@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-25 01:40 — PR pendiente · Versión web lista para publicar (sin publicar)
+- **Qué cambia para el jugador:** nada dentro del partido. `npm run build` deja en `dist/` sólo el juego, listo para subir a cualquier alojamiento estático con rutas relativas. El laboratorio ya no va en esa versión pública; sigue en `npm run dev` y en `npm run build:lab`.
+- **Qué probar:** `npm run build`, `npm run check:dist` y `npm run preview`; abre el enlace, elige equipos y juega un partido. Si copias un JPG o un video a `dist/`, el control debe fallar.
+- **Qué se rompe o cambia:** no se publica nada ni se configura alojamiento; Rolando decide dónde. El control rechaza el laboratorio, medios (incluidos los de PES), datos, mapas de código, rutas absolutas y archivos de más de 2 MiB (5 MiB en total).
+
 ## 2026-10-25 01:10 — PR pendiente · Jugadores con cuerpo humano y animación legible · referencia [#63](https://github.com/oxalc88/futbol-excitante/issues/63)
 - **Qué cambia para el jugador:** los jugadores ya no parecen fichas de lego. Tienen torso más ancho en los hombros que en la cintura, cuello, cabeza de tamaño humano, brazos con codo y piernas con rodilla, y botines hacia adelante. Miden entre 1,73 m y 1,94 m según el jugador. Al correr, piernas y brazos se balancean opuestos y con más amplitud cuanto más rápido van; el cuerpo se inclina hacia adelante con la velocidad y hacia el lado al girar. Al pasar o tirar se ve la carga de la pierna, el golpe y el acompañamiento con el pie hábil. Quietos, respiran un poco. Se mantienen los colores de equipo, los contornos y el balón como lo más brillante.
 - **Qué probar:** juega un partido y mira de cerca (C para cambiar de cámara) a un jugador que arranca, gira y pasa. Compara con `docs/evidence/c12/`. Prueba calidad baja: no hay contornos y debe ir fluido.

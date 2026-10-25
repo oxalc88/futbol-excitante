@@ -90,11 +90,24 @@ El botón online está oculto y desactivado. El prototipo de red anterior queda 
 
 El workflow `.github/workflows/ci.yml` se llama **CI — tests, evaluation and build** y se ejecuta en `push` a `main` y en pull requests hacia `main`. Sólo instala dependencias, prueba, evalúa, compila y guarda artefactos. **No tiene job de despliegue ni permisos de Pages.** Subir commits a `main` no publica el juego.
 
-Para preparar una futura distribución estática:
+### Preparar archivos estáticos
 
 ```bash
 npm run build
+npm run check:dist
 npm run preview
 ```
 
-El resultado está en `dist/`, con rutas relativas, página de juego y laboratorio. Cuando decidas publicar, necesitarás habilitar el alojamiento elegido y añadir expresamente un workflow de despliegue. No abras los módulos con `file://`; se necesita un servidor HTTP.
+`dist/` contiene sólo el juego (`index.html`) y sus recursos con rutas relativas. Se excluyen el laboratorio, medios y datos de investigación o evaluación. El control usa una allowlist: only .html, .js, .css. Rechaza también mapas de código y archivos demasiado grandes; imprime los tamaños. Usa un servidor HTTP, no `file://`.
+
+Para incluir el laboratorio localmente: `npm run build:lab`, `npm run check:dist -- --allow-lab` y `npm run preview`. `npm run dev` también sirve `/lab.html`. La verificación completa termina con un build que incluye el laboratorio para la prueba de navegador: después vuelve a ejecutar `npm run build` y `npm run check:dist` para preparar la distribución pública.
+
+Antes de cualquier publicación:
+
+- Rolando elige el alojamiento y se añade expresamente un workflow de despliegue.
+- Ejecutar `scripts/verify.sh` y obtener todos los pasos PASS.
+- Regenerar el build público y pasar `npm run check:dist`, sin laboratorio ni medios de PES.
+- Probar las rutas relativas en el alojamiento elegido, también bajo una subruta.
+- Usar HTTPS y revisar licencias y recursos de terceros.
+
+Estos comandos preparan archivos; no publican el juego.
