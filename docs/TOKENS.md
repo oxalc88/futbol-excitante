@@ -44,7 +44,9 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-25 | C7 part 3 pad-smoke fix | Codex CLI | review | gpt-6.1-sol | default | 1 | 127,871 | 19,920 | 559 | ~/.codex/sessions (wt-c7p3) |
 | 2026-10-25 | C7 part 3 pad-smoke deterministic setup | pi | write | nan/mimo-v2.6-flash | default | 3 | 5,143,463 | 247,627 | 82,652 | ~/.pi/agent/sessions (wt-c7p3) |
 | 2026-10-25 | C7 part 3 pad-smoke deterministic setup | Codex CLI | review | gpt-6.1-sol | default | 1 | 136,478 | 22,856 | 726 | ~/.codex/sessions (wt-c7p3) |
+| 2026-10-25 | #76 Model roles and docs-only CI | pi | write | nan/mimo-v2.6-flash | default | 1 | 86,600 | 12,675 | 6,469 | ~/.pi/agent/sessions (wt-model-roles) |
+| 2026-10-25 | #76 Model roles and docs-only CI | Codex CLI | review | gpt-6.1-sol | medium | 1 | 81,348 | 16,881 | 1,160 | ~/.codex/sessions (wt-model-roles) |
 | 2026-10-25 | pad-smoke flaky fix | pi | write | nan/mimo-v2.6-flash | default | 1 | 16,471 | 5,208 | 1,151 | ~/.pi/agent/sessions (wt-padflaky) |
 | 2026-10-25 | pad-smoke flaky fix | Codex CLI | review | gpt-6.1-sol | medium | 1 | 95,612 | 25,657 | 512 | ~/.codex/sessions (wt-padflaky) |
 
-Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty values at 03:16 Lima; PS4 pad preset values at 03:08 Lima; C7 part 3 values at 07:21 Lima (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
+Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty values at 03:16 Lima; PS4 pad preset values at 03:08 Lima; C7 part 3 values at 07:21 Lima; #76 values at 08:10 Lima; pad-smoke fix (#78) values at 08:33 Lima (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
