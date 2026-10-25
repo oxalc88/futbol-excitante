@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-25 08:33 — PR pendiente ([#78](https://github.com/oxalc88/futbol-excitante/pull/78)) · Prueba de mandos estable (pad-smoke)
+- **Qué cambia para el jugador:** nada en el juego. Solo cambia la prueba automática de mandos.
+- **Qué probar:** ejecuta `scripts/verify.sh`; pad-smoke debe pasar siempre. Causa del fallo intermitente: en el escenario 5 un tiro anterior seguía rodando y a veces entraba en el arco durante los 60 ticks medidos; la fase pasaba a «goal», los jugadores se congelaban y la prueba fallaba. Ahora la prueba detiene el balón con el gancho de prueba y comprueba que la fase sigue en «playing».
+- **Qué se rompe o cambia:** nada. Sin cambios en el motor ni en `eval/baseline.json`. Sin esperas más largas ni reintentos. 10 de 10 ejecuciones locales en verde con la CPU cargada.
+
 ## 2026-10-25 08:10 — PR pendiente ([#76](https://github.com/oxalc88/futbol-excitante/pull/76)) · Reglas de modelos y CI rápido para PR de solo documentación
 - **Qué cambia para el jugador:** nada en el juego. Cambian las reglas de trabajo: `AGENTS.md` fija qué modelo implementa y cuál revisa hasta el 30 de octubre y desde el 31 de octubre (Luna implementa tareas acotadas, Sol implementa tareas complejas, Sol siempre revisa, Luna nunca revisa). El CI detecta si una PR solo cambia documentación (`*.md`, `docs/`, `LICENSE`, `.agents/**/*.md`); en ese caso el check `build` termina en verde en segundos sin ejecutar `scripts/verify.sh`.
 - **Qué probar:** abre una PR que solo cambie un `.md` y comprueba que `build` pasa en menos de 2 minutos. Abre una PR con código y comprueba que `build` ejecuta todo `scripts/verify.sh`. Un push a `main` siempre ejecuta todo.
