@@ -6,6 +6,8 @@ import type { InputFrame, World } from '../src/contracts/types';
 import { OBSERVED_METRICS, validateObservedReference, type ObservedReference } from '../eval/reference';
 
 export type TimingMetric = typeof OBSERVED_METRICS[number];
+// Older slice-2 approximate ranges (eval/reference/pes-observed.json). C7 part 3 targets from
+// resumen_final.md supersede them for acceleration/turn: see scripts/measure-c7-movement.ts (timing:c7).
 export type TimingSample = { value_s:number; start_tick:number; end_tick:number; protocol:string };
 export type GameTiming = Record<TimingMetric, TimingSample>;
 const angleError=(a:number,b:number)=>Math.abs(Math.atan2(Math.sin(a-b),Math.cos(a-b)));

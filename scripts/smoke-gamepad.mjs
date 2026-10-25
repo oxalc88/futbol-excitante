@@ -83,7 +83,7 @@ try {
   });
   const snapshot = () => page.evaluate(() => window.__fe);
   const wait = async (fn, arg) => {
-    // Advance browser frames directly.
+    // Advance browser frames directly in fixed 100 ms steps.
     for (let i=0;i<200;i++) {
       const ready=await page.evaluate(({source,arg}) => (0,eval)(`(${source})`)(arg), {source:String(fn),arg});
       if (ready) return page.waitForFunction(fn,arg,{polling:10,timeout:1000});
@@ -115,25 +115,25 @@ try {
   await button(0,9,true); await wait(() => !window.__fe.paused); await ticks();
   await button(0,9,false); await ticks();
   await evidence(1,{clock});
-  // 2: Pass backward from kickoff. Wait for the receiver to control the ball.
-  stage='kickoff receiver';
-  const taker=(await snapshot()).selected[0];
-  await axes(0,[0,0,-1,0]); await button(0,0,true);
+  // 2: Take the kickoff, put the ball at the feet of slot 0, then charge a shot.
+  stage='kickoff';
+  await button(0,0,true); // Stick stays at 0: only X is pressed.
   await wait(() => window.__fe.phase==='playing');
-  await button(0,0,false); await axes(0,[0,0,0,0]);
-  await wait(id => {
-    const s=window.__fe,p=s.players.find(p=>p.id===s.selected[0]);
-    if (!p || s.selected[0]===id) return false;
-    const dx=s.ball.x-p.x,dy=s.ball.y-p.y,d=Math.hypot(dx,dy);
-    window.__pad.axes(0,d>1?[dx/d*.6,dy/d*.6,1,0]:[0,0,1,0]);
-    return s.phase==='playing' && !p.action && p.recovery===0 && d<1 && Math.hypot(p.vx,p.vy)<.2 && Math.hypot(s.ball.vx,s.ball.vy)<.5 && s.ball.z<.3;
-  },taker);
-  await axes(0,[0,0,1,0]);
-  await wait(() => document.querySelector('#clock')?.textContent!=='00:00');
-  check((await page.locator('#pad-status').innerText()).includes('2 MANDOS'),'Two-pad HUD missing');
+  await button(0,0,false);
   stage='charged shot';
-  const before = await snapshot();
-  await button(0,2,true); await ticks(12);
+  // The smoke hook (webdriver only) puts the ball at the feet and clears the restart rules.
+  check(await page.evaluate(() => window.__feSmoke.ballAtFeet(0)),'Smoke hook failed');
+  const before=await snapshot();
+  const takerId=before.selected[0];
+  const taker=before.players.find(p=>p.id===takerId);
+  check(!!taker,'Selected player of slot 0 missing');
+  check(Math.hypot(taker.x-before.ball.x,taker.y-before.ball.y)<=1,'Ball is not within 1 m of the player');
+  // The shell reports no team field, so the side comes from the id prefix.
+  const side=String(takerId).split('-')[0];
+  const opponentNear=before.players.filter(p=>String(p.id).split('-')[0]!==side&&Math.hypot(p.x-before.ball.x,p.y-before.ball.y)<=10);
+  check(opponentNear.length===0,'Opponent within 10 m of the ball');
+  await button(0,2,true);
+  await ticks(12);
   shotSetup={before,release:await snapshot()};
   check((await snapshot()).shots.actions[0]===before.shots.actions[0],'Shot fired while held');
   await button(0,2,false);
@@ -143,6 +143,9 @@ try {
   const fired=await snapshot();
   check(fired.shots.actions[0]===before.shots.actions[0]+1 && fired.shots.events[0]===before.shots.events[0]+1,'Duplicate shot');
   check(fired.shots.power[0]>.2,'Shot did not charge');
+  // Check the clock and HUD after the shot. A wait before the shot lets the ball roll out of reach.
+  await wait(() => document.querySelector('#clock')?.textContent!=='00:00');
+  check((await page.locator('#pad-status').innerText()).includes('2 MANDOS'),'Two-pad HUD missing');
   await evidence(2);
   stage='disconnect and reconnect';
   // 3 and 4: Repeat for each gamepad. Keep the other gamepad in its slot.

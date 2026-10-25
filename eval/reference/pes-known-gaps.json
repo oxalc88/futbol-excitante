@@ -2,6 +2,11 @@
   "version": "pes-timing-known-gaps-v1",
   "gaps": [
     {
+      "metric": "time_to_top_speed_s",
+      "direction": "BELOW",
+      "reason": "C7 part 3 retunes acceleration against the newer resumen_final.md criteria (384 ms target, 300-434 ms range, measured by scripts/measure-c7-movement.ts). Those targets supersede this older slice-2 range; the sprint ramp is intentionally faster now. No further tuning."
+    },
+    {
       "metric": "control_to_next_pass_s",
       "direction": "BELOW",
       "reason": "The immediate-return fixture releases sooner than the public-match range. PES samples include player decision and carry time; this is a protocol/context gap as well as a timing difference, not proof of engine error. No tuning applied."

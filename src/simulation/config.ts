@@ -1,5 +1,5 @@
 import type { Config, CpuDifficulty, TeamIndex } from '../contracts/types';
-export const engineVersion = 'engine-v3';
+export const engineVersion = 'engine-v4';
 // Fictional design values, VERSIONED_PROVISIONAL. No PES reference calibration.
 
 /** Multipliers of existing CPU parameters. `normal` is 1 in every field. */

@@ -66,10 +66,10 @@ test('Normal is exactly the current config and the current CPU behaviour',()=>{
 });
 
 test('a Normal CPU-vs-CPU match keeps the frozen pre-change gameplay hash',()=>{
-  // Frozen on the engine before the difficulty work (git archive HEAD): Normal must not move at all.
+  // Frozen on engine-v4 (C7 part 3 acceleration and turn retune). Difficulty Normal must not move at all.
   const sim=run(createConfig({seed:2017,human:[false,false],halfSeconds:60}),3600);
-  assert.equal(gameplayHash(sim),'467771cc','Normal gameplay must stay bit-identical to the pre-change engine');
-  assert.equal(sim.stateHash(),'7bde724a');
+  assert.equal(gameplayHash(sim),'d32a612e','Normal gameplay must stay bit-identical to engine-v4 (C7 part 3 retune)');
+  assert.equal(sim.stateHash(),'eb159334');
   assert.equal(hash(sim.snapshot().config),'61e3105f');
   assert.deepEqual(sim.snapshot().score,[0,0]);
   assert.equal(sim.phase,'playing');
