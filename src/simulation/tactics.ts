@@ -53,7 +53,7 @@ export function decideTeams(world: World) {
     const marked=new Set<string>();
     for(const p of own) {
       const anchor=anchors[p.id]; let point={...anchor}, responsibility='shape';
-      if(p.keeper) {
+      if(p.keeper&&!(p.manualControl&&c.human[ti]&&world.selected[ti]===p.id)) {
         const goal=-dir*c.pitch.length/2;
         const forward=clamp((world.ball.x-goal)*dir*.075,1.2,c.goalkeeper.radius*.65);
         point={x:goal+dir*forward,y:clamp(world.ball.y*.15,-c.goalkeeper.lateral,c.goalkeeper.lateral)};
@@ -100,7 +100,7 @@ export function decidePlayer(world: World, p: PlayerState): Intent {
     const defenders=world.players.filter(q=>q.team!==p.team&&!q.keeper);
     const pressure=Math.min(...defenders.map(q=>distance(p,q)));
     const receiver=bestPass(world,p);
-    if(p.keeper) { if(world.tick-p.heldSince>=c.goalkeeper.releaseTicks) {action='pass';aim=receiver?unit(delta(p,receiver)):{x:dir,y:.25};} }
+    if(p.keeper&&!(p.manualControl&&c.human[p.team]&&world.selected[p.team]===p.id)) { if(world.tick-p.heldSince>=c.goalkeeper.releaseTicks) {action='pass';aim=receiver?unit(delta(p,receiver)):{x:dir,y:.25};} }
     else if(distance(p,goal)<c.ai.shotDistance && Math.abs(p.y)<c.pitch.goalWidth/2+12) { action=b.z>.9?'header':'shoot'; aim=unit({x:goal.x-p.x,y:-p.y+(p.y>0?-1.5:1.5)});power=clamp(distance(p,goal)/35,.45,.85); }
     else if(receiver && (pressure<5 || world.tick-p.heldSince>90+(1-t.tactics.tempo)*150-t.tactics.shortPossession*70)) { action=receiver.x*dir>p.x*dir+9&&t.tactics.buildUp<.5?'through':'pass';aim=unit(delta(p,receiver)); }
     else if(Math.abs(p.y)>20 && p.x*dir>25) {action='cross'; aim=unit(delta(p,{x:dir*40,y:0}));power=.65;}
