@@ -681,11 +681,12 @@ try {
     check(await touchDown(page, '.tp-square', 42), 'Pad □ button not found');
     await page.waitForTimeout(500);
     await touchUp(page, 42);
-    await page.waitForFunction(id => window.__fe.ball.lastTouch?.playerId === id, second,
-      {timeout:8000, polling:50});
+    await page.waitForFunction(() => window.__feSmoke.setPieceState().restriction?.kind === 'free-kick',
+      null, {timeout:8000, polling:20});
+    const taker = (await page.evaluate(() => window.__feSmoke.setPieceState().restriction))?.taker;
+    check(taker === second, `Free kick taker ${taker} is not the second taker ${second}`);
     const lastTouch = await page.evaluate(() => window.__fe.ball.lastTouch?.playerId ?? null);
-    check(lastTouch === second, `Last touch ${lastTouch} is not the second taker ${second}`);
-    await evidence(page, '10-l2-second-taker', { second, lastTouch, hint });
+    await evidence(page, '10-l2-second-taker', { second, taker, lastTouch, hint });
     await touchUp(page, 41);
     await context.close();
   }
