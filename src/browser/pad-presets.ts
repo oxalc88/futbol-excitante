@@ -6,23 +6,25 @@
 
 import type { ActionKind } from '../contracts/types';
 
-export type PadContext = 'attack' | 'defense' | 'system' | 'keeper';
+export type PadContext = 'attack' | 'defense' | 'system' | 'keeper' | 'set-piece';
 /** identical: FE has the same control. remapped: FE has another button. missing: FE has no control. */
 export type PadState = 'identical' | 'remapped' | 'missing';
 
-/** PS glyph labels of the preset. */
-export const PS_GLYPHS = ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'OPTIONS', 'TOUCHPAD'] as const;
+/** PS glyph labels of the preset. The four arrows label the dpad rows. */
+export const PS_GLYPHS = ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'OPTIONS', 'TOUCHPAD', '↑', '↓', '←', '→'] as const;
 export type PsGlyph = (typeof PS_GLYPHS)[number];
 
-/** Gamepad standard-mapping button indices (W3C). Chrome exposes the DS4 touchpad as button 17. */
+/** Gamepad standard-mapping button indices (W3C). Chrome exposes the DS4 touchpad as button 17. The dpad is buttons 12-15. */
 export const PS_BUTTON = {
   cross: 0, circle: 1, square: 2, triangle: 3,
   l1: 4, r1: 5, l2: 6, r2: 7, options: 9, l3: 10, r3: 11, touchpad: 17,
+  dpadUp: 12, dpadDown: 13, dpadLeft: 14, dpadRight: 15,
 } as const;
 
 /** Glyph label for each standard button index used here. */
 export const PS_GLYPH_BY_BUTTON: Readonly<Record<number, PsGlyph>> = {
   0: '✕', 1: '○', 2: '□', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 9: 'OPTIONS', 10: 'L3', 11: 'R3', 17: 'TOUCHPAD',
+  12: '↑', 13: '↓', 14: '←', 15: '→',
 };
 
 /** Two tackle edges at most this many ticks apart play the standing tackle (✕ x2).
@@ -130,6 +132,46 @@ export const PES_2017_PS4_ROWS: readonly PadPresetRow[] = [
   { id: 'simulateDive', state: 'missing', context: 'attack', pes: 'Simulate foul (dive)', text: 'L1 + L2 + L3 + R3 (no R2)', glyphs: ['L3'], button: PS_BUTTON.l3,
     keys: { p1: ['KeyF'], p2: ['Numpad4'] }, shares: [],
     note: 'All four held in the same sample, R2 not held: the selected player falls. No foul and no card. Keyboard: F / Num 4.' },
+  // 13 set-piece rows (PES table: "Balón parado").
+  { id: 'setPower', state: 'missing', context: 'set-piece', pes: 'Set-piece power', text: 'Hold □ (shot) or ○ / ✕ (pass)', glyphs: ['□'], button: PS_BUTTON.square,
+    keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: ['panenka', 'wallJump'],
+    note: 'Free kick, corner, throw-in and goal kick: hold to fill the power bar, release to kick. Keyboard: hold K / Num 2, I / Num 5 or J / Num 1.' },
+  { id: 'setTrajectory', state: 'missing', context: 'set-piece', pes: 'Free kick: curl and height', text: 'Left stick while kicking', glyphs: [], button: null,
+    keys: { p1: [], p2: [] }, shares: [], axis: 'left',
+    note: 'The stick aims; the power bar sets the height; the deviation from the facing curls the flight. Keyboard: aim with the move-row keys.' },
+  { id: 'setFix', state: 'missing', context: 'set-piece', pes: 'Fix direction and trajectory', text: 'R2', glyphs: ['R2'], button: PS_BUTTON.r2,
+    keys: { p1: ['KeyG'], p2: ['Numpad6'] }, shares: [],
+    note: 'Offline set piece: hold R2 and the aim freezes at the value of the press; release to aim again. Keyboard: hold G / Num 6.' },
+  { id: 'secondTaker', state: 'missing', context: 'set-piece', pes: 'Second taker beside / behind', text: 'L1 + cruceta ↑ / ↓', glyphs: ['L1', '↑', '↓'], button: PS_BUTTON.l1,
+    keys: { p1: ['KeyQ'], p2: ['Enter'] }, shares: [],
+    note: 'Up places the second taker beside the ball, down behind it. Keyboard: hold Q + W / S, Enter + arrow up / down.' },
+  { id: 'secondTakerKick', state: 'missing', context: 'set-piece', pes: 'Kick with the second taker', text: 'Hold L2', glyphs: ['L2'], button: PS_BUTTON.l2,
+    keys: { p1: ['KeyE'], p2: ['Numpad9'] }, shares: [],
+    note: 'Hold L2 with the kick to play it with the second taker. Keyboard: hold E / Num 9.' },
+  { id: 'setFeint', state: 'missing', context: 'set-piece', pes: 'Free kick feint', text: '○ then ✕', glyphs: ['○'], button: PS_BUTTON.circle,
+    keys: { p1: ['KeyI'], p2: ['Numpad5'] }, shares: ['wallCharge'],
+    note: 'Press ✕ while the ○ charge is held: the taker fakes and no kick is taken. Keyboard: hold I / Num 5, then press J / Num 1.' },
+  { id: 'shortRoll', state: 'missing', context: 'set-piece', pes: 'Short roll', text: 'L1 + ✕', glyphs: ['✕'], button: PS_BUTTON.cross,
+    keys: { p1: ['KeyJ'], p2: ['Numpad1'] }, shares: ['wallHold'],
+    note: 'Rolls the ball short along the ground to a teammate. Keyboard: Q + J, Enter + Num 1.' },
+  { id: 'panenka', state: 'missing', context: 'set-piece', pes: 'Penalty chip (panenka)', text: 'L1 + □', glyphs: ['□'], button: PS_BUTTON.square,
+    keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: ['setPower', 'wallJump'],
+    note: 'Penalty only: hold L1 + □, then release □ for a slow chip down the middle. Keyboard: Q + K, Enter + Num 2.' },
+  { id: 'wallJump', state: 'missing', context: 'set-piece', pes: 'Wall: jump', text: '□', glyphs: ['□'], button: PS_BUTTON.square,
+    keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: ['setPower', 'panenka'],
+    note: 'Defending a free kick: one press jumps the wall, hold ✕ to keep it down. Keyboard: K / Num 2.' },
+  { id: 'wallHold', state: 'missing', context: 'set-piece', pes: 'Wall: no jump', text: 'Hold ✕', glyphs: ['✕'], button: PS_BUTTON.cross,
+    keys: { p1: ['KeyJ'], p2: ['Numpad1'] }, shares: ['shortRoll'],
+    note: 'While ✕ is held the □ press never jumps the wall. Keyboard: hold J / Num 1.' },
+  { id: 'wallCharge', state: 'missing', context: 'set-piece', pes: 'Wall: charge out to block', text: '○ at the kick', glyphs: ['○'], button: PS_BUTTON.circle,
+    keys: { p1: ['KeyI'], p2: ['Numpad5'] }, shares: ['setFeint'],
+    note: 'Defending a free kick: hold ○ as the ball is kicked and the wall runs out at the ball. Keyboard: hold I / Num 5.' },
+  { id: 'setKeeperMove', state: 'missing', context: 'set-piece', pes: 'Keeper: move on a free kick', text: 'Hold △ + left stick', glyphs: ['△'], button: PS_BUTTON.triangle,
+    keys: { p1: ['KeyL'], p2: ['Numpad3'] }, shares: [],
+    note: 'Defending a free kick: hold △ and move the keeper with the stick. On a penalty the stick alone moves him. Keyboard: hold L / Num 3 + move keys.' },
+  { id: 'cornerStrategy', state: 'missing', context: 'set-piece', pes: 'Corner attack and defence strategy', text: 'Cruceta ↑ ↓ ← →', glyphs: ['↑', '↓', '←', '→'], button: null,
+    keys: { p1: ['KeyW', 'KeyS', 'KeyA', 'KeyD'], p2: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'] }, shares: [],
+    note: 'Attack: ↑ fast, ↓ near post, ← in line, → far post. Defence: ↑ mixed, ← man to man, → zonal. Keyboard: the move keys of each player.' },
 ];
 
 export interface PadPreset { name: string; source: string; rows: readonly PadPresetRow[] }
@@ -187,10 +229,14 @@ export interface KeyRole {
   keeperHigh?: boolean;
   /** Press edge: the selected player falls (foul dive). */
   simulateDive?: boolean;
+  /** Held during a set piece: the aim freezes at the press (R2 fix). */
+  setFix?: boolean;
+  /** Held during a set piece: the kick is played with the second taker (L2). */
+  setSecond?: boolean;
 }
 
 /** Engine action role of each row. Rows without a role need no key action. */
-const KEY_ROLE: Readonly<Record<string, Pick<KeyRole, 'attack' | 'defense' | 'sprint' | 'switchPlayer' | 'keeperRush' | 'keeperKick' | 'keeperHigh' | 'simulateDive'>>> = {
+const KEY_ROLE: Readonly<Record<string, Pick<KeyRole, 'attack' | 'defense' | 'sprint' | 'switchPlayer' | 'keeperRush' | 'keeperKick' | 'keeperHigh' | 'simulateDive' | 'setFix' | 'setSecond'>>> = {
   pass: { attack: 'pass' },
   through: { attack: 'through' },
   cross: { attack: 'cross' },
@@ -208,6 +254,8 @@ const KEY_ROLE: Readonly<Record<string, Pick<KeyRole, 'attack' | 'defense' | 'sp
   keeperPunt: { keeperKick: true },
   keeperHighPunt: { keeperHigh: true },
   simulateDive: { simulateDive: true },
+  setFix: { setFix: true },
+  secondTakerKick: { setSecond: true },
 };
 
 function keyboardRoles(player: 'p1' | 'p2'): Record<string, KeyRole> {
@@ -226,7 +274,8 @@ function keyboardRoles(player: 'p1' | 'p2'): Record<string, KeyRole> {
 
 /** KeyboardEvent.code roles per player, derived from the preset rows.
  * L1 (switch key) plus ○ (cross key) plays the lob. The keeper rows add the
- * run-out key (△), the punt charge (○ with the high modifier G) and the foul-dive key. */
+ * run-out key (△), the punt charge (○ with the high modifier G) and the foul-dive key.
+ * The set-piece rows add the R2 fix key (G / Num 6) and the L2 second-taker key (E / Num 9). */
 export const KEYBOARD_MAP: Record<'p1' | 'p2', Readonly<Record<string, KeyRole>>> = {
   p1: keyboardRoles('p1'),
   p2: keyboardRoles('p2'),

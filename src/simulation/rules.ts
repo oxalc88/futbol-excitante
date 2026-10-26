@@ -1,5 +1,5 @@
-import type { PlayerState, TeamIndex, Vec2, World } from '../contracts/types';
-import { distance, segmentPoint } from './math';
+import type { ActionKind, CornerAttack, CornerDefence, PlayerState, SetDirection, TeamIndex, Vec2, World } from '../contracts/types';
+import { angleDelta, clamp, distance, segmentPoint } from './math';
 
 // Spatial adjudication for the playable simulation. Thresholds are versioned design
 // values, not a claim to reproduce an unseen referee or the PES implementation.
@@ -27,6 +27,52 @@ export function foulCard(w: World, offender: PlayerState, victim: PlayerState, s
   if (sliding || relativeSpeed > 4.5) return 'yellow';
   return null;
 }
+// Set-piece helpers of a human restart. They are pure: the engine writes the
+// state and only calls them while a human slot owns the restart.
+
+/** Wall of a team: the four outfield players closest to the ball. */
+export function wallPlayers(w: World, team: TeamIndex, point: Vec2): PlayerState[] {
+  return w.players.filter(p => p.team === team && !p.keeper && !p.sentOff)
+    .sort((a, b) => distance(a, point) - distance(b, point) || a.id.localeCompare(b.id)).slice(0, 4);
+}
+
+/** Second taker: the teammate closest to the ball that is not the taker. */
+export function secondTakerFor(w: World, team: TeamIndex, point: Vec2, taker: string): PlayerState | undefined {
+  return w.players.filter(p => p.team === team && !p.keeper && !p.sentOff && p.id !== taker)
+    .sort((a, b) => distance(a, point) - distance(b, point) || a.id.localeCompare(b.id))[0];
+}
+
+/** Set-piece kick of one button row: □ shoots, ○ lofts the ball high, ✕ keeps it low. */
+export function setPiecePower(power: number, action: ActionKind): { speed: number; vz: number } {
+  if (action === 'shoot') return { speed: 16 + power * 10, vz: 1 + power * 3 };
+  if (action === 'cross') return { speed: 12 + power * 6, vz: 4 + power * 4 };
+  return { speed: 8 + power * 8, vz: .3 + power * 1.2 };
+}
+
+/** Curl of a set kick: the stick deviation from the facing bends the flight. */
+export function setKickCurl(p: PlayerState, aim: Vec2): number {
+  return clamp(angleDelta(p.heading, Math.atan2(aim.y, aim.x)), -1, 1) * 5 * p.capabilities.curve;
+}
+
+/** One set-piece step of the keeper. On the line of a penalty he only moves sideways. */
+export function setKeeperMove(w: World, p: PlayerState, stick: Vec2, onLine: boolean): Vec2 {
+  const c = w.config;
+  const goal = { x: -w.teams[p.team].direction * c.pitch.length / 2, y: 0 };
+  const limitY = onLine ? Math.min(c.goalkeeper.lateral, c.pitch.goalWidth / 2 + 1) : c.goalkeeper.lateral;
+  const step = c.goalkeeper.speed * c.dt;
+  if (onLine) return { x: p.x, y: clamp(p.y + stick.y * step, -limitY, limitY) };
+  const x = p.x + stick.x * step, y = clamp(p.y + stick.y * step, -limitY, limitY);
+  // He never walks out of the goal radius that the keeper clamp uses.
+  const inside = Math.hypot(p.x - goal.x, p.y - goal.y) <= c.goalkeeper.radius;
+  const dx = x - goal.x, dy = y - goal.y, d = Math.hypot(dx, dy);
+  if (inside && d > c.goalkeeper.radius) return { x: goal.x + dx / d * c.goalkeeper.radius, y: goal.y + dy / d * c.goalkeeper.radius };
+  return { x, y };
+}
+
+/** Corner strategies of the dpad. The defence has no down row. */
+export const CORNER_ATTACK: Record<SetDirection, CornerAttack | undefined> = { up: 'fast', down: 'near', left: 'line', right: 'far' };
+export const CORNER_DEFENCE: Record<SetDirection, CornerDefence | undefined> = { up: 'mixed', left: 'man', right: 'zonal', down: undefined };
+
 export function offsideInterferer(w: World): PlayerState | undefined {
   if (!w.offside) return;
   const candidates = w.players.filter(p => !p.sentOff && w.offside!.candidates.includes(p.id));

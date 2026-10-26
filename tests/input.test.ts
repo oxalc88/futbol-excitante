@@ -54,6 +54,38 @@ test('with the ball each keyboard action is an edge and each player consumes onl
   assert.equal(input.sample(5,0).action,undefined);
 });
 
+test('△ starts an attacking throw-in for either slot, while defence keeps keeper movement',t=>{
+  const {input,key,pads}=browser(t);
+  pads.push(pad(0),pad(1));
+  input.sample(0,0);input.sample(0,1);
+  input.setDefending([true,true]);
+  input.setRestart([{kind:'throw-in',attacking:true},{kind:'throw-in',attacking:true}]);
+  for(const [slot,code] of [[0,'KeyL'],[1,'Numpad3']] as const){
+    key('keydown',code);
+    assert.equal(input.sample(1,slot).action,'through',`keyboard slot ${slot}`);
+    assert.equal(input.sample(2,slot).action,undefined,`held keyboard slot ${slot}`);
+    key('keyup',code);
+    assert.equal(input.sample(3,slot).action,undefined,`released keyboard slot ${slot}`);
+    pads[slot]=pad(slot,[3]);
+    assert.equal(input.sample(4,slot).action,'through',`pad slot ${slot}`);
+    assert.equal(input.sample(5,slot).action,undefined,`held pad slot ${slot}`);
+    pads[slot]=pad(slot);
+    assert.equal(input.sample(6,slot).action,undefined,`released pad slot ${slot}`);
+  }
+  input.setRestart([{kind:'free-kick',attacking:false},{kind:'free-kick',attacking:false}]);
+  for(const [slot,code,move] of [[0,'KeyL','KeyW'],[1,'Numpad3','ArrowUp']] as const){
+    key('keydown',code);key('keydown',move);
+    const keyboard=input.sample(7,slot);
+    assert.ok(keyboard.keeperMove,`defending keyboard keeper slot ${slot}`);
+    key('keyup',code);key('keyup',move);input.sample(8,slot);
+    pads[slot]=pad(slot,[3],[0,-1]);
+    const controller=input.sample(9,slot);
+    assert.equal(controller.action,undefined,`defending pad slot ${slot}`);
+    assert.ok(controller.keeperMove,`defending pad keeper slot ${slot}`);
+    pads[slot]=pad(slot);input.sample(10,slot);
+  }
+});
+
 test('without the ball the defensive keys act and the attack keys do not',t=>{
   const {input,key,time}=browser(t);
   input.setDefending([true,true]);

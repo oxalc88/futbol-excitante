@@ -4,7 +4,9 @@ import { PS_BUTTON, pesButton, TACKLE_TAP_TICKS } from '../browser/pad-presets';
 
 export interface PadReading { index:number; id:string; mapping:string; connected:boolean; axes:readonly number[]; buttons:readonly {pressed:boolean}[] }
 export interface PadFrame { move:Vec2; aim?:Vec2; action?:ActionKind; power:number; sprint:boolean; shield:boolean; switchPlayer:boolean; switchKeeper:boolean;
-  keeperRush?:boolean; keeperKick?:'punt'|'high'; keeperDrop?:boolean; keeperFeint?:boolean; simulateDive?:boolean }
+  keeperRush?:boolean; keeperKick?:'punt'|'high'; keeperDrop?:boolean; keeperFeint?:boolean; simulateDive?:boolean;
+  setKick?:boolean; secondTaker?:'side'|'behind'; secondKick?:boolean; setFeint?:boolean; shortRoll?:boolean; panenka?:boolean;
+  wallJump?:boolean; wallCharge?:number; keeperMove?:Vec2; cornerSide?:'up'|'down'|'left'|'right'; setFix?:boolean }
 const identity=(p:PadReading)=>`${p.index}:${p.id}`;
 const neutral=():PadFrame=>({move:{x:0,y:0},power:.55,sprint:false,shield:false,switchPlayer:false,switchKeeper:false});
 // Buttons of the PES 2017 PS4 preset. The preset is the default pad mapping.
@@ -33,7 +35,14 @@ export class ControllerMapper {
   private cameraStarts=new Map<string,boolean>();
   // Tick of the last defending ✕ tap, or -1 when no tackle is armed.
   private tackleTap=[-1,-1];
-  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];}
+  private setCharge:number[][]=[[0,0,0],[0,0,0]];
+  private setSpent:boolean[][]=[[false,false,false],[false,false,false]];
+  private setArmed:boolean[][]=[[true,true,true],[true,true,true]];
+  private setPanenka=[false,false];private setRoll=[false,false];
+  private wallCharge=[0,0];
+  private restartContext=[null,null] as (string|null)[];
+  private setAim:Vec2[]=[{x:1,y:0},{x:-1,y:0}];private fixedAim:(Vec2|null)[]=[null,null];
+  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
   assignments(){return [...this.slots];}
   /** One press edge of a system button per pad. Disconnected pads forget their edge. */
   private startEdge(pads:readonly PadReading[],button:number,starts:Map<string,boolean>){
@@ -54,18 +63,57 @@ export class ControllerMapper {
    * the header row, so a press at head height still dives.
    * hold: the keeper of the slot holds the ball in the hands, so the keeper row
    * uses the throw and kick gestures instead of the dive and the pressure. */
-  sample(pads:readonly PadReading[],tick:number,slot:TeamIndex,defending=false,aerial=false,keeper=false,hold=false):PadFrame {
+  sample(pads:readonly PadReading[],tick:number,slot:TeamIndex,defending=false,aerial=false,keeper=false,hold=false,restart:{kind:string;attacking:boolean}|null=null):PadFrame {
+    if(restart?.kind==='kickoff')restart=null;
+    const context=restart?`${restart.kind}:${restart.attacking}`:null;
+    const contextChanged=context!==this.restartContext[slot];
+    if(contextChanged){this.setCharge[slot]=[0,0,0];this.setSpent[slot]=[false,false,false];this.setPanenka[slot]=false;this.setRoll[slot]=false;this.wallCharge[slot]=0;this.fixedAim[slot]=null;this.restartContext[slot]=context;}
     const connected=pads.filter(p=>p.connected&&p.mapping==='standard');
-    for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.punt[i]=0;this.puntArmed[i]=true;this.lastTick[i]=-1;this.tackleTap[i]=-1;}
-    for(const p of connected){const id=identity(p);if(!this.slots.includes(id)){const i=this.slots.indexOf(null);if(i>=0){this.slots[i]=id;this.previous[i]=p.buttons.map(b=>b.pressed);this.armed[i]=!p.buttons[B.shot]?.pressed;}}}
+    for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.punt[i]=0;this.puntArmed[i]=true;this.lastTick[i]=-1;this.tackleTap[i]=-1;this.setCharge[i]=[0,0,0];this.setSpent[i]=[false,false,false];this.setPanenka[i]=false;this.setRoll[i]=false;}
+    for(const p of connected){const id=identity(p);if(!this.slots.includes(id)){const i=this.slots.indexOf(null);if(i>=0){this.slots[i]=id;this.previous[i]=p.buttons.map(b=>b.pressed);this.armed[i]=!p.buttons[B.shot]?.pressed;this.setArmed[i]=[B.pass,B.cross,B.shot].map(button=>!p.buttons[button]?.pressed);}}}
     const p=connected.find(p=>identity(p)===this.slots[slot]);if(!p)return neutral();
     if(this.lastTick[slot]===tick)return structuredClone(this.cached[slot]);
     const pressed=p.buttons.map(b=>b.pressed);if(this.previous[slot].length===0){this.previous[slot]=[...pressed];this.armed[slot]=!pressed[B.shot];}
+    if(contextChanged)this.setArmed[slot]=[B.pass,B.cross,B.shot].map(button=>!pressed[button]||!this.previous[slot][button]);
     const prev=this.previous[slot],f=neutral();
     const dead=(v:number)=>Number.isFinite(v)&&Math.abs(v)>.18?clamp(Math.sign(v)*(Math.abs(v)-.18)/.82,-1,1):0;
     f.move={x:dead(p.axes[0]??0),y:dead(p.axes[1]??0)};if(length(f.move)>1)f.move=unit(f.move);
     const right={x:dead(p.axes[2]??0),y:dead(p.axes[3]??0)};if(length(right)>.1)f.aim=unit(right);
+    if(restart){if(!p.buttons[B.r2]?.pressed){this.fixedAim[slot]=null;this.setAim[slot]=f.aim??(length(f.move)>.1?unit(f.move):this.setAim[slot]);if(f.aim||length(f.move)>.1)f.aim={...this.setAim[slot]};}else{if(!this.fixedAim[slot])this.fixedAim[slot]={...this.setAim[slot]};f.aim={...this.fixedAim[slot]};}}
     const edge=(i:number)=>!!pressed[i]&&!prev[i],held=(i:number)=>!!pressed[i];
+    if(restart){
+      const direction=([PS_BUTTON.dpadUp,PS_BUTTON.dpadDown,PS_BUTTON.dpadLeft,PS_BUTTON.dpadRight] as const).find(edge);
+      if(direction!==undefined&&restart.kind==='corner')f.cornerSide=({[PS_BUTTON.dpadUp]:'up',[PS_BUTTON.dpadDown]:'down',[PS_BUTTON.dpadLeft]:'left',[PS_BUTTON.dpadRight]:'right'} as const)[direction];
+      f.setFix=held(B.r2);
+      if(restart.attacking){
+        if(held(B.switchPlayer)&&edge(PS_BUTTON.dpadUp))f.secondTaker='side';
+        if(held(B.switchPlayer)&&edge(PS_BUTTON.dpadDown))f.secondTaker='behind';
+        if(held(B.l2))f.secondKick=true;
+        const buttons=[B.pass,B.cross,B.shot];
+        if(restart.kind!=='kickoff')for(let i=0;i<buttons.length;i++){
+          const button=buttons[i];
+          if(held(button)&&this.setArmed[slot][i]&&!this.setSpent[slot][i])this.setCharge[slot][i]=Math.min(1,this.setCharge[slot][i]+1/51);
+          if(!held(button)&&prev[button]){
+            if(!this.setSpent[slot][i]&&this.setCharge[slot][i]>0){f.action=(['pass','cross','shoot'] as const)[i];f.power=Math.max(.15,this.setCharge[slot][i]);f.setKick=true;if(i===0&&this.setRoll[slot])f.shortRoll=true;if(i===2&&this.setPanenka[slot])f.panenka=true;}
+            this.setCharge[slot][i]=0;this.setSpent[slot][i]=false;
+            if(i===0)this.setRoll[slot]=false;if(i===2)this.setPanenka[slot]=false;
+          }
+          if(!held(button))this.setArmed[slot][i]=true;
+        }
+        if(restart.kind==='penalty'&&edge(B.shot)&&held(B.switchPlayer))this.setPanenka[slot]=true;
+        if(edge(B.pass)&&held(B.switchPlayer))this.setRoll[slot]=true;
+        if((restart.kind==='free-kick'||restart.kind==='indirect')&&held(B.cross)&&edge(B.pass)){
+          f.setFeint=true;this.setSpent[slot][0]=true;this.setSpent[slot][1]=true;f.action=undefined;f.setKick=undefined;
+        }
+        if(!held(B.shot)&&!prev[B.shot])this.setPanenka[slot]=false;
+        if(!held(B.pass)&&!prev[B.pass])this.setRoll[slot]=false;
+      }else{
+        if((restart.kind==='free-kick'||restart.kind==='indirect')&&edge(B.shot)&&!held(B.pass))f.wallJump=true;
+        if((restart.kind==='free-kick'||restart.kind==='indirect')&&held(B.cross)){this.wallCharge[slot]=Math.min(1,this.wallCharge[slot]+1/51);f.wallCharge=this.wallCharge[slot];}else this.wallCharge[slot]=0;
+        if((restart.kind==='free-kick'||restart.kind==='indirect')&&held(B.through)&&length(f.move)>.1)f.keeperMove=f.move;
+        if(restart.kind==='penalty'&&length(f.move)>.1)f.keeperMove=f.move;
+      }
+    }
     // Foul dive: all four chord buttons held in this sample and R2 not held, on the edge.
     const chordCore=held(B.switchPlayer)&&held(B.l2)&&held(B.l3)&&held(B.keeper);
     const chord=chordCore&&!held(B.r2);
@@ -94,14 +142,14 @@ export class ControllerMapper {
     // one ✕ press dives even at head height. Outside defense and the aerial band
     // the keeper keeps the attack keys, as before. The holder of the ball uses
     // the attack keys in every context: ✕ throws, △ throws into space.
-    const dive=keeper&&(defending||aerial)&&!hold;
+    const dive=!restart&&keeper&&(defending||aerial)&&!hold;
     if(dive){
       this.tackleTap[slot]=-1;
       if(edge(B.tackle))f.action='tackle';
       if(edge(B.cross))f.action='slide';
       // A □ press spent at head height never becomes a shot release.
       if(aerial&&edge(B.shot))this.armed[slot]=false;
-    }else if(aerial&&!hold){
+    }else if(aerial&&!hold&&!restart){
       // Header row: □, ✕, △ and ○ head the ball instead of their kick.
       // The double tap never arms in the air and □ skips its shot charge.
       this.tackleTap[slot]=-1;
@@ -109,25 +157,26 @@ export class ControllerMapper {
       // The header spends the □ press: disarm the shot until □ is up, so the
       // release never fires a shot.
       if(edge(B.shot))this.armed[slot]=false;
-    }else if(defending&&!hold){
+    }else if(defending&&!hold&&!restart){
       // Pressure is a missing mechanic (phase 2), so the first tap only arms the
       // tackle and the second tap inside the window fires it.
       if(edge(B.tackle)){if(this.tackleTap[slot]>=0&&tick-this.tackleTap[slot]<=TACKLE_TAP_TICKS){f.action='tackle';this.tackleTap[slot]=-1;}else this.tackleTap[slot]=tick;}
       if(edge(B.cross))f.action='slide';
     }else{
       this.tackleTap[slot]=-1;
-      if(edge(B.pass)&&!f.keeperFeint)f.action='pass';
+      if(edge(B.pass)&&!f.keeperFeint&&!restart)f.action='pass';
       // While the ball is in the hands ○ is the punt charge, never a cross.
-      if(edge(B.cross)&&!hold)f.action=held(B.switchPlayer)?'lob':'cross';
+      if(edge(B.cross)&&!hold&&!restart)f.action=held(B.switchPlayer)?'lob':'cross';
       // A feint in this sample wins over the △ edge of the same sample.
-      if(edge(B.through)&&!f.keeperFeint)f.action='through';
+      if(edge(B.through)&&!f.keeperFeint&&(!restart||restart.attacking))f.action='through';
     }
     // At head height □ heads at once and never charges. Otherwise □ charges in
     // both contexts: shot with the ball, clearance without it. A press spent on a
     // header stays disarmed until the release, so the release gives no shot and
     // the next press charges again. The holder of the ball keeps the charge at
     // head height, because the kick never heads.
-    if(aerial&&!hold){this.charge[slot]=0;if(!held(B.shot))this.armed[slot]=true;}
+    if(restart){this.charge[slot]=0;if(!held(B.shot))this.armed[slot]=true;}
+    else if(aerial&&!hold){this.charge[slot]=0;if(!held(B.shot))this.armed[slot]=true;}
     else if(held(B.shot)&&this.armed[slot])this.charge[slot]=Math.min(1,this.charge[slot]+1/51);
     else if(!held(B.shot)){if(prev[B.shot]&&this.armed[slot]){f.action='shoot';f.power=Math.max(.15,this.charge[slot]);}this.charge[slot]=0;this.armed[slot]=true;}
     f.sprint=held(B.sprint);
@@ -138,7 +187,7 @@ export class ControllerMapper {
     // Hold △ without the ball: run out to the ball; R1 adds the sprint rush.
     if(keeper&&!hold&&held(B.through))f.keeperRush=true;
     // The chord never switches cursor or player in the same sample.
-    f.switchPlayer=edge(B.switchPlayer)&&!held(B.pass)&&!held(B.cross)&&!chordCore;
+    f.switchPlayer=!restart&&edge(B.switchPlayer)&&!held(B.pass)&&!held(B.cross)&&!chordCore;
     f.switchKeeper=edge(B.keeper)&&!chordCore;
     this.previous[slot]=pressed;this.lastTick[slot]=tick;this.cached[slot]=f;return structuredClone(f);
   }
