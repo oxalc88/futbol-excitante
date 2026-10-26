@@ -176,11 +176,110 @@ test('l1 + r2 held together reads r3 and no l1 or r2', () => {
   const f = sample(pad, mapper, 2);
   assert.equal(f.switchKeeper, true, 'the combo edges r3');
   assert.equal(f.switchPlayer, false, 'the combo never switches player');
-  // The l1 lift ends the combo: r2 reads alone again and r3 is up.
+  // The l1 lift keeps the latch: r2 stays consumed and r3 stays down, so the
+  // lone r2 never reads and no second switch fires.
   pad.release(1);
-  assert.equal(pad.reading(true).buttons[PS_BUTTON.r2].pressed, true);
-  assert.equal(pad.reading(true).buttons[PS_BUTTON.r3].pressed, false);
-  assert.equal(sample(pad, mapper, 3).switchKeeper, false);
+  const latched = pad.reading(true);
+  assert.equal(latched.buttons[PS_BUTTON.l1].pressed, false);
+  assert.equal(latched.buttons[PS_BUTTON.r2].pressed, false, 'the still-held r2 stays consumed');
+  assert.equal(latched.buttons[PS_BUTTON.r3].pressed, true, 'the latch holds r3 up until both lift');
+  const g = sample(pad, mapper, 3);
+  assert.equal(g.switchKeeper, false, 'the l1 lift gives no second keeper switch');
+  assert.equal(g.switchPlayer, false, 'the l1 lift gives no player switch');
+  // Both up: the latch ends and the reading is clean again.
+  pad.release(2);
+  const up = pad.reading(true);
+  assert.equal(up.buttons[PS_BUTTON.r2].pressed, false);
+  assert.equal(up.buttons[PS_BUTTON.r3].pressed, false);
+  const h = sample(pad, mapper, 4);
+  assert.equal(h.switchKeeper, false);
+  assert.equal(h.switchPlayer, false);
+});
+
+test('keeper combo latches through either release order and one re-press', () => {
+  for (const first of ['l1', 'r2'] as const) {
+    const second: 'l1' | 'r2' = first === 'l1' ? 'r2' : 'l1';
+    const pad = new TouchPad();
+    const mapper = new ControllerMapper();
+    assert.equal(sample(pad, mapper, 0).switchPlayer, false, `${first}: first sample`);
+    pad.press(1, first);
+    sample(pad, mapper, 1);
+    pad.press(2, second);
+    const combo = sample(pad, mapper, 2);
+    assert.equal(combo.switchKeeper, true, `${first}+${second}: the combo edges r3 once`);
+    assert.equal(combo.switchPlayer, false, `${first}+${second}: no player switch`);
+    // Release order 1: the pointer of the FIRST button lifts, the other stays.
+    pad.release(1);
+    const afterLift = sample(pad, mapper, 3);
+    assert.equal(afterLift.switchKeeper, false, `${first} lift: no extra keeper switch`);
+    assert.equal(afterLift.switchPlayer, false, `${first} lift: no player switch`);
+    const heldReading = pad.reading(true);
+    assert.equal(heldReading.buttons[PS_BUTTON.l1].pressed, false, `${first} lift: l1 consumed`);
+    assert.equal(heldReading.buttons[PS_BUTTON.r2].pressed, false, `${first} lift: r2 consumed`);
+    assert.equal(heldReading.buttons[PS_BUTTON.r3].pressed, true, `${first} lift: the latch keeps r3`);
+    // Re-press the released button while the other still holds: same reading.
+    pad.press(3, first);
+    const rePress = sample(pad, mapper, 4);
+    assert.equal(rePress.switchKeeper, false, `${first} re-press: no extra keeper switch`);
+    assert.equal(rePress.switchPlayer, false, `${first} re-press: no player switch`);
+    const reReading = pad.reading(true);
+    assert.equal(reReading.buttons[PS_BUTTON.l1].pressed, false, `${first} re-press: l1 consumed`);
+    assert.equal(reReading.buttons[PS_BUTTON.r2].pressed, false, `${first} re-press: r2 consumed`);
+    assert.equal(reReading.buttons[PS_BUTTON.r3].pressed, true, `${first} re-press: r3 stays down`);
+    // Release order 2: the last two pointers lift, the latch ends.
+    pad.release(3);
+    pad.release(2);
+    const clean = sample(pad, mapper, 5);
+    assert.equal(clean.switchKeeper, false, `${first}: both up, no edge`);
+    assert.equal(clean.switchPlayer, false, `${first}: both up, no edge`);
+    const cleanReading = pad.reading(true);
+    assert.equal(cleanReading.buttons[PS_BUTTON.r3].pressed, false, `${first}: the latch is open`);
+    // Fresh L1 after both up switches player, and the next combo still works.
+    pad.press(1, 'l1');
+    assert.equal(sample(pad, mapper, 6).switchPlayer, true, `${first}: fresh l1 after both up`);
+    pad.press(2, 'r2');
+    const next = sample(pad, mapper, 7);
+    assert.equal(next.switchKeeper, true, `${first}: the next combo switches the keeper`);
+    assert.equal(next.switchPlayer, false, `${first}: the next combo never switches player`);
+  }
+});
+
+test('the latch ends when both buttons lift between two readings', () => {
+  const pad = new TouchPad();
+  const mapper = new ControllerMapper();
+  assert.equal(sample(pad, mapper, 0).switchPlayer, false);
+  pad.press(1, 'l1');
+  pad.press(2, 'r2');
+  assert.equal(sample(pad, mapper, 1).switchKeeper, true, 'the combo edges r3');
+  // Both pointers lift with no reading in between, then a fresh l1 presses.
+  pad.release(1);
+  pad.release(2);
+  pad.press(1, 'l1');
+  const reading = pad.reading(true);
+  assert.equal(reading.buttons[PS_BUTTON.l1].pressed, true, 'the fresh l1 reads alone');
+  assert.equal(reading.buttons[PS_BUTTON.r3].pressed, false, 'the latch already ended');
+  const f = sample(pad, mapper, 2);
+  assert.equal(f.switchPlayer, true, 'the fresh l1 after both up switches player');
+  assert.equal(f.switchKeeper, false);
+  // The next combo still gives its own keeper switch.
+  pad.press(2, 'r2');
+  assert.equal(sample(pad, mapper, 3).switchKeeper, true, 'the next combo switches the keeper');
+});
+
+test('clear drops the keeper latch', () => {
+  const pad = new TouchPad();
+  const mapper = new ControllerMapper();
+  assert.equal(sample(pad, mapper, 0).switchPlayer, false);
+  pad.press(1, 'l1');
+  pad.press(2, 'r2');
+  assert.equal(sample(pad, mapper, 1).switchKeeper, true, 'the combo edges r3');
+  pad.clear();
+  pad.press(1, 'l1');
+  const reading = pad.reading(true);
+  assert.equal(reading.buttons[PS_BUTTON.l1].pressed, true, 'after clear the l1 is a fresh press');
+  assert.equal(reading.buttons[PS_BUTTON.r3].pressed, false);
+  assert.equal(sample(pad, mapper, 2).switchPlayer, true, 'the l1 switches player again');
+  assert.equal(sample(pad, mapper, 2).switchKeeper, false);
 });
 
 test('keeper dive labels win over the aerial row, as the mapper dives', () => {

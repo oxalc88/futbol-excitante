@@ -51,6 +51,11 @@ export class TouchPad {
   private buttons = new Map<number, Set<TouchButton>>();
   // Set by cancel(): the next reading must not turn a lift into a release.
   private cancelled = false;
+  // Keeper combo latch: once L1 and R2 were held together, both buttons stay
+  // consumed until BOTH physically lift, in any release order. A re-press of
+  // the lifted button while the other stays held never re-edges R3, so the
+  // combo gives exactly one keeper switch.
+  private keeperLatch = false;
 
   /** Starts the stick at the origin for the first pointer only. */
   stickDown(id: number, x: number, y: number): boolean {
@@ -88,10 +93,13 @@ export class TouchPad {
     set.add(b);
   }
 
-  /** Lift of pointer `id` anywhere: drop its buttons and its stick. */
+  /** Lift of pointer `id` anywhere: drop its buttons and its stick. The
+   * keeper latch ends here when the last of L1 / R2 lifts, so a release that
+   * happens between two readings still opens the latch. */
   release(id: number) {
     this.buttons.delete(id);
     this.stickUp(id);
+    if (this.keeperLatch && !this.held('l1') && !this.held('r2')) this.keeperLatch = false;
   }
 
   /** System cancel of pointer `id`: drop its buttons and arm the discard,
@@ -117,13 +125,19 @@ export class TouchPad {
   /** Drops all pointers, the stick and the axes. */
   clear() {
     this.buttons.clear(); this.stickId = -1; this.ox = 0; this.oy = 0; this.ax = 0; this.ay = 0; this.cancelled = false;
+    this.keeperLatch = false;
   }
 
   /** Standard-mapping reading that ControllerMapper consumes. L1 + R2 held
    * together is the touch keeper switch: the reading presses R3 only, so it
-   * never also switches player through the L1 edge. */
+   * never also switches player through the L1 edge. The latch then keeps both
+   * buttons consumed until both physically lift, whatever the release order. */
   reading(connected: boolean): PadReading {
-    const keeperSwitch = this.held('l1') && this.held('r2');
+    const l1 = this.held('l1');
+    const r2 = this.held('r2');
+    if (l1 && r2) this.keeperLatch = true;
+    else if (!l1 && !r2) this.keeperLatch = false;
+    const keeperSwitch = this.keeperLatch;
     const buttons: { pressed: boolean }[] = [];
     for (let i = 0; i < 17; i++) {
       const b = TOUCH_BY_INDEX[i];
