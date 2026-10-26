@@ -572,6 +572,82 @@ try {
     }
     await context.close();
   }
+  // 9: No pad control over the HUD: every visible pad button rect against every
+  // visible HUD rect (top toolbar controls, scoreboard, radar, #set-hint), in
+  // attack, defence and a set piece, at two landscape phone sizes; then pause
+  // is tapped with the pad visible.
+  stage='hud-overlap';
+  const HUD_SEL = ['#pause-btn','#camera-btn','#stats-btn','#sound-btn','#sound-volume',
+    '#fullscreen-btn','.field-toolbar','.scoreboard','#radar','#set-hint'];
+  for (const [W, H] of [[844, 390], [932, 430]]) {
+    const { context, page } = await newPage(W, H, true);
+    await beginPlay(page);
+    const sample = async (state) => {
+      const { pad, hud } = await page.evaluate((sels) => {
+        const rect = el => { const r = el.getBoundingClientRect();
+          return { x: r.x, y: r.y, w: r.width, h: r.height }; };
+        const visible = el => {
+          if (!el || el.hidden || el.getClientRects().length === 0) return false;
+          const cs = getComputedStyle(el);
+          if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+          const r = el.getBoundingClientRect();
+          return r.width > 0 && r.height > 0;
+        };
+        const pad = [...document.querySelectorAll('.tp-btn')].filter(visible)
+          .map(el => ({ name: el.dataset.touch, ...rect(el) }));
+        const hud = [];
+        for (const sel of sels) for (const el of document.querySelectorAll(sel))
+          if (visible(el)) hud.push({ name: sel, ...rect(el) });
+        return { pad, hud };
+      }, HUD_SEL);
+      check(pad.length === 7, `${W}x${H} ${state}: expected 7 visible pad buttons, found ${pad.length}`);
+      for (const b of pad)
+        check(b.w >= 56 && b.h >= 56, `${W}x${H} ${state}: pad ${b.name} is ${b.w}x${b.h}, below 56x56`);
+      for (const sel of ['#pause-btn', '.scoreboard', '#radar'])
+        check(hud.some(h => h.name === sel), `${W}x${H} ${state}: ${sel} is not in the HUD sample`);
+      if (state === 'set-piece')
+        check(hud.some(h => h.name === '#set-hint'), `${W}x${H} ${state}: #set-hint is not in the HUD sample`);
+      let minGap = Infinity, closest = null;
+      for (const a of pad) for (const b of hud) {
+        const gap = Math.max(b.x - (a.x + a.w), a.x - (b.x + b.w),
+          b.y - (a.y + a.h), a.y - (b.y + b.h));
+        if (gap < minGap) { minGap = gap; closest = `${a.name} over ${b.name}`; }
+        check(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y,
+          `${W}x${H} ${state}: pad ${a.name} ${JSON.stringify(a)} overlaps HUD ${b.name} ${JSON.stringify(b)}`);
+      }
+      await evidence(page, `9-hud-${W}x${H}-${state}`,
+        { width: W, height: H, state, minGap, closest, pad, hud });
+    };
+    await runHook(page, 'ballAtFeet', 0);
+    await waitRow(page, ROWS.attack);
+    await sample('attack');
+    await runHook(page, 'ballAtFeet', 1);
+    await waitRow(page, ROWS.defence);
+    await sample('defence');
+    await forceFreeKick(page, 0);
+    await sample('set-piece');
+    // Pause tapped with the pad on top of the screen: the HUD keeps the hit.
+    const c = await page.evaluate(() => {
+      const r = document.querySelector('#pause-btn').getBoundingClientRect();
+      return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+    });
+    const under = await page.evaluate(([x, y]) => {
+      const target = document.querySelector('#pause-btn');
+      const el = document.elementFromPoint(x, y);
+      return { ok: !!el && (el === target || target.contains(el)),
+        hit: el ? `${el.tagName.toLowerCase()}#${el.id || ''}.${el.className || ''}` : 'none' };
+    }, [c.x, c.y]);
+    check(under.ok, `${W}x${H}: #pause-btn centre (${c.x},${c.y}) is covered by ${under.hit}`);
+    const ps = await padState(page);
+    check(ps.touchOn && !ps.padHidden, `${W}x${H}: the touch pad is not visible before the pause tap`);
+    await page.touchscreen.tap(c.x, c.y);
+    await page.waitForFunction(() => window.__fe?.paused === true
+      && !document.querySelector('#pause-overlay').hidden, null, {timeout:5000, polling:100});
+    check(await page.evaluate(() => window.__fe?.paused === true
+      && !document.querySelector('#pause-overlay').hidden), `${W}x${H}: pause did not stick`);
+    await evidence(page, `9-hud-${W}x${H}-paused`, { paused: true, pauseCenter: { x: c.x, y: c.y } });
+    await context.close();
+  }
 } catch (e) { errors.push(`fatal (${stage}): ${e.message}`);
   try { results.push({failureState:await activePage?.evaluate(() => ({
     phase: window.__fe?.phase, padHidden: document.querySelector('#touch-pad')?.hidden ?? null }))}); } catch {}
