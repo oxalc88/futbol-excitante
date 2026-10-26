@@ -61,3 +61,15 @@ dialog{overflow:auto}
    ~83px in the short landscape HUD) without ever touching the radar. */
 #set-hint{position:absolute;bottom:150px;width:100%;text-align:center;font-size:.875rem;font-weight:700;letter-spacing:.04em;color:#fff6d8;text-shadow:0 1px 3px #122;pointer-events:none}
 @media(max-height:560px) and (orientation:landscape){#set-hint{bottom:112px}}
+
+/* Touch HUD: in touch mode the top toolbar is one compact 44px row and the
+   shoulders sit in a column left of the face diamond, so no pad control covers
+   pause, view, volume, fullscreen, the scoreboard, the radar or #set-hint. */
+body.touch-on .field-toolbar{flex-direction:row;align-items:center;gap:4px;top:calc(var(--sa-top) + 7px);right:calc(var(--sa-right) + 10px)}
+body.touch-on .field-toolbar button{min-width:44px;min-height:44px;height:44px;padding:0 8px}
+body.touch-on .field-toolbar label{flex-direction:row;align-items:center;font-size:0;gap:0;height:44px}
+body.touch-on #sound-volume{width:90px;height:44px}
+body.touch-on .tp-r1{right:calc(var(--sa-right) + 180px);bottom:calc(var(--sa-bottom) + 16px)}
+body.touch-on .tp-r2{right:calc(var(--sa-right) + 190px);bottom:calc(var(--sa-bottom) + 100px)}
+body.touch-on .tp-l1{right:calc(var(--sa-right) + 190px);bottom:calc(var(--sa-bottom) + 164px)}
+body.touch-on #set-hint{left:calc(var(--sa-left) + 8px);right:calc(var(--sa-right) + 272px);width:auto}
