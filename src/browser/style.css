@@ -56,4 +56,8 @@ dialog{overflow:auto}
 .tips-list li{position:relative;padding:12px 0 12px 22px;border-bottom:1px solid var(--line);font-size:.9375rem;line-height:1.55;color:#c8d6d7}
 .tips-list li::before{content:"›";position:absolute;left:2px;top:12px;color:var(--gold);font-weight:900}
 .tips-list b{color:var(--gold);font-weight:700}
-#set-hint{position:absolute;bottom:110px;width:100%;text-align:center;font-size:.875rem;font-weight:700;letter-spacing:.04em;color:#fff6d8;text-shadow:0 1px 3px #122;pointer-events:none}
+/* Set-piece hint: a reserved band above the radar and the rest of the bottom HUD.
+   The bottom offsets clear the tallest bottom-HUD row (radar top ~136px desktop,
+   ~83px in the short landscape HUD) without ever touching the radar. */
+#set-hint{position:absolute;bottom:150px;width:100%;text-align:center;font-size:.875rem;font-weight:700;letter-spacing:.04em;color:#fff6d8;text-shadow:0 1px 3px #122;pointer-events:none}
+@media(max-height:560px) and (orientation:landscape){#set-hint{bottom:112px}}

@@ -188,6 +188,76 @@ try {
   const evidence = async (page, step, details={}) => { check(errors.length===0, errors.join('; '));
     await page.screenshot({path:`${shots}/${step}.png`}); results.push({step,...details});
     console.log(`touch-e2e: ${step} passed`); };
+  // Waits until the match plays again: a pass press ends a waiting kickoff or a
+  // human restart of team 0, and the countdown ends any other one.
+  const waitPlaying = async (page, timeout = 30000) => {
+    const end = Date.now() + timeout;
+    while (Date.now() < end) {
+      if ((await page.evaluate(() => window.__fe?.phase ?? '')) === 'playing') return;
+      await page.keyboard.press('KeyJ');
+      await page.waitForTimeout(250);
+    }
+    throw new Error('Match did not reach the playing phase');
+  };
+  // Forces a waiting free kick with the smoke hook. Only a state where the
+  // waiting restart really is the free kick of `team` and the HUD shows that
+  // team's own long help line passes: a leftover kickoff or free-kick hint of
+  // the other team never does. No keyboard here, the hook alone changes state.
+  const forceFreeKick = async (page, team, previous = '') => {
+    const marker = team === 0 ? '2º lanzador' : 'barrera';
+    for (let i = 0; i < 80; i++) {
+      const s = await page.evaluate(([t, prev, mark]) => {
+        window.__feSmoke?.setPiece?.('free-kick', t);
+        const state = window.__feSmoke?.setPieceState?.();
+        const hint = document.querySelector('#set-hint');
+        return { phase: window.__fe?.phase ?? '', kind: state?.restart?.kind ?? null,
+          team: state?.restart?.team ?? null, hidden: hint ? hint.hidden : true,
+          text: (hint?.textContent ?? '').replace(/\s+/g, ' ').trim(), prev, mark };
+      }, [team, previous, marker]);
+      if (s.phase === 'free-kick' && s.kind === 'free-kick' && s.team === team
+        && !s.hidden && s.text !== s.prev && s.text.includes(s.mark)) return s;
+      await page.waitForTimeout(250);
+    }
+    throw new Error(`Smoke hook setPiece(free-kick,${team}) never produced the waiting free kick`);
+  };
+  // Boxes of the set-piece hint, the radar and both viewports, for stage 8.
+  const hintLayout = (page) => page.evaluate(() => {
+    const box = (sel) => {
+      const el = document.querySelector(sel);
+      if (!el) return null;
+      const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+      return { text: (el.textContent ?? '').replace(/\s+/g, ' ').trim(), hidden: !!el.hidden,
+        visible: el.getClientRects().length > 0 && cs.display !== 'none'
+          && cs.visibility !== 'hidden' && Number(cs.opacity) > 0,
+        x: r.x, y: r.y, w: r.width, h: r.height };
+    };
+    const v = document.querySelector('#viewport').getBoundingClientRect();
+    return { hint: box('#set-hint'), radar: box('#radar'), boxes: {
+      viewport: { x: v.x, y: v.y, w: v.width, h: v.height },
+      window: { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight },
+    } };
+  });
+  // Real text, visible, finite positive box, inside both viewports, clear of the radar.
+  const assertHintBand = (name, data) => {
+    check(!!data.hint, `${name}: #set-hint is missing`);
+    check(data.hint.hidden === false && data.hint.visible,
+      `${name}: #set-hint is not visible (${JSON.stringify(data.hint)})`);
+    check(data.hint.text.length > 0, `${name}: #set-hint has no text`);
+    check(data.hint.text.length > 20, `${name}: #set-hint is not the long help line: ${data.hint.text}`);
+    check(!!data.radar && data.radar.visible && !data.radar.hidden, `${name}: #radar is not visible`);
+    for (const [sel, b] of [['#set-hint', data.hint], ['#radar', data.radar]]) {
+      check([b.x, b.y, b.w, b.h].every(Number.isFinite) && b.w > 0 && b.h > 0,
+        `${name}: ${sel} rect is not finite and positive (${b.x},${b.y},${b.w},${b.h})`);
+      for (const [where, frame] of Object.entries(data.boxes)) {
+        check(b.x >= frame.x && b.y >= frame.y && b.x + b.w <= frame.x + frame.w
+          && b.y + b.h <= frame.y + frame.h,
+          `${name}: ${sel} leaves the ${where} (${JSON.stringify(b)} in ${JSON.stringify(frame)})`);
+      }
+    }
+    const h = data.hint, r = data.radar;
+    const apart = h.x + h.w <= r.x || r.x + r.w <= h.x || h.y + h.h <= r.y || r.y + r.h <= h.y;
+    check(apart, `${name}: #set-hint intersects #radar (hint ${JSON.stringify(h)} radar ${JSON.stringify(r)})`);
+  };
 
   // 1: Landscape phone with touch: 7 round buttons, all inside the safe areas,
   // and no rectangular text action button left outside the pad during play.
@@ -421,6 +491,60 @@ try {
       power: window.__fe.shots.power[0] }));
     check(after.actions === before, `pointercancel executed the charged shot (${before} → ${after.actions})`);
     await evidence(page, '7-cancel', { before, after: after.actions });
+    await context.close();
+  }
+
+  // 8: The set-piece hint keeps its own band above the radar: real text, visible,
+  // inside the viewport and never over the radar, with the pad shown only on touch.
+  stage='set-hint';
+  for (const spec of [
+    { name: '8a-hint-desktop', width: 1280, height: 720, hasTouch: false, defending: false },
+    { name: '8b-hint-touch', width: 844, height: 390, hasTouch: true, defending: true },
+  ]) {
+    const { context, page } = await newPage(spec.width, spec.height, spec.hasTouch);
+    if (spec.hasTouch) await beginPlay(page);
+    else { await startLocal(page); await waitPlaying(page); }
+    const pad = await padState(page);
+    if (spec.hasTouch) {
+      check(pad.touchOn, `${spec.name}: body.touch-on is missing on the touch page`);
+      check(!pad.padHidden, `${spec.name}: #touch-pad is hidden on the touch page`);
+    } else {
+      check(!pad.touchOn, `${spec.name}: body.touch-on is set without touch`);
+      check(pad.padHidden, `${spec.name}: #touch-pad is visible without touch`);
+    }
+    // Fresh pad state right before every geometry sample and screenshot: the
+    // values written to the evidence must describe the very saved frame.
+    const freshPad = async () => {
+      const p = await padState(page);
+      if (spec.hasTouch) {
+        check(p.touchOn, `${spec.name}: body.touch-on is missing on the touch page`);
+        check(!p.padHidden, `${spec.name}: #touch-pad is hidden on the touch page`);
+      } else {
+        check(!p.touchOn, `${spec.name}: body.touch-on is set without touch`);
+        check(p.padHidden, `${spec.name}: #touch-pad is visible without touch`);
+      }
+      return p;
+    };
+    // Attacking long help line: setPiece(free-kick, 0).
+    await forceFreeKick(page, 0);
+    const padAttack = await freshPad();
+    const attack = await hintLayout(page);
+    assertHintBand(`${spec.name}-attack`, attack);
+    await evidence(page, `${spec.name}-attack`, { width: spec.width, height: spec.height,
+      hasTouch: spec.hasTouch, touchOn: padAttack.touchOn, padHidden: padAttack.padHidden,
+      hint: attack.hint, radar: attack.radar, boxes: attack.boxes });
+    // Defending long help line: a free kick of team 1 on the touch layout.
+    if (spec.defending) {
+      await forceFreeKick(page, 1, attack.hint.text);
+      const padDefend = await freshPad();
+      const defend = await hintLayout(page);
+      check(defend.hint.text !== attack.hint.text,
+        `Defending hint repeats the attacking line: ${defend.hint.text}`);
+      assertHintBand(`${spec.name}-defend`, defend);
+      await evidence(page, `${spec.name}-defend`, { width: spec.width, height: spec.height,
+        hasTouch: spec.hasTouch, touchOn: padDefend.touchOn, padHidden: padDefend.padHidden,
+        hint: defend.hint, radar: defend.radar, boxes: defend.boxes });
+    }
     await context.close();
   }
 } catch (e) { errors.push(`fatal (${stage}): ${e.message}`);
