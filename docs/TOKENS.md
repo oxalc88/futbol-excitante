@@ -61,3 +61,7 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-25 | Set-piece e2e (#80) | Codex CLI | review | gpt-6.1-sol | medium | 1 | ~24,681 | — | — | codex exec "tokens used" (approximate) |
 
 Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty values at 03:16 Lima; PS4 pad preset values at 03:08 Lima; C7 part 3 values at 07:21 Lima; #76 values at 08:10 Lima; pad-smoke fix (#78) values at 08:33 Lima; keeper controls values at 11:33 Lima; keeper e2e values at 13:30 Lima (two mimo sessions gave no code, one hung 27 min; glm wrote the script); set-piece e2e values at 15:15 Lima (mimo wrote the hooks and the script; glm and Sol did not write) (pi total includes cached input; one pi session was stopped before it wrote code). C10 (#68), C5 (#69), static build (#70) and sound (#71) values are final.
+| 2026-10-25 | PS touch pad | pi | write | nan/mimo-v2.6-flash | default | 8 | 9,645,377 | 537,814 | 222,315 | ~/.pi/agent/sessions (wt-touchpad) |
+| 2026-10-25 | PS touch pad | pi | write | nan/glm5.3-flash | default | 5 | 4,795,561 | 270,446 | 101,435 | ~/.pi/agent/sessions (wt-touchpad) |
+| 2026-10-25 | PS touch pad | Codex CLI | write | gpt-6.1-sol | medium | 3 | ~37,781,770 | ~315,052 | ~66,993 | ~/.codex/sessions mentioning wt-touchpad (approximate) |
+| 2026-10-25 | PS touch pad | Codex CLI | review | gpt-6.1-sol | medium | 3 | ~1,324,235 | ~207,415 | ~8,288 | ~/.codex/sessions mentioning wt-touchpad (approximate) |
