@@ -4,7 +4,7 @@
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { connect } from 'node:net';
-import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 const require = createRequire(process.env.PLAYWRIGHT_CORE_DIR ? `${process.env.PLAYWRIGHT_CORE_DIR}/` : import.meta.url);
@@ -17,6 +17,12 @@ const shots = 'artifacts/local/touch-e2e';
 const mirror = '/workspace/touch-e2e';
 mkdirSync(out, { recursive: true });
 mkdirSync(shots, { recursive: true });
+
+// The pure pass-evidence helper of tests/touch-pass-evidence.test.ts, injected
+// into every page: the same source with the export keywords stripped so it runs
+// as a classic script and hangs the pure functions off window.
+const helperSource = readFileSync(new URL('./touch-pass-evidence.mjs', import.meta.url), 'utf8');
+const helperInit = `window.__touchPassEvidence=(()=>{\n${helperSource.replace(/^export\s+/gm, '')}\nreturn {beginPassEvidence,recordPassSample,passEvidenceVerdict};})();`;
 
 // Stop if another server uses the port.
 const portBusy = await new Promise((resolve) => {
@@ -87,6 +93,7 @@ try {
     page.on('console', m => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(m.text()); });
     page.on('response', r => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`HTTP ${r.status()} ${r.url()}`); });
     await page.addInitScript(() => { try { localStorage.setItem('fe.tipsSeen','1'); } catch {} });
+    await page.addInitScript({ content: helperInit });
     return { context, page };
   };
 
@@ -345,30 +352,48 @@ try {
     const sprintFrame = await page.evaluate(() =>
       window.__fe.frames.find(f => f.slot === 0 && f.sprint === true && f.move.x > 0.5) ?? null);
     check(!!sprintFrame, 'No slot-0 frame with sprint and move.x > 0.5');
-    // Strict pass evidence: the slot-0 pass counter must grow, and the ball
-    // must leave to the selected player's touch (or a team-0 pass event must
-    // fire). An opponent touch or a stray speed jump does not count.
-    const prePass = await page.evaluate(() => ({ pass: window.__fe.passes.actions[0],
-      passEvents: window.__fe.passes.events[0], selected: window.__fe.selected[0],
-      touch: window.__fe.ball.lastTouch?.playerId ?? null,
-      speed: Math.hypot(window.__fe.ball.vx, window.__fe.ball.vy) }));
-    check(await touchDown(page, '.tp-cross', 23), 'Pad ✕ button not found');
-    await page.waitForTimeout(150);
-    await touchUp(page, 23);
-    await page.waitForFunction(p => window.__fe.passes.actions[0] > p.pass
-      && (window.__fe.ball.lastTouch?.playerId === window.__fe.selected[0]
-        || window.__fe.passes.events[0] > p.passEvents), prePass,
-      {timeout:8000, polling:50});
-    const kicked = await page.evaluate(p => ({ pass: window.__fe.passes.actions[0],
-      passEvents: window.__fe.passes.events[0], selected: window.__fe.selected[0],
-      touch: window.__fe.ball.lastTouch?.playerId ?? null,
-      speed: Math.hypot(window.__fe.ball.vx, window.__fe.ball.vy) }), prePass);
-    check(kicked.pass > prePass.pass, `Slot-0 pass counter did not grow after ✕ (${prePass.pass} → ${kicked.pass})`);
-    check(kicked.touch === kicked.selected || kicked.passEvents > prePass.passEvents,
-      `Ball lastTouch ${kicked.touch} is not the slot-0 selected player ${kicked.selected} and no team-0 pass event fired`);
-    await evidence(page, '4a-multitouch', { sprint: sprintFrame,
-      pass: { before: prePass.pass, after: kicked.pass, touch: kicked.touch, selected: kicked.selected,
-        speed: kicked.speed } });
+    // Strict pass evidence: a NEW contact by the original passer after the
+    // press, at the exact contact tick of his own resolved pass action, plus
+    // proof that the ball left: a speed rise over the press sample, a growing
+    // distance from the passer, or a later touch by another player. A stale
+    // lastTouch, an action-start before the contact, a changed selected identity
+    // or an opponent-only touch never count. The accumulator and the recorder
+    // start BEFORE the press, so no contact frame can slip between the press and
+    // the observation.
+    const baseline = await page.evaluate(() => {
+      window.__passAttempt = window.__touchPassEvidence.beginPassEvidence(window.__fe);
+      window.__passVerdict = window.__touchPassEvidence.passEvidenceVerdict(window.__passAttempt);
+      window.__passRecorder = requestAnimationFrame(function tick() {
+        window.__passAttempt = window.__touchPassEvidence.recordPassSample(window.__passAttempt, window.__fe);
+        window.__passVerdict = window.__touchPassEvidence.passEvidenceVerdict(window.__passAttempt);
+        window.__passRecorder = requestAnimationFrame(tick);
+      });
+      return window.__passAttempt;
+    });
+    check(baseline.passerId !== null, 'No slot-0 player to pass with');
+    let verdict = null, failure = null;
+    try {
+      check(await touchDown(page, '.tp-cross', 23), 'Pad ✕ button not found');
+      await page.waitForTimeout(150);
+      await touchUp(page, 23);
+      await page.waitForFunction(() => window.__passVerdict.ok === true, null, {timeout:8000, polling:50});
+      verdict = await page.evaluate(() => window.__passVerdict);
+    } catch (e) {
+      // The failing accumulator carries the ticks that explain the miss: keep it
+      // and report it with the original error instead of hiding it.
+      failure = e;
+      verdict = await page.evaluate(() => window.__passVerdict).catch(() => null);
+    } finally {
+      await page.evaluate(() => {
+        if (window.__passRecorder !== null && window.__passRecorder !== undefined) {
+          cancelAnimationFrame(window.__passRecorder); window.__passRecorder = null;
+        }
+      }).catch(() => {});
+    }
+    check(!failure && verdict?.ok === true,
+      failure ? `Strict pass evidence failed: ${failure.message} · ${JSON.stringify(verdict)}`
+        : `Strict pass evidence missing: ${verdict?.reason ?? 'no verdict'} · ${JSON.stringify(verdict)}`);
+    await evidence(page, '4a-multitouch', { sprint: sprintFrame, pass: verdict });
     for (const id of [21, 22, 23]) await touchUp(page, id);
     await context.close();
   }
