@@ -19,7 +19,7 @@ npm run dev
 
 Abre la dirección que imprima Vite, elige equipos, modo y duración y pulsa **Jugar partido**. La CPU se calcula dentro del juego; no necesitas cuentas ni servicios externos.
 
-- **Tú contra la CPU:** teclado, mando estándar o controles táctiles.
+- **Tú contra la CPU:** teclado, mando estándar o mando táctil en pantalla.
 - **Dos jugadores locales:** dos mandos o teclado compartido con teclado numérico.
 - **CPU contra CPU:** partido autónomo.
 - **Repeticiones:** guarda un partido desde Estadísticas y carga el JSON desde el menú. Se reproduce el estado inicial y sus inputs, verificando el hash final. Los replays v2 requieren esta versión del motor; los antiguos v1 se rechazan.
@@ -50,7 +50,7 @@ Los partidos incluyen penaltis por faltas en el área, tarjetas, expulsión por 
 
 Pulsa un botón del mando para que el navegador lo detecte. El adaptador mantiene la identidad de los dos slots al desconectar un mando y suprime acciones que ya estaban pulsadas al reconectar. Las pruebas usan lecturas simuladas; la compatibilidad física depende del modelo, sistema operativo y navegador.
 
-Los controles táctiles incluyen joystick, todas las acciones, protección y tiro cargado al mantener y soltar. Se pueden activar manualmente en **Plan de juego → Controles táctiles → Mostrar**. En un saque humano, apunta y pulsa pase o tiro; al agotarse seis segundos se ejecuta automáticamente. Los penaltis siempre se lanzan hacia la portería rival.
+El mando táctil imita un mando PS: stick flotante en el 40 % izquierdo (aparece donde apoyas el pulgar, con zona muerta), ✕ ○ □ △ redondos a la derecha con una palabra que cambia en ataque, defensa y con el arquero con el balón, y R1 (correr), R2 y L1 (cambiar). Usa el mismo mapeo PS que el mando físico: □ tiro, ○ centro, ✕ pase, △ filtrado. Mantén para cargar y suelta para ejecutar; levantar el dedo en cualquier punto, también fuera del botón, ejecuta la acción. Deslizar el dedo a otro botón lo suma (amago). Aparece solo tras un toque real o con puntero táctil y se oculta al usar teclado o mando; nunca depende del tamaño de la ventana. En vertical pide girar el teléfono. En un saque humano, apunta y pulsa pase o tiro; al agotarse seis segundos se ejecuta automáticamente. Los penaltis siempre se lanzan hacia la portería rival.
 
 ## Laboratorio y evaluación
 

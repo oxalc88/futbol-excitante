@@ -24,6 +24,7 @@ const B={
 export class ControllerMapper {
   private slots:(string|null)[]=[null,null];
   private previous:boolean[][]=[[],[]];
+  private stash:(string|null)[]|null=null;
   private charge=[0,0];
   private armed=[false,false];
   // Charge of the keeper volley punt (○) per slot, while the ball is held.
@@ -35,6 +36,8 @@ export class ControllerMapper {
   private cameraStarts=new Map<string,boolean>();
   // Tick of the last defending ✕ tap, or -1 when no tackle is armed.
   private tackleTap=[-1,-1];
+  // Set-piece state of a slot: charge, spend and arm flags of the three kick
+  // buttons, the panenka and short-roll chords, the wall charge and the aim lock.
   private setCharge:number[][]=[[0,0,0],[0,0,0]];
   private setSpent:boolean[][]=[[false,false,false],[false,false,false]];
   private setArmed:boolean[][]=[[true,true,true],[true,true,true]];
@@ -42,7 +45,36 @@ export class ControllerMapper {
   private wallCharge=[0,0];
   private restartContext=[null,null] as (string|null)[];
   private setAim:Vec2[]=[{x:1,y:0},{x:-1,y:0}];private fixedAim:(Vec2|null)[]=[null,null];
+  /** Clears the transient sample state only. The identity stash of an active
+   * touch toggle survives: restoreSlots consumes it, so a reset while the touch
+   * pad owns slot 0 keeps the reversed physical slot ids. */
   reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
+  /** Frees both slots: the next sample assigns the pads again in list order. */
+  releaseSlots(){this.slots=[null,null];this.previous=[[],[]];}
+  /** Drops every set-piece charge and flag of a slot: a cancelled touch or a
+   * slot change must never fire a pending set kick. The restart context is
+   * forgotten too, so the next sample re-arms the buttons from their state. */
+  private clearSetState(slot:0|1){
+    this.setCharge[slot]=[0,0,0];this.setSpent[slot]=[false,false,false];this.setArmed[slot]=[true,true,true];
+    this.setPanenka[slot]=false;this.setRoll[slot]=false;this.wallCharge[slot]=0;this.fixedAim[slot]=null;this.restartContext[slot]=null;
+  }
+  /** The touch pad takes slot 0: stash the physical slot ids and reset only
+   * slot 0. Slot 1 keeps its pad, so no physical pad swaps slots. */
+  stashSlots(){
+    this.stash=[...this.slots];
+    this.slots[0]=null;this.previous[0]=[];this.charge[0]=0;this.armed[0]=false;
+    this.punt[0]=0;this.puntArmed[0]=true;this.lastTick[0]=-1;this.tackleTap[0]=-1;
+    this.clearSetState(0);
+  }
+  /** The touch pad leaves slot 0: put the stashed physical ids back. */
+  restoreSlots(){const ids=this.stash;this.stash=null;this.releaseSlots();if(ids)this.slots=[ids[0]??null,ids[1]??null];this.clearSetState(0);}
+  /** Drops the pending slot 0 releases: a cancelled touch pointer must not
+   * fire the shot, the keeper kick or a set kick on lift. The next sample
+   * re-seeds the previous state, so no false edge comes out either. */
+  discardCharge(){this.previous[0]=[];this.charge[0]=0;this.armed[0]=false;this.punt[0]=0;this.clearSetState(0);}
+  /** Charge level of a slot, for the HUD power meter. During a set piece the
+   * kick charge lives in the set-piece state, so the meter reads the larger. */
+  chargeLevel(slot:TeamIndex){return Math.max(this.charge[slot],...this.setCharge[slot]);}
   assignments(){return [...this.slots];}
   /** One press edge of a system button per pad. Disconnected pads forget their edge. */
   private startEdge(pads:readonly PadReading[],button:number,starts:Map<string,boolean>){
@@ -69,7 +101,7 @@ export class ControllerMapper {
     const contextChanged=context!==this.restartContext[slot];
     if(contextChanged){this.setCharge[slot]=[0,0,0];this.setSpent[slot]=[false,false,false];this.setPanenka[slot]=false;this.setRoll[slot]=false;this.wallCharge[slot]=0;this.fixedAim[slot]=null;this.restartContext[slot]=context;}
     const connected=pads.filter(p=>p.connected&&p.mapping==='standard');
-    for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.punt[i]=0;this.puntArmed[i]=true;this.lastTick[i]=-1;this.tackleTap[i]=-1;this.setCharge[i]=[0,0,0];this.setSpent[i]=[false,false,false];this.setPanenka[i]=false;this.setRoll[i]=false;}
+    for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.punt[i]=0;this.puntArmed[i]=true;this.lastTick[i]=-1;this.tackleTap[i]=-1;this.clearSetState(i as 0|1);}
     for(const p of connected){const id=identity(p);if(!this.slots.includes(id)){const i=this.slots.indexOf(null);if(i>=0){this.slots[i]=id;this.previous[i]=p.buttons.map(b=>b.pressed);this.armed[i]=!p.buttons[B.shot]?.pressed;this.setArmed[i]=[B.pass,B.cross,B.shot].map(button=>!p.buttons[button]?.pressed);}}}
     const p=connected.find(p=>identity(p)===this.slots[slot]);if(!p)return neutral();
     if(this.lastTick[slot]===tick)return structuredClone(this.cached[slot]);

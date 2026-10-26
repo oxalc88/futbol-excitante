@@ -56,6 +56,37 @@ test('two controller identities keep their slots after one disconnects, with no 
 test('controller charge fires once; dead zone, independent aim and pause edges are stable',()=>{
   const m=new ControllerMapper();m.sample([pad(0)],0,0);for(let t=1;t<30;t++)m.sample([pad(0,[2])],t,0);const shot=m.sample([pad(0,[],[.1,0,0,1])],30,0);assert.equal(shot.action,'shoot');assert(shot.power>.5);assert.equal(shot.move.x,0);assert.deepEqual(shot.aim,{x:0,y:1});assert.equal(m.sample([pad(0)],31,0).action,undefined);assert(!m.pauseRequested([pad(0)]));assert(m.pauseRequested([pad(0,[9])]));assert(!m.pauseRequested([pad(0,[9])]));m.reset();assert.equal(m.sample([pad(0,[0])],32,0).action,undefined);
 });
+/** The on-screen touch reading: it owns slot 0 only while the touch is active. */
+const touchPad=(buttons:number[]=[]):PadReading=>({index:99,id:'touch-pad',connected:true,mapping:'standard',axes:[0,0,0,0],buttons:Array.from({length:17},(_,i)=>({pressed:buttons.includes(i)}))});
+test('an input reset keeps the stashed slot identities across a touch toggle and fires no phantom action',()=>{
+  const m=new ControllerMapper();
+  // Physical order [pad1, pad0]: slot 0 owns pad1, slot 1 owns pad0.
+  m.sample([pad(1),pad(0)],0,0);m.sample([pad(1),pad(0)],0,1);
+  assert.deepEqual(m.assignments(),['1:pad1','0:pad0']);
+  // Touch takes slot 0: pad0 stays in slot 1, pad1 waits unassigned.
+  m.stashSlots();m.sample([touchPad(),pad(0),pad(1)],1,0);m.sample([touchPad(),pad(0),pad(1)],1,1);
+  assert.deepEqual(m.assignments(),['99:touch-pad','0:pad0']);
+  // Reset while the touch is active, with buttons still held on both pads.
+  m.reset();
+  assert.deepEqual(m.assignments(),['99:touch-pad','0:pad0']);
+  assert.equal(m.sample([touchPad([0]),pad(0,[2]),pad(1,[0])],2,0).action,undefined);
+  // Restore after re-enumeration: the pads come back listed as [pad0, pad1].
+  m.restoreSlots();
+  const held=m.sample([pad(0,[2]),pad(1,[0])],3,0),held1=m.sample([pad(0,[2]),pad(1,[0])],3,1);
+  assert.deepEqual(m.assignments(),['1:pad1','0:pad0']);
+  assert.equal(held.action,undefined);assert.equal(held1.action,undefined);
+  // The held buttons lift: neither release becomes an action.
+  const lift=m.sample([pad(0),pad(1)],4,0),lift1=m.sample([pad(0),pad(1)],4,1);
+  assert.equal(lift.action,undefined);assert.equal(lift1.action,undefined);
+  // Mapped movement stays on the pad of each slot, and the actions stay independent.
+  const s0=m.sample([pad(0,[],[0,-1,0,0]),pad(1,[0],[1,0,0,0])],5,0);
+  assert.deepEqual(s0.move,{x:1,y:0});assert.equal(s0.action,'pass');
+  const s1=m.sample([pad(0,[],[0,-1,0,0]),pad(1,[0],[1,0,0,0])],5,1);
+  assert.deepEqual(s1.move,{x:0,y:-1});assert.equal(s1.action,undefined);
+  const s1b=m.sample([pad(0,[0],[0,-1,0,0]),pad(1,[],[1,0,0,0])],6,1);
+  assert.equal(s1b.action,'pass');
+  assert.deepEqual(m.assignments(),['1:pad1','0:pad0']);
+});
 test('camera changes and repeated draws cannot change authoritative state or camera integration',()=>{
   const f=fixture(),a=new CameraRig(),b=new CameraRig();f.sim.restore(f.w);for(let i=0;i<120;i++){f.sim.step();const s=f.sim.presentation();a.advance(s);b.advance(s);for(let j=0;j<3;j++){b.advance(s);b.pose(.6,j/3);}}const hash=f.sim.stateHash();assert.deepEqual(a.pose(),b.pose());a.mode='close';a.pose();assert.equal(f.sim.stateHash(),hash);
 });

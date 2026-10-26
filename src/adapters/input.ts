@@ -1,5 +1,6 @@
 import type { ActionKind, InputFrame, TeamIndex, Vec2 } from '../contracts/types';
 import { ControllerMapper } from './controller';
+import { TouchPad, type TouchContext } from './touch-pad';
 import { KEYBOARD_MAP, KEYBOARD_MOVE, PES_2017_PS4_ROWS, pesHeader, TACKLE_TAP_TICKS, type KeyRole } from '../browser/pad-presets';
 import { clamp, length, unit } from '../simulation/math';
 // The keeper switch has no preset row. Keep the FE keys.
@@ -48,7 +49,9 @@ export class BrowserInput {
   private punt=new Map<string,number>();
   // Millisecond time of the last defending tackle key tap, or -1 when disarmed.
   private tackleTap=[-1,-1];
-  private touchMove:Vec2={x:0,y:0};private touchActions:ActionKind[]=[];private touchSprint=false;private touchShield=false;private touchCharge:number|null=null;private touchPower=.55;
+  // On-screen PS-style touch pad: one virtual gamepad reading for slot 0.
+  readonly touch=new TouchPad();
+  private touchOn=false;
   private aim:Vec2[]=[{x:1,y:0},{x:-1,y:0}];
   private lastTick=-1;private directions:[number,number]=[1,-1];
   enabled=false;
@@ -74,16 +77,22 @@ export class BrowserInput {
   setKeeperHold(flags:[boolean,boolean]){this.keeperHold=[...flags];}
   /** The match shell sets the set piece of both slots, or null when in play. */
   setRestart(r:[{kind:string,attacking:boolean}|null,{kind:string,attacking:boolean}|null]){for(const slot of [0,1] as const)if(this.restart[slot]?.kind!==r[slot]?.kind||this.restart[slot]?.attacking!==r[slot]?.attacking)this.fixedAim[slot]=null;this.restart=[...r];}
-  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.setSpent.clear();this.setPanenka.clear();this.setRoll.clear();this.fixedAim=[null,null];this.punt.clear();this.tackleTap=[-1,-1];this.aerial=[false,false];this.keeper=[false,false];this.keeperHold=[false,false];this.restart=[null,null];this.controller.reset();this.touchMove={x:0,y:0};this.touchActions=[];this.touchSprint=false;this.touchShield=false;this.touchCharge=null;this.lastTick=-1;}
-  setTouchMove(move:Vec2){this.touchMove=move;}
-  setTouchSprint(pressed:boolean){this.touchSprint=pressed;}
-  setTouchShield(pressed:boolean){this.touchShield=pressed;}
-  startTouchShot(){if(this.enabled)this.touchCharge=performance.now();}
-  endTouchShot(cancel=false){if(this.touchCharge!==null&&!cancel){this.touchPower=clamp((performance.now()-this.touchCharge)/850,.15,1);this.touchActions.push('shoot');}this.touchCharge=null;}
-  pauseRequested(){return this.controller.pauseRequested(this.gamepads);}
-  cameraRequested(){return this.controller.cameraRequested(this.gamepads);}
-  touchAction(action:ActionKind){this.touchActions.push(action);}
-  get charging(){const codes=this.restart[0]?.attacking?[...presetKeys('setPower','p1'),...presetKeys('setFeint','p1'),...presetKeys('shortRoll','p1')]:[firstCharge('p1')];const starts=codes.map(c=>this.charges.get(c)).filter((v):v is number=>v!==undefined);const start=this.touchCharge??(starts.length?Math.min(...starts):undefined);return start===undefined?0:clamp((performance.now()-start)/850,0,1);}
+  /** Drops every held key, edge, charge and release, every set-piece flag and
+   * the whole touch pad, so no pending state can fire after a reset. */
+  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.setSpent.clear();this.setPanenka.clear();this.setRoll.clear();this.fixedAim=[null,null];this.punt.clear();this.tackleTap=[-1,-1];this.aerial=[false,false];this.keeper=[false,false];this.keeperHold=[false,false];this.restart=[null,null];this.controller.reset();this.touch.clear();this.lastTick=-1;}
+  /** Shows or hides the on-screen touch pad. A change drops every held touch.
+   * The physical pads keep their slots: the touch reading takes slot 0 only. */
+  setTouchActive(on:boolean){if(on===this.touchOn)return;this.touchOn=on;this.touch.clear();if(on)this.controller.stashSlots();else this.controller.restoreSlots();}
+  get touchActive(){return this.touchOn;}
+  /** Pad readings of this sample. The touch reading comes first, so it owns slot 0. */
+  private pads(){return this.touchOn?[this.touch.reading(true),...this.gamepads]:this.gamepads;}
+  /** Label row of the touch buttons for the game state of one slot. */
+  context(slot:TeamIndex):TouchContext{const keeper=this.keeper[slot],hold=keeper&&this.keeperHold[slot];return{defending:this.defending[slot],aerial:this.aerial[slot],keeper,hold};}
+  pauseRequested(){return this.controller.pauseRequested(this.pads());}
+  cameraRequested(){return this.controller.cameraRequested(this.pads());}
+  // Keyboard charge first: the set-piece keys of an attack restart, else the shot
+  // key. With no key held the touch pad reads the mapper charge of slot 0.
+  get charging(){const codes=this.restart[0]?.attacking?[...presetKeys('setPower','p1'),...presetKeys('setFeint','p1'),...presetKeys('shortRoll','p1')]:[firstCharge('p1')];const starts=codes.map(c=>this.charges.get(c)).filter((v):v is number=>v!==undefined);if(starts.length)return clamp((performance.now()-Math.min(...starts))/850,0,1);return this.touchOn?this.controller.chargeLevel(0):0;}
   get gamepads(){return Array.from(navigator.getGamepads?.()??[]).filter((p):p is Gamepad=>!!p&&p.connected);}
   /** Set-piece chords of the keyboard rows, read by the set-piece row ids of the preset. */
   private setPieceFlags(slot:TeamIndex,player:'p1'|'p2',movement:Vec2,moveActive:boolean):Partial<InputFrame>{
@@ -215,8 +224,11 @@ export class BrowserInput {
       if(kind&&!keeperFeint&&!(hold&&role.keeperKick))action=(kind==='cross'&&switchHeld(roles,this.keys))?'lob':kind;
     }
     let switchKeeper=this.edges.delete(KEEPER_KEYS[slot]);
-    if(slot===0){if(length(this.touchMove)>.1)movement=this.touchMove;sprint||=this.touchSprint;shield||=this.touchShield;const touched=this.touchActions.shift();if(!action&&touched){action=touched;power=touched==='shoot'?this.touchPower:.55;}switchPlayer||=this.edges.delete('touch-switch');switchKeeper||=this.edges.delete('touch-keeper');}
-    const pad=this.controller.sample(this.gamepads,tick,slot,defending,aerial,keeper,hold,restart);
+    // A cancelled touch pointer must not fire its pending release: drop the
+    // charge, the set-piece state and the previous state of slot 0 before the
+    // mapper samples.
+    if(this.touch.takeCancelled())this.controller.discardCharge();
+    const pad=this.controller.sample(this.pads(),tick,slot,defending,aerial,keeper,hold,restart);
     if(length(pad.move)>.1)movement=pad.move;
     sprint||=pad.sprint;shield||=pad.shield;switchPlayer||=pad.switchPlayer;switchKeeper||=pad.switchKeeper;
     if(pad.action){action=pad.action;power=pad.power;}
@@ -242,6 +254,4 @@ export class BrowserInput {
     if(simulateDive)frame.simulateDive=true;
     return frame;
   }
-  switchTouch(){this.edges.add('touch-switch');}
-  switchKeeperTouch(){this.edges.add('touch-keeper');}
 }

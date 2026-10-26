@@ -6,11 +6,16 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 
 const require = createRequire(process.env.PLAYWRIGHT_CORE_DIR ? `${process.env.PLAYWRIGHT_CORE_DIR}/` : import.meta.url);
 const { chromium } = require('playwright-core');
-const port = Number(process.env.KEEPER_SMOKE_PORT ?? 4318);
+// KEEPER_PATH=touch drives the same ten keeper actions through the on-screen
+// touch pad (synthetic touch PointerEvents) instead of the fake gamepads.
+const touchPath = ['touch'].includes(process.env.KEEPER_PATH);
+const tag = touchPath ? 'keeper-e2e[touch]' : 'keeper-e2e';
+const port = Number(process.env.KEEPER_SMOKE_PORT ?? (touchPath ? 4320 : 4318));
 const base = `http://127.0.0.1:${port}`;
 const out = 'artifacts/local/smoke';
+const evidenceFile = touchPath ? 'keeper-touch.json' : 'keeper.json';
 // CI has no /workspace: keep the screenshots in the local artifacts there.
-const shots = process.env.KEEPER_SHOTS ?? (process.env.CI ? 'artifacts/local/keeper-e2e' : '/workspace/keeper-e2e');
+const shots = (process.env.KEEPER_SHOTS ?? (process.env.CI ? 'artifacts/local/keeper-e2e' : '/workspace/keeper-e2e')) + (touchPath ? '-touch' : '');
 mkdirSync(out, { recursive: true });
 mkdirSync(shots, { recursive: true });
 
@@ -22,8 +27,8 @@ const portBusy = await new Promise((resolve) => {
   sock.once('error', () => resolve(false));
 });
 if (portBusy) {
-  const message=`keeper-e2e: port ${port} is already in use; stop the old server first`;
-  writeFileSync(`${out}/keeper.json`, `${JSON.stringify({results:[],errors:[message]},null,2)}\n`);
+  const message=`${tag}: port ${port} is already in use; stop the old server first`;
+  writeFileSync(`${out}/${evidenceFile}`, `${JSON.stringify({results:[],errors:[message]},null,2)}\n`);
   console.error(message); process.exit(1);
 }
 
@@ -56,7 +61,7 @@ let activePage;
 let stage='startup';
 const timeoutMs = Number(process.env.KEEPER_SMOKE_TIMEOUT_MS ?? 180000);
 const deadline = setTimeout(() => { errors.push(`Total timeout (${timeoutMs} ms)`); stop(); writeEvidence(); process.exit(1); }, timeoutMs);
-function writeEvidence() { writeFileSync(`${out}/keeper.json`, `${JSON.stringify({results, errors}, null, 2)}\n`); }
+function writeEvidence() { writeFileSync(`${out}/${evidenceFile}`, `${JSON.stringify({results, errors}, null, 2)}\n`); }
 function check(value, message) { if (!value) throw new Error(message); }
 try {
   await waitForServer();
@@ -70,9 +75,10 @@ try {
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(m.text()); });
   page.on('response', r => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`HTTP ${r.status()} ${r.url()}`); });
-  await page.addInitScript(() => {
+  await page.addInitScript((fakePads) => {
     // This flow clicks #start-btn: skip the first-visit tips dialog.
     try { localStorage.setItem('fe.tipsSeen','1'); } catch {}
+    if (!fakePads) return; // Touch path: no fake pads, the touch pad owns slot 0.
     window.__fakePads = Array.from({length:4}, (_, index) => ({id:`Fake standard ${index}`,index,connected:false,mapping:'standard',axes:[0,0,0,0],
       buttons:Array.from({length:17}, () => ({pressed:false,value:0,touched:false})),timestamp:0}));
     Object.defineProperty(navigator, 'getGamepads', {value:() => window.__fakePads.map(p => p.connected ? p : null)});
@@ -82,7 +88,7 @@ try {
       button(slot, button, pressed) { const p=window.__fakePads[slot]; p.buttons[button]={pressed,value:Number(pressed),touched:pressed}; p.timestamp=performance.now(); },
       axes(slot, axes) { const p=window.__fakePads[slot]; p.axes=[...axes]; p.timestamp=performance.now(); }
     };
-  });
+  }, !touchPath);
   const snapshot = () => page.evaluate(() => window.__fe);
   const wait = async (fn, arg) => {
     // Advance browser frames directly in fixed 100 ms steps.
@@ -93,23 +99,67 @@ try {
     }
     throw new Error(`State did not arrive: ${String(fn)}`);
   };
-  const button = (slot, n, pressed) => page.evaluate(([s,n,p]) => window.__pad.button(s,n,p), [slot,n,pressed]);
-  const connectPad = (slot, connected) => page.evaluate(([s,c]) => window.__pad.connect(s,c), [slot,connected]);
-  const axes = (slot, values) => page.evaluate(([s,v]) => window.__pad.axes(s,v), [slot,values]);
+  // Touch pad wiring: standard button index -> touch button, and the STICK_RADIUS
+  // travel that gives full stick deflection.
+  const TOUCH_NAME = { 0:'cross', 1:'circle', 2:'square', 3:'triangle', 4:'l1', 5:'r1', 7:'r2' };
+  const center = (sel) => page.evaluate((sel) => {
+    const r = document.querySelector(sel).getBoundingClientRect();
+    return { x: r.x + r.width/2, y: r.y + r.height/2 };
+  }, sel);
+  const touchEvent = (type, sel, init) => page.evaluate(({type,sel,init}) =>
+    (sel ? document.querySelector(sel) : document.body)
+      .dispatchEvent(new PointerEvent(type, { bubbles:true, pointerType:'touch', ...init })), {type,sel,init});
+  const activateTouch = async () => {
+    const on = await page.evaluate(() => {
+      const pad = document.querySelector('#touch-pad');
+      if (!pad) return false;
+      document.body.dispatchEvent(new PointerEvent('pointerdown',
+        { bubbles:true, pointerType:'touch', pointerId:28, clientX:480, clientY:360 }));
+      return !pad.hidden;
+    });
+    check(on, 'The on-screen touch pad did not activate');
+  };
+  const button = async (slot, n, pressed) => {
+    if (!touchPath) return page.evaluate(([s,n,p]) => window.__pad.button(s,n,p), [slot,n,pressed]);
+    if (slot !== 0) return; // The touch pad reads slot 0 only: slot 1 stays idle.
+    const name = TOUCH_NAME[n];
+    check(name, `No touch button for pad index ${n}`);
+    if (pressed) {
+      const c = await center(`.tp-${name}`);
+      await touchEvent('pointerdown', `.tp-${name}`, { pointerId:30+n, clientX:c.x, clientY:c.y });
+    } else {
+      await touchEvent('pointerup', null, { pointerId:30+n });
+    }
+  };
+  const connectPad = touchPath ? async () => {} :
+    (slot, connected) => page.evaluate(([s,c]) => window.__pad.connect(s,c), [slot,connected]);
+  const axes = async (slot, values) => {
+    if (!touchPath) return page.evaluate(([s,v]) => window.__pad.axes(s,v), [slot,values]);
+    if (slot !== 0) return;
+    const [x,y] = values;
+    if (x===0 && y===0) { await touchEvent('pointerup', null, { pointerId:29 }); return; }
+    // A repeated pointerdown is a no-op while the stick pointer is already down
+    // and re-presses it if the view dropped the touches meanwhile.
+    const c = await center('.tp-zone[data-zone="stick"]');
+    await touchEvent('pointerdown', '.tp-zone[data-zone="stick"]', { pointerId:29, clientX:c.x, clientY:c.y });
+    await touchEvent('pointermove', null, { pointerId:29, clientX:c.x + x*56, clientY:c.y + y*56 });
+  };
   const ticks = async (count=12) => { const s=await snapshot(); await wait(n => window.__fe.tick>=n, s.tick+count); };
   const frames = async (count=12) => { const s=await snapshot(); await wait(n => window.__fe.browserFrames>=n, s.browserFrames+count); };
   const evidence = async (step, details={}) => { check(errors.length===0, errors.join('; '));
     await page.screenshot({path:`${shots}/${step}.png`}); results.push({step,...details});
-    console.log(`keeper-e2e: ${step} passed`); };
+    console.log(`${tag}: ${step} passed`); };
   const dist = (a,b) => Math.hypot(a.x-b.x,a.y-b.y);
   const keeper = (s) => s.players.find(p=>p.id===s.selected[0]);
   // Buttons (standard mapping): X=0, O=1, T=3, R1=5, R2=7.
   const ready = async () => {
     await wait(() => ['kickoff','playing'].includes(window.__fe.phase));
     if ((await snapshot()).phase==='kickoff') {
-      await button(0,0,true); await button(1,0,true);
+      await button(0,0,true);
+      if (!touchPath) await button(1,0,true); // Kickoff: touch ✕ only.
       await wait(() => window.__fe.phase==='playing');
-      await button(0,0,false); await button(1,0,false);
+      await button(0,0,false);
+      if (!touchPath) await button(1,0,false);
     }
   };
   const hold = async () => {
@@ -131,6 +181,7 @@ try {
   await page.locator('.tactics summary').click();
   await page.locator('#quality').selectOption('low');
   await page.locator('#start-btn').click();
+  if (touchPath) await activateTouch();
   await connectPad(0,true); await connectPad(1,true); await ticks();
   stage='rush';
   // 1: The keeper rushes to the ball that a nearby opponent threatens.
@@ -279,5 +330,5 @@ finally {
   stop(); writeEvidence();
 }
 for (const e of errors) console.error(e);
-console.log(`keeper-e2e: steps=${results.length} errors=${errors.length} shots=${shots}`);
+console.log(`${tag}: steps=${results.length} errors=${errors.length} shots=${shots}`);
 process.exit(errors.length ? 1 : 0);
