@@ -111,6 +111,11 @@ try {
       pointerType: 'touch', pointerId: id, isPrimary: true, clientX: x, clientY: y }));
     return true;
   }, [x, y, id]);
+  // System cancel of a pointer: the pad drops its buttons without a release.
+  const touchCancel = (page, id, x = 0, y = 0) => page.evaluate(([id, x, y]) => {
+    document.body.dispatchEvent(new PointerEvent('pointercancel', { bubbles: true, cancelable: true, composed: true,
+      pointerType: 'touch', pointerId: id, isPrimary: true, clientX: x, clientY: y }));
+  }, [id, x, y]);
   const touchMove = (page, id, x, y) => page.evaluate(([id, x, y]) => {
     document.body.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, cancelable: true, composed: true,
       pointerType: 'touch', pointerId: id, isPrimary: true, clientX: x, clientY: y }));
@@ -270,17 +275,30 @@ try {
     const sprintFrame = await page.evaluate(() =>
       window.__fe.frames.find(f => f.slot === 0 && f.sprint === true && f.move.x > 0.5) ?? null);
     check(!!sprintFrame, 'No slot-0 frame with sprint and move.x > 0.5');
-    const prePass = await page.evaluate(() => ({ touch: window.__fe.ball.lastTouch?.playerId ?? null,
+    // Strict pass evidence: the slot-0 pass counter must grow, and the ball
+    // must leave to the selected player's touch (or a team-0 pass event must
+    // fire). An opponent touch or a stray speed jump does not count.
+    const prePass = await page.evaluate(() => ({ pass: window.__fe.passes.actions[0],
+      passEvents: window.__fe.passes.events[0], selected: window.__fe.selected[0],
+      touch: window.__fe.ball.lastTouch?.playerId ?? null,
       speed: Math.hypot(window.__fe.ball.vx, window.__fe.ball.vy) }));
     check(await touchDown(page, '.tp-cross', 23), 'Pad ✕ button not found');
     await page.waitForTimeout(150);
     await touchUp(page, 23);
-    await page.waitForFunction(pre => window.__fe.frames.some(f => f.slot === 0 && f.action === 'pass')
-      || window.__fe.ball.lastTouch?.playerId !== pre.touch
-      || Math.hypot(window.__fe.ball.vx, window.__fe.ball.vy) > pre.speed + 4, prePass,
+    await page.waitForFunction(p => window.__fe.passes.actions[0] > p.pass
+      && (window.__fe.ball.lastTouch?.playerId === window.__fe.selected[0]
+        || window.__fe.passes.events[0] > p.passEvents), prePass,
       {timeout:8000, polling:50});
+    const kicked = await page.evaluate(p => ({ pass: window.__fe.passes.actions[0],
+      passEvents: window.__fe.passes.events[0], selected: window.__fe.selected[0],
+      touch: window.__fe.ball.lastTouch?.playerId ?? null,
+      speed: Math.hypot(window.__fe.ball.vx, window.__fe.ball.vy) }), prePass);
+    check(kicked.pass > prePass.pass, `Slot-0 pass counter did not grow after ✕ (${prePass.pass} → ${kicked.pass})`);
+    check(kicked.touch === kicked.selected || kicked.passEvents > prePass.passEvents,
+      `Ball lastTouch ${kicked.touch} is not the slot-0 selected player ${kicked.selected} and no team-0 pass event fired`);
     await evidence(page, '4a-multitouch', { sprint: sprintFrame,
-      passSpeed: await page.evaluate(() => Math.hypot(window.__fe.ball.vx, window.__fe.ball.vy)) });
+      pass: { before: prePass.pass, after: kicked.pass, touch: kicked.touch, selected: kicked.selected,
+        speed: kicked.speed } });
     for (const id of [21, 22, 23]) await touchUp(page, id);
     await context.close();
   }
@@ -333,13 +351,15 @@ try {
       const before = await page.evaluate(() => window.__fe.shots.actions[0]);
       check(await touchDown(page, '.tp-square', id), 'Pad □ button not found');
       await page.waitForTimeout(hold);
-      await touchUp(page, id, centre.x, centre.y);
+      // The sampler starts before the release: the shot leaves right at the
+      // pointerup, so a sampler started after it misses the fastest sample.
       const sampler = page.evaluate(() => new Promise(res => {
         let max = 0;
         const iv = setInterval(() => { const b = window.__fe.ball;
           max = Math.max(max, Math.hypot(b.vx, b.vy)); }, 40);
         setTimeout(() => { clearInterval(iv); res(max); }, 1000);
       }));
+      await touchUp(page, id, centre.x, centre.y);
       await page.waitForFunction(prev => window.__fe.shots.actions[0] > prev, before,
         {timeout:6000, polling:50});
       const maxSpeed = await sampler;
@@ -354,6 +374,53 @@ try {
     await evidence(page, '5-shot-800', s800);
     check(s800.power > s200.power, `Power after 800 ms (${s800.power}) is not above 200 ms (${s200.power})`);
     check(s800.maxSpeed > s200.maxSpeed, `Ball speed after 800 ms (${s800.maxSpeed.toFixed(2)}) is not above 200 ms (${s200.maxSpeed.toFixed(2)})`);
+    await context.close();
+  }
+
+  // 6: Keeper switch by touch: L1 + R2 held together switches the slot-0
+  // cursor to the keeper while the team defends.
+  stage='keeper-switch';
+  {
+    const { context, page } = await newPage(844, 390, true);
+    await beginPlay(page);
+    await runHook(page, 'ballAtFeet', 1);
+    await waitRow(page, ROWS.defence);
+    const before = await page.evaluate(() => {
+      const p = window.__fe.players.find(p => p.id === window.__fe.selected[0]);
+      return { selected: window.__fe.selected[0], keeper: p?.keeper === true };
+    });
+    check(!before.keeper, 'Slot-0 already controls the keeper before the switch');
+    check(await touchDown(page, '.tp-l1', 41), 'Pad L1 button not found');
+    check(await touchDown(page, '.tp-r2', 42), 'Pad R2 button not found');
+    await page.waitForTimeout(150);
+    await touchUp(page, 41);
+    await touchUp(page, 42);
+    await page.waitForFunction(() => {
+      const p = window.__fe.players.find(p => p.id === window.__fe.selected[0]);
+      return p?.keeper === true;
+    }, null, {timeout:6000, polling:100});
+    const after = await page.evaluate(() => window.__fe.selected[0]);
+    check(after !== before.selected, `Keeper switch kept the same player ${after}`);
+    await evidence(page, '6-keeper-switch', { before: before.selected, after });
+    await context.close();
+  }
+
+  // 7: A system pointercancel during a charged □ press drops the touch
+  // without firing the shot: no shot frame may be counted.
+  stage='cancel';
+  {
+    const { context, page } = await newPage(844, 390, true);
+    await beginPlay(page);
+    await runHook(page, 'ballAtFeet', 0);
+    const before = await page.evaluate(() => window.__fe.shots.actions[0]);
+    check(await touchDown(page, '.tp-square', 50), 'Pad □ button not found');
+    await page.waitForTimeout(500);
+    await touchCancel(page, 50);
+    await page.waitForTimeout(800);
+    const after = await page.evaluate(() => ({ actions: window.__fe.shots.actions[0],
+      power: window.__fe.shots.power[0] }));
+    check(after.actions === before, `pointercancel executed the charged shot (${before} → ${after.actions})`);
+    await evidence(page, '7-cancel', { before, after: after.actions });
     await context.close();
   }
 } catch (e) { errors.push(`fatal (${stage}): ${e.message}`);

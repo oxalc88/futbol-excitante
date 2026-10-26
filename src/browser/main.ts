@@ -209,9 +209,10 @@ peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.ti
 // Detached read-only evidence at the browser boundary. No engine access is exposed.
 let inputEvidence:InputFrame[]=[];
 const shotEvidence={actions:[0,0],events:[0,0],power:[0,0]};
+const passEvidence={actions:[0,0],events:[0,0]};
 const keeperEvidence={punts:[0,0],highPunts:[0,0],throws:[0,0]};
 let browserFrames=0;
-Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},sprint:f.sprint,action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},keeper:{punts:[...keeperEvidence.punts],highPunts:[...keeperEvidence.highPunts],throws:[...keeperEvidence.throws]},keeperHold:current.keeperHold?{playerId:current.keeperHold.playerId}:null,ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,keeper:p.keeper,keeperRushing:p.keeperRushing===true,keeperDropped:p.keeperDropped===true,keeperMode:p.keeperMode,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
+Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},sprint:f.sprint,action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},passes:{actions:[...passEvidence.actions],events:[...passEvidence.events]},keeper:{punts:[...keeperEvidence.punts],highPunts:[...keeperEvidence.highPunts],throws:[...keeperEvidence.throws]},keeperHold:current.keeperHold?{playerId:current.keeperHold.playerId}:null,ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,keeper:p.keeper,keeperRushing:p.keeperRushing===true,keeperDropped:p.keeperDropped===true,keeperMode:p.keeperMode,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
 // Smoke only: exists only when navigator.webdriver is true. It is not a game feature. The recorder replay is not valid after this call.
 if(navigator.webdriver)Object.defineProperty(window,'__feSmoke',{configurable:false,enumerable:false,value:{ballAtFeet(slot:0|1){
   if(!started||guest||replay||current.phase!=='playing')return false;
@@ -353,10 +354,11 @@ function loop(now:number){
         if(replay){while(replay.inputs[replayIndex]?.tick===sim.tick)frames.push(replay.inputs[replayIndex++]);}
         else for(const slot of [0,1]as const)if(config.human[slot]){const f=slot===1&&peer.role==='host'?peer.hostFrame(sim.tick):input.sample(sim.tick,slot);if(slot===0&&pendingTactics){f.tactics=pendingTactics;pendingTactics=undefined;}frames.push(f);}
         inputEvidence=structuredClone(frames);
-        for(const f of frames)if(f.action==='shoot'){shotEvidence.actions[f.slot]++;shotEvidence.power[f.slot]=f.power??0;}
+        for(const f of frames)if(f.action==='shoot'){shotEvidence.actions[f.slot]++;shotEvidence.power[f.slot]=f.power??0;}else if(f.action==='pass')passEvidence.actions[f.slot]++;
         sim.applyInputs(frames);if(!replay)record.record(frames);previous=current;sim.step();current=sim.presentation();renderer?.advanceCamera(current);
         for(const e of current.events){
           if(e.type==='shoot'&&e.team!==undefined)shotEvidence.events[e.team]++;
+          if(e.type==='action-start'&&e.data?.kind==='pass'&&e.team!==undefined)passEvidence.events[e.team]++;
           if(e.type==='keeper-punt'&&e.team!==undefined){keeperEvidence.punts[e.team]++;if(e.data?.high===true)keeperEvidence.highPunts[e.team]++;}
           if(e.type==='keeper-throw'&&e.team!==undefined)keeperEvidence.throws[e.team]++;
         }
