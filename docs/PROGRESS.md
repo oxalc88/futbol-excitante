@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-26 10:50 — PR pendiente ([#PRN](https://github.com/oxalc88/futbol-excitante/pull/PRN)) · L2 en el mando táctil
+## 2026-10-26 10:50 — PR pendiente ([#82](https://github.com/oxalc88/futbol-excitante/pull/82)) · L2 en el mando táctil
 - **Qué cambia para el jugador:** en pantalla táctil aparece un botón **L2** («2º tira», 56 px) solo cuando tu equipo tiene un tiro libre a favor. Al tocar L2 el 2º lanzador se pone al lado del balón; mantén L2 y patea con □, ○ o ✕: el tiro lo ejecuta el 2º lanzador, como «L2 tira el 2º» en el mando físico. La ayuda táctil del balón parado ya no nombra la cruceta ni L1+↑/↓, que el mando táctil no tiene; la ayuda de Controles menciona L2.
 - **Qué probar:** en un teléfono en horizontal, provoca un tiro libre a favor, toca L2, mantenlo y patea con □: debe patear el compañero que se colocó al lado. Fuera del tiro libre L2 no se ve. Con mando físico o teclado nada cambia.
 - **Qué deja de funcionar:** nada conocido. En táctil el 2º lanzador solo se coloca al lado (no detrás), porque no hay cruceta. Sin cambios en el motor ni en `eval/baseline.json` (0/276).
