@@ -45,7 +45,10 @@ export class ControllerMapper {
   private wallCharge=[0,0];
   private restartContext=[null,null] as (string|null)[];
   private setAim:Vec2[]=[{x:1,y:0},{x:-1,y:0}];private fixedAim:(Vec2|null)[]=[null,null];
-  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.stash=null;this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
+  /** Clears the transient sample state only. The identity stash of an active
+   * touch toggle survives: restoreSlots consumes it, so a reset while the touch
+   * pad owns slot 0 keeps the reversed physical slot ids. */
+  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
   /** Frees both slots: the next sample assigns the pads again in list order. */
   releaseSlots(){this.slots=[null,null];this.previous=[[],[]];}
   /** Drops every set-piece charge and flag of a slot: a cancelled touch or a
