@@ -17,6 +17,9 @@ const PHASE_1 = [...IDENTICAL, ...REMAPPED];
 /** The 10 C10 keeper rows: 9 Arquero rows plus the foul-dive chord of row 107. */
 const KEEPER_ROWS = ['keeperRush', 'keeperRushSprint', 'keeperHandThrow', 'keeperThrowSpace', 'keeperPunt',
   'keeperHighPunt', 'keeperDropPick', 'keeperRun', 'keeperFeint', 'simulateDive'] as const;
+/** The 13 set-piece rows: the playable rows of the PES "Balón parado" table. */
+const SET_PIECE_ROWS = ['setPower', 'setTrajectory', 'setFix', 'secondTaker', 'secondTakerKick', 'setFeint',
+  'shortRoll', 'panenka', 'wallJump', 'wallHold', 'wallCharge', 'setKeeperMove', 'cornerStrategy'] as const;
 
 const TABLE: readonly [string, PadPresetRow['state'], PadContext, number | null, readonly PsGlyph[], string][] = [
   ['move', 'identical', 'attack', null, [], 'Left stick'],
@@ -47,6 +50,19 @@ const TABLE: readonly [string, PadPresetRow['state'], PadContext, number | null,
   ['keeperRun', 'missing', 'keeper', null, [], 'Left stick (+ R1 sprint)'],
   ['keeperFeint', 'missing', 'keeper', 0, ['✕'], '✕ before release'],
   ['simulateDive', 'missing', 'attack', 10, ['L3'], 'L1 + L2 + L3 + R3 (no R2)'],
+  ['setPower', 'missing', 'set-piece', 2, ['□'], 'Hold □ (shot) or ○ / ✕ (pass)'],
+  ['setTrajectory', 'missing', 'set-piece', null, [], 'Left stick while kicking'],
+  ['setFix', 'missing', 'set-piece', 7, ['R2'], 'R2'],
+  ['secondTaker', 'missing', 'set-piece', 4, ['L1', '↑', '↓'], 'L1 + cruceta ↑ / ↓'],
+  ['secondTakerKick', 'missing', 'set-piece', 6, ['L2'], 'Hold L2'],
+  ['setFeint', 'missing', 'set-piece', 1, ['○'], '○ then ✕'],
+  ['shortRoll', 'missing', 'set-piece', 0, ['✕'], 'L1 + ✕'],
+  ['panenka', 'missing', 'set-piece', 2, ['□'], 'L1 + □'],
+  ['wallJump', 'missing', 'set-piece', 2, ['□'], '□'],
+  ['wallHold', 'missing', 'set-piece', 0, ['✕'], 'Hold ✕'],
+  ['wallCharge', 'missing', 'set-piece', 1, ['○'], '○ at the kick'],
+  ['setKeeperMove', 'missing', 'set-piece', 3, ['△'], 'Hold △ + left stick'],
+  ['cornerStrategy', 'missing', 'set-piece', null, ['↑', '↓', '←', '→'], 'Cruceta ↑ ↓ ← →'],
 ];
 
 const KEYS: readonly [string, readonly string[], readonly string[]][] = [
@@ -78,17 +94,31 @@ const KEYS: readonly [string, readonly string[], readonly string[]][] = [
   ['keeperRun', ['KeyW', 'KeyS', 'KeyA', 'KeyD'], ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']],
   ['keeperFeint', ['KeyJ'], ['Numpad1']],
   ['simulateDive', ['KeyF'], ['Numpad4']],
+  ['setPower', ['KeyK'], ['Numpad2']],
+  ['setTrajectory', [], []],
+  ['setFix', ['KeyG'], ['Numpad6']],
+  ['secondTaker', ['KeyQ'], ['Enter']],
+  ['secondTakerKick', ['KeyE'], ['Numpad9']],
+  ['setFeint', ['KeyI'], ['Numpad5']],
+  ['shortRoll', ['KeyJ'], ['Numpad1']],
+  ['panenka', ['KeyK'], ['Numpad2']],
+  ['wallJump', ['KeyK'], ['Numpad2']],
+  ['wallHold', ['KeyJ'], ['Numpad1']],
+  ['wallCharge', ['KeyI'], ['Numpad5']],
+  ['setKeeperMove', ['KeyL'], ['Numpad3']],
+  ['cornerStrategy', ['KeyW', 'KeyS', 'KeyA', 'KeyD'], ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']],
 ];
 
-test('preset has the 17 phase-1 rows, 1 missing row and the 10 keeper rows', () => {
+test('preset has the 17 phase-1 rows, 1 missing row, the 10 keeper rows and the 13 set-piece rows', () => {
   assert.equal(PHASE_1.length, 17);
   assert.equal(KEEPER_ROWS.length, 10);
-  assert.equal(PES_2017_PS4_ROWS.length, 28);
+  assert.equal(SET_PIECE_ROWS.length, 13);
+  assert.equal(PES_2017_PS4_ROWS.length, 41);
   assert.deepEqual(pesRows('identical').map((row) => row.id), [...IDENTICAL]);
   assert.deepEqual(pesRows('remapped').map((row) => row.id), [...REMAPPED]);
-  assert.deepEqual(pesRows('missing').map((row) => row.id), [...MISSING, ...KEEPER_ROWS]);
+  assert.deepEqual(pesRows('missing').map((row) => row.id), [...MISSING, ...KEEPER_ROWS, ...SET_PIECE_ROWS]);
   assert.equal(PES_2017_PS4_PRESET.rows, PES_2017_PS4_ROWS);
-  assert.deepEqual(PES_2017_PS4_ROWS.map((row) => row.id), [...PHASE_1, ...MISSING, ...KEEPER_ROWS]);
+  assert.deepEqual(PES_2017_PS4_ROWS.map((row) => row.id), [...PHASE_1, ...MISSING, ...KEEPER_ROWS, ...SET_PIECE_ROWS]);
   assert.equal(PHASE_1.filter((id) => pesRow(id).state === 'identical').length, 5);
   assert.equal(PHASE_1.filter((id) => pesRow(id).state === 'remapped').length, 12);
 });
@@ -106,9 +136,10 @@ test('each mapping row matches the PES 2017 PS4 table', () => {
 });
 
 test('the full PS button and glyph tables match literal values', () => {
-  assert.deepEqual([...PS_GLYPHS], ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'OPTIONS', 'TOUCHPAD']);
+  assert.deepEqual([...PS_GLYPHS], ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'OPTIONS', 'TOUCHPAD', '↑', '↓', '←', '→']);
   assert.deepEqual({ ...PS_BUTTON },
-    { cross: 0, circle: 1, square: 2, triangle: 3, l1: 4, r1: 5, l2: 6, r2: 7, options: 9, l3: 10, r3: 11, touchpad: 17 });
+    { cross: 0, circle: 1, square: 2, triangle: 3, l1: 4, r1: 5, l2: 6, r2: 7, options: 9, l3: 10, r3: 11, touchpad: 17,
+      dpadUp: 12, dpadDown: 13, dpadLeft: 14, dpadRight: 15 });
   assert.equal(PS_BUTTON.cross, 0);
   assert.equal(PS_BUTTON.circle, 1);
   assert.equal(PS_BUTTON.square, 2);
@@ -122,7 +153,8 @@ test('the full PS button and glyph tables match literal values', () => {
   assert.equal(PS_BUTTON.r3, 11);
   assert.equal(PS_BUTTON.touchpad, 17);
   assert.deepEqual({ ...PS_GLYPH_BY_BUTTON },
-    { 0: '✕', 1: '○', 2: '□', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 9: 'OPTIONS', 10: 'L3', 11: 'R3', 17: 'TOUCHPAD' });
+    { 0: '✕', 1: '○', 2: '□', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 9: 'OPTIONS', 10: 'L3', 11: 'R3', 17: 'TOUCHPAD',
+      12: '↑', 13: '↓', 14: '←', 15: '→' });
   for (const row of PES_2017_PS4_ROWS) {
     for (const glyph of row.glyphs) assert.ok((PS_GLYPHS as readonly string[]).includes(glyph), `${row.id}: ${glyph}`);
     if (row.button === null) continue;
@@ -139,14 +171,18 @@ test('shield is automatic: the row has no button, no glyph and no key', () => {
   assert.deepEqual([...shield.keys.p1], []);
   assert.deepEqual([...shield.keys.p2], []);
   assert.throws(() => pesButton('shield'), /no button/);
-  // No one-button row maps R2 or L2. The foul-dive chord row owns L3 alone.
+  // No one-button row maps R2 or L2. The foul-dive chord row owns L3 alone;
+  // the set-piece rows own R2 (fix) and L2 (second taker).
+  const shoulderOwned = ['simulateDive', 'setFix', 'secondTakerKick'];
   for (const row of PES_2017_PS4_ROWS) {
-    if (row.button === null || row.id === 'simulateDive') continue;
+    if (row.button === null || shoulderOwned.includes(row.id)) continue;
     assert.notEqual(row.button, PS_BUTTON.r2, row.id);
     assert.notEqual(row.button, PS_BUTTON.l2, row.id);
     assert.notEqual(row.button, PS_BUTTON.l3, row.id);
   }
   assert.equal(pesRow('simulateDive').button, PS_BUTTON.l3);
+  assert.equal(pesRow('setFix').button, PS_BUTTON.r2);
+  assert.equal(pesRow('secondTakerKick').button, PS_BUTTON.l2);
 });
 
 test('pressure (hold ✕) and standing tackle (✕ ×2) are separate gestures', () => {
@@ -229,7 +265,7 @@ test('keyboard rows carry the FE key codes of the preset', () => {
     assert.deepEqual([...row.keys.p1], p1, id);
     assert.deepEqual([...row.keys.p2], p2, id);
     if (row.button !== null) assert.equal(row.keys.p1.length > 0, true, id);
-    if (row.button === null && !row.axis && id !== 'camera') assert.equal(row.keys.p1.length, 0, id);
+    if (row.button === null && !row.axis && id !== 'camera' && id !== 'cornerStrategy') assert.equal(row.keys.p1.length, 0, id);
   }
 });
 
@@ -239,8 +275,9 @@ test('the exported keyboard map derives from the preset rows', () => {
   assert.deepEqual(KEYBOARD_MAP.p1.KeyJ, { attack: 'pass' });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyL, { attack: 'through', keeperRush: true });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyI, { attack: 'cross', keeperKick: true });
-  assert.deepEqual(KEYBOARD_MAP.p1.KeyG, { keeperHigh: true });
+  assert.deepEqual(KEYBOARD_MAP.p1.KeyG, { keeperHigh: true, setFix: true });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyF, { simulateDive: true });
+  assert.deepEqual(KEYBOARD_MAP.p1.KeyE, { setSecond: true });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyK, { attack: 'shoot', defense: 'shoot', charge: true });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyU, { defense: 'tackle' });
   assert.deepEqual(KEYBOARD_MAP.p1.KeyB, { defense: 'slide' });
@@ -248,7 +285,8 @@ test('the exported keyboard map derives from the preset rows', () => {
   assert.deepEqual(KEYBOARD_MAP.p1.KeyQ, { switchPlayer: true });
   assert.deepEqual(KEYBOARD_MAP.p2.Numpad1, { attack: 'pass' });
   assert.deepEqual(KEYBOARD_MAP.p2.Numpad4, { simulateDive: true });
-  assert.deepEqual(KEYBOARD_MAP.p2.Numpad6, { keeperHigh: true });
+  assert.deepEqual(KEYBOARD_MAP.p2.Numpad6, { keeperHigh: true, setFix: true });
+  assert.deepEqual(KEYBOARD_MAP.p2.Numpad9, { setSecond: true });
   assert.deepEqual(KEYBOARD_MAP.p2.Numpad2, { attack: 'shoot', defense: 'shoot', charge: true });
   assert.deepEqual(KEYBOARD_MAP.p2.Numpad0, { defense: 'tackle' });
   assert.deepEqual(KEYBOARD_MAP.p2.ShiftRight, { sprint: true });

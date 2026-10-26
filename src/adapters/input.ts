@@ -1,7 +1,7 @@
 import type { ActionKind, InputFrame, TeamIndex, Vec2 } from '../contracts/types';
 import { ControllerMapper } from './controller';
 import { TouchPad, type TouchContext } from './touch-pad';
-import { KEYBOARD_MAP, KEYBOARD_MOVE, pesHeader, TACKLE_TAP_TICKS, type KeyRole } from '../browser/pad-presets';
+import { KEYBOARD_MAP, KEYBOARD_MOVE, PES_2017_PS4_ROWS, pesHeader, TACKLE_TAP_TICKS, type KeyRole } from '../browser/pad-presets';
 import { clamp, length, unit } from '../simulation/math';
 // The keeper switch has no preset row. Keep the FE keys.
 const KEEPER_KEYS=['KeyR','Numpad8'] as const;
@@ -16,6 +16,8 @@ const firstCharge=(player:'p1'|'p2')=>Object.keys(KEYBOARD_MAP[player]).find(cod
 const switchHeld=(roles:Readonly<Record<string,KeyRole>>,keys:Set<string>)=>Object.entries(roles).some(([code,role])=>role.switchPlayer&&keys.has(code));
 /** Codes that play pass or cross (✕ and ○ on the pad). */
 const passOrCrossHeld=(roles:Readonly<Record<string,KeyRole>>,keys:Set<string>)=>Object.entries(roles).some(([code,role])=>(role.attack==='pass'||role.attack==='cross')&&keys.has(code));
+/** Keyboard keys of a preset row for one player, read by row id. */
+const presetKeys=(id:string,player:'p1'|'p2'):readonly string[]=>PES_2017_PS4_ROWS.find(row=>row.id===id)?.keys[player]??[];
 /** State of the ball and of the cursor that the match shell reads each frame. */
 export interface DefendingState{ball:{lastTouch:{team:TeamIndex}|null};selected:[string|null,string|null];carrier:string|null}
 /**
@@ -40,6 +42,9 @@ export class BrowserInput {
   private keeper:[boolean,boolean]=[false,false];
   // Keeper hold: set by the match shell when the keeper of the slot holds the ball.
   private keeperHold:[boolean,boolean]=[false,false];
+  // Set piece of the slot: kind, attacking or defending, or null when in play.
+  private restart:[{kind:string,attacking:boolean}|null,{kind:string,attacking:boolean}|null]=[null,null];
+  private setSpent=new Set<string>();private setPanenka=new Set<string>();private setRoll=new Set<string>();private fixedAim:[Vec2|null,Vec2|null]=[null,null];
   // Charge start of the keyboard volley punt (kick key) per code, -1 when the feint spent it.
   private punt=new Map<string,number>();
   // Millisecond time of the last defending tackle key tap, or -1 when disarmed.
@@ -53,8 +58,8 @@ export class BrowserInput {
   constructor(){
     // The keeper hold wins over the header row. With the ball in the hands the
     // □ key charges at head height too, as the charge of the pad does.
-    window.addEventListener('keydown',e=>{if(!this.enabled||this.isEditing(e.target))return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(e.code))e.preventDefault();if(!this.keys.has(e.code)){this.edges.add(e.code);const slot=chargeSlot.get(e.code);if(slot===undefined||!this.aerial[slot]||this.keeper[slot]&&this.keeperHold[slot])this.charges.set(e.code,performance.now());}this.keys.add(e.code);});
-    window.addEventListener('keyup',e=>{this.keys.delete(e.code);const start=this.charges.get(e.code);if(start!==undefined){this.releases.set(e.code,clamp((performance.now()-start)/850,.15,1));this.charges.delete(e.code);}});
+    window.addEventListener('keydown',e=>{if(!this.enabled||this.isEditing(e.target))return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(e.code))e.preventDefault();if(!this.keys.has(e.code)){this.edges.add(e.code);const slot=chargeSlot.get(e.code);const setSlot=([0,1] as const).find(i=>this.restart[i]?.attacking&&this.restart[i]?.kind!=='kickoff'&&['setPower','setFeint','shortRoll'].some(id=>presetKeys(id,i===0?'p1':'p2').includes(e.code)));if(setSlot!==undefined||slot===undefined||!this.aerial[slot]||this.keeper[slot]&&this.keeperHold[slot])this.charges.set(e.code,performance.now());if(setSlot!==undefined){const player=setSlot===0?'p1':'p2',second=presetKeys('secondTaker',player)[0];if(this.restart[setSlot]?.kind==='penalty'&&this.keys.has(second)&&presetKeys('panenka',player).includes(e.code))this.setPanenka.add(e.code);if(this.keys.has(second)&&presetKeys('shortRoll',player).includes(e.code))this.setRoll.add(e.code);}}this.keys.add(e.code);});
+    window.addEventListener('keyup',e=>{this.keys.delete(e.code);const start=this.charges.get(e.code);if(start!==undefined){if(!this.setSpent.has(e.code))this.releases.set(e.code,clamp((performance.now()-start)/850,.15,1));this.charges.delete(e.code);}else this.setSpent.delete(e.code);});
     window.addEventListener('blur',()=>this.clear());
     document.addEventListener('visibilitychange',()=>{if(document.hidden)this.clear();});
   }
@@ -70,7 +75,11 @@ export class BrowserInput {
   setKeeper(flags:[boolean,boolean]){this.keeper=[...flags];}
   /** The match shell sets the ball-in-hands state of both keepers. */
   setKeeperHold(flags:[boolean,boolean]){this.keeperHold=[...flags];}
-  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.punt.clear();this.tackleTap=[-1,-1];this.aerial=[false,false];this.keeper=[false,false];this.keeperHold=[false,false];this.controller.reset();this.touch.clear();this.lastTick=-1;}
+  /** The match shell sets the set piece of both slots, or null when in play. */
+  setRestart(r:[{kind:string,attacking:boolean}|null,{kind:string,attacking:boolean}|null]){for(const slot of [0,1] as const)if(this.restart[slot]?.kind!==r[slot]?.kind||this.restart[slot]?.attacking!==r[slot]?.attacking)this.fixedAim[slot]=null;this.restart=[...r];}
+  /** Drops every held key, edge, charge and release, every set-piece flag and
+   * the whole touch pad, so no pending state can fire after a reset. */
+  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.setSpent.clear();this.setPanenka.clear();this.setRoll.clear();this.fixedAim=[null,null];this.punt.clear();this.tackleTap=[-1,-1];this.aerial=[false,false];this.keeper=[false,false];this.keeperHold=[false,false];this.restart=[null,null];this.controller.reset();this.touch.clear();this.lastTick=-1;}
   /** Shows or hides the on-screen touch pad. A change drops every held touch.
    * The physical pads keep their slots: the touch reading takes slot 0 only. */
   setTouchActive(on:boolean){if(on===this.touchOn)return;this.touchOn=on;this.touch.clear();if(on)this.controller.stashSlots();else this.controller.restoreSlots();}
@@ -81,14 +90,44 @@ export class BrowserInput {
   context(slot:TeamIndex):TouchContext{const keeper=this.keeper[slot],hold=keeper&&this.keeperHold[slot];return{defending:this.defending[slot],aerial:this.aerial[slot],keeper,hold};}
   pauseRequested(){return this.controller.pauseRequested(this.pads());}
   cameraRequested(){return this.controller.cameraRequested(this.pads());}
-  // Keyboard charge first: with no key held the touch pad reads its own charge.
-  get charging(){const start=this.charges.get(firstCharge('p1'));if(start!==undefined)return clamp((performance.now()-start)/850,0,1);return this.touchOn?this.controller.chargeLevel(0):0;}
+  // Keyboard charge first: the set-piece keys of an attack restart, else the shot
+  // key. With no key held the touch pad reads the mapper charge of slot 0.
+  get charging(){const codes=this.restart[0]?.attacking?[...presetKeys('setPower','p1'),...presetKeys('setFeint','p1'),...presetKeys('shortRoll','p1')]:[firstCharge('p1')];const starts=codes.map(c=>this.charges.get(c)).filter((v):v is number=>v!==undefined);if(starts.length)return clamp((performance.now()-Math.min(...starts))/850,0,1);return this.touchOn?this.controller.chargeLevel(0):0;}
   get gamepads(){return Array.from(navigator.getGamepads?.()??[]).filter((p):p is Gamepad=>!!p&&p.connected);}
+  /** Set-piece chords of the keyboard rows, read by the set-piece row ids of the preset. */
+  private setPieceFlags(slot:TeamIndex,player:'p1'|'p2',movement:Vec2,moveActive:boolean):Partial<InputFrame>{
+    const sp=this.restart[slot];if(!sp)return{};
+    const keys=(id:string)=>presetKeys(id,player);
+    const held=(id:string)=>keys(id).some(c=>this.keys.has(c));
+    const edge=(id:string)=>keys(id).some(c=>this.edges.has(c));
+    const second=keys('secondTaker')[0]??'',cross=keys('shortRoll')[0]??'',move=keys('move'),f:Partial<InputFrame>={};
+    if(sp.attacking){
+      if([...keys('setPower'),...keys('setFeint'),...keys('shortRoll')].some(c=>this.releases.has(c)))f.setKick=true;
+      if(this.keys.has(second)){
+        if(move[0]&&this.edges.has(move[0]))f.secondTaker='side';
+        else if(move[1]&&this.edges.has(move[1]))f.secondTaker='behind';
+      }
+      if(held('secondTakerKick'))f.secondKick=true;
+      if((sp.kind==='free-kick'||sp.kind==='indirect')&&held('setFeint')&&cross&&this.edges.has(cross)){f.setFeint=true;f.setKick=undefined;for(const code of [...keys('setFeint'),...keys('shortRoll')]){if(this.keys.has(code))this.setSpent.add(code);this.charges.delete(code);this.releases.delete(code);}}
+      if(this.keys.has(second)&&cross&&this.edges.has(cross))this.setRoll.add(cross);
+      if(sp.kind==='penalty'&&this.keys.has(second)&&edge('panenka'))for(const code of keys('panenka'))if(this.keys.has(code))this.setPanenka.add(code);
+      if(cross&&this.releases.has(cross)&&this.setRoll.has(cross))f.shortRoll=true;
+      if(sp.kind==='penalty'&&[...keys('panenka')].some(c=>this.releases.has(c)&&this.setPanenka.has(c)))f.panenka=true;
+    }else{
+      const wallHold=keys('wallHold')[0]??'';
+      if(edge('wallJump')&&!(wallHold&&this.keys.has(wallHold)))f.wallJump=true;
+      const chargeCode=keys('wallCharge').find(c=>this.keys.has(c));
+      if(chargeCode!==undefined){const start=this.charges.get(chargeCode);if(start!==undefined)f.wallCharge=clamp((performance.now()-start)/850,0,1);}
+      if((held('setKeeperMove')||sp.kind==='penalty')&&moveActive)f.keeperMove={...movement};
+    }
+    if(sp.kind==='corner')for(const [code,dir] of [[move[0],'up'],[move[1],'down'],[move[2],'left'],[move[3],'right']] as const)if(code&&this.edges.has(code)){f.cornerSide=dir;break;}
+    return f;
+  }
   sample(tick:number,slot:TeamIndex):InputFrame {
     if(!this.enabled)return{tick,slot,move:{x:0,y:0},aim:this.aim[slot],sprint:false,shield:false};
     this.lastTick=tick;
     const player: 'p1'|'p2' = slot===0?'p1':'p2';
-    const move=KEYBOARD_MOVE[player],roles=KEYBOARD_MAP[player],defending=this.defending[slot],aerial=this.aerial[slot],keeper=this.keeper[slot],keeperHold=this.keeperHold[slot];
+    const move=KEYBOARD_MOVE[player],roles=KEYBOARD_MAP[player],restart=this.restart[slot]?.kind==='kickoff'?null:this.restart[slot],defending=restart?false:this.defending[slot],aerial=restart?false:this.aerial[slot],keeper=this.keeper[slot],keeperHold=this.keeperHold[slot];
     // The ball is in the keeper hands: the keeper row uses the throw and kick
     // gestures in every context instead of the dive and the header row.
     const hold=keeper&&keeperHold;
@@ -99,6 +138,8 @@ export class BrowserInput {
     if(!defending)this.tackleTap[slot]=-1;
     let movement={x:Number(this.keys.has(move[3]))-Number(this.keys.has(move[2])),y:Number(this.keys.has(move[1]))-Number(this.keys.has(move[0]))};
     const moveActive=length(movement)>.1;
+    // Set-piece chords read before the main loop consumes the key edges.
+    const setPiece=this.setPieceFlags(slot,player,movement,moveActive);
     let sprint=false,shield=false,action:ActionKind|undefined,power=.55,switchPlayer=false;
     let keeperRush=false,keeperDrop=false,keeperFeint=false,simulateDive=false,keeperKick:'punt'|'high'|undefined;
     const highHeld=Object.entries(roles).some(([code,role])=>role.keeperHigh&&this.keys.has(code));
@@ -132,7 +173,7 @@ export class BrowserInput {
       if(role.sprint&&this.keys.has(code))sprint=true;
       // At head height the key plays the header with or without the ball, except
       // for the keeper, that keeps its own row. The holder keeps the attack keys.
-      const kind=dive?role.defense:hold?role.attack:aerial?(role.attack??role.defense):(defending?role.defense:role.attack);
+      const kind=restart?.attacking?role.attack:dive?role.defense:hold?role.attack:aerial?(role.attack??role.defense):(defending?role.defense:role.attack);
       const edge=this.edges.delete(code);
       // R1 with the stick released puts the held ball down or picks a low ball up.
       if(role.sprint&&edge&&keeper&&!moveActive&&!rushKeyHeld)keeperDrop=true;
@@ -146,9 +187,14 @@ export class BrowserInput {
         if(release!==undefined){action='shoot';power=release;this.releases.delete(code);}
         continue;
       }
+      if(restart?.attacking&&(kind==='pass'||kind==='cross')){
+        const release=this.releases.get(code);
+        if(release!==undefined){action=kind;power=release;this.releases.delete(code);}
+        continue;
+      }
       if(!edge)continue;
       // L1 (switch key) + ○ (cross key) plays the lob, as in the PES table.
-      if(role.switchPlayer&&!passOrCrossHeld(roles,this.keys))switchPlayer=true;
+      if(role.switchPlayer&&!restart&&!passOrCrossHeld(roles,this.keys))switchPlayer=true;
       // The keeper □ key stays a clearance key: at head height it charges nothing
       // and never heads.
       if(dive&&kind==='shoot')continue;
@@ -179,9 +225,10 @@ export class BrowserInput {
     }
     let switchKeeper=this.edges.delete(KEEPER_KEYS[slot]);
     // A cancelled touch pointer must not fire its pending release: drop the
-    // charge and the previous state of slot 0 before the mapper samples.
+    // charge, the set-piece state and the previous state of slot 0 before the
+    // mapper samples.
     if(this.touch.takeCancelled())this.controller.discardCharge();
-    const pad=this.controller.sample(this.pads(),tick,slot,defending,aerial,keeper,hold);
+    const pad=this.controller.sample(this.pads(),tick,slot,defending,aerial,keeper,hold,restart);
     if(length(pad.move)>.1)movement=pad.move;
     sprint||=pad.sprint;shield||=pad.shield;switchPlayer||=pad.switchPlayer;switchKeeper||=pad.switchKeeper;
     if(pad.action){action=pad.action;power=pad.power;}
@@ -193,8 +240,13 @@ export class BrowserInput {
     // Header row: at head height □ or a pass button heads the ball. The holder
     // of the ball keeps its own row.
     if(action)action=pesHeader(action,aerial&&!hold);
-    if(length(movement)>1)movement=unit(movement);if(length(movement)>.1)this.aim[slot]=unit(movement);if(pad.aim)this.aim[slot]=pad.aim;
-    const frame:InputFrame={tick,slot,move:movement,aim:this.aim[slot],sprint,shield,action,power,switchPlayer,switchKeeper};
+    if(length(movement)>1)movement=unit(movement);
+    const fixed=restart&&(presetKeys('setFix',player).some(c=>this.keys.has(c))||pad.setFix);
+    if(!fixed){this.fixedAim[slot]=null;if(length(movement)>.1)this.aim[slot]=unit(movement);if(pad.aim)this.aim[slot]=pad.aim;}
+    else if(!this.fixedAim[slot])this.fixedAim[slot]={...this.aim[slot]};
+    const frame:InputFrame={tick,slot,move:movement,aim:{...(this.fixedAim[slot]??this.aim[slot])},sprint,shield,action,power,switchPlayer,switchKeeper,...setPiece};
+    for(const name of ['setKick','secondTaker','secondKick','setFeint','shortRoll','panenka','wallJump','wallCharge','keeperMove','cornerSide'] as const)if(pad[name]!==undefined)(frame as any)[name]=pad[name];
+    for(const code of [...presetKeys('panenka',player),...presetKeys('shortRoll',player)])if(!this.keys.has(code)&&!this.releases.has(code)){this.setPanenka.delete(code);this.setRoll.delete(code);}
     if(keeperRush)frame.keeperRush=true;
     if(keeperKick)frame.keeperKick=keeperKick;
     if(keeperDrop)frame.keeperDrop=true;

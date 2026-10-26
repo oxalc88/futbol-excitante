@@ -25,7 +25,7 @@ app.innerHTML=`
  <section id="viewport" aria-label="Partido de fútbol">
   <div class="scoreboard"><span class="team-tag home" id="home-short">COS</span><strong id="score">0 : 0</strong><span class="team-tag away" id="away-short">SIE</span><span id="clock">00:00</span><span id="half">1T</span></div>
   <div class="live-strip"><span id="match-mode">PARTIDO DE EXHIBICIÓN</span><span id="phase">Saque inicial</span></div>
-  <div id="announcement" role="status" aria-live="polite"></div>
+  <div id="announcement" role="status" aria-live="polite"></div><div id="set-hint" hidden></div>
   <div class="field-toolbar"><button id="pause-btn" title="Pausar (P)">Ⅱ <span>Pausa</span></button><button id="camera-btn" title="Cambiar cámara (C)">◈ <span>Cámara</span></button><button id="stats-btn">▥ <span>Estadísticas</span></button><button id="sound-btn" aria-pressed="false">♪ <span>Sonido</span></button><label>Volumen <input id="sound-volume" type="range" min="0" max="1" step="0.05" aria-label="Volumen del partido" /></label><button id="fullscreen-btn" title="Pantalla completa">⛶</button></div>
   <div id="pause-overlay" hidden><strong>PAUSA</strong><button id="resume-btn" class="primary">Seguir jugando</button></div>
   <div class="bottom-hud"><div class="player-card"><span class="eyebrow">CONTROLAS A</span><strong id="player-name">—</strong><div class="energy"><span id="energy-bar"></span></div><span id="player-trait">—</span><div class="power" id="power-meter" hidden><span id="power-bar"></span></div></div><canvas id="radar" width="252" height="162" aria-label="Radar con posiciones de jugadores y balón"></canvas><div class="input-hint"><span id="pad-status">TECLADO · JUGADOR 1</span><p><kbd>W A S D</kbd> mover · <kbd>J</kbd> pase<br><kbd>K</kbd> tiro · <kbd>Q</kbd> cambiar<br><kbd>R</kbd> arquero · <kbd>L</kbd> sale △ · <kbd>I</kbd> volea ○</p></div></div>
@@ -137,7 +137,7 @@ $('sound-btn').onclick=toggleSound;updateSoundButton();
 $<HTMLInputElement>('sound-volume').value=String(audio.volume);
 $('sound-volume').oninput=()=>audio.setVolume(Number($<HTMLInputElement>('sound-volume').value));
 function updateHud(){
-  renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil},$);
+  renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil,setHint:setHint(current,guest)},$);
   touchPad.update();
   const s=current;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
@@ -305,7 +305,29 @@ oneOnOne(slot:0|1){
   sim.restore(w);
   previous=current=sim.presentation();
   return true;
-}}});
+},
+// Smoke only: starts the restart of `kind` for `team`, with a four-man wall on the free kick.
+setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
+  // A ball out of play from the last step may leave a waiting restart: replace it.
+  if(!started||guest||replay||!(current.phase==='playing'||(current.restart&&current.phase!=='kickoff')))return false;
+  const L=config.pitch.length/2,W=config.pitch.width/2;
+  const dir=sim.snapshot().teams[team].direction;
+  const point=kind==='free-kick'?{x:dir*(L-24),y:0}:kind==='corner'?{x:dir*(L-.3),y:W-.3}:kind==='penalty'?{x:dir*(L-11),y:0}:kind==='throw-in'?{x:dir*10,y:W-.1}:{x:-dir*(L-5.5),y:6};
+  (sim as any).startRestart(kind,team,point);
+  if(kind==='free-kick'){
+    const w=sim.snapshot();
+    const wall=w.players.filter(p=>p.team===1-team&&!p.keeper&&!p.sentOff).sort((a,b)=>Math.hypot(a.x-point.x,a.y-point.y)-Math.hypot(b.x-point.x,b.y-point.y)||a.id.localeCompare(b.id)).slice(0,4);
+    const row=[-1.5,-.5,.5,1.5];
+    wall.forEach((p,i)=>{p.x=point.x+dir*9.15;p.y=row[i];p.vx=0;p.vy=0;});
+    w.pendingPass=null;
+    sim.restore(w);
+  }
+  previous=current=sim.presentation();
+  return true;
+},
+// Smoke only: reads back the waiting restart, the wall jumps, the keepers and the cursors.
+setPieceState(){const w=sim.snapshot();return {phase:w.phase,tick:w.tick,restart:w.restart?structuredClone(w.restart):null,wallJump:w.players.filter(p=>p.wallJump!==undefined&&p.wallJump>w.tick).map(p=>p.id),keepers:w.players.filter(p=>p.keeper).map(p=>({id:p.id,team:p.team,x:p.x,y:p.y})),selected:[...w.selected],restriction:w.restartRestriction?{...w.restartRestriction}:null};}
+}});
 // A / Cross (button 0) on any pad: start quick play from the menu, close the tips.
 // Button 0 or 1 closes the tips. Nothing acts while another dialog sits on the setup.
 interface PadMenuState{a:boolean;b:boolean}
@@ -341,6 +363,9 @@ function loop(now:number){
   input.setKeeper(guest?[keeper[1],keeper[0]]:keeper);
   const keeperHolding=keeperHoldFlags(current);
   input.setKeeperHold(guest?[keeperHolding[1],keeperHolding[0]]:keeperHolding);
+  // Set-piece keys: the waiting restart, with the team that takes it.
+  const rs=current.restart;const restart=([0,1] as const).map(t=>rs?{kind:rs.kind,attacking:rs.team===t}:null) as [{kind:string,attacking:boolean}|null,{kind:string,attacking:boolean}|null];
+  input.setRestart(guest?[restart[1],restart[0]]:restart);
   if(started&&!document.querySelector('dialog[open]')){
     if(input.pauseRequested())pause(!paused);
     if(input.cameraRequested())changeCamera();
@@ -379,3 +404,13 @@ function loop(now:number){
   requestAnimationFrame(loop);
 }
 updateHud();showDialog('setup-dialog');requestAnimationFrame(loop);
+
+/** HUD hint with the PS glyphs of the set-piece controls while a restart waits. */
+function setHint(s:typeof current,guest:boolean):string{
+  const r=s.restart;if(!r||!config.human[guest?1:0])return '';
+  const attacking=r.team===(guest?1:0);
+  if(r.kind==='penalty')return attacking?'□ tiro · L1+□ panenka · R2 fijar':'Stick: mueve al arquero';
+  if(!attacking)return r.kind==='free-kick'?'□ salta · mantén ✕ quieta · ○ sale la barrera · △+stick arquero':r.kind==='corner'?'Cruceta: ↑ mixta · ← al hombre · → zonal':'';
+  const base='□ / ○ / ✕ potencia · L1+✕ corto · R2 fijar';
+  return r.kind==='corner'?`${base} · Cruceta: ↑ rápido ↓ 1er palo ← en línea → 2º palo`:r.kind==='free-kick'?`${base} · L1+↑/↓ 2º lanzador · L2 tira el 2º · ○ y ✕ amago`:base;
+}

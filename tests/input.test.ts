@@ -54,6 +54,38 @@ test('with the ball each keyboard action is an edge and each player consumes onl
   assert.equal(input.sample(5,0).action,undefined);
 });
 
+test('△ starts an attacking throw-in for either slot, while defence keeps keeper movement',t=>{
+  const {input,key,pads}=browser(t);
+  pads.push(pad(0),pad(1));
+  input.sample(0,0);input.sample(0,1);
+  input.setDefending([true,true]);
+  input.setRestart([{kind:'throw-in',attacking:true},{kind:'throw-in',attacking:true}]);
+  for(const [slot,code] of [[0,'KeyL'],[1,'Numpad3']] as const){
+    key('keydown',code);
+    assert.equal(input.sample(1,slot).action,'through',`keyboard slot ${slot}`);
+    assert.equal(input.sample(2,slot).action,undefined,`held keyboard slot ${slot}`);
+    key('keyup',code);
+    assert.equal(input.sample(3,slot).action,undefined,`released keyboard slot ${slot}`);
+    pads[slot]=pad(slot,[3]);
+    assert.equal(input.sample(4,slot).action,'through',`pad slot ${slot}`);
+    assert.equal(input.sample(5,slot).action,undefined,`held pad slot ${slot}`);
+    pads[slot]=pad(slot);
+    assert.equal(input.sample(6,slot).action,undefined,`released pad slot ${slot}`);
+  }
+  input.setRestart([{kind:'free-kick',attacking:false},{kind:'free-kick',attacking:false}]);
+  for(const [slot,code,move] of [[0,'KeyL','KeyW'],[1,'Numpad3','ArrowUp']] as const){
+    key('keydown',code);key('keydown',move);
+    const keyboard=input.sample(7,slot);
+    assert.ok(keyboard.keeperMove,`defending keyboard keeper slot ${slot}`);
+    key('keyup',code);key('keyup',move);input.sample(8,slot);
+    pads[slot]=pad(slot,[3],[0,-1]);
+    const controller=input.sample(9,slot);
+    assert.equal(controller.action,undefined,`defending pad slot ${slot}`);
+    assert.ok(controller.keeperMove,`defending pad keeper slot ${slot}`);
+    pads[slot]=pad(slot);input.sample(10,slot);
+  }
+});
+
 test('without the ball the defensive keys act and the attack keys do not',t=>{
   const {input,key,time}=browser(t);
   input.setDefending([true,true]);
@@ -531,4 +563,145 @@ test('a keyboard □ press made in the air arms no shot until the key is up',t=>
   assert.equal(input.sample(2,0).action,undefined);
   key('keyup','KeyK');
   assert.equal(input.sample(3,0).action,'shoot');
+});
+
+// --- Set pieces through the virtual touch pad -----------------------------
+type SetRestart=[{kind:string,attacking:boolean}|null,{kind:string,attacking:boolean}|null];
+
+test('virtual touch set piece: □, ✕ and ○ charge in the mapper and fire the set kick on release',t=>{
+  const {input}=browser(t);
+  input.setTouchActive(true);
+  input.setRestart([{kind:'free-kick',attacking:true},null] as SetRestart);
+  // Assign the touch reading to slot 0 with no button held: the press is an edge.
+  input.sample(1,0);
+  // □ charges through the shared PS shot button and the release is the set kick.
+  input.touch.press(1,'square');
+  assert.equal(input.sample(2,0).setKick,undefined,'the hold never kicks');
+  let tick=3;
+  for(;tick<=28;tick++)input.sample(tick,0);
+  assert(input.charging>.4,`the touch set charge feeds the HUD meter: ${input.charging}`);
+  input.touch.release(1);
+  const shot=input.sample(tick++,0);
+  assert.equal(shot.action,'shoot');assert.equal(shot.setKick,true);
+  assert.ok(shot.power!==undefined&&shot.power>.4&&shot.power<=1,`set power ${shot.power}`);
+  assert.equal(input.charging,0,'the meter drops with the charge');
+  assert.equal(input.sample(tick++,0).action,undefined);
+  // ✕ is the ground pass and ○ the high pass of the same charge path.
+  input.touch.press(2,'cross');input.sample(tick++,0);input.touch.release(2);
+  const pass=input.sample(tick++,0);
+  assert.equal(pass.action,'pass');assert.equal(pass.setKick,true);
+  input.touch.press(3,'circle');input.sample(tick++,0);input.touch.release(3);
+  const centre=input.sample(tick++,0);
+  assert.equal(centre.action,'cross');assert.equal(centre.setKick,true);
+  // Without a restart the same touch gives the plain shot, never a set flag.
+  input.setRestart([null,null]);
+  input.touch.press(4,'square');input.sample(tick++,0);input.touch.release(4);
+  const normal=input.sample(tick++,0);
+  assert.equal(normal.action,'shoot');assert.equal(normal.setKick,undefined);
+});
+
+test('a cancelled or dropped touch never fires a pending set kick',t=>{
+  const {input}=browser(t);
+  input.setTouchActive(true);
+  input.setRestart([{kind:'free-kick',attacking:true},null] as SetRestart);
+  input.sample(1,0);
+  input.touch.press(1,'square');input.sample(2,0);input.sample(3,0);
+  assert(input.charging>0,'the set charge builds');
+  input.touch.cancel(1);
+  const cancelled=input.sample(4,0);
+  assert.equal(cancelled.action,undefined,'the cancel fires nothing');
+  assert.equal(cancelled.setKick,undefined);
+  assert.equal(input.charging,0,'the set charge is gone with the cancel');
+  // A charge held while the pad toggles off never reaches the kick either.
+  input.touch.press(2,'square');input.sample(5,0);input.sample(6,0);
+  assert(input.charging>0,'the charge builds again');
+  input.setTouchActive(false);
+  assert.equal(input.sample(7,0).action,undefined);
+  assert.equal(input.charging,0,'the toggle drops the set charge');
+  // A fresh touch charge still kicks after the cancellation.
+  input.setTouchActive(true);
+  input.sample(8,0);
+  input.touch.press(3,'square');input.sample(9,0);input.touch.release(3);
+  const kicked=input.sample(10,0);
+  assert.equal(kicked.action,'shoot');assert.equal(kicked.setKick,true);
+});
+
+test('R2 on the touch pad fixes the set-piece aim and a release follows the stick again',t=>{
+  const {input}=browser(t);
+  input.setTouchActive(true);
+  input.setRestart([{kind:'free-kick',attacking:true},null] as SetRestart);
+  input.sample(1,0);
+  input.touch.stickDown(1,100,100);
+  input.touch.stickMove(1,100+56,100);
+  assert.deepEqual(input.sample(2,0).aim,{x:1,y:0},'the stick aims right');
+  input.touch.press(2,'r2');
+  assert.deepEqual(input.sample(3,0).aim,{x:1,y:0},'R2 keeps the current direction');
+  input.touch.stickMove(1,100,100-56);
+  assert.deepEqual(input.sample(4,0).aim,{x:1,y:0},'R2 fixes the aim while the stick moves');
+  input.touch.release(2);
+  assert.deepEqual(input.sample(5,0).aim,{x:0,y:-1},'the release follows the stick again');
+});
+
+test('panenka, short roll and feint through the shared PS buttons of the touch pad',t=>{
+  const {input}=browser(t);
+  input.setTouchActive(true);
+  input.setRestart([{kind:'penalty',attacking:true},null] as SetRestart);
+  input.sample(1,0);
+  // L1 + □ arms the panenka; the release chips the ball.
+  input.touch.press(1,'l1');input.sample(2,0);
+  input.touch.press(2,'square');input.sample(3,0);
+  input.touch.release(2);
+  const chip=input.sample(4,0);
+  assert.equal(chip.action,'shoot');assert.equal(chip.panenka,true);
+  input.touch.release(1);input.sample(5,0);
+  // The next penalty kick without L1 is a plain shot.
+  input.touch.press(3,'square');input.sample(6,0);input.touch.release(3);
+  const plain=input.sample(7,0);
+  assert.equal(plain.action,'shoot');assert.equal(plain.panenka,undefined);
+  // Free kick: L1 + ✕ rolls the ball short.
+  input.setRestart([{kind:'free-kick',attacking:true},null] as SetRestart);
+  input.sample(8,0);
+  input.touch.press(4,'l1');input.sample(9,0);
+  input.touch.press(5,'cross');input.sample(10,0);
+  input.touch.release(5);
+  const roll=input.sample(11,0);
+  assert.equal(roll.action,'pass');assert.equal(roll.shortRoll,true);
+  input.touch.release(4);input.sample(12,0);
+  // ○ held and then ✕ fakes the kick: the feint flag sets and no ball leaves.
+  input.touch.press(6,'circle');input.sample(13,0);
+  input.touch.press(7,'cross');
+  const feint=input.sample(14,0);
+  assert.equal(feint.setFeint,true);assert.equal(feint.action,undefined);assert.equal(feint.setKick,undefined);
+  input.touch.release(7);
+  assert.equal(input.sample(15,0).action,undefined,'the spent charges fire nothing');
+  input.touch.release(6);
+  assert.equal(input.sample(16,0).action,undefined);
+});
+
+test('wall jump, wall charge and keeper move from the touch pad on a defending free kick',t=>{
+  const {input}=browser(t);
+  input.setTouchActive(true);
+  input.setRestart([{kind:'free-kick',attacking:false},null] as SetRestart);
+  input.sample(1,0);
+  // □ jumps over the wall and never kicks the ball away.
+  input.touch.press(1,'square');
+  const jump=input.sample(2,0);
+  assert.equal(jump.wallJump,true);assert.equal(jump.action,undefined);
+  input.touch.release(1);
+  assert.equal(input.sample(3,0).wallJump,undefined);
+  assert.equal(input.sample(4,0).action,undefined);
+  // A held ○ builds the wall charge sample by sample.
+  input.touch.press(2,'circle');
+  const first=input.sample(5,0),second=input.sample(6,0);
+  assert.ok(first.wallCharge!==undefined&&first.wallCharge>0,`wall charge ${first.wallCharge}`);
+  assert.ok(second.wallCharge!==undefined&&second.wallCharge>first.wallCharge,`wall charge grows ${first.wallCharge} → ${second.wallCharge}`);
+  input.touch.release(2);
+  assert.equal(input.sample(7,0).wallCharge,undefined);
+  // △ + stick moves the keeper of the wall.
+  input.touch.press(3,'triangle');
+  input.touch.stickDown(4,100,100);input.touch.stickMove(4,100,100-56);
+  const keeperMove=input.sample(8,0);
+  assert.ok(keeperMove.keeperMove&&keeperMove.keeperMove.y<0,`keeper move ${JSON.stringify(keeperMove.keeperMove)}`);
+  input.touch.release(3);input.touch.stickUp(4);
+  assert.equal(input.sample(9,0).keeperMove,undefined);
 });
