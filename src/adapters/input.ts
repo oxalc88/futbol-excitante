@@ -84,6 +84,8 @@ export class BrowserInput {
    * The physical pads keep their slots: the touch reading takes slot 0 only. */
   setTouchActive(on:boolean){if(on===this.touchOn)return;this.touchOn=on;this.touch.clear();if(on)this.controller.stashSlots();else this.controller.restoreSlots();}
   get touchActive(){return this.touchOn;}
+  /** Set piece of one slot: kind, attacking flag, or null while the ball is in play. */
+  setPieceOf(slot:TeamIndex){return this.restart[slot];}
   /** Pad readings of this sample. The touch reading comes first, so it owns slot 0. */
   private pads(){return this.touchOn?[this.touch.reading(true),...this.gamepads]:this.gamepads;}
   /** Label row of the touch buttons for the game state of one slot. */

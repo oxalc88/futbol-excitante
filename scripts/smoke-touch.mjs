@@ -600,7 +600,18 @@ try {
           if (visible(el)) hud.push({ name: sel, ...rect(el) });
         return { pad, hud };
       }, HUD_SEL);
-      check(pad.length === 7, `${W}x${H} ${state}: expected 7 visible pad buttons, found ${pad.length}`);
+      const want = state === 'set-piece' ? 8 : 7;
+      check(pad.length === want, `${W}x${H} ${state}: expected ${want} visible pad buttons, found ${pad.length}`);
+      // L2 shows only while the own waiting free kick of team 0 waits.
+      const l2 = pad.filter(b => b.name === 'l2');
+      check((state === 'set-piece') === (l2.length === 1),
+        `${W}x${H} ${state}: L2 visible for ${l2.length} pad buttons`);
+      // No two pad buttons cover each other.
+      for (let i = 0; i < pad.length; i++) for (let j = i + 1; j < pad.length; j++) {
+        const a = pad[i], b = pad[j];
+        check(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y,
+          `${W}x${H} ${state}: pad ${a.name} ${JSON.stringify(a)} overlaps pad ${b.name} ${JSON.stringify(b)}`);
+      }
       for (const b of pad)
         check(b.w >= 56 && b.h >= 56, `${W}x${H} ${state}: pad ${b.name} is ${b.w}x${b.h}, below 56x56`);
       for (const sel of ['#pause-btn', '.scoreboard', '#radar'])
@@ -646,6 +657,36 @@ try {
     check(await page.evaluate(() => window.__fe?.paused === true
       && !document.querySelector('#pause-overlay').hidden), `${W}x${H}: pause did not stick`);
     await evidence(page, `9-hud-${W}x${H}-paused`, { paused: true, pauseCenter: { x: c.x, y: c.y } });
+    await context.close();
+  }
+
+  // 10: L2 on the waiting free kick of team 0 gives the kick to the second
+  // taker, and the touch help line names no button that the pad hides.
+  stage='l2-second-taker';
+  {
+    const { context, page } = await newPage(844, 390, true);
+    await beginPlay(page);
+    await forceFreeKick(page, 0);
+    await page.waitForFunction(() => { const el = document.querySelector('.tp-l2');
+      return !!el && !el.hidden && el.getClientRects().length > 0; }, null, {timeout:5000, polling:100});
+    const hint = await page.evaluate(() =>
+      (document.querySelector('#set-hint').textContent ?? '').replace(/\s+/g, ' ').trim());
+    check(!hint.includes('↑'), `The touch hint still names the cruceta arrows: ${hint}`);
+    check(!hint.includes('Cruceta'), `The touch hint still names the cruceta: ${hint}`);
+    check(await touchDown(page, '.tp-l2', 41), 'Pad L2 button not found');
+    await page.waitForFunction(() => window.__feSmoke.setPieceState().restart?.second?.id != null,
+      null, {timeout:5000, polling:100});
+    const second = await page.evaluate(() => window.__feSmoke.setPieceState().restart?.second?.id ?? null);
+    check(second !== null, 'No second taker beside the ball');
+    check(await touchDown(page, '.tp-square', 42), 'Pad □ button not found');
+    await page.waitForTimeout(500);
+    await touchUp(page, 42);
+    await page.waitForFunction(id => window.__fe.ball.lastTouch?.playerId === id, second,
+      {timeout:8000, polling:50});
+    const lastTouch = await page.evaluate(() => window.__fe.ball.lastTouch?.playerId ?? null);
+    check(lastTouch === second, `Last touch ${lastTouch} is not the second taker ${second}`);
+    await evidence(page, '10-l2-second-taker', { second, lastTouch, hint });
+    await touchUp(page, 41);
     await context.close();
   }
 } catch (e) { errors.push(`fatal (${stage}): ${e.message}`);
