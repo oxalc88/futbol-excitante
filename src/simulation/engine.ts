@@ -26,6 +26,8 @@ const WALL_JUMP_TICKS=40;
 export class Simulation {
   private world: World;
   private observer?: (events: readonly MatchEvent[])=>void;
+  // Teammate press count held by each slot; 0 while no hold is active.
+  private teamPressHold:[number,number]=[0,0];
   constructor(config:Config, teams:[TeamProfile,TeamProfile], observer?: (events:readonly MatchEvent[])=>void) {
     if(!Number.isFinite(config.halfSeconds)||config.halfSeconds<=0||!Number.isInteger(config.seed)||!Number.isFinite(config.dt)||config.dt<=0||config.dt>.05) throw new Error('Invalid match configuration');
     if(teams.some(t=>t.players.length!==config.teamSize)||config.teamSize<2||config.teamSize>11||new Set(teams.flatMap(t=>t.players.map(p=>p.id))).size!==config.teamSize*2) throw new Error('Invalid roster cardinality or duplicate player IDs');
@@ -60,6 +62,10 @@ export class Simulation {
       for(const k of ['keeperRush','keeperDrop','keeperFeint','simulateDive']as const)if(f[k]!==undefined&&typeof f[k]!=='boolean')throw new Error('Invalid keeper input flag');
       // Set-piece flags: booleans, the two taker placements, the dpad and the wall charge.
       for(const k of ['setKick','secondKick','setFeint','shortRoll','panenka','wallJump']as const)if(f[k]!==undefined&&typeof f[k]!=='boolean')throw new Error('Invalid set-piece input flag');
+      // Defense flags: two booleans, a teammate count of 0 to 2 and a finite stick.
+      for(const k of ['press','jockey']as const)if(f[k]!==undefined&&typeof f[k]!=='boolean')throw new Error('Invalid defense input flag');
+      if(f.teamPress!==undefined&&(!Number.isInteger(f.teamPress)||f.teamPress<0||f.teamPress>2))throw new Error('Invalid team pressure count');
+      if(f.switchTarget!==undefined)for(const v of[f.switchTarget.x,f.switchTarget.y])if(!Number.isFinite(v))throw new Error('Non-finite input');
       if(f.secondTaker!==undefined&&!['side','behind'].includes(f.secondTaker))throw new Error('Unknown second taker');
       if(f.cornerSide!==undefined&&!['up','down','left','right'].includes(f.cornerSide))throw new Error('Unknown set-piece direction');
       if(f.wallCharge!==undefined&&(!Number.isFinite(f.wallCharge)||f.wallCharge<0||f.wallCharge>1))throw new Error('Invalid wall charge');
@@ -257,7 +263,54 @@ export class Simulation {
       // A player who cannot touch the ball yet (the taker after a second-taker kick) does not take the cursor.
       const carrier=this.player(w.carrier);if(carrier&&carrier.team===slot&&!carrier.keeper&&!(carrier.touchCooldown>0&&w.restartRestriction?.taker===w.ball.lastTouch?.playerId&&carrier.id!==w.ball.lastTouch?.playerId)&&!(this.player(w.selected[slot])?.manualControl)&&w.selected[slot]!==carrier.id){w.selected[slot]=carrier.id;this.emit('control-switched',carrier,slot);}
       let p=this.player(w.selected[slot]);if(p?.sentOff){w.selected[slot]=this.closestOutfield(slot);p=this.player(w.selected[slot]);}if(!p)continue;
-      const f=frames.find(f=>f.slot===slot);if(f&&(length(f.move)>.1||f.action))this.emit('input-intent',p,slot,{inputTick:f.tick,action:f.action??null,move:f.move});p.intent=f?{move:f.move,aim:f.aim,sprint:f.sprint,shield:f.shield,action:f.action,power:f.power??.5}:idle();
+      const f=frames.find(f=>f.slot===slot);if(f&&(length(f.move)>.1||f.action))this.emit('input-intent',p,slot,{inputTick:f.tick,action:f.action??null,move:f.move});const intentOf=()=>f?{move:f.move,aim:f.aim,sprint:f.sprint,shield:f.shield,action:f.action,power:f.power??.5}:idle();p.intent=intentOf();
+      // An opponent carries the ball: the slot defends and reads the PES rows.
+      const foe=carrier&&carrier.team!==slot?carrier:undefined;
+      // Right stick flick: manual switch while the own team has no ball. It runs
+      // before the press rows, and the cursor leaves the keeper as the L1 path does.
+      if(f?.switchTarget&&!(carrier&&carrier.team===slot)){
+        const dir=unit(f.switchTarget);
+        const pick=w.players.filter(q=>q.team===slot&&!q.keeper&&!q.sentOff&&q.id!==p.id)
+          .map(q=>({q,u:unit(delta(p,q)),dist:distance(p,q)})).map(c=>({...c,dot:c.u.x*dir.x+c.u.y*dir.y}))
+          .filter(c=>c.dot>.5).sort((a,b)=>b.dot-a.dot||a.dist-b.dist)[0];
+        if(pick){
+          const previous=p;
+          if(previous.keeper){delete previous.manualControl;delete previous.keeperRushing;if(w.keeperHold?.playerId===previous.id)this.scheduleKeeperRelease(previous);}
+          w.selected[slot]=pick.q.id;p=this.player(w.selected[slot])!;
+          if(previous.keeper)previous.intent=decidePlayer(w,previous);
+          p.intent=intentOf();this.emit('control-switched',p,slot);
+        }
+      }
+      // Only the current cursor may keep a press or contain flag.
+      for(const q of w.players)if(q.team===slot&&q!==p){if(q.pressing!==undefined)delete q.pressing;if(q.jockeying!==undefined)delete q.jockeying;}
+      // Hold ✕ chases the carrier, hold R2 contains him and hold □ sends teammates.
+      if(!p.keeper&&foe){
+        if(f?.press){p.intent.move=unit(delta(p,foe));if(p.pressing!==true){p.pressing=true;this.emit('defense-press',p,slot);}}else if(p.pressing!==undefined)delete p.pressing;
+        if(f?.jockey){
+          const m=p.intent.move,len=length(m);if(len>.55)p.intent.move={x:m.x*.55/len,y:m.y*.55/len};
+          p.intent.sprint=false;p.intent.aim=unit(delta(p,foe));
+          if(p.jockeying!==true){p.jockeying=true;this.emit('defense-jockey',p,slot);}
+        }else if(p.jockeying!==undefined)delete p.jockeying;
+        const count=f?.teamPress??0;
+        if(count>0){
+          const mates=w.players.filter(q=>q.team===slot&&!q.keeper&&!q.sentOff&&q.id!==p.id).sort((a,b)=>distance(a,foe)-distance(b,foe)||a.id.localeCompare(b.id));
+          const picked=new Set(mates.slice(0,count).map(q=>q.id));
+          // The AI rewrites intents on its cadence, so re-apply the chase every tick.
+          for(const q of w.players)if(q.team===slot&&!q.keeper){
+            if(picked.has(q.id)){q.intent={...q.intent,move:unit(delta(q,foe)),sprint:true};q.teamPressing=true;}
+            else if(q.teamPressing!==undefined)delete q.teamPressing;
+          }
+          if(this.teamPressHold[slot]!==count){this.teamPressHold[slot]=count;this.emit('team-press',p,slot,{count});}
+        }else{
+          this.teamPressHold[slot]=0;
+          for(const q of w.players)if(q.team===slot&&q.teamPressing!==undefined)delete q.teamPressing;
+        }
+      }else{
+        // No press row: the flags of the slot and of its teammates die here.
+        if(p.pressing!==undefined)delete p.pressing;if(p.jockeying!==undefined)delete p.jockeying;
+        this.teamPressHold[slot]=0;
+        for(const q of w.players)if(q.team===slot&&q.teamPressing!==undefined)delete q.teamPressing;
+      }
       // Foul dive (PES row: L1+L2+L3+R3 without R2): the selected player falls
       // without foul and without card. Keeper mode changes only for the keeper.
       if(f?.simulateDive&&p.recovery===0){
