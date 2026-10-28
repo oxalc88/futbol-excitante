@@ -49,6 +49,10 @@ export class BrowserInput {
   private punt=new Map<string,number>();
   // Millisecond time of the last defending tackle key tap, or -1 when disarmed.
   private tackleTap=[-1,-1];
+  // Millisecond time of the last defending shot key tap and its double tap flag:
+  // □ held sends one teammate, □ ×2 inside the window and held sends two.
+  private squareTap=[-1,-1];
+  private squareDouble=[false,false];
   // On-screen PS-style touch pad: one virtual gamepad reading for slot 0.
   readonly touch=new TouchPad();
   private touchOn=false;
@@ -67,8 +71,8 @@ export class BrowserInput {
   setDirections(d:[number,number]){if(d[0]!==this.directions[0]){this.aim=[{x:d[0],y:0},{x:d[1],y:0}];}this.directions=d;}
   /** The match shell sets the state of both teams from the ball. */
   setDefending(flags:[boolean,boolean]){this.defending=[...flags];
-    // The attack context disarms the armed tackle tap, as the pad path does.
-    for(const slot of [0,1] as const)if(!flags[slot])this.tackleTap[slot]=-1;}
+    // The attack context disarms the armed tackle tap and the □ double tap, as the pad path does.
+    for(const slot of [0,1] as const)if(!flags[slot]){this.tackleTap[slot]=-1;this.squareTap[slot]=-1;this.squareDouble[slot]=false;}}
   /** The match shell sets the head-height band of the ball for both teams. */
   setAerial(flags:[boolean,boolean]){this.aerial=[...flags];}
   /** The match shell sets the goalkeeper cursor of both teams. */
@@ -79,7 +83,7 @@ export class BrowserInput {
   setRestart(r:[{kind:string,attacking:boolean}|null,{kind:string,attacking:boolean}|null]){for(const slot of [0,1] as const)if(this.restart[slot]?.kind!==r[slot]?.kind||this.restart[slot]?.attacking!==r[slot]?.attacking)this.fixedAim[slot]=null;this.restart=[...r];}
   /** Drops every held key, edge, charge and release, every set-piece flag and
    * the whole touch pad, so no pending state can fire after a reset. */
-  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.setSpent.clear();this.setPanenka.clear();this.setRoll.clear();this.fixedAim=[null,null];this.punt.clear();this.tackleTap=[-1,-1];this.aerial=[false,false];this.keeper=[false,false];this.keeperHold=[false,false];this.restart=[null,null];this.controller.reset();this.touch.clear();this.lastTick=-1;}
+  clear(){this.keys.clear();this.edges.clear();this.charges.clear();this.releases.clear();this.setSpent.clear();this.setPanenka.clear();this.setRoll.clear();this.fixedAim=[null,null];this.punt.clear();this.tackleTap=[-1,-1];this.squareTap=[-1,-1];this.squareDouble=[false,false];this.aerial=[false,false];this.keeper=[false,false];this.keeperHold=[false,false];this.restart=[null,null];this.controller.reset();this.touch.clear();this.lastTick=-1;}
   /** Shows or hides the on-screen touch pad. A change drops every held touch.
    * The physical pads keep their slots: the touch reading takes slot 0 only. */
   setTouchActive(on:boolean){if(on===this.touchOn)return;this.touchOn=on;this.touch.clear();if(on)this.controller.stashSlots();else this.controller.restoreSlots();}
@@ -137,7 +141,19 @@ export class BrowserInput {
     // the hold, □ skips its shot charge, so the hold queues no release.
     if(aerial){this.tackleTap[slot]=-1;if(!hold)for(const code of Object.keys(roles))if(chargeCodes.has(code)){this.charges.delete(code);this.releases.delete(code);}}
     // The attack context disarms the armed tap too, as the pad path does.
-    if(!defending)this.tackleTap[slot]=-1;
+    if(!defending){this.tackleTap[slot]=-1;this.squareTap[slot]=-1;this.squareDouble[slot]=false;}
+    // Defense hold rows of the keyboard: hold ✕ for pressure, hold □ for the
+    // teammate pressure (□ ×2 inside the window and held sends two) and hold the
+    // R2 fix key for the jockey contain. They read the edges before the main loop.
+    const heldRow=(id:string)=>presetKeys(id,player).some(c=>this.keys.has(c));
+    const pressHeld=defending&&heldRow('pressure');
+    const jockeyHeld=defending&&heldRow('setFix');
+    const shotKeys=presetKeys('shot',player);
+    let teamPressHeld:0|1|2=0;
+    if(defending&&shotKeys.some(c=>this.keys.has(c))){
+      if(shotKeys.some(c=>this.edges.has(c))){const now=performance.now();this.squareDouble[slot]=this.squareTap[slot]>=0&&now-this.squareTap[slot]<=TAP_MS;this.squareTap[slot]=now;}
+      teamPressHeld=this.squareDouble[slot]?2:1;
+    }else this.squareDouble[slot]=false;
     let movement={x:Number(this.keys.has(move[3]))-Number(this.keys.has(move[2])),y:Number(this.keys.has(move[1]))-Number(this.keys.has(move[0]))};
     const moveActive=length(movement)>.1;
     // Set-piece chords read before the main loop consumes the key edges.
@@ -254,6 +270,13 @@ export class BrowserInput {
     if(keeperDrop)frame.keeperDrop=true;
     if(keeperFeint)frame.keeperFeint=true;
     if(simulateDive)frame.simulateDive=true;
+    // Defense rows: the keyboard and the pad hold the same flags. The larger
+    // teammate count wins when both sides hold □.
+    if(pressHeld||pad.press)frame.press=true;
+    if(jockeyHeld||pad.jockey)frame.jockey=true;
+    const teamPress=Math.max(teamPressHeld,pad.teamPress??0) as 0|1|2;
+    if(teamPress>0)frame.teamPress=teamPress;
+    if(pad.switchTarget)frame.switchTarget=pad.switchTarget;
     return frame;
   }
 }

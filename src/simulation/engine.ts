@@ -270,8 +270,10 @@ export class Simulation {
       // before the press rows, and the cursor leaves the keeper as the L1 path does.
       if(f?.switchTarget&&!(carrier&&carrier.team===slot)){
         const dir=unit(f.switchTarget);
-        const pick=w.players.filter(q=>q.team===slot&&!q.keeper&&!q.sentOff&&q.id!==p.id)
-          .map(q=>({q,u:unit(delta(p,q)),dist:distance(p,q)})).map(c=>({...c,dot:c.u.x*dir.x+c.u.y*dir.y}))
+        // The cursor is fixed here: the filter and the score read `self`, not `p`.
+        const self=p;
+        const pick=w.players.filter(q=>q.team===slot&&!q.keeper&&!q.sentOff&&q.id!==self.id)
+          .map(q=>({q,u:unit(delta(self,q)),dist:distance(self,q)})).map(c=>({...c,dot:c.u.x*dir.x+c.u.y*dir.y}))
           .filter(c=>c.dot>.5).sort((a,b)=>b.dot-a.dot||a.dist-b.dist)[0];
         if(pick){
           const previous=p;
