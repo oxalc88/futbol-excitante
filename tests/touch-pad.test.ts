@@ -12,8 +12,16 @@ function sample(pad: TouchPad, mapper: ControllerMapper, tick: number) {
 }
 
 test('touch buttons use the PS standard indices', () => {
-  assert.deepEqual([...TOUCH_BUTTONS], ['cross', 'circle', 'square', 'triangle', 'r1', 'r2', 'l1']);
-  assert.deepEqual(TOUCH_BUTTON_INDEX, { cross: 0, circle: 1, square: 2, triangle: 3, l1: 4, r1: 5, r2: 7 });
+  assert.deepEqual([...TOUCH_BUTTONS], ['cross', 'circle', 'square', 'triangle', 'r1', 'r2', 'l1', 'l2']);
+  assert.deepEqual(TOUCH_BUTTON_INDEX, { cross: 0, circle: 1, square: 2, triangle: 3, l1: 4, r1: 5, r2: 7, l2: 6 });
+});
+
+test('press l2 reads the standard l2 button', () => {
+  const pad = new TouchPad();
+  pad.press(1, 'l2');
+  assert.equal(pad.reading(true).buttons[6].pressed, true);
+  pad.release(1);
+  assert.equal(pad.reading(true).buttons[6].pressed, false);
 });
 
 test('stick dead zone reads zero and a clear move reads its axis', () => {
@@ -312,6 +320,25 @@ test('mapper: a held r1 sprints', () => {
   assert.equal(sample(pad, mapper, 1).sprint, true);
   pad.release(2);
   assert.equal(sample(pad, mapper, 2).sprint, false);
+});
+
+test('mapper: l2 on the touch pad during an attacking restart places the second taker', () => {
+  const pad = new TouchPad();
+  const mapper = new ControllerMapper();
+  const restart = { kind: 'free-kick', attacking: true };
+  const withRestart = (tick: number) =>
+    mapper.sample([pad.reading(true)], tick, 0, false, false, false, false, restart);
+  // One empty sample assigns the reading, so the first press is an edge.
+  assert.equal(withRestart(0).secondTaker, undefined);
+  pad.press(1, 'l2');
+  const press = withRestart(1);
+  assert.equal(press.secondTaker, 'side', 'the press places the taker beside the ball');
+  assert.equal(press.secondKick, true, 'the press still gives the kick');
+  const next = withRestart(2);
+  assert.equal(next.secondTaker, undefined, 'the placement is one edge, not a hold');
+  assert.equal(next.secondKick, true, 'the held l2 keeps the kick');
+  pad.release(1);
+  assert.equal(withRestart(3).secondKick, undefined, 'the release gives no kick');
 });
 
 test('mapper: a 48 tick square hold gives more power than a 12 tick hold', () => {
