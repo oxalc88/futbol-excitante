@@ -5,14 +5,14 @@
 import { PS_BUTTON } from '../browser/pad-presets';
 import type { PadReading } from './controller';
 
-export type TouchButton = 'cross'|'circle'|'square'|'triangle'|'r1'|'r2'|'l1';
+export type TouchButton = 'cross'|'circle'|'square'|'triangle'|'r1'|'r2'|'l1'|'l2';
 
-export const TOUCH_BUTTONS: readonly TouchButton[] = ['cross','circle','square','triangle','r1','r2','l1'];
+export const TOUCH_BUTTONS: readonly TouchButton[] = ['cross','circle','square','triangle','r1','r2','l1','l2'];
 
 /** Standard button index of each touch button, from the PS preset. */
 export const TOUCH_BUTTON_INDEX: Record<TouchButton, number> = {
   cross: PS_BUTTON.cross, circle: PS_BUTTON.circle, square: PS_BUTTON.square, triangle: PS_BUTTON.triangle,
-  l1: PS_BUTTON.l1, r1: PS_BUTTON.r1, r2: PS_BUTTON.r2,
+  l1: PS_BUTTON.l1, r1: PS_BUTTON.r1, r2: PS_BUTTON.r2, l2: PS_BUTTON.l2,
 };
 
 /** Pixels of finger travel that give full stick deflection. */

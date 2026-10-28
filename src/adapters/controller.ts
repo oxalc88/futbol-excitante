@@ -120,6 +120,8 @@ export class ControllerMapper {
       if(restart.attacking){
         if(held(B.switchPlayer)&&edge(PS_BUTTON.dpadUp))f.secondTaker='side';
         if(held(B.switchPlayer)&&edge(PS_BUTTON.dpadDown))f.secondTaker='behind';
+        // Touch pad: the L2 press also places the second taker beside the ball (no D-pad).
+        if(p.id==='touch-pad'&&edge(B.l2))f.secondTaker='side';
         if(held(B.l2))f.secondKick=true;
         const buttons=[B.pass,B.cross,B.shot];
         if(restart.kind!=='kickoff')for(let i=0;i<buttons.length;i++){

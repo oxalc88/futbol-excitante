@@ -23,6 +23,7 @@ ${faceButtons}
 ${shoulder('r1', '<b>R1</b><span class="tp-label">Correr</span>', 'Correr')}
 ${shoulder('r2', '<b>R2</b>', 'R2, con L1: portero')}
 ${shoulder('l1', '<b>L1</b><span class="tp-label">Cambiar</span>', 'Cambiar')}
+${shoulder('l2', '<b>L2</b><span class="tp-label">2º tira</span>', 'L2: tira el 2º lanzador')}
 </div>
 <div id="rotate-notice" hidden>Gira el teléfono para jugar en horizontal.</div>`;
 
@@ -119,6 +120,10 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
       if (input.gamepads.some(p => p.buttons.some(b => b.pressed))) setActive(false);
       const labels = touchLabels(input.context(0));
       for (const name of FACE) pad.querySelector<HTMLElement>(`.tp-${name} .tp-label`)!.textContent = labels[name];
+      // L2 shows only while the own waiting free kick of slot 0 waits: that is
+      // the one touch state where L2 gives the kick to the second taker.
+      const sp = input.setPieceOf(0);
+      pad.querySelector<HTMLElement>('.tp-l2')!.hidden = !(sp?.attacking && sp.kind === 'free-kick');
       rotate.hidden = !(active && window.innerHeight > window.innerWidth);
     },
   };

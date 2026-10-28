@@ -28,9 +28,11 @@ button{min-height:44px}.close{min-width:44px;min-height:44px}.bottom-hud{pointer
 .tp-square .tp-glyph{color:#d58bd2}
 .tp-triangle .tp-glyph{color:#3fc7a6}
 .tp-r1{width:76px;height:76px;right:calc(var(--sa-right) + 80px);bottom:calc(var(--sa-bottom) + 232px)}
-.tp-r2,.tp-l1{width:56px;height:56px;bottom:calc(var(--sa-bottom) + 232px)}
+.tp-r2,.tp-l1,.tp-l2{width:56px;height:56px;bottom:calc(var(--sa-bottom) + 232px)}
 .tp-r2{right:calc(var(--sa-right) + 16px)}
 .tp-l1{right:calc(var(--sa-right) + 164px)}
+/* L2 sits above R2 until a waiting free kick shows it. */
+.tp-l2{right:calc(var(--sa-right) + 16px);bottom:calc(var(--sa-bottom) + 296px)}
 body.touch-on .input-hint{display:none}
 #rotate-notice{position:fixed;inset:0;z-index:20;display:grid;place-items:center;text-align:center;padding:24px;background:#0a1725f5;color:#f1f4e9;font-size:1.15rem;font-weight:700;line-height:1.5}
 @media(max-width:650px){.live-strip,#player-trait{font-size:12px}.field-toolbar{right:8px}.game{padding-bottom:env(safe-area-inset-bottom)}}
@@ -72,4 +74,7 @@ body.touch-on #sound-volume{width:90px;height:44px}
 body.touch-on .tp-r1{right:calc(var(--sa-right) + 180px);bottom:calc(var(--sa-bottom) + 16px)}
 body.touch-on .tp-r2{right:calc(var(--sa-right) + 190px);bottom:calc(var(--sa-bottom) + 100px)}
 body.touch-on .tp-l1{right:calc(var(--sa-right) + 190px);bottom:calc(var(--sa-bottom) + 164px)}
+/* L2: same row as L1, left of it. It clears the R2 column (8 px), the radar
+   (right edge 345 px), the toolbar and the #set-hint band above it. */
+body.touch-on .tp-l2{right:calc(var(--sa-right) + 254px);bottom:calc(var(--sa-bottom) + 164px)}
 body.touch-on #set-hint{left:calc(var(--sa-left) + 8px);right:calc(var(--sa-right) + 272px);width:auto}
