@@ -13,10 +13,9 @@ button{min-height:44px}.close{min-width:44px;min-height:44px}.bottom-hud{pointer
 .tp-zone{position:absolute;left:var(--sa-left);top:var(--sa-top);bottom:var(--sa-bottom);width:40%;pointer-events:auto;touch-action:none}
 .tp-stick{position:absolute;width:112px;height:112px;border:2px solid #e2edd866;border-radius:50%;background:#17332e5e;transform:translate(-50%,-50%);pointer-events:none}
 .tp-knob{position:absolute;left:calc(50% - 24px);top:calc(50% - 24px);width:48px;height:48px;border-radius:50%;background:#eef1d58a;border:1px solid #fff8;pointer-events:none}
-.tp-btn{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;border-radius:50%;pointer-events:auto;touch-action:none;background:#10202cd9;border:1px solid #bbd3c566;color:#edf1e8;font-weight:800}
+.tp-btn{position:absolute;display:grid;place-items:center;padding:0;border-radius:50%;pointer-events:auto;touch-action:none;background:#10202cd9;border:1px solid #bbd3c566;color:#edf1e8;font-weight:800}
 .tp-btn>b{font-size:.75rem;line-height:1.1;letter-spacing:.02em}
 .tp-glyph{font-size:1.35rem;font-weight:900;line-height:1.1}
-.tp-label{font-size:10px;font-weight:600;color:#cdded6;text-align:center;line-height:1.15;max-width:58px}
 .tp-btn.on{filter:brightness(1.45);border-color:#eaf5e7}
 .tp-cross,.tp-circle,.tp-square,.tp-triangle{width:64px;height:64px}
 .tp-cross{right:calc(var(--sa-right) + 52px);bottom:calc(var(--sa-bottom) + 16px)}

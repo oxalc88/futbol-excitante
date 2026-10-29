@@ -6,12 +6,12 @@
 import { STICK_RADIUS, touchLabels, type TouchButton } from '../adapters/touch-pad';
 import type { BrowserInput } from '../adapters/input';
 
-/** The four kick buttons: their label row changes with the game context. */
+/** The four kick buttons: their context action changes with the game. */
 const FACE = ['cross', 'circle', 'square', 'triangle'] as const;
 const GLYPH: Record<(typeof FACE)[number], string> = { cross: '✕', circle: '○', square: '□', triangle: '△' };
 
 const faceButtons = FACE.map(name =>
-  `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" aria-label="Botón ${GLYPH[name]}"><b class="tp-glyph">${GLYPH[name]}</b><span class="tp-label"></span></button>`).join('');
+  `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" aria-label="Botón ${GLYPH[name]}"><b class="tp-glyph">${GLYPH[name]}</b></button>`).join('');
 
 const shoulder = (name: TouchButton, body: string, aria: string) =>
   `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" aria-label="${aria}">${body}</button>`;
@@ -20,10 +20,10 @@ const markup = `<div id="touch-pad" hidden>
 <div class="tp-zone" data-zone="stick"></div>
 <div class="tp-stick" hidden><span class="tp-knob"></span></div>
 ${faceButtons}
-${shoulder('r1', '<b>R1</b><span class="tp-label">Correr</span>', 'Correr')}
+${shoulder('r1', '<b>R1</b>', 'Correr')}
 ${shoulder('r2', '<b>R2</b>', 'R2, con L1: portero')}
-${shoulder('l1', '<b>L1</b><span class="tp-label">Cambiar</span>', 'Cambiar')}
-${shoulder('l2', '<b>L2</b><span class="tp-label">2º tira</span>', 'L2: tira el 2º lanzador')}
+${shoulder('l1', '<b>L1</b>', 'Cambiar')}
+${shoulder('l2', '<b>L2</b>', 'L2: tira el 2º lanzador')}
 </div>
 <div id="rotate-notice" hidden>Gira el teléfono para jugar en horizontal.</div>`;
 
@@ -119,7 +119,11 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
       // A pressed physical button hands the screen back to the real pad.
       if (input.gamepads.some(p => p.buttons.some(b => b.pressed))) setActive(false);
       const labels = touchLabels(input.context(0));
-      for (const name of FACE) pad.querySelector<HTMLElement>(`.tp-${name} .tp-label`)!.textContent = labels[name];
+      for (const name of FACE) {
+        const button = pad.querySelector<HTMLElement>(`.tp-${name}`)!;
+        button.dataset.action = labels[name];
+        button.setAttribute('aria-label', `Botón ${GLYPH[name]}: ${labels[name]}`);
+      }
       // L2 shows only while the own waiting free kick of slot 0 waits: that is
       // the one touch state where L2 gives the kick to the second taker.
       const sp = input.setPieceOf(0);
