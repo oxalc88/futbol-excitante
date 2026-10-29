@@ -2,6 +2,12 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-29 10:34 — PR pendiente ([#86](https://github.com/oxalc88/futbol-excitante/pull/86)) · CI sin pruebas de navegador
+- **Qué cambia para el jugador:** nada en el juego.
+- **Qué cambia para el desarrollo:** el CI de GitHub corre solo los pasos base (no-legacy, install, typecheck, test, evaluate, build, dist-check, build-lab); las pruebas del juego en navegador (smoke, pad-smoke, portero, táctil, balón parado, defensa) corren solo en la verificación local completa, obligatoria antes de pedir revisión y pegada en la PR.
+- **Qué probar:** nada.
+- **Qué se rompe o cambia:** ya no existe el artefacto browser-smoke en Actions; si una prueba del juego falla en local después de un merge, el arreglo va en una PR aparte.
+
 ## 2026-10-29 00:17 — PR pendiente ([#84](https://github.com/oxalc88/futbol-excitante/pull/84)) · Defensa estilo PES
 - **Qué cambia para el jugador:** sin el balón, con tu jugador de campo: mantén ✕ para presionar al rival que lleva el balón (con R1 lo persigue a toda velocidad); mantén □ para que 1 compañero presione, o toca □ dos veces y mantén para que presionen 2; mantén R2 para contener: el jugador va más lento y siempre mira al rival, aunque retroceda. Con el mando físico, mueve el stick derecho hacia un compañero para pasarle el control. En teclado: U/Num 0 presiona, K/Num 2 manda compañeros, G/Num 6 contiene. La CPU no usa estas acciones: sus partidos no cambian.
 - **Qué probar:** en el teléfono, cuando el rival tenga el balón, mantén ✕ y mira cómo tu jugador se le acerca; mantén □ y luego □ ×2; mantén R2 y retrocede. Al soltar, los compañeros vuelven a su sitio.
