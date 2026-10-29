@@ -171,6 +171,45 @@ test('switchTarget: a right stick flick moves the cursor to the teammate in that
   assert.equal(events.filter((e)=>e.type==='control-switched').length,1);
 });
 
+test('switchTarget: a flick with a slide or a move in the same frame gives the input to the new cursor only',()=>{
+  // The frame reaches the old cursor before the flick moves the cursor. A fix
+  // gives the old player his AI intent back, so the frame input runs once.
+  const run=(extra:Partial<InputFrame>)=>{
+    const {s,ids}=defenseMatch();
+    const w0=s.snapshot();
+    const old=player(w0,ids[0]),mate=player(w0,ids[1]);
+    old.x=8;old.y=0;old.vx=0;old.vy=0;old.action=null;old.recovery=0;
+    mate.x=12;mate.y=0;mate.vx=0;mate.vy=0;mate.action=null;mate.recovery=0;
+    Object.assign(w0.ball,{x:10,y:0,z:.11,vx:0,vy:0,vz:0,flight:'loose'});
+    s.restore(w0);
+    s.applyInputs([frame(s,0,{switchTarget:{x:1,y:0},...extra})]);s.step();
+    const w=s.snapshot();
+    assert.equal(w.selected[0],ids[1],'the +x teammate takes the cursor');
+    return {now:player(w,ids[1]),prev:player(w,ids[0]),start:mate};
+  };
+  // Reference run: the flick alone, so the old player can only read the AI.
+  const ai=run({}).prev;
+  assert.equal(ai.intent.action,undefined,'the fixture: the AI gives the old player no slide');
+  assert.notDeepEqual({move:ai.intent.move,action:ai.intent.action},{move:{x:0,y:1},action:'slide'},
+    'the fixture: the AI choice is not the frame input');
+  // Slide: the new cursor slides, the old player never does.
+  const slid=run({move:{x:0,y:1},action:'slide'});
+  assert.equal(slid.now.intent.action,'slide','the new cursor reads the frame slide');
+  assert.equal(slid.now.action?.kind,'slide','the new cursor slides from the frame input');
+  assert.deepEqual(slid.now.intent.move,{x:0,y:1},'the new cursor reads the frame move');
+  assert.deepEqual(slid.prev.intent,ai.intent,'the old player keeps the AI intent');
+  assert.equal(slid.prev.action?.kind,undefined,'the old player never slides from the frame input');
+  assert.deepEqual([+slid.prev.x.toFixed(6),+slid.prev.y.toFixed(6)],[+ai.x.toFixed(6),+ai.y.toFixed(6)],
+    'the old player moves on the AI intent only');
+  // Move only: the same rule holds without an action.
+  const moved=run({move:{x:0,y:1}});
+  assert.deepEqual(moved.now.intent.move,{x:0,y:1},'the new cursor reads the frame move');
+  assert.ok(moved.now.y>moved.start.y,'the new cursor moves from the frame input');
+  assert.deepEqual(moved.prev.intent,ai.intent,'the old player keeps the AI intent');
+  assert.deepEqual([+moved.prev.x.toFixed(6),+moved.prev.y.toFixed(6)],[+ai.x.toFixed(6),+ai.y.toFixed(6)],
+    'the old player moves on the AI intent only');
+});
+
 test('CPU-only determinism: two runs share the hash and carry no defense flags',()=>{
   const run=()=>{
     const s=new Simulation(createConfig({teamSize:5,human:[false,false],seed:11}),[makeTeam(0,5),makeTeam(1,5)]);

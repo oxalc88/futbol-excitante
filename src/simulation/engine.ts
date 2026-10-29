@@ -289,7 +289,10 @@ export class Simulation {
           const previous=p;
           if(previous.keeper){delete previous.manualControl;delete previous.keeperRushing;if(w.keeperHold?.playerId===previous.id)this.scheduleKeeperRelease(previous);}
           w.selected[slot]=pick.q.id;p=this.player(w.selected[slot])!;
-          if(previous.keeper)previous.intent=decidePlayer(w,previous);
+          // The frame input belongs to the new cursor only. The previous player
+          // takes his AI intent back now, so a flick with a slide or a move in
+          // the same frame never starts the action on both players.
+          previous.intent=decidePlayer(w,previous);
           p.intent=intentOf();this.emit('control-switched',p,slot);
         }
       }
