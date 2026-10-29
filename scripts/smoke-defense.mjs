@@ -152,6 +152,7 @@ try {
   const holdSnapshot = async (page) => {
     const state = await defenseState(page);
     if (state.carrierTeam !== 1) throw new PossessionLost('carrier changed');
+    if (state.lastTouchTeam !== 1) throw new PossessionLost('contested possession');
     return state;
   };
   // Wait for a mid-hold flag. A carrier change during the wait is a retry.
@@ -221,7 +222,7 @@ try {
   // retry. A wall clock timeout of 15 s is a defect and reports the state.
   const tickSpeed = async (page, flag, { settleTicks = 24, windowTicks = 30 } = {}) => {
     const result = await page.evaluate(([flag, settleTicks, windowTicks]) => new Promise((res) => {
-      let t0 = null, carrier0 = null, since0 = null, lt0 = null, first = null, last = null, distance = 0, baseSum = 0, baseSamples = 0, samples = 0, state = null, raf = 0;
+      let t0 = null, carrier0 = null, since0 = null, lt0 = null, first = null, last = null, distance = 0, baseSum = 0, baseSamples = 0, samples = 0, peak = null, state = null, raf = 0;
       const finish = (value) => { cancelAnimationFrame(raf); clearTimeout(timer); res(value); };
       const timer = setTimeout(() => finish({ timeout: true, t0, samples, distance, state }), 15000);
       // The last sample of the window gives the speed.
@@ -230,7 +231,8 @@ try {
         const speed = ticks > 0 ? distance / ticks : null;
         const avgBase = baseSamples > 0 ? baseSum / baseSamples : null;
         finish({ sample: { ticks, samples, distance, speed, avgBaseSpeed: avgBase,
-          norm: speed !== null && avgBase !== null && avgBase > 0 ? speed / avgBase : null }, state });
+          norm: speed !== null && avgBase !== null && avgBase > 0 ? speed / avgBase : null,
+          peakNorm: peak }, state });
       };
       const frame = () => {
         const s = window.__feSmoke?.defenseState?.(0) ?? null;
@@ -272,8 +274,16 @@ try {
           return;
         }
         if (typeof s.x !== 'number') { raf = requestAnimationFrame(frame); return; }
-        distance += Math.hypot(s.x - last.x, s.y - last.y);
+        const segTicks = s.tick - last.tick;
+        const segDist = Math.hypot(s.x - last.x, s.y - last.y);
+        distance += segDist;
         samples += 1;
+        // Peak share of the base speed over the window segments. A segment
+        // without ticks or without a base speed does not count.
+        if (segTicks > 0 && typeof s.baseSpeed === 'number') {
+          const segNorm = (segDist / segTicks) / s.baseSpeed;
+          peak = peak === null ? segNorm : Math.max(peak, segNorm);
+        }
         last = { tick: s.tick, x: s.x, y: s.y };
         if (typeof s.baseSpeed === 'number') { baseSum += s.baseSpeed; baseSamples += 1; }
         // The window keeps this sample when it reaches the end.
@@ -288,11 +298,12 @@ try {
     if (result.timeout) throw new Error(`Speed window timed out after 15 s: ${JSON.stringify({ flag,
       t0: result.t0 ?? null, samples: result.samples, distance: result.distance, state: result.state })}`);
     const sample = result.sample;
-    if (!sample || !(sample.ticks > 0) || !Number.isFinite(sample.speed) || !Number.isFinite(sample.norm)) {
+    if (!sample || !(sample.ticks > 0) || !Number.isFinite(sample.speed) || !Number.isFinite(sample.norm)
+      || !Number.isFinite(sample.peakNorm)) {
       throw new Error(`Speed window is too short or has no base speed: ${JSON.stringify({ flag, sample, state: result.state })}`);
     }
     if (sample.ticks < windowTicks) throw new Error(`Speed window is short: ${sample.ticks} ticks < ${windowTicks}: ${JSON.stringify({ flag, sample, state: result.state })}`);
-    return { norm: sample.norm, raw: sample.speed, ticks: sample.ticks };
+    return { norm: sample.norm, peakNorm: sample.peakNorm, raw: sample.speed, ticks: sample.ticks };
   };
   // Defense setup: the selected player walks away from the opponent half, then
   // the smoke hook gives the ball to the nearest opponent of that slot.
@@ -334,7 +345,7 @@ try {
     }, flag, {timeout:5000, polling:25}).then(() => true).catch(() => false);
     if (ok) return;
     const last = await defenseState(page).catch(() => ({}));
-    if (last.carrierTeam !== 1) throw new PossessionLost('carrier changed');
+    if (last.carrierTeam !== 1 || last.lastTouchTeam !== 1) throw new PossessionLost('carrier changed');
     throw new Error(`${message}: ${JSON.stringify({ carrierTeam: last.carrierTeam ?? null,
       selected: last.selected ?? null, pressing: last.pressing ?? null, jockeying: last.jockeying ?? null })}`);
   };
@@ -466,7 +477,7 @@ try {
         // defect.
         const last = await defenseState(page).catch(() => null);
         await touchUp(page, hold).catch(() => {});
-        if (!last || last.carrierTeam !== 1) throw new PossessionLost('carrier changed before two teammates');
+        if (!last || last.carrierTeam !== 1 || last.lastTouchTeam !== 1) throw new PossessionLost('carrier changed before two teammates');
         throw new Error('Double tap + hold □ gave no two teammates while team 1 carries');
       }
       return { hold, two };
@@ -480,7 +491,7 @@ try {
     }
     if (two === null) {
       const last = await defenseState(page);
-      if (last.carrierTeam !== 1) throw new PossessionLost('carrier changed before two teammates');
+      if (last.carrierTeam !== 1 || last.lastTouchTeam !== 1) throw new PossessionLost('carrier changed before two teammates');
     }
     check(two !== null, 'Double tap + hold □ never gave two teammates teamPressing');
     check(two.teamPressCount === 2, `Expected 2 teammates teamPressing, found ${two.teamPressCount}`);
@@ -504,6 +515,9 @@ try {
     await setupDefense(page);
     const before = await defenseState(page);
     check(before.jockeying === false, 'Jockeying is already set before the R2 hold');
+    // The hook gives the ball to an opponent at least 10 m away, so our players
+    // do not win the ball before the checks end.
+    await runHook(page, 'cpuBall', 0, 10);
     await ensureCpuBall(page);
     await stickDown(page, 51, -60);
     check(await touchDown(page, '.tp-r2', 52), 'Pad R2 button not found');
@@ -519,7 +533,19 @@ try {
     jockeyId = jockey.selected;
     await evidence(page, '04-jockey', { jockeyId,
       jockeySpeedNorm: jockeySpeed.norm, jockeySpeedRaw: jockeySpeed.raw,
+      jockeyPeakNorm: jockeySpeed.peakNorm,
       speedUnit: 'share of own base speed per tick (norm) · m/tick (raw)', distance: jockey.distance });
+    // R2-only release: the stick stays held, so only the R2 lift may drop
+    // the jockey flag.
+    await touchUp(page, 52);
+    await page.waitForFunction(() => {
+      const s = window.__feSmoke.defenseState(0);
+      return s.jockeying === false || s.carrierTeam !== 1 || s.lastTouchTeam !== 1;
+    }, null, {timeout:3000, polling:25});
+    const state = await defenseState(page);
+    if (state.carrierTeam !== 1 || state.lastTouchTeam !== 1) throw new PossessionLost('carrier changed');
+    check(state.jockeying === false, 'The jockey flag survives the R2 release while the stick stays held');
+    await touchUp(page, 51);
   });
 
   // 4b: no R2: the ✕ chase gives the full speed. After the contain the
@@ -546,9 +572,17 @@ try {
     check(press.jockeying === false, 'The jockey flag survives the R2 release');
     check(pressSpeed.norm > jockeySpeed.norm * 1.2,
       `Press speed ${pressSpeed.norm.toFixed(3)} (${pressSpeed.raw.toFixed(3)} m/tick, player ${pressId}) is not clearly above jockey speed ${jockeySpeed.norm.toFixed(3)} (${jockeySpeed.raw.toFixed(3)} m/tick, player ${jockeyId})`);
+    // The old check compared peak speeds (ASD-STE100). The press mean must now
+    // beat the jockey peak, so a short jump of the jockey speed fails. The
+    // engine caps speed as a factor of the own base speed, so the normalized
+    // ratio does not depend on the player.
+    check(pressSpeed.norm > jockeySpeed.peakNorm * 1.2,
+      `Press mean speed ${pressSpeed.norm.toFixed(4)} is not clearly above the jockey peak speed ${jockeySpeed.peakNorm.toFixed(4)}`);
     await evidence(page, '04b-press', { jockeyId, pressId,
       jockeySpeedNorm: jockeySpeed.norm, jockeySpeedRaw: jockeySpeed.raw,
+      jockeyPeakNorm: jockeySpeed.peakNorm,
       pressSpeedNorm: pressSpeed.norm, pressSpeedRaw: pressSpeed.raw,
+      pressPeakNorm: pressSpeed.peakNorm,
       speedUnit: 'share of own base speed per tick (norm) · m/tick (raw)' });
   });
 
@@ -558,6 +592,9 @@ try {
   stage='release';
   await withRetry('release', async (page) => {
     await setupDefense(page);
+    // The hook gives the ball to an opponent at least 10 m away, so our players
+    // do not win the ball before the checks end.
+    await runHook(page, 'cpuBall', 0, 10);
     await ensureCpuBall(page);
     await stickDown(page, 51, -60);
     check(await touchDown(page, '.tp-r2', 52), 'Pad R2 button not found');
@@ -569,7 +606,7 @@ try {
       null, {timeout:5000, polling:25}).then(() => true).catch(() => false);
     if (!oneTeammate) {
       const last = await defenseState(page).catch(() => ({}));
-      if (last.carrierTeam !== 1) throw new PossessionLost('carrier changed');
+      if (last.carrierTeam !== 1 || last.lastTouchTeam !== 1) throw new PossessionLost('carrier changed');
       throw new Error(`No teammate teamPressing during the □ hold: ${JSON.stringify({ carrierTeam: last.carrierTeam ?? null,
         selected: last.selected ?? null, pressing: last.pressing ?? null, jockeying: last.jockeying ?? null })}`);
     }
