@@ -122,6 +122,9 @@ export interface Config {
 export interface World {
   advantage: { team: TeamIndex; point: Vec2; until: number; offender: string; card: 'yellow' | 'red' | null } | null;
   pendingCards: { playerId: string; card: 'yellow' | 'red' }[];
+  /** Teammate press count held by each human slot. Absent while no hold is
+   * active and absent on CPU-only checkpoints. */
+  teamPressHold?: [number, number];
   /** Tick of the last pass feint. The feint never restarts `since`. */
   keeperHold: { playerId: string; since: number; feintTick?: number } | null;
   restartRestriction: { taker: string; team: TeamIndex; indirect: boolean; kind: Phase } | null;

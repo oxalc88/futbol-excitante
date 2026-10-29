@@ -40,8 +40,9 @@ export class ControllerMapper {
   // Tick of the last defending □ tap and the double tap flag of the held □.
   private squareTap=[-1,-1];
   private squareDouble=[false,false];
-  // Length of the right stick of the last sample: a flick crosses 0.3 to 0.7.
-  private stickLength=[0,0];
+  // Right stick switch, armed while the stick sits near the centre: a flick
+  // gives one switch from any sample above 0.7, however fast the stick rises.
+  private stickArmed=[true,true];
   // Set-piece state of a slot: charge, spend and arm flags of the three kick
   // buttons, the panenka and short-roll chords, the wall charge and the aim lock.
   private setCharge:number[][]=[[0,0,0],[0,0,0]];
@@ -54,7 +55,7 @@ export class ControllerMapper {
   /** Clears the transient sample state only. The identity stash of an active
    * touch toggle survives: restoreSlots consumes it, so a reset while the touch
    * pad owns slot 0 keeps the reversed physical slot ids. */
-  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.squareTap=[-1,-1];this.squareDouble=[false,false];this.stickLength=[0,0];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
+  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.squareTap=[-1,-1];this.squareDouble=[false,false];this.stickArmed=[true,true];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
   /** Frees both slots: the next sample assigns the pads again in list order. */
   releaseSlots(){this.slots=[null,null];this.previous=[[],[]];}
   /** Drops every set-piece charge and flag of a slot: a cancelled touch or a
@@ -63,7 +64,7 @@ export class ControllerMapper {
   private clearSetState(slot:0|1){
     this.setCharge[slot]=[0,0,0];this.setSpent[slot]=[false,false,false];this.setArmed[slot]=[true,true,true];
     this.setPanenka[slot]=false;this.setRoll[slot]=false;this.wallCharge[slot]=0;this.fixedAim[slot]=null;this.restartContext[slot]=null;
-    this.squareTap[slot]=-1;this.squareDouble[slot]=false;this.stickLength[slot]=0;
+    this.squareTap[slot]=-1;this.squareDouble[slot]=false;this.stickArmed[slot]=true;
   }
   /** The touch pad takes slot 0: stash the physical slot ids and reset only
    * slot 0. Slot 1 keeps its pad, so no physical pad swaps slots. */
@@ -120,10 +121,12 @@ export class ControllerMapper {
     const right={x:dead(p.axes[2]??0),y:dead(p.axes[3]??0)};if(length(right)>.1)f.aim=unit(right);
     if(restart){if(!p.buttons[B.r2]?.pressed){this.fixedAim[slot]=null;this.setAim[slot]=f.aim??(length(f.move)>.1?unit(f.move):this.setAim[slot]);if(f.aim||length(f.move)>.1)f.aim={...this.setAim[slot]};}else{if(!this.fixedAim[slot])this.fixedAim[slot]={...this.setAim[slot]};f.aim={...this.fixedAim[slot]};}}
     // Right stick flick: the stick crosses from the centre to a full deflection.
-    // One crossing gives one manual switch and the tick keeps no aim of its own.
+    // The switch is armed near the centre and fires once above the threshold, so
+    // a stick that jumps over the middle bands still gives one switch. The tick
+    // of the flick keeps no aim of its own.
     const rightLength=length(right);
-    const flick=defending&&!restart&&!hold&&rightLength>.7&&this.stickLength[slot]<.3;
-    this.stickLength[slot]=rightLength;
+    const flick=defending&&!restart&&!hold&&this.stickArmed[slot]&&rightLength>.7;
+    if(rightLength<.3)this.stickArmed[slot]=true;else if(flick)this.stickArmed[slot]=false;
     if(flick){f.switchTarget=unit(right);f.aim=undefined;}
     const edge=(i:number)=>!!pressed[i]&&!prev[i],held=(i:number)=>!!pressed[i];
     if(restart){

@@ -292,8 +292,11 @@ try {
     check(press.jockeying === false, 'The jockey flag survives the R2 release');
     check(pressSpeed > jockeySpeed * 1.2,
       `Press speed ${pressSpeed.toFixed(2)} is not clearly above jockey speed ${jockeySpeed.toFixed(2)}`);
-    // Every finger up: no defense flag may stay set.
-    for (const id of [51, 52, 53]) await touchUp(page, id);
+    // Every finger up: no defense flag may stay set. The □ hold is active here,
+    // so the release also drops the teammate override.
+    check(await touchDown(page, '.tp-square', 54), 'Pad □ button not found');
+    await page.waitForFunction(() => window.__feSmoke.defenseState(0).teamPressCount === 1, null, {timeout:5000, polling:25});
+    for (const id of [51, 52, 53, 54]) await touchUp(page, id);
     await page.waitForTimeout(500);
     const after = await defenseState(page);
     check(after.pressing === false, 'The ✕ pressure flag survived the release');

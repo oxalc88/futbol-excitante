@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { Simulation } from '../src/simulation/engine';
 import { createConfig } from '../src/simulation/config';
 import { makeTeam } from '../src/adapters/data';
+import { decidePlayer } from '../src/simulation/tactics';
 import { ControllerMapper, type PadReading } from '../src/adapters/controller';
 import type { InputFrame, MatchEvent, PlayerState, TeamIndex, World } from '../src/contracts/types';
 
@@ -95,6 +96,64 @@ test('jockey: hold R2 contains the carrier, runs slower than a chase and faces h
   assert(contain.facing>.99,`contain faces the carrier (dot ${contain.facing.toFixed(3)})`);
 });
 
+test('jockey: the body faces the carrier while the player retreats and strafes',()=>{
+  for(const move of [{x:-1,y:0},{x:0,y:1}] as const){
+    const {s,foeId}=defenseMatch();
+    const start=s.snapshot(),sel=start.selected[0]!,from=player(start,sel);
+    const after=s.tick+40;
+    while(s.tick<after){s.applyInputs([frame(s,0,{jockey:true,move:{...move}})]);s.step();}
+    const w=s.snapshot(),p=player(w,sel),foe=player(w,foeId);
+    const gap=Math.hypot(foe.x-p.x,foe.y-p.y);
+    const dot=(Math.cos(p.heading)*(foe.x-p.x)+Math.sin(p.heading)*(foe.y-p.y))/gap;
+    const travelled=dist(p,from);
+    assert(travelled>1,`move ${move.x},${move.y}: the player moves (${travelled.toFixed(2)} m)`);
+    assert(dot>.99,`move ${move.x},${move.y}: the heading faces the carrier (dot ${dot.toFixed(3)})`);
+  }
+});
+
+test('teamPress: a checkpoint inside a held □ press resumes without a second team-press event',()=>{
+  const {s,events}=defenseMatch();
+  const hold=(sim:Simulation,n:number)=>{for(let i=0;i<n;i++){sim.applyInputs([frame(sim,0,{teamPress:1})]);sim.step();}};
+  hold(s,12);
+  assert.equal(events.filter(e=>e.type==='team-press').length,1,'one team-press event per hold');
+  const checkpoint=s.snapshot(),marked=checkpoint.players.filter(p=>p.teamPressing===true).map(p=>p.id);
+  assert.equal(marked.length,1,'the hold marks one teammate');
+  // The same match resumes the hold from the checkpoint.
+  s.restore(checkpoint);
+  assert.equal(player(s.snapshot(),marked[0]).teamPressing,true,'the hold survives the restore');
+  hold(s,12);
+  assert.equal(events.filter(e=>e.type==='team-press').length,1,'a restored hold never repeats the event');
+  // A second match loads the same checkpoint, as a restored session does.
+  const resumed:MatchEvent[]=[];
+  const other=new Simulation(createConfig({teamSize:5,human:[true,false],seed:7}),[makeTeam(0,5),makeTeam(1,5)],(e)=>resumed.push(...e));
+  other.restore(checkpoint);hold(other,12);
+  assert.equal(resumed.filter(e=>e.type==='team-press').length,0,'a loaded hold never repeats the event');
+  assert.equal(s.stateHash(),other.stateHash(),'both continuations agree');
+  assert.deepEqual(player(s.snapshot(),marked[0]).intent,player(other.snapshot(),marked[0]).intent);
+});
+
+test('teamPress release: the teammates drop the forced chase on the release tick',()=>{
+  const {s}=defenseMatch();
+  const cadence=s.snapshot().config.ai.cadence;
+  const hold=()=>{s.applyInputs([frame(s,0,{teamPress:1})]);s.step();};
+  for(let i=0;i<12;i++)hold();
+  // The AI rewrites intents only on its cadence: release on any other tick.
+  while(s.tick%cadence===0)hold();
+  const before=s.snapshot();
+  const marked=before.players.filter(p=>p.teamPressing===true).map(p=>p.id);
+  assert.equal(marked.length,1,'the hold marks one teammate');
+  s.applyInputs([frame(s,0)]);s.step();
+  const after=s.snapshot();
+  for(const id of marked){
+    const q=player(before,id),now=player(after,id),forced=q.intent,ai=decidePlayer(before,q);
+    assert.equal(now.teamPressing,undefined,'the flag dies on the release');
+    assert.equal(forced.sprint,true,'the hold forces a sprint at the carrier');
+    assert.notDeepEqual({move:forced.move,sprint:forced.sprint},{move:ai.move,sprint:ai.sprint},
+      'the fixture: the forced chase is not the AI choice');
+    assert.deepEqual(now.intent,ai,`${id} keeps no forced chase one tick after the release`);
+  }
+});
+
 test('switchTarget: a right stick flick moves the cursor to the teammate in that direction',()=>{
   const {s,events,ids}=defenseMatch();
   const w=s.snapshot();
@@ -172,4 +231,19 @@ test('controller: one right stick flick gives one switchTarget and clears the ai
   assert.equal(frames[2].switchTarget?.x,1);
   assert.equal(frames[2].aim,undefined,'the flick tick keeps no aim');
   assert.equal(frames[3].switchTarget,undefined,'a held stick never repeats the flick');
+});
+
+test('controller: a stick that jumps past the half band to full still gives one switchTarget',()=>{
+  // The reported sequence: centre, half deflection, then full deflection.
+  const frames=run([{buttons:[],axes:[0,0,0,0]},{buttons:[],axes:[0,0,.45,0]},{buttons:[],axes:[0,0,.8,0]},{buttons:[],axes:[0,0,1,0]}]);
+  assert.equal(frames[1].switchTarget,undefined,'the centre sample never switches');
+  assert.equal(frames[2].switchTarget,undefined,'half deflection never switches');
+  assert.equal(frames[3].switchTarget?.x,1,'the full deflection switches once');
+  assert.equal(frames[4].switchTarget,undefined,'the held stick disarms after the switch');
+  // Back to the centre arms the next flick.
+  const again=run([{buttons:[],axes:[0,0,.45,0]},{buttons:[],axes:[0,0,.8,0]},{buttons:[],axes:[0,0,1,0]},{buttons:[],axes:[0,0,0,0]},{buttons:[],axes:[0,0,1,0]}]);
+  assert.equal(again[1].switchTarget,undefined,'half deflection before the centre never switches');
+  assert.equal(again[2].switchTarget?.x,1,'the first full deflection switches');
+  assert.equal(again[3].switchTarget,undefined,'the held stick stays disarmed');
+  assert.equal(again[5].switchTarget?.x,1,'a new flick from the centre switches again');
 });
