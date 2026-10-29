@@ -18,6 +18,12 @@
 - Use `.github/pull_request_template.md`.
 - Do not add a deploy job or publish the game without explicit approval.
 
+## UI text
+
+- Cut taglines, helper text and secondary labels. If a screen needs them to make sense, fix the layout.
+- Make the best decision that will elevate all three: the user experience (UX), developer experience (DX), and agent experience (AX) always, without breaking anything.
+- Enforcement: review rejects a PR that adds on-screen help text, labels or explanations. Put controls only on the controls screen or in pause, not over the match. Reviewers examine the e2e screenshots against this rule. `scripts/smoke-touch.mjs` stage 8 fails if text shows over the match.
+
 ## Verification
 
 ```bash

@@ -3,7 +3,7 @@ import { renderHud } from './hud';
 import './style.css';
 import { cardAlert, CARD_ALERT_TICKS } from './card-alert';
 import { loadPitchPalette, savePitchPalette, type PitchPaletteStorage } from './pitch-palette';
-import { quickPlaySetup, shouldShowTips, markTipsSeen, menuReducer, initialMenuState, loadCpuDifficulty, saveCpuDifficulty, matchCpuDifficulty, type QuickPlaySetup, type StartMenuStorage } from './start-menu';
+import { quickPlaySetup, menuReducer, initialMenuState, loadCpuDifficulty, saveCpuDifficulty, matchCpuDifficulty, type QuickPlaySetup, type StartMenuStorage } from './start-menu';
 import type { PitchPaletteId } from '../adapters/presentation-model';
 import { shouldPause } from './pause-state';
 import { isFulltime, rematchSetup } from './fulltime-flow';
@@ -21,33 +21,30 @@ const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(
 const app=$('app');
 app.innerHTML=`
 <main class="game">
- <header class="topbar"><a class="wordmark" href="./" aria-label="Fútbol Excitante, inicio"><span class="crest">FE</span><span>FÚTBOL <b>EXCITANTE</b></span></a><span class="edition">EDICIÓN CANCHA · 01</span><button id="menu-btn" class="quiet">Partido <span>☰</span></button></header>
+ <header class="topbar"><a class="wordmark" href="./" aria-label="Fútbol Excitante, inicio"><span class="crest">FE</span><span>FÚTBOL <b>EXCITANTE</b></span></a><button id="menu-btn" class="quiet">Partido <span>☰</span></button></header>
  <section id="viewport" aria-label="Partido de fútbol">
   <div class="scoreboard"><span class="team-tag home" id="home-short">COS</span><strong id="score">0 : 0</strong><span class="team-tag away" id="away-short">SIE</span><span id="clock">00:00</span><span id="half">1T</span></div>
-  <div class="live-strip"><span id="match-mode">PARTIDO DE EXHIBICIÓN</span><span id="phase">Saque inicial</span></div>
-  <div id="announcement" role="status" aria-live="polite"></div><div id="set-hint" hidden></div>
-  <div class="field-toolbar"><button id="pause-btn" title="Pausar (P)">Ⅱ <span>Pausa</span></button><button id="camera-btn" title="Cambiar cámara (C)">◈ <span>Cámara</span></button><button id="stats-btn">▥ <span>Estadísticas</span></button><button id="sound-btn" aria-pressed="false">♪ <span>Sonido</span></button><label>Volumen <input id="sound-volume" type="range" min="0" max="1" step="0.05" aria-label="Volumen del partido" /></label><button id="fullscreen-btn" title="Pantalla completa">⛶</button></div>
+  <div class="live-strip sr-only"><span id="match-mode">PARTIDO DE EXHIBICIÓN</span><span id="phase">Saque inicial</span></div>
+  <div id="announcement" role="status" aria-live="polite"></div>
+  <div class="field-toolbar"><button id="pause-btn" title="Pausar (P)" aria-label="Pausa">Ⅱ</button><button id="camera-btn" title="Cambiar cámara (C)" aria-label="Cámara">◈</button><button id="stats-btn" aria-label="Estadísticas">▥</button><button id="sound-btn" aria-pressed="false" aria-label="Sonido">♪</button><input id="sound-volume" type="range" min="0" max="1" step="0.05" aria-label="Volumen del partido" /><button id="fullscreen-btn" title="Pantalla completa" aria-label="Pantalla completa">⛶</button></div>
   <div id="pause-overlay" hidden><strong>PAUSA</strong><button id="resume-btn" class="primary">Seguir jugando</button></div>
-  <div class="bottom-hud"><div class="player-card"><span class="eyebrow">CONTROLAS A</span><strong id="player-name">—</strong><div class="energy"><span id="energy-bar"></span></div><span id="player-trait">—</span><div class="power" id="power-meter" hidden><span id="power-bar"></span></div></div><canvas id="radar" width="252" height="162" aria-label="Radar con posiciones de jugadores y balón"></canvas><div class="input-hint"><span id="pad-status">TECLADO · JUGADOR 1</span><p><kbd>W A S D</kbd> mover · <kbd>J</kbd> pase<br><kbd>K</kbd> tiro · <kbd>Q</kbd> cambiar<br><kbd>R</kbd> arquero · <kbd>L</kbd> sale △ · <kbd>I</kbd> volea ○</p></div></div>
+  <div class="bottom-hud"><div class="player-card"><strong id="player-name">—</strong><div class="energy"><span id="energy-bar"></span></div><div class="power" id="power-meter" hidden><span id="power-bar"></span></div></div><canvas id="radar" width="252" height="162" aria-label="Radar con posiciones de jugadores y balón"></canvas><span id="pad-status" class="sr-only" role="status">TECLADO · JUGADOR 1</span></div>
  </section>
- <footer><span id="footer-match">ATLÉTICO COSTA <i>vs</i> DEPORTIVO SIERRA</span><span id="footer-size">11 contra 11 · Equipos ficticios</span><button id="help-btn">Controles</button></footer>
+ <footer><button id="help-btn">Controles</button></footer>
 </main>
-<dialog id="setup-dialog" class="setup"><form id="setup-form"><div class="dialog-top"><span class="eyebrow">FÚTBOL EXCITANTE</span><button type="button" id="close-setup" class="close" aria-label="Cerrar">×</button></div><h1>A la cancha.</h1>
-<button type="button" id="quick-play-btn" class="primary wide" autofocus>Jugar rápido <span>→</span></button><p class="quick-note">Tú contra la CPU · 6 minutos · 11 contra 11 · Empieza ya.</p>
+<dialog id="setup-dialog" class="setup"><form id="setup-form"><div class="dialog-top"><button type="button" id="close-setup" class="close" aria-label="Cerrar">×</button></div><h1>A la cancha.</h1>
+<button type="button" id="quick-play-btn" class="primary wide" autofocus>Jugar rápido <span>→</span></button>
 <div class="difficulty-row"><label for="difficulty">Dificultad de la CPU</label><select id="difficulty" aria-label="Dificultad de la CPU"><option value="easy">Fácil</option><option value="normal" selected>Normal</option><option value="hard">Difícil</option></select></div>
-<p class="section-title">Partido personalizado · elige tus equipos</p>
 <div class="team-selection"><label>LOCAL<select id="home-team">${TEAM_CATALOG.map((t,i)=>`<option value="${i}">${t.name}</option>`).join('')}</select><span class="team-stripe cream"></span></label><span class="versus">VS</span><label>VISITANTE<select id="away-team">${TEAM_CATALOG.map((t,i)=>`<option value="${i}" ${i===1?'selected':''}>${t.name}</option>`).join('')}</select><span class="team-stripe blue"></span></label></div>
 <div class="setup-grid"><label>Modo<select id="mode"><option value="solo">Tú contra la CPU</option><option value="local">Dos jugadores locales</option><option value="watch">CPU contra CPU</option></select></label><label>Duración<select id="duration"><option value="120">2 minutos</option><option value="360" selected>6 minutos</option><option value="600">10 minutos</option></select></label><label>Jugadores<select id="size"><option value="11">11 contra 11</option><option value="5">5 contra 5</option><option value="2">2 contra 2</option></select></label><label>Semilla<input id="seed" type="number" min="1" max="2147483647" value="2017" required /></label></div>
-<details class="tactics"><summary>Plan de juego y opciones</summary><div class="setup-grid"><label>Formación local<select id="formation"><option>4-3-3</option><option>4-4-2</option><option>3-5-2</option></select></label><label>Presión<input id="pressing" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Amplitud<input id="width" type="range" min="0" max="1" step="0.05" value="0.7" /></label><label>Ritmo<input id="tempo" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Contra presión<input id="counterPress" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Pases cortos<input id="shortPossession" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Marcaje estrecho<input id="tightMarking" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Adaptación CPU<input id="adaptation" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Línea defensiva<input id="defensiveLine" type="range" min="0" max="1" step="0.05" value="0.52" /></label><label>Compactación<input id="compactness" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Apoyo<input id="support" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Gráficos<select id="quality"><option value="high">Normal</option><option value="low">Ligero</option></select></label><label>Paleta de cancha<select id="pitch-palette"><option value="viva">Viva</option><option value="sobria">Sobria</option></select></label><label>Equipo JSON<input id="roster-file" type="file" accept="application/json,.json" /></label></div><p id="roster-status">Opcional: importa un equipo ficticio propio para el lado local.</p><button type="button" id="export-roster" class="quiet">Descargar equipo de ejemplo</button></details>
-<p id="setup-error" class="error" role="alert"></p><button id="start-btn" class="primary wide" type="submit">Jugar partido <span>→</span></button><div class="secondary-actions"><button type="button" id="menu-help-btn">Controles</button><button type="button" id="show-tips-btn">Ver consejos</button><button type="button" id="online-btn" hidden disabled>Online — próxima etapa</button><button type="button" id="load-replay">Cargar repetición</button></div><p class="fine-print">Física y reglas experimentales inspiradas en la visión del proyecto.</p></form></dialog>
-<dialog id="tips-dialog"><div class="dialog-top"><span class="eyebrow">PRIMER PARTIDO</span><button type="button" class="close" data-close="tips-dialog" aria-label="Cerrar">×</button></div><h2>Consejos para empezar</h2><ul class="tips-list"><li><b>Teclado:</b> <kbd>W A S D</kbd> para mover, <kbd>J</kbd> pase, <kbd>K</kbd> tiro y <kbd>Q</kbd> para cambiar.</li><li><b>Mando:</b> sticks para mover y apuntar, <kbd>✕</kbd> para pasar y <kbd>□</kbd> para tirar.</li><li><b>Táctil:</b> mando en pantalla: stick a la izquierda, ✕ ○ □ △, R1, R2 y L1 a la derecha.</li><li><b>Pausa:</b> pulsa <kbd>P</kbd> o <kbd>Esc</kbd> para pausar el partido.</li></ul><button type="button" id="tips-close" data-close="tips-dialog" class="primary wide">Entendido</button></dialog>
-<dialog id="help-dialog"><div class="dialog-top"><span class="eyebrow">TODO EMPIEZA CON UN PASE</span><button class="close" data-close="help-dialog" aria-label="Cerrar">×</button></div><h2>Controles</h2><div class="table-scroll"><table><thead><tr><th>Acción</th><th>Jugador 1</th><th>Jugador 2</th><th>Mando (PS4)</th></tr></thead><tbody><tr><td>Mover / apuntar</td><td>W A S D</td><td>Flechas</td><td>Stick izquierdo · derecho para apuntar</td></tr><tr><td>Pase corto</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Pase alto / centro</td><td>I</td><td>Num 5</td><td>○</td></tr><tr><td>Tiro (mantener y soltar)</td><td>K</td><td>Num 2</td><td>□</td></tr><tr><td>Pase filtrado</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Pase elevado</td><td>Q + I</td><td>Enter + Num 5</td><td>L1 + ○</td></tr><tr><td>Cambio de frente</td><td>WASD hacia la otra banda + I</td><td>Flechas hacia la otra banda + Num 5</td><td>Stick izq. a la otra banda + ○</td></tr><tr><td>Correr</td><td>Shift izquierdo</td><td>Shift derecho</td><td>R1</td></tr><tr><td>Cambiar jugador</td><td>Q</td><td>Enter</td><td>L1</td></tr><tr><td>Entrada de pie</td><td>U ×2</td><td>Num 0 ×2</td><td>✕ ✕ (doble toque)</td></tr><tr><td>Presión (mantener) · próximamente</td><td>U (mantener)</td><td>Num 0 (mantener)</td><td>✕ mantener</td></tr><tr><td>Entrada deslizante (sin balón)</td><td>B</td><td>Num 7</td><td>○</td></tr><tr><td>Despeje (sin balón)</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cabezazo (balón a la altura de la cabeza)</td><td>K o J</td><td>Num 2 o Num 1</td><td>□ o pase</td></tr><tr><td>Proteger balón</td><td>Automático</td><td>Automático</td><td>Automático (sin botón)</td></tr><tr><td>Controlar portero / volver</td><td>R</td><td>Num 8</td><td>R3</td></tr><tr><td>Portero: lanzarse</td><td>U</td><td>Num 0</td><td>✕</td></tr><tr><td>Portero: salir (mantener)</td><td>L (mantener)</td><td>Num 3 (mantener)</td><td>△ (mantener)</td></tr><tr><td>Portero: salir en sprint</td><td>Shift izq. + L</td><td>Shift der. + Num 3</td><td>R1 + △</td></tr><tr><td>Portero: saque con la mano al espacio</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Portero: saque de volea</td><td>I (mantener y soltar)</td><td>Num 5 (mantener y soltar)</td><td>○</td></tr><tr><td>Portero: volea alta</td><td>G + I</td><td>Num 6 + Num 5</td><td>R2 + ○</td></tr><tr><td>Portero: soltar / recoger el balón</td><td>Shift (stick centrado)</td><td>Shift der. (stick centrado)</td><td>R1 + stick centrado</td></tr><tr><td>Portero: correr con el balón</td><td>W A S D (Shift = sprint)</td><td>Flechas (Shift der.)</td><td>Stick izq. (R1)</td></tr><tr><td>Portero: amago de pase</td><td>J antes de soltar</td><td>Num 1 antes de soltar</td><td>✕ antes de soltar</td></tr><tr><td>Simular falta (caer)</td><td>F</td><td>Num 4</td><td>L1 + L2 + L3 + R3 (sin R2)</td></tr><tr><td>Portero: pase / saque con la mano</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Portero: saque con el pie</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cámara</td><td>C</td><td>C</td><td>Touchpad (clic)</td></tr><tr><td>Pausa</td><td>P / Esc</td><td>P / Esc</td><td>OPTIONS</td></tr></tbody></table></div><p>Con el balón: <kbd>✕</kbd> pase, <kbd>○</kbd> centro, <kbd>□</kbd> tiro, <kbd>△</kbd> filtrado. Sin balón: <kbd>✕</kbd> entrada, <kbd>○</kbd> barrida, <kbd>□</kbd> despeje. Mantener <kbd>✕</kbd> será la presión, todavía sin acción en FE (próximamente). Apunta con el movimiento antes de pasar o disparar. Los jugadores aceleran y giran con inercia. Los saques se ejecutan automáticamente.</p><p>Conecta hasta dos mandos y pulsa un botón para activarlos. Se admiten mandos que el navegador reconozca con mapeo estándar.</p><p><kbd>P / Esc</kbd> pausa · <kbd>C</kbd> o clic en el touchpad: cámara. En pantalla táctil aparece un mando: stick a la izquierda, ✕ ○ □ △ a la derecha, R1, R2 y L1. L2 aparece en tu tiro libre: tira el 2º lanzador. Mantén para cargar y suelta para ejecutar.</p><button data-close="help-dialog" class="primary wide">Entendido</button></dialog>
-<dialog id="stats-dialog"><div class="dialog-top"><span class="eyebrow" id="stats-label">EL PARTIDO EN NÚMEROS</span><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button><button id="rematch" hidden>Revancha</button><button id="new-match">Nuevo partido</button></div></dialog>
+<details class="tactics"><summary>Plan de juego y opciones</summary><div class="setup-grid"><label>Formación local<select id="formation"><option>4-3-3</option><option>4-4-2</option><option>3-5-2</option></select></label><label>Presión<input id="pressing" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Amplitud<input id="width" type="range" min="0" max="1" step="0.05" value="0.7" /></label><label>Ritmo<input id="tempo" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Contra presión<input id="counterPress" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Pases cortos<input id="shortPossession" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Marcaje estrecho<input id="tightMarking" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Adaptación CPU<input id="adaptation" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Línea defensiva<input id="defensiveLine" type="range" min="0" max="1" step="0.05" value="0.52" /></label><label>Compactación<input id="compactness" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Apoyo<input id="support" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Gráficos<select id="quality"><option value="high">Normal</option><option value="low">Ligero</option></select></label><label>Paleta de cancha<select id="pitch-palette"><option value="viva">Viva</option><option value="sobria">Sobria</option></select></label><label>Equipo JSON<input id="roster-file" type="file" accept="application/json,.json" /></label></div><p id="roster-status"></p><button type="button" id="export-roster" class="quiet">Descargar equipo de ejemplo</button></details>
+<p id="setup-error" class="error" role="alert"></p><button id="start-btn" class="primary wide" type="submit">Jugar partido <span>→</span></button><div class="secondary-actions"><button type="button" id="menu-help-btn">Controles</button><button type="button" id="load-replay">Cargar repetición</button></div></form></dialog>
+<dialog id="help-dialog"><div class="dialog-top"><button class="close" data-close="help-dialog" aria-label="Cerrar">×</button></div><h2>Controles</h2><div class="table-scroll"><table><thead><tr><th>Acción</th><th>Jugador 1</th><th>Jugador 2</th><th>Mando (PS4)</th></tr></thead><tbody><tr><td>Mover / apuntar</td><td>W A S D</td><td>Flechas</td><td>Stick izquierdo · derecho para apuntar</td></tr><tr><td>Pase corto</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Pase alto / centro</td><td>I</td><td>Num 5</td><td>○</td></tr><tr><td>Tiro (mantener y soltar)</td><td>K</td><td>Num 2</td><td>□</td></tr><tr><td>Pase filtrado</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Pase elevado</td><td>Q + I</td><td>Enter + Num 5</td><td>L1 + ○</td></tr><tr><td>Cambio de frente</td><td>WASD hacia la otra banda + I</td><td>Flechas hacia la otra banda + Num 5</td><td>Stick izq. a la otra banda + ○</td></tr><tr><td>Correr</td><td>Shift izquierdo</td><td>Shift derecho</td><td>R1</td></tr><tr><td>Cambiar jugador</td><td>Q</td><td>Enter</td><td>L1</td></tr><tr><td>Entrada de pie</td><td>U ×2</td><td>Num 0 ×2</td><td>✕ ✕ (doble toque)</td></tr><tr><td>Presión (mantener) · próximamente</td><td>U (mantener)</td><td>Num 0 (mantener)</td><td>✕ mantener</td></tr><tr><td>Entrada deslizante (sin balón)</td><td>B</td><td>Num 7</td><td>○</td></tr><tr><td>Despeje (sin balón)</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cabezazo (balón a la altura de la cabeza)</td><td>K o J</td><td>Num 2 o Num 1</td><td>□ o pase</td></tr><tr><td>Proteger balón</td><td>Automático</td><td>Automático</td><td>Automático (sin botón)</td></tr><tr><td>Controlar portero / volver</td><td>R</td><td>Num 8</td><td>R3</td></tr><tr><td>Portero: lanzarse</td><td>U</td><td>Num 0</td><td>✕</td></tr><tr><td>Portero: salir (mantener)</td><td>L (mantener)</td><td>Num 3 (mantener)</td><td>△ (mantener)</td></tr><tr><td>Portero: salir en sprint</td><td>Shift izq. + L</td><td>Shift der. + Num 3</td><td>R1 + △</td></tr><tr><td>Portero: saque con la mano al espacio</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Portero: saque de volea</td><td>I (mantener y soltar)</td><td>Num 5 (mantener y soltar)</td><td>○</td></tr><tr><td>Portero: volea alta</td><td>G + I</td><td>Num 6 + Num 5</td><td>R2 + ○</td></tr><tr><td>Portero: soltar / recoger el balón</td><td>Shift (stick centrado)</td><td>Shift der. (stick centrado)</td><td>R1 + stick centrado</td></tr><tr><td>Portero: correr con el balón</td><td>W A S D (Shift = sprint)</td><td>Flechas (Shift der.)</td><td>Stick izq. (R1)</td></tr><tr><td>Portero: amago de pase</td><td>J antes de soltar</td><td>Num 1 antes de soltar</td><td>✕ antes de soltar</td></tr><tr><td>Simular falta (caer)</td><td>F</td><td>Num 4</td><td>L1 + L2 + L3 + R3 (sin R2)</td></tr><tr><td>Portero: pase / saque con la mano</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Portero: saque con el pie</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Balón parado: potencia y altura</td><td>K / I / J (mantener y soltar)</td><td>Num 2 / Num 5 / Num 1 (mantener y soltar)</td><td>□ / ○ / ✕</td></tr><tr><td>Balón parado: pase corto</td><td>Q + J</td><td>Enter + Num 1</td><td>L1 + ✕</td></tr><tr><td>Balón parado: fijar dirección</td><td>G</td><td>Num 6</td><td>R2</td></tr><tr><td>Balón parado: 2º lanzador</td><td>Q + W / S</td><td>Enter + ↑ / ↓</td><td>L1 + ↑/↓</td></tr><tr><td>Tiro libre: tira el 2º lanzador</td><td>E</td><td>Num 9</td><td>L2</td></tr><tr><td>Tiro libre: amago</td><td>I + J</td><td>Num 5 + Num 1</td><td>○ + ✕</td></tr><tr><td>Penal: panenka</td><td>Q + K</td><td>Enter + Num 2</td><td>L1 + □</td></tr><tr><td>Barrera: saltar</td><td>K</td><td>Num 2</td><td>□</td></tr><tr><td>Barrera: quieta</td><td>J (mantener)</td><td>Num 1 (mantener)</td><td>mantener ✕</td></tr><tr><td>Barrera: sale un jugador</td><td>I (mantener)</td><td>Num 5 (mantener)</td><td>○</td></tr><tr><td>Arquero en balón parado</td><td>L + W A S D</td><td>Num 3 + Flechas</td><td>△ + stick</td></tr><tr><td>Córner atacante</td><td>W / S / A / D</td><td>↑ / ↓ / ← / →</td><td>Cruceta ↑ rápido · ↓ 1er palo · ← en línea · → 2º palo</td></tr><tr><td>Córner defensivo</td><td>W / S / A / D</td><td>↑ / ↓ / ← / →</td><td>Cruceta ↑ mixta · ← al hombre · → zonal</td></tr><tr><td>Mando táctil</td><td>—</td><td>—</td><td>Stick a la izquierda · ✕ ○ □ △ · R1 · R2 · L1 · L2 en tu tiro libre (sin cruceta)</td></tr><tr><td>Cámara</td><td>C</td><td>C</td><td>Touchpad (clic)</td></tr><tr><td>Pausa</td><td>P / Esc</td><td>P / Esc</td><td>OPTIONS</td></tr></tbody></table></div><button data-close="help-dialog" class="primary wide">Entendido</button></dialog>
+<dialog id="stats-dialog"><div class="dialog-top"><span class="eyebrow" id="stats-label"></span><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button><button id="rematch" hidden>Revancha</button><button id="new-match">Nuevo partido</button></div></dialog>
 <dialog id="online-dialog"><div class="dialog-top"><span class="eyebrow">CONEXIÓN ENTRE AMIGOS</span><button class="close" data-close="online-dialog" aria-label="Cerrar">×</button></div><h2>Online experimental</h2><p>El anfitrión simula el partido. Intercambia estos códigos por el medio que prefieras; no se envían automáticamente.</p><label>Servidor STUN (opcional)<input id="stun-url" placeholder="stun:tu-servidor:3478" /></label><p class="fine-print">Sin STUN funciona en redes que permiten una ruta directa. Algunas redes necesitan TURN, que este prototipo no configura.</p><label>Código recibido<textarea id="remote-code" rows="4" placeholder="Pega la invitación o la respuesta de tu amigo"></textarea></label><div class="secondary-actions"><button id="create-offer">1. Crear invitación</button><button id="create-answer">2. Responder invitación</button><button id="accept-answer">3. Aceptar respuesta</button></div><label>Tu código<textarea id="local-code" rows="4" readonly></textarea></label><button id="copy-code">Copiar código</button><p id="network-status" role="status">Esperando conexión.</p><p class="fine-print">Al conectar, el anfitrión inicia un partido de 6 minutos. El invitado controla al visitante. No hay predicción ni compensación de latencia.</p></dialog>
 <input id="replay-file" type="file" accept="application/json,.json" hidden />`;
 
 let paletteStorage:PitchPaletteStorage|undefined;try{paletteStorage=window.localStorage;}catch{}
-let tipsStorage:StartMenuStorage|undefined;try{tipsStorage=window.localStorage;}catch{}
 let difficultyStorage:StartMenuStorage|undefined;try{difficultyStorage=window.localStorage;}catch{}
 let menu=initialMenuState;
 let pitchPalette=loadPitchPalette(paletteStorage);$<HTMLSelectElement>('pitch-palette').value=pitchPalette;
@@ -75,7 +72,7 @@ function download(name:string,value:unknown){const url=URL.createObjectURL(new B
 function closeDialog(id:string){$<HTMLDialogElement>(id).close();refreshPause();}
 function showDialog(id:string){const d=$<HTMLDialogElement>(id);if(!d.open)d.showModal();if(id==='setup-dialog')$<HTMLButtonElement>('quick-play-btn').focus();refreshPause();}
 function pause(value:boolean){manualPaused=value;refreshPause();}
-function refreshPause(){paused=shouldPause(manualPaused,started&&!guest&&!!document.querySelector('dialog[open]'),isFulltime(current.phase)||!!replayResult);input.enabled=started&&!paused&&!replay;input.clear();$('pause-overlay').hidden=!paused||!!document.querySelector('dialog[open]');$('pause-btn').setAttribute('aria-pressed',String(paused));$('pause-btn').innerHTML=paused?'▶ <span>Seguir</span>':'Ⅱ <span>Pausa</span>';accumulator=0;}
+function refreshPause(){paused=shouldPause(manualPaused,started&&!guest&&!!document.querySelector('dialog[open]'),isFulltime(current.phase)||!!replayResult);input.enabled=started&&!paused&&!replay;input.clear();$('pause-overlay').hidden=!paused||!!document.querySelector('dialog[open]');$('pause-btn').setAttribute('aria-pressed',String(paused));$('pause-btn').innerHTML=paused?'▶':'Ⅱ';$('pause-btn').setAttribute('aria-label',paused?'Seguir':'Pausa');accumulator=0;}
 function rematch(){
   if(!kickoffSetup||!isFulltime(current.phase)||peer.role==='host')return;
   peer.close();
@@ -104,25 +101,20 @@ function start(mode?:string,forced?:QuickPlaySetup,online=false){
   kickoffMode=$('match-mode').textContent??'';
   document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);updateHud();
   menu=menuReducer(menu,{type:'start-match'});
-  if(shouldShowTips(tipsStorage))showTips(); // First visit: the tips pause the kickoff until dismissed.
 }
 $('setup-form').addEventListener('submit',e=>{e.preventDefault();try{peer.close();start();$('setup-error').textContent='';}catch(e){$('setup-error').textContent=(e as Error).message;}});
 // Quick play ignores the form: one click (or a pad A press) starts the default match.
 function quickPlay(){try{peer.close();start(undefined,quickPlaySetup());$('setup-error').textContent='';}catch(e){$('setup-error').textContent=(e as Error).message;}}
-function showTips(){if($<HTMLDialogElement>('tips-dialog').open)return;markTipsSeen(tipsStorage);menu=menuReducer(menu,{type:'show-tips'});showDialog('tips-dialog');}
 function matchInProgress(){return started&&!replay&&!replayResult&&!isFulltime(current.phase);}
 $('quick-play-btn').onclick=quickPlay;
 $('menu-help-btn').onclick=()=>showDialog('help-dialog');
-$('show-tips-btn').onclick=showTips;
 $('menu-btn').onclick=()=>{menu=menuReducer(menu,{type:'open-setup'});showDialog('setup-dialog');};$('close-setup').onclick=()=>closeDialog('setup-dialog');
 $('pause-btn').onclick=$('resume-btn').onclick=()=>pause(!paused);$('help-btn').onclick=()=>showDialog('help-dialog');
 document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(b=>b.onclick=()=>closeDialog(b.dataset.close!));
 document.querySelectorAll<HTMLDialogElement>('dialog').forEach(d=>{
   d.addEventListener('cancel',e=>{e.preventDefault();closeDialog(d.id);});
   d.addEventListener('close',()=>{
-    // A queued setup close must not hide an open tips screen.
-    if(d.id==='setup-dialog'&&!$<HTMLDialogElement>('tips-dialog').open)menu=menuReducer(menu,{type:started?'start-match':'close-setup'});
-    if(d.id==='tips-dialog')menu=menuReducer(menu,{type:'close-tips'});
+    if(d.id==='setup-dialog')menu=menuReducer(menu,{type:started?'start-match':'close-setup'});
     refreshPause();
   });
 });
@@ -137,7 +129,7 @@ $('sound-btn').onclick=toggleSound;updateSoundButton();
 $<HTMLInputElement>('sound-volume').value=String(audio.volume);
 $('sound-volume').oninput=()=>audio.setVolume(Number($<HTMLInputElement>('sound-volume').value));
 function updateHud(){
-  renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil,setHint:setHint(current,guest)},$);
+  renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil},$);
   touchPad.update();
   const s=current;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
@@ -196,7 +188,6 @@ $('pitch-palette').onchange=()=>{pitchPalette=$<HTMLSelectElement>('pitch-palett
 // The choice is saved at once and read back on the next page load.
 $('difficulty').onchange=()=>{$<HTMLSelectElement>('difficulty').value=saveCpuDifficulty(difficultyStorage,$<HTMLSelectElement>('difficulty').value);};
 $('quality').onchange=()=>renderer?.setQuality($<HTMLSelectElement>('quality').value);
-$('online-btn').onclick=()=>showDialog('online-dialog');
 async function networkTask(work:()=>Promise<string|void>){try{$('network-status').textContent='Preparando conexión…';const code=await work();if(code)$<HTMLTextAreaElement>('local-code').value=code;$('network-status').textContent='Código listo. Intercámbialo con tu amigo.';}catch(e){$('network-status').textContent=(e as Error).message;}}
 $('create-offer').onclick=()=>networkTask(()=>peer.offer($<HTMLInputElement>('stun-url').value.trim()));
 $('create-answer').onclick=()=>networkTask(()=>peer.answer($<HTMLTextAreaElement>('remote-code').value,$<HTMLInputElement>('stun-url').value.trim()));
@@ -363,24 +354,23 @@ setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
 // Smoke only: reads back the waiting restart, the wall jumps, the keepers and the cursors.
 setPieceState(){const w=sim.snapshot();return {phase:w.phase,tick:w.tick,restart:w.restart?structuredClone(w.restart):null,wallJump:w.players.filter(p=>p.wallJump!==undefined&&p.wallJump>w.tick).map(p=>p.id),keepers:w.players.filter(p=>p.keeper).map(p=>({id:p.id,team:p.team,x:p.x,y:p.y})),selected:[...w.selected],restriction:w.restartRestriction?{...w.restartRestriction}:null};}
 }});
-// A / Cross (button 0) on any pad: start quick play from the menu, close the tips.
-// Button 0 or 1 closes the tips. Nothing acts while another dialog sits on the setup.
-interface PadMenuState{a:boolean;b:boolean}
+// A / Cross (button 0) on any pad starts quick play from the menu.
+// Nothing acts while another dialog sits on the setup.
+interface PadMenuState{a:boolean}
 let padMenuDown:PadMenuState[]=[];
 function pollMenuPad(){
   let pads:(Gamepad|null)[]=[];
   try{pads=Array.from(navigator.getGamepads?.()??[]);}catch{return;}
-  const tips=$<HTMLDialogElement>('tips-dialog'),setup=$<HTMLDialogElement>('setup-dialog');
+  const setup=$<HTMLDialogElement>('setup-dialog');
   const onlySetupOpen=setup.open&&document.querySelectorAll('dialog[open]').length===1;
   for(let i=0;i<pads.length||i<padMenuDown.length;i++){
     const buttons=pads[i]?.buttons;
-    const prev=padMenuDown[i]??{a:false,b:false};
-    const state={a:!!buttons?.[0]?.pressed,b:!!buttons?.[1]?.pressed};
+    const prev=padMenuDown[i]??{a:false};
+    const state={a:!!buttons?.[0]?.pressed};
     padMenuDown[i]=state;
-    const aEdge=state.a&&!prev.a,bEdge=state.b&&!prev.b;
-    if(!aEdge&&!bEdge)continue;
-    if(tips.open&&menu.view==='tips'){tips.close();break;}
-    if(aEdge&&onlySetupOpen&&menu.view==='setup'&&!matchInProgress()){quickPlay();break;}
+    const aEdge=state.a&&!prev.a;
+    if(!aEdge)continue;
+    if(onlySetupOpen&&menu.view==='setup'&&!matchInProgress()){quickPlay();break;}
   }
 }
 // Sampling on a timer catches short presses even when frames run slowly.
@@ -439,22 +429,3 @@ function loop(now:number){
   requestAnimationFrame(loop);
 }
 updateHud();showDialog('setup-dialog');requestAnimationFrame(loop);
-
-/** HUD hint with the PS glyphs of the set-piece controls while a restart waits. */
-function setHint(s:typeof current,guest:boolean):string{
-  const r=s.restart;if(!r||!config.human[guest?1:0])return '';
-  const attacking=r.team===(guest?1:0);
-  // Touch has no cruceta. In touch mode the hint drops every cruceta part and
-  // the L1 + arrow chord, so it never names a button that the pad does not show.
-  const touch=document.body.classList.contains('touch-on');
-  if(r.kind==='penalty')return attacking?'□ tiro · L1+□ panenka · R2 fijar':'Stick: mueve al arquero';
-  if(!attacking){
-    if(r.kind==='free-kick')return '□ salta · mantén ✕ quieta · ○ sale la barrera · △+stick arquero';
-    if(r.kind==='corner'&&!touch)return 'Cruceta: ↑ mixta · ← al hombre · → zonal';
-    return '';
-  }
-  const base='□ / ○ / ✕ potencia · L1+✕ corto · R2 fijar';
-  if(r.kind==='corner')return touch?base:`${base} · Cruceta: ↑ rápido ↓ 1er palo ← en línea → 2º palo`;
-  if(r.kind==='free-kick')return touch?`${base} · L2 tira el 2º lanzador · ○ y ✕ amago`:`${base} · L1+↑/↓ 2º lanzador · L2 tira el 2º · ○ y ✕ amago`;
-  return base;
-}

@@ -12,4 +12,5 @@
 
 ## Checklist
 - [ ] `docs/PROGRESS.md` updated (date UTC-5, PR/issue, player-facing change, what to test, what breaks)
+- [ ] No new on-screen help text, taglines or secondary labels (see `AGENTS.md`, UI text); e2e screenshots reviewed
 - [ ] Capability map in `.agents/skills/verify-futbol-excitante/SKILL.md` updated
