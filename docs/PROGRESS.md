@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-29 13:06 — PR pendiente (#PRNUM) · Prueba de defensa estable con carga
+## 2026-10-29 13:06 — PR pendiente ([#87](https://github.com/oxalc88/futbol-excitante/pull/87)) · Prueba de defensa estable con carga
 - **Qué cambia para el jugador:** nada en el juego.
 - **Qué cambia para el desarrollo:** la prueba defense-e2e mide la velocidad de presión y de contención por ticks de simulación (normalizada por la velocidad base de cada jugador) y exige que la media de la presión supere en 20 % tanto la media como el pico de la contención. Un toque de un compañero (posesión disputada) o un cambio de portador repite la etapa; la caída de un indicador con la misma posesión sigue siendo un fallo.
 - **Qué probar:** nada.
