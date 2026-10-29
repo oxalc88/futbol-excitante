@@ -81,6 +81,6 @@ Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty
 | 2026-10-29 | UI declutter | pi | write | nan/deepseek-v4-flash | default | 4 | 4,055,812 | 289,102 | 52,534 | ~/.pi/agent/sessions (wt-declutter) |
 | 2026-10-29 | UI declutter | Codex CLI | review | gpt-6.1-sol | medium | 2 | ~360,091 | ~69,582 | ~1,871 | ~/.codex/sessions (wt-declutter, approximate) |
 | 2026-10-29 | UI declutter | Codex CLI | test | gpt-6.1-terra | default | 2 | ~120,000 | — | — | screenshot review + verify read-out (approximate) |
-| 2026-10-29 | Menu scroll cue (#PRNUM) | pi | write | nan/deepseek-v4-flash | default | 8 | 5,391,271 | 351,623 | 144,800 | ~/.pi/agent/sessions (wt-scroll-cue) |
-| 2026-10-29 | Menu scroll cue (#PRNUM) | Codex CLI | review | gpt-6.1-sol | medium | 5 | ~218,241 | — | — | codex "tokens used" (wt-scroll-cue) |
-| 2026-10-29 | Menu scroll cue (#PRNUM) | Codex CLI | test | gpt-6.1-terra | default | 5 | ~121,716 | — | — | codex "tokens used", screenshot review (wt-scroll-cue) |
+| 2026-10-29 | Menu scroll cue (#85) | pi | write | nan/deepseek-v4-flash | default | 8 | 5,391,271 | 351,623 | 144,800 | ~/.pi/agent/sessions (wt-scroll-cue) |
+| 2026-10-29 | Menu scroll cue (#85) | Codex CLI | review | gpt-6.1-sol | medium | 5 | ~218,241 | — | — | codex "tokens used" (wt-scroll-cue) |
+| 2026-10-29 | Menu scroll cue (#85) | Codex CLI | test | gpt-6.1-terra | default | 5 | ~121,716 | — | — | codex "tokens used", screenshot review (wt-scroll-cue) |

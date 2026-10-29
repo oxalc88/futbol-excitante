@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-29 07:58 — PR pendiente ([#PRNUM](https://github.com/oxalc88/futbol-excitante/pull/PRNUM)) · Aviso de menú con más contenido abajo
+## 2026-10-29 07:58 — PR pendiente ([#85](https://github.com/oxalc88/futbol-excitante/pull/85)) · Aviso de menú con más contenido abajo
 - **Qué cambia para el jugador:** en el menú de inicio y en **Controles**, cuando hay más opciones o filas más abajo, el borde inferior de la ventana se oscurece y aparece una flecha dorada ⌄ que sube y baja suave. Al llegar al final, o si todo cabe en pantalla, la flecha y la sombra desaparecen. No tapa botones, no bloquea clics ni toques, y no agrega ningún texto. Con «reducir movimiento» la flecha queda quieta.
 - **Qué probar:** en PC (1280×720) y en un teléfono en horizontal (844×390), abre el menú y Controles: debe verse la flecha abajo. Baja con la rueda, con el dedo o con Tab/mando hasta el final: la flecha se va. En una pantalla alta el menú cabe y no hay flecha.
 - **Qué se rompe o cambia:** el borde inferior de las ventanas tiene unos píxeles más de margen. Sin cambios en el motor ni en `eval/baseline.json` (0/276).
