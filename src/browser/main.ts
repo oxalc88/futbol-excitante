@@ -16,6 +16,7 @@ import { FootballRenderer, type Kit } from '../adapters/renderer';
 import { makeTeam, TEAM_CATALOG, validateTeam } from '../adapters/data';
 import { Recorder, parseReplay, replaySimulation } from '../adapters/replay';
 import { PeerSession } from '../adapters/network';
+import { attachScrollCue } from './scroll-cue';
 
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)as T;
 const app=$('app');
@@ -43,6 +44,8 @@ app.innerHTML=`
 <dialog id="stats-dialog"><div class="dialog-top"><span class="eyebrow" id="stats-label"></span><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button><button id="rematch" hidden>Revancha</button><button id="new-match">Nuevo partido</button></div></dialog>
 <dialog id="online-dialog"><div class="dialog-top"><span class="eyebrow">CONEXIÓN ENTRE AMIGOS</span><button class="close" data-close="online-dialog" aria-label="Cerrar">×</button></div><h2>Online experimental</h2><p>El anfitrión simula el partido. Intercambia estos códigos por el medio que prefieras; no se envían automáticamente.</p><label>Servidor STUN (opcional)<input id="stun-url" placeholder="stun:tu-servidor:3478" /></label><p class="fine-print">Sin STUN funciona en redes que permiten una ruta directa. Algunas redes necesitan TURN, que este prototipo no configura.</p><label>Código recibido<textarea id="remote-code" rows="4" placeholder="Pega la invitación o la respuesta de tu amigo"></textarea></label><div class="secondary-actions"><button id="create-offer">1. Crear invitación</button><button id="create-answer">2. Responder invitación</button><button id="accept-answer">3. Aceptar respuesta</button></div><label>Tu código<textarea id="local-code" rows="4" readonly></textarea></label><button id="copy-code">Copiar código</button><p id="network-status" role="status">Esperando conexión.</p><p class="fine-print">Al conectar, el anfitrión inicia un partido de 6 minutos. El invitado controla al visitante. No hay predicción ni compensación de latencia.</p></dialog>
 <input id="replay-file" type="file" accept="application/json,.json" hidden />`;
+// Every dialog gets the bottom cue: a fade and a chevron for hidden content.
+document.querySelectorAll<HTMLDialogElement>('dialog').forEach(d=>attachScrollCue(d));
 
 let paletteStorage:PitchPaletteStorage|undefined;try{paletteStorage=window.localStorage;}catch{}
 let difficultyStorage:StartMenuStorage|undefined;try{difficultyStorage=window.localStorage;}catch{}
