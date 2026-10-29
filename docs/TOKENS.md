@@ -70,3 +70,6 @@ Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty
 | 2026-10-25 | PS touch pad | Codex CLI | review | gpt-6.1-sol | medium | 3 | ~1,324,235 | ~207,415 | ~8,288 | ~/.codex/sessions mentioning wt-touchpad (approximate) |
 | 2026-10-25 | Touch HUD overlap (#81) | pi | write | nan/mimo-v2.6-flash | default | 2 | 56,528 | 17,014 | 4,058 | ~/.pi/agent/sessions (wt-touchpad) |
 | 2026-10-25 | Touch HUD overlap (#81) | Codex CLI | review | gpt-6.1-sol | medium | 1 | ~87,438 | ~14,904 | ~342 | ~/.codex/sessions (wt-touchpad, approximate) |
+| 2026-10-29 | UI declutter | pi | write | nan/deepseek-v4-flash | default | 4 | 4,055,812 | 289,102 | 52,534 | ~/.pi/agent/sessions (wt-declutter) |
+| 2026-10-29 | UI declutter | Codex CLI | review | gpt-6.1-sol | medium | 2 | ~360,091 | ~69,582 | ~1,871 | ~/.codex/sessions (wt-declutter, approximate) |
+| 2026-10-29 | UI declutter | Codex CLI | test | gpt-6.1-terra | default | 2 | ~120,000 | — | — | screenshot review + verify read-out (approximate) |

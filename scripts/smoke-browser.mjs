@@ -52,8 +52,8 @@ function observe(page, label) {
   page.on('console', (m) => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(`${label} console: ${m.text()}`); });
   page.on('response', (r) => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`${label} http ${r.status()}: ${r.url()}`); });
 }
-// Flows that click #start-btn must not be blocked by the first-visit tips dialog,
-// so they mark the tips as seen before any script runs. The quick-play flow below
+// Flows that click #start-btn mark the tips as seen before any script runs, so
+// they keep the same profile as a returning player. The quick-play flow below
 // keeps a clean profile on purpose.
 const seenTips = (page) => page.addInitScript(() => { try { localStorage.setItem('fe.tipsSeen', '1'); } catch {} });
 try {
@@ -121,29 +121,30 @@ try {
   await page.screenshot({ path: `${out}/game.png` });
   if (canvases < 1) errors.push('game: no canvas after match start');
 
-  // Quick play from a clean profile: the tips dialog appears exactly once.
+  // Quick play from a clean profile: there is no tips dialog and the match runs
+  // at once, not paused.
   const quick = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   observe(quick, 'quick');
-  match.quick = { tipsFirst: null, tipsSeen: null, mode: null, tickWhileTips: null, clockStart: null, clockEnd: null, tipsAgain: null };
+  match.quick = { tipsCount: null, mode: null, phase: null, paused: null, clockStart: null, clockEnd: null, tipsAgain: null };
   await quick.goto(`${base}/`, { waitUntil: 'networkidle' });
   await quick.locator('#quick-play-btn').waitFor({ state: 'visible', timeout: 15000 });
-  match.quick.tipsFirst = await quick.locator('#tips-dialog').isVisible();
-  if (match.quick.tipsFirst) errors.push('quick: tips dialog open before the first match');
+  match.quick.tipsCount = await quick.locator('#tips-dialog').count();
+  if (match.quick.tipsCount !== 0) errors.push('quick: #tips-dialog exists before the first match');
   await quick.locator('#quick-play-btn').click();
-  await quick.locator('#tips-dialog').waitFor({ state: 'visible', timeout: 10000 });
-  match.quick.tipsSeen = await quick.evaluate(() => localStorage.getItem('fe.tipsSeen'));
-  if (match.quick.tipsSeen !== '1') errors.push('quick: fe.tipsSeen was not stored on the first match');
   match.quick.mode = (await quick.locator('#match-mode').innerText()).trim();
   if (match.quick.mode !== 'TÚ CONTRA LA CPU') errors.push(`quick: unexpected match mode "${match.quick.mode}"`);
-  // The sim must hold still while the tips block the kickoff.
-  const tipsState = await quick.evaluate(() => ({ tick: window.__fe.tick, paused: window.__fe.paused }));
-  await quick.waitForTimeout(1500);
-  const tipsStateAfter = await quick.evaluate(() => ({ tick: window.__fe.tick, paused: window.__fe.paused }));
-  match.quick.tickWhileTips = { before: tipsState.tick, after: tipsStateAfter.tick, paused: tipsStateAfter.paused };
-  if (!tipsStateAfter.paused) errors.push('quick: match was not paused while the tips dialog was open');
-  if (tipsStateAfter.tick !== tipsState.tick) errors.push(`quick: sim tick advanced while the tips dialog was open (${tipsState.tick} → ${tipsStateAfter.tick})`);
-  await quick.locator('#tips-close').click();
-  await quick.locator('#tips-dialog').waitFor({ state: 'hidden', timeout: 5000 });
+  // No tips block the kickoff: the match must not pause after quick play.
+  try {
+    await quick.waitForFunction(() => !!window.__fe && ['kickoff','playing'].includes(window.__fe.phase)
+      && window.__fe.paused === false, null, { timeout: 15000 });
+  } catch {
+    errors.push('quick: match was paused after quick play');
+  }
+  match.quick.phase = await quick.evaluate(() => window.__fe?.phase ?? null);
+  match.quick.paused = await quick.evaluate(() => window.__fe?.paused ?? null);
+  if (match.quick.paused !== false) errors.push(`quick: paused is ${match.quick.paused} after quick play`);
+  match.quick.tipsCount = await quick.locator('#tips-dialog').count();
+  if (match.quick.tipsCount !== 0) errors.push('quick: #tips-dialog exists after quick play');
   match.quick.clockStart = (await quick.locator('#clock').innerText()).trim();
   // Same kickoff assist as the main flow: pass until the phase leaves the initial whistle.
   const quickKickoff = Date.now();
@@ -161,21 +162,22 @@ try {
     errors.push('quick: clock did not advance after quick play');
   }
   match.quick.clockEnd = (await quick.locator('#clock').innerText()).trim();
-  // After a reload the tips must not show again.
+  // After a reload the quick play also starts with no tips dialog.
   await quick.reload({ waitUntil: 'networkidle' });
   await quick.locator('#quick-play-btn').waitFor({ state: 'visible', timeout: 15000 });
   await quick.locator('#quick-play-btn').click();
   await quick.waitForTimeout(1500);
-  match.quick.tipsAgain = await quick.locator('#tips-dialog').isVisible();
-  if (match.quick.tipsAgain) errors.push('quick: tips dialog shown again after it was seen');
+  match.quick.tipsAgain = await quick.locator('#tips-dialog').count();
+  if (match.quick.tipsAgain !== 0) errors.push('quick: #tips-dialog exists after the reloaded quick play');
+  if (await quick.evaluate(() => window.__fe?.paused ?? null) !== false) errors.push('quick: match paused after the reloaded quick play');
   if ((await quick.locator('#match-mode').innerText()).trim() !== 'TÚ CONTRA LA CPU') errors.push('quick: quick play after reload did not start the solo CPU match');
   await quick.screenshot({ path: `${out}/quick-play.png` });
   await quick.close();
 
-  // Enter on the focused quick-play button starts the match too. The tips are stored as seen.
+  // Enter on the focused quick-play button starts the match too, with no dialog.
   const enter = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   observe(enter, 'enter');
-  match.enter = { focused: null, mode: null, tips: null };
+  match.enter = { focused: null, mode: null, tips: null, paused: null };
   await seenTips(enter);
   await enter.goto(`${base}/`, { waitUntil: 'networkidle' });
   await enter.locator('#quick-play-btn').waitFor({ state: 'visible', timeout: 15000 });
@@ -185,8 +187,10 @@ try {
   await enter.waitForTimeout(1500);
   match.enter.mode = (await enter.locator('#match-mode').innerText()).trim();
   if (match.enter.mode !== 'TÚ CONTRA LA CPU') errors.push(`enter: Enter on the focused #quick-play-btn did not start the match (mode "${match.enter.mode}")`);
-  match.enter.tips = await enter.locator('#tips-dialog').isVisible();
-  if (match.enter.tips) errors.push('enter: tips dialog opened although fe.tipsSeen is 1');
+  match.enter.tips = await enter.locator('#tips-dialog').count();
+  if (match.enter.tips !== 0) errors.push('enter: #tips-dialog exists after quick play');
+  match.enter.paused = await enter.evaluate(() => window.__fe?.paused ?? null);
+  if (match.enter.paused !== false) errors.push(`enter: paused is ${match.enter.paused} after quick play`);
   await enter.close();
 
   videoContext = await browser.newContext({
