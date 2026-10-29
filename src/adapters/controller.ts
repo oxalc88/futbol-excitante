@@ -6,7 +6,8 @@ export interface PadReading { index:number; id:string; mapping:string; connected
 export interface PadFrame { move:Vec2; aim?:Vec2; action?:ActionKind; power:number; sprint:boolean; shield:boolean; switchPlayer:boolean; switchKeeper:boolean;
   keeperRush?:boolean; keeperKick?:'punt'|'high'; keeperDrop?:boolean; keeperFeint?:boolean; simulateDive?:boolean;
   setKick?:boolean; secondTaker?:'side'|'behind'; secondKick?:boolean; setFeint?:boolean; shortRoll?:boolean; panenka?:boolean;
-  wallJump?:boolean; wallCharge?:number; keeperMove?:Vec2; cornerSide?:'up'|'down'|'left'|'right'; setFix?:boolean }
+  wallJump?:boolean; wallCharge?:number; keeperMove?:Vec2; cornerSide?:'up'|'down'|'left'|'right'; setFix?:boolean;
+  press?:boolean; teamPress?:0|1|2; jockey?:boolean; switchTarget?:Vec2 }
 const identity=(p:PadReading)=>`${p.index}:${p.id}`;
 const neutral=():PadFrame=>({move:{x:0,y:0},power:.55,sprint:false,shield:false,switchPlayer:false,switchKeeper:false});
 // Buttons of the PES 2017 PS4 preset. The preset is the default pad mapping.
@@ -36,6 +37,12 @@ export class ControllerMapper {
   private cameraStarts=new Map<string,boolean>();
   // Tick of the last defending ✕ tap, or -1 when no tackle is armed.
   private tackleTap=[-1,-1];
+  // Tick of the last defending □ tap and the double tap flag of the held □.
+  private squareTap=[-1,-1];
+  private squareDouble=[false,false];
+  // Right stick switch, armed while the stick sits near the centre: a flick
+  // gives one switch from any sample above 0.7, however fast the stick rises.
+  private stickArmed=[true,true];
   // Set-piece state of a slot: charge, spend and arm flags of the three kick
   // buttons, the panenka and short-roll chords, the wall charge and the aim lock.
   private setCharge:number[][]=[[0,0,0],[0,0,0]];
@@ -48,7 +55,7 @@ export class ControllerMapper {
   /** Clears the transient sample state only. The identity stash of an active
    * touch toggle survives: restoreSlots consumes it, so a reset while the touch
    * pad owns slot 0 keeps the reversed physical slot ids. */
-  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
+  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.squareTap=[-1,-1];this.squareDouble=[false,false];this.stickArmed=[true,true];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
   /** Frees both slots: the next sample assigns the pads again in list order. */
   releaseSlots(){this.slots=[null,null];this.previous=[[],[]];}
   /** Drops every set-piece charge and flag of a slot: a cancelled touch or a
@@ -57,6 +64,7 @@ export class ControllerMapper {
   private clearSetState(slot:0|1){
     this.setCharge[slot]=[0,0,0];this.setSpent[slot]=[false,false,false];this.setArmed[slot]=[true,true,true];
     this.setPanenka[slot]=false;this.setRoll[slot]=false;this.wallCharge[slot]=0;this.fixedAim[slot]=null;this.restartContext[slot]=null;
+    this.squareTap[slot]=-1;this.squareDouble[slot]=false;this.stickArmed[slot]=true;
   }
   /** The touch pad takes slot 0: stash the physical slot ids and reset only
    * slot 0. Slot 1 keeps its pad, so no physical pad swaps slots. */
@@ -112,6 +120,19 @@ export class ControllerMapper {
     f.move={x:dead(p.axes[0]??0),y:dead(p.axes[1]??0)};if(length(f.move)>1)f.move=unit(f.move);
     const right={x:dead(p.axes[2]??0),y:dead(p.axes[3]??0)};if(length(right)>.1)f.aim=unit(right);
     if(restart){if(!p.buttons[B.r2]?.pressed){this.fixedAim[slot]=null;this.setAim[slot]=f.aim??(length(f.move)>.1?unit(f.move):this.setAim[slot]);if(f.aim||length(f.move)>.1)f.aim={...this.setAim[slot]};}else{if(!this.fixedAim[slot])this.fixedAim[slot]={...this.setAim[slot]};f.aim={...this.fixedAim[slot]};}}
+    // Right stick flick: the stick crosses from the centre to a full deflection.
+    // The switch is armed near the centre and fires once above the threshold, so
+    // a stick that jumps over the middle bands still gives one switch. The arm
+    // state works in every context: a full deflection disarms the stick in attack
+    // too, so a held stick never switches after a change of possession. Only a
+    // sample near the centre arms the stick again. The flick tick keeps no aim.
+    const rightLength=length(right);
+    if(rightLength<.3)this.stickArmed[slot]=true;
+    const flick=this.stickArmed[slot]&&rightLength>.7;
+    if(flick)this.stickArmed[slot]=false;
+    if(flick&&defending&&!restart&&!hold){f.switchTarget=unit(right);f.aim=undefined;}
+    // Outside defense the □ double tap dies, as in the keyboard path of input.ts.
+    if(!defending){this.squareTap[slot]=-1;this.squareDouble[slot]=false;}
     const edge=(i:number)=>!!pressed[i]&&!prev[i],held=(i:number)=>!!pressed[i];
     if(restart){
       const direction=([PS_BUTTON.dpadUp,PS_BUTTON.dpadDown,PS_BUTTON.dpadLeft,PS_BUTTON.dpadRight] as const).find(edge);
@@ -192,9 +213,16 @@ export class ControllerMapper {
       // release never fires a shot.
       if(edge(B.shot))this.armed[slot]=false;
     }else if(defending&&!hold&&!restart){
-      // Pressure is a missing mechanic (phase 2), so the first tap only arms the
-      // tackle and the second tap inside the window fires it.
+      // The first ✕ tap arms the tackle and the second tap inside the window
+      // fires it. ✕ held is the pressure hold of the selected player.
       if(edge(B.tackle)){if(this.tackleTap[slot]>=0&&tick-this.tackleTap[slot]<=TACKLE_TAP_TICKS){f.action='tackle';this.tackleTap[slot]=-1;}else this.tackleTap[slot]=tick;}
+      if(held(B.tackle))f.press=true;
+      // □ held sends one teammate at the carrier; □ ×2 inside the window and held
+      // sends two. The double flag dies with the release of □.
+      if(edge(B.shot)){this.squareDouble[slot]=this.squareTap[slot]>=0&&tick-this.squareTap[slot]<=TACKLE_TAP_TICKS;this.squareTap[slot]=tick;}
+      if(held(B.shot))f.teamPress=this.squareDouble[slot]?2:1;else this.squareDouble[slot]=false;
+      // R2 held contains the carrier at low speed. L1 keeps its own rows.
+      if(held(B.r2)&&!held(B.switchPlayer))f.jockey=true;
       if(edge(B.cross))f.action='slide';
     }else{
       this.tackleTap[slot]=-1;

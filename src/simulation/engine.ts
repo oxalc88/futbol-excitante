@@ -60,6 +60,10 @@ export class Simulation {
       for(const k of ['keeperRush','keeperDrop','keeperFeint','simulateDive']as const)if(f[k]!==undefined&&typeof f[k]!=='boolean')throw new Error('Invalid keeper input flag');
       // Set-piece flags: booleans, the two taker placements, the dpad and the wall charge.
       for(const k of ['setKick','secondKick','setFeint','shortRoll','panenka','wallJump']as const)if(f[k]!==undefined&&typeof f[k]!=='boolean')throw new Error('Invalid set-piece input flag');
+      // Defense flags: two booleans, a teammate count of 0 to 2 and a finite stick.
+      for(const k of ['press','jockey']as const)if(f[k]!==undefined&&typeof f[k]!=='boolean')throw new Error('Invalid defense input flag');
+      if(f.teamPress!==undefined&&(!Number.isInteger(f.teamPress)||f.teamPress<0||f.teamPress>2))throw new Error('Invalid team pressure count');
+      if(f.switchTarget!==undefined)for(const v of[f.switchTarget.x,f.switchTarget.y])if(!Number.isFinite(v))throw new Error('Non-finite input');
       if(f.secondTaker!==undefined&&!['side','behind'].includes(f.secondTaker))throw new Error('Unknown second taker');
       if(f.cornerSide!==undefined&&!['up','down','left','right'].includes(f.cornerSide))throw new Error('Unknown set-piece direction');
       if(f.wallCharge!==undefined&&(!Number.isFinite(f.wallCharge)||f.wallCharge<0||f.wallCharge>1))throw new Error('Invalid wall charge');
@@ -103,6 +107,18 @@ export class Simulation {
       w.stats[team].penalties++;
     }
     this.emit('restart-awarded',taker,team,{kind,point,discontinuity:true});
+  }
+  // Teammate press count of a human slot. It stays in the world, so a restored
+  // checkpoint continues the hold without a second team-press event.
+  private pressHold(slot:TeamIndex){return this.world.teamPressHold?.[slot]??0;}
+  private setPressHold(slot:TeamIndex,count:0|1|2){
+    const w=this.world,hold=w.teamPressHold??[0,0];hold[slot]=count;
+    if(hold[0]===0&&hold[1]===0)delete w.teamPressHold;else w.teamPressHold=hold;
+  }
+  /** Drops a forced teammate chase and gives the player his AI intent back.
+   * The cursor keeps his own input intent. */
+  private releaseTeamPress(q:PlayerState,cursor?:PlayerState){
+    delete q.teamPressing;if(q!==cursor)q.intent=decidePlayer(this.world,q);
   }
   private humanKeeper(p:PlayerState){return p.manualControl===true&&p.keeper&&this.world.config.human[p.team]&&this.world.selected[p.team]===p.id;}
   private scheduleKeeperRelease(p:PlayerState){
@@ -257,7 +273,61 @@ export class Simulation {
       // A player who cannot touch the ball yet (the taker after a second-taker kick) does not take the cursor.
       const carrier=this.player(w.carrier);if(carrier&&carrier.team===slot&&!carrier.keeper&&!(carrier.touchCooldown>0&&w.restartRestriction?.taker===w.ball.lastTouch?.playerId&&carrier.id!==w.ball.lastTouch?.playerId)&&!(this.player(w.selected[slot])?.manualControl)&&w.selected[slot]!==carrier.id){w.selected[slot]=carrier.id;this.emit('control-switched',carrier,slot);}
       let p=this.player(w.selected[slot]);if(p?.sentOff){w.selected[slot]=this.closestOutfield(slot);p=this.player(w.selected[slot]);}if(!p)continue;
-      const f=frames.find(f=>f.slot===slot);if(f&&(length(f.move)>.1||f.action))this.emit('input-intent',p,slot,{inputTick:f.tick,action:f.action??null,move:f.move});p.intent=f?{move:f.move,aim:f.aim,sprint:f.sprint,shield:f.shield,action:f.action,power:f.power??.5}:idle();
+      const f=frames.find(f=>f.slot===slot);if(f&&(length(f.move)>.1||f.action))this.emit('input-intent',p,slot,{inputTick:f.tick,action:f.action??null,move:f.move});const intentOf=()=>f?{move:f.move,aim:f.aim,sprint:f.sprint,shield:f.shield,action:f.action,power:f.power??.5}:idle();p.intent=intentOf();
+      // An opponent carries the ball: the slot defends and reads the PES rows.
+      const foe=carrier&&carrier.team!==slot?carrier:undefined;
+      // Right stick flick: manual switch while the own team has no ball. It runs
+      // before the press rows, and the cursor leaves the keeper as the L1 path does.
+      if(f?.switchTarget&&!(carrier&&carrier.team===slot)){
+        const dir=unit(f.switchTarget);
+        // The cursor is fixed here: the filter and the score read `self`, not `p`.
+        const self=p;
+        const pick=w.players.filter(q=>q.team===slot&&!q.keeper&&!q.sentOff&&q.id!==self.id)
+          .map(q=>({q,u:unit(delta(self,q)),dist:distance(self,q)})).map(c=>({...c,dot:c.u.x*dir.x+c.u.y*dir.y}))
+          .filter(c=>c.dot>.5).sort((a,b)=>b.dot-a.dot||a.dist-b.dist)[0];
+        if(pick){
+          const previous=p;
+          if(previous.keeper){delete previous.manualControl;delete previous.keeperRushing;if(w.keeperHold?.playerId===previous.id)this.scheduleKeeperRelease(previous);}
+          w.selected[slot]=pick.q.id;p=this.player(w.selected[slot])!;
+          // The frame input belongs to the new cursor only. The previous player
+          // takes his AI intent back now, so a flick with a slide or a move in
+          // the same frame never starts the action on both players.
+          previous.intent=decidePlayer(w,previous);
+          p.intent=intentOf();this.emit('control-switched',p,slot);
+        }
+      }
+      // Only the current cursor may keep a press or contain flag.
+      for(const q of w.players)if(q.team===slot&&q!==p){if(q.pressing!==undefined)delete q.pressing;if(q.jockeying!==undefined)delete q.jockeying;}
+      // Hold ✕ chases the carrier, hold R2 contains him and hold □ sends teammates.
+      if(!p.keeper&&foe){
+        if(f?.press){p.intent.move=unit(delta(p,foe));if(p.pressing!==true){p.pressing=true;this.emit('defense-press',p,slot);}}else if(p.pressing!==undefined)delete p.pressing;
+        if(f?.jockey){
+          const m=p.intent.move,len=length(m);if(len>.55)p.intent.move={x:m.x*.55/len,y:m.y*.55/len};
+          p.intent.sprint=false;p.intent.aim=unit(delta(p,foe));
+          if(p.jockeying!==true){p.jockeying=true;this.emit('defense-jockey',p,slot);}
+        }else if(p.jockeying!==undefined)delete p.jockeying;
+        const count=f?.teamPress??0;
+        if(count>0){
+          const mates=w.players.filter(q=>q.team===slot&&!q.keeper&&!q.sentOff&&q.id!==p.id).sort((a,b)=>distance(a,foe)-distance(b,foe)||a.id.localeCompare(b.id));
+          const picked=new Set(mates.slice(0,count).map(q=>q.id));
+          // The AI rewrites intents on its cadence, so re-apply the chase every tick.
+          for(const q of w.players)if(q.team===slot&&!q.keeper){
+            if(picked.has(q.id)){q.intent={...q.intent,move:unit(delta(q,foe)),sprint:true};q.teamPressing=true;}
+            else if(q.teamPressing!==undefined)this.releaseTeamPress(q,p);
+          }
+          if(this.pressHold(slot)!==count){this.setPressHold(slot,count);this.emit('team-press',p,slot,{count});}
+        }else{
+          // Release: the flags die and the teammates drop the forced chase now,
+          // not at the next AI decision.
+          this.setPressHold(slot,0);
+          for(const q of w.players)if(q.team===slot&&q.teamPressing!==undefined)this.releaseTeamPress(q,p);
+        }
+      }else{
+        // No press row: the flags of the slot and of its teammates die here.
+        if(p.pressing!==undefined)delete p.pressing;if(p.jockeying!==undefined)delete p.jockeying;
+        this.setPressHold(slot,0);
+        for(const q of w.players)if(q.team===slot&&q.teamPressing!==undefined)this.releaseTeamPress(q,p);
+      }
       // Foul dive (PES row: L1+L2+L3+R3 without R2): the selected player falls
       // without foul and without card. Keeper mode changes only for the keeper.
       if(f?.simulateDive&&p.recovery===0){
@@ -357,6 +427,11 @@ export class Simulation {
     if(kind==='slide'){p.vx+=aim.x*2;p.vy+=aim.y*2;}
     this.emit('action-start',p,p.team,{kind,intentTick:w.tick,contactTick:p.action.contact,recoveryTick:p.action.end,aim});
   }
+  /** Body turn toward a heading, with the extra rate of a direction reversal. */
+  private turnHeading(p:PlayerState,wanted:number,turnRate:number,dt:number){
+    const turn=angleDelta(p.heading,wanted),rate=turnRate*(1+REVERSAL_TURN_BOOST*Math.max(0,Math.abs(turn)-Math.PI/2)/(Math.PI/2));
+    p.heading+=clamp(turn,-rate*dt,rate*dt);p.heading=Math.atan2(Math.sin(p.heading),Math.cos(p.heading));
+  }
   private movePlayers(){
     const w=this.world,c=w.config,dt=c.dt;
     for(const p of w.players){
@@ -368,7 +443,12 @@ export class Simulation {
       const gkSprint=p.keeper===true&&this.humanKeeper(p)===true&&p.intent.sprint===true&&(p.keeperRushing===true||w.keeperHold?.playerId===p.id);
       const speedLimit=p.keeper?c.goalkeeper.speed*(p.keeperMode==='recover'?.1:1)*(gkSprint?1.25:1):a.speed*(p.intent.sprint?1:c.movement.jog)*(.65+.35*p.energy)*(p.intent.shield ? .73 : 1);
       const desired={x:input.x*speedLimit,y:input.y*speedLimit};
-      if(length(input)>.1){const wanted=Math.atan2(input.y,input.x),turn=angleDelta(p.heading,wanted);const turnRate=a.turnRate*(1+REVERSAL_TURN_BOOST*Math.max(0,Math.abs(turn)-Math.PI/2)/(Math.PI/2));p.heading+=clamp(turn,-turnRate*dt,turnRate*dt);p.heading=Math.atan2(Math.sin(p.heading),Math.cos(p.heading));}
+      // The body follows the movement input, except while the player jockeys:
+      // then it faces the carrier, so a retreat or a strafe still contains him.
+      const jockeyed=p.jockeying===true?this.player(w.carrier):undefined;
+      const faceCarrier=jockeyed&&jockeyed.team!==p.team&&jockeyed.id!==p.id?Math.atan2(jockeyed.y-p.y,jockeyed.x-p.x):null;
+      if(faceCarrier!==null)this.turnHeading(p,faceCarrier,a.turnRate,dt);
+      else if(length(input)>.1)this.turnHeading(p,Math.atan2(input.y,input.x),a.turnRate,dt);
       const speed=Math.hypot(p.vx,p.vy),turn=length(input)>.1&&speed>.1?Math.abs(angleDelta(Math.atan2(p.vy,p.vx),Math.atan2(input.y,input.x))):0;
       const targetScale=1-c.movement.turnLoss*(turn/Math.PI)*(speed/a.speed);
       const change={x:desired.x*targetScale-p.vx,y:desired.y*targetScale-p.vy},amount=length(change);

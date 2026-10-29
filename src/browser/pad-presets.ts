@@ -2,6 +2,8 @@
 // Rows come from pes2017-ps4-controls.md:
 // 5 rows marked "existe-igual" (identical), 12 marked "existe-distinto" (remapped)
 // and 1 row marked "falta" (missing): pressure.
+// The 6 defense rows (pressure, chase, teammate, multiple, jockey, manual switch)
+// are implemented now, so their state is "identical": FE uses the PES gesture.
 // The preset is the default pad and keyboard mapping of the game.
 
 import type { ActionKind } from '../contracts/types';
@@ -28,7 +30,7 @@ export const PS_GLYPH_BY_BUTTON: Readonly<Record<number, PsGlyph>> = {
 };
 
 /** Two tackle edges at most this many ticks apart play the standing tackle (✕ x2).
- * One edge, a hold or a slower pair gives no action: pressure is a missing mechanic (phase 2). */
+ * One edge, a hold or a slower pair gives no tackle: the hold is the pressure row. */
 export const TACKLE_TAP_TICKS = 15;
 
 /** KeyboardEvent.code list per player. For movement: up, down, left, right. */
@@ -49,7 +51,7 @@ export interface PadPresetRow {
   keys: PadKeys;
   /** Rows in the same context that use the same button. The PES table says so. */
   shares: readonly string[];
-  axis?: 'left';
+  axis?: 'left' | 'right';
   note?: string;
 }
 
@@ -85,21 +87,38 @@ export const PES_2017_PS4_ROWS: readonly PadPresetRow[] = [
   { id: 'shield', state: 'remapped', context: 'attack', pes: 'Shield ball', text: 'Automatic', glyphs: [], button: null,
     keys: { p1: [], p2: [] }, shares: [], note: 'Automatic on contact. No button, no glyph and no key. FE uses L3.' },
   { id: 'standingTackle', state: 'remapped', context: 'defense', pes: 'Standing tackle', text: '✕ ×2', glyphs: ['✕'],
-    button: PS_BUTTON.cross, keys: { p1: ['KeyU'], p2: ['Numpad0'] }, shares: ['pressure'],
-    note: 'Two ✕ edges within 15 ticks. A single tap or a hold gives no action. FE uses R1 for tackle.' },
+    button: PS_BUTTON.cross, keys: { p1: ['KeyU'], p2: ['Numpad0'] }, shares: ['pressure', 'chasePressure'],
+    note: 'Two ✕ edges within 15 ticks. A single tap or a hold gives no tackle: the hold is the pressure. FE uses R1 for tackle.' },
   { id: 'slide', state: 'remapped', context: 'defense', pes: 'Slide tackle', text: '○ (defending)', glyphs: ['○'],
     button: PS_BUTTON.circle, keys: { p1: ['KeyB'], p2: ['Numpad7'] }, shares: [], note: 'FE uses L2 + R1 for slide.' },
   { id: 'clearance', state: 'remapped', context: 'defense', pes: 'Clearance (no ball: shot)', text: '□', glyphs: ['□'],
-    button: PS_BUTTON.square, keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: [], note: 'Hold to charge. FE uses ○ for the clearance shot.' },
+    button: PS_BUTTON.square, keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: ['teamPress', 'multiPressure'],
+    note: 'Hold to charge. FE uses ○ for the clearance shot. Shares □ with the teammate pressure rows.' },
   { id: 'shoulderCharge', state: 'remapped', context: 'defense', pes: 'Shoulder charge', text: 'Automatic', glyphs: [], button: null,
     keys: { p1: [], p2: [] }, shares: [], note: 'Automatic while running into a rival. No button.' },
   { id: 'camera', state: 'remapped', context: 'system', pes: 'Change camera (fixed camera)', text: 'Touchpad click', glyphs: ['TOUCHPAD'],
     button: PS_BUTTON.touchpad, keys: { p1: ['KeyC'], p2: ['KeyC'] }, shares: [],
     note: 'Touchpad click on standard-mapping button 17. FE keeps key C.' },
-  // 1 missing row.
-  { id: 'pressure', state: 'missing', context: 'defense', pes: 'Pressure', text: '✕ hold', glyphs: ['✕'], button: PS_BUTTON.cross,
-    keys: { p1: ['KeyU'], p2: ['Numpad0'] }, shares: ['standingTackle'],
-    note: 'Hold ✕. Separate gesture from the tackle double tap. Pressure is a missing mechanic (phase 2), so a hold gives no action.' },
+  // Defense rows. Pressure and the four holds were missing (phase 2): they are
+  // implemented now with the PES gesture, so their state is identical.
+  { id: 'pressure', state: 'identical', context: 'defense', pes: 'Pressure', text: '✕ hold', glyphs: ['✕'], button: PS_BUTTON.cross,
+    keys: { p1: ['KeyU'], p2: ['Numpad0'] }, shares: ['standingTackle', 'chasePressure'],
+    note: 'Hold ✕: the selected player chases the carrier. Separate gesture from the tackle double tap. Keyboard: hold U / Num 0.' },
+  { id: 'chasePressure', state: 'identical', context: 'defense', pes: 'Chase pressure', text: '✕ + R1', glyphs: ['R1'], button: PS_BUTTON.r1,
+    keys: { p1: ['KeyU', 'ShiftLeft'], p2: ['Numpad0', 'ShiftRight'] }, shares: ['pressure', 'standingTackle'],
+    note: 'Hold ✕ with R1: the chase keeps the sprint of the pressure row. Keyboard: hold Shift + U / Num 0.' },
+  { id: 'teamPress', state: 'identical', context: 'defense', pes: 'Teammate pressure', text: 'Hold □', glyphs: ['□'], button: PS_BUTTON.square,
+    keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: ['clearance', 'multiPressure'],
+    note: 'Hold □: one teammate presses the carrier. Keyboard: hold K / Num 2.' },
+  { id: 'multiPressure', state: 'identical', context: 'defense', pes: 'Multiple pressure', text: '□ ×2 hold', glyphs: ['□'], button: PS_BUTTON.square,
+    keys: { p1: ['KeyK'], p2: ['Numpad2'] }, shares: ['teamPress', 'clearance'],
+    note: 'Two □ edges within 15 ticks and hold: two teammates press. Keyboard: K / Num 2 twice and hold.' },
+  { id: 'jockey', state: 'identical', context: 'defense', pes: 'Jockey (contain)', text: 'R2 hold', glyphs: ['R2'], button: PS_BUTTON.r2,
+    keys: { p1: ['KeyG'], p2: ['Numpad6'] }, shares: [],
+    note: 'Hold R2: contain the carrier at low speed, always facing him. Keyboard: hold G / Num 6.' },
+  { id: 'manualSwitch', state: 'identical', context: 'defense', pes: 'Manual cursor switch', text: 'Right stick', glyphs: [], button: null,
+    keys: { p1: [], p2: [] }, shares: [], axis: 'right',
+    note: 'Flick the right stick: the cursor moves to the teammate in that direction. Pad only.' },
   // 10 keeper rows (PES table: "Arquero", plus the foul-dive chord row).
   { id: 'keeperRush', state: 'missing', context: 'keeper', pes: 'Keeper rush out', text: 'Hold △', glyphs: ['△'], button: PS_BUTTON.triangle,
     keys: { p1: ['KeyL'], p2: ['Numpad3'] }, shares: ['keeperThrowSpace'],
