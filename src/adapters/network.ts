@@ -1,9 +1,9 @@
-import type { InputFrame, Presentation, World } from '../contracts/types';
+import type { InputFrame, Presentation, Vec2, World } from '../contracts/types';
 import { clamp } from '../simulation/math';
 type Message={type:string;[key:string]:unknown};
 export class PeerSession {
   private pc:RTCPeerConnection|null=null;private channel:RTCDataChannel|null=null;private latest:Partial<InputFrame>={};
-  private receivedSequence=0;private sentInputSequence=0;private pendingAction:InputFrame['action'];private pendingSwitch=false;private pendingKeeperSwitch=false;private pendingKeeperKick:InputFrame['keeperKick'];private pendingKeeperDrop=false;private pendingKeeperFeint=false;private pendingSimulateDive=false;private pendingSet:Partial<InputFrame>={};private pendingKick:Partial<InputFrame>={};private lastInputAt=0;
+  private receivedSequence=0;private sentInputSequence=0;private pendingAction:InputFrame['action'];private pendingSwitch=false;private pendingSwitchTarget:Vec2|undefined;private pendingKeeperSwitch=false;private pendingKeeperKick:InputFrame['keeperKick'];private pendingKeeperDrop=false;private pendingKeeperFeint=false;private pendingSimulateDive=false;private pendingSet:Partial<InputFrame>={};private pendingKick:Partial<InputFrame>={};private lastInputAt=0;
   role:'host'|'guest'|null=null;onStatus:(status:string)=>void=()=>{};onStart:(world:World)=>void=()=>{};onSnapshot:(s:Presentation)=>void=()=>{};onConnect:()=>void=()=>{};
   private guestSnapshot:Presentation|null=null;
   get connected(){return this.channel?.readyState==='open';}
@@ -20,7 +20,12 @@ export class PeerSession {
         const aim={x:clamp(f.aim.x,-1,1),y:clamp(f.aim.y,-1,1)},power=clamp(f.power??.5,0,1);
         const keeperMove=f.keeperMove&&[f.keeperMove.x,f.keeperMove.y].every(Number.isFinite)?{x:clamp(f.keeperMove.x,-1,1),y:clamp(f.keeperMove.y,-1,1)}:undefined;
         const wallCharge=typeof f.wallCharge==='number'&&Number.isFinite(f.wallCharge)?clamp(f.wallCharge,0,1):undefined;
-        this.latest={move:{x:clamp(f.move.x,-1,1),y:clamp(f.move.y,-1,1)},aim,power,sprint:!!f.sprint,shield:!!f.shield,keeperRush:!!f.keeperRush,keeperMove,wallCharge,secondKick:f.secondKick===true||undefined};this.lastInputAt=performance.now();
+        // Defense holds: the flags stay in the frame while the guest holds them.
+        const press=f.press===true||undefined,jockey=f.jockey===true||undefined;
+        const teamPress=Number.isInteger(f.teamPress)&&Number(f.teamPress)>=1&&Number(f.teamPress)<=2?Number(f.teamPress) as 1|2:undefined;
+        // The right stick flick is a one-shot, like the switch and the keeper edges.
+        const switchTarget=f.switchTarget&&[f.switchTarget.x,f.switchTarget.y].every(Number.isFinite)?{x:clamp(f.switchTarget.x,-1,1),y:clamp(f.switchTarget.y,-1,1)}:undefined;
+        this.latest={move:{x:clamp(f.move.x,-1,1),y:clamp(f.move.y,-1,1)},aim,power,sprint:!!f.sprint,shield:!!f.shield,keeperRush:!!f.keeperRush,keeperMove,wallCharge,press,teamPress,jockey,secondKick:f.secondKick===true||undefined};this.lastInputAt=performance.now();
         const keeperKick=f.keeperKick==='punt'||f.keeperKick==='high'?f.keeperKick:undefined;
         if(Number(m.sequence)>this.receivedSequence){this.receivedSequence=Number(m.sequence);
           const action=['pass','shoot','cross','through','tackle','header','lob','slide'].includes(f.action??'')?f.action:undefined;
@@ -29,7 +34,7 @@ export class PeerSession {
           if(f.secondTaker==='side'||f.secondTaker==='behind')transient.secondTaker=f.secondTaker;
           if(f.cornerSide==='up'||f.cornerSide==='down'||f.cornerSide==='left'||f.cornerSide==='right')transient.cornerSide=f.cornerSide;
           if(action){this.pendingAction=action;this.pendingKick={aim,power,secondKick:transient.secondKick,...transient};}else for(const key of ['secondTaker','setFeint','wallJump','cornerSide'] as const)if(transient[key]!==undefined)(this.pendingSet as any)[key]=transient[key];
-          this.pendingSwitch||=f.switchPlayer===true;this.pendingKeeperSwitch||=f.switchKeeper===true;this.pendingKeeperKick||=keeperKick;this.pendingKeeperDrop||=f.keeperDrop===true;this.pendingKeeperFeint||=f.keeperFeint===true;this.pendingSimulateDive||=f.simulateDive===true;
+          this.pendingSwitch||=f.switchPlayer===true;if(switchTarget)this.pendingSwitchTarget||=switchTarget;this.pendingKeeperSwitch||=f.switchKeeper===true;this.pendingKeeperKick||=keeperKick;this.pendingKeeperDrop||=f.keeperDrop===true;this.pendingKeeperFeint||=f.keeperFeint===true;this.pendingSimulateDive||=f.simulateDive===true;
         }
       }
       if(m.type==='start'&&this.role==='guest'){const w=m.world as World;this.guestSnapshot=structuredClone({tick:w.tick,phase:w.phase,half:w.half,played:w.played,score:w.score,stats:w.stats,selected:w.selected,ball:w.ball,players:w.players,events:w.events,carrier:w.carrier,keeperHold:w.keeperHold,restart:w.restart?{team:w.restart.team,kind:w.restart.kind}:null,teams:w.teams});this.onStart(w);}
@@ -54,16 +59,17 @@ export class PeerSession {
     const {players,...metadata}=snapshot;
     this.send({type:'snapshot',patch:{...metadata,players:players.map(p=>({id:p.id,x:p.x,y:p.y,vx:p.vx,vy:p.vy,heading:p.heading,energy:p.energy,travel:p.travel,recovery:p.recovery,action:p.action}))}});
   }
-  input(frame:InputFrame){if(frame.action||frame.switchPlayer||frame.switchKeeper||frame.keeperKick||frame.keeperDrop||frame.keeperFeint||frame.simulateDive||frame.setKick||frame.secondTaker||frame.secondKick||frame.setFeint||frame.shortRoll||frame.panenka||frame.wallJump||frame.cornerSide)this.sentInputSequence++;this.send({type:'input',sequence:this.sentInputSequence,frame});}
+  input(frame:InputFrame){if(frame.action||frame.switchPlayer||frame.switchTarget||frame.switchKeeper||frame.keeperKick||frame.keeperDrop||frame.keeperFeint||frame.simulateDive||frame.setKick||frame.secondTaker||frame.secondKick||frame.setFeint||frame.shortRoll||frame.panenka||frame.wallJump||frame.cornerSide)this.sentInputSequence++;this.send({type:'input',sequence:this.sentInputSequence,frame});}
   hostFrame(tick:number):InputFrame {
     const fresh=this.connected&&performance.now()-this.lastInputAt<350;
     const result:InputFrame={tick,slot:1,move:{x:0,y:0},aim:{x:-1,y:0},sprint:false,shield:false,...(fresh?this.latest:{}),...(fresh?this.pendingSet:{}),...(fresh?this.pendingKick:{}),action:fresh?this.pendingAction:undefined,switchPlayer:fresh&&this.pendingSwitch,switchKeeper:fresh&&this.pendingKeeperSwitch};
+    if(fresh&&this.pendingSwitchTarget)result.switchTarget={...this.pendingSwitchTarget};
     if(fresh&&this.pendingKeeperKick)result.keeperKick=this.pendingKeeperKick;
     if(fresh&&this.pendingKeeperDrop)result.keeperDrop=true;
     if(fresh&&this.pendingKeeperFeint)result.keeperFeint=true;
     if(fresh&&this.pendingSimulateDive)result.simulateDive=true;
-    this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;this.pendingSet={};this.pendingKick={};return result;
+    this.pendingAction=undefined;this.pendingSwitch=false;this.pendingSwitchTarget=undefined;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;this.pendingSet={};this.pendingKick={};return result;
   }
-  private clearInput(){this.latest={};this.lastInputAt=0;this.pendingAction=undefined;this.pendingSwitch=false;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;this.pendingSet={};this.pendingKick={};}
+  private clearInput(){this.latest={};this.lastInputAt=0;this.pendingAction=undefined;this.pendingSwitch=false;this.pendingSwitchTarget=undefined;this.pendingKeeperSwitch=false;this.pendingKeeperKick=undefined;this.pendingKeeperDrop=false;this.pendingKeeperFeint=false;this.pendingSimulateDive=false;this.pendingSet={};this.pendingKick={};}
   close(){if(this.channel){this.channel.onclose=null;this.channel.onmessage=null;this.channel.onopen=null;this.channel.close();}if(this.pc){this.pc.onconnectionstatechange=null;this.pc.ondatachannel=null;this.pc.close();}this.channel=null;this.pc=null;this.role=null;this.clearInput();this.receivedSequence=0;this.sentInputSequence=0;this.guestSnapshot=null;}
 }

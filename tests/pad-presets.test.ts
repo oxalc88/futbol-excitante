@@ -8,12 +8,13 @@ import {
 } from '../src/browser/pad-presets';
 import { ControllerMapper, type PadReading } from '../src/adapters/controller';
 
-const IDENTICAL = ['move', 'pass', 'through', 'switchPlayer', 'pause'] as const;
+const IDENTICAL = ['move', 'pass', 'through', 'switchPlayer', 'pause', 'pressure', 'chasePressure', 'teamPress', 'multiPressure', 'jockey', 'manualSwitch'] as const;
 const REMAPPED = ['cross', 'switchPlay', 'crossHigh', 'shot', 'header', 'sprint', 'shield',
   'standingTackle', 'slide', 'clearance', 'shoulderCharge', 'camera'] as const;
-const MISSING = ['pressure'] as const;
+/** The 6 defense rows implemented in phase 2. They were missing; FE uses the PES gesture now. */
+const DEFENSE_ROWS = ['pressure', 'chasePressure', 'teamPress', 'multiPressure', 'jockey', 'manualSwitch'] as const;
 /** The 17 phase-1 rows of the research: 5 identical and 12 remapped. */
-const PHASE_1 = [...IDENTICAL, ...REMAPPED];
+const PHASE_1 = [...IDENTICAL.slice(0, 5), ...REMAPPED];
 /** The 10 C10 keeper rows: 9 Arquero rows plus the foul-dive chord of row 107. */
 const KEEPER_ROWS = ['keeperRush', 'keeperRushSprint', 'keeperHandThrow', 'keeperThrowSpace', 'keeperPunt',
   'keeperHighPunt', 'keeperDropPick', 'keeperRun', 'keeperFeint', 'simulateDive'] as const;
@@ -39,7 +40,12 @@ const TABLE: readonly [string, PadPresetRow['state'], PadContext, number | null,
   ['clearance', 'remapped', 'defense', 2, ['□'], '□'],
   ['shoulderCharge', 'remapped', 'defense', null, [], 'Automatic'],
   ['camera', 'remapped', 'system', 17, ['TOUCHPAD'], 'Touchpad click'],
-  ['pressure', 'missing', 'defense', 0, ['✕'], '✕ hold'],
+  ['pressure', 'identical', 'defense', 0, ['✕'], '✕ hold'],
+  ['chasePressure', 'identical', 'defense', 5, ['R1'], '✕ + R1'],
+  ['teamPress', 'identical', 'defense', 2, ['□'], 'Hold □'],
+  ['multiPressure', 'identical', 'defense', 2, ['□'], '□ ×2 hold'],
+  ['jockey', 'identical', 'defense', 7, ['R2'], 'R2 hold'],
+  ['manualSwitch', 'identical', 'defense', null, [], 'Right stick'],
   ['keeperRush', 'missing', 'keeper', 3, ['△'], 'Hold △'],
   ['keeperRushSprint', 'missing', 'keeper', 5, ['R1'], 'R1 + hold △'],
   ['keeperHandThrow', 'missing', 'keeper', 0, ['✕'], '✕'],
@@ -84,6 +90,11 @@ const KEYS: readonly [string, readonly string[], readonly string[]][] = [
   ['shoulderCharge', [], []],
   ['camera', ['KeyC'], ['KeyC']],
   ['pressure', ['KeyU'], ['Numpad0']],
+  ['chasePressure', ['KeyU', 'ShiftLeft'], ['Numpad0', 'ShiftRight']],
+  ['teamPress', ['KeyK'], ['Numpad2']],
+  ['multiPressure', ['KeyK'], ['Numpad2']],
+  ['jockey', ['KeyG'], ['Numpad6']],
+  ['manualSwitch', [], []],
   ['keeperRush', ['KeyL'], ['Numpad3']],
   ['keeperRushSprint', ['ShiftLeft'], ['ShiftRight']],
   ['keeperHandThrow', ['KeyJ'], ['Numpad1']],
@@ -109,18 +120,20 @@ const KEYS: readonly [string, readonly string[], readonly string[]][] = [
   ['cornerStrategy', ['KeyW', 'KeyS', 'KeyA', 'KeyD'], ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']],
 ];
 
-test('preset has the 17 phase-1 rows, 1 missing row, the 10 keeper rows and the 13 set-piece rows', () => {
+test('preset has the 17 phase-1 rows, the 6 defense rows, the 10 keeper rows and the 13 set-piece rows', () => {
   assert.equal(PHASE_1.length, 17);
+  assert.equal(DEFENSE_ROWS.length, 6);
   assert.equal(KEEPER_ROWS.length, 10);
   assert.equal(SET_PIECE_ROWS.length, 13);
-  assert.equal(PES_2017_PS4_ROWS.length, 41);
+  assert.equal(PES_2017_PS4_ROWS.length, 46);
   assert.deepEqual(pesRows('identical').map((row) => row.id), [...IDENTICAL]);
   assert.deepEqual(pesRows('remapped').map((row) => row.id), [...REMAPPED]);
-  assert.deepEqual(pesRows('missing').map((row) => row.id), [...MISSING, ...KEEPER_ROWS, ...SET_PIECE_ROWS]);
+  assert.deepEqual(pesRows('missing').map((row) => row.id), [...KEEPER_ROWS, ...SET_PIECE_ROWS]);
   assert.equal(PES_2017_PS4_PRESET.rows, PES_2017_PS4_ROWS);
-  assert.deepEqual(PES_2017_PS4_ROWS.map((row) => row.id), [...PHASE_1, ...MISSING, ...KEEPER_ROWS, ...SET_PIECE_ROWS]);
+  assert.deepEqual(PES_2017_PS4_ROWS.map((row) => row.id), [...PHASE_1, ...DEFENSE_ROWS, ...KEEPER_ROWS, ...SET_PIECE_ROWS]);
   assert.equal(PHASE_1.filter((id) => pesRow(id).state === 'identical').length, 5);
   assert.equal(PHASE_1.filter((id) => pesRow(id).state === 'remapped').length, 12);
+  assert.equal(DEFENSE_ROWS.filter((id) => pesRow(id).state === 'identical').length, 6);
 });
 
 test('each mapping row matches the PES 2017 PS4 table', () => {
@@ -172,8 +185,8 @@ test('shield is automatic: the row has no button, no glyph and no key', () => {
   assert.deepEqual([...shield.keys.p2], []);
   assert.throws(() => pesButton('shield'), /no button/);
   // No one-button row maps R2 or L2. The foul-dive chord row owns L3 alone;
-  // the set-piece rows own R2 (fix) and L2 (second taker).
-  const shoulderOwned = ['simulateDive', 'setFix', 'secondTakerKick'];
+  // the set-piece rows own R2 (fix) and L2 (second taker); the defense jockey owns R2.
+  const shoulderOwned = ['simulateDive', 'setFix', 'secondTakerKick', 'jockey'];
   for (const row of PES_2017_PS4_ROWS) {
     if (row.button === null || shoulderOwned.includes(row.id)) continue;
     assert.notEqual(row.button, PS_BUTTON.r2, row.id);
@@ -195,9 +208,9 @@ test('pressure (hold ✕) and standing tackle (✕ ×2) are separate gestures', 
   assert.equal(tackle.context, 'defense');
   assert.equal(pressure.button, PS_BUTTON.cross);
   assert.equal(tackle.button, PS_BUTTON.cross);
-  assert.equal(pressure.state, 'missing');
-  assert.deepEqual([...pressure.shares], ['standingTackle']);
-  assert.deepEqual([...tackle.shares], ['pressure']);
+  assert.equal(pressure.state, 'identical');
+  assert.deepEqual([...pressure.shares], ['standingTackle', 'chasePressure']);
+  assert.deepEqual([...tackle.shares], ['pressure', 'chasePressure']);
   // No row mixes a hold with a double tap.
   for (const row of PES_2017_PS4_ROWS) assert.equal(/hold.*then|hold.*×2/i.test(row.text), false, row.id);
 });
@@ -244,7 +257,8 @@ test('attack and defense use the PES buttons, and both contexts stay free', () =
   assert.deepEqual(attack.map((row) => [row.id, row.button]),
     [['pass', 0], ['through', 3], ['cross', 1], ['switchPlay', 1], ['crossHigh', 1], ['shot', 2], ['header', 2], ['sprint', 5]]);
   assert.deepEqual(defense.map((row) => [row.id, row.button]),
-    [['switchPlayer', 4], ['standingTackle', 0], ['slide', 1], ['clearance', 2], ['pressure', 0]]);
+    [['switchPlayer', 4], ['standingTackle', 0], ['slide', 1], ['clearance', 2], ['pressure', 0],
+     ['chasePressure', 5], ['teamPress', 2], ['multiPressure', 2], ['jockey', 7]]);
   // ✕ ○ □ mean one thing in attack and another in defense.
   assert.equal(pesRow('pass').button, pesRow('standingTackle').button);
   assert.equal(pesRow('pass').button, pesButton('pressure'));
@@ -311,6 +325,26 @@ test('the preset is wired into the input, controller and help UI', () => {
   for (const glyph of ['✕', '○', '□', '△', 'L1', 'R1', 'R3', 'OPTIONS']) assert.equal(main.includes(glyph), true, glyph);
   assert.equal(main.includes('Mando (PS4)'), true);
   assert.equal(PES_2017_PS4_PRESET.source, 'pes2017-ps4-controls.md');
+});
+
+test('defense rows keep the PES gestures and share their buttons and keys', () => {
+  assert.equal(pesRow('chasePressure').state, 'identical');
+  assert.equal(pesRow('teamPress').text, 'Hold □');
+  assert.equal(pesRow('multiPressure').text, '□ ×2 hold');
+  assert.equal(pesRow('jockey').text, 'R2 hold');
+  assert.equal(pesRow('jockey').button, PS_BUTTON.r2);
+  assert.equal(pesRow('manualSwitch').axis, 'right');
+  assert.equal(pesRow('manualSwitch').button, null);
+  assert.deepEqual([...pesRow('manualSwitch').keys.p1], []);
+  // The □ rows and the ✕ rows share button and keys inside the defense context.
+  for (const id of ['clearance', 'teamPress', 'multiPressure']) {
+    for (const other of ['clearance', 'teamPress', 'multiPressure']) {
+      if (id === other) continue;
+      assert.ok(pesRow(id).shares.includes(other), `${id} -> ${other}`);
+    }
+  }
+  // No row mixes a hold with a double tap.
+  for (const row of PES_2017_PS4_ROWS) assert.equal(/hold.*then|hold.*×2/i.test(row.text), false, row.id);
 });
 
 function pad(index = 0, buttons: number[] = [], axes: number[] = []): PadReading {

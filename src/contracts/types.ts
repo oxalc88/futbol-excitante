@@ -44,6 +44,14 @@ export interface InputFrame {
   keeperFeint?: boolean;
   /** Foul-dive chord (L1+L2+L3+R3 without R2) of the selected player. */
   simulateDive?: boolean;
+  /** Defense only: hold ✕ so the selected player chases the ball carrier. */
+  press?: boolean;
+  /** Defense only: hold □ for one teammate press, double tap and hold for two. */
+  teamPress?: 0|1|2;
+  /** Defense only: hold R2 to contain the carrier at low speed. */
+  jockey?: boolean;
+  /** Defense only: right stick flick switches the cursor toward that direction. */
+  switchTarget?: Vec2;
   /** Human set piece only: the kick uses the set-piece rows (stick trajectory, power height and curl). */
   setKick?: boolean;
   /** Set piece only: L1 + dpad up or down places the second taker beside or behind the ball. */
@@ -71,6 +79,10 @@ export interface PlayerState extends PlayerProfile, Vec2 {
   manualControl?: boolean;
   // Set only by human keeper commands. Keep absent for CPU-only checkpoints.
   keeperRushing?: boolean;
+  // Set only by human defense commands. Keep absent for CPU-only checkpoints.
+  pressing?: true;
+  jockeying?: true;
+  teamPressing?: true;
   keeperDropped?: boolean;
   // Tick until which a free-kick wall player jumps. Absent on CPU-only checkpoints.
   wallJump?: number;
@@ -110,6 +122,9 @@ export interface Config {
 export interface World {
   advantage: { team: TeamIndex; point: Vec2; until: number; offender: string; card: 'yellow' | 'red' | null } | null;
   pendingCards: { playerId: string; card: 'yellow' | 'red' }[];
+  /** Teammate press count held by each human slot. Absent while no hold is
+   * active and absent on CPU-only checkpoints. */
+  teamPressHold?: [number, number];
   /** Tick of the last pass feint. The feint never restarts `since`. */
   keeperHold: { playerId: string; since: number; feintTick?: number } | null;
   restartRestriction: { taker: string; team: TeamIndex; indirect: boolean; kind: Phase } | null;
