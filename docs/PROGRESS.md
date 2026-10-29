@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-29 00:05 — PR pendiente (#PRNUM) · Cancha sin textos de ayuda
+## 2026-10-29 00:05 — PR pendiente ([#83](https://github.com/oxalc88/futbol-excitante/pull/83)) · Cancha sin textos de ayuda
 - **Qué cambia para el jugador:** como en PES, en el partido solo quedan el marcador, el reloj, el minimapa, el nombre y la energía de tu jugador, y los íconos de pausa, cámara, estadísticas, sonido, volumen y pantalla completa (sin palabras). Desaparecen la línea de ayuda del balón parado, la guía de teclas abajo a la derecha, «CONTROLAS A», el rasgo del jugador, el modo y la fase del partido, el pie con los equipos y «EDICIÓN CANCHA · 01». El mando táctil muestra solo ✕ ○ □ △, R1, R2, L1 y L2, sin palabras. En el menú se van las notas, los subtítulos, la letra chica y la ventana de consejos del primer partido. Los controles de balón parado y del mando táctil están ahora en la pantalla **Controles** (menú o pie del partido).
 - **Qué probar:** juega un partido en PC y en un teléfono en horizontal: provoca un tiro libre y un córner y confirma que no aparece texto sobre la cancha. Abre Controles y busca las filas de balón parado y de mando táctil.
 - **Qué deja de funcionar:** ya no hay consejos al primer partido ni ayuda en la cancha; para recordar un botón abre Controles o pausa. Sin cambios en el motor ni en `eval/baseline.json` (0/276).
