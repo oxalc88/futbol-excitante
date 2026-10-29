@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-29 00:17 — PR pendiente (PRLINK) · Defensa estilo PES
+## 2026-10-29 00:17 — PR pendiente ([#84](https://github.com/oxalc88/futbol-excitante/pull/84)) · Defensa estilo PES
 - **Qué cambia para el jugador:** sin el balón, con tu jugador de campo: mantén ✕ para presionar al rival que lleva el balón (con R1 lo persigue a toda velocidad); mantén □ para que 1 compañero presione, o toca □ dos veces y mantén para que presionen 2; mantén R2 para contener: el jugador va más lento y siempre mira al rival, aunque retroceda. Con el mando físico, mueve el stick derecho hacia un compañero para pasarle el control. En teclado: U/Num 0 presiona, K/Num 2 manda compañeros, G/Num 6 contiene. La CPU no usa estas acciones: sus partidos no cambian.
 - **Qué probar:** en el teléfono, cuando el rival tenga el balón, mantén ✕ y mira cómo tu jugador se le acerca; mantén □ y luego □ ×2; mantén R2 y retrocede. Al soltar, los compañeros vuelven a su sitio.
 - **Qué se rompe o cambia:** el mando táctil no tiene stick derecho, así que el cambio de jugador con el stick solo funciona con mando físico (en táctil sigue L1). No se agregan textos ni etiquetas en pantalla. Baseline 0/276 sin cambios.
