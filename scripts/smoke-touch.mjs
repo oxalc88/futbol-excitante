@@ -251,6 +251,33 @@ try {
     check(data.found.length === 0,
       `${name}: help text inside #viewport: ${JSON.stringify(data.found)}`);
   };
+  // Boxes of the radar, #viewport and the window, for stage 8. The radar keeps
+  // its own band over the match.
+  const radarLayout = (page) => page.evaluate(() => {
+    const el = document.querySelector('#radar');
+    const box = (r) => ({ x: r.x, y: r.y, w: r.width, h: r.height });
+    const v = document.querySelector('#viewport').getBoundingClientRect();
+    const r = el?.getBoundingClientRect() ?? null;
+    const cs = el ? getComputedStyle(el) : null;
+    return { visible: !!el && !el.hidden && el.getClientRects().length > 0 && !!cs
+        && cs.display !== 'none' && cs.visibility !== 'hidden' && Number(cs.opacity) > 0,
+      radar: r ? box(r) : null,
+      boxes: { viewport: box(v),
+        window: { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight } } };
+  });
+  // Visible #radar with a finite positive rect, fully inside the window and
+  // inside #viewport, as the removed hint band check did for the radar.
+  const assertRadarInside = (name, data) => {
+    check(!!data.radar && data.visible, `${name}: #radar is not visible`);
+    const r = data.radar;
+    check([r.x, r.y, r.w, r.h].every(Number.isFinite) && r.w > 0 && r.h > 0,
+      `${name}: #radar rect is not finite and positive (${r.x},${r.y},${r.w},${r.h})`);
+    for (const [where, frame] of Object.entries(data.boxes)) {
+      check(r.x >= frame.x && r.y >= frame.y && r.x + r.w <= frame.x + frame.w
+        && r.y + r.h <= frame.y + frame.h,
+        `${name}: #radar leaves the ${where} (${JSON.stringify(r)} in ${JSON.stringify(frame)})`);
+    }
+  };
 
   // 1: Landscape phone with touch: 7 round buttons, all inside the safe areas,
   // and no rectangular text action button left outside the pad during play.
@@ -539,26 +566,32 @@ try {
     // Open play: no help text.
     const open = await visibleText(page);
     assertNoHelpText(`${spec.name}-open`, open);
+    const openRadar = await radarLayout(page);
+    assertRadarInside(`${spec.name}-open`, openRadar);
     await evidence(page, `${spec.name}-open`, { width: spec.width, height: spec.height,
       hasTouch: spec.hasTouch, state: 'open', touchOn: pad.touchOn,
-      padHidden: pad.padHidden, found: open.found });
+      padHidden: pad.padHidden, found: open.found, radar: openRadar.radar });
     // Attacking waiting free kick: setPiece(free-kick, 0).
     await forceFreeKick(page, 0);
     const padAttack = await freshPad();
     const attack = await visibleText(page);
     assertNoHelpText(`${spec.name}-attack`, attack);
+    const attackRadar = await radarLayout(page);
+    assertRadarInside(`${spec.name}-attack`, attackRadar);
     await evidence(page, `${spec.name}-attack`, { width: spec.width, height: spec.height,
       hasTouch: spec.hasTouch, state: 'attack', touchOn: padAttack.touchOn,
-      padHidden: padAttack.padHidden, found: attack.found });
+      padHidden: padAttack.padHidden, found: attack.found, radar: attackRadar.radar });
     // Defending waiting free kick: a free kick of team 1 on the touch layout.
     if (spec.defending) {
       await forceFreeKick(page, 1);
       const padDefend = await freshPad();
       const defend = await visibleText(page);
       assertNoHelpText(`${spec.name}-defend`, defend);
+      const defendRadar = await radarLayout(page);
+      assertRadarInside(`${spec.name}-defend`, defendRadar);
       await evidence(page, `${spec.name}-defend`, { width: spec.width, height: spec.height,
         hasTouch: spec.hasTouch, state: 'defend', touchOn: padDefend.touchOn,
-        padHidden: padDefend.padHidden, found: defend.found });
+        padHidden: padDefend.padHidden, found: defend.found, radar: defendRadar.radar });
     }
     await context.close();
   }
