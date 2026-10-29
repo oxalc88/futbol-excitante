@@ -76,22 +76,6 @@ function installProbe() {
     }
     return value;
   };
-  // The two transform values of the bob animation, read from the CSS keyframes.
-  window.__cueBobFrames = () => {
-    for (const sheet of document.styleSheets) {
-      let rules;
-      try { rules = sheet.cssRules; } catch { continue; }
-      for (const rule of rules) {
-        if (rule.type !== CSSRule.KEYFRAMES_RULE || rule.name !== 'scroll-cue-bob') continue;
-        const frames = [...rule.cssRules];
-        const at = (key) => frames.find(f => f.keyText.split(',').map(v => v.trim()).includes(key))?.style.transform ?? null;
-        const up = at('0%');
-        const down = at('50%');
-        return up && down ? [up, down] : null;
-      }
-    }
-    return null;
-  };
   window.__cueProbe = (id) => {
     const d = document.getElementById(id);
     if (!d) return null;
@@ -125,7 +109,6 @@ function installProbe() {
       fade: { left: fr.left, top: fr.top, right: fr.right, bottom: fr.bottom, opacity: Number(getComputedStyle(fade).opacity), visibility: getComputedStyle(fade).visibility },
       arrow: { x: (ar.left + ar.right) / 2, y: (ar.top + ar.bottom) / 2, top: ar.top, bottom: ar.bottom, width: ar.width, height: ar.height },
       cueAnim: getComputedStyle(arrow).animationName,
-      cuePlay: getComputedStyle(arrow).animationPlayState,
       arrowOpacity: window.__cueArrowOpacity(id),
       cuePointer: getComputedStyle(cue).pointerEvents,
       cueAriaHidden: cue.getAttribute('aria-hidden'),
@@ -188,52 +171,16 @@ function expectBand(s, label) {
 }
 
 // The fade ramps from transparent to solid dialog color over its top 30%. The
-// chevron must sit in the solid part below the ramp, so a cut-off row never
-// shows through behind it.
+// chevron sits still in the solid part below the ramp and inside the dialog
+// bottom edge, so a cut-off row never shows through behind it.
 function expectCueOnSolidFade(s, label) {
   const solidTop = s.fade.top + (s.fade.bottom - s.fade.top) * 0.3;
   check(s.arrow.top >= solidTop - 1,
     `${label}: chevron top ${s.arrow.top} is above the solid fade start ${solidTop} (fade ${s.fade.top}-${s.fade.bottom})`);
-}
-
-// The chevron must stay in the solid part of the band at both ends of its bob
-// and inside the dialog bottom edge. Pause the bob, apply each keyframe
-// transform as a still image, then measure the chevron box.
-async function expectBobInBand(page, id, label) {
-  const frames = await page.evaluate(() => window.__cueBobFrames());
-  check(Array.isArray(frames) && frames.length === 2, `${label}: the bob keyframes are not readable`);
-  await page.evaluate((id) => {
-    const arrow = document.querySelector(`#${id} > .scroll-cue .scroll-cue-arrow`);
-    if (arrow) arrow.style.animationPlayState = 'paused';
-  }, id);
-  const measured = [];
-  for (const transform of frames) {
-    const s = await page.evaluate(([id, transform]) => {
-      const arrow = document.querySelector(`#${id} > .scroll-cue .scroll-cue-arrow`);
-      if (!arrow) return null;
-      arrow.style.animationName = 'none';
-      arrow.style.transform = transform;
-      return window.__cueProbe(id);
-    }, [id, transform]);
-    check(!!s, `${label}: no chevron in #${id}`);
-    const solidTop = s.fade.top + (s.fade.bottom - s.fade.top) * 0.3;
-    check(s.arrow.top >= solidTop - 0.5,
-      `${label}: chevron top ${s.arrow.top} at transform "${transform}" is above the solid fade start ${solidTop}`);
-    check(s.arrow.bottom <= s.fade.bottom + 0.5,
-      `${label}: chevron bottom ${s.arrow.bottom} at transform "${transform}" is below the band bottom ${s.fade.bottom}`);
-    check(s.arrow.bottom <= s.dialog.bottom + 0.5,
-      `${label}: chevron bottom ${s.arrow.bottom} at transform "${transform}" is below the dialog bottom ${s.dialog.bottom}`);
-    measured.push({ transform, top: s.arrow.top, bottom: s.arrow.bottom, solidTop, bandBottom: s.fade.bottom });
-  }
-  await page.evaluate((id) => {
-    const arrow = document.querySelector(`#${id} > .scroll-cue .scroll-cue-arrow`);
-    if (!arrow) return;
-    arrow.style.animationName = '';
-    arrow.style.transform = '';
-    arrow.style.animationPlayState = '';
-  }, id);
-  await settle(page);
-  return measured;
+  check(s.arrow.bottom <= s.fade.bottom + 0.5,
+    `${label}: chevron bottom ${s.arrow.bottom} is below the band bottom ${s.fade.bottom}`);
+  check(s.arrow.bottom <= s.dialog.bottom + 0.5,
+    `${label}: chevron bottom ${s.arrow.bottom} is below the dialog bottom ${s.dialog.bottom}`);
 }
 
 async function expectFadeVisible(page, id) {
@@ -353,8 +300,7 @@ async function checkCueChrome(page, id, label) {
   check(s.cuePointer === 'none', `${label}: cue pointer-events is "${s.cuePointer}"`);
   check(s.cueAriaHidden === 'true', `${label}: cue is not aria-hidden`);
   check(s.cueText === '', `${label}: cue holds text "${s.cueText}"`);
-  check(s.cueAnim === 'scroll-cue-bob', `${label}: the chevron bob animation is "${s.cueAnim}"`);
-  check(s.cuePlay === 'running', `${label}: the chevron bob animation is "${s.cuePlay}"`);
+  check(s.cueAnim === 'none', `${label}: the chevron runs the animation "${s.cueAnim}"`);
   check(s.cueLabel.length === 0, `${label}: cue holds an aria label or title`);
   const emptyContent = (value) => ['none', 'normal', '""', "''", ''].includes(value);
   const badContent = s.pseudo.filter(value => !emptyContent(value));
@@ -557,7 +503,9 @@ try {
     check(fits.fade.opacity < 0.05, `tall setup: the cue shows with no hidden content (opacity ${fits.fade.opacity})`);
     check(fits.arrowOpacity === 0, `tall setup: the chevron shows with no hidden content (opacity ${fits.arrowOpacity})`);
     check(fits.cueText === '' && fits.cueLabel.length === 0, 'tall setup: the cue holds text');
-    // Reduced motion: the chevron must not bob.
+    // The chevron holds no endless animation, so it never repaints the dialog.
+    check(fits.cueAnim === 'none', `tall setup: the chevron runs the animation "${fits.cueAnim}"`);
+    // Reduced motion: the chevron stays hidden and still.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const reduced = await probe(page, 'setup-dialog');
     check(reduced.cueAnim === 'none', `tall setup: reduced motion keeps the chevron animation "${reduced.cueAnim}"`);
@@ -568,7 +516,7 @@ try {
   }
 
   // 10: Portrait phone 390x844 with touch. The 20 px cue band is the tightest
-  // one, so the chevron must stay in its solid part at both bob ends.
+  // one, so the chevron must stay still in its solid part.
   {
     const { context, page } = await openPage('portrait', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     stage = 'portrait-setup';
@@ -576,9 +524,11 @@ try {
     check(setup.overflow, 'portrait: the setup dialog fits after the options block opens');
     check(setup.more === 'true', `portrait setup: data-more is "${setup.more}" with hidden content`);
     await checkCueChrome(page, 'setup-dialog', 'portrait setup top');
-    const bob = await expectBobInBand(page, 'setup-dialog', 'portrait setup');
-    record('portrait-setup-bob', { solidHeight: bob[0].bandBottom - bob[0].solidTop, frames: bob });
-    await evidence(page, '13-portrait-setup-bob');
+    const still = await probe(page, 'setup-dialog');
+    expectCueOnSolidFade(still, 'portrait setup');
+    const solidTop = still.fade.top + (still.fade.bottom - still.fade.top) * 0.3;
+    record('portrait-setup-chevron', { solidTop, solidHeight: still.fade.bottom - solidTop, top: still.arrow.top, bottom: still.arrow.bottom });
+    await evidence(page, '13-portrait-setup-chevron');
     await context.close();
   }
 } catch (e) {

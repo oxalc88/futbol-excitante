@@ -68,24 +68,21 @@ body.touch-on .tp-l2{right:calc(var(--sa-right) + 254px);bottom:calc(var(--sa-bo
    (--cue-pad), from the content box bottom down to the dialog bottom, under
    every fully visible control: a short transparent-to-solid ramp over its top
    30%, then solid dialog color, so no cut-off row shows through behind the
-   chevron. The chevron stays in the solid part of that band at both ends of
-   its bob. It takes no pointer event. Fade and chevron hide together: they take
-   opacity only while the dialog carries data-more="true". */
+   chevron. The chevron does not move: a moving chevron repaints the dialog every
+   frame and blocks input on a slow CPU. It takes no pointer event. Fade and
+   chevron hide together: they take opacity only while the dialog carries
+   data-more="true". */
 dialog>.scroll-cue{position:sticky;bottom:0;display:block;height:0;z-index:3;pointer-events:none}
 .scroll-cue-fade{position:absolute;left:0;right:0;bottom:calc(-1*var(--cue-pad));height:var(--cue-pad);background:linear-gradient(to bottom,#10233100 0%,#102331 30%,#102331 100%);opacity:0;transition:opacity .18s ease}
 dialog[data-more=true]>.scroll-cue .scroll-cue-fade{opacity:1}
 /* The chevron box is 9 px square with 2 px borders. It turns 45deg, so its
    bounding box is 9*sqrt(2) = 12.73 px tall. The fade turns solid at 30% of
-   --cue-pad, so the solid part is .7*--cue-pad tall: 14 px at pad 20. Keep the
-   chevron in that solid part. The top of .65*--cue-pad - 4.5 px puts the box
-   middle on the middle of the solid part. The bob range is 12.73 px plus two
-   amplitudes, so the amplitude is .2*--cue-pad - 3.6 px: .4 px at pad 20, 2 px
-   at pad 28 and 2.4 px at pad 30. The chevron stays in the solid part at both
-   ends. */
-.scroll-cue-arrow{--cue-bob:calc(var(--cue-pad) * .2 - 3.6px);position:absolute;left:50%;top:calc(var(--cue-pad) * .65 - 4.5px);width:9px;height:9px;margin-left:-4.5px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);opacity:0;transition:opacity .18s ease;animation:scroll-cue-bob 1.6s ease-in-out infinite;animation-play-state:paused}
-dialog[data-more=true]>.scroll-cue .scroll-cue-arrow{opacity:1;animation-play-state:running}
-@keyframes scroll-cue-bob{0%,100%{transform:translateY(calc(-1 * var(--cue-bob))) rotate(45deg)}50%{transform:translateY(var(--cue-bob)) rotate(45deg)}}
-@media(prefers-reduced-motion:reduce){.scroll-cue-arrow{animation:none}.scroll-cue-fade{transition:none}}
+   --cue-pad, so the solid part is .7*--cue-pad tall: 14 px at pad 20. The top of
+   .65*--cue-pad - 4.5 px puts the box middle on the middle of the solid part, so
+   the chevron stays in the solid part. */
+.scroll-cue-arrow{position:absolute;left:50%;top:calc(var(--cue-pad) * .65 - 4.5px);width:9px;height:9px;margin-left:-4.5px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);opacity:0;transition:opacity .18s ease}
+dialog[data-more=true]>.scroll-cue .scroll-cue-arrow{opacity:1}
+@media(prefers-reduced-motion:reduce){.scroll-cue-fade{transition:none}}
 
 /* Visually hidden, still read by screen readers. It stays last so it wins over
    the layout of the element it is added to. */
