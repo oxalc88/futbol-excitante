@@ -162,7 +162,10 @@ try {
       .then(() => null).catch((e) => e);
     if (!failed) return;
     const last = await defenseState(page).catch(() => ({}));
-    if (last.carrierTeam !== 1) throw new PossessionLost('carrier changed');
+    // A team-0 touch clears the press flags through the input context, so a
+    // clear state under a contested possession proves nothing about the
+    // pointer release. Retry.
+    if (last.carrierTeam !== 1 || last.lastTouchTeam !== 1) throw new PossessionLost('carrier changed');
     throw failed;
   };
   // Run one stage on a new page. A carrier change gives team 1 the ball back,
@@ -626,7 +629,10 @@ try {
         bubbles: true, cancelable: true, composed: true,
         pointerType: 'touch', pointerId: id, isPrimary: true, clientX: 0, clientY: 0 }));
       const s0 = window.__feSmoke?.defenseState?.(0);
-      if (!s0 || s0.carrierTeam !== 1) { res({lost: true}); return; }
+      // A team-0 touch clears the press flags through the input context, so a
+      // clear state under a contested possession proves nothing about the
+      // pointer release. Retry.
+      if (!s0 || s0.carrierTeam !== 1 || s0.lastTouchTeam !== 1) { res({lost: true}); return; }
       for (const id of [51, 52, 53, 54, 55]) lift(id);
       // Phase 1: poll each frame until no flag stays set. One frame can last
       // longer than a fixed wait when the load is high. Stop after 1500 ms.
@@ -636,7 +642,7 @@ try {
       let tc = null, holdStart = null;
       const hold = () => {
         const s = window.__feSmoke?.defenseState?.(0);
-        if (!s || s.carrierTeam !== 1) { res({lost: true}); return; }
+        if (!s || s.carrierTeam !== 1 || s.lastTouchTeam !== 1) { res({lost: true}); return; }
         if (tc === null) { tc = s.tick; holdStart = performance.now(); }
         if (s.pressing || s.jockeying || s.teamPressCount > 0) { res({held: s0, after: s, reappeared: true}); return; }
         if (s.tick - tc >= 30) { res({held: s0, after: s, clearTicks: s.tick - tc}); return; }
@@ -645,7 +651,7 @@ try {
       };
       const waitClear = () => {
         const s = window.__feSmoke?.defenseState?.(0);
-        if (!s || s.carrierTeam !== 1) { res({lost: true}); return; }
+        if (!s || s.carrierTeam !== 1 || s.lastTouchTeam !== 1) { res({lost: true}); return; }
         if (!s.pressing && !s.jockeying && s.teamPressCount === 0) { hold(); return; }
         if (performance.now() - start > 1500) { res({held: s0, after: s, timeout: true}); return; }
         requestAnimationFrame(waitClear);
