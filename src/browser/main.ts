@@ -306,6 +306,41 @@ oneOnOne(slot:0|1){
   previous=current=sim.presentation();
   return true;
 },
+// Smoke only: gives the ball to the nearest opponent of the slot, at his feet.
+cpuBall(slot:0|1){
+  if(!started||guest||replay||current.phase!=='playing')return false;
+  const w=sim.snapshot();
+  const self=w.players.find(p=>p.id===w.selected[slot]);
+  if(!self)return false;
+  let foe:typeof self|null=null,best=Infinity;
+  for(const q of w.players){
+    if(q.team===slot||q.keeper||q.sentOff)continue;
+    const d=Math.hypot(q.x-self.x,q.y-self.y);
+    if(d<best){best=d;foe=q;}
+  }
+  if(!foe)return false;
+  foe.vx=0;foe.vy=0;foe.action=null;foe.recovery=0;
+  const rest=config.physics.radius;
+  w.ball.x=foe.x+Math.cos(foe.heading)*.3;w.ball.y=foe.y+Math.sin(foe.heading)*.3;w.ball.z=rest;
+  w.ball.vx=0;w.ball.vy=0;w.ball.vz=0;w.ball.spin={x:0,y:0,z:0};w.ball.freeTicks=0;
+  const point={x:w.ball.x,y:w.ball.y,z:rest};
+  w.ball.lastTouch={id:`smoke-${w.tick}`,tick:w.tick,playerId:foe.id,team:foe.team,surface:'foot',point};
+  w.carrier=foe.id;w.possession=foe.team;
+  w.pendingPass=null;w.restartRestriction=null;
+  sim.restore(w);
+  previous=current=sim.presentation();
+  return true;
+},
+// Smoke only, read only: defence flags of one slot and its distance to the carrier.
+defenseState(slot:0|1=0){
+  const w=sim.snapshot();
+  const p=w.players.find(q=>q.id===w.selected[slot])??null;
+  const carrier=w.players.find(q=>q.id===w.carrier)??null;
+  const pressing=w.players.filter(q=>q.team===slot&&q.teamPressing===true).map(q=>q.id);
+  return {selected:w.selected[slot]??null,keeper:p?.keeper===true,pressing:p?.pressing===true,jockeying:p?.jockeying===true,
+    teamPressing:pressing,teamPressCount:pressing.length,carrier:w.carrier??null,carrierTeam:carrier?.team??null,
+    distance:p&&carrier?Math.hypot(p.x-carrier.x,p.y-carrier.y):null,speed:p?Math.hypot(p.vx,p.vy):null};
+},
 // Smoke only: starts the restart of `kind` for `team`, with a four-man wall on the free kick.
 setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
   // A ball out of play from the last step may leave a waiting restart: replace it.

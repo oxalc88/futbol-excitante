@@ -2,6 +2,11 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-28 23:49 — PR pendiente · Prueba de las defensas en el mando táctil (defense-e2e)
+- **Qué cambia para el jugador:** nada en el juego. Nueva prueba automática de las defensas con el mando táctil: mantener ✕ persigue al rival y acerca al jugador elegido, mantener □ envía a 1 compañero, □ ×2 y mantener envía a 2, mantener R2 contiene más lento que la persecución, y al soltar todo no queda ninguna marca. Añade dos ganchos de prueba que solo existen en el navegador automatizado: `cpuBall(slot)` (da el balón al rival más cercano) y `defenseState(slot)` (lectura de las marcas y la distancia al que lleva el balón).
+- **Qué probar:** ejecuta `scripts/verify.sh`; el paso nuevo `defense-e2e` debe imprimir PASS en sus 5 casos (56 comprobaciones). Capturas en `artifacts/local/defense-e2e/`.
+- **Qué se rompe o cambia:** nada. Sin cambios en el motor, en los controles ni en `eval/baseline.json` (0/276 huellas). El mando táctil no tiene stick derecho, así que el cambio manual de jugador (stick derecho) no se prueba aquí: queda para el mando físico.
+
 ## 2026-10-26 10:50 — PR pendiente ([#82](https://github.com/oxalc88/futbol-excitante/pull/82)) · L2 en el mando táctil
 - **Qué cambia para el jugador:** en pantalla táctil aparece un botón **L2** («2º tira», 56 px) solo cuando tu equipo tiene un tiro libre a favor. Al tocar L2 el 2º lanzador se pone al lado del balón; mantén L2 y patea con □, ○ o ✕: el tiro lo ejecuta el 2º lanzador, como «L2 tira el 2º» en el mando físico. La ayuda táctil del balón parado ya no nombra la cruceta ni L1+↑/↓, que el mando táctil no tiene; la ayuda de Controles menciona L2.
 - **Qué probar:** en un teléfono en horizontal, provoca un tiro libre a favor, toca L2, mantenlo y patea con □: debe patear el compañero que se colocó al lado. Fuera del tiro libre L2 no se ve. Con mando físico o teclado nada cambia.
