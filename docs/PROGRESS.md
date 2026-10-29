@@ -2,6 +2,12 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-29 07:58 — PR pendiente ([#PRNUM](https://github.com/oxalc88/futbol-excitante/pull/PRNUM)) · Aviso de menú con más contenido abajo
+- **Qué cambia para el jugador:** en el menú de inicio y en **Controles**, cuando hay más opciones o filas más abajo, el borde inferior de la ventana se oscurece y aparece una flecha dorada ⌄ que sube y baja suave. Al llegar al final, o si todo cabe en pantalla, la flecha y la sombra desaparecen. No tapa botones, no bloquea clics ni toques, y no agrega ningún texto. Con «reducir movimiento» la flecha queda quieta.
+- **Qué probar:** en PC (1280×720) y en un teléfono en horizontal (844×390), abre el menú y Controles: debe verse la flecha abajo. Baja con la rueda, con el dedo o con Tab/mando hasta el final: la flecha se va. En una pantalla alta el menú cabe y no hay flecha.
+- **Qué se rompe o cambia:** el borde inferior de las ventanas tiene unos píxeles más de margen. Sin cambios en el motor ni en `eval/baseline.json` (0/276).
+- **Prueba automática:** paso `scroll-cue-e2e` en `scripts/verify.sh` (arriba, final, deslizar, Tab hasta el último control, pantalla alta, vertical 390×844; la flecha queda dentro de su franja y nada intercepta clics). Capturas antes y después en `/workspace/scroll-cue-shots/`.
+
 ## 2026-10-29 00:17 — PR pendiente ([#84](https://github.com/oxalc88/futbol-excitante/pull/84)) · Defensa estilo PES
 - **Qué cambia para el jugador:** sin el balón, con tu jugador de campo: mantén ✕ para presionar al rival que lleva el balón (con R1 lo persigue a toda velocidad); mantén □ para que 1 compañero presione, o toca □ dos veces y mantén para que presionen 2; mantén R2 para contener: el jugador va más lento y siempre mira al rival, aunque retroceda. Con el mando físico, mueve el stick derecho hacia un compañero para pasarle el control. En teclado: U/Num 0 presiona, K/Num 2 manda compañeros, G/Num 6 contiene. La CPU no usa estas acciones: sus partidos no cambian.
 - **Qué probar:** en el teléfono, cuando el rival tenga el balón, mantén ✕ y mira cómo tu jugador se le acerca; mantén □ y luego □ ×2; mantén R2 y retrocede. Al soltar, los compañeros vuelven a su sitio.
