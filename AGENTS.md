@@ -11,7 +11,7 @@
 
 - Do not force-push. Do not reset or rewrite `main`.
 - Use one branch for each task. Open a pull request to `main`.
-- Run `scripts/verify.sh` before you open a pull request. All checks must show PASS.
+- Run the full local verify before you open a pull request. All checks must show PASS. See Verification.
 - The writer and the reviewer of a change must use different models.
 - Every capability PR updates `docs/PROGRESS.md` with one entry: date (UTC-5), PR and issue links, what changes for the player (in Spanish), what to test, and what breaks.
 - Every capability PR keeps the capability map in `.agents/skills/verify-futbol-excitante/SKILL.md` up to date.
@@ -27,10 +27,16 @@
 ## Verification
 
 ```bash
-scripts/verify.sh
+flock /tmp/fe-verify.lock env CHROME_PATH=/usr/bin/google-chrome scripts/verify.sh
 ```
 
-The script runs `npm ci`, typecheck, tests, the headless evaluation, the build and a headless browser smoke test (`scripts/smoke-browser.mjs`). It prints PASS or FAIL for each check and exits non-zero if one check fails. Set `CHROME_PATH` to use a specific Chrome or Chromium.
+This full local run is mandatory before you ask for review. Paste its summary into the PR body.
+
+If a game test fails in the local verify after a merge, for example in the verify of the next task, do not stop the current task. Open a separate PR that contains only the fix. Opening that PR is approved. Merging it needs the owner's approval.
+
+The full run covers the core steps and the browser e2e suites, prints PASS or FAIL for each check, and exits non-zero if one check fails.
+
+CI (`.github/workflows/ci.yml`) runs `scripts/verify.sh --ci`, which runs only the core steps: no-legacy, install, typecheck, test, evaluate, build, dist-check, build-lab. Browser e2e suites run only locally; CI installs no browser and runs no browser step.
 
 See [.agents/skills/verify-futbol-excitante/SKILL.md](.agents/skills/verify-futbol-excitante/SKILL.md) for verification steps, evidence and capability coverage.
 

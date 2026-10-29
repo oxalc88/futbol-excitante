@@ -2,6 +2,18 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-29 13:06 — PR pendiente ([#87](https://github.com/oxalc88/futbol-excitante/pull/87)) · Prueba de defensa estable con carga
+- **Qué cambia para el jugador:** nada en el juego.
+- **Qué cambia para el desarrollo:** la prueba defense-e2e mide la velocidad de presión y de contención por ticks de simulación (normalizada por la velocidad base de cada jugador) y exige que la media de la presión supere en 20 % tanto la media como el pico de la contención. Un toque de un compañero (posesión disputada) o un cambio de portador repite la etapa; la caída de un indicador con la misma posesión sigue siendo un fallo.
+- **Qué probar:** nada.
+- **Qué se rompe o cambia:** el gancho de prueba cpuBall acepta una distancia mínima opcional; el juego no cambia.
+
+## 2026-10-29 10:34 — PR pendiente ([#86](https://github.com/oxalc88/futbol-excitante/pull/86)) · CI sin pruebas de navegador
+- **Qué cambia para el jugador:** nada en el juego.
+- **Qué cambia para el desarrollo:** el CI de GitHub corre solo los pasos base (no-legacy, install, typecheck, test, evaluate, build, dist-check, build-lab); las pruebas del juego en navegador (smoke, pad-smoke, portero, táctil, balón parado, defensa) corren solo en la verificación local completa, obligatoria antes de pedir revisión y pegada en la PR.
+- **Qué probar:** nada.
+- **Qué se rompe o cambia:** ya no existe el artefacto browser-smoke en Actions; si una prueba del juego falla en local después de un merge, el arreglo va en una PR aparte.
+
 ## 2026-10-29 07:58 — PR pendiente ([#85](https://github.com/oxalc88/futbol-excitante/pull/85)) · Aviso de menú con más contenido abajo
 - **Qué cambia para el jugador:** en el menú de inicio y en **Controles**, cuando hay más opciones o filas más abajo, el borde inferior de la ventana se oscurece y aparece una flecha dorada ⌄ quieta. Al llegar al final, o si todo cabe en pantalla, la flecha y la sombra desaparecen. No tapa botones, no bloquea clics ni toques, y no agrega ningún texto.
 - **Qué probar:** en PC (1280×720) y en un teléfono en horizontal (844×390), abre el menú y Controles: debe verse la flecha abajo. Baja con la rueda, con el dedo o con Tab/mando hasta el final: la flecha se va. En una pantalla alta el menú cabe y no hay flecha.
