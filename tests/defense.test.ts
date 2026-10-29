@@ -5,6 +5,7 @@ import { createConfig } from '../src/simulation/config';
 import { makeTeam } from '../src/adapters/data';
 import { decidePlayer } from '../src/simulation/tactics';
 import { ControllerMapper, type PadReading } from '../src/adapters/controller';
+import { PeerSession } from '../src/adapters/network';
 import type { InputFrame, MatchEvent, PlayerState, TeamIndex, World } from '../src/contracts/types';
 
 /** One playing match where team 1 carries the ball at (10,0) and the team 0
@@ -316,4 +317,44 @@ test('controller: a stick that jumps past the half band to full still gives one 
   assert.equal(again[2].switchTarget?.x,1,'the first full deflection switches');
   assert.equal(again[3].switchTarget,undefined,'the held stick stays disarmed');
   assert.equal(again[5].switchTarget?.x,1,'a new flick from the centre switches again');
+});
+
+test('network: the host carries the defense holds and one right stick flick',()=>{
+  type FakeChannel={readyState:string;bufferedAmount:number;onopen:null;onclose:null;onmessage:((e:{data:string})=>void)|null;close():void;send(data:string):void};
+  const sent:string[]=[];
+  const channel:FakeChannel={readyState:'open',bufferedAmount:0,onopen:null,onclose:null,onmessage:null,close(){},send:(data)=>{sent.push(data);}};
+  const session=new PeerSession();
+  session.role='host';
+  (session as unknown as {bind:(c:FakeChannel)=>void}).bind(channel);
+  const base:InputFrame={tick:1,slot:0,move:{x:0,y:0},aim:{x:1,y:0},sprint:false,shield:false};
+  const deliver=(sequence:number,frame:unknown)=>{channel.onmessage!({data:JSON.stringify({type:'input',sequence,frame})});};
+  // All four defense fields in one guest input.
+  deliver(1,{...base,press:true,teamPress:2,jockey:true,switchTarget:{x:0,y:-1}});
+  const first=session.hostFrame(1);
+  assert.equal(first.press,true,'the pressure hold reaches the host');
+  assert.equal(first.teamPress,2,'the teammate pressure count reaches the host');
+  assert.equal(first.jockey,true,'the contain hold reaches the host');
+  assert.deepEqual(first.switchTarget,{x:0,y:-1},'the flick reaches the host');
+  // The holds stay while the guest holds them. The flick fires once.
+  const second=session.hostFrame(2);
+  assert.equal(second.press,true,'the pressure hold stays in the frame');
+  assert.equal(second.teamPress,2,'the teammate pressure count stays in the frame');
+  assert.equal(second.jockey,true,'the contain hold stays in the frame');
+  assert.equal(second.switchTarget,undefined,'the flick is one frame only');
+  // A release ends the holds.
+  deliver(1,base);
+  const released=session.hostFrame(3);
+  assert.equal(released.press,undefined,'the released pressure hold never stays');
+  assert.equal(released.teamPress,undefined,'the released teammate pressure never stays');
+  assert.equal(released.jockey,undefined,'the released contain hold never stays');
+  // A non-finite flick and a count outside 0 to 2 never reach the host.
+  deliver(2,{...base,teamPress:3,switchTarget:{x:Infinity,y:0}});
+  const bad=session.hostFrame(4);
+  assert.equal(bad.switchTarget,undefined,'a non-finite flick never reaches the host');
+  assert.equal(bad.teamPress,undefined,'a count outside 0 to 2 never reaches the host');
+  // One flick spends a send sequence. A held defense frame keeps the sequence.
+  session.input({...base,tick:5,switchTarget:{x:1,y:0}});
+  session.input({...base,tick:6,press:true,teamPress:1,jockey:true});
+  assert.deepEqual(sent.map((raw)=>(JSON.parse(raw)as {sequence:number}).sequence),[1,1],'only the flick frame spends a sequence');
+  session.close();
 });
