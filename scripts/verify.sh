@@ -1,13 +1,41 @@
 #!/usr/bin/env bash
-# Verify the Astra game: install, typecheck, tests, headless evaluation,
-# build, and browser smoke test. Exit code is non-zero if any check fails.
-# Usage: scripts/verify.sh   (set CHROME_PATH to use a system Chrome)
+# Verify the Astra game.
+# Full mode (default, no flag): install, typecheck, tests, headless evaluation,
+# build, dist check, lab build and all browser e2e suites (Playwright/Chrome).
+# CI mode (--ci or VERIFY_MODE=ci): core steps only, from an explicit allow-list.
+# CI mode skips the Playwright/Chrome setup and every browser step.
+# Exit code is non-zero if any check fails or is missing.
+# Usage: scripts/verify.sh [--ci]
+#        VERIFY_MODE=ci scripts/verify.sh
+# Set CHROME_PATH to use a specific Chrome or Chromium in full mode.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
+mode="${VERIFY_MODE:-full}"
+for arg in "$@"; do
+  case "$arg" in
+    --ci) mode=ci ;;
+    "") ;;
+    *) echo "unknown argument: $arg" >&2; exit 2 ;;
+  esac
+done
+[ "$mode" = ci ] || mode=full
+
+# Steps that CI mode runs. Every other step is skipped in CI mode.
+CI_STEPS=(no-legacy install typecheck test evaluate build dist-check build-lab)
+
 declare -A result
 order=(no-legacy install typecheck test evaluate build dist-check build-lab smoke pad-smoke keeper-e2e keeper-e2e-touch touch-e2e setpiece-e2e defense-e2e)
-run() { local name=$1; shift; echo "=== $name: $*"; if "$@"; then result[$name]=PASS; else result[$name]=FAIL; fi; }
+
+active() {
+  local name=$1 step
+  [ "$mode" = ci ] || return 0
+  for step in "${CI_STEPS[@]}"; do [ "$step" = "$name" ] && return 0; done
+  return 1
+}
+
+# Steps outside the CI allow-list return early: no run, no recorded result.
+run() { local name=$1; shift; if ! active "$name"; then return 0; fi; echo "=== $name: $*"; if "$@"; then result[$name]=PASS; else result[$name]=FAIL; fi; }
 
 run no-legacy bash scripts/check-no-legacy.sh
 run install npm ci --no-audit --no-fund
@@ -18,18 +46,21 @@ run build npm run build
 run dist-check npm run check:dist
 run build-lab npm run build:lab
 
+# Browser setup: full mode only. CI mode has no Playwright/Chrome step.
 tools="${VERIFY_TOOLS_DIR:-${TMPDIR:-/tmp}/futbol-excitante-verify-tools}"
-if [ ! -d "$tools/node_modules/playwright-core" ]; then
-  npm install --prefix "$tools" --no-audit --no-fund --no-save playwright-core@1.56.1 >/dev/null
+if [ "$mode" = full ]; then
+  if [ ! -d "$tools/node_modules/playwright-core" ]; then
+    npm install --prefix "$tools" --no-audit --no-fund --no-save playwright-core@1.56.1 >/dev/null
+  fi
+  if [ -z "${CHROME_PATH:-}" ]; then
+    for c in google-chrome chromium chromium-browser; do command -v "$c" >/dev/null && CHROME_PATH=$(command -v "$c") && break; done
+    [ -z "${CHROME_PATH:-}" ] && npx --prefix "$tools" playwright-core install chromium >/dev/null
+  fi
+  npx --prefix "$tools" playwright-core install ffmpeg >/dev/null
+  export CHROME_PATH="${CHROME_PATH:-}"
 fi
-if [ -z "${CHROME_PATH:-}" ]; then
-  for c in google-chrome chromium chromium-browser; do command -v "$c" >/dev/null && CHROME_PATH=$(command -v "$c") && break; done
-  [ -z "${CHROME_PATH:-}" ] && npx --prefix "$tools" playwright-core install chromium >/dev/null
-fi
-npx --prefix "$tools" playwright-core install ffmpeg >/dev/null
-export CHROME_PATH="${CHROME_PATH:-}"
-run smoke env PLAYWRIGHT_CORE_DIR="$tools/node_modules/playwright-core" node scripts/smoke-browser.mjs
 
+run smoke env PLAYWRIGHT_CORE_DIR="$tools/node_modules/playwright-core" node scripts/smoke-browser.mjs
 run pad-smoke env PLAYWRIGHT_CORE_DIR="$tools/node_modules/playwright-core" node scripts/smoke-gamepad.mjs
 run keeper-e2e env PLAYWRIGHT_CORE_DIR="$tools/node_modules/playwright-core" node scripts/smoke-keeper.mjs
 run keeper-e2e-touch env KEEPER_PATH=touch PLAYWRIGHT_CORE_DIR="$tools/node_modules/playwright-core" node scripts/smoke-keeper.mjs
@@ -41,6 +72,11 @@ run defense-e2e env PLAYWRIGHT_CORE_DIR="$tools/node_modules/playwright-core" no
 git checkout -- artifacts/evaluation.json 2>/dev/null || true
 
 echo "=== summary"
+echo "mode: $mode"
 status=0
-for k in "${order[@]}"; do echo "$k: ${result[$k]}"; [ "${result[$k]}" = PASS ] || status=1; done
+for k in "${order[@]}"; do
+  active "$k" || continue
+  echo "$k: ${result[$k]}"
+  [ "${result[$k]}" = PASS ] || status=1
+done
 exit $status
