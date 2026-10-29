@@ -8,10 +8,12 @@ description: Verify a change to Fútbol Excitante (Astra). Run before calling an
 ## Run
 
 ```bash
-scripts/verify.sh            # set CHROME_PATH to use a specific Chrome/Chromium
+flock /tmp/fe-verify.lock env CHROME_PATH=/usr/bin/google-chrome scripts/verify.sh   # full run
 ```
 
-Every step must print PASS. The script exits non-zero if one fails. CI (`.github/workflows/ci.yml`) runs the same script.
+Every step must print PASS. The script exits non-zero if one fails. This full local run is mandatory before you ask for review; paste its summary into the PR body.
+
+CI (`.github/workflows/ci.yml`) runs `scripts/verify.sh --ci`, which runs only the core steps: no-legacy, install, typecheck, test, evaluate, build, dist-check, build-lab. Browser e2e suites run only locally. CI installs no browser and runs no browser step.
 
 | Step | What it proves |
 |---|---|
@@ -33,9 +35,9 @@ Every step must print PASS. The script exits non-zero if one fails. CI (`.github
 
 ## Evidence
 
-`artifacts/local/smoke/` (git-ignored; CI uploads it as `browser-smoke`):
+`artifacts/local/smoke/` (git-ignored, local only; CI uploads no browser artifact):
 `pad.json` (scenario snapshots and errors), `game.png`, `match.json` (clock start/end, kickoffMs, score, phase, canvases, quick-play flow `quick`, Enter flow `enter`, errors), `quick-play.png`, `cpu-vs-cpu.png`, `video/*.webm`, `lab.png`.
-Attach these paths, or the CI artifact, to the PR.
+Attach these paths to the PR. Browser e2e evidence comes from the local run, not from CI.
 
 ## Capability map
 

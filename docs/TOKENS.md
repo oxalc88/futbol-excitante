@@ -81,3 +81,5 @@ Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty
 | 2026-10-29 | UI declutter | pi | write | nan/deepseek-v4-flash | default | 4 | 4,055,812 | 289,102 | 52,534 | ~/.pi/agent/sessions (wt-declutter) |
 | 2026-10-29 | UI declutter | Codex CLI | review | gpt-6.1-sol | medium | 2 | ~360,091 | ~69,582 | ~1,871 | ~/.codex/sessions (wt-declutter, approximate) |
 | 2026-10-29 | UI declutter | Codex CLI | test | gpt-6.1-terra | default | 2 | ~120,000 | — | — | screenshot review + verify read-out (approximate) |
+| 2026-10-29 | CI no browser e2e (#86) | pi | write | nan/deepseek-v4-flash | default | 3 | ~360,000 | ~40,000 | ~13,000 | ~/.pi/agent/sessions (wt-ci-lite, approximate) |
+| 2026-10-29 | CI no browser e2e (#86) | Codex CLI | review | gpt-6.1-sol | medium | 1 | ~26,000 | — | — | codex exec tokens used (wt-ci-lite) |
