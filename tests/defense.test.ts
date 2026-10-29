@@ -272,6 +272,37 @@ test('controller: one right stick flick gives one switchTarget and clears the ai
   assert.equal(frames[3].switchTarget,undefined,'a held stick never repeats the flick');
 });
 
+test('controller: a stick held in attack never switches after the loss of the ball',()=>{
+  const mapper=new ControllerMapper();
+  const sample=(axes:number[],defending:boolean,tick:number)=>mapper.sample([pad(0,[],axes)],tick,0,defending);
+  sample([0,0,0,0],false,0);
+  sample([0,0,1,0],false,1);
+  assert.equal(sample([0,0,1,0],true,2).switchTarget,undefined,'the held attack stick gives no switch in defense');
+  // Near the centre the stick arms again and a new flick switches.
+  sample([0,0,0,0],true,3);
+  assert.equal(sample([0,0,1,0],true,4).switchTarget?.x,1,'a new flick from the centre switches');
+  // The same rule holds for a second loss of the ball.
+  sample([0,0,0,0],false,5);
+  sample([0,0,1,0],false,6);
+  assert.equal(sample([0,0,1,0],true,7).switchTarget,undefined,'the attack stick stays disarmed');
+});
+
+test('controller: the □ double tap dies when the mapper samples outside defense',()=>{
+  const mapper=new ControllerMapper();
+  const sample=(buttons:number[],defending:boolean,tick:number)=>mapper.sample([pad(0,buttons)],tick,0,defending);
+  assert.equal(sample([],true,0).teamPress,undefined,'no press gives no team press');
+  assert.equal(sample([2],true,1).teamPress,1,'the first tap is a single press');
+  // Release in attack: the possession change clears the first tap of the pair.
+  sample([],false,2);
+  assert.equal(sample([2],true,3).teamPress,1,'the new defending tap is a single press');
+  // A real double tap inside the window still gives two teammates.
+  const pair=new ControllerMapper();
+  assert.equal(pair.sample([pad(0,[])],0,0,true).teamPress,undefined);
+  assert.equal(pair.sample([pad(0,[2])],1,0,true).teamPress,1);
+  assert.equal(pair.sample([pad(0,[])],2,0,true).teamPress,undefined);
+  assert.equal(pair.sample([pad(0,[2])],3,0,true).teamPress,2,'the double tap in defense gives two');
+});
+
 test('controller: a stick that jumps past the half band to full still gives one switchTarget',()=>{
   // The reported sequence: centre, half deflection, then full deflection.
   const frames=run([{buttons:[],axes:[0,0,0,0]},{buttons:[],axes:[0,0,.45,0]},{buttons:[],axes:[0,0,.8,0]},{buttons:[],axes:[0,0,1,0]}]);

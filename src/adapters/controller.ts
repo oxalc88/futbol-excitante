@@ -122,12 +122,17 @@ export class ControllerMapper {
     if(restart){if(!p.buttons[B.r2]?.pressed){this.fixedAim[slot]=null;this.setAim[slot]=f.aim??(length(f.move)>.1?unit(f.move):this.setAim[slot]);if(f.aim||length(f.move)>.1)f.aim={...this.setAim[slot]};}else{if(!this.fixedAim[slot])this.fixedAim[slot]={...this.setAim[slot]};f.aim={...this.fixedAim[slot]};}}
     // Right stick flick: the stick crosses from the centre to a full deflection.
     // The switch is armed near the centre and fires once above the threshold, so
-    // a stick that jumps over the middle bands still gives one switch. The tick
-    // of the flick keeps no aim of its own.
+    // a stick that jumps over the middle bands still gives one switch. The arm
+    // state works in every context: a full deflection disarms the stick in attack
+    // too, so a held stick never switches after a change of possession. Only a
+    // sample near the centre arms the stick again. The flick tick keeps no aim.
     const rightLength=length(right);
-    const flick=defending&&!restart&&!hold&&this.stickArmed[slot]&&rightLength>.7;
-    if(rightLength<.3)this.stickArmed[slot]=true;else if(flick)this.stickArmed[slot]=false;
-    if(flick){f.switchTarget=unit(right);f.aim=undefined;}
+    if(rightLength<.3)this.stickArmed[slot]=true;
+    const flick=this.stickArmed[slot]&&rightLength>.7;
+    if(flick)this.stickArmed[slot]=false;
+    if(flick&&defending&&!restart&&!hold){f.switchTarget=unit(right);f.aim=undefined;}
+    // Outside defense the □ double tap dies, as in the keyboard path of input.ts.
+    if(!defending){this.squareTap[slot]=-1;this.squareDouble[slot]=false;}
     const edge=(i:number)=>!!pressed[i]&&!prev[i],held=(i:number)=>!!pressed[i];
     if(restart){
       const direction=([PS_BUTTON.dpadUp,PS_BUTTON.dpadDown,PS_BUTTON.dpadLeft,PS_BUTTON.dpadRight] as const).find(edge);
