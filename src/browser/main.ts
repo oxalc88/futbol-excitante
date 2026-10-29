@@ -298,7 +298,9 @@ oneOnOne(slot:0|1){
   return true;
 },
 // Smoke only: gives the ball to the nearest opponent of the slot, at his feet.
-cpuBall(slot:0|1){
+// With minDistance > 0, pick the nearest opponent at that distance or more;
+// if none, fall back to the nearest one.
+cpuBall(slot:0|1, minDistance=0){
   if(!started||guest||replay||current.phase!=='playing')return false;
   const w=sim.snapshot();
   const self=w.players.find(p=>p.id===w.selected[slot]);
@@ -308,6 +310,15 @@ cpuBall(slot:0|1){
     if(q.team===slot||q.keeper||q.sentOff)continue;
     const d=Math.hypot(q.x-self.x,q.y-self.y);
     if(d<best){best=d;foe=q;}
+  }
+  if(minDistance>0){
+    let far:typeof self|null=null,farBest=Infinity;
+    for(const q of w.players){
+      if(q.team===slot||q.keeper||q.sentOff)continue;
+      const d=Math.hypot(q.x-self.x,q.y-self.y);
+      if(d>=minDistance&&d<farBest){farBest=d;far=q;}
+    }
+    if(far)foe=far;
   }
   if(!foe)return false;
   foe.vx=0;foe.vy=0;foe.action=null;foe.recovery=0;
@@ -322,15 +333,23 @@ cpuBall(slot:0|1){
   previous=current=sim.presentation();
   return true;
 },
-// Smoke only, read only: defence flags of one slot and its distance to the carrier.
+// Smoke only, read only: defence flags of one slot, his tick and position, and his distance to the carrier.
+// carrierSince is the heldSince of the carrier. The engine sets heldSince each time a player gains the
+// ball, also after a dribble touch pushed the ball out of reach. lastTouchTeam and lastTouchTick are the
+// team and tick of the last ball touch: the controller sets the press flags only while the last touch is
+// not a teammate touch, so a teammate poke ends the press. That is a contested possession, not a defect.
+// baseSpeed is the engine speed limit of the field player before the jog, sprint and contain factors
+// (simulation/engine.ts movePlayers), so two players compare by their share of their own base speed.
 defenseState(slot:0|1=0){
   const w=sim.snapshot();
   const p=w.players.find(q=>q.id===w.selected[slot])??null;
   const carrier=w.players.find(q=>q.id===w.carrier)??null;
   const pressing=w.players.filter(q=>q.team===slot&&q.teamPressing===true).map(q=>q.id);
-  return {selected:w.selected[slot]??null,keeper:p?.keeper===true,pressing:p?.pressing===true,jockeying:p?.jockeying===true,
-    teamPressing:pressing,teamPressCount:pressing.length,carrier:w.carrier??null,carrierTeam:carrier?.team??null,
-    distance:p&&carrier?Math.hypot(p.x-carrier.x,p.y-carrier.y):null,speed:p?Math.hypot(p.vx,p.vy):null};
+  return {selected:w.selected[slot]??null,tick:w.tick,keeper:p?.keeper===true,pressing:p?.pressing===true,jockeying:p?.jockeying===true,
+    teamPressing:pressing,teamPressCount:pressing.length,carrier:w.carrier??null,carrierTeam:carrier?.team??null,carrierSince:carrier?.heldSince??null,
+    distance:p&&carrier?Math.hypot(p.x-carrier.x,p.y-carrier.y):null,speed:p?Math.hypot(p.vx,p.vy):null,
+    baseSpeed:p&&!p.keeper?p.capabilities.speed*(.65+.35*p.energy):null,
+    x:p?.x??null,y:p?.y??null,lastTouchTeam:w.ball.lastTouch?.team??null,lastTouchTick:w.ball.lastTouch?.tick??null};
 },
 // Smoke only: starts the restart of `kind` for `team`, with a four-man wall on the free kick.
 setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
