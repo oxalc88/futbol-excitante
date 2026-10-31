@@ -28,7 +28,7 @@ ${shoulder('l2', '<b>L2</b>', 'L2: tira el 2º lanzador')}
 <div id="rotate-notice" hidden>Gira el teléfono para jugar en horizontal.</div>`;
 
 /** Builds the touch pad inside `root` and returns the per-HUD-refresh update. */
-export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(): void } {
+export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(): void; setSuspended(on:boolean):void } {
   root.insertAdjacentHTML('beforeend', markup);
   const pad = root.querySelector<HTMLElement>('#touch-pad')!;
   const stick = root.querySelector<HTMLElement>('.tp-stick')!;
@@ -39,6 +39,7 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
   // Pointers that already hold a button: only they can slide onto another one.
   const buttonPointers = new Set<number>();
   let active = false;
+  let suspended = false;
 
   const refresh = () => { for (const el of buttons) el.classList.toggle('on', input.touch.held(nameOf(el))); };
   const showStick = (x: number, y: number) => {
@@ -56,7 +57,7 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
     active = on;
     input.setTouchActive(on);
     document.body.classList.toggle('touch-on', on);
-    pad.hidden = !on;
+    pad.hidden = !on || suspended;
     if (!on) { buttonPointers.clear(); hideStick(); refresh(); }
   };
   const buttonAt = (x: number, y: number): HTMLElement | null => {
@@ -115,6 +116,10 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
   if (window.matchMedia?.('(pointer: coarse)').matches) setActive(true);
 
   return {
+    setSuspended(on:boolean) {
+      if(on&&!suspended){input.touch.clear();buttonPointers.clear();hideStick();refresh();}
+      suspended=on;pad.hidden=!active||suspended;
+    },
     update() {
       // A pressed physical button hands the screen back to the real pad.
       if (input.gamepads.some(p => p.buttons.some(b => b.pressed))) setActive(false);
