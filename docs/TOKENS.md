@@ -97,9 +97,8 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-30 | PR pendiente Audit PR B docs and process round 2 | Codex CLI | write | gpt-6-luna | none | 1 | 45,819 | n/a | n/a | codex exec total tokens used (wt-audit-b) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process | Codex CLI | verify | gpt-6.1-sol | medium | 1 | 115,558 | n/a | n/a | codex exec total tokens used (wt-audit-b) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process loop 2 | Codex CLI | verify | gpt-6.1-sol | medium | 1 | 89,670 | n/a | n/a | codex exec total tokens used (prB/sol2.log) |
-| 2026-10-30 | PR pendiente Audit PR B docs and process | Claude Code | review | claude-opus-5-5 | high | TBD | TBD | TBD | TBD | claude -p JSON modelUsage (prB/review) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process round 3 | Codex CLI | write | gpt-6-luna | none | 1 | 13,087 | n/a | n/a | codex exec total tokens used (wt-audit-b) |
-| 2026-10-30 | PR pendiente Audit PR B docs and process round 4 | Codex CLI | write | gpt-6-luna | none | TBD | TBD | TBD | TBD | codex exec total tokens used (wt-audit-b) |
+| 2026-10-30 | PR pendiente Audit PR B docs and process round 4 | Codex CLI | write | gpt-6-luna | none | 1 | 20,781 | n/a | n/a | codex exec total tokens used (wt-audit-b) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process review 1 | Claude Code | review | claude-opus-5-5 | high | 1 | 18,254 | 80 | 18,174 | claude -p JSON modelUsage (prB/review; cache read 3,037,427; cache create 111,265; cost $1.86) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process review 2 | Claude Code | review | claude-opus-5-5 | high | TBD | TBD | TBD | TBD | claude -p JSON modelUsage (prB/review) |
 
