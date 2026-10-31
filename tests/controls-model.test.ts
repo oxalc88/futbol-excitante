@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { controlsTab, keyLabel, glyphLabel, defaultControlsTab, ROW_TEXT, SOUND_KEY } from '../src/browser/controls-model';
+import { controlsTab, keyLabel, glyphLabel, defaultControlsTab, ROW_TEXT, SOUND_KEY, SUPPORTED_GESTURES } from '../src/browser/controls-model';
 import { PES_2017_PS4_ROWS, KEEPER_SWITCH } from '../src/browser/pad-presets';
 import { TOUCH_GLYPHS, TOUCH_KEEPER_COMBO } from '../src/adapters/touch-pad';
 
@@ -13,7 +13,8 @@ test('every preset row has a model entry and every rendered row has a code sourc
   const allowed=new Set([...PES_2017_PS4_ROWS.map(r=>r.id),'cornerAttack','cornerDefence','keeperSwitch','keeperDive','sound','touchSecondTaker','touchPause']);
   for(const tab of ['keyboard','pad','touch'] as const)for(const e of entries(tab))assert.ok(allowed.has(e.id),`${tab}: ${e.id}`);
   const used=new Set(PES_2017_PS4_ROWS.map(row=>row.id));for(const id of Object.keys(ROW_TEXT))assert.ok(used.has(id),`unused gesture/model row: ${id}`);
-  for(const row of Object.values(ROW_TEXT))if(row.gesture)assert.ok(PES_2017_PS4_ROWS.some(preset=>preset.id in ROW_TEXT&&ROW_TEXT[preset.id]===row),`gesture has no preset row: ${row.label}`);
+  const actual=[...new Set(PES_2017_PS4_ROWS.map(preset=>ROW_TEXT[preset.id]?.gesture).filter((gesture):gesture is NonNullable<typeof gesture>=>!!gesture))].sort();
+  assert.deepEqual([...SUPPORTED_GESTURES].sort(),actual,'every supported gesture must be used by a preset-backed row');
 });
 
 test('keyboard rows show each preset key in its player cell',()=>{

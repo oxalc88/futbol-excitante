@@ -8,7 +8,9 @@ export const GROUP_TITLES:Record<ControlsGroup,string>={attack:'Ataque',defense:
 export const TAB_TITLES:Record<ControlsTab,string>={keyboard:'Teclado',pad:'Mando',touch:'Táctil'};
 export interface ControlsEntry{id:string;label:string;cells:string[]}
 export interface ControlsSection{group:ControlsGroup;title:string;entries:ControlsEntry[]}
-interface RowText{label:string;group?:ControlsGroup;gesture?:'hold'|'double'|'release'|'before';pad?:string;keys?:{p1:string;p2:string};touch?:string;keysFrom?:string;hidden?:string}
+export const SUPPORTED_GESTURES=['hold','double','release','before'] as const;
+type Gesture=typeof SUPPORTED_GESTURES[number];
+interface RowText{label:string;group?:ControlsGroup;gesture?:Gesture;pad?:string;keys?:{p1:string;p2:string};touch?:string;keysFrom?:string;hidden?:string}
 export const SOUND_KEY='KeyM';
 
 /** Player-facing labels and intentional differences from the preset literals. */
@@ -111,7 +113,7 @@ export function controlsMarkdown():string{
     if(entry.id==='touchPause'){const current=all.get('pause');if(current)current.entries.touch=['Ⅱ'];continue;}
     const current=all.get(entry.id)??{label:entry.label,group:section.group,entries:{}};current.entries[tab]=entry.cells;all.set(entry.id,current);
   }
-  const cell=(value:string|undefined)=>value?value.replaceAll('|','\\|'):'—';
+  const cell=(value:string|undefined)=>value?value.replaceAll('|','\\|').replaceAll('\n','<br>'):'—';
   return GROUP_ORDER.flatMap(group=>{const rows=[...all.values()].filter(row=>row.group===group);if(!rows.length)return[];
     return[`### ${GROUP_TITLES[group]}`,'','| Acción | Jugador 1 | Jugador 2 | Mando PS4 | Táctil |','|---|---|---|---|---|',...rows.map(row=>{const k=row.entries.keyboard??[],p=row.entries.pad??[],t=row.entries.touch??[];return`| ${cell(row.label)} | ${cell(k[0])} | ${cell(k[1])} | ${cell(p[0])} | ${cell(t[0])} |`;}),''];
   }).join('\n').trimEnd();
