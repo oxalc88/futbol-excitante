@@ -101,8 +101,8 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-30 | PR pendiente Audit PR B docs and process round 4 | Codex CLI | write | gpt-6-luna | none | 1 | 20,781 | n/a | n/a | codex exec total tokens used (wt-audit-b) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process review 1 | Claude Code | review | claude-opus-5-5 | high | 1 | 3,166,946 | 80 | 18,174 | claude -p JSON modelUsage (prB/review; cache read 3,037,427; cache create 111,265; cost $1.86) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process review 2 | Claude Code | review | claude-opus-5-5 | high | 1 | 273,533 | 12 | 3,692 | claude -p JSON modelUsage (prB/review3.json; cache read 210,895; cache create 58,934; cost $0.59) |
-| 2026-10-30 | PR pendiente Audit PR B docs and process round 5 | Codex CLI | write | gpt-6-luna | none | 1 | TBD | n/a | n/a | codex exec total tokens used (wt-audit-b) |
-| 2026-10-30 | PR pendiente Audit PR B docs and process review 3 | Claude Code | review | claude-opus-5-5 | high | TBD | TBD | TBD | TBD | Total includes cached input |
+| 2026-10-30 | PR pendiente Audit PR B docs and process round 5 | Codex CLI | write | gpt-6-luna | none | 1 | 12,215 | n/a | n/a | codex exec total tokens used (wt-audit-b) |
+| 2026-10-30 | PR pendiente Audit PR B docs and process review 3 | Claude Code | review | claude-opus-5-5 | high | 1 | 332,180 | 18 | 4,111 | claude -p JSON modelUsage (prB/review4.json; cache read 295,358; cache create 32,693; cost $0.40) |
 
 Luna used 5 rounds, Sol used 2 verify loops, and Opus reviewed 3 times.
 
