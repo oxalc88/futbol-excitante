@@ -45,7 +45,7 @@ app.innerHTML=`
 <p id="setup-error" class="error" role="alert"></p><button id="start-btn" class="primary wide" type="submit">Jugar partido <span>→</span></button><div class="secondary-actions"><button type="button" id="menu-help-btn">Controles</button><button type="button" id="load-replay">Cargar repetición</button></div></form></dialog>
 <dialog id="help-dialog"><div class="dialog-top"><button class="close" data-close="help-dialog" aria-label="Cerrar">×</button></div><h2>Controles</h2><div id="controls-root"></div></dialog>
 <dialog id="stats-dialog"><div class="dialog-top"><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button></div></dialog>
-<dialog id="fulltime-dialog" aria-labelledby="fulltime-title"><h2 id="fulltime-title">Final</h2><p class="fulltime-score"><span id="ft-home">COS</span><strong id="ft-score">0 — 0</strong><span id="ft-away">SIE</span></p><div class="fulltime-actions"><button id="ft-rematch" class="primary wide">Revancha</button><button id="ft-menu" class="wide">Volver al menú</button><button id="ft-stats">Estadísticas</button><button id="ft-save">Guardar repetición</button></div></dialog>
+<dialog id="fulltime-dialog" aria-labelledby="fulltime-title"><h2 id="fulltime-title">Final</h2><p class="fulltime-score"><span id="ft-home">COS</span><strong id="ft-score">0 — 0</strong><span id="ft-away">SIE</span></p><div class="fulltime-actions"><button id="ft-rematch" class="primary">Revancha</button><button id="ft-menu">Volver al menú</button><button id="ft-stats">Estadísticas</button><button id="ft-save">Guardar repetición</button></div></dialog>
 
 <input id="replay-file" type="file" accept="application/json,.json" hidden />`;
 // Every dialog gets the bottom cue: a fade and a chevron for hidden content.
@@ -78,7 +78,7 @@ makeRenderer(kits(0,1));
 const controls=renderControls($('controls-root'),defaultControlsTab(false,0));
 function download(name:string,value:unknown){const url=URL.createObjectURL(new Blob([JSON.stringify(value)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function closeDialog(id:string){$<HTMLDialogElement>(id).close();refreshPause();}
-function showDialog(id:string){const d=$<HTMLDialogElement>(id);if(id==='help-dialog')controls.select(defaultControlsTab(document.body.classList.contains('touch-on'),input.gamepads.length));if(!d.open)d.showModal();if(id==='setup-dialog')$<HTMLButtonElement>('quick-play-btn').focus();refreshPause();}
+function showDialog(id:string){const d=$<HTMLDialogElement>(id);if(id==='help-dialog'){const tab=defaultControlsTab(document.body.classList.contains('touch-on'),input.gamepads.length);controls.select(tab);controlsTabIndex=['keyboard','pad','touch'].indexOf(tab);}if(!d.open)d.showModal();if(id==='setup-dialog')$<HTMLButtonElement>('quick-play-btn').focus();refreshPause();}
 function pause(value:boolean){if(value&&(isFulltime(current.phase)||!!replayResult))return;manualPaused=value;refreshPause();}
 function refreshPause(){const terminal=isFulltime(current.phase)||!!replayResult,dialogOpen=started&&!guest&&!!document.querySelector('dialog[open]'),blocked=started&&touchPad.portraitBlocked(),wasPaused=paused;paused=shouldPause(manualPaused,dialogOpen,terminal,blocked);input.enabled=started&&!paused&&!replay;if(pausedStateChanged(wasPaused,paused))input.clear();const overlay=$('pause-overlay'),show=showPauseMenu(manualPaused,dialogOpen,terminal,blocked);if(!show)overlay.hidden=true;else{const opening=overlay.hidden;overlay.hidden=false;if(opening){$('pause-main').hidden=false;$('pause-confirm').hidden=true;$('resume-btn').focus();}}touchPad.setSuspended(paused||!started);$('pause-btn').setAttribute('aria-pressed',String(paused));$('pause-btn').innerHTML=paused?'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m8 5 12 7-12 7z" fill="currentColor"/></svg>':'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="3"/></svg>';$('pause-btn').setAttribute('aria-label',paused?'Seguir':'Pausa');accumulator=0;}
 window.addEventListener('resize',refreshPause);screen.orientation?.addEventListener?.('change',refreshPause);
@@ -410,13 +410,15 @@ setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1,sid
 },
 // Smoke only: reads back the waiting restart, the wall jumps, the keepers and the cursors.
 setPieceState(){const w=sim.snapshot();return {phase:w.phase,tick:w.tick,restart:w.restart?structuredClone(w.restart):null,wallJump:w.players.filter(p=>p.wallJump!==undefined&&p.wallJump>w.tick).map(p=>p.id),keepers:w.players.filter(p=>p.keeper).map(p=>({id:p.id,team:p.team,x:p.x,y:p.y})),selected:[...w.selected],restriction:w.restartRestriction?{...w.restartRestriction}:null};}
-,cornerView(){const w=sim.snapshot(),r=w.restart;if(!r)return null;const taker=w.players.find(p=>p.id===r.taker),project=(x:number,y:number)=>renderer?.screenPoint({x,y,z:0})??null;const goalX=(w.teams[0].direction===1?1:-1)*(52.5-11),corners=[project(goalX,-20.16),project(52.5*Math.sign(goalX),-20.16),project(goalX,20.16),project(52.5*Math.sign(goalX),20.16)].filter(Boolean) as {x:number;y:number}[];return{ball:renderer?.screenPoint({x:w.ball.x,y:w.ball.y,z:w.ball.z})??null,taker:taker?renderer?.screenPoint({x:taker.x,y:taker.y,z:0})??null:null,targetZone:corners.length?{x:Math.min(...corners.map(p=>p.x)),y:Math.min(...corners.map(p=>p.y)),w:Math.max(...corners.map(p=>p.x))-Math.min(...corners.map(p=>p.x)),h:Math.max(...corners.map(p=>p.y))-Math.min(...corners.map(p=>p.y))}:null,kind:r.kind,team:r.team};}
+,cornerView(){const w=sim.snapshot(),r=w.restart;if(!r)return null;const taker=w.players.find(p=>p.id===r.taker),project=(x:number,y:number)=>renderer?.screenPoint({x,y,z:0})??null;const end=Math.sign(r.point.x),goalX=end*(config.pitch.length/2),boxX=end*(config.pitch.length/2-16.5),corners=[project(goalX,-20.16),project(boxX,-20.16),project(goalX,20.16),project(boxX,20.16)];const targetZone=corners.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y))?{x:Math.min(...corners.map(p=>p!.x)),y:Math.min(...corners.map(p=>p!.y)),w:Math.max(...corners.map(p=>p!.x))-Math.min(...corners.map(p=>p!.x)),h:Math.max(...corners.map(p=>p!.y))-Math.min(...corners.map(p=>p!.y))}:null;return{ball:renderer?.screenPoint({x:w.ball.x,y:w.ball.y,z:w.ball.z})??null,taker:taker?renderer?.screenPoint({x:taker.x,y:taker.y,z:0})??null:null,targetZone,kind:r.kind,team:r.team};}
 ,refreshHud(){updateHud();return{radar:$('radar').classList.contains('dodge'),card:document.querySelector('.player-card')?.classList.contains('dodge'),ball:renderer?.screenPoint({x:current.ball.x,y:current.ball.y,z:current.ball.z})??null,radarRect:(()=>{const r=$('radar').getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height};})()};}
 }});
 // A / Cross (button 0) on any pad starts quick play from the menu.
 // Nothing acts while another dialog sits on the setup.
-interface PadMenuState{a:boolean;x:boolean;o:boolean;up:boolean;down:boolean}
+interface PadMenuState{a:boolean;x:boolean;o:boolean;up:boolean;down:boolean;left:boolean;right:boolean}
 let padMenuDown:PadMenuState[]=[];
+let controlsRepeatAt:number[]=[];
+let controlsTabIndex=0;
 function pollMenuPad(){
   let pads:(Gamepad|null)[]=[];
   try{pads=Array.from(navigator.getGamepads?.()??[]);}catch{return;}
@@ -424,19 +426,27 @@ function pollMenuPad(){
   const onlySetupOpen=setup.open&&document.querySelectorAll('dialog[open]').length===1;
   for(let i=0;i<pads.length||i<padMenuDown.length;i++){
     const buttons=pads[i]?.buttons;
-    const prev=padMenuDown[i]??{a:false,x:false,o:false,up:false,down:false};
-    const state={a:!!buttons?.[0]?.pressed,x:!!buttons?.[0]?.pressed,o:!!buttons?.[1]?.pressed,up:!!buttons?.[12]?.pressed,down:!!buttons?.[13]?.pressed};
+    const prev=padMenuDown[i]??{a:false,x:false,o:false,up:false,down:false,left:false,right:false};
+    const state={a:!!buttons?.[0]?.pressed,x:!!buttons?.[0]?.pressed,o:!!buttons?.[1]?.pressed,up:!!buttons?.[12]?.pressed,down:!!buttons?.[13]?.pressed,left:!!buttons?.[14]?.pressed,right:!!buttons?.[15]?.pressed};
     padMenuDown[i]=state;
-    const aEdge=state.a&&!prev.a,xEdge=state.x&&!prev.x,oEdge=state.o&&!prev.o,upEdge=state.up&&!prev.up,downEdge=state.down&&!prev.down;
+    const aEdge=state.a&&!prev.a,xEdge=state.x&&!prev.x,oEdge=state.o&&!prev.o,upEdge=state.up&&!prev.up,downEdge=state.down&&!prev.down,leftEdge=state.left&&!prev.left,rightEdge=state.right&&!prev.right;
     const overlay=$('pause-overlay');
     const activeDialog=document.querySelector<HTMLDialogElement>('dialog[open]');
+    if(activeDialog?.id==='help-dialog'){
+      const stickY=pads[i]?.axes?.[1]??0,scrollDir=Math.abs(stickY)>.35?(stickY<0?-1:1):upEdge?-1:downEdge?1:0,now=Date.now();
+      const verticalHeld=Math.abs(stickY)>.35||state.up||state.down;
+      if(scrollDir&&(upEdge||downEdge||now>=(controlsRepeatAt[i]??0))){activeDialog.scrollTop+=scrollDir*48;controlsRepeatAt[i]=now+(upEdge||downEdge?300:85);}
+      if(!verticalHeld)controlsRepeatAt[i]=0;
+      const tabs=[...activeDialog.querySelectorAll<HTMLButtonElement>('[id^="controls-tab-"]')];
+      if(leftEdge||rightEdge){const selected=tabs.findIndex(tab=>tab.getAttribute('aria-selected')==='true');controlsTabIndex=(Math.max(0,selected)+(rightEdge?1:-1)+tabs.length)%tabs.length;tabs[controlsTabIndex]?.focus({preventScroll:true});}
+      if(aEdge)tabs[controlsTabIndex]?.click();
+      if(xEdge&&activeDialog.contains(document.activeElement))(document.activeElement as HTMLElement).click();
+      if(oEdge)activeDialog.querySelector<HTMLElement>('[data-close]')?.click();
+      continue;
+    }
     if(activeDialog&&started){
-      if(activeDialog.id==='help-dialog'){
-        const stickY=pads[i]?.axes?.[1]??0,scrollDir=stickY<-.5?-1:stickY>.5?1:upEdge?-1:downEdge?1:0;
-        if(scrollDir&&(Math.abs(stickY)>.5||upEdge||downEdge))activeDialog.scrollTop+=scrollDir*48;
-      }
       const focusable=[...activeDialog.querySelectorAll<HTMLButtonElement>('button:not([hidden])')].filter(b=>b.getClientRects().length);
-      if(upEdge||downEdge){const i=focusable.indexOf(document.activeElement as HTMLButtonElement);focusable[(i+(downEdge?1:-1)+focusable.length)%focusable.length]?.focus();}
+      if(upEdge||downEdge){const fi=focusable.indexOf(document.activeElement as HTMLButtonElement);focusable[(fi+(downEdge?1:-1)+focusable.length)%focusable.length]?.focus({preventScroll:true});}
       if(xEdge&&activeDialog.contains(document.activeElement))(document.activeElement as HTMLElement).click();
       if(oEdge){const close=activeDialog.querySelector<HTMLElement>('[data-close]');if(close)close.click();else if(activeDialog.id==='stats-dialog')activeDialog.close();}
       continue;
