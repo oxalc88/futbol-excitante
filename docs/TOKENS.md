@@ -103,6 +103,8 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-30 | PR pendiente Audit PR B docs and process review 2 | Claude Code | review | claude-opus-5-5 | high | 1 | 273,533 | 12 | 3,692 | claude -p JSON modelUsage (prB/review3.json; cache read 210,895; cache create 58,934; cost $0.59) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process round 5 | Codex CLI | write | gpt-6-luna | none | 1 | 12,215 | n/a | n/a | codex exec total tokens used (wt-audit-b) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process review 3 | Claude Code | review | claude-opus-5-5 | high | 1 | 332,180 | 18 | 4,111 | claude -p JSON modelUsage (prB/review4.json; cache read 295,358; cache create 32,693; cost $0.40) |
+| 2026-10-31 | PR pendiente Audit PR B remove pr-body workflow | Codex CLI | write | gpt-6-luna | default | 2 | 43,121 | n/a | n/a | codex exec total tokens used (33,155 + 9,966) |
+| 2026-10-31 | PR pendiente Audit PR B remove pr-body workflow review | Codex CLI | review | gpt-6.1-sol | medium | 1 | 14,952 | n/a | n/a | codex exec total tokens used; APPROVE |
 
 Luna used 5 rounds, Sol used 2 verify loops, and Opus reviewed 3 times.
 

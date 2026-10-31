@@ -15,7 +15,7 @@
 - The writer and the reviewer of a change must use different models.
 - Every capability PR updates `docs/PROGRESS.md` with one entry. Write it in Spanish. Give the date and time (Lima, UTC-5), the PR link, the issue link or «sin issue», what changes for the player, what to test and what breaks. Write «PR pendiente» while the PR is open. When you edit the file, remove «PR pendiente» from entries of merged PRs. `tests/docs-format.test.ts` checks the header format and the order.
 - Every capability PR keeps the capability map in `.agents/skills/verify-futbol-excitante/SKILL.md` up to date.
-- Use `.github/pull_request_template.md`. Fill all 5 sections. The `pr-body` check (`.github/workflows/pr-body.yml`) fails if a section is empty, the issue line is missing, the verify summary is not `mode: full` with PASS for each step, the models per step are missing, or a checklist item is not checked.
+- Use `.github/pull_request_template.md`. Fill all 5 sections. Before each PR, write the PR body to a file and run `node scripts/check-pr-body.mjs --file <body.md>` locally. It must print `pr-body: PASS`. Run it again after each PR body edit.
 - Do not add a deploy job or publish the game without explicit approval.
 
 ## UI text
@@ -36,9 +36,7 @@ If a game test fails in the local verify after a merge, for example in the verif
 
 The full run covers the core steps and the browser e2e suites, prints PASS or FAIL for each check, and exits non-zero if one check fails.
 
-CI (`.github/workflows/ci.yml`) runs `scripts/verify.sh --ci`, which runs only the core steps: no-legacy, install, typecheck, test, evaluate, build, dist-check, build-lab. Browser e2e suites run only locally; CI installs no browser and runs no browser step.
-
-A second workflow, `.github/workflows/pr-body.yml` (check `pr-body`), reads only the PR description. It has read-only permission, runs no build and publishes nothing. To check a body locally: `node scripts/check-pr-body.mjs --file <body.md>`.
+CI (`.github/workflows/ci.yml`) runs only the `build` job (`scripts/verify.sh --ci`). Browser e2e suites run only locally.
 
 See [.agents/skills/verify-futbol-excitante/SKILL.md](.agents/skills/verify-futbol-excitante/SKILL.md) for verification steps, evidence and capability coverage.
 

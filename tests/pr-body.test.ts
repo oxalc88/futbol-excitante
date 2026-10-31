@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { checkPrBody, SECTIONS, verifySteps } from '../scripts/check-pr-body.mjs';
 
@@ -53,13 +53,10 @@ test('unchecked checklist item fails', () => {
   assert.ok(checkPrBody(validBody().replace('- [x] One', '- [ ] One'), steps).errors.some((e) => e.includes('not checked')));
 });
 
-test('workflow is read-only and does not interpolate PR text in a run command', () => {
-  const workflow = readFileSync('.github/workflows/pr-body.yml', 'utf8');
-  assert.match(workflow, /pull_request:/);
-  assert.match(workflow, /contents: read/);
-  assert.match(workflow, /node scripts\/check-pr-body\.mjs/);
-  assert.doesNotMatch(workflow, /pull_request_target|deploy|pages|release|upload-artifact|secrets\.|: write/);
-  assert.doesNotMatch(workflow, /^\s*run:.*\$\{\{/m);
+test('no PR body workflow exists and CI does not reference pr-body', () => {
+  assert.equal(existsSync('.github/workflows/pr-body.yml'), false);
+  const ci = readFileSync('.github/workflows/ci.yml', 'utf8');
+  assert.doesNotMatch(ci, /pr-body/);
 });
 
 test('CI keeps the existing build job, scope step and CI verify command', () => {
