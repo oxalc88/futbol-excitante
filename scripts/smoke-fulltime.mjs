@@ -10,6 +10,8 @@ try{
     check(await page.evaluate(()=>window.__feSmoke.toFulltime()),`${vp}: fulltime hook failed`);
     await page.waitForFunction(()=>window.__fe?.phase==='fulltime'&&document.querySelector('#fulltime-dialog').open,{timeout:5000});
     await shot(page,'fulltime',vp,1,'fulltime');
+    const actions=await page.locator('#fulltime-dialog .fulltime-actions button').evaluateAll(buttons=>buttons.map(button=>{const r=button.getBoundingClientRect(),s=getComputedStyle(button);return{left:r.left,width:r.width,textAlign:s.textAlign};}));
+    check(actions.length===4&&actions.every(a=>Math.abs(a.left-actions[0].left)<1&&Math.abs(a.width-actions[0].width)<1&&a.textAlign===actions[0].textAlign),`${vp}: full-time actions are misaligned ${JSON.stringify(actions)}`);
     const assertNoPause=async()=>{
       check(await page.locator('#pause-overlay').evaluate(el=>el.hidden),`${vp}: pause overlay visible after fulltime`);
       const texts=await visibleTexts(page);check(!texts.some(t=>/PAUSA|Seguir jugando/.test(t)),`${vp}: pause text remains: ${texts.join(' | ')}`);
