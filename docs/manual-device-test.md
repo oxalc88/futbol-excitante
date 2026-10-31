@@ -61,11 +61,11 @@ controller or iPhone Safari. The manual table above remains the hardware record.
 | iPhone Safari: pause and camera | Human only: Safari controls and dialogs. |
 | iPhone Safari: cancel gesture | `touch-e2e` (pointercancel); human only: system gesture and notification. |
 | iPhone Safari: switch apps | Human only: iOS app switching and input reset. |
-| Xbox / PlayStation: connect, dead zone and right-stick switch | `pad-smoke`; human only: real controller mapping and feel. |
+| Xbox / PlayStation: connect, dead zone and right-stick switch | `pad-smoke` checks connection and movement, not right-stick switching; `defense.test.ts` checks the right-stick switch mapping; human only: physical controller mapping and feel. |
 | Xbox / PlayStation: attack buttons | `pad-smoke`; human only: real controller mapping. |
-| Xbox / PlayStation: defence buttons | `pad-smoke`; `defense-e2e` checks touch defense only. |
+| Xbox / PlayStation: defence buttons | `defense.test.ts` checks defence behavior and controller mappings; `defense-e2e` checks touch defence only. `pad-smoke` has no defence assertions. Human only: physical controller mapping and feel. |
 | Xbox / PlayStation: keeper | `keeper-e2e` (10 steps); human only: real controller mapping. |
-| Xbox / PlayStation: foul dive | `keeper-e2e` checks the scripted keeper actions; human only: physical combo. |
+| Xbox / PlayStation: foul dive | `keeper-controls.test.ts` checks the foul-dive combo; `keeper-e2e` does not test foul dive. Human only: physical combo. |
 | Xbox / PlayStation: set pieces | `setpiece-e2e` (24 stages); human only: real controller feel. |
 | Xbox / PlayStation: charged shot | `pad-smoke`; human only: full charge and physical buttons. |
 | Xbox / PlayStation: pause and camera | `pad-smoke`; human only: physical OPTIONS/touchpad mapping. |
