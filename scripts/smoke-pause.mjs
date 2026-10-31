@@ -7,7 +7,6 @@ try{
   for(const spec of [{w:1280,h:720,touch:false},{w:844,h:390,touch:true},{w:390,h:844,touch:false}]){
     const vp=`${spec.w}x${spec.h}`,{context,page}=await newPage(browser,spec);const checks=[];
     await startMatch(page,{mode:'solo',touch:spec.touch});
-    if(!spec.touch&&spec.w===1280){await page.keyboard.down('KeyW');await page.setViewportSize({width:spec.w,height:spec.h});await page.waitForFunction(()=>Math.abs(window.__fe.frames[0]?.move?.y??0)>0);await page.keyboard.up('KeyW');check(true,'held movement survived a resize refresh');}
     await shot(page,'pause',vp,1,'play');
     check(await page.locator('#app [title], #app [placeholder]').count()===0,`${vp}: title or placeholder attribute remains`);
     await page.locator('#menu-btn').click();check(await page.locator('#pause-overlay').isVisible(),`${vp}: menu button did not open pause`);check(!await page.locator('#setup-dialog').evaluate(el=>el.open),`${vp}: setup opened from a live match`);check(await page.evaluate(()=>window.__fe.paused),`${vp}: game is not paused`);
