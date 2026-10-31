@@ -83,7 +83,7 @@ function corners(tab:ControlsTab):ControlsEntry[]{
     const selected=directions.filter(d=>values[d]!==undefined);
     const names:Record<string,string>={fast:'rápido',near:'1.er palo',line:'en línea',far:'2.º palo',mixed:'mixta',man:'al hombre',zonal:'zonal'};
     const strategy=(d:typeof directions[number],player:'p1'|'p2')=>`${keyLabel(r.keys[player][directions.indexOf(d)])} ${names[values[d]!]}`;
-    return{id,label,cells:[selected.map(d=>strategy(d,'p1')).join(' · '),selected.map(d=>strategy(d,'p2')).join(' · ')]};
+    return{id,label,cells:[selected.map(d=>strategy(d,'p1')).join('\n'),selected.map(d=>strategy(d,'p2')).join('\n')]};
   };
   const attack=CORNER_ATTACK as Record<string,string|undefined>,defence=CORNER_DEFENCE as Record<string,string|undefined>;
   return[make('cornerAttack','Córner a favor',attack,'↑ rápido · ↓ 1.er palo · ← en línea · → 2.º palo'),make('cornerDefence','Córner en contra',defence,'↑ mixta · ← al hombre · → zonal')];
