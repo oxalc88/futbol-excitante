@@ -28,7 +28,7 @@ Orden por tick: comandos → reglas pendientes → posesión e interferencia →
 | Táctica | Formación, perseguidor con histéresis, cobertura, apoyos, desmarques, línea, amplitud, compactación, contra presión temporal y retorno a estructura |
 | Adaptación | Memoria de contactos y bandas observadas con decaimiento; prioridad de marca y desplazamiento del bloque, siempre serializados |
 | Presentación | Cancha, kits, figuras articuladas, animaciones de golpeo/entrada/cabeceo/portero, radar, tres cámaras, HUD, estadísticas, sonido opcional |
-| Controles | Teclado, dos mandos estándar, stick derecho para apuntar, mando táctil PS en pantalla (7 controles, misma capa PS que el Gamepad API), tiro cargado, pausa y neutralización al perder foco |
+| Controles | Teclado, dos mandos estándar, stick derecho para apuntar, mando táctil PS en pantalla (7 controles, 8 con L2 en un tiro libre propio; misma capa PS que el Gamepad API), tiro cargado, pausa y neutralización al perder foco |
 
 ## Reglas experimentales v2
 
