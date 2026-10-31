@@ -52,10 +52,10 @@ Every summary names the model of each step: plan, implement, test, verify and re
 | Until 2026-10-27 | `pi` with `mimo-v2.6-flash`. After two failed verifications, `glm5.3-flash`. If that also fails, Codex `gpt-6.1-sol`. | — | Codex `gpt-6.1-sol` |
 | 2026-10-28 | As above. Rolando approved `pi` with `deepseek-v4-flash` on 2026-10-28. | — | Codex `gpt-6.1-sol` |
 | 2026-10-29 to 2026-10-30 | `pi` with `deepseek-v4-flash` or `glm5.3-flash`. If both fail, Codex `gpt-6.1-sol`. | Codex `gpt-6.1-terra`: screenshots and UI checks only. Terra does not review code. | Codex `gpt-6.1-sol`, effort `medium` |
-| From 2026-10-31 | Codex only. Luna (`gpt-6.1-luna`) for bounded tasks: UI, presets, tests and repetitive work. Sol (`gpt-6.1-sol`) for complex or long tasks: C5/C10 class tasks and PES mechanics blocks. | — | Sol, effort `medium`. Do not use Luna to review. |
+| From 2026-10-31 | Codex only. Luna (`gpt-6-luna`) for bounded tasks: UI, presets, tests and repetitive work. Sol (`gpt-6.1-sol`) for complex or long tasks: C5/C10 class tasks and PES mechanics blocks. | — | Sol, effort `medium`. Do not use Luna to review. |
 
 Audit PRs (2026-10-30, Rolando's decision, overrides the table for these PRs only):
-plan with Claude Code `claude-opus-5-5` (effort `high`), implement with Codex `gpt-6.1-luna`,
+plan with Claude Code `claude-opus-5-5` (effort `high`), implement with Codex `gpt-6-luna`,
 verify with Codex `gpt-6.1-sol` (effort `medium`), final review with Claude Code `claude-opus-5-5` (effort `high`).
 
 - From 2026-10-31, record the first 3 or 4 PRs that Luna implements in `docs/TOKENS.md`. Record the tokens and the number of rounds.
