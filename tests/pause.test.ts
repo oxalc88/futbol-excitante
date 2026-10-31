@@ -30,6 +30,7 @@ test('pause menu only shows for an unblocked manual pause in a live match', () =
   assert.equal(showPauseMenu(false,false,false), false);
   assert.equal(showPauseMenu(true,false,false,true), false);
   assert.equal(shouldPause(false,false,true), true);
+  assert.equal(shouldPause(false,false,false,true), true);
 });
 test('rematch preserves kickoff config and teams independently of match and form edits', () => {
   const config=createConfig({seed:42,teamSize:2,human:[false,false],halfSeconds:1});

@@ -76,8 +76,6 @@ try {
   page.on('console', m => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(m.text()); });
   page.on('response', r => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`HTTP ${r.status()} ${r.url()}`); });
   await page.addInitScript((fakePads) => {
-    // This flow clicks #start-btn: skip the first-visit tips dialog.
-    try { localStorage.setItem('fe.tipsSeen','1'); } catch {}
     if (!fakePads) return; // Touch path: no fake pads, the touch pad owns slot 0.
     window.__fakePads = Array.from({length:4}, (_, index) => ({id:`Fake standard ${index}`,index,connected:false,mapping:'standard',axes:[0,0,0,0],
       buttons:Array.from({length:17}, () => ({pressed:false,value:0,touched:false})),timestamp:0}));
@@ -178,7 +176,7 @@ try {
   await page.goto(base, {waitUntil:'networkidle'});
   await page.clock.pauseAt(new Date());
   await page.locator('#mode').selectOption('local');
-  await page.locator('.tactics summary').click();
+  await page.locator('.options summary').click();
   await page.locator('#quality').selectOption('low');
   await page.locator('#start-btn').click();
   if (touchPath) await activateTouch();

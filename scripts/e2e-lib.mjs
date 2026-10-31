@@ -20,7 +20,6 @@ export async function launch(){return chromium.launch({executablePath:process.en
 export async function newPage(browser,{w,h,touch}){
   const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:touch,isMobile:touch});
   await context.addInitScript(()=>{
-    try{localStorage.setItem('fe.tipsSeen','1');}catch{}
     window.__fakePads=Array.from({length:4},(_,index)=>({id:`Fake standard ${index}`,index,connected:false,mapping:'standard',axes:[0,0,0,0],buttons:Array.from({length:17},()=>({pressed:false,value:0,touched:false})),timestamp:0}));
     Object.defineProperty(navigator,'getGamepads',{value:()=>window.__fakePads.map(p=>p.connected?p:null)});
     window.__pad={connect(slot,connected){const p=window.__fakePads[slot];p.connected=connected;p.timestamp=performance.now();const event=new Event(connected?'gamepadconnected':'gamepaddisconnected');Object.defineProperty(event,'gamepad',{value:p});window.dispatchEvent(event);},button(slot,button,pressed){const p=window.__fakePads[slot];p.buttons[button]={pressed,value:Number(pressed),touched:pressed};p.timestamp=performance.now();},axes(slot,axes){const p=window.__fakePads[slot];p.axes=[...axes];p.timestamp=performance.now();}};
@@ -41,8 +40,7 @@ export async function shot(page,suite,vp,nn,name){
 }
 export function writeEvidence(suite,data){mkdirSync('artifacts/local/smoke',{recursive:true});writeFileSync(`artifacts/local/smoke/${suite}.json`,`${JSON.stringify(data,null,2)}\n`);}
 export async function startMatch(page,{mode='solo',touch=false}){
-  await page.evaluate(()=>{try{localStorage.setItem('fe.tipsSeen','1');}catch{}});
-  await page.locator('.tactics summary').click();await page.locator('#mode').selectOption(mode);await page.locator('#quality').selectOption('low');await page.locator('#start-btn').click();
+  await page.locator('.options summary').click();await page.locator('#mode').selectOption(mode);await page.locator('#quality').selectOption('low');await page.locator('#start-btn').click();
   if(touch){const r=await page.locator('#viewport').boundingBox();await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);for(let i=0;i<100;i++){if(await page.evaluate(()=>window.__fe?.phase==='playing'))break;const b=await page.locator('.tp-cross').boundingBox();await page.touchscreen.tap(b.x+b.width/2,b.y+b.height/2);await page.waitForTimeout(100);}}
   else for(let i=0;i<100;i++){if(await page.evaluate(()=>window.__fe?.phase==='playing'))break;await page.keyboard.press('KeyJ');await page.waitForTimeout(100);}
   await page.waitForFunction(()=>window.__fe?.phase==='playing',{timeout:10000});

@@ -1,6 +1,6 @@
 /** Dialogs suspend play without changing the player's pause choice. */
-export function shouldPause(manual: boolean, dialogOpen: boolean, terminal: boolean): boolean {
-  return manual || dialogOpen || terminal;
+export function shouldPause(manual: boolean, dialogOpen: boolean, terminal: boolean, blocked=false): boolean {
+  return manual || dialogOpen || terminal || blocked;
 }
 
 /** The pause menu shows only for a player pause in a live match. */
