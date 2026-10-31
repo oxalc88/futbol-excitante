@@ -411,6 +411,7 @@ setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1,sid
 // Smoke only: reads back the waiting restart, the wall jumps, the keepers and the cursors.
 setPieceState(){const w=sim.snapshot();return {phase:w.phase,tick:w.tick,restart:w.restart?structuredClone(w.restart):null,wallJump:w.players.filter(p=>p.wallJump!==undefined&&p.wallJump>w.tick).map(p=>p.id),keepers:w.players.filter(p=>p.keeper).map(p=>({id:p.id,team:p.team,x:p.x,y:p.y})),selected:[...w.selected],restriction:w.restartRestriction?{...w.restartRestriction}:null};}
 ,cornerView(){const w=sim.snapshot(),r=w.restart;if(!r)return null;const taker=w.players.find(p=>p.id===r.taker);return{ball:renderer?.screenPoint({x:w.ball.x,y:w.ball.y,z:w.ball.z})??null,taker:taker?renderer?.screenPoint({x:taker.x,y:taker.y,z:0})??null:null,kind:r.kind,team:r.team};}
+,refreshHud(){updateHud();return{radar:$('radar').classList.contains('dodge'),card:document.querySelector('.player-card')?.classList.contains('dodge'),ball:renderer?.screenPoint({x:current.ball.x,y:current.ball.y,z:current.ball.z})??null,radarRect:(()=>{const r=$('radar').getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height};})()};}
 }});
 // A / Cross (button 0) on any pad starts quick play from the menu.
 // Nothing acts while another dialog sits on the setup.
