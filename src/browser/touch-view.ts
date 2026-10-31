@@ -11,7 +11,7 @@ const FACE = ['cross', 'circle', 'square', 'triangle'] as const;
 const GLYPH: Record<(typeof FACE)[number], string> = { cross: '✕', circle: '○', square: '□', triangle: '△' };
 
 const faceButtons = FACE.map(name =>
-  `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" data-glyph="${GLYPH[name]}" aria-label="Botón ${GLYPH[name]}"</button>`).join('');
+  `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" data-glyph="${GLYPH[name]}" aria-label="Botón ${GLYPH[name]}"></button>`).join('');
 
 const shoulder = (name: TouchButton, body: string, aria: string) =>
   `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" data-glyph="${body.replace(/<[^>]+>/g, '')}" aria-label="${aria}"></button>`;
@@ -28,7 +28,7 @@ ${shoulder('l2', '<b>L2</b>', 'L2: tira el 2º lanzador')}
 <div id="rotate-notice" role="img" aria-label="Gira el teléfono" hidden><svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><rect x="32" y="28" width="32" height="48" rx="5"/><path d="M43 68h10"/><path d="M28 18a31 31 0 0 1 48 8"/><path d="m76 15 1 12-12-1"/></g></svg></div>`;
 
 /** Builds the touch pad inside `root` and returns the per-HUD-refresh update. */
-export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(state:{started:boolean}): void; setSuspended(on:boolean):void; portraitBlocked():boolean } {
+export function mountTouchPad(root: HTMLElement, input: BrowserInput, onBlockedChange:()=>void=()=>{}): { update(state:{started:boolean}): void; setSuspended(on:boolean):void; portraitBlocked():boolean } {
   root.insertAdjacentHTML('beforeend', markup);
   const pad = root.querySelector<HTMLElement>('#touch-pad')!;
   const stick = root.querySelector<HTMLElement>('.tp-stick')!;
@@ -59,6 +59,7 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
     document.body.classList.toggle('touch-on', on);
     pad.hidden = !on || suspended;
     if (!on) { buttonPointers.clear(); hideStick(); refresh(); }
+    queueMicrotask(onBlockedChange);
   };
   const buttonAt = (x: number, y: number): HTMLElement | null => {
     const over = document.elementFromPoint(x, y);

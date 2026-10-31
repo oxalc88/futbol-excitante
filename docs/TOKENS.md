@@ -92,6 +92,5 @@ Values at 2026-10-25 01:20 Lima; quick play values at 02:40 Lima; CPU difficulty
 | 2026-10-29 | Menu scroll cue CI fix (#85) | pi | write | nan/deepseek-v4-flash | default | 2 | 513,416 | — | — | ~/.pi/agent/sessions (wt-scroll-cue, CI fix) |
 | 2026-10-29 | Menu scroll cue CI fix (#85) | Codex CLI | review | gpt-6.1-sol | medium | 1 | ~9,069 | — | — | codex "tokens used" (CI fix) |
 | 2026-10-29 | Menu scroll cue CI fix (#85) | Codex CLI | test | gpt-6.1-terra | default | 1 | ~7,747 | — | — | codex "tokens used", screenshot review (CI fix) |
-
 | 2026-10-30 | PR A UI and controls audit (PR pendiente, 6 rounds) | Codex CLI | write | gpt-6-luna | default | 1 | 53,223,850 | 497,023 | 199,394 | ~/.codex/sessions (wt-audit-a) |
 | 2026-10-30 | PR A UI and controls audit | Codex CLI | review | gpt-6.1-sol | medium | 1 | 262,438 | 50,345 | 1,119 | ~/.codex/sessions (wt-audit-a) |

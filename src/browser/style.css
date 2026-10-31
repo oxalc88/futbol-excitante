@@ -47,6 +47,9 @@ button{min-height:44px}.close{min-width:44px;min-height:44px}.bottom-hud{pointer
 @media(max-height:560px){#fulltime-dialog{padding:12px;max-height:96dvh}#fulltime-dialog h2{font-size:1.2rem;margin-bottom:2px}.fulltime-score{margin:0 0 6px}.fulltime-score strong{font-size:2rem}.fulltime-actions{grid-template-columns:1fr 1fr;gap:6px}.fulltime-actions button{min-height:38px;padding:.55rem}}
 #pause-overlay{gap:10px;padding:14px;overflow:auto}
 #pause-overlay>strong{font-size:2rem;letter-spacing:.1em}
+#pause-confirm{grid-template-columns:1fr 1fr;width:min(360px,100%);align-items:stretch}
+#pause-confirm>strong{grid-column:1/-1;width:100%;font-size:1rem;line-height:1.25;letter-spacing:0;text-align:center}
+#pause-confirm button{height:auto;min-height:44px}
 .pause-menu{display:grid;grid-template-columns:1fr;gap:7px;width:min(260px,100%)}
 .pause-menu button{min-height:42px;padding:.55rem .75rem;text-align:center}
 .pause-sound{display:grid;grid-template-columns:1fr 70px;align-items:center;gap:8px}

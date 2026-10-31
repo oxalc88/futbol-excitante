@@ -723,6 +723,21 @@ try {
     await evidence(page,'11-landscape',{tick:await page.evaluate(()=>window.__fe.tick)});await shot(page,'touch-e2e','844x390',11,'landscape');
     await context.close();
   }
+  // Touch activation itself must apply the portrait block; handing back to
+  // keyboard while blocked must remove it and resume the match.
+  {
+    const {context,page}=await newPage(390,844,true);await beginPlay(page);
+    await page.keyboard.press('KeyA');
+    await page.waitForFunction(()=>!document.body.classList.contains('touch-on')&&!window.__fe.paused,null,{timeout:3000,polling:50});
+    const r=await page.locator('#viewport').boundingBox();await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);
+    await page.waitForFunction(()=>document.body.classList.contains('touch-on')&&document.querySelector('#rotate-notice').hidden===false&&window.__fe.paused===true,null,{timeout:3000,polling:50});
+    const tick=await page.evaluate(()=>window.__fe.tick);await page.waitForTimeout(500);
+    check(await page.evaluate(t=>window.__fe.tick===t,tick),'Portrait touch activation did not freeze the clock');
+    await page.keyboard.press('KeyA');
+    await page.waitForFunction(()=>!document.body.classList.contains('touch-on')&&document.querySelector('#rotate-notice').hidden&&window.__fe.paused===false,null,{timeout:3000,polling:50});
+    await page.waitForFunction(t=>window.__fe.tick>t,tick,{timeout:2000,polling:50});
+    await evidence(page,'11-portrait-touch-handoff',{tick});await shot(page,'touch-e2e','390x844',12,'portrait-touch-handoff');await context.close();
+  }
 } catch (e) { errors.push(`fatal (${stage}): ${e.message}`);
   try { results.push({failureState:await activePage?.evaluate(() => ({
     phase: window.__fe?.phase, padHidden: document.querySelector('#touch-pad')?.hidden ?? null }))}); } catch {}

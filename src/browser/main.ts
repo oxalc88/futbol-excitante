@@ -58,7 +58,7 @@ let pitchPalette=loadPitchPalette(paletteStorage);$<HTMLSelectElement>('pitch-pa
 $<HTMLSelectElement>('difficulty').value=loadCpuDifficulty(difficultyStorage);
 const input=new BrowserInput(),peer=new PeerSession();let importedTeam:TeamProfile|null=null;
 // The on-screen touch pad is mounted once and refreshed with every HUD update.
-const touchPad=mountTouchPad($('viewport'),input);
+const touchPad=mountTouchPad($('viewport'),input,()=>refreshPause());
 let config=createConfig({human:[false,false]}),sim=new Simulation(config,[makeTeam(0),makeTeam(1)]),record=new Recorder(sim);
 let previous=sim.presentation(),current=previous,renderer:FootballRenderer|null=null,paused=false,started=false,last=performance.now(),accumulator=0,hudClock=0;
 let replay:Replay|null=null,replayIndex=0,guest=false,guestCounter=0,networkTick=0,finalShown=false,cameraIndex=0;
