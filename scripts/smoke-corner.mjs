@@ -28,10 +28,10 @@ try{
     if(spec.touch){const r=await page.locator('.tp-square').boundingBox();await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);}else await page.keyboard.press('KeyK');
     const transition=await page.waitForFunction(()=>{const phase=window.__fe?.phase,restart=window.__feSmoke?.setPieceState()?.restart;if(phase==='playing'&&(!restart||restart.kind!=='corner'))return{phase,restart};if(restart&&restart.kind!=='corner')return{phase,restart};return false;},null,{timeout:7000});
     const postKick=await transition.jsonValue();
+    if(prior===null)await radar.evaluate(el=>el.removeAttribute('style'));else await radar.evaluate((el,s)=>el.setAttribute('style',s),prior);
     await page.waitForFunction(()=>!document.querySelector('#radar').classList.contains('dodge')&&!document.querySelector('.player-card').classList.contains('dodge'),null,{timeout:1000});
     if(!postKick||postKick.restart?.kind==='corner')throw Error(`${key}: kick did not end forced corner: ${JSON.stringify(postKick)}`);
     results.at(-1).postKick=postKick;
-    if(prior===null)await radar.evaluate(el=>el.removeAttribute('style'));else await radar.evaluate((el,s)=>el.setAttribute('style',s),prior);
    }
    if(failures.length)throw Error(`${key}: ${failures.join('; ')}`);
   }
