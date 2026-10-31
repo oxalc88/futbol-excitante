@@ -42,9 +42,9 @@ button{min-height:44px}.close{min-width:44px;min-height:44px}.bottom-hud{pointer
 #fulltime-dialog h2{margin:0 0 8px;text-align:center;font-size:1.5rem}
 .fulltime-score{display:flex;align-items:center;justify-content:center;gap:18px;margin:4px 0 14px;color:#d3e0dc;font-weight:800}
 .fulltime-score strong{font-size:clamp(2rem,8vw,3rem);color:var(--gold);font-variant-numeric:tabular-nums}
-.fulltime-actions{display:grid;grid-template-columns:1fr;gap:7px}
-.fulltime-actions button{min-height:42px}
-@media(max-height:560px){#fulltime-dialog{padding:12px;max-height:96dvh}#fulltime-dialog h2{font-size:1.2rem;margin-bottom:2px}.fulltime-score{margin:0 0 6px}.fulltime-score strong{font-size:2rem}.fulltime-actions{grid-template-columns:1fr 1fr;gap:6px}.fulltime-actions button{min-height:38px;padding:.55rem}}
+.fulltime-actions{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:7px;justify-items:stretch}
+.fulltime-actions button{grid-column:1;min-height:42px;width:100%;text-align:center}
+@media(max-height:560px){#fulltime-dialog{padding:12px;max-height:96dvh}#fulltime-dialog h2{font-size:1.2rem;margin-bottom:2px}.fulltime-score{margin:0 0 6px}.fulltime-score strong{font-size:2rem}.fulltime-actions{grid-template-columns:1fr;gap:6px}.fulltime-actions button{min-height:38px;padding:.55rem}}
 #pause-overlay{gap:10px;padding:14px;overflow:auto}
 #pause-overlay>strong{font-size:2rem;letter-spacing:.1em}
 #pause-confirm{grid-template-columns:1fr 1fr;width:min(360px,100%);align-items:stretch}
@@ -106,7 +106,8 @@ dialog[data-more=true]>.scroll-cue .scroll-cue-arrow{opacity:1}
    the layout of the element it is added to. */
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;padding:0;border:0;background:none;display:block}
 
-#help-dialog table{table-layout:fixed;width:100%}#help-dialog td,#help-dialog th{overflow-wrap:normal;word-break:normal;hyphens:none}#controls-root{min-width:0}.controls-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}.controls-tabs button{min-height:44px;padding:.55rem}.controls-tabs button.selected{background:var(--gold);border-color:var(--gold);color:#172632}.controls-panel{min-width:0}.controls-panel h3{font-size:1rem;color:var(--gold);margin:18px 0 6px}.controls-panel table{font-size:.8125rem}.controls-panel th,.controls-panel td{padding:8px 5px}.controls-panel thead th:first-child{width:50%}#controls-panel-keyboard thead th:nth-child(2),#controls-panel-keyboard thead th:nth-child(3){width:25%}#controls-panel-pad thead th:first-child,#controls-panel-touch thead th:first-child{width:60%}#controls-panel-pad thead th:nth-child(2),#controls-panel-touch thead th:nth-child(2){width:40%}
+#help-dialog table{table-layout:fixed;width:100%}#help-dialog td,#help-dialog th{overflow-wrap:normal;word-break:normal;hyphens:none}#controls-root{min-width:0}.controls-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}.controls-tabs button{min-height:44px;padding:.55rem}.controls-tabs button.selected{background:var(--gold);border-color:var(--gold);color:#172632}.controls-panel{min-width:0}.controls-panel h3{font-size:1rem;color:var(--gold);margin:18px 0 6px}.controls-panel table{font-size:.8125rem}.controls-panel th,.controls-panel td{padding:8px 5px}.controls-panel thead th:first-child{width:50%}#controls-panel-keyboard thead th:nth-child(2),#controls-panel-keyboard thead th:nth-child(3){width:25%}#controls-panel-keyboard td{white-space:pre-line}#controls-panel-pad thead th:first-child,#controls-panel-touch thead th:first-child{width:60%}#controls-panel-pad thead th:nth-child(2),#controls-panel-touch thead th:nth-child(2){width:40%}
+#controls-panel-keyboard table.keyboard-set-piece thead th:first-child{width:30%}#controls-panel-keyboard table.keyboard-set-piece thead th:nth-child(2){width:30%}#controls-panel-keyboard table.keyboard-set-piece thead th:nth-child(3){width:40%}#controls-panel-keyboard tr[data-entry-id="cornerAttack"] td span,#controls-panel-keyboard tr[data-entry-id="cornerDefence"] td span{display:block;white-space:nowrap}
 .controls-panel tr:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 
 .dodge{visibility:hidden;opacity:0;transition:opacity .15s}@media(prefers-reduced-motion:reduce){.dodge{transition:none}}

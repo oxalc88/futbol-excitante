@@ -1,8 +1,20 @@
 # Registro de avances
 
+## 2026-10-31 08:37 — PR pendiente · Ajustes de pantallas y controles · sin issue
+- **Qué cambia para el jugador:**
+  - Las acciones del final quedan alineadas y con el mismo ancho en escritorio y móvil.
+  - En Controles, la cruceta y el stick recorren cada pestaña hasta sus extremos; A cambia de pestaña y B cierra.
+  - Las estrategias de córner muestran una línea por tecla, y las cuatro acciones del final centran sus rótulos.
+  - Una tecla de movimiento mantenida sigue activa al cambiar el tamaño de la ventana; los botones táctiles no se superponen con el área penal.
+- **Qué probar:**
+  - Recorre con el mando ambas direcciones de cada pestaña en vertical y horizontal, desde menú y pausa; revisa los extremos y la activación/cierre.
+  - Mantén W al redimensionar; revisa la alineación final y las cuatro esquinas con ambos equipos.
+- **Qué se rompe o cambia:**
+  - Se elimina del modelo el gesto doble con mantenimiento porque ninguna fila del preset lo usa; la presión de dos compañeros conserva su rótulo explícito.
+
 Una entrada por cada PR de capacidad. La PR añade su entrada pendiente y su enlace. Cuando la PR se fusiona, la siguiente PR que edita este archivo elimina la marca de pendiente. Título: `## AAAA-MM-DD HH:MM — [#N](enlace de la PR) · Título · [#I](enlace del issue)`, o `· sin issue`. Hora de Lima (UTC-5). Lo más reciente primero. `tests/docs-format.test.ts` comprueba el formato y el orden.
 
-## 2026-10-31 00:03 — PR pendiente ([#89](https://github.com/oxalc88/futbol-excitante/pull/89)) · Pantallas y controles como en PES · sin issue
+## 2026-10-31 00:03 — [#89](https://github.com/oxalc88/futbol-excitante/pull/89) · Pantallas y controles como en PES · sin issue
 - **Qué cambia para el jugador:**
   - Al terminar el partido ves «Final» con el marcador, «Revancha», «Volver al menú», «Estadísticas» y «Guardar repetición». Ya no aparece «PAUSA».
   - La pausa tiene «Seguir jugando», «Controles», «Cámara», «Estadísticas», «Sonido» y «Salir al menú». Salir pide confirmación.

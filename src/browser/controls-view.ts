@@ -22,9 +22,9 @@ export function renderControls(root:HTMLElement,initial:ControlsTab):{select(tab
     const sections=controlsTab(tab);
     for(const [sectionIndex,section] of sections.entries()){
       const heading=el('h3');heading.textContent=GROUP_TITLES[section.group];panel.append(heading);
-      const table=el('table'),thead=el('thead'),tr=el('tr');
+      const table=el('table');if(isKeyboard&&section.group==='set-piece')table.classList.add('keyboard-set-piece');const thead=el('thead'),tr=el('tr');
       for(const label of isKeyboard?['Acción','J1','J2']:['Acción',TAB_TITLES[tab]]){const th=el('th');th.scope='col';th.textContent=label;tr.append(th);}thead.append(tr);table.append(thead);
-      const tbody=el('tbody');for(const [entryIndex,entry] of section.entries.entries()){const row=el('tr'),label=el('th');label.scope='row';label.textContent=entry.label;row.append(label);for(const cell of entry.cells){const td=el('td');td.textContent=cell;row.append(td);}if(sectionIndex===sections.length-1&&entryIndex===section.entries.length-1)row.tabIndex=0;tbody.append(row);}table.append(tbody);panel.append(table);
+      const tbody=el('tbody');for(const [entryIndex,entry] of section.entries.entries()){const row=el('tr');row.dataset.entryId=entry.id;const label=el('th');label.scope='row';label.textContent=entry.label;row.append(label);for(const cell of entry.cells){const td=el('td');if(isKeyboard&&(entry.id==='cornerAttack'||entry.id==='cornerDefence')){for(const line of cell.split('\n')){const span=el('span');span.textContent=line;td.append(span);}}else td.textContent=cell;row.append(td);}if(sectionIndex===sections.length-1&&entryIndex===section.entries.length-1)row.tabIndex=0;tbody.append(row);}table.append(tbody);panel.append(table);
     }
     root.append(panel);panels.set(tab,panel);
   }

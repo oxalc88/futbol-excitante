@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { controlsTab, keyLabel, glyphLabel, defaultControlsTab, ROW_TEXT, SOUND_KEY } from '../src/browser/controls-model';
+import { controlsTab, keyLabel, glyphLabel, defaultControlsTab, ROW_TEXT, SOUND_KEY, SUPPORTED_GESTURES } from '../src/browser/controls-model';
 import { PES_2017_PS4_ROWS, KEEPER_SWITCH } from '../src/browser/pad-presets';
 import { TOUCH_GLYPHS, TOUCH_KEEPER_COMBO } from '../src/adapters/touch-pad';
 
@@ -12,6 +12,9 @@ test('every preset row has a model entry and every rendered row has a code sourc
   assert.deepEqual(Object.keys(ROW_TEXT).sort(),PES_2017_PS4_ROWS.map(r=>r.id).sort());
   const allowed=new Set([...PES_2017_PS4_ROWS.map(r=>r.id),'cornerAttack','cornerDefence','keeperSwitch','keeperDive','sound','touchSecondTaker','touchPause']);
   for(const tab of ['keyboard','pad','touch'] as const)for(const e of entries(tab))assert.ok(allowed.has(e.id),`${tab}: ${e.id}`);
+  const used=new Set(PES_2017_PS4_ROWS.map(row=>row.id));for(const id of Object.keys(ROW_TEXT))assert.ok(used.has(id),`unused gesture/model row: ${id}`);
+  const actual=[...new Set(PES_2017_PS4_ROWS.map(preset=>ROW_TEXT[preset.id]?.gesture).filter((gesture):gesture is NonNullable<typeof gesture>=>!!gesture))].sort();
+  assert.deepEqual([...SUPPORTED_GESTURES].sort(),actual,'every supported gesture must be used by a preset-backed row');
 });
 
 test('keyboard rows show each preset key in its player cell',()=>{
@@ -55,9 +58,9 @@ test('touch tab shows only supported controls and both touch-only actions',()=>{
 test('corner strategies use the direction rules and omit the unused defending down key',()=>{
   const attack=find('pad','cornerAttack').cells[0],defence=find('pad','cornerDefence').cells[0];
   assert.match(attack,/↑.*↓.*←.*→/);assert.doesNotMatch(defence,/↓/);
-  assert.equal(find('keyboard','cornerAttack').cells[0],'1 rápido · 2 1.er palo · 3 en línea · 4 2.º palo');
-  assert.equal(find('keyboard','cornerDefence').cells[0],'1 mixta · 3 al hombre · 4 zonal');
-  assert.equal(find('keyboard','cornerDefence').cells[1],'Num / mixta · Num - al hombre · Num + zonal');
+  assert.equal(find('keyboard','cornerAttack').cells[0],'1 rápido\n2 1.er palo\n3 en línea\n4 2.º palo');
+  assert.equal(find('keyboard','cornerDefence').cells[0],'1 mixta\n3 al hombre\n4 zonal');
+  assert.equal(find('keyboard','cornerDefence').cells[1],'Num / mixta\nNum - al hombre\nNum + zonal');
   assert.equal(entries('touch').some(e=>e.id.startsWith('corner')),false);
 });
 

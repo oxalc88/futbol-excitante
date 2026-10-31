@@ -16,6 +16,11 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 
 | Date (Lima) | Task / PR | Tool | Role | Model | Effort | Sessions | Total | Not cached | Output | Source |
 |---|---|---|---|---|---|---:|---:|---:|---:|---|
+| 2026-10-31 | PR C audit follow-ups | Gareca list + Claude Code review of #89 | plan | Grok Bot + claude-opus-5-5 | high | see PR body | see PR body | see PR body | see PR body | Gareca list; Opus review 2 of #89 (no separate Opus planning run) |
+| 2026-10-31 | PR C audit follow-ups round 1 | Codex CLI | write | gpt-6-luna | default | 1 | 4,205,975 | n/a | 11,938 | Codex session total (user-measured) |
+| 2026-10-31 | PR C audit follow-ups round 2 | Codex CLI | write | gpt-6-luna | default | 1 | 2,348,370 | n/a | 6,666 | Codex session total (user-measured) |
+| 2026-10-31 | PR C audit follow-ups verification 1 | Codex CLI | verify | gpt-6.1-sol | medium | 1 | 4,555,683 | 100,606 | 17,189 | input 4,538,494; cached input 4,437,888; user-measured |
+| 2026-10-31 | PR C audit follow-ups round 3 | Codex CLI | write | gpt-6-luna | default | see PR body | see PR body | see PR body | see PR body | current session and later rows: see PR body |
 | 2026-10-25 | #67 player figures (reference) | Codex CLI | write | gpt-6.1-sol | default | 1 | 439,379 | 20,238 | 5,008 | ~/.codex/sessions (wt-figures) |
 | 2026-10-25 | #67 player figures (reference) | Codex CLI | review | gpt-6-luna | default | 2 | 163,394 | 39,165 | 4,359 | ~/.codex/sessions (wt-figures) |
 | 2026-10-25 | #69 C5 fake gamepad smoke | Codex CLI | write | gpt-6.1-sol | default | 2 | 6,017,112 | 107,903 | 29,510 | ~/.codex/sessions (wt-c5) |
