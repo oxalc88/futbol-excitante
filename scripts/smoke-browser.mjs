@@ -91,6 +91,10 @@ try {
     errors.push(`game: clock did not advance within ${clockSeconds}s`);
   }
   match.clockEnd = (await page.locator('#clock').innerText()).trim();
+  const heldBefore=await page.evaluate(()=>{const p=window.__fe?.players?.find(p=>p.team===0&&!p.keeper);return p&&{id:p.id,x:p.x,y:p.y};});
+  await page.keyboard.down('KeyW');await page.waitForTimeout(300);await page.setViewportSize({width:1200,height:720});await page.waitForTimeout(900);
+  const heldAfter=await page.evaluate(()=>{const p=window.__fe?.players?.find(p=>p.team===0&&!p.keeper);return p&&{id:p.id,x:p.x,y:p.y};});await page.keyboard.up('KeyW');
+  if(!heldBefore||!heldAfter||heldBefore.id!==heldAfter.id||Math.hypot(heldAfter.x-heldBefore.x,heldAfter.y-heldBefore.y)<.05)errors.push(`game: held movement key did not survive resize: ${JSON.stringify({heldBefore,heldAfter})}`);
   match.phase = (await page.locator('#phase').innerText()).trim();
   match.pauseCase = { pausedClock: null, afterHelp: null, resumedClock: null, passed: false };
   await page.keyboard.press('KeyP');
