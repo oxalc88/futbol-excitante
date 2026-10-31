@@ -1,6 +1,6 @@
 # Registro de avances
 
-## 2026-10-31 07:15 — PR pendiente (PR #TBD) · Ajustes de pantallas y controles · sin issue
+## 2026-10-31 07:27 — PR pendiente · Ajustes de pantallas y controles · sin issue
 - **Qué cambia para el jugador:**
   - Las acciones del final quedan alineadas y con el mismo ancho en escritorio y móvil.
   - En controles, el mando permite recorrer la tabla; las estrategias de córner del teclado muestran cada tecla en su propia línea.

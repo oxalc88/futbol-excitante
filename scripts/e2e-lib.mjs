@@ -41,7 +41,7 @@ export async function shot(page,suite,vp,nn,name){
 export function writeEvidence(suite,data){mkdirSync('artifacts/local/smoke',{recursive:true});writeFileSync(`artifacts/local/smoke/${suite}.json`,`${JSON.stringify(data,null,2)}\n`);}
 export async function startMatch(page,{mode='solo',touch=false}){
   await page.locator('.options summary').click();await page.locator('#mode').selectOption(mode);await page.locator('#quality').selectOption('low');await page.locator('#start-btn').click();
-  if(touch){const r=await page.locator('#viewport').boundingBox();await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);for(let i=0;i<100;i++){if(await page.evaluate(()=>window.__fe?.phase==='playing'))break;const b=await page.locator('.tp-cross').boundingBox();await page.touchscreen.tap(b.x+b.width/2,b.y+b.height/2);await page.waitForTimeout(100);}}
+  if(touch){await page.locator('#viewport').waitFor({state:'visible'});const viewport=page.locator('#viewport'),r=await viewport.boundingBox();if(r)await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);for(let i=0;i<100;i++){if(await page.evaluate(()=>window.__fe?.phase==='playing'))break;const cross=page.locator('.tp-cross');await cross.waitFor({state:'visible',timeout:5000});const b=await cross.boundingBox();if(!b)throw new Error('touch kickoff control has no visible bounds');await page.touchscreen.tap(b.x+b.width/2,b.y+b.height/2);await page.waitForTimeout(100);}}
   else for(let i=0;i<100;i++){if(await page.evaluate(()=>window.__fe?.phase==='playing'))break;await page.keyboard.press('KeyJ');await page.waitForTimeout(100);}
   await page.waitForFunction(()=>window.__fe?.phase==='playing',{timeout:10000});
 }

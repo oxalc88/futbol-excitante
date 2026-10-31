@@ -94,8 +94,18 @@ Los partidos incluyen penaltis por faltas en el área, tarjetas, expulsión por 
 | Barrera: quieta | J (mantener) | Num 1 (mantener) | ✕ (mantener) | ✕ (mantener) |
 | Barrera: sale un jugador | I (mantener) | Num 5 (mantener) | ○ (mantener) | ○ (mantener) |
 | Arquero: moverse | L | Num 3 | △ (mantener) + stick izq. | △ (mantener) + stick izq. |
-| Córner a favor | 1 rápido · 2 1.er palo · 3 en línea · 4 2.º palo | Num / rápido · Num * 1.er palo · Num - en línea · Num + 2.º palo | ↑ rápido · ↓ 1.er palo · ← en línea · → 2.º palo | — |
-| Córner en contra | 1 mixta · 3 al hombre · 4 zonal | Num / mixta · Num - al hombre · Num + zonal | ↑ mixta · ← al hombre · → zonal | — |
+| Córner a favor | 1 rápido
+2 1.er palo
+3 en línea
+4 2.º palo | Num / rápido
+Num * 1.er palo
+Num - en línea
+Num + 2.º palo | ↑ rápido · ↓ 1.er palo · ← en línea · → 2.º palo | — |
+| Córner en contra | 1 mixta
+3 al hombre
+4 zonal | Num / mixta
+Num - al hombre
+Num + zonal | ↑ mixta · ← al hombre · → zonal | — |
 | 2.º lanzador al lado | — | — | — | L2 |
 
 ### Sistema
