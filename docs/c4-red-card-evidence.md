@@ -24,10 +24,4 @@ Outputs under `artifacts/local/smoke/`:
 The check requires expiry at 100 ticks (with up to 12 ticks allowed for HUD
 refresh and browser observation). Wall time is recorded but not asserted (runner speed varies); each browser wait has a 20 s timeout.
 
-Local validation in this managed workspace: TypeScript, tsx tests and build
-passed. Browser capture could not run because binding the preview server to
-127.0.0.1:4317 fails with `listen EPERM`. Screenshot, timing and full smoke PASS
-remain unverified here. Do not treat the expected JSON as browser evidence.
-
-The skill directory is read-only. Apply `docs/c4-capability-map.patch` from the
-repository root in a writable checkout to update its C4 row.
+The `smoke` step of the full local verify runs this check. The C4 row of the capability map in `.agents/skills/verify-futbol-excitante/SKILL.md` lists the tests and the evidence.
