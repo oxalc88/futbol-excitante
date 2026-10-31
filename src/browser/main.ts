@@ -433,7 +433,7 @@ function pollMenuPad(){
     const overlay=$('pause-overlay');
     const openDialogs=[...document.querySelectorAll<HTMLDialogElement>('dialog[open]')],focusedDialog=document.activeElement?.closest('dialog[open]') as HTMLDialogElement|null,activeDialog=focusedDialog??openDialogs.at(-1);
     if(activeDialog?.id==='help-dialog'){
-      const stickY=pads[i]?.axes?.[1]??0,scrollDir=Math.abs(stickY)>.35?(stickY<0?-1:1):upEdge?-1:downEdge?1:0,now=Date.now();
+      const stickY=pads[i]?.axes?.[1]??0,scrollDir=Math.abs(stickY)>.35?(stickY<0?-1:1):state.up?-1:state.down?1:0,now=Date.now();
       const verticalHeld=Math.abs(stickY)>.35||state.up||state.down;
       if(scrollDir&&(upEdge||downEdge||now>=(controlsRepeatAt[i]??0))){activeDialog.scrollTop+=scrollDir*48;controlsRepeatAt[i]=now+(upEdge||downEdge?300:85);}
       if(!verticalHeld)controlsRepeatAt[i]=0;
