@@ -6,9 +6,9 @@ try{
  for(const spec of [{w:1280,h:720,touch:false},{w:844,h:390,touch:true},{w:932,h:430,touch:true}]){
   const vp=`${spec.w}x${spec.h}`,{context,page}=await newPage(browser,spec);await startMatch(page,{mode:'solo',touch:spec.touch});
   for(let team=0;team<2;team++)for(const side of [1,-1]){
-   const key=`${vp}-t${team}-s${side}`;let state=null;
-   for(let i=0;i<80;i++){const accepted=await page.evaluate(([t,s])=>window.__feSmoke?.setPiece('corner',t,s)??false,[team,side]);if(accepted){state=await page.evaluate(()=>window.__feSmoke?.cornerView?.()??null);if(state?.ball&&state?.taker)break;}await page.waitForTimeout(100);}
-   await page.waitForTimeout(300);state=await page.evaluate(()=>window.__feSmoke?.cornerView?.()??null);
+   const key=`${vp}-t${team}-s${side}`;
+   await page.evaluate(([t,s])=>new Promise(resolve=>{window.__feSmoke?.setPiece('corner',t,s);const timer=setInterval(()=>window.__feSmoke?.setPiece('corner',t,s),25);setTimeout(()=>{clearInterval(timer);resolve();},300);}),[team,side]);
+   const state=await page.evaluate(()=>window.__feSmoke?.cornerView?.()??null);
    const forced=await page.evaluate(()=>window.__feSmoke?.setPieceState?.());
    if(!state||state.kind!=='corner'||state.team!==team||forced?.restart?.kind!=='corner'||forced.restart.team!==team||Math.sign(forced.restart.point?.y??0)!==side)throw Error(`${key}: forced restart mismatch ${JSON.stringify({state,restart:forced?.restart})}`);
    const layout=await page.evaluate(()=>{const box=el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}};const visible=el=>!!el&&!el.hidden&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden';return{viewport:box(document.querySelector('#viewport')),blocked:['.scoreboard','.field-toolbar','.topbar','.tp-btn','#radar','.player-card'].flatMap(sel=>[...document.querySelectorAll(sel)].filter(visible).map(el=>({sel,rect:box(el),dodge:el.classList.contains('dodge')})))};});

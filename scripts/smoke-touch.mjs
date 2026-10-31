@@ -726,9 +726,11 @@ try {
   // Touch activation itself must apply the portrait block; handing back to
   // keyboard while blocked must remove it and resume the match.
   {
-    const {context,page}=await newPage(390,844,true);await beginPlay(page);
-    await page.keyboard.press('KeyA');
+    const {context,page}=await newPage(844,390,true);await startLocal(page);await page.keyboard.press('KeyA');
     await page.waitForFunction(()=>!document.body.classList.contains('touch-on')&&!window.__fe.paused,null,{timeout:3000,polling:50});
+    for(let i=0;i<20&&await page.evaluate(()=>window.__fe.phase)!=='playing';i++){await page.keyboard.press('KeyJ');await page.waitForTimeout(100);}
+    await page.waitForFunction(()=>window.__fe.phase==='playing',{timeout:3000,polling:50});
+    await page.setViewportSize({width:390,height:844});
     const r=await page.locator('#viewport').boundingBox();await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);
     await page.waitForFunction(()=>document.body.classList.contains('touch-on')&&document.querySelector('#rotate-notice').hidden===false&&window.__fe.paused===true,null,{timeout:3000,polling:50});
     const tick=await page.evaluate(()=>window.__fe.tick);await page.waitForTimeout(500);
