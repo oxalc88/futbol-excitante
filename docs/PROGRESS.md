@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
-## 2026-10-31 00:03 — PR pendiente (PR #TBD) · Pantallas y controles como en PES
+## 2026-10-31 00:03 — PR pendiente ([#89](https://github.com/oxalc88/futbol-excitante/pull/89)) · Pantallas y controles como en PES
 - **Qué cambia para el jugador:**
   - Al terminar el partido ves «Final» con el marcador, «Revancha», «Volver al menú», «Estadísticas» y «Guardar repetición». Ya no aparece «PAUSA».
   - La pausa tiene «Seguir jugando», «Controles», «Cámara», «Estadísticas», «Sonido» y «Salir al menú». Salir pide confirmación.
