@@ -55,9 +55,9 @@ Los partidos incluyen penaltis por faltas en el área, tarjetas, expulsión por 
 | Despeje | K (mantener y soltar) | Num 2 (mantener y soltar) | □ (mantener y soltar) | □ (mantener y soltar) |
 | Carga | Automático | Automático | Automático | Automático |
 | Presión | U (mantener) | Num 0 (mantener) | ✕ (mantener) | ✕ (mantener) |
-| Presión en carrera | U Shift izq. | Num 0 Shift der. | R1 + ✕ (mantener) | R1 + ✕ (mantener) |
+| Presión en carrera | U + Shift izq. (mantener) | Num 0 + Shift der. (mantener) | R1 + ✕ (mantener) | R1 + ✕ (mantener) |
 | Presión de un compañero | K (mantener) | Num 2 (mantener) | □ (mantener) | □ (mantener) |
-| Presión de dos compañeros | K | Num 2 | □ ×2 (mantener) | □ ×2 (mantener) |
+| Presión de dos compañeros | K (doble toque y mantener) | Num 2 (doble toque y mantener) | □ ×2 (mantener) | □ ×2 (mantener) |
 | Contener | G (mantener) | Num 6 (mantener) | R2 (mantener) | R2 (mantener) |
 | Cambio manual | — | — | Stick der. | — |
 
@@ -94,18 +94,17 @@ Los partidos incluyen penaltis por faltas en el área, tarjetas, expulsión por 
 | Barrera: quieta | J (mantener) | Num 1 (mantener) | ✕ (mantener) | ✕ (mantener) |
 | Barrera: sale un jugador | I (mantener) | Num 5 (mantener) | ○ (mantener) | ○ (mantener) |
 | Arquero: moverse | L | Num 3 | △ (mantener) + stick izq. | △ (mantener) + stick izq. |
-| Córner a favor | 1 / 2 / 3 / 4 | Num / / Num * / Num - / Num + | ↑ rápido · ↓ 1.er palo · ← en línea · → 2.º palo | — |
-| Córner en contra | 1 / 3 / 4 | Num / / Num - / Num + | ↑ mixta · ← al hombre · → zonal | — |
+| Córner a favor | 1 rápido · 2 1.er palo · 3 en línea · 4 2.º palo | Num / rápido · Num * 1.er palo · Num - en línea · Num + 2.º palo | ↑ rápido · ↓ 1.er palo · ← en línea · → 2.º palo | — |
+| Córner en contra | 1 mixta · 3 al hombre · 4 zonal | Num / mixta · Num - al hombre · Num + zonal | ↑ mixta · ← al hombre · → zonal | — |
 | 2.º lanzador al lado | — | — | — | L2 |
 
 ### Sistema
 
 | Acción | Jugador 1 | Jugador 2 | Mando PS4 | Táctil |
 |---|---|---|---|---|
-| Pausa | Esc P | Esc P | OPTIONS | — |
+| Pausa | Esc P | Esc P | OPTIONS | Ⅱ |
 | Cámara | C | C | Panel táctil | — |
-| Sonido | M | — | — | — |
-| Pausa | — | — | — | Ⅱ |
+| Sonido | M | M | — | — |
 <!-- controls:end -->
 
 Pulsa un botón del mando para que el navegador lo detecte. El adaptador mantiene la identidad de los dos slots al desconectar un mando y suprime acciones que ya estaban pulsadas al reconectar. Las pruebas usan lecturas simuladas; la compatibilidad física depende del modelo, sistema operativo y navegador.

@@ -8,7 +8,7 @@ export const GROUP_TITLES:Record<ControlsGroup,string>={attack:'Ataque',defense:
 export const TAB_TITLES:Record<ControlsTab,string>={keyboard:'Teclado',pad:'Mando',touch:'Táctil'};
 export interface ControlsEntry{id:string;label:string;cells:string[]}
 export interface ControlsSection{group:ControlsGroup;title:string;entries:ControlsEntry[]}
-interface RowText{label:string;group?:ControlsGroup;gesture?:'hold'|'double'|'release'|'before';pad?:string;keys?:{p1:string;p2:string};touch?:string;keysFrom?:string;hidden?:string}
+interface RowText{label:string;group?:ControlsGroup;gesture?:'hold'|'double'|'double-hold'|'release'|'before';pad?:string;keys?:{p1:string;p2:string};touch?:string;keysFrom?:string;hidden?:string}
 export const SOUND_KEY='KeyM';
 
 /** Player-facing labels and intentional differences from the preset literals. */
@@ -17,8 +17,8 @@ export const ROW_TEXT:Record<string,RowText>={
   cross:{label:'Pase alto / centro'},switchPlay:{label:'Cambio de frente',pad:'Stick izq. a la otra banda + ○',keys:{p1:'W A S D a la otra banda + I',p2:'↑ ↓ ← → a la otra banda + Num 5'}},
   crossHigh:{label:'',hidden:'same control as cross'},shot:{label:'Tiro',gesture:'release'},header:{label:'Cabezazo',pad:'□ ✕ ○ △',keys:{p1:'K J I L',p2:'Num 2 Num 1 Num 5 Num 3'}},
   sprint:{label:'Correr'},shield:{label:'Proteger balón'},standingTackle:{label:'Entrada',gesture:'double'},slide:{label:'Entrada deslizante'},clearance:{label:'Despeje',gesture:'release'},shoulderCharge:{label:'Carga'},camera:{label:'Cámara'},
-  pressure:{label:'Presión',group:'defense',gesture:'hold'},chasePressure:{label:'Presión en carrera',group:'defense',pad:'R1 + ✕ (mantener)'},teamPress:{label:'Presión de un compañero',group:'defense',gesture:'hold'},
-  multiPressure:{label:'Presión de dos compañeros',group:'defense',pad:'□ ×2 (mantener)'},jockey:{label:'Contener',group:'defense',gesture:'hold'},manualSwitch:{label:'Cambio manual',group:'defense',pad:'Stick der.'},
+  pressure:{label:'Presión',group:'defense',gesture:'hold'},chasePressure:{label:'Presión en carrera',pad:'R1 + ✕ (mantener)',keys:{p1:'U + Shift izq. (mantener)',p2:'Num 0 + Shift der. (mantener)'}},teamPress:{label:'Presión de un compañero',group:'defense',gesture:'hold'},
+  multiPressure:{label:'Presión de dos compañeros',group:'defense',pad:'□ ×2 (mantener)',keys:{p1:'K (doble toque y mantener)',p2:'Num 2 (doble toque y mantener)'}},jockey:{label:'Contener',group:'defense',gesture:'hold'},manualSwitch:{label:'Cambio manual',group:'defense',pad:'Stick der.'},
   keeperRush:{label:'Salir',group:'keeper',gesture:'hold'},keeperRushSprint:{label:'Salir en carrera',group:'keeper',pad:'R1 + △ (mantener)',keys:{p1:'Shift izq. + L (mantener)',p2:'Shift der. + Num 3 (mantener)'}},keeperHandThrow:{label:'Saque con la mano',group:'keeper'},keeperThrowSpace:{label:'Saque al espacio',group:'keeper'},
   keeperPunt:{label:'Volea',group:'keeper',gesture:'release'},keeperHighPunt:{label:'Volea alta',group:'keeper',pad:'R2 + ○ (mantener y soltar)',keys:{p1:'G + I',p2:'Num 6 + Num 5'}},
   keeperDropPick:{label:'Soltar / recoger balón',group:'keeper',pad:'R1 con el stick suelto',keys:{p1:'Shift izq. sin mover',p2:'Shift der. sin mover'}},keeperRun:{label:'Correr con el balón',group:'keeper'},keeperFeint:{label:'Amago de pase',group:'keeper',gesture:'before'},
@@ -30,7 +30,7 @@ export const ROW_TEXT:Record<string,RowText>={
 };
 
 const GROUP_ORDER:ControlsGroup[]=['attack','defense','keeper','set-piece','system'];
-const suffix=(g:RowText['gesture'])=>g==='hold'?' (mantener)':g==='double'?' ×2':g==='release'?' (mantener y soltar)':g==='before'?' antes de soltar':'';
+const suffix=(g:RowText['gesture'])=>g==='hold'?' (mantener)':g==='double'?' ×2':g==='double-hold'?' doble toque y mantener':g==='release'?' (mantener y soltar)':g==='before'?' antes de soltar':'';
 const row=(id:string)=>pesRow(id);
 export function keyLabel(code:string):string{
   if(/^Key[A-Z]$/.test(code))return code.slice(3);
@@ -68,7 +68,7 @@ function extras(tab:ControlsTab):ControlsEntry[]{
   const common:Record<string,ControlsEntry>={
     keeperSwitch:{id:'keeperSwitch',label:'Tomar al arquero',cells:tab==='keyboard'?[keyLabel(KEEPER_SWITCH.keys.p1[0]),keyLabel(KEEPER_SWITCH.keys.p2[0])]:[tab==='pad'?glyphLabel(PS_GLYPH_BY_BUTTON[KEEPER_SWITCH.button]):TOUCH_KEEPER_COMBO.join(' + ')]},
     keeperDive:{id:'keeperDive',label:'Lanzarse',cells:tab==='keyboard'?[keyLabel(row('standingTackle').keys.p1[0]),keyLabel(row('standingTackle').keys.p2[0])]:[glyphLabel(row('standingTackle').glyphs[0])]},
-    sound:{id:'sound',label:'Sonido',cells:[keyLabel(SOUND_KEY)]},
+    sound:{id:'sound',label:'Sonido',cells:tab==='keyboard'?[keyLabel(SOUND_KEY),keyLabel(SOUND_KEY)]:[keyLabel(SOUND_KEY)]},
     touchSecondTaker:{id:'touchSecondTaker',label:'2.º lanzador al lado',cells:['L2']},
     touchPause:{id:'touchPause',label:'Pausa',cells:['Ⅱ']}
   };
@@ -81,7 +81,9 @@ function corners(tab:ControlsTab):ControlsEntry[]{
   const make=(id:string,label:string,values:Record<string,string|undefined>,pad:string)=>{
     if(tab==='pad')return{id,label,cells:[pad]};
     const selected=directions.filter(d=>values[d]!==undefined);
-    return{id,label,cells:[selected.map(d=>keyLabel(r.keys.p1[directions.indexOf(d)])).join(' / '),selected.map(d=>keyLabel(r.keys.p2[directions.indexOf(d)])).join(' / ')]};
+    const names:Record<string,string>={fast:'rápido',near:'1.er palo',line:'en línea',far:'2.º palo',mixed:'mixta',man:'al hombre',zonal:'zonal'};
+    const strategy=(d:typeof directions[number],player:'p1'|'p2')=>`${keyLabel(r.keys[player][directions.indexOf(d)])} ${names[values[d]!]}`;
+    return{id,label,cells:[selected.map(d=>strategy(d,'p1')).join(' · '),selected.map(d=>strategy(d,'p2')).join(' · ')]};
   };
   const attack=CORNER_ATTACK as Record<string,string|undefined>,defence=CORNER_DEFENCE as Record<string,string|undefined>;
   return[make('cornerAttack','Córner a favor',attack,'↑ rápido · ↓ 1.er palo · ← en línea · → 2.º palo'),make('cornerDefence','Córner en contra',defence,'↑ mixta · ← al hombre · → zonal')];
@@ -106,6 +108,7 @@ function groupOfEntry(id:string,group:ControlsGroup):boolean{
 export function controlsMarkdown():string{
   const tabs=['keyboard','pad','touch'] as const,all=new Map<string,{label:string;group:ControlsGroup;entries:Partial<Record<ControlsTab,string[]>>}>();
   for(const tab of tabs)for(const section of controlsTab(tab))for(const entry of section.entries){
+    if(entry.id==='touchPause'){const current=all.get('pause');if(current)current.entries.touch=['Ⅱ'];continue;}
     const current=all.get(entry.id)??{label:entry.label,group:section.group,entries:{}};current.entries[tab]=entry.cells;all.set(entry.id,current);
   }
   const cell=(value:string|undefined)=>value?value.replaceAll('|','\\|'):'—';

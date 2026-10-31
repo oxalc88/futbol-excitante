@@ -12,6 +12,7 @@ try{
       const headings=await page.locator(`#controls-panel-${tab} h3`).allTextContents();check(JSON.stringify(headings)===JSON.stringify(['Ataque','Defensa','Arquero','Balón parado','Sistema']),`${vp}: ${tab} groups ${headings.join(', ')}`);
       const widths=await page.evaluate(()=>{const d=document.querySelector('#help-dialog');return{dialog:d.scrollWidth<=d.clientWidth+1,tables:[...d.querySelectorAll('table')].every(t=>t.scrollWidth<=t.clientWidth+1),page:document.documentElement.scrollWidth<=innerWidth};});
       check(widths.dialog&&widths.tables&&widths.page,`${vp}: ${tab} has horizontal overflow ${JSON.stringify(widths)}`);
+      if(vp==='390x844'){const wrapping=await page.locator(`#controls-panel-${tab} td`).evaluateAll(cells=>cells.every(cell=>{const s=getComputedStyle(cell);return s.wordBreak==='normal'&&s.overflowWrap==='normal'&&s.hyphens==='none';}));check(wrapping,`${vp}: ${tab} permits mid-word breaks`);}
       await page.locator('#help-dialog').evaluate(el=>el.scrollTop=0);await shot(page,'controls',vp,['keyboard','pad','touch'].indexOf(tab)*2+1,`${tab}-top`);
       await page.locator('#help-dialog').evaluate(el=>el.scrollTop=el.scrollHeight);await page.waitForTimeout(50);await shot(page,'controls',vp,['keyboard','pad','touch'].indexOf(tab)*2+2,`${tab}-bottom`);
     }

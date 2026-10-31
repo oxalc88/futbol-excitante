@@ -72,7 +72,7 @@ dialog{overflow:auto}
    pause, view, volume, fullscreen, the scoreboard or the radar. */
 body.touch-on .field-toolbar{flex-direction:row;align-items:center;gap:4px;top:calc(var(--sa-top) + 7px);right:calc(var(--sa-right) + 10px)}
 body.touch-on .field-toolbar button{min-width:44px;min-height:44px;height:44px;padding:0 8px}
-body.touch-on #sound-volume{width:90px;height:44px}
+body.touch-on .field-toolbar #sound-volume{width:90px;height:44px}
 body.touch-on .tp-r1{right:calc(var(--sa-right) + 180px);bottom:calc(var(--sa-bottom) + 16px)}
 body.touch-on .tp-r2{right:calc(var(--sa-right) + 190px);bottom:calc(var(--sa-bottom) + 100px)}
 body.touch-on .tp-l1{right:calc(var(--sa-right) + 190px);bottom:calc(var(--sa-bottom) + 164px)}
@@ -106,7 +106,7 @@ dialog[data-more=true]>.scroll-cue .scroll-cue-arrow{opacity:1}
    the layout of the element it is added to. */
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;padding:0;border:0;background:none;display:block}
 
-#help-dialog table{table-layout:fixed;width:100%}#help-dialog td,#help-dialog th{overflow-wrap:anywhere}#controls-root{min-width:0}.controls-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}.controls-tabs button{min-height:44px;padding:.55rem}.controls-tabs button.selected{background:var(--gold);border-color:var(--gold);color:#172632}.controls-panel{min-width:0}.controls-panel h3{font-size:1rem;color:var(--gold);margin:18px 0 6px}.controls-panel table{font-size:.8125rem}.controls-panel th,.controls-panel td{padding:8px 5px}.controls-panel thead th:first-child{width:50%}#controls-panel-keyboard thead th:nth-child(2),#controls-panel-keyboard thead th:nth-child(3){width:25%}#controls-panel-pad thead th:first-child,#controls-panel-touch thead th:first-child{width:60%}#controls-panel-pad thead th:nth-child(2),#controls-panel-touch thead th:nth-child(2){width:40%}
+#help-dialog table{table-layout:fixed;width:100%}#help-dialog td,#help-dialog th{overflow-wrap:normal;word-break:normal;hyphens:none}#controls-root{min-width:0}.controls-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}.controls-tabs button{min-height:44px;padding:.55rem}.controls-tabs button.selected{background:var(--gold);border-color:var(--gold);color:#172632}.controls-panel{min-width:0}.controls-panel h3{font-size:1rem;color:var(--gold);margin:18px 0 6px}.controls-panel table{font-size:.8125rem}.controls-panel th,.controls-panel td{padding:8px 5px}.controls-panel thead th:first-child{width:50%}#controls-panel-keyboard thead th:nth-child(2),#controls-panel-keyboard thead th:nth-child(3){width:25%}#controls-panel-pad thead th:first-child,#controls-panel-touch thead th:first-child{width:60%}#controls-panel-pad thead th:nth-child(2),#controls-panel-touch thead th:nth-child(2){width:40%}
 .controls-panel tr:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 
 .dodge{visibility:hidden;opacity:0;transition:opacity .15s}@media(prefers-reduced-motion:reduce){.dodge{transition:none}}
