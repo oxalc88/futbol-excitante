@@ -12,6 +12,8 @@ test('every preset row has a model entry and every rendered row has a code sourc
   assert.deepEqual(Object.keys(ROW_TEXT).sort(),PES_2017_PS4_ROWS.map(r=>r.id).sort());
   const allowed=new Set([...PES_2017_PS4_ROWS.map(r=>r.id),'cornerAttack','cornerDefence','keeperSwitch','keeperDive','sound','touchSecondTaker','touchPause']);
   for(const tab of ['keyboard','pad','touch'] as const)for(const e of entries(tab))assert.ok(allowed.has(e.id),`${tab}: ${e.id}`);
+  const used=new Set(PES_2017_PS4_ROWS.map(row=>row.id));for(const id of Object.keys(ROW_TEXT))assert.ok(used.has(id),`unused gesture/model row: ${id}`);
+  for(const row of Object.values(ROW_TEXT))if(row.gesture)assert.ok(PES_2017_PS4_ROWS.some(preset=>preset.id in ROW_TEXT&&ROW_TEXT[preset.id]===row),`gesture has no preset row: ${row.label}`);
 });
 
 test('keyboard rows show each preset key in its player cell',()=>{

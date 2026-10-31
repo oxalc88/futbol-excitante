@@ -8,7 +8,7 @@ export const GROUP_TITLES:Record<ControlsGroup,string>={attack:'Ataque',defense:
 export const TAB_TITLES:Record<ControlsTab,string>={keyboard:'Teclado',pad:'Mando',touch:'Táctil'};
 export interface ControlsEntry{id:string;label:string;cells:string[]}
 export interface ControlsSection{group:ControlsGroup;title:string;entries:ControlsEntry[]}
-interface RowText{label:string;group?:ControlsGroup;gesture?:'hold'|'double'|'double-hold'|'release'|'before';pad?:string;keys?:{p1:string;p2:string};touch?:string;keysFrom?:string;hidden?:string}
+interface RowText{label:string;group?:ControlsGroup;gesture?:'hold'|'double'|'release'|'before';pad?:string;keys?:{p1:string;p2:string};touch?:string;keysFrom?:string;hidden?:string}
 export const SOUND_KEY='KeyM';
 
 /** Player-facing labels and intentional differences from the preset literals. */
@@ -30,7 +30,7 @@ export const ROW_TEXT:Record<string,RowText>={
 };
 
 const GROUP_ORDER:ControlsGroup[]=['attack','defense','keeper','set-piece','system'];
-const suffix=(g:RowText['gesture'])=>g==='hold'?' (mantener)':g==='double'?' ×2':g==='double-hold'?' doble toque y mantener':g==='release'?' (mantener y soltar)':g==='before'?' antes de soltar':'';
+const suffix=(g:RowText['gesture'])=>g==='hold'?' (mantener)':g==='double'?' ×2':g==='release'?' (mantener y soltar)':g==='before'?' antes de soltar':'';
 const row=(id:string)=>pesRow(id);
 export function keyLabel(code:string):string{
   if(/^Key[A-Z]$/.test(code))return code.slice(3);
