@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad. La PR añade su entrada pendiente y su enlace. Cuando la PR se fusiona, la siguiente PR que edita este archivo elimina la marca de pendiente. Título: `## AAAA-MM-DD HH:MM — [#N](enlace de la PR) · Título · [#I](enlace del issue)`, o `· sin issue`. Hora de Lima (UTC-5). Lo más reciente primero. `tests/docs-format.test.ts` comprueba el formato y el orden.
 
-## 2026-10-31 00:03 — PR pendiente ([#89](https://github.com/oxalc88/futbol-excitante/pull/89)) · Pantallas y controles como en PES
+## 2026-10-31 00:03 — PR pendiente ([#89](https://github.com/oxalc88/futbol-excitante/pull/89)) · Pantallas y controles como en PES · sin issue
 - **Qué cambia para el jugador:**
   - Al terminar el partido ves «Final» con el marcador, «Revancha», «Volver al menú», «Estadísticas» y «Guardar repetición». Ya no aparece «PAUSA».
   - La pausa tiene «Seguir jugando», «Controles», «Cámara», «Estadísticas», «Sonido» y «Salir al menú». Salir pide confirmación.
