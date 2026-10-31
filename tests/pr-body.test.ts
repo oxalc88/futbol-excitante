@@ -9,12 +9,27 @@ function validBody(names = steps): string {
   return `## Capacidad\nNo issue: test\n\n## Resultado de verify\n\`\`\`text\nmode: full\n${names.map((s) => `${s}: PASS`).join('\n')}\n\`\`\`\nTest count: 380\n\n## Evidencia\nTest output.\n\n## Revisión\nPlan: claude-opus-5-5\nImplement: gpt-6.1-luna\nTest: gpt-6.1-luna\nVerify: gpt-6.1-sol\nReview: claude-opus-5-5\nFindings: none.\n\n## Checklist\n- [x] One\n- [x] Two\n- [x] Three\n- [x] Four\n`;
 }
 
-test('verifySteps reads all 16 full verify steps', () => {
-  assert.equal(steps.length, 16);
-  assert.equal(steps[0], 'no-legacy');
-  assert.equal(steps.at(-1), 'scroll-cue-e2e');
-  assert.ok(steps.includes('test'));
-  assert.ok(steps.includes('defense-e2e'));
+test('verifySteps includes the mandatory CI steps and the required e2e steps', () => {
+  const ciMatch = verify.match(/^CI_STEPS=\(([^)]*)\)/m);
+  assert.ok(ciMatch, 'CI_STEPS array exists in scripts/verify.sh');
+  const ciSteps = ciMatch[1].trim().split(/\s+/);
+  for (const step of ['no-legacy', 'install', 'typecheck', 'test', 'evaluate', 'build', 'dist-check', 'build-lab']) {
+    assert.ok(ciSteps.includes(step), `${step} is in CI_STEPS`);
+  }
+  for (const step of ciSteps) {
+    assert.ok(steps.includes(step), `${step} is included in verify steps`);
+  }
+
+  const skill = readFileSync('.agents/skills/verify-futbol-excitante/SKILL.md', 'utf8');
+  const e2eSteps = skill.split('\n').flatMap((line) => {
+    const match = line.match(/^\|\s*([^|]+?)\s*\|/);
+    if (!match) return [];
+    const name = match[1].trim();
+    return /^[a-z0-9-]+$/.test(name) && (name.includes('e2e') || name === 'smoke' || name === 'pad-smoke') ? [name] : [];
+  });
+  assert.ok(e2eSteps.length > 0, 'verify skill lists required e2e steps');
+  assert.ok(e2eSteps.includes('keeper-e2e-touch'), 'verify skill includes keeper-e2e-touch');
+  for (const step of e2eSteps) assert.ok(steps.includes(step), `${step} is included in verify steps`);
 });
 
 test('valid body passes with CRLF and a fenced verify summary', () => {
