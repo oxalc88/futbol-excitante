@@ -2,6 +2,30 @@
 
 Una entrada por cada PR de capacidad. La PR añade su entrada pendiente y su enlace. Cuando la PR se fusiona, la siguiente PR que edita este archivo elimina la marca de pendiente. Título: `## AAAA-MM-DD HH:MM — [#N](enlace de la PR) · Título · [#I](enlace del issue)`, o `· sin issue`. Hora de Lima (UTC-5). Lo más reciente primero. `tests/docs-format.test.ts` comprueba el formato y el orden.
 
+## 2026-10-31 00:03 — PR pendiente ([#89](https://github.com/oxalc88/futbol-excitante/pull/89)) · Pantallas y controles como en PES · sin issue
+- **Qué cambia para el jugador:**
+  - Al terminar el partido ves «Final» con el marcador, «Revancha», «Volver al menú», «Estadísticas» y «Guardar repetición». Ya no aparece «PAUSA».
+  - La pausa tiene «Seguir jugando», «Controles», «Cámara», «Estadísticas», «Sonido» y «Salir al menú». Salir pide confirmación.
+  - «Partido ☰» abre la pausa. La barra solo tiene pausa y pantalla completa. En pausa se oculta el mando táctil.
+  - Controles tiene pestañas Teclado, Mando y Táctil, por situación. En el teléfono se lee sin deslizar de lado.
+  - Se fueron «A la cancha.», la ventana online, «Semilla» y el selector de archivo en inglés.
+  - En vertical aparece un ícono para girar y el partido se pausa.
+  - En los córners la cámara muestra al lanzador. El minimapa y la ficha se apartan.
+  - Teclado: la estrategia de córner va con 1 2 3 4 (J2: Num / * - +). WASD solo apunta.
+  - En el mando, L1+L2+L3+R3 en cualquier orden ya no cambia de jugador antes de simular la falta.
+- **Qué probar:**
+  - Termina un partido de 2 minutos. Abre y cierra Estadísticas. Pulsa Revancha.
+  - En pausa, recorre todas las opciones con mando, teclado y dedo.
+  - Abre Controles en un teléfono vertical.
+  - Provoca un córner a favor y en contra en PC y en el teléfono horizontal.
+- **Qué se rompe o cambia:**
+  - Cámara, estadísticas y sonido ya no están en la barra: están en la pausa.
+  - La semilla del partido personalizado es fija (2017). Las semillas siguen en el laboratorio. El menú de configuración puede requerir desplazamiento.
+  - La estrategia de córner del teclado cambió de tecla.
+  - El cambio de jugador con L1 llega al soltar L1 o a los 100 ms.
+  - Sin cambios en el motor ni en `eval/baseline.json` (0/276).
+- **Prueba automática:** pasos `fulltime-e2e`, `pause-e2e`, `controls-e2e`, `ui-text-e2e` y `corner-e2e` en `scripts/verify.sh`. touch-e2e: etapa 8 más estricta y etapa 11 vertical. Capturas en `/workspace/fe-audit-prs/prA/shots/after/`.
+
 ## 2026-10-30 22:46 — PR pendiente ([#88](https://github.com/oxalc88/futbol-excitante/pull/88)) · Documentos y reglas de trabajo al día · sin issue
 - **Qué cambia para el jugador:** nada en el juego.
 - **Qué cambia para el desarrollo:** `AGENTS.md` dice qué modelo planifica, implementa, prueba y revisa en cada etapa: deepseek-v4-flash aprobado el 28 de octubre; desde el 29, pi con deepseek-v4-flash o glm5.3-flash, Terra solo prueba pantallas y Sol (medium) revisa; en las PR de la auditoría planifica Opus 5.5, implementa Luna, verifica Sol y revisa Opus. La guía de verificación, este registro, la tabla de tokens, la prueba manual de mandos y las notas de C4 dicen lo que hace el juego hoy. No hay check `pr-body` en CI; los bots ejecutan `node scripts/check-pr-body.mjs --file <cuerpo.md>` en local antes de cada PR y debe dar `pr-body: PASS`. CI solo corre `build`.

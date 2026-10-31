@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shouldPause } from '../src/browser/pause-state';
+import { shouldPause, showPauseMenu, pausedStateChanged } from '../src/browser/pause-state';
 import { isFulltime, rematchSetup } from '../src/browser/fulltime-flow';
 import { createConfig } from '../src/simulation/config';
 import { makeTeam } from '../src/adapters/data';
@@ -22,6 +22,21 @@ test('fulltime and completed replay remain paused after closing dialogs', () => 
 test('only fulltime enables the end-of-match flow', () => {
   for (const phase of ['kickoff', 'playing', 'halftime', 'goal']) assert.equal(isFulltime(phase), false);
   assert.equal(isFulltime('fulltime'), true);
+});
+test('pause menu only shows for an unblocked manual pause in a live match', () => {
+  assert.equal(showPauseMenu(true,false,true), false);
+  assert.equal(showPauseMenu(true,true,false), false);
+  assert.equal(showPauseMenu(true,false,false), true);
+  assert.equal(showPauseMenu(false,false,false), false);
+  assert.equal(showPauseMenu(true,false,false,true), false);
+  assert.equal(shouldPause(false,false,true), true);
+  assert.equal(shouldPause(false,false,false,true), true);
+});
+test('held input clears only when the paused state changes', () => {
+  assert.equal(pausedStateChanged(false,false),false);
+  assert.equal(pausedStateChanged(true,true),false);
+  assert.equal(pausedStateChanged(false,true),true);
+  assert.equal(pausedStateChanged(true,false),true);
 });
 test('rematch preserves kickoff config and teams independently of match and form edits', () => {
   const config=createConfig({seed:42,teamSize:2,human:[false,false],halfSeconds:1});

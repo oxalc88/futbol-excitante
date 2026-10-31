@@ -81,7 +81,6 @@ try {
     page.on('pageerror', e => errors.push(e.message));
     page.on('console', m => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(m.text()); });
     page.on('response', r => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`HTTP ${r.status()} ${r.url()}`); });
-    await page.addInitScript(() => { try { localStorage.setItem('fe.tipsSeen','1'); } catch {} });
     return { context, page };
   };
 
@@ -114,7 +113,7 @@ try {
   const startLocal = async (page) => {
     await page.goto(base, {waitUntil:'networkidle'});
     await page.locator('#mode').selectOption('local');
-    await page.locator('.tactics summary').click();
+    await page.locator('.options summary').click();
     await page.locator('#quality').selectOption('low');
     await page.locator('#start-btn').click();
     await page.waitForFunction(() => window.__fe && ['kickoff','playing'].includes(window.__fe.phase), null, {timeout:30000, polling:200});

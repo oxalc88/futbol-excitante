@@ -23,6 +23,9 @@ export const PS_BUTTON = {
   dpadUp: 12, dpadDown: 13, dpadLeft: 14, dpadRight: 15,
 } as const;
 
+/** Keeper cursor switch, separate from the preset rows. */
+export const KEEPER_SWITCH = { button: PS_BUTTON.r3, keys: { p1: ['KeyR'], p2: ['Numpad8'] } } as const;
+
 /** Glyph label for each standard button index used here. */
 export const PS_GLYPH_BY_BUTTON: Readonly<Record<number, PsGlyph>> = {
   0: '✕', 1: '○', 2: '□', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 9: 'OPTIONS', 10: 'L3', 11: 'R3', 17: 'TOUCHPAD',
@@ -32,6 +35,8 @@ export const PS_GLYPH_BY_BUTTON: Readonly<Record<number, PsGlyph>> = {
 /** Two tackle edges at most this many ticks apart play the standing tackle (✕ x2).
  * One edge, a hold or a slower pair gives no tackle: the hold is the pressure row. */
 export const TACKLE_TAP_TICKS = 15;
+/** Wait up to 100 ms to distinguish a standalone L1/R3 switch from the foul-dive chord. */
+export const CHORD_WAIT_TICKS = 6;
 
 /** KeyboardEvent.code list per player. For movement: up, down, left, right. */
 export interface PadKeys { p1: readonly string[]; p2: readonly string[] }
@@ -189,8 +194,8 @@ export const PES_2017_PS4_ROWS: readonly PadPresetRow[] = [
     keys: { p1: ['KeyL'], p2: ['Numpad3'] }, shares: [],
     note: 'Defending a free kick: hold △ and move the keeper with the stick. On a penalty the stick alone moves him. Keyboard: hold L / Num 3 + move keys.' },
   { id: 'cornerStrategy', state: 'missing', context: 'set-piece', pes: 'Corner attack and defence strategy', text: 'Cruceta ↑ ↓ ← →', glyphs: ['↑', '↓', '←', '→'], button: null,
-    keys: { p1: ['KeyW', 'KeyS', 'KeyA', 'KeyD'], p2: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'] }, shares: [],
-    note: 'Attack: ↑ fast, ↓ near post, ← in line, → far post. Defence: ↑ mixed, ← man to man, → zonal. Keyboard: the move keys of each player.' },
+    keys: { p1: ['Digit1', 'Digit2', 'Digit3', 'Digit4'], p2: ['NumpadDivide', 'NumpadMultiply', 'NumpadSubtract', 'NumpadAdd'] }, shares: [],
+    note: 'Attack: ↑ fast, ↓ near post, ← in line, → far post. Defence: ↑ mixed, ← man to man, → zonal. Keyboard: 1 2 3 4 / Num / * - +.' },
 ];
 
 export interface PadPreset { name: string; source: string; rows: readonly PadPresetRow[] }

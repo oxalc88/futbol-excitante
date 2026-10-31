@@ -4,7 +4,7 @@ interface HudView {
   guest: boolean; replay: boolean; gamepadCount: number; charging: number;
   renderError: string; replayResult: string; notice: string; noticeUntil: number;
 }
-const phaseLabels:Record<string,string>={kickoff:'Saque inicial',playing:'En juego',goal:'¡GOL!',halftime:'Entretiempo',fulltime:'Final del partido','throw-in':'Saque de banda',corner:'Tiro de esquina','goal-kick':'Saque de meta','free-kick':'Tiro libre',offside:'Fuera de juego',penalty:'Penalti · apunta y tira',indirect:'Tiro libre indirecto'};
+const phaseLabels:Record<string,string>={kickoff:'Saque inicial',playing:'En juego',goal:'¡GOL!',halftime:'Entretiempo',fulltime:'Final del partido','throw-in':'Saque de banda',corner:'Tiro de esquina','goal-kick':'Saque de meta','free-kick':'Tiro libre',offside:'Fuera de juego',penalty:'Penal',indirect:'Tiro libre indirecto'};
 
 /** Only writes display elements; match and input coordination stay with the caller. */
 export function renderHud(s:ReadonlyPresentation,config:DeepReadonly<Config>,view:Readonly<HudView>,$:(id:string)=>HTMLElement){

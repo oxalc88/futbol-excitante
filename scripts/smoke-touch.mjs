@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 import { connect } from 'node:net';
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { shot } from './e2e-lib.mjs';
 
 const require = createRequire(process.env.PLAYWRIGHT_CORE_DIR ? `${process.env.PLAYWRIGHT_CORE_DIR}/` : import.meta.url);
 const { chromium } = require('playwright-core');
@@ -73,7 +74,7 @@ function check(value, message) { checks++; if (!value) throw new Error(message);
 // The pad shows glyphs only: each word lives in data-action.
 const ROWS = {
   attack: { cross:'Pase', circle:'Centro', square:'Tiro', triangle:'Filtrado' },
-  defence: { cross:'Entrada', circle:'Barrida', square:'Despeje', triangle:'Presión' },
+  defence: { cross:'Entrada', circle:'Barrida', square:'Despeje', triangle:'' },
   hold: { cross:'Mano', circle:'Volea', square:'Patear', triangle:'Al espacio' },
 };
 // Words of the old text panel and of every pad label row: no plain rectangular
@@ -93,7 +94,6 @@ try {
     page.on('pageerror', e => errors.push(e.message));
     page.on('console', m => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(m.text()); });
     page.on('response', r => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`HTTP ${r.status()} ${r.url()}`); });
-    await page.addInitScript(() => { try { localStorage.setItem('fe.tipsSeen','1'); } catch {} });
     await page.addInitScript({ content: helperInit });
     return { context, page };
   };
@@ -141,7 +141,7 @@ try {
   const startLocal = async (page) => {
     await page.goto(base, {waitUntil:'networkidle'});
     await page.locator('#mode').selectOption('local');
-    await page.locator('.tactics summary').click();
+    await page.locator('.options summary').click();
     await page.locator('#quality').selectOption('low');
     await page.locator('#start-btn').click();
     await page.waitForFunction(() => window.__fe && ['kickoff','playing'].includes(window.__fe.phase), null, {timeout:30000, polling:200});
@@ -226,30 +226,24 @@ try {
     }
     throw new Error(`Smoke hook setPiece(free-kick,${team}) never produced the waiting free kick`);
   };
-  // Visible own text of every element inside #viewport. The scoreboard, the
-  // player name, the announcement, the pause overlay and the rotate notice may
-  // show text; screen-reader-only text is not on screen.
+  const forceSetPiece=async(page,kind,team)=>{for(let i=0;i<80;i++){const s=await page.evaluate(([k,t])=>{window.__feSmoke?.setPiece?.(k,t);const r=window.__feSmoke?.setPieceState?.().restart;return {phase:window.__fe?.phase,kind:r?.kind,team:r?.team};},[kind,team]);if(s.kind===kind&&s.team===team)return s;await page.waitForTimeout(250);}throw new Error(`Smoke hook setPiece(${kind},${team}) failed`);};
+  // Visible own text throughout the page; only the match chrome is allowed.
   const visibleText = (page) => page.evaluate(() => {
-    const allowed = '.scoreboard, #player-name, #announcement, #pause-overlay, #rotate-notice, .sr-only';
-    const own = (el) => [...el.childNodes].filter(n => n.nodeType === Node.TEXT_NODE)
-      .map(n => n.textContent).join(' ').replace(/\s+/g, ' ').trim();
-    const found = [];
-    for (const el of document.querySelectorAll('#viewport *')) {
-      if (el.closest(allowed)) continue;
-      const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
-      if (el.hidden || r.width <= 0 || r.height <= 0) continue;
-      if (cs.display === 'none' || cs.visibility !== 'visible') continue;
-      const text = own(el);
-      if (text.length > 3) found.push({ tag: el.tagName.toLowerCase(), id: el.id,
-        cls: String(el.className), text });
+    const allowed = '.scoreboard, #player-name, #announcement, .sr-only, .wordmark, #menu-btn, footer #help-btn';
+    const own = (el) => [...el.childNodes].filter(n => n.nodeType === Node.TEXT_NODE).map(n => n.textContent).join(' ').replace(/\s+/g, ' ').trim();
+    const found=[];
+    for(const el of document.querySelectorAll('body *')) {
+      if(el.closest(allowed)) continue;
+      const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
+      if(el.hidden||r.width<=0||r.height<=0||cs.display==='none'||cs.visibility!=='visible') continue;
+      const text=own(el); if(text)found.push({tag:el.tagName.toLowerCase(),id:el.id,text});
     }
-    return { hint: document.querySelector('#set-hint') !== null, found };
+    return {found,dialogOpen:!!document.querySelector('dialog[open]'),badAttrs:[...document.querySelectorAll('#app [title],#app [placeholder]')].map(e=>e.outerHTML)};
   });
-  // No help text: no #set-hint element and no visible own text over 3 characters.
-  const assertNoHelpText = (name, data) => {
-    check(data.hint === false, `${name}: #set-hint still exists`);
-    check(data.found.length === 0,
-      `${name}: help text inside #viewport: ${JSON.stringify(data.found)}`);
+  const assertNoHelpText=(name,data)=>{
+    check(!data.dialogOpen,`${name}: dialog is open during text scan`);
+    check(data.badAttrs.length===0,`${name}: title/placeholder attributes: ${JSON.stringify(data.badAttrs)}`);
+    check(data.found.length===0,`${name}: visible text: ${JSON.stringify(data.found)}`);
   };
   // Boxes of the radar, #viewport and the window, for stage 8. The radar keeps
   // its own band over the match.
@@ -593,6 +587,10 @@ try {
         hasTouch: spec.hasTouch, state: 'defend', touchOn: padDefend.touchOn,
         padHidden: padDefend.padHidden, found: defend.found, radar: defendRadar.radar });
     }
+    for(const [kind,team,name] of [['corner',0,'corner-attack'],['corner',1,'corner-defend'],['penalty',0,'penalty-attack'],['penalty',1,'penalty-defend'],['throw-in',0,'throw-in'],['goal-kick',0,'goal-kick']]){
+      await forceSetPiece(page,kind,team);const state=await visibleText(page);assertNoHelpText(`${spec.name}-${name}`,state);
+      await evidence(page,`${spec.name}-${name}`,{width:spec.width,height:spec.height,state:name,found:state.found});
+    }
     await context.close();
   }
   // 9: No pad control over the HUD: every visible pad button rect against every
@@ -600,8 +598,7 @@ try {
   // defence and a set piece, at two landscape phone sizes; then pause is tapped
   // with the pad visible.
   stage='hud-overlap';
-  const HUD_SEL = ['#pause-btn','#camera-btn','#stats-btn','#sound-btn','#sound-volume',
-    '#fullscreen-btn','.field-toolbar','.scoreboard','#radar'];
+  const HUD_SEL = ['#pause-btn','#fullscreen-btn','.field-toolbar','.scoreboard','#radar'];
   for (const [W, H] of [[844, 390], [932, 430]]) {
     const { context, page } = await newPage(W, H, true);
     await beginPlay(page);
@@ -675,6 +672,7 @@ try {
     await page.touchscreen.tap(c.x, c.y);
     await page.waitForFunction(() => window.__fe?.paused === true
       && !document.querySelector('#pause-overlay').hidden, null, {timeout:5000, polling:100});
+    check(await page.locator('#touch-pad').evaluate(el=>el.hidden), `${W}x${H}: touch pad is visible while paused`);
     check(await page.evaluate(() => window.__fe?.paused === true
       && !document.querySelector('#pause-overlay').hidden), `${W}x${H}: pause did not stick`);
     await evidence(page, `9-hud-${W}x${H}-paused`, { paused: true, pauseCenter: { x: c.x, y: c.y } });
@@ -706,6 +704,41 @@ try {
     await evidence(page, '10-l2-second-taker', { second, taker, lastTouch });
     await touchUp(page, 41);
     await context.close();
+  }
+  // 11: Portrait touch blocks the match; landscape resumes without a manual pause.
+  stage='portrait';
+  {
+    const {context,page}=await newPage(844,390,true);await beginPlay(page);await page.setViewportSize({width:390,height:844});await page.waitForFunction(()=>document.querySelector('#rotate-notice').hidden===false&&window.__fe.paused===true,null,{timeout:5000,polling:50});
+    check(await page.locator('#rotate-notice').isVisible(),'Rotation icon is not visible in portrait');
+    check((await page.locator('#rotate-notice').textContent()).trim()==='','Rotation notice contains visible text');
+    check(await page.locator('#rotate-notice svg').count()>0,'Rotation icon SVG is missing');
+    check(await page.evaluate(()=>window.__fe.paused===true),'Portrait match is not paused');
+    const tick=await page.evaluate(()=>window.__fe.tick);await page.waitForTimeout(1500);
+    check(await page.evaluate(t=>window.__fe.tick===t,tick),'Clock advanced in portrait');
+    check(await page.locator('#pause-overlay').evaluate(e=>e.hidden),'Pause menu showed during rotation block');
+    await evidence(page,'11-portrait',{tick});await shot(page,'touch-e2e','390x844',11,'portrait');
+    await page.setViewportSize({width:844,height:390});
+    await page.waitForFunction(()=>document.querySelector('#rotate-notice').hidden&&window.__fe.paused===false,null,{timeout:3000,polling:50});
+    await page.waitForFunction(t=>window.__fe.tick>t,tick,{timeout:2000,polling:50});
+    await evidence(page,'11-landscape',{tick:await page.evaluate(()=>window.__fe.tick)});await shot(page,'touch-e2e','844x390',11,'landscape');
+    await context.close();
+  }
+  // Touch activation itself must apply the portrait block; handing back to
+  // keyboard while blocked must remove it and resume the match.
+  {
+    const {context,page}=await newPage(844,390,true);await startLocal(page);await page.keyboard.press('KeyA');
+    await page.waitForFunction(()=>!document.body.classList.contains('touch-on')&&!window.__fe.paused,null,{timeout:3000,polling:50});
+    for(let i=0;i<20&&await page.evaluate(()=>window.__fe.phase)!=='playing';i++){await page.keyboard.press('KeyJ');await page.waitForTimeout(100);}
+    await page.waitForFunction(()=>window.__fe.phase==='playing',{timeout:3000,polling:50});
+    await page.setViewportSize({width:390,height:844});
+    const r=await page.locator('#viewport').boundingBox();await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);
+    await page.waitForFunction(()=>document.body.classList.contains('touch-on')&&document.querySelector('#rotate-notice').hidden===false&&window.__fe.paused===true,null,{timeout:3000,polling:50});
+    const tick=await page.evaluate(()=>window.__fe.tick);await page.waitForTimeout(500);
+    check(await page.evaluate(t=>window.__fe.tick===t,tick),'Portrait touch activation did not freeze the clock');
+    await page.keyboard.press('KeyA');
+    await page.waitForFunction(()=>!document.body.classList.contains('touch-on')&&document.querySelector('#rotate-notice').hidden&&window.__fe.paused===false,null,{timeout:3000,polling:50});
+    await page.waitForFunction(t=>window.__fe.tick>t,tick,{timeout:2000,polling:50});
+    await evidence(page,'11-portrait-touch-handoff',{tick});await shot(page,'touch-e2e','390x844',12,'portrait-touch-handoff');await context.close();
   }
 } catch (e) { errors.push(`fatal (${stage}): ${e.message}`);
   try { results.push({failureState:await activePage?.evaluate(() => ({

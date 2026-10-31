@@ -52,10 +52,6 @@ function observe(page, label) {
   page.on('console', (m) => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(`${label} console: ${m.text()}`); });
   page.on('response', (r) => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`${label} http ${r.status()}: ${r.url()}`); });
 }
-// Flows that click #start-btn mark the tips as seen before any script runs, so
-// they keep the same profile as a returning player. The quick-play flow below
-// keeps a clean profile on purpose.
-const seenTips = (page) => page.addInitScript(() => { try { localStorage.setItem('fe.tipsSeen', '1'); } catch {} });
 try {
   await waitForServer();
   browser = await chromium.launch({
@@ -64,7 +60,6 @@ try {
   });
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   observe(page, 'game');
-  await seenTips(page);
 
   await page.goto(`${base}/`, { waitUntil: 'networkidle' });
   await page.locator('#start-btn').waitFor({ state: 'visible', timeout: 15000 });
@@ -178,7 +173,6 @@ try {
   const enter = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   observe(enter, 'enter');
   match.enter = { focused: null, mode: null, tips: null, paused: null };
-  await seenTips(enter);
   await enter.goto(`${base}/`, { waitUntil: 'networkidle' });
   await enter.locator('#quick-play-btn').waitFor({ state: 'visible', timeout: 15000 });
   match.enter.focused = await enter.evaluate(() => document.activeElement?.id ?? '');
@@ -199,7 +193,6 @@ try {
   });
   const watch = await videoContext.newPage();
   observe(watch, 'watch');
-  await seenTips(watch);
   await watch.goto(`${base}/`, { waitUntil: 'networkidle' });
   await watch.locator('#start-btn').waitFor({ state: 'visible', timeout: 15000 });
   await watch.locator('#mode').selectOption('watch');
@@ -217,7 +210,6 @@ try {
   const expected = JSON.parse(readFileSync(`${out}/red-card-expected.json`, 'utf8'));
   const red = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   observe(red, 'red-card');
-  await seenTips(red);
   await red.goto(`${base}/`, { waitUntil: 'networkidle' });
   await red.locator('#replay-file').setInputFiles(`${out}/red-card-replay.json`);
   await red.waitForFunction(text => document.querySelector('#announcement')?.textContent === text, expected.text, { timeout: 20000 });

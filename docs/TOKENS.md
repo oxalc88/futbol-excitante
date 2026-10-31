@@ -92,6 +92,13 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-29 | Menu scroll cue CI fix (#85) | pi | write | nan/deepseek-v4-flash | default | 2 | 513,416 | — | — | ~/.pi/agent/sessions (wt-scroll-cue, CI fix) |
 | 2026-10-29 | Menu scroll cue CI fix (#85) | Codex CLI | review | gpt-6.1-sol | medium | 1 | ~9,069 | — | — | codex "tokens used" (CI fix) |
 | 2026-10-29 | Menu scroll cue CI fix (#85) | Codex CLI | test | gpt-6.1-terra | default | 1 | ~7,747 | — | — | codex "tokens used", screenshot review (CI fix) |
+| 2026-10-30 | PR A UI and controls audit (PR pendiente, 6 rounds) | Codex CLI | write | gpt-6-luna | default | 1 | 53,223,850 | 497,023 | 199,394 | ~/.codex/sessions (wt-audit-a) |
+| 2026-10-30 | PR A UI and controls audit | Codex CLI | review | gpt-6.1-sol | medium | 1 | 262,438 | 50,345 | 1,119 | ~/.codex/sessions (wt-audit-a) |
+| 2026-10-31 | PR A loop 2 (R1–R5 + should fixes) | Codex CLI | write | gpt-6-luna | default | 1 | 29,157,601 | 185,697 | 55,689 | `/workspace/fe-audit-prs/prA/luna3.jsonl` |
+| 2026-10-31 | PR A loop 2 | Codex CLI | review | gpt-6.1-sol | medium | 1 | 1,128,271 | 106,575 | 6,627 | `/workspace/fe-audit-prs/prA/sol2.jsonl` |
+| 2026-10-30 | PR A plan | Claude Code | plan | claude-opus-5-5 | high | 1 | 2,795,422 | 397,424 | 126,019 | claude -p JSON modelUsage |
+| 2026-10-31 | PR A final review 1 | Claude Code | review | claude-opus-5-5 | high | 1 | 7,913,922 | 224,680 | 39,442 | claude -p JSON modelUsage (FAIL) |
+| 2026-10-31 | PR A final review 2 | Claude Code | review | claude-opus-5-5 | high | 1 | 3,129,658 | 119,628 | 24,787 | claude -p JSON modelUsage (PASS) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process | Claude Code | plan | claude-opus-5-5 | high | 1 | 1,852,962 | 38 | 52,535 | claude -p JSON modelUsage (prB/plan.json; cache read 1,681,934; cache create 118,455; cost $2.33) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process | Codex CLI | write | gpt-6-luna | none | 1 | 124,679 | n/a | n/a | codex exec total tokens used (wt-audit-b) |
 | 2026-10-30 | PR pendiente Audit PR B docs and process round 2 | Codex CLI | write | gpt-6-luna | none | 1 | 45,819 | n/a | n/a | codex exec total tokens used (wt-audit-b) |

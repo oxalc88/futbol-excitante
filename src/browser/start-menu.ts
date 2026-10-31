@@ -1,4 +1,4 @@
-// Pure start-menu logic: quick play defaults, first-time tips, CPU difficulty and menu state.
+// Pure start-menu logic: quick play defaults, CPU difficulty and menu state.
 
 import type { CpuDifficulty } from '../contracts/types';
 
@@ -11,26 +11,7 @@ export function quickPlaySetup():QuickPlaySetup {
   return { home:0, away:1, mode:'solo', duration:360, teamSize:11, seed:2017 };
 }
 
-const tipsKey='fe.tipsSeen';
 const difficultyKey='fe.cpuDifficulty';
-
-// Session flag: one write failure must not bring the tips back on every match.
-let tipsSeenThisSession=false;
-
-/** Tips show only while the flag is missing; without storage never show them (they cannot be remembered). */
-export function shouldShowTips(storage?:StartMenuStorage):boolean {
-  if(tipsSeenThisSession)return false;
-  if(!storage)return false;
-  try{return storage.getItem(tipsKey)!=='1';}catch{return false;}
-}
-
-export function markTipsSeen(storage?:StartMenuStorage):void {
-  tipsSeenThisSession=true;
-  try{storage?.setItem(tipsKey,'1');}catch{}
-}
-
-/** Test hook: forget the session flag so each test starts from storage only. */
-export function resetTipsSession():void {tipsSeenThisSession=false;}
 
 /** Menu value to level. A missing or invalid value gives Normal. */
 export function parseCpuDifficulty(value:string|null|undefined):CpuDifficulty {
@@ -55,10 +36,10 @@ export function matchCpuDifficulty(online:boolean,value:string|null|undefined):C
   return online?'normal':parseCpuDifficulty(value);
 }
 
-/** Which start-menu screen is active; tips always return to the screen that opened them. */
-export type MenuView='setup'|'tips'|'match'|'closed';
+/** Which start-menu screen is active. */
+export type MenuView='setup'|'match'|'closed';
 export interface MenuState { view:MenuView; returnTo:MenuView }
-export type MenuAction={type:'open-setup'}|{type:'start-match'}|{type:'show-tips'}|{type:'close-tips'}|{type:'close-setup'};
+export type MenuAction={type:'open-setup'}|{type:'start-match'}|{type:'close-setup'};
 
 export const initialMenuState:MenuState={view:'setup',returnTo:'closed'};
 
@@ -66,8 +47,6 @@ export function menuReducer(state:MenuState,action:MenuAction):MenuState {
   switch(action.type){
     case 'open-setup':return{view:'setup',returnTo:state.view};
     case 'start-match':return{view:'match',returnTo:state.view};
-    case 'show-tips':return{view:'tips',returnTo:state.view==='tips'?state.returnTo:state.view};
-    case 'close-tips':return{view:state.returnTo,returnTo:'closed'};
     case 'close-setup':return{view:'closed',returnTo:'closed'};
     default:return state;
   }

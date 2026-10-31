@@ -624,7 +624,7 @@ test('foul dive input: the pad chord dives once and R2 cancels the dive',t=>{
   input.sample(h.next++,0);
   // Without the chord R3 alone keeps the keeper switch.
   pads[0]=pad(0,[11]);
-  assert.equal(input.sample(h.next++,0).switchKeeper,true);
+  let keeperSwitch=false;for(let i=0;i<=6;i++)keeperSwitch=input.sample(h.next++,0).switchKeeper||keeperSwitch;assert.equal(keeperSwitch,true,'R3 alone switches after the wait');
 });
 
 // ------------------------------------------------------------------ network

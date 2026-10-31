@@ -1,6 +1,6 @@
 import type { ActionKind, TeamIndex, Vec2 } from '../contracts/types';
 import { clamp, length, unit } from '../simulation/math';
-import { PS_BUTTON, pesButton, TACKLE_TAP_TICKS } from '../browser/pad-presets';
+import { PS_BUTTON, pesButton, TACKLE_TAP_TICKS, CHORD_WAIT_TICKS, KEEPER_SWITCH } from '../browser/pad-presets';
 
 export interface PadReading { index:number; id:string; mapping:string; connected:boolean; axes:readonly number[]; buttons:readonly {pressed:boolean}[] }
 export interface PadFrame { move:Vec2; aim?:Vec2; action?:ActionKind; power:number; sprint:boolean; shield:boolean; switchPlayer:boolean; switchKeeper:boolean;
@@ -18,7 +18,7 @@ const B={
   tackle:pesButton('standingTackle'),slide:pesButton('slide'),
   clearance:pesButton('clearance'),pause:pesButton('pause'),camera:pesButton('camera'),
   // R3 keeps the keeper switch; there is no preset row for it.
-  keeper:PS_BUTTON.r3,
+  keeper:KEEPER_SWITCH.button,
   // Foul-dive chord buttons (L1 + L2 + L3 + R3, R2 decides against the dive).
   l2:PS_BUTTON.l2,r2:PS_BUTTON.r2,l3:PS_BUTTON.l3,
 };
@@ -37,6 +37,7 @@ export class ControllerMapper {
   private cameraStarts=new Map<string,boolean>();
   // Tick of the last defending ✕ tap, or -1 when no tackle is armed.
   private tackleTap=[-1,-1];
+  private pendingSwitch=[-1,-1];private pendingKeeper=[-1,-1];
   // Tick of the last defending □ tap and the double tap flag of the held □.
   private squareTap=[-1,-1];
   private squareDouble=[false,false];
@@ -55,7 +56,7 @@ export class ControllerMapper {
   /** Clears the transient sample state only. The identity stash of an active
    * touch toggle survives: restoreSlots consumes it, so a reset while the touch
    * pad owns slot 0 keeps the reversed physical slot ids. */
-  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.squareTap=[-1,-1];this.squareDouble=[false,false];this.stickArmed=[true,true];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
+  reset(){this.previous=[[],[]];this.charge=[0,0];this.armed=[false,false];this.punt=[0,0];this.puntArmed=[true,true];this.lastTick=[-1,-1];this.tackleTap=[-1,-1];this.pendingSwitch=[-1,-1];this.pendingKeeper=[-1,-1];this.setCharge=[[0,0,0],[0,0,0]];this.setSpent=[[false,false,false],[false,false,false]];this.setArmed=[[true,true,true],[true,true,true]];this.squareTap=[-1,-1];this.squareDouble=[false,false];this.stickArmed=[true,true];this.setPanenka=[false,false];this.setRoll=[false,false];this.wallCharge=[0,0];this.restartContext=[null,null];this.setAim=[{x:1,y:0},{x:-1,y:0}];this.fixedAim=[null,null];}
   /** Frees both slots: the next sample assigns the pads again in list order. */
   releaseSlots(){this.slots=[null,null];this.previous=[[],[]];}
   /** Drops every set-piece charge and flag of a slot: a cancelled touch or a
@@ -64,14 +65,14 @@ export class ControllerMapper {
   private clearSetState(slot:0|1){
     this.setCharge[slot]=[0,0,0];this.setSpent[slot]=[false,false,false];this.setArmed[slot]=[true,true,true];
     this.setPanenka[slot]=false;this.setRoll[slot]=false;this.wallCharge[slot]=0;this.fixedAim[slot]=null;this.restartContext[slot]=null;
-    this.squareTap[slot]=-1;this.squareDouble[slot]=false;this.stickArmed[slot]=true;
+    this.squareTap[slot]=-1;this.squareDouble[slot]=false;this.stickArmed[slot]=true;this.pendingSwitch[slot]=-1;this.pendingKeeper[slot]=-1;
   }
   /** The touch pad takes slot 0: stash the physical slot ids and reset only
    * slot 0. Slot 1 keeps its pad, so no physical pad swaps slots. */
   stashSlots(){
     this.stash=[...this.slots];
     this.slots[0]=null;this.previous[0]=[];this.charge[0]=0;this.armed[0]=false;
-    this.punt[0]=0;this.puntArmed[0]=true;this.lastTick[0]=-1;this.tackleTap[0]=-1;
+    this.punt[0]=0;this.puntArmed[0]=true;this.lastTick[0]=-1;this.tackleTap[0]=-1;this.pendingSwitch[0]=-1;this.pendingKeeper[0]=-1;
     this.clearSetState(0);
   }
   /** The touch pad leaves slot 0: put the stashed physical ids back. */
@@ -109,7 +110,7 @@ export class ControllerMapper {
     const contextChanged=context!==this.restartContext[slot];
     if(contextChanged){this.setCharge[slot]=[0,0,0];this.setSpent[slot]=[false,false,false];this.setPanenka[slot]=false;this.setRoll[slot]=false;this.wallCharge[slot]=0;this.fixedAim[slot]=null;this.restartContext[slot]=context;}
     const connected=pads.filter(p=>p.connected&&p.mapping==='standard');
-    for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.punt[i]=0;this.puntArmed[i]=true;this.lastTick[i]=-1;this.tackleTap[i]=-1;this.clearSetState(i as 0|1);}
+    for(let i=0;i<2;i++)if(this.slots[i]&&!connected.some(p=>identity(p)===this.slots[i])){this.slots[i]=null;this.previous[i]=[];this.charge[i]=0;this.armed[i]=false;this.punt[i]=0;this.puntArmed[i]=true;this.lastTick[i]=-1;this.tackleTap[i]=-1;this.pendingSwitch[i]=-1;this.pendingKeeper[i]=-1;this.clearSetState(i as 0|1);}
     for(const p of connected){const id=identity(p);if(!this.slots.includes(id)){const i=this.slots.indexOf(null);if(i>=0){this.slots[i]=id;this.previous[i]=p.buttons.map(b=>b.pressed);this.armed[i]=!p.buttons[B.shot]?.pressed;this.setArmed[i]=[B.pass,B.cross,B.shot].map(button=>!p.buttons[button]?.pressed);}}}
     const p=connected.find(p=>identity(p)===this.slots[slot]);if(!p)return neutral();
     if(this.lastTick[slot]===tick)return structuredClone(this.cached[slot]);
@@ -248,9 +249,17 @@ export class ControllerMapper {
     if(keeper&&edge(B.sprint)&&length(f.move)<.1&&!held(B.through))f.keeperDrop=true;
     // Hold △ without the ball: run out to the ball; R1 adds the sprint rush.
     if(keeper&&!hold&&held(B.through))f.keeperRush=true;
-    // The chord never switches cursor or player in the same sample.
-    f.switchPlayer=!restart&&edge(B.switchPlayer)&&!held(B.pass)&&!held(B.cross)&&!chordCore;
-    f.switchKeeper=edge(B.keeper)&&!chordCore;
+    // STE: defer L1/R3 briefly so all four chord orders can cancel the switch before the foul dive.
+    if(edge(B.switchPlayer)&&!restart)this.pendingSwitch[slot]=tick;
+    if(this.pendingSwitch[slot]>=0){
+      if(restart||held(B.l2)||held(B.l3)||held(B.keeper)||held(B.pass)||held(B.cross))this.pendingSwitch[slot]=-1;
+      else if(!held(B.switchPlayer)||tick-this.pendingSwitch[slot]>=CHORD_WAIT_TICKS){f.switchPlayer=true;this.pendingSwitch[slot]=-1;}
+    }
+    if(edge(B.keeper)){if(p.id==='touch-pad'){f.switchKeeper=true;this.pendingKeeper[slot]=-1;}else this.pendingKeeper[slot]=tick;}
+    if(this.pendingKeeper[slot]>=0){
+      if(held(B.switchPlayer)||held(B.l2)||held(B.l3))this.pendingKeeper[slot]=-1;
+      else if(!held(B.keeper)||tick-this.pendingKeeper[slot]>=CHORD_WAIT_TICKS){f.switchKeeper=true;this.pendingKeeper[slot]=-1;}
+    }
     this.previous[slot]=pressed;this.lastTick[slot]=tick;this.cached[slot]=f;return structuredClone(f);
   }
 }

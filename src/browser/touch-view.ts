@@ -11,10 +11,10 @@ const FACE = ['cross', 'circle', 'square', 'triangle'] as const;
 const GLYPH: Record<(typeof FACE)[number], string> = { cross: '✕', circle: '○', square: '□', triangle: '△' };
 
 const faceButtons = FACE.map(name =>
-  `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" aria-label="Botón ${GLYPH[name]}"><b class="tp-glyph">${GLYPH[name]}</b></button>`).join('');
+  `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" data-glyph="${GLYPH[name]}" aria-label="Botón ${GLYPH[name]}"></button>`).join('');
 
 const shoulder = (name: TouchButton, body: string, aria: string) =>
-  `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" aria-label="${aria}">${body}</button>`;
+  `<button type="button" class="tp-btn tp-${name}" data-touch="${name}" data-glyph="${body.replace(/<[^>]+>/g, '')}" aria-label="${aria}"></button>`;
 
 const markup = `<div id="touch-pad" hidden>
 <div class="tp-zone" data-zone="stick"></div>
@@ -25,10 +25,10 @@ ${shoulder('r2', '<b>R2</b>', 'R2, con L1: portero')}
 ${shoulder('l1', '<b>L1</b>', 'Cambiar')}
 ${shoulder('l2', '<b>L2</b>', 'L2: tira el 2º lanzador')}
 </div>
-<div id="rotate-notice" hidden>Gira el teléfono para jugar en horizontal.</div>`;
+<div id="rotate-notice" role="img" aria-label="Gira el teléfono" hidden><svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><rect x="32" y="28" width="32" height="48" rx="5"/><path d="M43 68h10"/><path d="M28 18a31 31 0 0 1 48 8"/><path d="m76 15 1 12-12-1"/></g></svg></div>`;
 
 /** Builds the touch pad inside `root` and returns the per-HUD-refresh update. */
-export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(): void } {
+export function mountTouchPad(root: HTMLElement, input: BrowserInput, onBlockedChange:()=>void=()=>{}): { update(state:{started:boolean}): void; setSuspended(on:boolean):void; portraitBlocked():boolean } {
   root.insertAdjacentHTML('beforeend', markup);
   const pad = root.querySelector<HTMLElement>('#touch-pad')!;
   const stick = root.querySelector<HTMLElement>('.tp-stick')!;
@@ -39,6 +39,7 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
   // Pointers that already hold a button: only they can slide onto another one.
   const buttonPointers = new Set<number>();
   let active = false;
+  let suspended = false;
 
   const refresh = () => { for (const el of buttons) el.classList.toggle('on', input.touch.held(nameOf(el))); };
   const showStick = (x: number, y: number) => {
@@ -56,8 +57,9 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
     active = on;
     input.setTouchActive(on);
     document.body.classList.toggle('touch-on', on);
-    pad.hidden = !on;
+    pad.hidden = !on || suspended;
     if (!on) { buttonPointers.clear(); hideStick(); refresh(); }
+    queueMicrotask(onBlockedChange);
   };
   const buttonAt = (x: number, y: number): HTMLElement | null => {
     const over = document.elementFromPoint(x, y);
@@ -115,20 +117,25 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
   if (window.matchMedia?.('(pointer: coarse)').matches) setActive(true);
 
   return {
-    update() {
+    setSuspended(on:boolean) {
+      if(on&&!suspended){input.touch.clear();buttonPointers.clear();hideStick();refresh();}
+      suspended=on;pad.hidden=!active||suspended;
+    },
+    portraitBlocked() { return active && window.innerHeight > window.innerWidth; },
+    update({started}) {
       // A pressed physical button hands the screen back to the real pad.
       if (input.gamepads.some(p => p.buttons.some(b => b.pressed))) setActive(false);
       const labels = touchLabels(input.context(0));
       for (const name of FACE) {
         const button = pad.querySelector<HTMLElement>(`.tp-${name}`)!;
         button.dataset.action = labels[name];
-        button.setAttribute('aria-label', `Botón ${GLYPH[name]}: ${labels[name]}`);
+        button.setAttribute('aria-label', labels[name] ? `Botón ${GLYPH[name]}: ${labels[name]}` : `Botón ${GLYPH[name]}`);
       }
       // L2 shows only while the own waiting free kick of slot 0 waits: that is
       // the one touch state where L2 gives the kick to the second taker.
       const sp = input.setPieceOf(0);
       pad.querySelector<HTMLElement>('.tp-l2')!.hidden = !(sp?.attacking && sp.kind === 'free-kick');
-      rotate.hidden = !(active && window.innerHeight > window.innerWidth);
+      rotate.hidden = !(active && started && window.innerHeight > window.innerWidth);
     },
   };
 }

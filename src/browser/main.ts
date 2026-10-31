@@ -5,7 +5,7 @@ import { cardAlert, CARD_ALERT_TICKS } from './card-alert';
 import { loadPitchPalette, savePitchPalette, type PitchPaletteStorage } from './pitch-palette';
 import { quickPlaySetup, menuReducer, initialMenuState, loadCpuDifficulty, saveCpuDifficulty, matchCpuDifficulty, type QuickPlaySetup, type StartMenuStorage } from './start-menu';
 import type { PitchPaletteId } from '../adapters/presentation-model';
-import { shouldPause } from './pause-state';
+import { shouldPause, showPauseMenu, pausedStateChanged } from './pause-state';
 import { isFulltime, rematchSetup } from './fulltime-flow';
 import type { Config, InputFrame, Presentation, Replay, TeamProfile, World } from '../contracts/types';
 import { Simulation } from '../simulation/engine';
@@ -17,6 +17,9 @@ import { makeTeam, TEAM_CATALOG, validateTeam } from '../adapters/data';
 import { Recorder, parseReplay, replaySimulation } from '../adapters/replay';
 import { PeerSession } from '../adapters/network';
 import { attachScrollCue } from './scroll-cue';
+import { defaultControlsTab, SOUND_KEY } from './controls-model';
+import { renderControls } from './controls-view';
+import { dodgeHud } from './hud-dodge';
 
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)as T;
 const app=$('app');
@@ -27,22 +30,23 @@ app.innerHTML=`
   <div class="scoreboard"><span class="team-tag home" id="home-short">COS</span><strong id="score">0 : 0</strong><span class="team-tag away" id="away-short">SIE</span><span id="clock">00:00</span><span id="half">1T</span></div>
   <div class="live-strip sr-only"><span id="match-mode">PARTIDO DE EXHIBICIÓN</span><span id="phase">Saque inicial</span></div>
   <div id="announcement" role="status" aria-live="polite"></div>
-  <div class="field-toolbar"><button id="pause-btn" title="Pausar (P)" aria-label="Pausa">Ⅱ</button><button id="camera-btn" title="Cambiar cámara (C)" aria-label="Cámara">◈</button><button id="stats-btn" aria-label="Estadísticas">▥</button><button id="sound-btn" aria-pressed="false" aria-label="Sonido">♪</button><input id="sound-volume" type="range" min="0" max="1" step="0.05" aria-label="Volumen del partido" /><button id="fullscreen-btn" title="Pantalla completa" aria-label="Pantalla completa">⛶</button></div>
-  <div id="pause-overlay" hidden><strong>PAUSA</strong><button id="resume-btn" class="primary">Seguir jugando</button></div>
+  <div class="field-toolbar"><button id="pause-btn" aria-label="Pausa"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="3"/></svg></button><button id="fullscreen-btn" aria-label="Pantalla completa"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button></div>
+  <div id="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden><strong id="pause-title">PAUSA</strong><div id="pause-main" class="pause-menu"><button id="resume-btn" class="primary">Seguir jugando</button><button id="pause-controls">Controles</button><button id="pause-camera">Cámara: <span id="pause-camera-value">Transmisión</span></button><button id="pause-stats">Estadísticas</button><div class="pause-sound"><button id="sound-btn" aria-pressed="true">Sonido: <span id="sound-value">Sí</span></button><input id="sound-volume" type="range" min="0" max="1" step="0.05" aria-label="Volumen" /></div><button id="pause-quit">Salir al menú</button></div><div id="pause-confirm" class="pause-menu" hidden><strong>¿Salir del partido?</strong><button id="quit-no" class="primary">Seguir jugando</button><button id="quit-yes">Salir</button></div></div>
   <div class="bottom-hud"><div class="player-card"><strong id="player-name">—</strong><div class="energy"><span id="energy-bar"></span></div><div class="power" id="power-meter" hidden><span id="power-bar"></span></div></div><canvas id="radar" width="252" height="162" aria-label="Radar con posiciones de jugadores y balón"></canvas><span id="pad-status" class="sr-only" role="status">TECLADO · JUGADOR 1</span></div>
  </section>
  <footer><button id="help-btn">Controles</button></footer>
 </main>
-<dialog id="setup-dialog" class="setup"><form id="setup-form"><div class="dialog-top"><button type="button" id="close-setup" class="close" aria-label="Cerrar">×</button></div><h1>A la cancha.</h1>
+<dialog id="setup-dialog" class="setup"><form id="setup-form"><div class="dialog-top"><button type="button" id="close-setup" class="close" aria-label="Cerrar">×</button></div>
 <button type="button" id="quick-play-btn" class="primary wide" autofocus>Jugar rápido <span>→</span></button>
 <div class="difficulty-row"><label for="difficulty">Dificultad de la CPU</label><select id="difficulty" aria-label="Dificultad de la CPU"><option value="easy">Fácil</option><option value="normal" selected>Normal</option><option value="hard">Difícil</option></select></div>
 <div class="team-selection"><label>LOCAL<select id="home-team">${TEAM_CATALOG.map((t,i)=>`<option value="${i}">${t.name}</option>`).join('')}</select><span class="team-stripe cream"></span></label><span class="versus">VS</span><label>VISITANTE<select id="away-team">${TEAM_CATALOG.map((t,i)=>`<option value="${i}" ${i===1?'selected':''}>${t.name}</option>`).join('')}</select><span class="team-stripe blue"></span></label></div>
-<div class="setup-grid"><label>Modo<select id="mode"><option value="solo">Tú contra la CPU</option><option value="local">Dos jugadores locales</option><option value="watch">CPU contra CPU</option></select></label><label>Duración<select id="duration"><option value="120">2 minutos</option><option value="360" selected>6 minutos</option><option value="600">10 minutos</option></select></label><label>Jugadores<select id="size"><option value="11">11 contra 11</option><option value="5">5 contra 5</option><option value="2">2 contra 2</option></select></label><label>Semilla<input id="seed" type="number" min="1" max="2147483647" value="2017" required /></label></div>
-<details class="tactics"><summary>Plan de juego y opciones</summary><div class="setup-grid"><label>Formación local<select id="formation"><option>4-3-3</option><option>4-4-2</option><option>3-5-2</option></select></label><label>Presión<input id="pressing" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Amplitud<input id="width" type="range" min="0" max="1" step="0.05" value="0.7" /></label><label>Ritmo<input id="tempo" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Contra presión<input id="counterPress" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Pases cortos<input id="shortPossession" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Marcaje estrecho<input id="tightMarking" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Adaptación CPU<input id="adaptation" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Línea defensiva<input id="defensiveLine" type="range" min="0" max="1" step="0.05" value="0.52" /></label><label>Compactación<input id="compactness" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Apoyo<input id="support" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Gráficos<select id="quality"><option value="high">Normal</option><option value="low">Ligero</option></select></label><label>Paleta de cancha<select id="pitch-palette"><option value="viva">Viva</option><option value="sobria">Sobria</option></select></label><label>Equipo JSON<input id="roster-file" type="file" accept="application/json,.json" /></label></div><p id="roster-status"></p><button type="button" id="export-roster" class="quiet">Descargar equipo de ejemplo</button></details>
+<div class="setup-grid"><label>Modo<select id="mode"><option value="solo">Tú contra la CPU</option><option value="local">Dos jugadores locales</option><option value="watch">CPU contra CPU</option></select></label><label>Duración<select id="duration"><option value="120">2 minutos</option><option value="360" selected>6 minutos</option><option value="600">10 minutos</option></select></label><label>Jugadores<select id="size"><option value="11">11 contra 11</option><option value="5">5 contra 5</option><option value="2">2 contra 2</option></select></label></div>
+<details class="tactics"><summary>Plan de juego</summary><div class="setup-grid"><label>Formación local<select id="formation"><option>4-3-3</option><option>4-4-2</option><option>3-5-2</option></select></label><label>Presión<input id="pressing" type="range" min="0" max="1" step="0.05" value="0.6" /></label><label>Amplitud<input id="width" type="range" min="0" max="1" step="0.05" value="0.7" /></label><label>Ritmo<input id="tempo" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Contra presión<input id="counterPress" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Pases cortos<input id="shortPossession" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Marcaje estrecho<input id="tightMarking" type="range" min="0" max="1" step="0.05" value="0.3" /></label><label>Adaptación<input id="adaptation" type="range" min="0" max="1" step="0.05" value="0.5" /></label><label>Línea defensiva<input id="defensiveLine" type="range" min="0" max="1" step="0.05" value="0.52" /></label><label>Compactación<input id="compactness" type="range" min="0" max="1" step="0.05" value="0.65" /></label><label>Apoyo<input id="support" type="range" min="0" max="1" step="0.05" value="0.6" /></label></div><input id="roster-file" type="file" hidden /><p id="roster-status"></p><div class="secondary-actions"><button type="button" id="roster-btn" class="quiet">Cargar equipo</button><button type="button" id="export-roster" class="quiet">Equipo de ejemplo</button></div></details><details class="options"><summary>Opciones</summary><div class="setup-grid"><label>Gráficos<select id="quality"><option value="high">Normal</option><option value="low">Ligero</option></select></label><label>Paleta de cancha<select id="pitch-palette"><option value="viva">Viva</option><option value="sobria">Sobria</option></select></label></div></details>
 <p id="setup-error" class="error" role="alert"></p><button id="start-btn" class="primary wide" type="submit">Jugar partido <span>→</span></button><div class="secondary-actions"><button type="button" id="menu-help-btn">Controles</button><button type="button" id="load-replay">Cargar repetición</button></div></form></dialog>
-<dialog id="help-dialog"><div class="dialog-top"><button class="close" data-close="help-dialog" aria-label="Cerrar">×</button></div><h2>Controles</h2><div class="table-scroll"><table><thead><tr><th>Acción</th><th>Jugador 1</th><th>Jugador 2</th><th>Mando (PS4)</th></tr></thead><tbody><tr><td>Mover / apuntar</td><td>W A S D</td><td>Flechas</td><td>Stick izquierdo · derecho para apuntar</td></tr><tr><td>Pase corto</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Pase alto / centro</td><td>I</td><td>Num 5</td><td>○</td></tr><tr><td>Tiro (mantener y soltar)</td><td>K</td><td>Num 2</td><td>□</td></tr><tr><td>Pase filtrado</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Pase elevado</td><td>Q + I</td><td>Enter + Num 5</td><td>L1 + ○</td></tr><tr><td>Cambio de frente</td><td>WASD hacia la otra banda + I</td><td>Flechas hacia la otra banda + Num 5</td><td>Stick izq. a la otra banda + ○</td></tr><tr><td>Correr</td><td>Shift izquierdo</td><td>Shift derecho</td><td>R1</td></tr><tr><td>Cambiar jugador</td><td>Q</td><td>Enter</td><td>L1</td></tr><tr><td>Entrada de pie</td><td>U ×2</td><td>Num 0 ×2</td><td>✕ ✕ (doble toque)</td></tr><tr><td>Presión</td><td>U (mantener)</td><td>Num 0 (mantener)</td><td>✕ mantener</td></tr><tr><td>Presión en sprint</td><td>Shift izq. + U (mantener)</td><td>Shift der. + Num 0 (mantener)</td><td>R1 + ✕ mantener</td></tr><tr><td>Presión de un compañero</td><td>K (mantener)</td><td>Num 2 (mantener)</td><td>□ mantener</td></tr><tr><td>Presión de dos compañeros</td><td>K ×2 (mantener)</td><td>Num 2 ×2 (mantener)</td><td>□ ×2 mantener</td></tr><tr><td>Contener</td><td>G (mantener)</td><td>Num 6 (mantener)</td><td>R2 mantener</td></tr><tr><td>Cambio de jugador manual</td><td>—</td><td>—</td><td>Stick derecho</td></tr><tr><td>Entrada deslizante (sin balón)</td><td>B</td><td>Num 7</td><td>○</td></tr><tr><td>Despeje (sin balón)</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Cabezazo (balón a la altura de la cabeza)</td><td>K o J</td><td>Num 2 o Num 1</td><td>□ o pase</td></tr><tr><td>Proteger balón</td><td>Automático</td><td>Automático</td><td>Automático (sin botón)</td></tr><tr><td>Controlar portero / volver</td><td>R</td><td>Num 8</td><td>R3</td></tr><tr><td>Portero: lanzarse</td><td>U</td><td>Num 0</td><td>✕</td></tr><tr><td>Portero: salir (mantener)</td><td>L (mantener)</td><td>Num 3 (mantener)</td><td>△ (mantener)</td></tr><tr><td>Portero: salir en sprint</td><td>Shift izq. + L</td><td>Shift der. + Num 3</td><td>R1 + △</td></tr><tr><td>Portero: saque con la mano al espacio</td><td>L</td><td>Num 3</td><td>△</td></tr><tr><td>Portero: saque de volea</td><td>I (mantener y soltar)</td><td>Num 5 (mantener y soltar)</td><td>○</td></tr><tr><td>Portero: volea alta</td><td>G + I</td><td>Num 6 + Num 5</td><td>R2 + ○</td></tr><tr><td>Portero: soltar / recoger el balón</td><td>Shift (stick centrado)</td><td>Shift der. (stick centrado)</td><td>R1 + stick centrado</td></tr><tr><td>Portero: correr con el balón</td><td>W A S D (Shift = sprint)</td><td>Flechas (Shift der.)</td><td>Stick izq. (R1)</td></tr><tr><td>Portero: amago de pase</td><td>J antes de soltar</td><td>Num 1 antes de soltar</td><td>✕ antes de soltar</td></tr><tr><td>Simular falta (caer)</td><td>F</td><td>Num 4</td><td>L1 + L2 + L3 + R3 (sin R2)</td></tr><tr><td>Portero: pase / saque con la mano</td><td>J</td><td>Num 1</td><td>✕</td></tr><tr><td>Portero: saque con el pie</td><td>K (mantener y soltar)</td><td>Num 2</td><td>□</td></tr><tr><td>Balón parado: potencia y altura</td><td>K / I / J (mantener y soltar)</td><td>Num 2 / Num 5 / Num 1 (mantener y soltar)</td><td>□ / ○ / ✕</td></tr><tr><td>Balón parado: pase corto</td><td>Q + J</td><td>Enter + Num 1</td><td>L1 + ✕</td></tr><tr><td>Balón parado: fijar dirección</td><td>G</td><td>Num 6</td><td>R2</td></tr><tr><td>Balón parado: 2º lanzador</td><td>Q + W / S</td><td>Enter + ↑ / ↓</td><td>L1 + ↑/↓</td></tr><tr><td>Tiro libre: tira el 2º lanzador</td><td>E</td><td>Num 9</td><td>L2</td></tr><tr><td>Tiro libre: amago</td><td>I + J</td><td>Num 5 + Num 1</td><td>○ + ✕</td></tr><tr><td>Penal: panenka</td><td>Q + K</td><td>Enter + Num 2</td><td>L1 + □</td></tr><tr><td>Barrera: saltar</td><td>K</td><td>Num 2</td><td>□</td></tr><tr><td>Barrera: quieta</td><td>J (mantener)</td><td>Num 1 (mantener)</td><td>mantener ✕</td></tr><tr><td>Barrera: sale un jugador</td><td>I (mantener)</td><td>Num 5 (mantener)</td><td>○</td></tr><tr><td>Arquero en balón parado</td><td>L + W A S D</td><td>Num 3 + Flechas</td><td>△ + stick</td></tr><tr><td>Córner atacante</td><td>W / S / A / D</td><td>↑ / ↓ / ← / →</td><td>Cruceta ↑ rápido · ↓ 1er palo · ← en línea · → 2º palo</td></tr><tr><td>Córner defensivo</td><td>W / S / A / D</td><td>↑ / ↓ / ← / →</td><td>Cruceta ↑ mixta · ← al hombre · → zonal</td></tr><tr><td>Mando táctil</td><td>—</td><td>—</td><td>Stick a la izquierda · ✕ ○ □ △ · R1 · R2 · L1 · L2 en tu tiro libre (sin cruceta)</td></tr><tr><td>Cámara</td><td>C</td><td>C</td><td>Touchpad (clic)</td></tr><tr><td>Pausa</td><td>P / Esc</td><td>P / Esc</td><td>OPTIONS</td></tr></tbody></table></div><button data-close="help-dialog" class="primary wide">Entendido</button></dialog>
-<dialog id="stats-dialog"><div class="dialog-top"><span class="eyebrow" id="stats-label"></span><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button><button id="rematch" hidden>Revancha</button><button id="new-match">Nuevo partido</button></div></dialog>
-<dialog id="online-dialog"><div class="dialog-top"><span class="eyebrow">CONEXIÓN ENTRE AMIGOS</span><button class="close" data-close="online-dialog" aria-label="Cerrar">×</button></div><h2>Online experimental</h2><p>El anfitrión simula el partido. Intercambia estos códigos por el medio que prefieras; no se envían automáticamente.</p><label>Servidor STUN (opcional)<input id="stun-url" placeholder="stun:tu-servidor:3478" /></label><p class="fine-print">Sin STUN funciona en redes que permiten una ruta directa. Algunas redes necesitan TURN, que este prototipo no configura.</p><label>Código recibido<textarea id="remote-code" rows="4" placeholder="Pega la invitación o la respuesta de tu amigo"></textarea></label><div class="secondary-actions"><button id="create-offer">1. Crear invitación</button><button id="create-answer">2. Responder invitación</button><button id="accept-answer">3. Aceptar respuesta</button></div><label>Tu código<textarea id="local-code" rows="4" readonly></textarea></label><button id="copy-code">Copiar código</button><p id="network-status" role="status">Esperando conexión.</p><p class="fine-print">Al conectar, el anfitrión inicia un partido de 6 minutos. El invitado controla al visitante. No hay predicción ni compensación de latencia.</p></dialog>
+<dialog id="help-dialog"><div class="dialog-top"><button class="close" data-close="help-dialog" aria-label="Cerrar">×</button></div><h2>Controles</h2><div id="controls-root"></div></dialog>
+<dialog id="stats-dialog"><div class="dialog-top"><button class="close" data-close="stats-dialog" aria-label="Cerrar">×</button></div><h2 id="result-title">Estadísticas</h2><div id="stats-content"></div><div class="secondary-actions"><button id="save-replay" class="primary">Guardar repetición</button></div></dialog>
+<dialog id="fulltime-dialog" aria-labelledby="fulltime-title"><h2 id="fulltime-title">Final</h2><p class="fulltime-score"><span id="ft-home">COS</span><strong id="ft-score">0 — 0</strong><span id="ft-away">SIE</span></p><div class="fulltime-actions"><button id="ft-rematch" class="primary wide">Revancha</button><button id="ft-menu" class="wide">Volver al menú</button><button id="ft-stats">Estadísticas</button><button id="ft-save">Guardar repetición</button></div></dialog>
+
 <input id="replay-file" type="file" accept="application/json,.json" hidden />`;
 // Every dialog gets the bottom cue: a fade and a chevron for hidden content.
 document.querySelectorAll<HTMLDialogElement>('dialog').forEach(d=>attachScrollCue(d));
@@ -54,7 +58,7 @@ let pitchPalette=loadPitchPalette(paletteStorage);$<HTMLSelectElement>('pitch-pa
 $<HTMLSelectElement>('difficulty').value=loadCpuDifficulty(difficultyStorage);
 const input=new BrowserInput(),peer=new PeerSession();let importedTeam:TeamProfile|null=null;
 // The on-screen touch pad is mounted once and refreshed with every HUD update.
-const touchPad=mountTouchPad($('viewport'),input);
+const touchPad=mountTouchPad($('viewport'),input,()=>refreshPause());
 let config=createConfig({human:[false,false]}),sim=new Simulation(config,[makeTeam(0),makeTeam(1)]),record=new Recorder(sim);
 let previous=sim.presentation(),current=previous,renderer:FootballRenderer|null=null,paused=false,started=false,last=performance.now(),accumulator=0,hudClock=0;
 let replay:Replay|null=null,replayIndex=0,guest=false,guestCounter=0,networkTick=0,finalShown=false,cameraIndex=0;
@@ -71,11 +75,13 @@ const tacticalKeys=['pressing','width','tempo','counterPress','shortPossession',
 function kits(home:number,away:number):[Kit,Kit]{const a=TEAM_CATALOG[home],b=TEAM_CATALOG[away];return[{shirt:a.color,shorts:a.shorts,accent:a.accent,pattern:'band'},{shirt:home===away?'#2052a5':b.color,shorts:b.shorts,accent:b.accent,pattern:'plain'}];}
 function makeRenderer(k:[Kit,Kit]){renderer?.dispose();renderError='';try{renderer=new FootballRenderer($('viewport'),$<HTMLCanvasElement>('radar'),config,k);renderer.setQuality($<HTMLSelectElement>('quality').value);renderer.setPitchPalette(pitchPalette);}catch(e){renderer=null;renderError='No se pudo iniciar WebGL2. Prueba un navegador compatible con aceleración gráfica.';$('announcement').textContent=renderError;console.error(e);}}
 makeRenderer(kits(0,1));
+const controls=renderControls($('controls-root'),defaultControlsTab(false,0));
 function download(name:string,value:unknown){const url=URL.createObjectURL(new Blob([JSON.stringify(value)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function closeDialog(id:string){$<HTMLDialogElement>(id).close();refreshPause();}
-function showDialog(id:string){const d=$<HTMLDialogElement>(id);if(!d.open)d.showModal();if(id==='setup-dialog')$<HTMLButtonElement>('quick-play-btn').focus();refreshPause();}
-function pause(value:boolean){manualPaused=value;refreshPause();}
-function refreshPause(){paused=shouldPause(manualPaused,started&&!guest&&!!document.querySelector('dialog[open]'),isFulltime(current.phase)||!!replayResult);input.enabled=started&&!paused&&!replay;input.clear();$('pause-overlay').hidden=!paused||!!document.querySelector('dialog[open]');$('pause-btn').setAttribute('aria-pressed',String(paused));$('pause-btn').innerHTML=paused?'▶':'Ⅱ';$('pause-btn').setAttribute('aria-label',paused?'Seguir':'Pausa');accumulator=0;}
+function showDialog(id:string){const d=$<HTMLDialogElement>(id);if(id==='help-dialog')controls.select(defaultControlsTab(document.body.classList.contains('touch-on'),input.gamepads.length));if(!d.open)d.showModal();if(id==='setup-dialog')$<HTMLButtonElement>('quick-play-btn').focus();refreshPause();}
+function pause(value:boolean){if(value&&(isFulltime(current.phase)||!!replayResult))return;manualPaused=value;refreshPause();}
+function refreshPause(){const terminal=isFulltime(current.phase)||!!replayResult,dialogOpen=started&&!guest&&!!document.querySelector('dialog[open]'),blocked=started&&touchPad.portraitBlocked(),wasPaused=paused;paused=shouldPause(manualPaused,dialogOpen,terminal,blocked);input.enabled=started&&!paused&&!replay;if(pausedStateChanged(wasPaused,paused))input.clear();const overlay=$('pause-overlay'),show=showPauseMenu(manualPaused,dialogOpen,terminal,blocked);if(!show)overlay.hidden=true;else{const opening=overlay.hidden;overlay.hidden=false;if(opening){$('pause-main').hidden=false;$('pause-confirm').hidden=true;$('resume-btn').focus();}}touchPad.setSuspended(paused||!started);$('pause-btn').setAttribute('aria-pressed',String(paused));$('pause-btn').innerHTML=paused?'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m8 5 12 7-12 7z" fill="currentColor"/></svg>':'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="3"/></svg>';$('pause-btn').setAttribute('aria-label',paused?'Seguir':'Pausa');accumulator=0;}
+window.addEventListener('resize',refreshPause);screen.orientation?.addEventListener?.('change',refreshPause);
 function rematch(){
   if(!kickoffSetup||!isFulltime(current.phase)||peer.role==='host')return;
   peer.close();
@@ -84,6 +90,11 @@ function rematch(){
   replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;notice='';noticeUntil=0;
   makeRenderer(kickoffKits);$('match-mode').textContent=kickoffMode;
   document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);updateHud();
+}
+function quitToMenu(){
+  peer.close();config=createConfig({human:[false,false]});sim=new Simulation(config,[makeTeam(0),makeTeam(1)]);record=new Recorder(sim);
+  previous=current=sim.presentation();started=false;replay=null;replayIndex=0;replayResult='';finalShown=false;manualPaused=false;kickoffSetup=null;guest=false;pendingTactics=undefined;
+  makeRenderer(kits(0,1));document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());menu=menuReducer(menu,{type:'open-setup'});showDialog('setup-dialog');updateHud();
 }
 // `forced` is the quick-play path: it ignores the match form and uses the defaults.
 // The menu difficulty applies to quick play and to custom match; online play always runs Normal.
@@ -97,7 +108,7 @@ function start(mode?:string,forced?:QuickPlaySetup,online=false){
     t1.tactics.formation=$<HTMLSelectElement>('formation').value as TeamProfile['tactics']['formation'];
     for(const k of tacticalKeys)t1.tactics[k]=Number($<HTMLInputElement>(k).value);
   }
-  config=createConfig({human:chosen==='watch'?[false,false]:chosen==='local'?[true,true]:[true,false],seed:forced?.seed??Number($<HTMLInputElement>('seed').value),teamSize:size,halfSeconds:(forced?.duration??Number($<HTMLSelectElement>('duration').value))/2,difficulty:matchCpuDifficulty(online,$<HTMLSelectElement>('difficulty').value)});
+  config=createConfig({human:chosen==='watch'?[false,false]:chosen==='local'?[true,true]:[true,false],seed:forced?.seed??quickPlaySetup().seed,teamSize:size,halfSeconds:(forced?.duration??Number($<HTMLSelectElement>('duration').value))/2,difficulty:matchCpuDifficulty(online,$<HTMLSelectElement>('difficulty').value)});
   kickoffSetup=rematchSetup(config,[validateTeam(t1),validateTeam(t2)]);kickoffKits=kits(home,away);
   sim=new Simulation(config,[validateTeam(t1),validateTeam(t2)]);previous=current=sim.presentation();record=new Recorder(sim);replay=null;replayIndex=0;replayResult='';guest=false;finalShown=false;started=true;pendingTactics=undefined;notice='';noticeUntil=0;
   makeRenderer(kits(home,away));$('match-mode').textContent=chosen==='watch'?'CPU CONTRA CPU':chosen==='local'?'DOS JUGADORES':'TÚ CONTRA LA CPU';
@@ -111,29 +122,52 @@ function quickPlay(){try{peer.close();start(undefined,quickPlaySetup());$('setup
 function matchInProgress(){return started&&!replay&&!replayResult&&!isFulltime(current.phase);}
 $('quick-play-btn').onclick=quickPlay;
 $('menu-help-btn').onclick=()=>showDialog('help-dialog');
-$('menu-btn').onclick=()=>{menu=menuReducer(menu,{type:'open-setup'});showDialog('setup-dialog');};$('close-setup').onclick=()=>closeDialog('setup-dialog');
+$('menu-btn').onclick=()=>{if(matchInProgress()){pause(true);return;}menu=menuReducer(menu,{type:'open-setup'});showDialog('setup-dialog');};$('close-setup').onclick=()=>closeDialog('setup-dialog');
 $('pause-btn').onclick=$('resume-btn').onclick=()=>pause(!paused);$('help-btn').onclick=()=>showDialog('help-dialog');
 document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(b=>b.onclick=()=>closeDialog(b.dataset.close!));
 document.querySelectorAll<HTMLDialogElement>('dialog').forEach(d=>{
-  d.addEventListener('cancel',e=>{e.preventDefault();closeDialog(d.id);});
+  d.addEventListener('cancel',e=>{e.preventDefault();if(d.id==='fulltime-dialog')return;closeDialog(d.id);});
   d.addEventListener('close',()=>{
     if(d.id==='setup-dialog')menu=menuReducer(menu,{type:started?'start-match':'close-setup'});
     refreshPause();
+    if(d.id==='stats-dialog'&&started&&!replay&&isFulltime(current.phase))showFulltime();
   });
 });
-function changeCamera(){cameraIndex=(cameraIndex+1)%3;renderer?.setCamera((['broadcast','tactical','close']as const)[cameraIndex]);}
-$('camera-btn').onclick=changeCamera;
-window.addEventListener('keydown',e=>{if((e.target as HTMLElement)?.matches('input,textarea,select')||document.querySelector('dialog[open]'))return;if(e.repeat)return;if(e.code==='KeyP'||e.code==='Escape')pause(!paused);if(e.code==='KeyC')changeCamera();if(e.code==='KeyM')toggleSound();});
+function changeCamera(){cameraIndex=(cameraIndex+1)%3;renderer?.setCamera((['broadcast','tactical','close']as const)[cameraIndex]);const value=document.getElementById('pause-camera-value');if(value)value.textContent=(['Transmisión','Táctica','Cerca']as const)[cameraIndex];}
+function focusPauseButton(delta:number){const buttons=[...$('pause-overlay').querySelectorAll<HTMLButtonElement>('button')].filter(b=>!b.hidden&&b.getClientRects().length);if(!buttons.length)return;const i=buttons.indexOf(document.activeElement as HTMLButtonElement);buttons[(i+delta+buttons.length)%buttons.length].focus();}
+window.addEventListener('keydown',e=>{
+  if((e.target as HTMLElement)?.matches('input,textarea,select')||document.querySelector('dialog[open]'))return;if(e.repeat)return;
+  if(!$('pause-overlay').hidden&&(e.code==='ArrowUp'||e.code==='ArrowDown')){e.preventDefault();focusPauseButton(e.code==='ArrowDown'?1:-1);return;}
+  if(e.code==='Escape'&&!$('pause-overlay').hidden&&!$('pause-confirm').hidden){$('pause-confirm').hidden=true;$('pause-main').hidden=false;$('pause-quit').focus();return;}
+  if(e.code==='KeyP'||e.code==='Escape')pause(!paused);if(e.code==='KeyC')changeCamera();if(e.code===SOUND_KEY)toggleSound();
+});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&started&&!guest)pause(true);});
 $('fullscreen-btn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('app').requestFullscreen();}catch{$('announcement').textContent='Pantalla completa no disponible en este navegador.';}};
-function updateSoundButton(){$('sound-btn').setAttribute('aria-pressed',String(!audio.muted));$('sound-btn').title='Activar o silenciar sonido (M)';}
+function updateSoundButton(){$('sound-btn').setAttribute('aria-pressed',String(!audio.muted));$('sound-value').textContent=audio.muted?'No':'Sí';}
 function toggleSound(){audio.setMuted(!audio.muted);updateSoundButton();}
 $('sound-btn').onclick=toggleSound;updateSoundButton();
 $<HTMLInputElement>('sound-volume').value=String(audio.volume);
 $('sound-volume').oninput=()=>audio.setVolume(Number($<HTMLInputElement>('sound-volume').value));
+$('pause-controls').onclick=()=>showDialog('help-dialog');
+$('pause-stats').onclick=showStats;
+$('pause-camera').onclick=changeCamera;
+$('pause-quit').onclick=()=>{$('pause-main').hidden=true;$('pause-confirm').hidden=false;$('quit-no').focus();};
+$('quit-no').onclick=()=>{$('pause-confirm').hidden=true;$('pause-main').hidden=false;$('pause-quit').focus();};
+$('quit-yes').onclick=quitToMenu;
 function updateHud(){
   renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil},$);
-  touchPad.update();
+  touchPad.update({started});
+  const radar=$('radar'),card=document.querySelector<HTMLElement>('.player-card');
+  const restart=current.restart;
+  let points:{x:number;y:number}[]=[];
+  if(restart&&renderer){
+    const taker=current.players.filter(p=>p.team===restart.team).sort((a,b)=>Math.hypot(a.x-current.ball.x,a.y-current.ball.y)-Math.hypot(b.x-current.ball.x,b.y-current.ball.y))[0];
+    const ballPoint=renderer.screenPoint({x:current.ball.x,y:current.ball.y,z:current.ball.z});
+    const takerPoint=taker?renderer.screenPoint({x:taker.x,y:taker.y,z:0}):null;
+    if(ballPoint)points.push(ballPoint);if(takerPoint)points.push(takerPoint);
+  }
+  const dodge=dodgeHud(points,{radar:radar.getBoundingClientRect(),card:card?.getBoundingClientRect()});
+  radar.classList.toggle('dodge',!!restart&&dodge.radar);card?.classList.toggle('dodge',!!restart&&dodge.card);
   const s=current;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
 }
@@ -165,14 +199,15 @@ function keeperHoldFlags(s:Presentation):[boolean,boolean]{
   return [flag(0),flag(1)];
 }
 function showStats(){const s=current;
-  $('rematch').hidden=!isFulltime(s.phase)||!kickoffSetup||!!replay||guest||peer.role==='host';
-  $('new-match').textContent=isFulltime(s.phase)?'Volver al menú':'Nuevo partido';$('result-title').textContent=`${s.teams[0].shortName} ${s.score[0]} — ${s.score[1]} ${s.teams[1].shortName}`;
+  $('result-title').textContent=`${s.teams[0].shortName} ${s.score[0]} — ${s.score[1]} ${s.teams[1].shortName}`;
   const total=s.stats[0].possessionTicks+s.stats[1].possessionTicks||1;
-  const rows=[['Posesión',`${Math.round(s.stats[0].possessionTicks/total*100)}%`,`${Math.round(s.stats[1].possessionTicks/total*100)}%`],['Tiros',s.stats[0].shots,s.stats[1].shots],['A puerta',s.stats[0].onTarget,s.stats[1].onTarget],['Pases completados',`${s.stats[0].completed}/${s.stats[0].passes}`,`${s.stats[1].completed}/${s.stats[1].passes}`],['Atajadas',s.stats[0].saves,s.stats[1].saves],['Entradas ganadas',s.stats[0].tackles,s.stats[1].tackles],['Faltas',s.stats[0].fouls,s.stats[1].fouls],['Amarillas',s.stats[0].yellows,s.stats[1].yellows],['Expulsiones',s.stats[0].reds,s.stats[1].reds],['Penaltis',s.stats[0].penalties,s.stats[1].penalties],['Córners',s.stats[0].corners,s.stats[1].corners],['Fuera de juego',s.stats[0].offsides,s.stats[1].offsides]];
+  const rows=[['Posesión',`${Math.round(s.stats[0].possessionTicks/total*100)}%`,`${Math.round(s.stats[1].possessionTicks/total*100)}%`],['Tiros',s.stats[0].shots,s.stats[1].shots],['A puerta',s.stats[0].onTarget,s.stats[1].onTarget],['Pases completados',`${s.stats[0].completed}/${s.stats[0].passes}`,`${s.stats[1].completed}/${s.stats[1].passes}`],['Atajadas',s.stats[0].saves,s.stats[1].saves],['Entradas ganadas',s.stats[0].tackles,s.stats[1].tackles],['Faltas',s.stats[0].fouls,s.stats[1].fouls],['Amarillas',s.stats[0].yellows,s.stats[1].yellows],['Expulsiones',s.stats[0].reds,s.stats[1].reds],['Penal',s.stats[0].penalties,s.stats[1].penalties],['Córners',s.stats[0].corners,s.stats[1].corners],['Fuera de juego',s.stats[0].offsides,s.stats[1].offsides]];
+  $('save-replay').hidden=guest;
   $('stats-content').replaceChildren();for(const [label,a,b]of rows){const row=document.createElement('div');row.className='stat-row';for(const value of [a,label,b]){const span=document.createElement('span');span.textContent=String(value);row.append(span);}$('stats-content').append(row);}showDialog('stats-dialog');}
-$('rematch').onclick=rematch;
-$('stats-btn').onclick=showStats;$('new-match').onclick=()=>{closeDialog('stats-dialog');menu=menuReducer(menu,{type:'open-setup'});showDialog('setup-dialog');};
-$('save-replay').onclick=()=>{if(guest){$('stats-label').textContent='El anfitrión puede guardar la repetición.';return;}download(`futbol-${config.seed}-${sim.tick}.json`,record.finish(sim));};
+function showFulltime(){const s=current;$('ft-home').textContent=s.teams[0].shortName;$('ft-away').textContent=s.teams[1].shortName;$('ft-score').textContent=`${s.score[0]} — ${s.score[1]}`;manualPaused=false;const unavailable=!kickoffSetup||!!replay||guest||peer.role==='host';$('ft-rematch').hidden=unavailable;$('ft-menu').classList.toggle('primary',unavailable);showDialog('fulltime-dialog');($<HTMLButtonElement>(unavailable?'ft-menu':'ft-rematch')).focus();}
+function saveReplay(){if(!guest)download(`futbol-${config.seed}-${sim.tick}.json`,record.finish(sim));}
+$('ft-rematch').onclick=rematch;$('ft-stats').onclick=showStats;$('ft-save').onclick=saveReplay;$('save-replay').onclick=saveReplay;$('ft-menu').onclick=quitToMenu;
+$('roster-btn').onclick=()=>$<HTMLInputElement>('roster-file').click();
 $('export-roster').onclick=()=>download('equipo-ejemplo.json',makeTeam(Number($<HTMLSelectElement>('home-team').value),Number($<HTMLSelectElement>('size').value)));
 $<HTMLInputElement>('roster-file').onchange=async e=>{try{const f=(e.target as HTMLInputElement).files?.[0];if(!f)return;if(f.size>100000)throw new Error('El archivo supera 100 KB.');importedTeam=validateTeam(JSON.parse(await f.text()));$('roster-status').textContent=`${importedTeam.name} · ${importedTeam.players.length} jugadores cargados.`;}catch(e){importedTeam=null;$('roster-status').textContent=(e as Error).message;}};
 $('load-replay').onclick=()=>$<HTMLInputElement>('replay-file').click();
@@ -191,14 +226,9 @@ $('pitch-palette').onchange=()=>{pitchPalette=$<HTMLSelectElement>('pitch-palett
 // The choice is saved at once and read back on the next page load.
 $('difficulty').onchange=()=>{$<HTMLSelectElement>('difficulty').value=saveCpuDifficulty(difficultyStorage,$<HTMLSelectElement>('difficulty').value);};
 $('quality').onchange=()=>renderer?.setQuality($<HTMLSelectElement>('quality').value);
-async function networkTask(work:()=>Promise<string|void>){try{$('network-status').textContent='Preparando conexión…';const code=await work();if(code)$<HTMLTextAreaElement>('local-code').value=code;$('network-status').textContent='Código listo. Intercámbialo con tu amigo.';}catch(e){$('network-status').textContent=(e as Error).message;}}
-$('create-offer').onclick=()=>networkTask(()=>peer.offer($<HTMLInputElement>('stun-url').value.trim()));
-$('create-answer').onclick=()=>networkTask(()=>peer.answer($<HTMLTextAreaElement>('remote-code').value,$<HTMLInputElement>('stun-url').value.trim()));
-$('accept-answer').onclick=()=>networkTask(()=>peer.accept($<HTMLTextAreaElement>('remote-code').value));
-$('copy-code').onclick=async()=>{try{await navigator.clipboard.writeText($<HTMLTextAreaElement>('local-code').value);$('network-status').textContent='Código copiado.';}catch{$<HTMLTextAreaElement>('local-code').select();$('network-status').textContent='Selecciona y copia el código.';}};
-peer.onStatus=s=>{$('network-status').textContent=s;if(s.includes('interrumpida')||s.includes('cerrada')){input.clear();pause(true);}};
+peer.onStatus=s=>{if(s.includes('interrumpida')||s.includes('cerrada')){input.clear();pause(true);}};
 peer.onConnect=()=>{if(peer.role==='host'){start('local',undefined,true);peer.start(sim.snapshot());$('match-mode').textContent='ONLINE · ANFITRIÓN';}};
-peer.onStart=(world:World)=>{try{world.teams.forEach(validateTeam);sim=new Simulation(world.config,world.teams);sim.restore(world);config=world.config;kickoffSetup=null;guest=true;started=true;replay=null;previous=current=sim.presentation();makeRenderer(kits(0,1));document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);$('match-mode').textContent='ONLINE · VISITANTE';}catch{peer.close();$('network-status').textContent='Estado inicial incompatible.';}};
+peer.onStart=(world:World)=>{try{world.teams.forEach(validateTeam);sim=new Simulation(world.config,world.teams);sim.restore(world);config=world.config;kickoffSetup=null;guest=true;started=true;replay=null;previous=current=sim.presentation();makeRenderer(kits(0,1));document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach(d=>d.close());pause(false);$('match-mode').textContent='ONLINE · VISITANTE';}catch(e){peer.close();console.warn('Estado inicial incompatible.',e);}};
 peer.onSnapshot=s=>{if(!guest||!s||!Number.isInteger(s.tick)||s.tick<=current.tick||!Array.isArray(s.players)||s.players.length!==config.teamSize*2)return;audio.play(soundCues(current,s));previous=current;current=s;networkTick=performance.now();};
 // Detached read-only evidence at the browser boundary. No engine access is exposed.
 let inputEvidence:InputFrame[]=[];
@@ -206,9 +236,14 @@ const shotEvidence={actions:[0,0],events:[0,0],power:[0,0]};
 const passEvidence={actions:[0,0],events:[0,0]};
 const keeperEvidence={punts:[0,0],highPunts:[0,0],throws:[0,0]};
 let browserFrames=0;
-Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},sprint:f.sprint,action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},passes:{actions:[...passEvidence.actions],events:[...passEvidence.events]},keeper:{punts:[...keeperEvidence.punts],highPunts:[...keeperEvidence.highPunts],throws:[...keeperEvidence.throws]},keeperHold:current.keeperHold?{playerId:current.keeperHold.playerId}:null,ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,keeper:p.keeper,keeperRushing:p.keeperRushing===true,keeperDropped:p.keeperDropped===true,keeperMode:p.keeperMode,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
+Object.defineProperty(window,'__fe',{configurable:false,enumerable:false,get:()=>({tick:current.tick,phase:current.phase,paused,started,dialogs:[...document.querySelectorAll<HTMLDialogElement>('dialog[open]')].map(d=>d.id),browserFrames,frames:inputEvidence.map(f=>({slot:f.slot,move:{...f.move},sprint:f.sprint,action:f.action,power:f.power})),shots:{actions:[...shotEvidence.actions],events:[...shotEvidence.events],power:[...shotEvidence.power]},passes:{actions:[...passEvidence.actions],events:[...passEvidence.events]},keeper:{punts:[...keeperEvidence.punts],highPunts:[...keeperEvidence.highPunts],throws:[...keeperEvidence.throws]},keeperHold:current.keeperHold?{playerId:current.keeperHold.playerId}:null,ball:structuredClone(current.ball),selected:[...current.selected],players:current.players.map(p=>({id:p.id,keeper:p.keeper,keeperRushing:p.keeperRushing===true,keeperDropped:p.keeperDropped===true,keeperMode:p.keeperMode,x:p.x,y:p.y,vx:p.vx,vy:p.vy,action:p.action,recovery:p.recovery}))})});
 // Smoke only: exists only when navigator.webdriver is true. It is not a game feature. The recorder replay is not valid after this call.
-if(navigator.webdriver)Object.defineProperty(window,'__feSmoke',{configurable:false,enumerable:false,value:{ballAtFeet(slot:0|1){
+if(navigator.webdriver)Object.defineProperty(window,'__feSmoke',{configurable:false,enumerable:false,value:{toFulltime(){
+  if(!started||guest||replay)return false;const w=sim.snapshot();
+  if(w.half===1){w.half=2;for(const t of w.teams)t.direction=t.direction===1?-1:1;}
+  w.phase='playing';w.restart=null;w.countdown=0;w.played=config.halfSeconds-config.dt*3;
+  sim.restore(w);previous=current=sim.presentation();return true;
+},ballAtFeet(slot:0|1){
   if(!started||guest||replay||current.phase!=='playing')return false;
   const w=sim.snapshot();
   const p=w.players.find(p=>p.id===w.selected[slot]);
@@ -355,12 +390,12 @@ defenseState(slot:0|1=0){
     x:p?.x??null,y:p?.y??null,lastTouchTeam:w.ball.lastTouch?.team??null,lastTouchTick:w.ball.lastTouch?.tick??null};
 },
 // Smoke only: starts the restart of `kind` for `team`, with a four-man wall on the free kick.
-setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
+setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1,side:1|-1=1){
   // A ball out of play from the last step may leave a waiting restart: replace it.
   if(!started||guest||replay||!(current.phase==='playing'||(current.restart&&current.phase!=='kickoff')))return false;
   const L=config.pitch.length/2,W=config.pitch.width/2;
   const dir=sim.snapshot().teams[team].direction;
-  const point=kind==='free-kick'?{x:dir*(L-24),y:0}:kind==='corner'?{x:dir*(L-.3),y:W-.3}:kind==='penalty'?{x:dir*(L-11),y:0}:kind==='throw-in'?{x:dir*10,y:W-.1}:{x:-dir*(L-5.5),y:6};
+  const point=kind==='free-kick'?{x:dir*(L-24),y:0}:kind==='corner'?{x:dir*(L-.3),y:side*(W-.3)}:kind==='penalty'?{x:dir*(L-11),y:0}:kind==='throw-in'?{x:dir*10,y:W-.1}:{x:-dir*(L-5.5),y:6};
   (sim as any).startRestart(kind,team,point);
   if(kind==='free-kick'){
     const w=sim.snapshot();
@@ -375,10 +410,12 @@ setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
 },
 // Smoke only: reads back the waiting restart, the wall jumps, the keepers and the cursors.
 setPieceState(){const w=sim.snapshot();return {phase:w.phase,tick:w.tick,restart:w.restart?structuredClone(w.restart):null,wallJump:w.players.filter(p=>p.wallJump!==undefined&&p.wallJump>w.tick).map(p=>p.id),keepers:w.players.filter(p=>p.keeper).map(p=>({id:p.id,team:p.team,x:p.x,y:p.y})),selected:[...w.selected],restriction:w.restartRestriction?{...w.restartRestriction}:null};}
+,cornerView(){const w=sim.snapshot(),r=w.restart;if(!r)return null;const taker=w.players.find(p=>p.id===r.taker);return{ball:renderer?.screenPoint({x:w.ball.x,y:w.ball.y,z:w.ball.z})??null,taker:taker?renderer?.screenPoint({x:taker.x,y:taker.y,z:0})??null:null,kind:r.kind,team:r.team};}
+,refreshHud(){updateHud();return{radar:$('radar').classList.contains('dodge'),card:document.querySelector('.player-card')?.classList.contains('dodge'),ball:renderer?.screenPoint({x:current.ball.x,y:current.ball.y,z:current.ball.z})??null,radarRect:(()=>{const r=$('radar').getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height};})()};}
 }});
 // A / Cross (button 0) on any pad starts quick play from the menu.
 // Nothing acts while another dialog sits on the setup.
-interface PadMenuState{a:boolean}
+interface PadMenuState{a:boolean;x:boolean;o:boolean;up:boolean;down:boolean}
 let padMenuDown:PadMenuState[]=[];
 function pollMenuPad(){
   let pads:(Gamepad|null)[]=[];
@@ -387,12 +424,26 @@ function pollMenuPad(){
   const onlySetupOpen=setup.open&&document.querySelectorAll('dialog[open]').length===1;
   for(let i=0;i<pads.length||i<padMenuDown.length;i++){
     const buttons=pads[i]?.buttons;
-    const prev=padMenuDown[i]??{a:false};
-    const state={a:!!buttons?.[0]?.pressed};
+    const prev=padMenuDown[i]??{a:false,x:false,o:false,up:false,down:false};
+    const state={a:!!buttons?.[0]?.pressed,x:!!buttons?.[0]?.pressed,o:!!buttons?.[1]?.pressed,up:!!buttons?.[12]?.pressed,down:!!buttons?.[13]?.pressed};
     padMenuDown[i]=state;
-    const aEdge=state.a&&!prev.a;
-    if(!aEdge)continue;
-    if(onlySetupOpen&&menu.view==='setup'&&!matchInProgress()){quickPlay();break;}
+    const aEdge=state.a&&!prev.a,xEdge=state.x&&!prev.x,oEdge=state.o&&!prev.o,upEdge=state.up&&!prev.up,downEdge=state.down&&!prev.down;
+    const overlay=$('pause-overlay');
+    const activeDialog=document.querySelector<HTMLDialogElement>('dialog[open]');
+    if(activeDialog&&started){
+      const focusable=[...activeDialog.querySelectorAll<HTMLButtonElement>('button:not([hidden])')].filter(b=>b.getClientRects().length);
+      if(upEdge||downEdge){const i=focusable.indexOf(document.activeElement as HTMLButtonElement);focusable[(i+(downEdge?1:-1)+focusable.length)%focusable.length]?.focus();}
+      if(xEdge&&activeDialog.contains(document.activeElement))(document.activeElement as HTMLElement).click();
+      if(oEdge){const close=activeDialog.querySelector<HTMLElement>('[data-close]');if(close)close.click();else if(activeDialog.id==='stats-dialog')activeDialog.close();}
+      continue;
+    }
+    if(!overlay.hidden){
+      if(upEdge)focusPauseButton(-1);if(downEdge)focusPauseButton(1);
+      if(xEdge&&overlay.contains(document.activeElement))(document.activeElement as HTMLElement).click();
+      if(oEdge){if(!$('pause-confirm').hidden)$('quit-no').click();else $('resume-btn').click();}
+      continue;
+    }
+    if(aEdge&&onlySetupOpen&&menu.view==='setup'&&!matchInProgress()){quickPlay();break;}
   }
 }
 // Sampling on a timer catches short presses even when frames run slowly.
@@ -421,7 +472,7 @@ function loop(now:number){
     if(guest){if(peer.connected&&!paused){guestCounter++;const frame=input.sample(guestCounter,0);peer.input({...frame,slot:1});}renderer?.draw(previous,current,Math.min(1,(now-networkTick)/100),elapsed);}
     else{
       if(!paused){accumulator+=elapsed;let steps=0;while(accumulator>=config.dt&&steps<6){
-        if(replay&&sim.tick>=replay.endTick){pause(true);$('pause-overlay').hidden=true;replayResult=sim.stateHash()===replay.finalHash?'REPETICIÓN VERIFICADA':'La repetición diverge de su estado original.';$('announcement').textContent=replayResult;break;}
+        if(replay&&sim.tick>=replay.endTick){pause(true);replayResult=sim.stateHash()===replay.finalHash?'REPETICIÓN VERIFICADA':'La repetición diverge de su estado original.';$('announcement').textContent=replayResult;refreshPause();break;}
         const frames:InputFrame[]=[];
         if(replay){while(replay.inputs[replayIndex]?.tick===sim.tick)frames.push(replay.inputs[replayIndex++]);}
         else for(const slot of [0,1]as const)if(config.human[slot]){const f=slot===1&&peer.role==='host'?peer.hostFrame(sim.tick):input.sample(sim.tick,slot);if(slot===0&&pendingTactics){f.tactics=pendingTactics;pendingTactics=undefined;}frames.push(f);}
@@ -442,7 +493,7 @@ function loop(now:number){
         audio.play(soundCues(previous,current));
         if(peer.role==='host'&&sim.tick%6===0)peer.snapshot(current);
         accumulator-=config.dt;steps++;
-        if(current.phase==='fulltime'&&started&&!finalShown&&!replay){finalShown=true;showStats();break;}
+        if(current.phase==='fulltime'&&started&&!finalShown&&!replay){finalShown=true;showFulltime();break;}
       }if(steps===6)accumulator=Math.min(accumulator,config.dt);}
       renderer?.draw(previous,current,paused?1:accumulator/config.dt,elapsed);
     }

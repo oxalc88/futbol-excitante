@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import type { DeepReadonly, PlayerState, ReadonlyPresentation, Vec3 } from '../contracts/types';
 import { clamp } from '../simulation/math';
 
@@ -49,18 +50,30 @@ export function solveLimb(root:Vec3,target:Vec3,lengths:readonly number[],bend=1
   const horiz=Math.hypot(dx,dy),nx=horiz>1e-5?-dy/horiz:1,ny=horiz>1e-5?dx/horiz:0;
   return {root,knee:{x:root.x+dx/d*along+nx*height*bend,y:root.y+dy/d*along+ny*height*bend,z:root.z+dz/d*along},end:target};
 }
+export function cameraWanted(s:ReadonlyPresentation):{x:number,y:number}{
+  const b=s.ball;
+  if(s.restart?.kind==='corner')return{x:clamp(b.x*.9,-48,48),y:clamp(b.y-Math.sign(b.y)*4,-30,30)};
+  return{x:clamp(b.x*.7,-33,33),y:clamp(b.y*.5,-13,13)};
+}
+export function projectPoint(pose:{position:{x:number,y:number,z:number};target:{x:number,y:number,z:number};fov:number},aspect:number,p:{x:number,y:number,z:number}):{x:number,y:number,front:boolean}{
+  const eye=new THREE.Vector3(pose.position.x,pose.position.z,pose.position.y),centre=new THREE.Vector3(pose.target.x,pose.target.z,pose.target.y),point=new THREE.Vector3(p.x,p.z,p.y);
+  const back=eye.clone().sub(centre).normalize(),up=new THREE.Vector3(0,1,0),right=up.clone().cross(back).normalize(),cameraUp=back.clone().cross(right).normalize(),delta=point.sub(eye),depth=-delta.dot(back),tan=Math.tan(pose.fov*Math.PI/360);
+  return{x:delta.dot(right)/(depth*tan*aspect),y:delta.dot(cameraUp)/(depth*tan),front:depth>0};
+}
+
 export class CameraRig {
-  private tick=-1;private target={x:0,y:0};private previous={x:0,y:0};
+  private tick=-1;private restartKey='';private target={x:0,y:0};private previous={x:0,y:0};
   rotation={x:0,z:0};mode:'broadcast'|'tactical'|'close'='broadcast';
   constructor(private dt=1/60){}
-  reset(){this.tick=-1;this.rotation={x:0,z:0};}
+  reset(){this.tick=-1;this.restartKey='';this.rotation={x:0,z:0};}
   advance(s:ReadonlyPresentation){
-    if(s.tick<=this.tick)return;
-    const wanted={x:clamp(s.ball.x*.7,-33,33),y:clamp(s.ball.y*.5,-13,13)};
+    const restartKey=s.restart?`${s.restart.kind}:${s.restart.team}`:'';
+    if(s.tick<=this.tick&&restartKey===this.restartKey)return;
+    const wanted=cameraWanted(s),snap=this.tick<0||restartKey!==this.restartKey||s.events.some(e=>e.type==='restart-awarded');
     this.previous={...this.target};
-    if(this.tick<0||s.events.some(e=>e.type==='restart-awarded'))this.target=wanted;
-    else {const k=1-Math.exp(-(s.tick-this.tick)*this.dt*4);this.target.x+=(wanted.x-this.target.x)*k;this.target.y+=(wanted.y-this.target.y)*k;}
-    this.rotation.x+=s.ball.vy*this.dt/.11;this.rotation.z-=s.ball.vx*this.dt/.11;this.tick=s.tick;
+    if(snap)this.target=wanted;
+    else {const k=1-Math.exp(-Math.max(1,s.tick-this.tick)*this.dt*4);this.target.x+=(wanted.x-this.target.x)*k;this.target.y+=(wanted.y-this.target.y)*k;}
+    this.rotation.x+=s.ball.vy*this.dt/.11;this.rotation.z-=s.ball.vx*this.dt/.11;this.tick=s.tick;this.restartKey=restartKey;
   }
   pose(aspect=16/9,alpha=1){
     const tactical=this.mode==='tactical',zoom=this.mode==='close'?.72:1,portrait=aspect<1;

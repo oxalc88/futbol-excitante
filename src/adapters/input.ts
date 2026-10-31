@@ -1,10 +1,10 @@
 import type { ActionKind, InputFrame, TeamIndex, Vec2 } from '../contracts/types';
 import { ControllerMapper } from './controller';
 import { TouchPad, type TouchContext } from './touch-pad';
-import { KEYBOARD_MAP, KEYBOARD_MOVE, PES_2017_PS4_ROWS, pesHeader, TACKLE_TAP_TICKS, type KeyRole } from '../browser/pad-presets';
+import { KEYBOARD_MAP, KEYBOARD_MOVE, PES_2017_PS4_ROWS, pesHeader, TACKLE_TAP_TICKS, KEEPER_SWITCH, type KeyRole } from '../browser/pad-presets';
 import { clamp, length, unit } from '../simulation/math';
 // The keeper switch has no preset row. Keep the FE keys.
-const KEEPER_KEYS=['KeyR','Numpad8'] as const;
+const KEEPER_KEYS=[KEEPER_SWITCH.keys.p1[0],KEEPER_SWITCH.keys.p2[0]] as const;
 // Keyboard window of the ✕ ×2 tackle tap: the same time as on the pad.
 const TAP_MS=TACKLE_TAP_TICKS*1000/60;
 // Charge key per slot: player 1 owns slot 0 and player 2 owns slot 1.
@@ -126,7 +126,7 @@ export class BrowserInput {
       if(chargeCode!==undefined){const start=this.charges.get(chargeCode);if(start!==undefined)f.wallCharge=clamp((performance.now()-start)/850,0,1);}
       if((held('setKeeperMove')||sp.kind==='penalty')&&moveActive)f.keeperMove={...movement};
     }
-    if(sp.kind==='corner')for(const [code,dir] of [[move[0],'up'],[move[1],'down'],[move[2],'left'],[move[3],'right']] as const)if(code&&this.edges.has(code)){f.cornerSide=dir;break;}
+    if(sp.kind==='corner'){const strategy=keys('cornerStrategy');for(const [code,dir] of [[strategy[0],'up'],[strategy[1],'down'],[strategy[2],'left'],[strategy[3],'right']] as const)if(code&&this.edges.has(code)){f.cornerSide=dir;break;}}
     return f;
   }
   sample(tick:number,slot:TeamIndex):InputFrame {

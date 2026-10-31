@@ -30,27 +30,86 @@ Los partidos incluyen penaltis por faltas en el área, tarjetas, expulsión por 
 
 ## Controles
 
-| Acción | Jugador 1 | Jugador 2 | Xbox / PlayStation estándar |
-|---|---|---|---|
-| Mover | WASD | Flechas | Stick izquierdo |
-| Apuntar independientemente | Dirección de movimiento | Dirección de movimiento | Stick derecho |
-| Pase | J | Num 1 | A / ✕ |
-| Tiro: mantener y soltar | K | Num 2 | B / ○ |
-| Pase filtrado | L | Num 3 | Y / △ |
-| Pase elevado | H | Num 4 | LB + A / L1 + ✕ |
-| Centro | I | Num 5 | X / □ |
-| Entrada de pie | U | Num 0 | RB / R1 |
-| Entrada deslizante | B | Num 7 | LT + RB / L2 + R1 |
-| Cabecear | O | Num 6 | RT / R2 |
-| Correr | Shift izquierdo | Shift derecho | LT / L2 |
-| Cambiar jugador | Q | Enter | LB / L1 |
-| Proteger balón | Espacio | Num . | L3 |
-| Pausa | P / Esc | — | Start / Options |
-| Cámara | C | — | Botón en pantalla |
+<!-- controls:start -->
+### Ataque
+
+| Acción | Jugador 1 | Jugador 2 | Mando PS4 | Táctil |
+|---|---|---|---|---|
+| Mover | W S A D | ↑ ↓ ← → | Stick izq. | Stick izq. |
+| Pase corto | J | Num 1 | ✕ | ✕ |
+| Pase filtrado | L | Num 3 | △ | △ |
+| Pase alto / centro | I | Num 5 | ○ | ○ |
+| Cambio de frente | W A S D a la otra banda + I | ↑ ↓ ← → a la otra banda + Num 5 | Stick izq. a la otra banda + ○ | Stick izq. a la otra banda + ○ |
+| Tiro | K (mantener y soltar) | Num 2 (mantener y soltar) | □ (mantener y soltar) | □ (mantener y soltar) |
+| Cabezazo | K J I L | Num 2 Num 1 Num 5 Num 3 | □ ✕ ○ △ | □ ✕ ○ △ |
+| Correr | Shift izq. | Shift der. | R1 | R1 |
+| Proteger balón | Automático | Automático | Automático | Automático |
+
+### Defensa
+
+| Acción | Jugador 1 | Jugador 2 | Mando PS4 | Táctil |
+|---|---|---|---|---|
+| Cambiar jugador | Q | Enter | L1 | L1 |
+| Entrada | U ×2 | Num 0 ×2 | ✕ ×2 | ✕ ×2 |
+| Entrada deslizante | B | Num 7 | ○ | ○ |
+| Despeje | K (mantener y soltar) | Num 2 (mantener y soltar) | □ (mantener y soltar) | □ (mantener y soltar) |
+| Carga | Automático | Automático | Automático | Automático |
+| Presión | U (mantener) | Num 0 (mantener) | ✕ (mantener) | ✕ (mantener) |
+| Presión en carrera | U + Shift izq. (mantener) | Num 0 + Shift der. (mantener) | R1 + ✕ (mantener) | R1 + ✕ (mantener) |
+| Presión de un compañero | K (mantener) | Num 2 (mantener) | □ (mantener) | □ (mantener) |
+| Presión de dos compañeros | K (doble toque y mantener) | Num 2 (doble toque y mantener) | □ ×2 (mantener) | □ ×2 (mantener) |
+| Contener | G (mantener) | Num 6 (mantener) | R2 (mantener) | R2 (mantener) |
+| Cambio manual | — | — | Stick der. | — |
+
+### Arquero
+
+| Acción | Jugador 1 | Jugador 2 | Mando PS4 | Táctil |
+|---|---|---|---|---|
+| Salir | L (mantener) | Num 3 (mantener) | △ (mantener) | △ (mantener) |
+| Salir en carrera | Shift izq. + L (mantener) | Shift der. + Num 3 (mantener) | R1 + △ (mantener) | R1 + △ (mantener) |
+| Saque con la mano | J | Num 1 | ✕ | ✕ |
+| Saque al espacio | L | Num 3 | △ | △ |
+| Volea | I (mantener y soltar) | Num 5 (mantener y soltar) | ○ (mantener y soltar) | ○ (mantener y soltar) |
+| Volea alta | G + I | Num 6 + Num 5 | R2 + ○ (mantener y soltar) | R2 + ○ (mantener y soltar) |
+| Soltar / recoger balón | Shift izq. sin mover | Shift der. sin mover | R1 con el stick suelto | R1 con el stick suelto |
+| Correr con el balón | W S A D | ↑ ↓ ← → | Stick izq. | Stick izq. |
+| Amago de pase | J antes de soltar | Num 1 antes de soltar | ✕ antes de soltar | ✕ antes de soltar |
+| Simular falta | F | Num 4 | L1 + L2 + L3 + R3 (sin R2) | — |
+| Tomar al arquero | R | Num 8 | R3 | L1 + R2 |
+| Lanzarse | U | Num 0 | ✕ | ✕ |
+
+### Balón parado
+
+| Acción | Jugador 1 | Jugador 2 | Mando PS4 | Táctil |
+|---|---|---|---|---|
+| Potencia y altura | K / I / J (mantener y soltar) | Num 2 / Num 5 / Num 1 (mantener y soltar) | □ / ○ / ✕ (mantener y soltar) | □ / ○ / ✕ (mantener y soltar) |
+| Dirección y efecto | W S A D | ↑ ↓ ← → | Stick izq. | Stick izq. |
+| Fijar dirección | G (mantener) | Num 6 (mantener) | R2 (mantener) | R2 (mantener) |
+| 2.º lanzador | Q + W / S | Enter + ↑ / ↓ | L1 + ↑ / ↓ | — |
+| Tira el 2.º lanzador | E (mantener) | Num 9 (mantener) | L2 (mantener) | L2 (mantener) |
+| Amago | I | Num 5 | ○ + ✕ | ○ + ✕ |
+| Pase corto | Q + J | Enter + Num 1 | L1 + ✕ | L1 + ✕ |
+| Penal: picada | Q + K | Enter + Num 2 | L1 + □ | L1 + □ |
+| Barrera: saltar | K | Num 2 | □ | □ |
+| Barrera: quieta | J (mantener) | Num 1 (mantener) | ✕ (mantener) | ✕ (mantener) |
+| Barrera: sale un jugador | I (mantener) | Num 5 (mantener) | ○ (mantener) | ○ (mantener) |
+| Arquero: moverse | L | Num 3 | △ (mantener) + stick izq. | △ (mantener) + stick izq. |
+| Córner a favor | 1 rápido · 2 1.er palo · 3 en línea · 4 2.º palo | Num / rápido · Num * 1.er palo · Num - en línea · Num + 2.º palo | ↑ rápido · ↓ 1.er palo · ← en línea · → 2.º palo | — |
+| Córner en contra | 1 mixta · 3 al hombre · 4 zonal | Num / mixta · Num - al hombre · Num + zonal | ↑ mixta · ← al hombre · → zonal | — |
+| 2.º lanzador al lado | — | — | — | L2 |
+
+### Sistema
+
+| Acción | Jugador 1 | Jugador 2 | Mando PS4 | Táctil |
+|---|---|---|---|---|
+| Pausa | Esc P | Esc P | OPTIONS | Ⅱ |
+| Cámara | C | C | Panel táctil | — |
+| Sonido | M | M | — | — |
+<!-- controls:end -->
 
 Pulsa un botón del mando para que el navegador lo detecte. El adaptador mantiene la identidad de los dos slots al desconectar un mando y suprime acciones que ya estaban pulsadas al reconectar. Las pruebas usan lecturas simuladas; la compatibilidad física depende del modelo, sistema operativo y navegador.
 
-El mando táctil imita un mando PS: stick flotante en el 40 % izquierdo (aparece donde apoyas el pulgar, con zona muerta), ✕ ○ □ △ redondos a la derecha con una palabra que cambia en ataque, defensa y con el arquero con el balón, y R1 (correr), R2 y L1 (cambiar). Usa el mismo mapeo PS que el mando físico: □ tiro, ○ centro, ✕ pase, △ filtrado. Mantén para cargar y suelta para ejecutar; levantar el dedo en cualquier punto, también fuera del botón, ejecuta la acción. Deslizar el dedo a otro botón lo suma (amago). Aparece solo tras un toque real o con puntero táctil y se oculta al usar teclado o mando; nunca depende del tamaño de la ventana. En vertical pide girar el teléfono. En un saque humano, apunta y pulsa pase o tiro; al agotarse seis segundos se ejecuta automáticamente. Los penaltis siempre se lanzan hacia la portería rival.
+El mando táctil imita un mando PS: stick flotante en el 40 % izquierdo (aparece donde apoyas el pulgar, con zona muerta), ✕ ○ □ △ redondos a la derecha, y R1, R2, L1 y L2 (solo en tu tiro libre). Usa el mismo mapeo PS que el mando físico: □ tiro, ○ centro, ✕ pase, △ filtrado. Mantén para cargar y suelta para ejecutar; levantar el dedo en cualquier punto, también fuera del botón, ejecuta la acción. Deslizar el dedo a otro botón lo suma (amago). Aparece solo tras un toque real o con puntero táctil y se oculta al usar teclado o mando; nunca depende del tamaño de la ventana. En vertical el partido se pausa. En un saque humano, apunta y pulsa pase o tiro; al agotarse seis segundos se ejecuta automáticamente. Los penaltis siempre se lanzan hacia la portería rival.
 
 ## Laboratorio y evaluación
 
