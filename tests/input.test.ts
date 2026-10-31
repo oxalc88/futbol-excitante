@@ -390,7 +390,9 @@ test('keeper keyboard and pad switches are isolated edges and clear on pause',t=
  assert(!input.sample(1,0).switchKeeper);assert(!input.sample(1,1).switchKeeper);
  pads.push(pad(0),pad(1));input.sample(2,0);input.sample(2,1);
  pads[0]=pad(0,[11]);pads[1]=pad(1,[11]);
- assert(input.sample(3,0).switchKeeper);assert(input.sample(3,1).switchKeeper);
+ assert.equal(input.sample(3,0).switchKeeper,false);assert.equal(input.sample(3,1).switchKeeper,false);
+ let switched=[false,false];for(let tick=4;tick<=9;tick++){switched=[input.sample(tick,0).switchKeeper===true,input.sample(tick,1).switchKeeper===true];}
+ assert.deepEqual(switched,[true,true]);
  input.clear();input.enabled=false;
  assert(!input.sample(4,0).switchKeeper);
  input.enabled=true;assert(!input.sample(5,0).switchKeeper);
@@ -417,7 +419,12 @@ for(const source of ['keyboard','gamepad'] as const)test(`browser ${source} adap
   for(const entering of [true,false]){
    if(source==='keyboard')key('keydown',slot===0?'KeyR':'Numpad8');
    if(source==='gamepad')pads[slot]=pad(slot,[11]);
-   sim.applyInputs([input.sample(sim.tick,0),input.sample(sim.tick,1)]);sim.step();
+   let reached=false;
+   for(let i=0;i<(source==='gamepad'?8:1);i++){
+    const before=sim.snapshot().selected[slot]===keeper.id;sim.applyInputs([input.sample(sim.tick,0),input.sample(sim.tick,1)]);sim.step();
+    const after=sim.snapshot().selected[slot]===keeper.id;if(after===entering&&after!==before){reached=true;break;}
+   }
+   assert(reached,'cursor switch arrives on the edge for keyboard or after the gamepad wait');
    const world=sim.snapshot();assert.equal(world.selected[slot]===keeper.id,entering);
    assert.equal(world.players.find(p=>p.id===keeper.id)!.manualControl,entering?true:undefined);
    const hash=sim.stateHash();assert(sim.presentation().players.every(p=>!('manualControl' in p)));assert.equal(sim.stateHash(),hash);

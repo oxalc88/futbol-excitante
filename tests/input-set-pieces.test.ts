@@ -68,8 +68,16 @@ test('attacking penalty panenka and corner strategy edge',t=>{
   assert.equal(input.sample(1,0).panenka,true);
   key('keyup','KeyQ');
   input.setRestart([{kind:'corner',attacking:true},null] as Restart);
-  key('keydown','KeyD');key('keyup','KeyD');
-  assert.equal(input.sample(2,0).cornerSide,'right');
+  key('keydown','KeyD');
+  const aimed=input.sample(2,0);assert.equal(aimed.cornerSide,undefined);assert.ok(aimed.aim.x>0);
+  key('keyup','KeyD');
+  key('keydown','Digit4');key('keyup','Digit4');
+  assert.equal(input.sample(3,0).cornerSide,'right');
+  input.setRestart([{kind:'corner',attacking:false},null] as Restart);
+  key('keydown','Digit1');key('keyup','Digit1');assert.equal(input.sample(4,0).cornerSide,'up');
+  input.setRestart([null,{kind:'corner',attacking:true}] as Restart);
+  key('keydown','NumpadAdd');key('keyup','NumpadAdd');assert.equal(input.sample(5,1).cornerSide,'right');
+  key('keydown','KeyA');key('keyup','KeyA');assert.equal(input.sample(6,0).cornerSide,undefined);
 });
 
 test('defending free kick: wall jump, wall charge and keeper move',t=>{

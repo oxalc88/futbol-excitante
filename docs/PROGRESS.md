@@ -2,6 +2,30 @@
 
 Una entrada por cada PR de capacidad fusionado en `main`. Las horas están en hora de Lima (UTC-5). Las entradas más recientes van primero.
 
+## 2026-10-31 00:03 — PR pendiente (PR #TBD) · Pantallas y controles como en PES
+- **Qué cambia para el jugador:**
+  - Al terminar el partido ves «Final» con el marcador, «Revancha», «Volver al menú», «Estadísticas» y «Guardar repetición». Ya no aparece «PAUSA».
+  - La pausa tiene «Seguir jugando», «Controles», «Cámara», «Estadísticas», «Sonido» y «Salir al menú». Salir pide confirmación.
+  - «Partido ☰» abre la pausa. La barra solo tiene pausa y pantalla completa. En pausa se oculta el mando táctil.
+  - Controles tiene pestañas Teclado, Mando y Táctil, por situación. En el teléfono se lee sin deslizar de lado.
+  - Se fueron «A la cancha.», la ventana online, «Semilla» y el selector de archivo en inglés.
+  - En vertical aparece un ícono para girar y el partido se pausa.
+  - En los córners la cámara muestra al lanzador. El minimapa y la ficha se apartan.
+  - Teclado: la estrategia de córner va con 1 2 3 4 (J2: Num / * - +). WASD solo apunta.
+  - En el mando, L1+L2+L3+R3 en cualquier orden ya no cambia de jugador antes de simular la falta.
+- **Qué probar:**
+  - Termina un partido de 2 minutos. Abre y cierra Estadísticas. Pulsa Revancha.
+  - En pausa, recorre todas las opciones con mando, teclado y dedo.
+  - Abre Controles en un teléfono vertical.
+  - Provoca un córner a favor y en contra en PC y en el teléfono horizontal.
+- **Qué se rompe o cambia:**
+  - Cámara, estadísticas y sonido ya no están en la barra: están en la pausa.
+  - La semilla del partido personalizado es fija (2017). Las semillas siguen en el laboratorio. El menú de configuración puede requerir desplazamiento.
+  - La estrategia de córner del teclado cambió de tecla.
+  - El cambio de jugador con L1 llega al soltar L1 o a los 100 ms.
+  - Sin cambios en el motor ni en `eval/baseline.json` (0/276).
+- **Prueba automática:** pasos `fulltime-e2e`, `pause-e2e`, `controls-e2e`, `ui-text-e2e` y `corner-e2e` en `scripts/verify.sh`. touch-e2e: etapa 8 más estricta y etapa 11 vertical. Capturas en `/workspace/fe-audit-prs/prA/shots/after/`.
+
 ## 2026-10-29 13:06 — PR pendiente ([#87](https://github.com/oxalc88/futbol-excitante/pull/87)) · Prueba de defensa estable con carga
 - **Qué cambia para el jugador:** nada en el juego.
 - **Qué cambia para el desarrollo:** la prueba defense-e2e mide la velocidad de presión y de contención por ticks de simulación (normalizada por la velocidad base de cada jugador) y exige que la media de la presión supere en 20 % tanto la media como el pico de la contención. Un toque de un compañero (posesión disputada) o un cambio de portador repite la etapa; la caída de un indicador con la misma posesión sigue siendo un fallo.

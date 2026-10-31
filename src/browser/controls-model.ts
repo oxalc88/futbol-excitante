@@ -100,3 +100,16 @@ function groupOfEntry(id:string,group:ControlsGroup):boolean{
   if(id==='cornerStrategy')return group==='set-piece';
   const r=PES_2017_PS4_ROWS.find(x=>x.id===id),t=ROW_TEXT[id];return !!r&&groupOf(id,r,t)===group;
 }
+
+
+/** Markdown source for the README: all device tabs share the same controls rows. */
+export function controlsMarkdown():string{
+  const tabs=['keyboard','pad','touch'] as const,all=new Map<string,{label:string;group:ControlsGroup;entries:Partial<Record<ControlsTab,string[]>>}>();
+  for(const tab of tabs)for(const section of controlsTab(tab))for(const entry of section.entries){
+    const current=all.get(entry.id)??{label:entry.label,group:section.group,entries:{}};current.entries[tab]=entry.cells;all.set(entry.id,current);
+  }
+  const cell=(value:string|undefined)=>value?value.replaceAll('|','\\|'):'—';
+  return GROUP_ORDER.flatMap(group=>{const rows=[...all.values()].filter(row=>row.group===group);if(!rows.length)return[];
+    return[`### ${GROUP_TITLES[group]}`,'','| Acción | Jugador 1 | Jugador 2 | Mando PS4 | Táctil |','|---|---|---|---|---|',...rows.map(row=>{const k=row.entries.keyboard??[],p=row.entries.pad??[],t=row.entries.touch??[];return`| ${cell(row.label)} | ${cell(k[0])} | ${cell(k[1])} | ${cell(p[0])} | ${cell(t[0])} |`;}),''];
+  }).join('\n').trimEnd();
+}

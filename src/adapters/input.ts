@@ -126,7 +126,7 @@ export class BrowserInput {
       if(chargeCode!==undefined){const start=this.charges.get(chargeCode);if(start!==undefined)f.wallCharge=clamp((performance.now()-start)/850,0,1);}
       if((held('setKeeperMove')||sp.kind==='penalty')&&moveActive)f.keeperMove={...movement};
     }
-    if(sp.kind==='corner')for(const [code,dir] of [[move[0],'up'],[move[1],'down'],[move[2],'left'],[move[3],'right']] as const)if(code&&this.edges.has(code)){f.cornerSide=dir;break;}
+    if(sp.kind==='corner'){const strategy=keys('cornerStrategy');for(const [code,dir] of [[strategy[0],'up'],[strategy[1],'down'],[strategy[2],'left'],[strategy[3],'right']] as const)if(code&&this.edges.has(code)){f.cornerSide=dir;break;}}
     return f;
   }
   sample(tick:number,slot:TeamIndex):InputFrame {

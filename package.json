@@ -15,7 +15,8 @@
     "timing:compare": "node --import tsx scripts/measure-game-timing.ts",
     "timing:c7": "node --import tsx scripts/measure-c7-movement.ts",
     "build:lab": "tsc --noEmit && FE_BUILD_LAB=1 vite build",
-    "check:dist": "node scripts/check-dist.mjs"
+    "check:dist": "node scripts/check-dist.mjs",
+    "controls:readme": "node --import tsx scripts/controls-readme.ts"
   },
   "dependencies": {
     "three": "0.180.0"

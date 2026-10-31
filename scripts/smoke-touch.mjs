@@ -74,7 +74,7 @@ function check(value, message) { checks++; if (!value) throw new Error(message);
 // The pad shows glyphs only: each word lives in data-action.
 const ROWS = {
   attack: { cross:'Pase', circle:'Centro', square:'Tiro', triangle:'Filtrado' },
-  defence: { cross:'Entrada', circle:'Barrida', square:'Despeje', triangle:'Presión' },
+  defence: { cross:'Entrada', circle:'Barrida', square:'Despeje', triangle:'' },
   hold: { cross:'Mano', circle:'Volea', square:'Patear', triangle:'Al espacio' },
 };
 // Words of the old text panel and of every pad label row: no plain rectangular

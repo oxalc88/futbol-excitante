@@ -116,7 +116,7 @@ test('labels pick one row per context', () => {
   const attack = touchLabels({ defending: false, aerial: false, keeper: false, hold: false });
   assert.deepEqual(attack, { cross: 'Pase', circle: 'Centro', square: 'Tiro', triangle: 'Filtrado' });
   const defense = touchLabels({ defending: true, aerial: false, keeper: false, hold: false });
-  assert.deepEqual(defense, { cross: 'Entrada', circle: 'Barrida', square: 'Despeje', triangle: 'Presión' });
+  assert.deepEqual(defense, { cross: 'Entrada', circle: 'Barrida', square: 'Despeje', triangle: '' });
   const keeper = touchLabels({ defending: true, aerial: false, keeper: true, hold: false });
   assert.deepEqual(keeper, { cross: 'Lanzarse', circle: 'Barrida', square: 'Despeje', triangle: 'Salir' });
   const aerial = touchLabels({ defending: false, aerial: true, keeper: false, hold: false });
@@ -129,7 +129,7 @@ test('labels pick one row per context', () => {
     for (const key of ['cross', 'circle', 'square', 'triangle'] as const) {
       const max = row[key] === 'Al espacio' ? 10 : 9;
       assert(row[key].length <= max, `${row[key]} is too long`);
-      assert(row[key].length > 0, 'empty label');
+      if(key==='triangle'&&row===defense)assert.equal(row[key],'');else assert(row[key].length>0,'empty label');
     }
   }
 });
@@ -173,7 +173,7 @@ test('l1 + r2 held together reads r3 and no l1 or r2', () => {
   assert.equal(sample(pad, mapper, 0).switchPlayer, false);
   pad.press(1, 'l1');
   assert.equal(pad.reading(true).buttons[PS_BUTTON.l1].pressed, true);
-  assert.equal(sample(pad, mapper, 1).switchPlayer, true, 'l1 alone still switches player');
+  assert.equal(sample(pad, mapper, 1).switchPlayer, false, 'l1 waits for release or chord');
   pad.press(2, 'r2');
   const reading = pad.reading(true);
   assert.equal(reading.buttons[PS_BUTTON.l1].pressed, false);
@@ -244,7 +244,7 @@ test('keeper combo latches through either release order and one re-press', () =>
     assert.equal(cleanReading.buttons[PS_BUTTON.r3].pressed, false, `${first}: the latch is open`);
     // Fresh L1 after both up switches player, and the next combo still works.
     pad.press(1, 'l1');
-    assert.equal(sample(pad, mapper, 6).switchPlayer, true, `${first}: fresh l1 after both up`);
+    assert.equal(sample(pad, mapper, 6).switchPlayer, false, `${first}: fresh l1 waits`);
     pad.press(2, 'r2');
     const next = sample(pad, mapper, 7);
     assert.equal(next.switchKeeper, true, `${first}: the next combo switches the keeper`);
@@ -267,11 +267,11 @@ test('the latch ends when both buttons lift between two readings', () => {
   assert.equal(reading.buttons[PS_BUTTON.l1].pressed, true, 'the fresh l1 reads alone');
   assert.equal(reading.buttons[PS_BUTTON.r3].pressed, false, 'the latch already ended');
   const f = sample(pad, mapper, 2);
-  assert.equal(f.switchPlayer, true, 'the fresh l1 after both up switches player');
-  assert.equal(f.switchKeeper, false);
-  // The next combo still gives its own keeper switch.
-  pad.press(2, 'r2');
-  assert.equal(sample(pad, mapper, 3).switchKeeper, true, 'the next combo switches the keeper');
+  assert.equal(f.switchPlayer, false, 'fresh l1 waits');assert.equal(f.switchKeeper, false);
+  // A release still switches once; a subsequent combo still gets its own keeper switch.
+  pad.release(1);assert.equal(sample(pad,mapper,3).switchPlayer,true);
+  pad.press(1,'l1');pad.press(2, 'r2');
+  assert.equal(sample(pad, mapper, 4).switchKeeper, true, 'the next combo switches the keeper');
 });
 
 test('clear drops the keeper latch', () => {
@@ -286,8 +286,9 @@ test('clear drops the keeper latch', () => {
   const reading = pad.reading(true);
   assert.equal(reading.buttons[PS_BUTTON.l1].pressed, true, 'after clear the l1 is a fresh press');
   assert.equal(reading.buttons[PS_BUTTON.r3].pressed, false);
-  assert.equal(sample(pad, mapper, 2).switchPlayer, true, 'the l1 switches player again');
+  assert.equal(sample(pad, mapper, 2).switchPlayer, false, 'l1 waits after clear');
   assert.equal(sample(pad, mapper, 2).switchKeeper, false);
+  pad.release(1);assert.equal(sample(pad,mapper,3).switchPlayer,true);
 });
 
 test('keeper dive labels win over the aerial row, as the mapper dives', () => {

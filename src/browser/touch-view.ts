@@ -128,7 +128,7 @@ export function mountTouchPad(root: HTMLElement, input: BrowserInput): { update(
       for (const name of FACE) {
         const button = pad.querySelector<HTMLElement>(`.tp-${name}`)!;
         button.dataset.action = labels[name];
-        button.setAttribute('aria-label', `Botón ${GLYPH[name]}: ${labels[name]}`);
+        button.setAttribute('aria-label', labels[name] ? `Botón ${GLYPH[name]}: ${labels[name]}` : `Botón ${GLYPH[name]}`);
       }
       // L2 shows only while the own waiting free kick of slot 0 waits: that is
       // the one touch state where L2 gives the kick to the second taker.

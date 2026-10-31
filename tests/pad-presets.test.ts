@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  PES_2017_PS4_PRESET, PES_2017_PS4_ROWS, KEYBOARD_MAP, KEYBOARD_MOVE, PS_GLYPHS, PS_GLYPH_BY_BUTTON, PS_BUTTON, TACKLE_TAP_TICKS,
+  PES_2017_PS4_PRESET, PES_2017_PS4_ROWS, KEYBOARD_MAP, KEYBOARD_MOVE, PS_GLYPHS, PS_GLYPH_BY_BUTTON, PS_BUTTON, TACKLE_TAP_TICKS, CHORD_WAIT_TICKS,
   buttonConflicts, keyboardConflicts, pesButton, pesHeader, pesRow, pesRows,
   type PadContext, type PadPresetRow, type PsGlyph,
 } from '../src/browser/pad-presets';
@@ -117,7 +117,7 @@ const KEYS: readonly [string, readonly string[], readonly string[]][] = [
   ['wallHold', ['KeyJ'], ['Numpad1']],
   ['wallCharge', ['KeyI'], ['Numpad5']],
   ['setKeeperMove', ['KeyL'], ['Numpad3']],
-  ['cornerStrategy', ['KeyW', 'KeyS', 'KeyA', 'KeyD'], ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']],
+  ['cornerStrategy', ['Digit1', 'Digit2', 'Digit3', 'Digit4'], ['NumpadDivide', 'NumpadMultiply', 'NumpadSubtract', 'NumpadAdd']],
 ];
 
 test('preset has the 17 phase-1 rows, the 6 defense rows, the 10 keeper rows and the 13 set-piece rows', () => {
@@ -202,6 +202,7 @@ test('pressure (hold ✕) and standing tackle (✕ ×2) are separate gestures', 
   const pressure = pesRow('pressure');
   const tackle = pesRow('standingTackle');
   assert.equal(TACKLE_TAP_TICKS, 15);
+  assert.equal(CHORD_WAIT_TICKS, 6);
   assert.equal(pressure.text, '✕ hold');
   assert.equal(tackle.text, '✕ ×2');
   assert.equal(pressure.context, 'defense');
@@ -384,14 +385,20 @@ test('through row: △ plays the through ball only with the ball', () => {
   assert.equal(press([PS_BUTTON.triangle], true).action, undefined);
 });
 
-test('switch player row: L1 changes the cursor in both contexts', () => {
+test('switch player row: L1 changes the cursor on release in both contexts', () => {
   assert.equal(pesRow('switchPlayer').button, PS_BUTTON.l1);
-  assert.equal(press([PS_BUTTON.l1]).switchPlayer, true);
-  assert.equal(press([PS_BUTTON.l1], true).switchPlayer, true);
+  const tap=run([{buttons:[PS_BUTTON.l1]},{buttons:[]}]);
+  assert.equal(tap[1].switchPlayer,false);assert.equal(tap[2].switchPlayer,true);
+  const defendingTap=run([{buttons:[PS_BUTTON.l1]},{buttons:[]}],true);assert.equal(defendingTap[2].switchPlayer,true);
   // L1 + ○ is the lob, so it does not change the cursor.
   const frames = run([{ buttons: [PS_BUTTON.l1] }, { buttons: [PS_BUTTON.l1, PS_BUTTON.circle] }]);
   assert.equal(frames[2].action, 'lob');
   assert.equal(frames[2].switchPlayer, false);
+});
+
+test('holding L1 switches once at the 100 ms chord wait',()=>{
+ const held=Array.from({length:CHORD_WAIT_TICKS+1},()=>({buttons:[PS_BUTTON.l1]})),frames=run(held);
+ assert.equal(frames[CHORD_WAIT_TICKS].switchPlayer,false);assert.equal(frames[CHORD_WAIT_TICKS+1].switchPlayer,true);assert.equal(frames.filter(f=>f.switchPlayer).length,1);
 });
 
 test('pause row: OPTIONS starts the pause on an edge', () => {
@@ -587,9 +594,24 @@ test('camera row: the touchpad click starts one camera change on an edge', () =>
   assert.equal(mapper.pauseRequested([unknown]), false);
 });
 
-test('R3 keeps the keeper switch as an edge', () => {
-  const frames = run([{ buttons: [PS_BUTTON.r3] }, { buttons: [PS_BUTTON.r3] }, { buttons: [] }]);
-  assert.equal(frames[1].switchKeeper, true);
-  assert.equal(frames[2].switchKeeper, false);
-  assert.equal(frames[3].switchKeeper, false);
+test('R3 alone still switches the keeper once on release or after the wait', () => {
+  const tap=run([{buttons:[PS_BUTTON.r3]},{buttons:[]}]);assert.equal(tap[1].switchKeeper,false);assert.equal(tap[2].switchKeeper,true);
+  const held=Array.from({length:CHORD_WAIT_TICKS+1},()=>({buttons:[PS_BUTTON.r3]}));const frames=run(held);assert.equal(frames[CHORD_WAIT_TICKS+1].switchKeeper,true);
+});
+
+test('L1 + L2 + L3 + R3 in any order never switches before one foul dive',()=>{
+ const permutations=(a:number[]):number[][]=>a.length? a.flatMap((x,i)=>permutations([...a.slice(0,i),...a.slice(i+1)]).map(t=>[x,...t])):[[]];
+ for(const spacing of [1,4])for(const order of permutations([PS_BUTTON.l1,PS_BUTTON.l2,PS_BUTTON.l3,PS_BUTTON.r3])){
+  const mapper=new ControllerMapper();let tick=0,held:number[]=[];const frames=[mapper.sample([pad()],tick++,0)];
+  for(let i=0;i<order.length;i++){
+   if(i>0)for(let wait=1;wait<spacing;wait++)frames.push(mapper.sample([pad(0,held)],tick++,0));
+   held=[...held,order[i]];frames.push(mapper.sample([pad(0,held)],tick++,0));
+  }
+  for(let i=0;i<10;i++)frames.push(mapper.sample([pad(0,held)],tick++,0));frames.push(mapper.sample([pad()],tick++,0));
+  assert.equal(frames.filter(f=>f.switchPlayer).length,0,`switchPlayer ${spacing}: ${order}`);assert.equal(frames.filter(f=>f.switchKeeper).length,0,`switchKeeper ${spacing}: ${order}`);assert.equal(frames.filter(f=>f.simulateDive).length,1,`dive ${spacing}: ${order}`);
+ }
+});
+
+test('L1 then ○ inside the chord window gives lob and no switch',()=>{
+ const frames=run([{buttons:[PS_BUTTON.l1]},{buttons:[PS_BUTTON.l1,PS_BUTTON.circle]},{buttons:[]}]);assert.equal(frames[2].action,'lob');assert.equal(frames.some(f=>f.switchPlayer),false);
 });

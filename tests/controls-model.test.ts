@@ -55,9 +55,9 @@ test('touch tab shows only supported controls and both touch-only actions',()=>{
 test('corner strategies use the direction rules and omit the unused defending down key',()=>{
   const attack=find('pad','cornerAttack').cells[0],defence=find('pad','cornerDefence').cells[0];
   assert.match(attack,/↑.*↓.*←.*→/);assert.doesNotMatch(defence,/↓/);
-  assert.equal(find('keyboard','cornerAttack').cells[0],'W / S / A / D');
-  assert.equal(find('keyboard','cornerDefence').cells[0],'W / A / D');
-  assert.equal(find('keyboard','cornerDefence').cells[1],'↑ / ← / →');
+  assert.equal(find('keyboard','cornerAttack').cells[0],'1 / 2 / 3 / 4');
+  assert.equal(find('keyboard','cornerDefence').cells[0],'1 / 3 / 4');
+  assert.equal(find('keyboard','cornerDefence').cells[1],'Num / / Num - / Num +');
   assert.equal(entries('touch').some(e=>e.id.startsWith('corner')),false);
 });
 

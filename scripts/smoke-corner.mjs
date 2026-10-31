@@ -13,7 +13,7 @@ try{
    const failures=[];for(const part of ['ball','taker']){const p=state?.[part];if(!p){failures.push(`${part} is not projected`);continue;}const v=layout.viewport;if(p.x<v.x+16||p.y<v.y+16||p.x>v.x+v.w-16||p.y>v.y+v.h-16)failures.push(`${part} outside viewport: ${JSON.stringify(p)}`);for(const b of layout.blocked){if((b.sel==='#radar'||b.sel==='.player-card')&&b.dodge)continue;if(overlap(p,b.rect,6))failures.push(`${part} under ${b.sel}: ${JSON.stringify(p)}`);}}
    await shot(page,'corner',vp,results.length+1,`t${team}-s${side}`);results.push({viewport:vp,team,side,state,failures});
    if(team===0&&side===1){if(spec.touch){const r=await page.locator('.tp-square').boundingBox();await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);}else await page.keyboard.press('KeyK');await page.waitForFunction(()=>window.__fe?.phase==='playing'||window.__feSmoke?.setPieceState()?.restart===null,{timeout:7000}).catch(()=>{});await page.waitForFunction(()=>!document.querySelector('#radar').classList.contains('dodge')&&!document.querySelector('.player-card').classList.contains('dodge'),{timeout:1000}).catch(()=>failures.push('HUD did not return after kick'));}
-   if(process.env.CORNER_STRICT==='1'&&failures.length)throw Error(`${key}: ${failures.join('; ')}`);
+   if(failures.length)throw Error(`${key}: ${failures.join('; ')}`);
   }
   await context.close();
  }

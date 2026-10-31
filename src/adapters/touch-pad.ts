@@ -31,7 +31,7 @@ export function touchLabels(c: TouchContext): Record<'cross'|'circle'|'square'|'
   if (c.hold) return { cross: 'Mano', circle: 'Volea', square: 'Patear', triangle: 'Al espacio' };
   if (c.keeper && (c.defending || c.aerial)) return { cross: 'Lanzarse', circle: 'Barrida', square: 'Despeje', triangle: 'Salir' };
   if (c.aerial) return { cross: 'Cabeza', circle: 'Cabeza', square: 'Cabeza', triangle: 'Cabeza' };
-  if (c.defending) return { cross: 'Entrada', circle: 'Barrida', square: 'Despeje', triangle: 'Presión' };
+  if (c.defending) return { cross: 'Entrada', circle: 'Barrida', square: 'Despeje', triangle: '' };
   return { cross: 'Pase', circle: 'Centro', square: 'Tiro', triangle: 'Filtrado' };
 }
 
