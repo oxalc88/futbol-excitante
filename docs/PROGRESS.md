@@ -1,5 +1,18 @@
 # Registro de avances
 
+## 2026-10-31 07:15 — PR pendiente (PR #TBD) · Ajustes de pantallas y controles · sin issue
+- **Qué cambia para el jugador:**
+  - Las acciones del final quedan alineadas y con el mismo ancho en escritorio y móvil.
+  - En controles, el mando permite recorrer la tabla; las estrategias de córner del teclado muestran cada tecla en su propia línea.
+  - Una tecla de movimiento mantenida sigue activa al cambiar el tamaño de la ventana.
+  - Los botones táctiles no cubren la zona de penalti en córners horizontales.
+- **Qué probar:**
+  - Revisa final, controles y córners en los tamaños de pantalla del smoke.
+  - Desplázate hasta la última fila con el mando, mantén W al redimensionar y comprueba las cuatro esquinas.
+- **Qué se rompe o cambia:**
+  - Las estrategias de córner del teclado ocupan varias líneas en una celda.
+  - Se elimina un gesto de controles sin fila asociada.
+
 Una entrada por cada PR de capacidad. La PR añade su entrada pendiente y su enlace. Cuando la PR se fusiona, la siguiente PR que edita este archivo elimina la marca de pendiente. Título: `## AAAA-MM-DD HH:MM — [#N](enlace de la PR) · Título · [#I](enlace del issue)`, o `· sin issue`. Hora de Lima (UTC-5). Lo más reciente primero. `tests/docs-format.test.ts` comprueba el formato y el orden.
 
 ## 2026-10-31 00:03 — PR pendiente ([#89](https://github.com/oxalc88/futbol-excitante/pull/89)) · Pantallas y controles como en PES · sin issue
