@@ -2,7 +2,7 @@
 
 Una entrada por cada PR de capacidad. La PR añade su entrada pendiente y su enlace. Cuando la PR se fusiona, la siguiente PR que edita este archivo elimina la marca de pendiente. Título: `## AAAA-MM-DD HH:MM — [#N](enlace de la PR) · Título · [#I](enlace del issue)`, o `· sin issue`. Hora de Lima (UTC-5). Lo más reciente primero. `tests/docs-format.test.ts` comprueba el formato y el orden.
 
-## 2026-10-30 22:46 — PR pendiente · Documentos y reglas de trabajo al día · sin issue
+## 2026-10-30 22:46 — PR pendiente ([#88](https://github.com/oxalc88/futbol-excitante/pull/88)) · Documentos y reglas de trabajo al día · sin issue
 - **Qué cambia para el jugador:** nada en el juego.
 - **Qué cambia para el desarrollo:** `AGENTS.md` dice qué modelo planifica, implementa, prueba y revisa en cada etapa: deepseek-v4-flash aprobado el 28 de octubre; desde el 29, pi con deepseek-v4-flash o glm5.3-flash, Terra solo prueba pantallas y Sol (medium) revisa; en las PR de la auditoría planifica Opus 5.5, implementa Luna, verifica Sol y revisa Opus. La guía de verificación, este registro, la tabla de tokens, la prueba manual de mandos y las notas de C4 dicen lo que hace el juego hoy. Un check nuevo de solo lectura, `pr-body`, falla si la descripción de la PR no sigue la plantilla o no trae el resumen `mode: full` con PASS en cada paso.
 - **Qué probar:** abre una PR con la plantilla vacía: `pr-body` sale en rojo. Pega el resumen del verify completo, nombra los modelos y marca la lista: sale en verde. `build` sigue igual.
