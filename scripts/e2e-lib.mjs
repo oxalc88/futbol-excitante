@@ -19,7 +19,12 @@ export function stop(){if(server&&!server.killed){try{process.kill(-server.pid,'
 export async function launch(){return chromium.launch({executablePath:process.env.CHROME_PATH,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});}
 export async function newPage(browser,{w,h,touch}){
   const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:touch,isMobile:touch});
-  await context.addInitScript(()=>{try{localStorage.setItem('fe.tipsSeen','1');}catch{}});
+  await context.addInitScript(()=>{
+    try{localStorage.setItem('fe.tipsSeen','1');}catch{}
+    window.__fakePads=Array.from({length:4},(_,index)=>({id:`Fake standard ${index}`,index,connected:false,mapping:'standard',axes:[0,0,0,0],buttons:Array.from({length:17},()=>({pressed:false,value:0,touched:false})),timestamp:0}));
+    Object.defineProperty(navigator,'getGamepads',{value:()=>window.__fakePads.map(p=>p.connected?p:null)});
+    window.__pad={connect(slot,connected){const p=window.__fakePads[slot];p.connected=connected;p.timestamp=performance.now();const event=new Event(connected?'gamepadconnected':'gamepaddisconnected');Object.defineProperty(event,'gamepad',{value:p});window.dispatchEvent(event);},button(slot,button,pressed){const p=window.__fakePads[slot];p.buttons[button]={pressed,value:Number(pressed),touched:pressed};p.timestamp=performance.now();},axes(slot,axes){const p=window.__fakePads[slot];p.axes=[...axes];p.timestamp=performance.now();}};
+  });
   const page=await context.newPage();page.setDefaultTimeout(5000);
   page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error'&&!m.text().startsWith('Failed to load resource'))errors.push(m.text());});

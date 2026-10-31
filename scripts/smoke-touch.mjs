@@ -600,8 +600,7 @@ try {
   // defence and a set piece, at two landscape phone sizes; then pause is tapped
   // with the pad visible.
   stage='hud-overlap';
-  const HUD_SEL = ['#pause-btn','#camera-btn','#stats-btn','#sound-btn','#sound-volume',
-    '#fullscreen-btn','.field-toolbar','.scoreboard','#radar'];
+  const HUD_SEL = ['#pause-btn','#fullscreen-btn','.field-toolbar','.scoreboard','#radar'];
   for (const [W, H] of [[844, 390], [932, 430]]) {
     const { context, page } = await newPage(W, H, true);
     await beginPlay(page);
@@ -675,6 +674,7 @@ try {
     await page.touchscreen.tap(c.x, c.y);
     await page.waitForFunction(() => window.__fe?.paused === true
       && !document.querySelector('#pause-overlay').hidden, null, {timeout:5000, polling:100});
+    check(await page.locator('#touch-pad').evaluate(el=>el.hidden), `${W}x${H}: touch pad is visible while paused`);
     check(await page.evaluate(() => window.__fe?.paused === true
       && !document.querySelector('#pause-overlay').hidden), `${W}x${H}: pause did not stick`);
     await evidence(page, `9-hud-${W}x${H}-paused`, { paused: true, pauseCenter: { x: c.x, y: c.y } });

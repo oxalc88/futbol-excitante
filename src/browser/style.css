@@ -45,6 +45,13 @@ button{min-height:44px}.close{min-width:44px;min-height:44px}.bottom-hud{pointer
 .fulltime-actions{display:grid;grid-template-columns:1fr;gap:7px}
 .fulltime-actions button{min-height:42px}
 @media(max-height:560px){#fulltime-dialog{padding:12px;max-height:96dvh}#fulltime-dialog h2{font-size:1.2rem;margin-bottom:2px}.fulltime-score{margin:0 0 6px}.fulltime-score strong{font-size:2rem}.fulltime-actions{grid-template-columns:1fr 1fr;gap:6px}.fulltime-actions button{min-height:38px;padding:.55rem}}
+#pause-overlay{gap:10px;padding:14px;overflow:auto}
+#pause-overlay>strong{font-size:2rem;letter-spacing:.1em}
+.pause-menu{display:grid;grid-template-columns:1fr;gap:7px;width:min(260px,100%)}
+.pause-menu button{min-height:42px;padding:.55rem .75rem;text-align:center}
+.pause-sound{display:grid;grid-template-columns:1fr 70px;align-items:center;gap:8px}
+.pause-sound input{height:42px}
+@media(max-height:560px){#pause-overlay{gap:4px;padding:8px}.pause-menu{width:min(440px,100%);grid-template-columns:1fr 1fr;gap:6px}.pause-menu button{min-height:38px;padding:.4rem;font-size:.8125rem}#pause-overlay>strong{font-size:1.35rem}.pause-sound{grid-template-columns:1fr 60px}.pause-sound input{height:38px}}
 
 /* Keep card identity readable as a separate line at all viewport sizes. */
 #announcement{white-space:pre-line;font-size:clamp(1.1rem,3vw,2.5rem);padding:0 20px;box-sizing:border-box}
