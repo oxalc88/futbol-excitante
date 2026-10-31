@@ -1,10 +1,10 @@
 import type { ActionKind, InputFrame, TeamIndex, Vec2 } from '../contracts/types';
 import { ControllerMapper } from './controller';
 import { TouchPad, type TouchContext } from './touch-pad';
-import { KEYBOARD_MAP, KEYBOARD_MOVE, PES_2017_PS4_ROWS, pesHeader, TACKLE_TAP_TICKS, type KeyRole } from '../browser/pad-presets';
+import { KEYBOARD_MAP, KEYBOARD_MOVE, PES_2017_PS4_ROWS, pesHeader, TACKLE_TAP_TICKS, KEEPER_SWITCH, type KeyRole } from '../browser/pad-presets';
 import { clamp, length, unit } from '../simulation/math';
 // The keeper switch has no preset row. Keep the FE keys.
-const KEEPER_KEYS=['KeyR','Numpad8'] as const;
+const KEEPER_KEYS=[KEEPER_SWITCH.keys.p1[0],KEEPER_SWITCH.keys.p2[0]] as const;
 // Keyboard window of the ✕ ×2 tackle tap: the same time as on the pad.
 const TAP_MS=TACKLE_TAP_TICKS*1000/60;
 // Charge key per slot: player 1 owns slot 0 and player 2 owns slot 1.

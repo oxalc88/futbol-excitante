@@ -1,6 +1,6 @@
 import type { ActionKind, TeamIndex, Vec2 } from '../contracts/types';
 import { clamp, length, unit } from '../simulation/math';
-import { PS_BUTTON, pesButton, TACKLE_TAP_TICKS } from '../browser/pad-presets';
+import { PS_BUTTON, pesButton, TACKLE_TAP_TICKS, KEEPER_SWITCH } from '../browser/pad-presets';
 
 export interface PadReading { index:number; id:string; mapping:string; connected:boolean; axes:readonly number[]; buttons:readonly {pressed:boolean}[] }
 export interface PadFrame { move:Vec2; aim?:Vec2; action?:ActionKind; power:number; sprint:boolean; shield:boolean; switchPlayer:boolean; switchKeeper:boolean;
@@ -18,7 +18,7 @@ const B={
   tackle:pesButton('standingTackle'),slide:pesButton('slide'),
   clearance:pesButton('clearance'),pause:pesButton('pause'),camera:pesButton('camera'),
   // R3 keeps the keeper switch; there is no preset row for it.
-  keeper:PS_BUTTON.r3,
+  keeper:KEEPER_SWITCH.button,
   // Foul-dive chord buttons (L1 + L2 + L3 + R3, R2 decides against the dive).
   l2:PS_BUTTON.l2,r2:PS_BUTTON.r2,l3:PS_BUTTON.l3,
 };

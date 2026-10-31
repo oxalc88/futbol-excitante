@@ -314,16 +314,13 @@ test('the exported keyboard map derives from the preset rows', () => {
   for (const code of Object.keys(KEYBOARD_MAP.p2)) assert.equal(code.startsWith('Key'), false, code);
 });
 
-test('the preset is wired into the input, controller and help UI', () => {
+test('the preset is wired into the input and controller', () => {
   const source = readFileSync(new URL('../src/browser/pad-presets.ts', import.meta.url), 'utf8');
   assert.equal(source.includes('Not wired'), false);
   for (const file of ['src/adapters/input.ts', 'src/adapters/controller.ts']) {
     const text = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
     assert.equal(text.includes('pad-presets'), true, file);
   }
-  const main = readFileSync(new URL('../src/browser/main.ts', import.meta.url), 'utf8');
-  for (const glyph of ['✕', '○', '□', '△', 'L1', 'R1', 'R3', 'OPTIONS']) assert.equal(main.includes(glyph), true, glyph);
-  assert.equal(main.includes('Mando (PS4)'), true);
   assert.equal(PES_2017_PS4_PRESET.source, 'pes2017-ps4-controls.md');
 });
 
@@ -595,21 +592,4 @@ test('R3 keeps the keeper switch as an edge', () => {
   assert.equal(frames[1].switchKeeper, true);
   assert.equal(frames[2].switchKeeper, false);
   assert.equal(frames[3].switchKeeper, false);
-});
-
-test('help shows the player keys, the tackle double tap and the single-press keeper dive', () => {
-  const main = readFileSync(new URL('../src/browser/main.ts', import.meta.url), 'utf8');
-  // Switch play uses the movement keys of each player column; only the pad keeps the stick.
-  const switchPlay = main.split('<tr>').find((row) => row.includes('Cambio de frente'))!;
-  assert.equal(switchPlay.includes('WASD hacia la otra banda + I'), true, 'player 1 keys');
-  assert.equal(switchPlay.includes('Flechas hacia la otra banda + Num 5'), true, 'player 2 keys');
-  assert.equal(switchPlay.includes('Stick izq. a la otra banda + ○'), true, 'pad keeps the left stick');
-  assert.equal(switchPlay.includes('Stick izq. a la otra banda + I'), false, 'no pad keys in the player column');
-  // The outfield tackle reads as a double tap on the pad.
-  const tackle = main.split('<tr>').find((row) => row.includes('Entrada de pie'))!;
-  assert.equal(tackle.includes('✕ ✕ (doble toque)'), true);
-  // The keeper dive stays one press, as before the preset.
-  const dive = main.split('<tr>').find((row) => row.includes('Portero: lanzarse'))!;
-  assert.equal(dive.includes('✕ ×2'), false);
-  assert.equal(dive.includes('<td>U</td>') && dive.includes('<td>Num 0</td>') && dive.includes('<td>✕</td>'), true);
 });

@@ -8,6 +8,8 @@ import type { PadReading } from './controller';
 export type TouchButton = 'cross'|'circle'|'square'|'triangle'|'r1'|'r2'|'l1'|'l2';
 
 export const TOUCH_BUTTONS: readonly TouchButton[] = ['cross','circle','square','triangle','r1','r2','l1','l2'];
+export const TOUCH_GLYPHS = ['✕','○','□','△','R1','R2','L1','L2'] as const;
+export const TOUCH_KEEPER_COMBO = ['L1','R2'] as const;
 
 /** Standard button index of each touch button, from the PS preset. */
 export const TOUCH_BUTTON_INDEX: Record<TouchButton, number> = {
@@ -133,6 +135,7 @@ export class TouchPad {
    * never also switches player through the L1 edge. The latch then keeps both
    * buttons consumed until both physically lift, whatever the release order. */
   reading(connected: boolean): PadReading {
+    // The held touch L1 + R2 keeper chord becomes R3 for the controller mapper.
     const l1 = this.held('l1');
     const r2 = this.held('r2');
     if (l1 && r2) this.keeperLatch = true;

@@ -23,6 +23,9 @@ export const PS_BUTTON = {
   dpadUp: 12, dpadDown: 13, dpadLeft: 14, dpadRight: 15,
 } as const;
 
+/** Keeper cursor switch, separate from the preset rows. */
+export const KEEPER_SWITCH = { button: PS_BUTTON.r3, keys: { p1: ['KeyR'], p2: ['Numpad8'] } } as const;
+
 /** Glyph label for each standard button index used here. */
 export const PS_GLYPH_BY_BUTTON: Readonly<Record<number, PsGlyph>> = {
   0: '✕', 1: '○', 2: '□', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 9: 'OPTIONS', 10: 'L3', 11: 'R3', 17: 'TOUCHPAD',
