@@ -20,6 +20,12 @@ try{
     if(vp==='1280x720'){
       await page.locator('#help-dialog .close').click();await startMatch(page,{mode:'solo'});await page.locator('#menu-btn').click();await page.locator('#pause-controls').click();
       check(await page.locator('#help-dialog').evaluate(el=>el.open),`${vp}: pause controls did not open help`);await page.locator('#help-dialog .close').click();
+    }else if(vp==='390x844'){
+      await page.locator('#help-dialog .close').click();await startMatch(page,{mode:'solo',touch:true});await page.keyboard.press('KeyP');await page.locator('#pause-controls').click();
+      await page.evaluate(()=>window.__pad.connect(0,true));await page.waitForTimeout(100);const first=await page.locator('#help-dialog').evaluate(el=>el.scrollTop);
+      for(let i=0;i<30;i++){await page.evaluate(()=>window.__pad.button(0,13,true));await page.waitForTimeout(90);await page.evaluate(()=>window.__pad.button(0,13,false));await page.waitForTimeout(30);}
+      const end=await page.locator('#help-dialog').evaluate(el=>({top:el.scrollTop,max:el.scrollHeight-el.clientHeight}));check(end.top>first&&end.top>=end.max-2,`${vp}: gamepad d-pad did not scroll controls to last row ${JSON.stringify({first,end})}`);
+      await page.locator('#controls-tab-pad').click();check(await page.locator('#controls-tab-pad').getAttribute('aria-selected')==='true',`${vp}: pad tab stopped working`);await page.locator('#help-dialog .close').click();
     }else await page.locator('#help-dialog .close').click();
     await context.close();results.push({viewport:vp,result:'PASS'});
   }
