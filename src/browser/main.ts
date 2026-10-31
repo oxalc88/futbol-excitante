@@ -19,6 +19,7 @@ import { PeerSession } from '../adapters/network';
 import { attachScrollCue } from './scroll-cue';
 import { defaultControlsTab, SOUND_KEY } from './controls-model';
 import { renderControls } from './controls-view';
+import { dodgeHud } from './hud-dodge';
 
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)as T;
 const app=$('app');
@@ -156,6 +157,17 @@ $('quit-yes').onclick=quitToMenu;
 function updateHud(){
   renderHud(current,config,{guest,replay:!!replay,gamepadCount:input.gamepads.length,charging:input.charging,renderError,replayResult,notice,noticeUntil},$);
   touchPad.update({started});
+  const radar=$('radar'),card=document.querySelector<HTMLElement>('.player-card');
+  const restart=current.restart;
+  let points:{x:number;y:number}[]=[];
+  if(restart&&renderer){
+    const taker=current.players.filter(p=>p.team===restart.team).sort((a,b)=>Math.hypot(a.x-current.ball.x,a.y-current.ball.y)-Math.hypot(b.x-current.ball.x,b.y-current.ball.y))[0];
+    const ballPoint=renderer.screenPoint({x:current.ball.x,y:current.ball.y,z:current.ball.z});
+    const takerPoint=taker?renderer.screenPoint({x:taker.x,y:taker.y,z:0}):null;
+    if(ballPoint)points.push(ballPoint);if(takerPoint)points.push(takerPoint);
+  }
+  const dodge=dodgeHud(points,{radar:radar.getBoundingClientRect(),card:card?.getBoundingClientRect()});
+  radar.classList.toggle('dodge',!!restart&&dodge.radar);card?.classList.toggle('dodge',!!restart&&dodge.card);
   const s=current;
   input.setDirections(guest?[s.teams[1].direction,s.teams[0].direction]:[s.teams[0].direction,s.teams[1].direction]);
 }
@@ -378,12 +390,12 @@ defenseState(slot:0|1=0){
     x:p?.x??null,y:p?.y??null,lastTouchTeam:w.ball.lastTouch?.team??null,lastTouchTick:w.ball.lastTouch?.tick??null};
 },
 // Smoke only: starts the restart of `kind` for `team`, with a four-man wall on the free kick.
-setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
+setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1,side:1|-1=1){
   // A ball out of play from the last step may leave a waiting restart: replace it.
   if(!started||guest||replay||!(current.phase==='playing'||(current.restart&&current.phase!=='kickoff')))return false;
   const L=config.pitch.length/2,W=config.pitch.width/2;
   const dir=sim.snapshot().teams[team].direction;
-  const point=kind==='free-kick'?{x:dir*(L-24),y:0}:kind==='corner'?{x:dir*(L-.3),y:W-.3}:kind==='penalty'?{x:dir*(L-11),y:0}:kind==='throw-in'?{x:dir*10,y:W-.1}:{x:-dir*(L-5.5),y:6};
+  const point=kind==='free-kick'?{x:dir*(L-24),y:0}:kind==='corner'?{x:dir*(L-.3),y:side*(W-.3)}:kind==='penalty'?{x:dir*(L-11),y:0}:kind==='throw-in'?{x:dir*10,y:W-.1}:{x:-dir*(L-5.5),y:6};
   (sim as any).startRestart(kind,team,point);
   if(kind==='free-kick'){
     const w=sim.snapshot();
@@ -398,6 +410,7 @@ setPiece(kind:'free-kick'|'corner'|'penalty'|'throw-in'|'goal-kick',team:0|1){
 },
 // Smoke only: reads back the waiting restart, the wall jumps, the keepers and the cursors.
 setPieceState(){const w=sim.snapshot();return {phase:w.phase,tick:w.tick,restart:w.restart?structuredClone(w.restart):null,wallJump:w.players.filter(p=>p.wallJump!==undefined&&p.wallJump>w.tick).map(p=>p.id),keepers:w.players.filter(p=>p.keeper).map(p=>({id:p.id,team:p.team,x:p.x,y:p.y})),selected:[...w.selected],restriction:w.restartRestriction?{...w.restartRestriction}:null};}
+,cornerView(){const w=sim.snapshot(),r=w.restart;if(!r)return null;const taker=w.players.find(p=>p.id===r.taker);return{ball:renderer?.screenPoint({x:w.ball.x,y:w.ball.y,z:w.ball.z})??null,taker:taker?renderer?.screenPoint({x:taker.x,y:taker.y,z:0})??null:null,kind:r.kind,team:r.team};}
 }});
 // A / Cross (button 0) on any pad starts quick play from the menu.
 // Nothing acts while another dialog sits on the setup.

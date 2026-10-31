@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { Config, DeepReadonly, PlayerState, ReadonlyPresentation, TeamIndex } from '../contracts/types';
-import { CameraRig, PLAYER_PROPORTIONS, playerHeightScale, playerPose, contactPose, EMBODIMENT_MAPPING, solveLimb, PALETTE, PITCH_PALETTES, type PitchPaletteId, teamSilhouettes, keeperSilhouette, type Kit, type SilhouetteColors } from './presentation-model';
+import { CameraRig, projectPoint, PLAYER_PROPORTIONS, playerHeightScale, playerPose, contactPose, EMBODIMENT_MAPPING, solveLimb, PALETTE, PITCH_PALETTES, type PitchPaletteId, teamSilhouettes, keeperSilhouette, type Kit, type SilhouetteColors } from './presentation-model';
 import { clamp } from '../simulation/math';
 export type { Kit } from './presentation-model';
 interface Actor { contact:THREE.Group; segments:THREE.Mesh[]; root:THREE.Group; body:THREE.Group; arms:THREE.Group[]; legs:THREE.Group[]; elbows:THREE.Group[]; knees:THREE.Group[]; ring:THREE.Mesh; label:THREE.Sprite; }
@@ -9,7 +9,7 @@ export class FootballRenderer {
   private renderer:THREE.WebGLRenderer;private actors=new Map<string,Actor>();private ball:THREE.Mesh;private ballShadow:THREE.Mesh;private ballMarker:THREE.Mesh;
   private environment=new THREE.Group();private radar:CanvasRenderingContext2D;private target=new THREE.Vector3();private cameraReady=false;
   private config:DeepReadonly<Config>;private mode:'broadcast'|'tactical'|'close'='broadcast';private resizeObserver:ResizeObserver;
-  private cameraRig=new CameraRig();
+  private cameraRig=new CameraRig();private lastPose:ReturnType<CameraRig['pose']>|null=null;private lastAspect=1;
   private materials=new Map<string,THREE.MeshToonMaterial>();private outlines:THREE.Mesh[]=[];
   private outlineMaterial=new THREE.MeshBasicMaterial({color:PALETTE.outline,side:THREE.BackSide});
   private pitchMaterials=PALETTE.pitch.map(color=>new THREE.MeshToonMaterial({color}));
@@ -22,6 +22,7 @@ export class FootballRenderer {
   // Three hulls per player. Reuse each source geometry and one unlit material.
   private outline(mesh:THREE.Mesh,scale:number){const hull=new THREE.Mesh(mesh.geometry,this.outlineMaterial);hull.scale.setScalar(scale);hull.visible=this.quality!=='low';mesh.add(hull);this.outlines.push(hull);}
   advanceCamera(s:ReadonlyPresentation){this.cameraRig.advance(s);}
+  screenPoint(p:{x:number,y:number,z:number}){if(!this.lastPose)return null;const c=this.renderer.domElement,r=c.getBoundingClientRect(),n=projectPoint(this.lastPose,this.lastAspect,p);if(!n.front)return null;return{x:r.left+(n.x+1)*r.width/2,y:r.top+(1-n.y)*r.height/2};}
   private kits:[Kit,Kit];private quality='high';private animations=true;
   constructor(private container:HTMLElement,radar:HTMLCanvasElement,config:DeepReadonly<Config>,kits:[Kit,Kit],createRenderer:()=>THREE.WebGLRenderer=()=>new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'})){
     this.config=config;this.kits=kits;this.teams=teamSilhouettes(kits);this.keeper=keeperSilhouette(this.teams);this.radar=radar.getContext('2d')!;
@@ -147,7 +148,7 @@ export class FootballRenderer {
     const b=current.ball,pb=previous.ball;this.ball.position.set(THREE.MathUtils.lerp(pb.x,b.x,blend),THREE.MathUtils.lerp(pb.z,b.z,blend),THREE.MathUtils.lerp(pb.y,b.y,blend));
     this.ball.rotation.x=this.cameraRig.rotation.x;this.ball.rotation.z=this.cameraRig.rotation.z;
     this.ballShadow.position.set(this.ball.position.x,.03,this.ball.position.z);this.ballShadow.scale.setScalar(1+Math.min(b.z,8)*.13);(this.ballShadow.material as THREE.MeshBasicMaterial).opacity=.85/(1+b.z*.2);
-    this.cameraRig.advance(current);const camera=this.cameraRig.pose(this.camera.aspect,blend);
+    this.cameraRig.advance(current);const camera=this.cameraRig.pose(this.camera.aspect,blend);this.lastPose=camera;this.lastAspect=this.camera.aspect;
     this.camera.position.set(camera.position.x,camera.position.z,camera.position.y);this.camera.lookAt(camera.target.x,0,camera.target.y);
     this.ballMarker.position.set(this.ball.position.x,.04,this.ball.position.z);this.ballMarker.scale.setScalar(clamp(this.camera.position.distanceTo(this.ball.position)/45,1,2.2));
     this.renderer.render(this.scene,this.camera);this.drawRadar(current);
