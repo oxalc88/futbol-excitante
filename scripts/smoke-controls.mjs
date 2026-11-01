@@ -28,6 +28,17 @@ try{
       for(const origin of ['menu','pause']){
         if(origin==='menu')await page.locator('#menu-help-btn').click();
         if(origin==='pause'){await startMatch(page,{mode:'solo',touch:false});await page.keyboard.press('KeyP');await page.locator('#pause-controls').click();}
+        const initialTab=await page.locator('#help-dialog [role=tab][aria-selected=true]').getAttribute('id');
+        await page.evaluate(()=>window.__pad.button(0,0,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,0,false));await page.waitForTimeout(110);
+        check(await page.locator('#help-dialog').evaluate(el=>el.open),`${vp} ${origin}: A closed Controls on open`);
+        const initialIndex=['controls-tab-keyboard','controls-tab-pad','controls-tab-touch'].indexOf(initialTab);
+        await page.evaluate(()=>window.__pad.button(0,15,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,15,false));await page.waitForTimeout(110);
+        await page.evaluate(()=>window.__pad.button(0,15,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,15,false));await page.waitForTimeout(110);
+        await page.evaluate(()=>window.__pad.button(0,0,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,0,false));await page.waitForTimeout(110);
+        const twoRight=['keyboard','pad','touch'][(initialIndex+2)%3];check(await page.locator(`#controls-tab-${twoRight}`).getAttribute('aria-selected')==='true',`${vp} ${origin}: Right, Right, A did not activate ${twoRight}`);
+        for(const button of [14,14]){await page.evaluate(b=>window.__pad.button(0,b,true),button);await page.waitForTimeout(120);await page.evaluate(b=>window.__pad.button(0,b,false),button);await page.waitForTimeout(110);}
+        await page.evaluate(()=>window.__pad.button(0,0,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,0,false));await page.waitForTimeout(110);
+        check(await page.locator(`#controls-tab-${initialTab.replace('controls-tab-','')}`).getAttribute('aria-selected')==='true',`${vp} ${origin}: Left, Left, A did not return to ${initialTab}`);
         for(const tab of ['keyboard','pad','touch']){
           await page.locator(`#controls-tab-${tab}`).click();
           const records=[];records.push(await scrollWithPad(page,'dpad',13,1,1));records.push(await scrollWithPad(page,'dpad',12,1,-1));records.push(await scrollWithPad(page,'stick',0,1,1));records.push(await scrollWithPad(page,'stick',0,1,-1));

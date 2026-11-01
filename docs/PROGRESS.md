@@ -1,9 +1,9 @@
 # Registro de avances
 
-## 2026-10-31 08:37 — PR pendiente · Ajustes de pantallas y controles · sin issue
+## 2026-10-31 08:37 — PR pendiente ([#90](https://github.com/oxalc88/futbol-excitante/pull/90)) · Ajustes de pantallas y controles · sin issue
 - **Qué cambia para el jugador:**
   - Las acciones del final quedan alineadas y con el mismo ancho en escritorio y móvil.
-  - En Controles, la cruceta y el stick recorren cada pestaña hasta sus extremos; A cambia de pestaña y B cierra.
+  - En Controles, la cruceta y el stick recorren cada pestaña hasta sus extremos; A cambia de pestaña y B cierra. Al abrir, el foco queda en la pestaña activa; dos toques a la derecha o a la izquierda avanzan dos pestañas antes de A.
   - Las estrategias de córner muestran una línea por tecla, y las cuatro acciones del final centran sus rótulos.
   - Una tecla de movimiento mantenida sigue activa al cambiar el tamaño de la ventana; los botones táctiles no se superponen con el área penal.
 - **Qué probar:**
