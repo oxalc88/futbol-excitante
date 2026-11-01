@@ -33,7 +33,7 @@ try{
   // Physical pad navigation on desktop.
   const {context,page}=await newPage(browser,{w:1280,h:720,touch:false});await startMatch(page,{mode:'solo'});
   const pad=(button,pressed)=>page.evaluate(([b,p])=>window.__pad.button(0,b,p),[button,pressed]);await page.evaluate(()=>window.__pad.connect(0,true));await wait(200);
-  const tap=async button=>{await pad(button,true);await wait(100);await pad(button,false);await wait(100);};
+  const tap=async button=>{await pad(button,true);await wait(180);await pad(button,false);await wait(180);};
   await tap(9);await page.waitForFunction(()=>!document.querySelector('#pause-overlay').hidden);
   await tap(13);await tap(13);check(await page.evaluate(()=>document.activeElement?.id)==='pause-camera','pad down did not focus camera');
   await tap(0);check(await page.locator('#pause-camera-value').textContent()==='Táctica','pad cross did not click camera');await tap(1);await page.waitForFunction(()=>document.querySelector('#pause-overlay').hidden);

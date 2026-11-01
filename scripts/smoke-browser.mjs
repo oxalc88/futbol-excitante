@@ -91,6 +91,15 @@ try {
     errors.push(`game: clock did not advance within ${clockSeconds}s`);
   }
   match.clockEnd = (await page.locator('#clock').innerText()).trim();
+  match.resizeCase={};await page.keyboard.down('KeyW');await page.waitForTimeout(300);
+  match.resizeCase.before=await page.evaluate(()=>{const state=window.__fe,p=state?.players?.find(p=>p.id===state.selected?.[0]),frame=state?.frames?.filter(f=>f.slot===0).at(-1);return p&&{id:p.id,x:p.x,y:p.y,tick:state.tick,phase:state.phase,move:frame?.move};});
+  await page.setViewportSize({width:1200,height:720});await page.waitForFunction(tick=>window.__fe?.tick>tick,match.resizeCase.before?.tick,{timeout:2500});
+  match.resizeCase.after=await page.evaluate(()=>{const state=window.__fe,p=state?.players?.find(p=>p.id===state.selected?.[0]),frame=state?.frames?.filter(f=>f.slot===0).at(-1);return p&&{id:p.id,x:p.x,y:p.y,tick:state.tick,phase:state.phase,move:frame?.move};});
+  await page.keyboard.up('KeyW');await page.waitForFunction(tick=>{const state=window.__fe;return state?.tick>tick&&state.frames?.filter(f=>f.slot===0).at(-1)?.move?.y===0;},match.resizeCase.after?.tick,{timeout:2500});
+  match.resizeCase.released=await page.evaluate(()=>({tick:window.__fe.tick,move:window.__fe.frames?.filter(f=>f.slot===0).at(-1)?.move}));
+  const heldBefore=match.resizeCase.before,heldAfter=match.resizeCase.after;
+  if(!heldBefore||!heldAfter||heldBefore.id!==heldAfter.id||heldAfter.phase!=='playing'||heldAfter.tick<=heldBefore.tick||heldAfter.move?.y!==-1||Math.hypot(heldAfter.x-heldBefore.x,heldAfter.y-heldBefore.y)<.05)errors.push(`game: held movement key did not survive resize: ${JSON.stringify(match.resizeCase)}`);
+  if(match.resizeCase.released?.move?.y!==0)errors.push(`game: released movement key was not neutral: ${JSON.stringify(match.resizeCase)}`);
   match.phase = (await page.locator('#phase').innerText()).trim();
   match.pauseCase = { pausedClock: null, afterHelp: null, resumedClock: null, passed: false };
   await page.keyboard.press('KeyP');
