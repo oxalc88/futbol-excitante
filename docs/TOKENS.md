@@ -24,6 +24,8 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-31 | PR C audit follow-ups round 4 | Codex CLI | write | gpt-6-luna | default | 1 | 12,948,355 | n/a | 35,186 | user-measured; not cached 148,753 |
 | 2026-10-31 | PR C audit follow-ups verification 2 | Codex CLI | verify | gpt-6.1-sol | medium | 1 | 4,784,640 | 138,404 | 18,140 | user-measured |
 | 2026-10-31 | PR C audit follow-ups final review | Claude Code | review | claude-opus-5-5 | high | 1 | 2,457,296 | n/a | 22,219 | US$1.66 list; user-measured |
+| 2026-10-31 | PR C fix round 5 (#90 focus, Right-Right, tokens) | Codex CLI | write | gpt-6-luna | default | 1 | 5,029,655 | 113,527 | 10,400 | codex exec --json usage |
+| 2026-10-31 | PR C verification 3 | Codex CLI | verify | gpt-6.1-sol | medium | 1 | 110,377 | 26,985 | 1,088 | codex exec --json usage |
 | 2026-10-25 | #67 player figures (reference) | Codex CLI | write | gpt-6.1-sol | default | 1 | 439,379 | 20,238 | 5,008 | ~/.codex/sessions (wt-figures) |
 | 2026-10-25 | #67 player figures (reference) | Codex CLI | review | gpt-6-luna | default | 2 | 163,394 | 39,165 | 4,359 | ~/.codex/sessions (wt-figures) |
 | 2026-10-25 | #69 C5 fake gamepad smoke | Codex CLI | write | gpt-6.1-sol | default | 2 | 6,017,112 | 107,903 | 29,510 | ~/.codex/sessions (wt-c5) |
