@@ -122,6 +122,14 @@ For pi, read the session files in `~/.pi/agent/sessions/`.
 | 2026-10-30 | PR pendiente Audit PR B docs and process review 3 | Claude Code | review | claude-opus-5-5 | high | 1 | 332,180 | 18 | 4,111 | claude -p JSON modelUsage (prB/review4.json; cache read 295,358; cache create 32,693; cost $0.40) |
 | 2026-10-31 | PR pendiente Audit PR B remove pr-body workflow | Codex CLI | write | gpt-6-luna | default | 2 | 43,121 | n/a | n/a | codex exec total tokens used (33,155 + 9,966) |
 | 2026-10-31 | PR pendiente Audit PR B remove pr-body workflow review | Codex CLI | review | gpt-6.1-sol | medium | 1 | 14,952 | n/a | n/a | codex exec total tokens used; APPROVE |
+| 2026-11-03 | PR pendiente C10 close #53 Luna 1 implement | Codex CLI | write | gpt-6-luna | default | 1 | 4,240,101 | 84,253 | 19,528 | codex exec turn.completed usage |
+| 2026-11-03 | PR pendiente C10 close #53 Sol 1 review | Codex CLI | review | gpt-6.1-sol | medium | 1 | 225,546 | 44,788 | 1,942 | codex exec turn.completed usage |
+| 2026-11-03 | PR pendiente C10 close #53 Luna 2 fix loop 1 | Codex CLI | write | gpt-6-luna | default | 1 | 1,345,203 | 48,744 | 8,907 | codex exec turn.completed usage |
+| 2026-11-03 | PR pendiente C10 close #53 Sol 2 review | Codex CLI | review | gpt-6.1-sol | medium | 1 | 198,857 | 40,334 | 1,723 | codex exec turn.completed usage |
+| 2026-11-03 | PR pendiente C10 close #53 Luna 3 fix loop 2 | Codex CLI | write | gpt-6-luna | default | 1 | 1,530,239 | 71,037 | 6,146 | codex exec turn.completed usage |
+| 2026-11-03 | PR pendiente C10 close #53 Sol 3 review | Codex CLI | review | gpt-6.1-sol | medium | 1 | 180,659 | 38,390 | 1,725 | codex exec turn.completed usage |
+| 2026-11-03 | PR pendiente C10 close #53 Sol implement scanner fixes | Codex CLI | write | gpt-6.1-sol | medium | 1 | 686,223 | 32,580 | 3,275 | codex exec turn.completed usage |
+| 2026-11-03 | PR pendiente C10 close #53 Sol clean review; APPROVE | Codex CLI | review | gpt-6.1-sol | medium | 1 | 243,914 | 34,010 | 1,264 | codex exec turn.completed usage |
 
 Luna used 5 rounds, Sol used 2 verify loops, and Opus reviewed 3 times.
 
