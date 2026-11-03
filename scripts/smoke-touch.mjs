@@ -229,12 +229,13 @@ try {
   const forceSetPiece=async(page,kind,team)=>{for(let i=0;i<80;i++){const s=await page.evaluate(([k,t])=>{window.__feSmoke?.setPiece?.(k,t);const r=window.__feSmoke?.setPieceState?.().restart;return {phase:window.__fe?.phase,kind:r?.kind,team:r?.team};},[kind,team]);if(s.kind===kind&&s.team===team)return s;await page.waitForTimeout(250);}throw new Error(`Smoke hook setPiece(${kind},${team}) failed`);};
   // Visible own text throughout the page; only the match chrome is allowed.
   const visibleText = (page) => page.evaluate(() => {
-    const allowed = '.scoreboard, #player-name, #announcement, .sr-only, .wordmark, #menu-btn, footer #help-btn';
+    const allowed = '.scoreboard, #player-name, #announcement, .wordmark, #menu-btn, footer #help-btn';
     const own = (el) => [...el.childNodes].filter(n => n.nodeType === Node.TEXT_NODE).map(n => n.textContent).join(' ').replace(/\s+/g, ' ').trim();
     const found=[];
     for(const el of document.querySelectorAll('body *')) {
-      if(el.closest(allowed)) continue;
       const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
+      const sr=el.closest('.sr-only');
+      if(el.closest(allowed)||sr&&(()=>{const q=sr.getBoundingClientRect(),s=getComputedStyle(sr),rect=s.clip.match(/^rect\((.*)\)$/);if(q.width<=1&&q.height<=1&&s.overflow==='hidden')return true;if(rect&&(s.position==='absolute'||s.position==='fixed')){const v=rect[1].split(/[\s,]+/).filter(Boolean).map(n=>parseFloat(n));if(v.length===4&&Number.isFinite(v[0]+v[1]+v[2]+v[3])&&v[2]<=v[0]&&v[3]<=v[1])return true}const inset=s.clipPath.match(/^inset\(([^)]*)\)/);if(inset){const raw=inset[1].split(/[\s,]+/).filter(Boolean),v=raw.map(n=>n.endsWith('%')?parseFloat(n):NaN);if(v.length&&v.every(Number.isFinite)){const [t,rr=t,b=t,l=rr]=v;if(t+b>=100||rr+l>=100)return true}}return false})()) continue;
       if(el.hidden||r.width<=0||r.height<=0||cs.display==='none'||cs.visibility!=='visible') continue;
       const text=own(el); if(text)found.push({tag:el.tagName.toLowerCase(),id:el.id,text});
     }
@@ -536,6 +537,17 @@ try {
     const { context, page } = await newPage(spec.width, spec.height, spec.hasTouch);
     if (spec.hasTouch) await beginPlay(page);
     else { await startLocal(page); await waitPlaying(page); }
+    await page.evaluate(()=>{const e=document.createElement('span');e.className='sr-only';e.id='touch-sr-probe';e.textContent='AYUDA NO PERMITIDA';Object.assign(e.style,{position:'static',width:'auto',height:'auto',overflow:'visible',clip:'auto',clipPath:'none',whiteSpace:'normal'});document.body.append(e)});
+    const srProbe=await visibleText(page);
+    check(srProbe.found.some(x=>x.text.includes('AYUDA NO PERMITIDA')),`${spec.name}: visible .sr-only text escaped stage 8 scanner`);
+    await page.locator('#touch-sr-probe').evaluate(el=>el.remove());
+    await page.evaluate(()=>{const e=document.createElement('span');e.className='sr-only';e.id='touch-sr-clip-probe';e.textContent='AYUDA NO PERMITIDA';Object.assign(e.style,{position:'static',width:'auto',height:'auto',overflow:'visible',clip:'auto',clipPath:'inset(0)',whiteSpace:'normal'});document.body.append(e)});
+    const clipProbe=await visibleText(page);
+    check(clipProbe.found.some(x=>x.text.includes('AYUDA NO PERMITIDA')),`${spec.name}: .sr-only clip-path:inset(0) escaped stage 8 scanner`);
+    await page.locator('#touch-sr-clip-probe').evaluate(el=>Object.assign(el.style,{clip:'',clipPath:'none'}));
+    const staticClipProbe=await visibleText(page);
+    check(staticClipProbe.found.some(x=>x.text.includes('AYUDA NO PERMITIDA')),`${spec.name}: .sr-only static clip:rect escaped stage 8 scanner`);
+    await page.locator('#touch-sr-clip-probe').evaluate(el=>el.remove());
     const pad = await padState(page);
     if (spec.hasTouch) {
       check(pad.touchOn, `${spec.name}: body.touch-on is missing on the touch page`);

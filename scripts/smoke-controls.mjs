@@ -1,6 +1,7 @@
 import { startServer,stop,launch,newPage,check,shot,writeEvidence,errors,startMatch,finish } from './e2e-lib.mjs';
 const port=Number(process.env.CONTROLS_SMOKE_PORT??4325),results=[];
 let browser;
+const pressPad=async(page,button,expected)=>{await page.evaluate(b=>window.__pad.button(0,b,true),button);await page.waitForFunction(({focusId,selectedId,clickCount})=>(!focusId||document.activeElement?.id===focusId)&&(!selectedId||document.querySelector('#help-dialog [role=tab][aria-selected=true]')?.id===selectedId)&&(clickCount===undefined||window.__controlsTabClicks>=clickCount),expected,{timeout:5000});await page.evaluate(b=>window.__pad.button(0,b,false),button);await page.waitForTimeout(110);};
 const scrollWithPad=async(page,kind,button,axis,dir)=>{const d=page.locator('#help-dialog');await d.evaluate((el,direction)=>el.scrollTop=direction>0?0:el.scrollHeight,dir);const before=await d.evaluate(el=>el.scrollTop),deadline=Date.now()+8000;let n=0,reached=false;if(kind==='dpad')await page.evaluate(([b,p])=>window.__pad.button(0,b,p),[button,true]);else await page.evaluate(([a,v])=>{const axes=[0,0,0,0];axes[a]=v;window.__pad.axes(0,axes);},[axis,dir]);let state;while(Date.now()<deadline){await page.waitForTimeout(110);n++;state=await d.evaluate(el=>({top:el.scrollTop,max:el.scrollHeight-el.clientHeight}));reached=dir>0?state.top>=state.max-2:state.top<=2;if(reached)break;}if(kind==='dpad')await page.evaluate(b=>window.__pad.button(0,b,false),button);else await page.evaluate(()=>window.__pad.axes(0,[0,0,0,0]));await page.waitForTimeout(110);state=await d.evaluate(el=>({top:el.scrollTop,max:el.scrollHeight-el.clientHeight}));const rows=await page.locator('#help-dialog [role="tabpanel"]:not([hidden]) tbody tr').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect(),d=document.querySelector('#help-dialog').getBoundingClientRect();return{top:r.top,bottom:r.bottom,dialogTop:d.top,dialogBottom:d.bottom};}));const visible=dir>0?rows.at(-1)?.bottom<=rows.at(-1)?.dialogBottom:rows[0]?.top>=rows[0]?.dialogTop;check(reached&&state.max>0&&(dir>0?state.top>=state.max-2:state.top<=2)&&visible,`${kind} ${dir>0?'down':'up'} failed at measured boundary: ${JSON.stringify({before,state,rows:rows.slice(dir>0?-1:0,dir>0?undefined:1),n})}`);return{before,state,visible,holdMs:n*110};};
 try{
   await startServer(port);browser=await launch();
@@ -29,15 +30,20 @@ try{
         if(origin==='menu')await page.locator('#menu-help-btn').click();
         if(origin==='pause'){await startMatch(page,{mode:'solo',touch:false});await page.keyboard.press('KeyP');await page.locator('#pause-controls').click();}
         const initialTab=await page.locator('#help-dialog [role=tab][aria-selected=true]').getAttribute('id');
-        await page.evaluate(()=>window.__pad.button(0,0,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,0,false));await page.waitForTimeout(110);
+        check(await page.evaluate(()=>document.activeElement?.id)===initialTab,`${vp} ${origin}: focus does not match selected tab ${initialTab}`);
+        await page.evaluate(()=>{window.__controlsTabClicks=0;document.querySelectorAll('#help-dialog [role=tab]').forEach(tab=>tab.addEventListener('click',()=>window.__controlsTabClicks++));});
+        await pressPad(page,0,{clickCount:1});
         check(await page.locator('#help-dialog').evaluate(el=>el.open),`${vp} ${origin}: A closed Controls on open`);
         const initialIndex=['controls-tab-keyboard','controls-tab-pad','controls-tab-touch'].indexOf(initialTab);
-        await page.evaluate(()=>window.__pad.button(0,15,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,15,false));await page.waitForTimeout(110);
-        await page.evaluate(()=>window.__pad.button(0,15,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,15,false));await page.waitForTimeout(110);
-        await page.evaluate(()=>window.__pad.button(0,0,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,0,false));await page.waitForTimeout(110);
-        const twoRight=['keyboard','pad','touch'][(initialIndex+2)%3];check(await page.locator(`#controls-tab-${twoRight}`).getAttribute('aria-selected')==='true',`${vp} ${origin}: Right, Right, A did not activate ${twoRight}`);
-        for(const button of [14,14]){await page.evaluate(b=>window.__pad.button(0,b,true),button);await page.waitForTimeout(120);await page.evaluate(b=>window.__pad.button(0,b,false),button);await page.waitForTimeout(110);}
-        await page.evaluate(()=>window.__pad.button(0,0,true));await page.waitForTimeout(120);await page.evaluate(()=>window.__pad.button(0,0,false));await page.waitForTimeout(110);
+        const twoRight=['keyboard','pad','touch'][(initialIndex+2)%3];
+        await pressPad(page,15,{focusId:'controls-tab-'+['keyboard','pad','touch'][(initialIndex+1)%3]});
+        await pressPad(page,15,{focusId:'controls-tab-'+twoRight});
+        await pressPad(page,0,{selectedId:'controls-tab-'+twoRight,clickCount:2});
+        check(await page.locator(`#controls-tab-${twoRight}`).getAttribute('aria-selected')==='true',`${vp} ${origin}: Right, Right, A did not activate ${twoRight}`);
+        const backLeft=['keyboard','pad','touch'][(initialIndex+1)%3];
+        await pressPad(page,14,{focusId:'controls-tab-'+backLeft});
+        await pressPad(page,14,{focusId:initialTab});
+        await pressPad(page,0,{selectedId:initialTab,clickCount:3});
         check(await page.locator(`#controls-tab-${initialTab.replace('controls-tab-','')}`).getAttribute('aria-selected')==='true',`${vp} ${origin}: Left, Left, A did not return to ${initialTab}`);
         for(const tab of ['keyboard','pad','touch']){
           await page.locator(`#controls-tab-${tab}`).click();

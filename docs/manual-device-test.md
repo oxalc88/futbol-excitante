@@ -3,8 +3,8 @@
 Physical testing is pending. Run on a reachable build and fill in every action;
 attach screenshots/video links, including failures. Repeat the pad actions for
 both Xbox and PlayStation controllers, then with both connected together.
-This checklist follows the C5 request and `EVALUATION.md`; confirm it against
-issue #44 when available.
+This checklist records the C5 physical test in issue #44. C10 keeper control
+does not depend on these physical checks.
 
 Xbox names: A = ✕, B = ○, X = □, Y = △, LB = L1, RB = R1, LT = L2, RT = R2, Menu = OPTIONS. Xbox pads have no touchpad: change the camera with key C or the top-bar icon.
 
