@@ -1,5 +1,10 @@
 # Registro de avances
 
+## 2026-11-03 00:15 — PR pendiente ([#91](https://github.com/oxalc88/futbol-excitante/pull/91)) · Cierre del control manual del arquero · cierra [#53](https://github.com/oxalc88/futbol-excitante/issues/53)
+- **Qué cambia para el jugador:** en Controles, A activa la pestaña que tiene el foco. Nada cambia en el partido.
+- **Qué probar:** ejecuta `scripts/verify.sh` dos veces; `ui-text-e2e`, `controls-e2e` y `keeper-e2e` pasan. Revisa la evidencia del arquero en `artifacts/local/smoke/keeper.json`.
+- **Qué se rompe o cambia:** la prueba con mandos y teléfonos reales sale de C10 y queda solo en [#44](https://github.com/oxalc88/futbol-excitante/issues/44). El texto de solo lector de pantalla ya no cuenta como texto visible.
+
 ## 2026-10-31 08:37 — PR pendiente ([#90](https://github.com/oxalc88/futbol-excitante/pull/90)) · Ajustes de pantallas y controles · sin issue
 - **Qué cambia para el jugador:**
   - Las acciones del final quedan alineadas y con el mismo ancho en escritorio y móvil.
