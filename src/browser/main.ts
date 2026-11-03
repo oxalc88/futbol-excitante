@@ -438,8 +438,9 @@ function pollMenuPad(){
       if(scrollDir&&(upEdge||downEdge||now>=(controlsRepeatAt[i]??0))){activeDialog.scrollTop+=scrollDir*48;controlsRepeatAt[i]=now+(upEdge||downEdge?300:85);}
       if(!verticalHeld)controlsRepeatAt[i]=0;
       const tabs=[...activeDialog.querySelectorAll<HTMLButtonElement>('[id^="controls-tab-"]')];
-      if(leftEdge||rightEdge){const focused=tabs.indexOf(document.activeElement as HTMLButtonElement),selected=tabs.findIndex(tab=>tab.getAttribute('aria-selected')==='true');const current=focused>=0?focused:Math.max(0,selected);controlsTabIndex=(current+(rightEdge?1:-1)+tabs.length)%tabs.length;tabs[controlsTabIndex]?.focus({preventScroll:true});}
-      if(aEdge)tabs[controlsTabIndex]?.click();
+      const focused=tabs.indexOf(document.activeElement as HTMLButtonElement),selected=tabs.findIndex(tab=>tab.getAttribute('aria-selected')==='true');
+      if(leftEdge||rightEdge){const current=focused>=0?focused:Math.max(0,selected);controlsTabIndex=(current+(rightEdge?1:-1)+tabs.length)%tabs.length;tabs[controlsTabIndex]?.focus({preventScroll:true});}
+      if(aEdge){const current=tabs.indexOf(document.activeElement as HTMLButtonElement),target=current>=0?current:Math.max(0,selected);controlsTabIndex=target;tabs[target]?.click();}
       if(xEdge&&activeDialog.contains(document.activeElement))(document.activeElement as HTMLElement).click();
       if(oEdge)activeDialog.querySelector<HTMLElement>('[data-close]')?.click();
       continue;
