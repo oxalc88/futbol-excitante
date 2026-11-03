@@ -235,7 +235,7 @@ try {
     for(const el of document.querySelectorAll('body *')) {
       const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
       const sr=el.closest('.sr-only');
-      if(el.closest(allowed)||sr&&(()=>{const q=sr.getBoundingClientRect(),s=getComputedStyle(sr),rect=s.clip.match(/^rect\((.*)\)$/);if(q.width<=1&&q.height<=1&&s.overflow==='hidden')return true;if(rect){const v=rect[1].split(/[\s,]+/).filter(Boolean).map(n=>parseFloat(n));if(v.length===4&&Number.isFinite(v[0]+v[1]+v[2]+v[3])&&v[2]<=v[0]&&v[3]<=v[1])return true}const inset=s.clipPath.match(/^inset\(([^)]*)\)/);if(inset){const raw=inset[1].split(/[\s,]+/).filter(Boolean),v=raw.map(n=>n.endsWith('%')?parseFloat(n):NaN);if(v.length&&v.every(Number.isFinite)){const [t,rr=t,b=t,l=rr]=v;if(t+b>=100||rr+l>=100)return true}}return false})()) continue;
+      if(el.closest(allowed)||sr&&(()=>{const q=sr.getBoundingClientRect(),s=getComputedStyle(sr),rect=s.clip.match(/^rect\((.*)\)$/);if(q.width<=1&&q.height<=1&&s.overflow==='hidden')return true;if(rect&&(s.position==='absolute'||s.position==='fixed')){const v=rect[1].split(/[\s,]+/).filter(Boolean).map(n=>parseFloat(n));if(v.length===4&&Number.isFinite(v[0]+v[1]+v[2]+v[3])&&v[2]<=v[0]&&v[3]<=v[1])return true}const inset=s.clipPath.match(/^inset\(([^)]*)\)/);if(inset){const raw=inset[1].split(/[\s,]+/).filter(Boolean),v=raw.map(n=>n.endsWith('%')?parseFloat(n):NaN);if(v.length&&v.every(Number.isFinite)){const [t,rr=t,b=t,l=rr]=v;if(t+b>=100||rr+l>=100)return true}}return false})()) continue;
       if(el.hidden||r.width<=0||r.height<=0||cs.display==='none'||cs.visibility!=='visible') continue;
       const text=own(el); if(text)found.push({tag:el.tagName.toLowerCase(),id:el.id,text});
     }
@@ -544,6 +544,9 @@ try {
     await page.evaluate(()=>{const e=document.createElement('span');e.className='sr-only';e.id='touch-sr-clip-probe';e.textContent='AYUDA NO PERMITIDA';Object.assign(e.style,{position:'static',width:'auto',height:'auto',overflow:'visible',clip:'auto',clipPath:'inset(0)',whiteSpace:'normal'});document.body.append(e)});
     const clipProbe=await visibleText(page);
     check(clipProbe.found.some(x=>x.text.includes('AYUDA NO PERMITIDA')),`${spec.name}: .sr-only clip-path:inset(0) escaped stage 8 scanner`);
+    await page.locator('#touch-sr-clip-probe').evaluate(el=>Object.assign(el.style,{clip:'',clipPath:'none'}));
+    const staticClipProbe=await visibleText(page);
+    check(staticClipProbe.found.some(x=>x.text.includes('AYUDA NO PERMITIDA')),`${spec.name}: .sr-only static clip:rect escaped stage 8 scanner`);
     await page.locator('#touch-sr-clip-probe').evaluate(el=>el.remove());
     const pad = await padState(page);
     if (spec.hasTouch) {
