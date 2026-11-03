@@ -5,7 +5,7 @@
 - **Qué probar:** ejecuta `scripts/verify.sh` dos veces; `ui-text-e2e`, `controls-e2e` y `keeper-e2e` pasan. Revisa la evidencia del arquero en `artifacts/local/smoke/keeper.json`.
 - **Qué se rompe o cambia:** la prueba con mandos y teléfonos reales sale de C10 y queda solo en [#44](https://github.com/oxalc88/futbol-excitante/issues/44). El texto de solo lector de pantalla ya no cuenta como texto visible.
 
-## 2026-10-31 08:37 — PR pendiente ([#90](https://github.com/oxalc88/futbol-excitante/pull/90)) · Ajustes de pantallas y controles · sin issue
+## 2026-10-31 08:37 — [#90](https://github.com/oxalc88/futbol-excitante/pull/90) · Ajustes de pantallas y controles · sin issue
 - **Qué cambia para el jugador:**
   - Las acciones del final quedan alineadas y con el mismo ancho en escritorio y móvil.
   - En Controles, la cruceta y el stick recorren cada pestaña hasta sus extremos; A cambia de pestaña y B cierra. Al abrir, el foco queda en la pestaña activa; dos toques a la derecha o a la izquierda avanzan dos pestañas antes de A.

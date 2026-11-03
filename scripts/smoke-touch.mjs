@@ -229,12 +229,13 @@ try {
   const forceSetPiece=async(page,kind,team)=>{for(let i=0;i<80;i++){const s=await page.evaluate(([k,t])=>{window.__feSmoke?.setPiece?.(k,t);const r=window.__feSmoke?.setPieceState?.().restart;return {phase:window.__fe?.phase,kind:r?.kind,team:r?.team};},[kind,team]);if(s.kind===kind&&s.team===team)return s;await page.waitForTimeout(250);}throw new Error(`Smoke hook setPiece(${kind},${team}) failed`);};
   // Visible own text throughout the page; only the match chrome is allowed.
   const visibleText = (page) => page.evaluate(() => {
-    const allowed = '.scoreboard, #player-name, #announcement, .sr-only, .wordmark, #menu-btn, footer #help-btn';
+    const allowed = '.scoreboard, #player-name, #announcement, .wordmark, #menu-btn, footer #help-btn';
     const own = (el) => [...el.childNodes].filter(n => n.nodeType === Node.TEXT_NODE).map(n => n.textContent).join(' ').replace(/\s+/g, ' ').trim();
     const found=[];
     for(const el of document.querySelectorAll('body *')) {
-      if(el.closest(allowed)) continue;
       const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
+      const sr=el.closest('.sr-only');
+      if(el.closest(allowed)||sr&&(()=>{const q=sr.getBoundingClientRect(),s=getComputedStyle(sr);return /rect\(/.test(s.clip)&&s.position==='absolute'||/inset\(/.test(s.clipPath)&&s.clipPath!=='none'||q.width<=1&&q.height<=1&&s.overflow==='hidden'})()) continue;
       if(el.hidden||r.width<=0||r.height<=0||cs.display==='none'||cs.visibility!=='visible') continue;
       const text=own(el); if(text)found.push({tag:el.tagName.toLowerCase(),id:el.id,text});
     }
@@ -536,6 +537,10 @@ try {
     const { context, page } = await newPage(spec.width, spec.height, spec.hasTouch);
     if (spec.hasTouch) await beginPlay(page);
     else { await startLocal(page); await waitPlaying(page); }
+    await page.evaluate(()=>{const e=document.createElement('span');e.className='sr-only';e.id='touch-sr-probe';e.textContent='AYUDA NO PERMITIDA';Object.assign(e.style,{position:'static',width:'auto',height:'auto',overflow:'visible',clip:'auto',clipPath:'none',whiteSpace:'normal'});document.body.append(e)});
+    const srProbe=await visibleText(page);
+    check(srProbe.found.some(x=>x.text.includes('AYUDA NO PERMITIDA')),`${spec.name}: visible .sr-only text escaped stage 8 scanner`);
+    await page.locator('#touch-sr-probe').evaluate(el=>el.remove());
     const pad = await padState(page);
     if (spec.hasTouch) {
       check(pad.touchOn, `${spec.name}: body.touch-on is missing on the touch page`);
